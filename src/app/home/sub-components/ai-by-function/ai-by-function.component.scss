@@ -1,0 +1,106 @@
+*{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.chart{
+    flex-direction: column;
+    position: relative;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 1% 5px;
+    background: white;
+    height: 100%;
+    border-radius: 15px;
+}
+.chartTitle{
+    width: 100%;
+    justify-content: flex-start;
+    border-bottom: 1px solid #E1E7EC;
+}
+.chartTitle h3{
+    color: #222529;
+    font-size: 16px;
+    font-weight: 500; 
+    margin: 5px;
+}
+.chart-bars{
+    flex-direction: row;
+    justify-content: center;
+    height: 80%;
+    gap: 10px;
+    width: 95%;
+}
+.chart-1bar{
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+    width: 8%;
+}
+.bar{
+    height: 50%;
+    width: 88%;
+    background: black;
+    border-radius: 3px 3px 0 0;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+.barTitle{
+    color: #333333; 
+    font-size: 9px;
+    font-weight: 500;
+    line-height: 12px;
+    word-wrap: break-word;
+    height: 40px;
+    text-align: center;
+}
+#ActuarialFunction{
+    background: #2097F6;
+}
+#ComplianceOversightFunction{
+    background: #FF5A43;
+}
+#ExecutiveGeovernceFunction{
+    background: #65BF73;
+}
+#FinanceFunction{
+    background: #884DFF;
+}
+#InternalAuditFunction{
+    background: #83C4F8;
+}
+#MIROFunction{
+    background: #5452F6;
+}
+#Non-ExecutiveGovernanceFunction{
+    background: #FFA946;
+}
+#RiskManager{
+    background: #FF7866;
+}
+#SeniorExecutiveFunction{
+    background: #5452F6;
+}
+#SeniorManagementFunction{
+    background: #64D7B4;
+}
+.numbers{
+    position: absolute;
+    left: 5px;
+    bottom: 0;
+    height: 230px;
+}
+.numbers img{
+    height: 100%;
+    width: auto;
+}
+.countOfBar{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 10px;
+    background-color:  rgba(255, 255, 255, 0.15);
+    color: white;
+    margin: 5px 0;
+}

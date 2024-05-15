@@ -1,0 +1,30 @@
+
+.ai-byFunction{
+    grid-area: ai;
+    height: 300px;
+    width: 54vw;
+}
+.reoprtsSubmittions{
+    grid-area: rs;
+    height: 300px;
+    width: 42vw;
+}
+.taskList{
+    grid-area: tl;
+    height: 350px;
+}
+.firms-bySelector{
+    grid-area: fs;
+    height:350px;
+}
+.stastics-grid{
+    display: grid;
+    grid-template-areas:
+    'ai ai ai rs rs rs rs rs'
+    'tl tl tl tl  fs fs fs fs';
+    gap: 1rem;
+    padding: 0.5rem;
+}
+app-ai-by-function{
+    width: 100%;
+}

@@ -1,0 +1,40 @@
+
+.table{
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    justify-content: flex-start;
+    align-items: flex-end;
+    padding: 1% 5px;
+    background: white;
+    height: 100%;
+    border-radius: 15px;
+}
+.tableTitle{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-start;
+}
+.tableTitle h3{
+    color: #222529;
+    font-size: 16px;
+    font-weight: 500; 
+    margin: 5px;
+}
+.reportsTable{
+    width: 100%;
+    text-align: left;
+}
+.reportsTable th{
+    border-bottom: 1px solid #E1E7EC;
+    color: rgba(18, 18, 18, 0.39);
+    font-size: 14px;
+    font-weight: 500;
+}
+.reportsTable tr{
+    height: 3rem;
+}
+.numbers{
+    color: #909090; 
+}
