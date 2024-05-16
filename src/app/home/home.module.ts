@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChartModule } from 'primeng/chart';
 import { HomeRoutingModule } from './home-routing.module';
 import { MainPageComponent } from './main-page/main-page.component';
 import { StatisticsHeaderComponent } from './sub-components/statistics-header/statistics-header.component';
@@ -23,8 +22,7 @@ import { FirmListComponent } from './sub-components/firm-list/firm-list.componen
   ],
   imports: [
     CommonModule,
-    HomeRoutingModule,
-    ChartModule
+    HomeRoutingModule
   ]
 })
 export class HomeModule { }
