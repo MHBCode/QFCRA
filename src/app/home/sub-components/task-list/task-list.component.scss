@@ -63,3 +63,6 @@ td {
 .taskDesc{
     width: 40px;
 }
+tr:nth-child(even) {
+    background-color: #F2F2F2;
+  }

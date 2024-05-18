@@ -97,3 +97,19 @@ header{
     font-weight: 400;
     line-height: 28.46px;
 }
+.nav{
+    height: 40px;
+    background: #A51E36;
+}
+.navigation-ul{
+    justify-content: space-around;
+    gap: 2rem;
+}
+.navigation-ul li a{
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+.navigation-ul li a:hover{
+    color: rgba(255, 255, 255, 0.538);
+}

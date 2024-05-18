@@ -69,21 +69,17 @@ export class FirmsBySelectorComponent implements OnInit {
   //   } 
   // }
   setBars(): void {
-    const barElement = this.el.nativeElement.querySelector('#ActuarialFunction');
-    const barElement1 = this.el.nativeElement.querySelector('#ComplianceOversightFunction');
-    const barElement2 = this.el.nativeElement.querySelector('#ExecutiveGeovernceFunction');
-    const barElement3 = this.el.nativeElement.querySelector('#FinanceFunction'); 
-    const barElement4 = this.el.nativeElement.querySelector('#InternalAuditFunction');
-    const barElement5 = this.el.nativeElement.querySelector('#MIROFunction');
-    const barElement6 = this.el.nativeElement.querySelector('#Non-ExecutiveGovernanceFunction');
-    const barElement7 = this.el.nativeElement.querySelector('#RiskManager');
-    const barElement8 = this.el.nativeElement.querySelector('#SeniorExecutiveFunction');
-    const barElement9 = this.el.nativeElement.querySelector('#SeniorManagementFunction');
-  
+    const barElement = this.el.nativeElement.querySelector('#bank');
+    const barElement1 = this.el.nativeElement.querySelector('#BankIslamic');
+    const barElement2 = this.el.nativeElement.querySelector('#InsuranceIntermediary');
+    const barElement3 = this.el.nativeElement.querySelector('#Insurer'); 
+    const barElement4 = this.el.nativeElement.querySelector('#InsurerIslamic');
+    const barElement5 = this.el.nativeElement.querySelector('#InvestmentManager');
+    const barElement6 = this.el.nativeElement.querySelector('#RepOffice');
     const transitionStyle = 'height 0.7s ease-in-out';
   
-    const elements = [barElement, barElement1, barElement2, barElement3, barElement4, barElement5, barElement6, barElement7, barElement8, barElement9];
-    const heights = ['10%', '40%', '70%', '30%', '50%', '70%', '70%', '40%', '20%', '70%'];
+    const elements = [barElement, barElement1, barElement2, barElement3, barElement4, barElement5, barElement6];
+    const heights = ['10%', '40%', '70%', '30%', '50%', '90%', '60%'];
   
     elements.forEach((element, index) => {
       if (element) {

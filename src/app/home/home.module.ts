@@ -8,6 +8,8 @@ import { ReportsSubmissionsComponent } from './sub-components/reports-submission
 import { FirmsBySelectorComponent } from './sub-components/firms-by-selector/firms-by-selector.component';
 import { TaskListComponent } from './sub-components/task-list/task-list.component';
 import { FirmListComponent } from './sub-components/firm-list/firm-list.component';
+import { FirmsPageComponent } from './sub-pages/firms-page/firms-page.component';
+import { ViewFirmPageComponent } from './sub-pages/view-firm-page/view-firm-page.component';
 
 
 @NgModule({
@@ -18,7 +20,9 @@ import { FirmListComponent } from './sub-components/firm-list/firm-list.componen
     ReportsSubmissionsComponent,
     FirmsBySelectorComponent,
     TaskListComponent,
-    FirmListComponent
+    FirmListComponent,
+    FirmsPageComponent,
+    ViewFirmPageComponent
   ],
   imports: [
     CommonModule,
