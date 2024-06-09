@@ -18,6 +18,7 @@ header{
     align-items: center;
     margin: 0.5rem;
     gap: 0.5rem;
+    cursor: pointer;
 }
 .logo img{
     width: 200px;
@@ -46,9 +47,8 @@ header{
     gap: 0.5rem;
 }
 .profile-details{
-    width: 300px;
     height: 80px;
-    background: #A51E36;
+    background: transparent;
     border-radius: 20px;
     display: flex;
     align-items: center;
@@ -85,7 +85,7 @@ header{
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
-    color: white;
+    color: black;
 }
 .pd-details-name{
     font-size: 13.47px;
@@ -98,8 +98,11 @@ header{
     line-height: 28.46px;
 }
 .nav{
-    height: 40px;
+    height: 60px;
     background: #A51E36;
+    position: relative;
+    width: 50%;
+    border-radius: 40px;
 }
 .navigation-ul{
     justify-content: space-around;
@@ -110,6 +113,57 @@ header{
     text-decoration: none;
     cursor: pointer;
 }
+.navigation-ul li{
+    position: relative;
+}
 .navigation-ul li a:hover{
     color: rgba(255, 255, 255, 0.538);
+}
+.menuOfTop{
+    position: absolute;
+    top: 1.5rem;
+    left: -76px;
+    background: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 4px 14.199999809265137px rgba(0, 0, 0, 0.18);
+    border-radius: 15px;
+    z-index: 999;
+}
+.menuOfTop ul{
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 200px;
+}
+.menuOfTop ul li{
+    color: #1C1C1C;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 19.21px;
+    word-wrap: break-word;
+    cursor: pointer;
+}
+.menuOfTop ul li:hover{
+    color: #A51E36;
+    font-weight: 600;
+}
+.my-invention{
+    width: 95vw;
+    height: 90vh;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    background: transparent;
+    z-index: 10;
+}
+@media  (max-width: 1080px){
+    .search-bar{
+        display: none;
+    }
 }

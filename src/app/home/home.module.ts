@@ -10,6 +10,8 @@ import { TaskListComponent } from './sub-components/task-list/task-list.componen
 import { FirmListComponent } from './sub-components/firm-list/firm-list.component';
 import { FirmsPageComponent } from './sub-pages/firms-page/firms-page.component';
 import { ViewFirmPageComponent } from './sub-pages/view-firm-page/view-firm-page.component';
+import { EditFirmComponent } from './sub-pages/edit-firm/edit-firm.component';
+import { NewFirmComponent } from './sub-pages/new-firm/new-firm.component';
 
 
 @NgModule({
@@ -22,7 +24,9 @@ import { ViewFirmPageComponent } from './sub-pages/view-firm-page/view-firm-page
     TaskListComponent,
     FirmListComponent,
     FirmsPageComponent,
-    ViewFirmPageComponent
+    ViewFirmPageComponent,
+    EditFirmComponent,
+    NewFirmComponent
   ],
   imports: [
     CommonModule,

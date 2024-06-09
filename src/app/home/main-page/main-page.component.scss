@@ -1,32 +1,122 @@
 
 .ai-byFunction{
     grid-area: ai;
-    height: 300px;
-    margin-bottom: 1rem;
+    min-height: 350px;
+    max-height: 350px;
+    width: 34.5%;
 }
 .reoprtsSubmittions{
     grid-area: rs;
-    height: 300px;
+    min-height: 350px;
+    max-height: 350px;
+    width: 31%;
+}
+.firms-bySelector{
+    grid-area: fs;
+    min-height: 350px;
+    max-height: 350px;
+    width: 32.4%;
 }
 .taskList{
     grid-area: tl;
     height: 350px;
+    width: 39%;
+    margin-top: 0.4rem;
 }
-.firms-bySelector{
-    grid-area: fs;
-    height:350px;
+
+.firmsList{
+    grid-area: fl;
+    height: 350px;
+    width: 60%;
+    margin-top: 0.4rem;
 }
 .stastics-grid{
-    display: grid;
-
-    grid-template-areas:
-    'ai ai rs rs rs rs'
-    'tl tl tl tl fs fs';
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    gap: 1.2rem;
     padding: 0.5rem;
-    margin-bottom: 1rem;
-    max-width: 100vw;
+    max-width: 99vw;
+    flex-wrap: wrap;
 }
-app-ai-by-function{
+.stastics-grid-upper{
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
 }
+.stastics-grid-lower{
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+app-ai-by-function{
+    display: flex;
+    height: 350px;
+}
+app-reports-submissions {
+    display: flex;
+    height: 350px;
+}
+app-firms-by-selector {
+    display: flex;
+    height: 350px;
+}
+app-firm-list {
+    display: flex;
+    height: 350px;
+}
+app-task-list{
+    display: flex;
+    height: 350px;
+}
+// .stastics-grid div{
+//     width: 33%;
+// }
+@media  (max-width: 1450px) {
+    // .stastics-grid{
+    //     display: grid;
+    
+    //     grid-template-areas:
+    //     'ai ai fs fs' 
+    //     'rs rs tl tl'
+    //     'fl fl fl fl';
+
+    //     gap: 2rem;
+    // }
+    .ai-byFunction{
+        width: 100%;
+        margin-bottom: 40px;
+    }
+    .firms-bySelector{
+        width: 39%;
+    }
+    .firmsList{
+        width: 100%;
+    }
+    .reoprtsSubmittions{
+        width: 60%;
+    }
+    .taskList{
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}
+// @media  (max-width: 1280px) {
+//     .stastics-grid{
+//         display: grid;
+    
+//         grid-template-areas:
+//         'ai ai fs fs' 
+//         'rs rs tl tl'
+//         'fl fl fl fl';
+
+//         gap: 1rem;
+//     }
+// }

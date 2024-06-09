@@ -1,9 +1,76 @@
 <header>
-<div class="logo">
+<div class="logo" (click)="goHome()" >
     <img src="../../../assets/images/logo.jpg">
-    <div class="search-bar">
-        <input type="text" placeholder="search">
-     </div>
+</div>
+<div class="nav">
+    <div class="my-invention" (click)="openMenu(0)" *ngIf="firms == true || admin == true || individuals == true || reports == true"></div>
+    <ul class="navigation-ul">
+        <li>
+            <a (click)="goHome()">
+                Home
+            </a>
+        </li>
+        <li>
+            <a (click)="openMenu(1)">
+                Firms 
+            </a>
+            <div class="menuOfTop" *ngIf="firms == true">
+                <ul>
+                    <li (click)="goto(1)">Open</li>
+                    <li (click)="goto(0)">New</li>
+                    <li>CO/Supervisors</li>
+                    <li>Notices and Responses</li>
+                    <li>Enforcement & Disciplinary Actions</li>
+                </ul>
+            </div>
+        </li>
+        <li>
+            <a (click)="openMenu(2)" >
+                Individuals
+            </a>
+            <div class="menuOfTop" *ngIf="individuals == true">
+                <ul>
+                    <li>Open</li>
+                    <li>Change registration Status</li>
+                    <li>Pending Ai Application</li>
+                </ul>
+            </div>
+        </li>
+        <li>
+            <a (click)="openMenu(3)">
+                Reports 
+            </a>
+            <div class="menuOfTop" *ngIf="reports == true">
+                <ul>
+                    <li>Firms Report</li>
+                    <li>Contacts Report</li>
+                    <li>AI Application Reports</li>
+                    <li>Approved individuals Report </li>
+                    <li>Returns Submission Reports</li>
+                    <li>Notices and Responses Reports</li>
+                    <li>Waiver Reports </li>
+                    <li>RMP Reports</li>
+                    <li>Breach Reports</li>
+                    <li>AML Reports</li>
+                    <li>Document Reports</li>
+                    <li>Statistics Reports</li>
+                    <li>System Reports</li>
+                </ul>
+            </div>
+        </li>
+        <li>
+            <a (click)="openMenu(4)">
+                Admin
+            </a>
+            <div class="menuOfTop" *ngIf="admin == true">
+                <ul>
+                    <li>User Access</li>
+                    <li>Re-assign Tasks</li>
+                    <li>Credit Ratings Upload</li>
+                </ul>
+            </div>
+        </li>
+    </ul>
 </div>
 <div class="profile-access">
     <div class="notifications">
@@ -24,32 +91,3 @@
     </div>
 </div>
 </header>
-<div class="nav">
-    <ul class="navigation-ul">
-        <li>
-            <a>
-                Home
-            </a>
-        </li>
-        <li>
-            <a>
-                Firms 
-            </a>
-        </li>
-        <li>
-            <a>
-                Individuals
-            </a>
-        </li>
-        <li>
-            <a>
-                Reports 
-            </a>
-        </li>
-        <li>
-            <a>
-                Admin
-            </a>
-        </li>
-    </ul>
-</div>

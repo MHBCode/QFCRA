@@ -1,17 +1,23 @@
 
     <app-statistics-header></app-statistics-header>
     <div class="stastics-grid">
-        <div class="ai-byFunction">
-            <app-ai-by-function></app-ai-by-function>
+        <div class="stastics-grid-upper">
+            <div class="ai-byFunction">
+                <app-ai-by-function></app-ai-by-function>
+            </div>
+            <div class="reoprtsSubmittions">
+                <app-reports-submissions></app-reports-submissions>
+            </div>
+            <div class="firms-bySelector">
+                <app-firms-by-selector></app-firms-by-selector>
+            </div>
         </div>
-        <div class="reoprtsSubmittions">
-            <app-reports-submissions></app-reports-submissions>
-        </div>
-        <div class="taskList">
-            <app-task-list></app-task-list>
-        </div>
-        <div class="firms-bySelector">
-            <app-firms-by-selector></app-firms-by-selector>
+        <div class="stastics-grid-lower">
+            <div class="taskList">
+                <app-task-list></app-task-list>
+            </div>
+            <div class="firmsList">
+                <app-firm-list></app-firm-list>
+            </div>
         </div>
     </div>
-    <app-firm-list></app-firm-list>

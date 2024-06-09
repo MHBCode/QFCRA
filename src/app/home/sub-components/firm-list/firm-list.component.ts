@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-firm-list',
@@ -6,5 +7,13 @@ import { Component } from '@angular/core';
   styleUrls: ['./firm-list.component.scss']
 })
 export class FirmListComponent {
+
+  constructor(private router: Router){};
+  
+
+  viewFirm() {
+    this.router.navigate(['home/view-firm']);
+  }
+
 
 }

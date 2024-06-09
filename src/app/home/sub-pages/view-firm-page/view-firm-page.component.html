@@ -1,21 +1,27 @@
 <div class="brid-crump">
     <div class="text">
-        Here will add a brid crump
+        <span> Home ></span> Firm Details
     </div>
     <div class="edit-btn">
-        <button>
+        <button (click)=" editFirm()" >
             <i class="bi bi-pen"></i>
             Edit
         </button>
     </div>
 </div>
 <div class="page">
-    <div class="menu">
+    <div class="menu" [ngStyle]="{ 'width': menuWidth }">
+        <!-- <button (click)="toggleFulMenu()" class="menu-item menu-item-btn-ce"> -->
+            <i (click)="toggleFulMenu()" *ngIf="menuWidth.match(width1)"  class="menu-icons bi bi-arrow-left-square-fill"></i>
+            <!-- <p *ngIf="menuWidth.match('20%')">Close Menu</p> -->
+            <i (click)="toggleFulMenu()" *ngIf="menuWidth.match(width2)"  class="menu-icons bi bi-arrow-right-square-fill"></i>
+        <!-- </button> -->
         <div class="menu-item">
-            <h3 id="1-item" (click)="toggleMenu(1)" [ngClass]="{'active': menuId === 1}">
+            <h3 *ngIf="menuWidth.match(width1)"  id="1-item" (click)="toggleMenu(1)" [ngClass]="{'active': menuId === 1}">
                 FIRM Details
             </h3>
-            <div class="sub-menu" *ngIf="menuId === 1">
+            <i *ngIf="menuWidth.match(width2)" (click)="toggleMenu(1)" class="menu-icons bi bi-info-square"></i>
+            <div class="sub-menu" *ngIf="menuId === 1 && menuWidth.match(width1)">
                 <a class="menu-sub-item">
                     Core Details 
                 </a>
@@ -34,10 +40,11 @@
             </div>
         </div>
         <div class="menu-item">
-            <h3 id="2-item" (click)="toggleMenu(2)" [ngClass]="{'active': menuId === 2}">
+            <h3 *ngIf="menuWidth.match(width1)"  id="2-item" (click)="toggleMenu(2)" [ngClass]="{'active': menuId === 2}">
                 Individuals
             </h3>
-            <div class="sub-menu" *ngIf="menuId === 2">
+            <i *ngIf="menuWidth.match(width2)" (click)="toggleMenu(2)"  class="menu-icons bi bi-people"></i>
+            <div class="sub-menu" *ngIf="menuId === 2 && menuWidth.match(width1)">
                 <a class="menu-sub-item">
                     Core Details 
                 </a>
@@ -47,10 +54,11 @@
             </div>
         </div>
         <div class="menu-item">
-            <h3 id="2-item" (click)="toggleMenu(3)" [ngClass]="{'active': menuId === 3}">
+            <h3 *ngIf="menuWidth.match(width1)"  id="2-item" (click)="toggleMenu(3)" [ngClass]="{'active': menuId === 3}">
                 Supervision
             </h3>
-            <div class="sub-menu" *ngIf="menuId === 3">
+            <i *ngIf="menuWidth.match(width2)" (click)="toggleMenu(3)" class="menu-icons bi bi-kanban"></i>
+            <div class="sub-menu" *ngIf="menuId === 3 && menuWidth.match(width1)">
                 <a class="menu-sub-item">
                     Core Details 
                 </a>
@@ -60,90 +68,160 @@
             </div>
         </div>
     </div>
-    <div class="container">
-        <div class="section">
-            <div class="secTitle">
-                <h2>Firms Details</h2>
+    <section class="edit-firm-section" [ngStyle]="{ 'width': dataWidth }">
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                    FIRM Details > <span>Abu Dhabi Islamic Bank - Qatar Financial Center Branch</span>
+                </h2>
             </div>
-            <div class="secData">
-                <p>Firm Name: Abu Dhabi Islamic Bank - Qatar Financial Center Branch</p>
-                <p>QFC Number: 00143</p>
-                <p>Code: ADIB</p>
-                <p>Legal Status: Branch</p>
-                <p>Prudential Category: PIIB 5</p>
-                <p>Financial Year End: 31 December</p>                
+            <div class="edit-firms-inputs">
+               <div class="input-field">
+                    <label for="QFCNumber">
+                        QFC Number
+                    </label>
+                    <input disabled name="QFCNumber" id="QFCNumber" type="text" value="00143">
+                </div>
+                <div class="input-field">
+                    <label for="code">
+                        Code
+                    </label>
+                    <input disabled name="code" id="code" type="text" value="ADIB">
+                </div>
+                <div class="input-field">
+                    <label for="lagalStatus">
+                        Legal Status
+                    </label>
+                    <input disabled name="lagalStatus" id="lagalStatus" type="text" value="Branch">
+                </div>
+                <div class="input-field">
+                    <label for="PrudentialCategory">
+                        Prudential Category
+                    </label>
+                    <input disabled name="PrudentialCategory" id="PrudentialCategory" type="text" value="PIIB 5">
+                </div>
+                <div class="input-field">
+                    <label for="financialYearEnd">
+                        Financial Year End
+                    </label>
+                    <input disabled name="financialYearEnd" id="financialYearEnd" type="text" value="31 Decembe">
+                </div>
             </div>
-        </div>
     
-        <div class="section">
-            <div class="secTitle">
-                <h2>Application Details</h2>
+        </div>
+        <!---->
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                    Application Details
+                </h2>
+                <div class="edit-btn">
+                </div>
             </div>
-            <div class="secData">
-                <p>Date Of Application: 27/Jan/2011</p>
-                <p>Firms Application Type: Authorithasion</p>
-                <p>QFC License Status: Licensed</p>
-                <p>Date Licensed: 31/JUL/2011</p>
-                <p>Authorization: Authorized</p>
-                <p>Date Authorized: 31/JUL/2011</p>
+            <div class="edit-firms-inputs">
+                <div class="input-field">
+                    <label for="qfcLicenseStatus">
+                        QFC License Status
+                    </label>
+                    <input disabled type="text" name="qfcLicenseStatus" id="qfcLicenseStatus" value="Licensed">
+                </div>
+                <div class="input-field">
+                    <label for="dateOfApplication">
+                        Date of Application
+                    </label>
+                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="27/Jan/2011">
+                </div>
+                <div class="input-field">
+                    <label for="firmApplicationType">
+                        Firm Application Type
+                    </label>
+                    <input type="text" disabled name="firmApplicationType" id="firmApplicationType" value="Authorithasion">
+                </div>
+                <div class="input-field">
+                    <label for="DateLicensed">
+                        Date Licensed
+                    </label>
+                    <input disabled name="DateLicensed" id="DateLicensed" type="text" value="31/JUL/2011">
+                </div>
+                <div class="input-field">
+                    <label for="dateApplication">
+                        Date Authorized
+                    </label>
+                    <input disabled name="dateApplication" id="dateApplication" type="text" value="31/JUL/2011">
+                </div>
             </div>
         </div>
-    
-        <div class="section">
-            <div class="secTitle">
-                <h2>Operational Information</h2>
+        <!---->
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                    Comments
+                </h2>
+                <div class="edit-btn">
+                </div>
             </div>
-            <div class="secData">
-                <p>No of staff in quarter: 7</p>
-                <p>Staff total: 10</p>
-                <p>Note: Reconciled to the reporting in BR050, FOR Q2, 2019</p>                
+            <div class="edit-firms-inputs">
+                <div class="input-field">
+                    <label for="generalComments">
+                        General Comments
+                    </label>
+                    <textarea disabled name="generalComments" id="generalComments"></textarea>
+                </div>
+                <div class="input-field">
+                    <label for="publicRegisterComments">
+                        Public Register Comments
+                    </label>
+                    <textarea disabled name="publicRegisterComments" id="publicRegisterComments"></textarea>
+                </div>
             </div>
         </div>
-    
-        <div class="section">
-            <h2>RA Personal Assigned</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Function / Role</th>
-                        <th>Name</th>
-                        <th>Date Form</th>
-                        <th>Date to</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Function / Role</td>
-                        <td>Name</td>
-                        <td>Date Form</td>
-                        <td>Date to</td>
-                    </tr>
-                    <tr>
-                        <td>Function / Role</td>
-                        <td>Name</td>
-                        <td>Date Form</td>
-                        <td>Date to</td>
-                    </tr>
-                    <tr>
-                        <td>Function / Role</td>
-                        <td>Name</td>
-                        <td>Date Form</td>
-                        <td>Date to</td>
-                    </tr>
-                    <tr>
-                        <td>Function / Role</td>
-                        <td>Name</td>
-                        <td>Date Form</td>
-                        <td>Date to</td>
-                    </tr>
-                    <tr>
-                        <td>Function / Role</td>
-                        <td>Name</td>
-                        <td>Date Form</td>
-                        <td>Date to</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!---->
+        <div class="inputs-field-set">
+            <div class="section">
+                <h2>RA Personal Assigned</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Function / Role</th>
+                            <th>Name</th>
+                            <th>Date Form</th>
+                            <th>Date to</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Function / Role</td>
+                            <td>Name</td>
+                            <td>Date Form</td>
+                            <td>Date to</td>
+                        </tr>
+                        <tr>
+                            <td>Function / Role</td>
+                            <td>Name</td>
+                            <td>Date Form</td>
+                            <td>Date to</td>
+                        </tr>
+                        <tr>
+                            <td>Function / Role</td>
+                            <td>Name</td>
+                            <td>Date Form</td>
+                            <td>Date to</td>
+                        </tr>
+                        <tr>
+                            <td>Function / Role</td>
+                            <td>Name</td>
+                            <td>Date Form</td>
+                            <td>Date to</td>
+                        </tr>
+                        <tr>
+                            <td>Function / Role</td>
+                            <td>Name</td>
+                            <td>Date Form</td>
+                            <td>Date to</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    </section>
 </div>

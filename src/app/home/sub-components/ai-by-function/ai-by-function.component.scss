@@ -13,6 +13,8 @@
     height: 100%;
     border-radius: 15px;
     box-shadow: 8px 8px 43px rgba(8, 50, 79, 0.10);
+    padding-right: 15px;
+    width: 100%;
 }
 .chartTitle{
     width: 100%;
@@ -27,10 +29,10 @@
 }
 .chart-bars{
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     height: 80%;
     gap: 10px;
-    width: 95%;
+    width: 92%;
 }
 .chart-1bar{
     flex-direction: column;
@@ -49,7 +51,7 @@
 }
 .barTitle{
     color: #333333; 
-    font-size: 9px;
+    font-size:8px;
     font-weight: 500;
     line-height: 12px;
     word-wrap: break-word;
