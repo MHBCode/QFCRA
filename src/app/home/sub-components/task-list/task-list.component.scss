@@ -45,7 +45,8 @@ th {
     font-weight: 500;
     line-height: 18.97px;
     letter-spacing: 0.09px;
-    word-wrap: break-word 
+    word-wrap: break-word;
+    max-width: 100px;
 }
 
 td {
@@ -58,8 +59,8 @@ td {
     word-wrap: break-word ;
     text-overflow: ellipsis;
     overflow: hidden;
-    max-width: 139px;
     text-wrap: nowrap;
+    max-width: 90px;
 }
 .taskDesc{
     width: 40px;

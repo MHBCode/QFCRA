@@ -22,10 +22,10 @@
             </h3>
             <i *ngIf="menuWidth.match(width2)" (click)="toggleMenu(1)" class="menu-icons bi bi-info-square"></i>
             <div class="sub-menu" *ngIf="menuId === 1 && menuWidth.match(width1)">
-                <a class="menu-sub-item">
+                <a (click)="switchTab('CD')" class="menu-sub-item">
                     Core Details 
                 </a>
-                <a class="menu-sub-item">
+                <a (click)="switchTab('Scope')" class="menu-sub-item">
                     Scope
                 </a>
                 <a class="menu-sub-item">
@@ -68,11 +68,11 @@
             </div>
         </div>
     </div>
-    <section class="edit-firm-section" [ngStyle]="{ 'width': dataWidth }">
+    <section id="main" class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}">
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    FIRM Details > <span>Abu Dhabi Islamic Bank - Qatar Financial Center Branch</span>
+                    FIRM Details > <span>{{firmDetails?.firmName}}</span>
                 </h2>
             </div>
             <div class="edit-firms-inputs">
@@ -80,32 +80,45 @@
                     <label for="QFCNumber">
                         QFC Number
                     </label>
-                    <input disabled name="QFCNumber" id="QFCNumber" type="text" value="00143">
+                    <input disabled name="QFCNumber" id="QFCNumber" type="text" value="{{firmDetails?.qfcnum}}">
                 </div>
                 <div class="input-field">
                     <label for="code">
                         Code
                     </label>
-                    <input disabled name="code" id="code" type="text" value="ADIB">
+                    <input disabled name="code" id="code" type="text" value="{{firmDetails?.firmCode}}">
                 </div>
                 <div class="input-field">
                     <label for="lagalStatus">
                         Legal Status
                     </label>
-                    <input disabled name="lagalStatus" id="lagalStatus" type="text" value="Branch">
+                    <input disabled name="lagalStatus" id="lagalStatus" type="text" value="{{firmDetails?.legalStatusType}}">
                 </div>
                 <div class="input-field">
                     <label for="PrudentialCategory">
                         Prudential Category
                     </label>
-                    <input disabled name="PrudentialCategory" id="PrudentialCategory" type="text" value="PIIB 5">
+                    <input disabled name="PrudentialCategory" id="PrudentialCategory" type="text" value="{{firmDetails?.firmPrudentialCategory}}">
                 </div>
                 <div class="input-field">
+                    <label for="qfctradingName">
+                        QFC trading Name
+                    </label>
+                    <input disabled name="qfctradingName" id="qfctradingName" type="text" value="{{firmDetails?.qfctradingName}}">
+                </div>
+                <div class="input-field">
+                    <label for="placeOfIncorporation">
+                        Place Of Incorporation
+                    </label>
+                    <input disabled name="placeOfIncorporation" id="placeOfIncorporation" type="text" value="{{firmDetails?.placeOfIncorporation}}">
+                </div>
+                <!--Cant find it the returned object!-->
+                <!-- <div class="input-field">
                     <label for="financialYearEnd">
                         Financial Year End
                     </label>
-                    <input disabled name="financialYearEnd" id="financialYearEnd" type="text" value="31 Decembe">
-                </div>
+                    <input disabled name="financialYearEnd" id="financialYearEnd" type="text" value="Does Not Appear In the Integratoin">
+                </div> -->
             </div>
     
         </div>
@@ -119,35 +132,43 @@
                 </div>
             </div>
             <div class="edit-firms-inputs">
-                <div class="input-field">
+                <!-- not found in integration response -->
+                <!-- <div class="input-field">
                     <label for="qfcLicenseStatus">
                         QFC License Status
                     </label>
-                    <input disabled type="text" name="qfcLicenseStatus" id="qfcLicenseStatus" value="Licensed">
-                </div>
+                    <input disabled type="text" name="qfcLicenseStatus" id="qfcLicenseStatus" value="Not In Integration!">
+                </div> -->
                 <div class="input-field">
                     <label for="dateOfApplication">
                         Date of Application
                     </label>
-                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="27/Jan/2011">
-                </div>
+                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="{{firmDetails?.createdDate | date:'MM/dd/yyyy'}}">
+                </div> 
                 <div class="input-field">
+                    <label for="crocertificateLink">
+                        Crocertificate Link
+                    </label>
+                    <input type="text" disabled name="crocertificateLink" id="crocertificateLink" value="{{firmDetails?.crocertificateLink}}">
+                </div>
+                <!-- not found in integration response -->
+                <!-- <div class="input-field">
                     <label for="firmApplicationType">
                         Firm Application Type
                     </label>
                     <input type="text" disabled name="firmApplicationType" id="firmApplicationType" value="Authorithasion">
-                </div>
+                </div> -->
                 <div class="input-field">
                     <label for="DateLicensed">
                         Date Licensed
                     </label>
-                    <input disabled name="DateLicensed" id="DateLicensed" type="text" value="31/JUL/2011">
+                    <input disabled name="DateLicensed" id="DateLicensed" type="text" value="{{firmDetails?.licensedDate | date:'MM/dd/yyyy'}}">
                 </div>
                 <div class="input-field">
                     <label for="dateApplication">
                         Date Authorized
                     </label>
-                    <input disabled name="dateApplication" id="dateApplication" type="text" value="31/JUL/2011">
+                    <input disabled name="dateApplication" id="dateApplication" type="text" value="{{firmDetails?.authorisationDate | date:'MM/dd/yyyy'}}">
                 </div>
             </div>
         </div>
@@ -165,13 +186,13 @@
                     <label for="generalComments">
                         General Comments
                     </label>
-                    <textarea disabled name="generalComments" id="generalComments"></textarea>
+                    <textarea disabled name="generalComments" id="generalComments" placeholder="{{firmDetails?.firmApplicationDataComments}}"></textarea>
                 </div>
                 <div class="input-field">
                     <label for="publicRegisterComments">
                         Public Register Comments
                     </label>
-                    <textarea disabled name="publicRegisterComments" id="publicRegisterComments"></textarea>
+                    <textarea disabled name="publicRegisterComments" id="publicRegisterComments" placeholder="{{firmDetails?.publicRegisterComments}}"></textarea>
                 </div>
             </div>
         </div>
@@ -221,6 +242,297 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </section>
+    <section id='CD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                    FIRM Details > <span>{{firmDetails?.firmName}}</span>
+                </h2>
+            </div>
+            <div class="edit-firms-inputs">
+               <div class="input-field">
+                    <label for="qfctradingName">
+                        QFC Trading Name
+                    </label>
+                    <input disabled name="qfctradingName" id="qfctradingName" type="text" value="{{firmDetails?.qfctradingName}}">
+                </div>
+                <div class="input-field">
+                    <label for="prevTradingName">
+                        Prev. Trading Name
+                    </label>
+                    <input disabled name="prevTradingName" id="prevTradingName" type="text" value="{{firmDetails?.prevTradingName}}">
+                </div>
+                <div class="input-field">
+                    <label for="dateOfIncorporation">
+                        Date Of Incorporation
+                    </label>
+                    <input disabled name="dateOfIncorporation" id="dateOfIncorporation" type="text" value="{{firmDetails?.dateOfIncorporation | date:'MM/dd/yyyy'}}">
+                </div>
+                <div class="input-field">
+                    <label for="firmAccountingStandards">
+                        Firm Accounting Standards
+                    </label>
+                    <input disabled name="firmAccountingStandards" id="firmAccountingStandards" type="text" value="{{firmDetails?.firmAccountingStandards}}">
+                </div>
+                <div class="input-field">
+                    <label for="webSiteAddress">
+                        Website Address
+                    </label>
+                    <input disabled name="webSiteAddress" id="webSiteAddress" type="text" value="{{firmDetails?.webSiteAddress}}">
+                </div>
+            </div>
+    
+        </div>
+        <!---->
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                    Application Details
+                </h2>
+                <div class="edit-btn">
+                </div>
+            </div>
+            <div class="edit-firms-inputs">
+                <h3 class="subTitle-firmDetails">License Status</h3>
+                <div class="input-field">
+                    <label for="appliedOn">
+                        Applied On
+                    </label>
+                    <input disabled name="appliedOn" id="appliedOn" type="text" value="">
+                </div> 
+                <div class="input-field">
+                    <label for="licensedOn">
+                        Licensed On
+                    </label>
+                    <input type="text" disabled name="licensedOn" id="licensedOn" value="">
+                </div>
+                <div class="input-field">
+                    <label for="currentStatus">
+                        Current Status
+                    </label>
+                    <input disabled name="currentStatus" id="currentStatus" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="currentStatusEffectiveDate">
+                        Current Status Effective Date
+                    </label>
+                    <input disabled name="currentStatusEffectiveDate" id="currentStatusEffectiveDate" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="lastModifiedBy">
+                        Last Modified By
+                    </label>
+                    <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="lastModifiedDate">
+                        Last Modified Date
+                    </label>
+                    <input disabled name="lastModifiedDate" id="lastModifiedDate" type="text" value="">
+                </div>
+                <h3 class="subTitle-firmDetails">Authorization Status</h3>
+                <div class="input-field">
+                    <label for="appliedOnAuth">
+                        Applied On
+                    </label>
+                    <input disabled name="appliedOnAuth" id="appliedOnAuth" type="text" value="">
+                </div> 
+                <div class="input-field">
+                    <label for="AuthorizedOnAuth">
+                        Authorized On
+                    </label>
+                    <input type="text" disabled name="AuthorizedOnAuth" id="AuthorizedOnAuth" value="">
+                </div>
+                <div class="input-field">
+                    <label for="currentStatusAuth">
+                        Current Status
+                    </label>
+                    <input disabled name="currentStatusAuth" id="currentStatusAuth" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="currentStatusEffectiveDateAuth">
+                        Current Status Effective Date
+                    </label>
+                    <input disabled name="currentStatusEffectiveDateAuth" id="currentStatusEffectiveDateAuth" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="lastModifiedByAuth">
+                        Last Modified By
+                    </label>
+                    <input disabled name="lastModifiedByAuth" id="lastModifiedByAuth" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="lastModifiedDateAuth">
+                        Last Modified Date
+                    </label>
+                    <input disabled name="lastModifiedDateAuth" id="lastModifiedDateAuth" type="text" value="">
+                </div>
+            </div>
+        </div>
+        <!---->
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                    Addresses
+                </h2>
+                <div class="edit-btn">
+                </div>
+            </div>
+            <div class="edit-firms-inputs">
+                <div class="input-field">
+                    <label for="addressType">
+                        Address Type
+                    </label>
+                    <input disabled name="addressType" id="addressType" type="text" value="">
+                </div> 
+                <div class="input-field">
+                    <label for="addressLine1">
+                        Address Line 1
+                    </label>
+                    <input type="text" disabled name="addressLine1" id="addressLine1" value="">
+                </div>
+                <div class="input-field">
+                    <label for="addressLine2">
+                        Address Line 2
+                    </label>
+                    <input disabled name="addressLine2" id="addressLine2" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="addressLine3">
+                        Address Line 3
+                    </label>
+                    <input disabled name="addressLine3" id="addressLine3" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="addressLine4">
+                        Address Line 4
+                    </label>
+                    <input disabled name="addressLine4" id="addressLine4" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="city">
+                        City
+                    </label>
+                    <input disabled name="city" id="city" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="state">
+                        State
+                    </label>
+                    <input disabled name="state" id="state" type="text" value="">
+                </div> 
+                <div class="input-field">
+                    <label for="country">
+                        Country
+                    </label>
+                    <input type="text" disabled name="country" id="country" value="">
+                </div>
+                <div class="input-field">
+                    <label for="zip">
+                        Zip
+                    </label>
+                    <input disabled name="zip" id="zip" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="phone">
+                        Phone
+                    </label>
+                    <input disabled name="phone" id="phone" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="fax">
+                        Fax
+                    </label>
+                    <input disabled name="fax" id="fax" type="text" value="">
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--Scope Section-->
+    <section id='Scope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                    Licensed
+                </h2>
+            </div>
+            <div class="edit-firms-inputs">
+               <div class="input-field">
+                    <label for="formReff">
+                        Form Refferance: 
+                    </label>
+                    <input disabled name="formReff" id="formReff" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="linkToScope">
+                        Link To Scope
+                    </label>
+                    <input disabled name="linkToScope" id="linkToScope" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="scopeRevNum">
+                        Scope Revision Number
+                    </label>
+                    <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="appDate">
+                        Application Date
+                    </label>
+                    <input disabled name="appDate" id="appDate" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="licenseDate">
+                        License Date
+                    </label>
+                    <input disabled name="licenseDate" id="licenseDate" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="createdBy">
+                        Created By
+                    </label>
+                    <input disabled name="createdBy" id="createdBy" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="createdDate">
+                        Creation Date
+                    </label>
+                    <input disabled name="createdDate" id="createdDate" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="modBy">
+                        Modified By
+                    </label>
+                    <input disabled name="modBy" id="modBy" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="modDate">
+                        Modification Date
+                    </label>
+                    <input disabled name="modDate" id="modDate" type="text" value="">
+                </div>
+            </div>
+    
+        </div>
+        <!---->
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                    Authorised
+                </h2>
+                <div class="edit-btn">
+                </div>
+            </div>
+            <div class="edit-firms-inputs">
+                <div class="input-field">
+                    <label for="appliedOn">
+                        Applied On
+                    </label>
+                    <input disabled name="appliedOn" id="appliedOn" type="text" value="">
+                </div> 
             </div>
         </div>
     </section>

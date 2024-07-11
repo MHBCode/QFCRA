@@ -1,6 +1,6 @@
 <div class="firmList-wrapper">
     <div class="table">
-        <div class="tableTitle">
+        <div (click)="goToAllFirms()" class="tableTitle">
             <h3>Firm List</h3>
         </div>
         <table>
@@ -13,59 +13,19 @@
                     <th>Authorization Status</th>
                     <th>Sector</th>
                     <th>Authorization Category</th>
-                    <th>Supervision Category</th>
+                    <th>AssignmentLevel</th>
                 </tr>
             </thead>
             <tbody>
-                <tr (click)="viewFirm()">
-                    <td>00065</td>
-                    <td>ABN AMRO Bank NV</td>
-                    <td>Branch</td>
-                    <td>Application withdrawn</td>
-                    <td>No longer authorized</td>
-                    <td>Bank</td>
-                    <td>-</td>
-                    <td>PIIB 4</td>
-                </tr>
-                <tr (click)="viewFirm()">
-                    <td>00065</td>
-                    <td>ABN AMRO Bank NV</td>
-                    <td>Branch</td>
-                    <td>Application withdrawn</td>
-                    <td>No longer authorized</td>
-                    <td>Bank</td>
-                    <td>-</td>
-                    <td>PIIB 4</td>
-                </tr>
-                <tr (click)="viewFirm()">
-                    <td>00065</td>
-                    <td>ABN AMRO Bank NV</td>
-                    <td>Branch</td>
-                    <td>Application withdrawn</td>
-                    <td>No longer authorized</td>
-                    <td>Bank</td>
-                    <td>-</td>
-                    <td>PIIB 4</td>
-                </tr>
-                <tr (click)="viewFirm()">
-                    <td>00065</td>
-                    <td>ABN AMRO Bank NV</td>
-                    <td>Branch</td>
-                    <td>Application withdrawn</td>
-                    <td>No longer authorized</td>
-                    <td>Bank</td>
-                    <td>-</td>
-                    <td>PIIB 4</td>
-                </tr>
-                <tr (click)="viewFirm()">
-                    <td>00065</td>
-                    <td>ABN AMRO Bank NV</td>
-                    <td>Branch</td>
-                    <td>Application withdrawn</td>
-                    <td>No longer authorized</td>
-                    <td>Bank</td>
-                    <td>-</td>
-                    <td>PIIB 4</td>
+                <tr *ngFor="let item of firms.slice(0, listCount)" (click)="viewFirm(item.firmID)" >
+                    <td>{{ item.qfcNum }}</td>
+                    <td>{{ item.firmName }}</td>
+                    <td>{{ item.legalStatusTypeDesc }}</td>
+                    <td>{{ item.licenseStatusTypeDesc }}</td>
+                    <td>{{ item.authorisationStatusTypeDesc }}</td>
+                    <td>{{ item.sectorTypeShortDesc }}</td>
+                    <td>{{ item.authorisationCategoryTypeDesc }}</td>
+                    <td>{{ item.assignmentLevel }}</td>
                 </tr>
             </tbody>
         </table>
