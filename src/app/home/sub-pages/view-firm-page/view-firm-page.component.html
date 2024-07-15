@@ -28,13 +28,13 @@
                 <a (click)="switchTab('Scope')" class="menu-sub-item">
                     Scope
                 </a>
-                <a class="menu-sub-item">
+                <a (click)="switchTab('Controllers')" class="menu-sub-item">
                     Controllers
                 </a>
-                <a class="menu-sub-item">
+                <a (click)="switchTab('Auditors')" class="menu-sub-item">
                     Auditors
                 </a>
-                <a class="menu-sub-item">
+                <a (click)="switchTab('Contacts')" class="menu-sub-item">
                     Contacts
                 </a>
             </div>
@@ -45,10 +45,10 @@
             </h3>
             <i *ngIf="menuWidth.match(width2)" (click)="toggleMenu(2)"  class="menu-icons bi bi-people"></i>
             <div class="sub-menu" *ngIf="menuId === 2 && menuWidth.match(width1)">
-                <a class="menu-sub-item">
+                <a (click)="switchTab('INDCD')" class="menu-sub-item">
                     Core Details 
                 </a>
-                <a class="menu-sub-item">
+                <a (click)="switchTab('INDScope')" class="menu-sub-item">
                     Scope
                 </a>
             </div>
@@ -59,15 +59,16 @@
             </h3>
             <i *ngIf="menuWidth.match(width2)" (click)="toggleMenu(3)" class="menu-icons bi bi-kanban"></i>
             <div class="sub-menu" *ngIf="menuId === 3 && menuWidth.match(width1)">
-                <a class="menu-sub-item">
+                <a (click)="switchTab('SPCD')" class="menu-sub-item">
                     Core Details 
                 </a>
-                <a class="menu-sub-item">
+                <a (click)="switchTab('SPScope')" class="menu-sub-item">
                     Scope
                 </a>
             </div>
         </div>
     </div>
+
     <section id="main" class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}">
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
@@ -245,6 +246,10 @@
             </div>
         </div>
     </section>
+
+    <!--Start Firm details sub section-->
+
+    <!--Core Details-->
     <section id='CD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
@@ -451,6 +456,7 @@
             </div>
         </div>
     </section>
+
     <!--Scope Section-->
     <section id='Scope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
         <div class="inputs-field-set">
@@ -536,4 +542,322 @@
             </div>
         </div>
     </section>
+
+    <!--Controllers-->
+    <section id='Controllers' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+            <div class="inputs-field-set">
+                <div class="edit-firm-actions">
+                    <h2 class="edit-firm-header">
+                       This is the controllers section
+                    </h2>
+                </div>
+                <div class="edit-firms-inputs">
+                   <div class="input-field">
+                        <label for="formReff">
+                            Form Refferance: 
+                        </label>
+                        <input disabled name="formReff" id="formReff" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="linkToScope">
+                            Link To Scope
+                        </label>
+                        <input disabled name="linkToScope" id="linkToScope" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="scopeRevNum">
+                            Scope Revision Number
+                        </label>
+                        <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="appDate">
+                            Application Date
+                        </label>
+                        <input disabled name="appDate" id="appDate" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="licenseDate">
+                            License Date
+                        </label>
+                        <input disabled name="licenseDate" id="licenseDate" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="createdBy">
+                            Created By
+                        </label>
+                        <input disabled name="createdBy" id="createdBy" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="createdDate">
+                            Creation Date
+                        </label>
+                        <input disabled name="createdDate" id="createdDate" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="modBy">
+                            Modified By
+                        </label>
+                        <input disabled name="modBy" id="modBy" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="modDate">
+                            Modification Date
+                        </label>
+                        <input disabled name="modDate" id="modDate" type="text" value="">
+                    </div>
+                </div>
+        
+            </div>
+    </section> 
+
+    <!--Auditors-->
+    <section id='Auditors' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+            <div class="inputs-field-set">
+                <div class="edit-firm-actions">
+                    <h2 class="edit-firm-header">
+                       This is the Auditors section
+                    </h2>
+                </div>
+                <div class="edit-firms-inputs">
+                   <div class="input-field">
+                        <label for="formReff">
+                            Form Refferance: 
+                        </label>
+                        <input disabled name="formReff" id="formReff" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="linkToScope">
+                            Link To Scope
+                        </label>
+                        <input disabled name="linkToScope" id="linkToScope" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="scopeRevNum">
+                            Scope Revision Number
+                        </label>
+                        <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="appDate">
+                            Application Date
+                        </label>
+                        <input disabled name="appDate" id="appDate" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="licenseDate">
+                            License Date
+                        </label>
+                        <input disabled name="licenseDate" id="licenseDate" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="createdBy">
+                            Created By
+                        </label>
+                        <input disabled name="createdBy" id="createdBy" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="createdDate">
+                            Creation Date
+                        </label>
+                        <input disabled name="createdDate" id="createdDate" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="modBy">
+                            Modified By
+                        </label>
+                        <input disabled name="modBy" id="modBy" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="modDate">
+                            Modification Date
+                        </label>
+                        <input disabled name="modDate" id="modDate" type="text" value="">
+                    </div>
+                </div>
+        
+            </div>
+    </section>
+
+    <!--Contacts-->
+    <section id='Contacts' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                   This is the Contacts section
+                </h2>
+            </div>
+            <div class="edit-firms-inputs">
+               <div class="input-field">
+                    <label for="formReff">
+                        Form Refferance: 
+                    </label>
+                    <input disabled name="formReff" id="formReff" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="linkToScope">
+                        Link To Scope
+                    </label>
+                    <input disabled name="linkToScope" id="linkToScope" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="scopeRevNum">
+                        Scope Revision Number
+                    </label>
+                    <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="appDate">
+                        Application Date
+                    </label>
+                    <input disabled name="appDate" id="appDate" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="licenseDate">
+                        License Date
+                    </label>
+                    <input disabled name="licenseDate" id="licenseDate" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="createdBy">
+                        Created By
+                    </label>
+                    <input disabled name="createdBy" id="createdBy" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="createdDate">
+                        Creation Date
+                    </label>
+                    <input disabled name="createdDate" id="createdDate" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="modBy">
+                        Modified By
+                    </label>
+                    <input disabled name="modBy" id="modBy" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="modDate">
+                        Modification Date
+                    </label>
+                    <input disabled name="modDate" id="modDate" type="text" value="">
+                </div>
+            </div>
+    
+        </div>
+    </section>
+
+    <!--End Firm details sub section-->
+
+    <!--Start Individuals sub sections-->
+
+    <!--Individuals Core Details-->
+    <section id='INDCD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                   This is the Individuals Core Details section
+                </h2>
+            </div>
+            <div class="edit-firms-inputs">
+               <div class="input-field">
+                    <label for="formReff">
+                        Form Refferance: 
+                    </label>
+                    <input disabled name="formReff" id="formReff" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="linkToScope">
+                        Link To Scope
+                    </label>
+                    <input disabled name="linkToScope" id="linkToScope" type="text" value="">
+                </div>
+            </div>
+    
+        </div>
+    </section>
+
+    <!--Individuals Scope-->
+    <section id='INDScope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                   This is the Individuals Scope section
+                </h2>
+            </div>
+            <div class="edit-firms-inputs">
+               <div class="input-field">
+                    <label for="formReff">
+                        Form Refferance: 
+                    </label>
+                    <input disabled name="formReff" id="formReff" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="linkToScope">
+                        Link To Scope
+                    </label>
+                    <input disabled name="linkToScope" id="linkToScope" type="text" value="">
+                </div>
+            </div>
+    
+        </div>
+    </section>
+
+    <!--End Individuals sub sections-->
+
+    <!--Start Supervision sub sections-->
+
+        <!--Supervision Core Details-->
+    <section id='SPCD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+            <div class="inputs-field-set">
+                <div class="edit-firm-actions">
+                    <h2 class="edit-firm-header">
+                       This is the Supervision Core Details section
+                    </h2>
+                </div>
+                <div class="edit-firms-inputs">
+                   <div class="input-field">
+                        <label for="formReff">
+                            Form Refferance: 
+                        </label>
+                        <input disabled name="formReff" id="formReff" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="linkToScope">
+                            Link To Scope
+                        </label>
+                        <input disabled name="linkToScope" id="linkToScope" type="text" value="">
+                    </div>
+                </div>
+        
+            </div>
+    </section>
+    
+        <!--Supervision Scope-->
+    <section id='SPScope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+            <div class="inputs-field-set">
+                <div class="edit-firm-actions">
+                    <h2 class="edit-firm-header">
+                       This is the Supervision Scope section
+                    </h2>
+                </div>
+                <div class="edit-firms-inputs">
+                   <div class="input-field">
+                        <label for="formReff">
+                            Form Refferance: 
+                        </label>
+                        <input disabled name="formReff" id="formReff" type="text" value="">
+                    </div>
+                    <div class="input-field">
+                        <label for="linkToScope">
+                            Link To Scope
+                        </label>
+                        <input disabled name="linkToScope" id="linkToScope" type="text" value="">
+                    </div>
+                </div>
+        
+            </div>
+    </section>
+
+    <!--End Supervision sub sections-->
 </div>

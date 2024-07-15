@@ -48,8 +48,11 @@ export class ViewFirmPageComponent implements OnInit {
       this.menuId = inputNumber;
       this.menuWidth = this.width1;
       this.dataWidth = this.widthData2;
-    } else {
+    } else if (this.menuId == inputNumber) {
       this.menuId = 0;
+    }
+    else {
+      this.menuId = inputNumber;
     }
   }
 
