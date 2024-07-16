@@ -92,7 +92,7 @@
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    // align-items: flex-start;
     justify-content: center;
     gap: 1rem;
     padding: 1rem;
@@ -280,4 +280,66 @@ tr:nth-child(even) {
 }
 .subTitle-firmDetails{
     width: 100%;
+}
+
+.inputs-field-set .section table tr th,.inputs-field-set .section table tr td{
+    text-align: center;
+}
+
+.auditor-header, .contacts-header,.return-review-header,.ENFAction-header,.Journal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.auditor-header label, .contacts-header label, .ENFAction-header label,.Journal-header label{
+    color: red;
+    font-weight: 600;
+}
+
+.radio-table {
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.radioBtn {
+    cursor: pointer;
+}
+
+.radioBtn input[type="radio"]{
+    display: none;
+}
+
+.radioBtn span {
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    border: 3px solid #A51E36;
+    display: block;
+    position: absolute;
+    top: 8px;
+}
+
+.radioBtn input[type="radio"]:checked + span::after {
+    content: "";
+    height: 10px;
+    width: 10px;
+    background-color: #A51E36;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    display: block;
+    border-radius: 50%;
+}
+
+.return-review-header span {
+    display: flex;
+    gap: 10px;
+}
+
+.SPReview-dropdown {
+    width: 150px;
 }
