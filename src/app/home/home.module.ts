@@ -17,6 +17,10 @@ import { EditFirmComponent } from './sub-pages/edit-firm/edit-firm.component';
 import { NewFirmComponent } from './sub-pages/new-firm/new-firm.component';
 import { TasksPageComponent } from './sub-pages/tasksPages/tasks-page/tasks-page.component';
 import { SharedModule } from '../shared/shared.module';
+import { IndividualPageComponent } from './sub-pages/individualPages/individual-page/individual-page.component';
+import { IndividualListComponent } from './sub-components/individual-list/individual-list.component';
+import { IndividualRegistrationStatusComponent } from './sub-pages/individualPages/individual-registration-status/individual-registration-status.component';
+import { IndividualPendingAiAppsComponent } from './sub-pages/individualPages/individual-pending-ai-apps/individual-pending-ai-apps.component';
 @NgModule({
   declarations: [
     MainPageComponent,
@@ -31,6 +35,10 @@ import { SharedModule } from '../shared/shared.module';
     EditFirmComponent,
     NewFirmComponent,
     TasksPageComponent,
+    IndividualPageComponent,
+    IndividualListComponent,
+    IndividualRegistrationStatusComponent,
+    IndividualPendingAiAppsComponent,
   ],
   imports: [
     CommonModule,
