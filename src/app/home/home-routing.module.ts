@@ -9,6 +9,9 @@ import { TasksPageComponent } from './sub-pages/tasksPages/tasks-page/tasks-page
 import { IndividualPageComponent } from './sub-pages/individualPages/individual-page/individual-page.component';
 import { IndividualRegistrationStatusComponent } from './sub-pages/individualPages/individual-registration-status/individual-registration-status.component';
 import { IndividualPendingAiAppsComponent } from './sub-pages/individualPages/individual-pending-ai-apps/individual-pending-ai-apps.component';
+import { UserAccessComponent } from './sub-pages/adminPages/user-access/user-access.component';
+import { ReAssignTasksComponent } from './sub-pages/adminPages/re-assign-tasks/re-assign-tasks.component';
+import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm-reports.component';
 const routes: Routes = [
   { path: '', component: MainPageComponent},
   { path: 'firms-page', component: FirmsPageComponent},
@@ -18,7 +21,10 @@ const routes: Routes = [
   { path: 'tasks-page', component: TasksPageComponent},
   { path: 'individual-page', component: IndividualPageComponent},
   { path: 'individual-registration-status', component: IndividualRegistrationStatusComponent},
-  { path: 'individual-pending-ai-apps', component: IndividualPendingAiAppsComponent}
+  { path: 'individual-pending-ai-apps', component: IndividualPendingAiAppsComponent},
+  { path: 'firm-reports', component: FirmReportsComponent},
+  { path: 'userAccess', component: UserAccessComponent},
+  { path: 're-assign-tasks', component: ReAssignTasksComponent}
 ];
 
 @NgModule({

@@ -42,7 +42,7 @@
             </a>
             <div class="menuOfTop" *ngIf="reports == true">
                 <ul>
-                    <li>Firms Report</li>
+                    <li (click)="goto(9)">Firms Report</li>
                     <li>Contacts Report</li>
                     <li>AI Application Reports</li>
                     <li>Approved individuals Report </li>
@@ -64,8 +64,8 @@
             </a>
             <div class="menuOfTop" *ngIf="admin == true">
                 <ul>
-                    <li>User Access</li>
-                    <li>Re-assign Tasks</li>
+                    <li (click)="goto(22)">User Access</li>
+                    <li (click)="goto(23)">Re-assign Tasks</li>
                     <li>Credit Ratings Upload</li>
                 </ul>
             </div>

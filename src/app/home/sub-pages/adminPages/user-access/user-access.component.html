@@ -1,0 +1,70 @@
+<div class="useraccess-actions">
+    <div class="btns">
+        <button class="save-btn">Save</button>
+        <button class="cancel-btn">Cancel</button>
+    </div>
+</div>
+
+<section class="useraccess-section">
+    <div class="inputs-field-set">
+        <div class="section">
+            <h2>User Access Assigned</h2>
+            <div class="system-access-container">
+                <label>
+                    System Access Request For:
+                    <select name="" id="" class="system-access-select">
+                        <option value="">Select</option>
+                        <option value="">name 1</option>
+                        <option value="">name 2</option>
+                    </select>
+                </label>
+                <a class="view-access-history" href="#">View User Access History</a>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Firm Level</th>
+                        <th>Effective Date <br> [DD/MON/YYYY]</th>
+                        <th>Expiration Date <br> [DD/MON/YYYY]</th>
+                        <th>Justification</th>
+                        <th><button class="addRowBtn" (click)="addRow()">+</button></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let row of rows; let i = index"> 
+                        <td>
+                            <select name="" id="userRole" [(ngModel)]="row.userRole">
+                                <option value="">Select</option>
+                                <option value="CEO">CEO</option>
+                                <option value="Contact Viewer">Contact Viewer</option>
+                            </select>
+                        </td>
+
+                        <td>
+                            <select name="" id="firmLevel" [(ngModel)]="row.firmLevel">
+                                <option value="">Select</option>
+                            </select>
+                        </td>
+
+                        <td>
+                            <input type="date" id="effectiveDate" [(ngModel)]="row.effectiveDate">
+                        </td>
+
+                        <td>
+                            <input type="date" id="expirationDate" [(ngModel)]="row.expirationDate">
+                        </td>
+
+                        <td>
+                            <textarea name="" id="" [(ngModel)]="row.justification"></textarea>
+                        </td>
+
+                        <td>
+                            <button class="removeRowBtn" (click)="removeRow(i)">x</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeRoutingModule } from './home-routing.module';
 import { HttpClientModule } from '@angular/common/http';  // Import HttpClientModule
+import { FormsModule } from '@angular/forms';
 
 import { MainPageComponent } from './main-page/main-page.component';
 import { StatisticsHeaderComponent } from './sub-components/statistics-header/statistics-header.component';
@@ -21,6 +22,10 @@ import { IndividualPageComponent } from './sub-pages/individualPages/individual-
 import { IndividualListComponent } from './sub-components/individual-list/individual-list.component';
 import { IndividualRegistrationStatusComponent } from './sub-pages/individualPages/individual-registration-status/individual-registration-status.component';
 import { IndividualPendingAiAppsComponent } from './sub-pages/individualPages/individual-pending-ai-apps/individual-pending-ai-apps.component';
+import { UserAccessComponent } from './sub-pages/adminPages/user-access/user-access.component';
+import { ReAssignTasksComponent } from './sub-pages/adminPages/re-assign-tasks/re-assign-tasks.component';
+import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm-reports.component';
+
 @NgModule({
   declarations: [
     MainPageComponent,
@@ -39,11 +44,15 @@ import { IndividualPendingAiAppsComponent } from './sub-pages/individualPages/in
     IndividualListComponent,
     IndividualRegistrationStatusComponent,
     IndividualPendingAiAppsComponent,
+    FirmReportsComponent,
+    UserAccessComponent,
+    ReAssignTasksComponent,
   ],
   imports: [
     CommonModule,
     SharedModule,
     HomeRoutingModule,
+    FormsModule,
     HttpClientModule  // Add HttpClientModule to the imports array
   ]
 })

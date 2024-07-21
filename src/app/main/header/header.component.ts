@@ -93,5 +93,14 @@ export class HeaderComponent implements OnInit {
     if (where == 8) {
       this.router.navigate(['home/individual-pending-ai-apps'])
     }
+    if (where == 9) {
+      this.router.navigate(['home/firm-reports']);
+    }
+    if (where == 22) {
+      this.router.navigate(['home/userAccess'])
+    }
+    if (where == 23) {
+      this.router.navigate(['home/re-assign-tasks'])
+    }
   }
 }
