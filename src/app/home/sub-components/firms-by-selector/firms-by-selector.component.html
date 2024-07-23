@@ -1,4 +1,4 @@
-<div class="chart">
+<!-- <div class="chart">
     <div class="chartTitle">
         <h3>Firm by sector </h3>
     </div>
@@ -8,15 +8,14 @@
         </div>
         <div class="chart-1bar">
             <div class="bar" id="bank">
-                <!-- <div class="countOfBar">
+                <div class="countOfBar">
                     10
-                </div> -->
+                </div> 
             </div>
             <div class="barTitle">
                 Bank
             </div>
         </div>
-        <!---->
         <div class="chart-1bar">
             <div class="bar" id="BankIslamic">
                 <div class="countOfBar">
@@ -78,4 +77,25 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
+
+<div class="chart">
+    <div class="chartTitle">
+      <h3>Firm by sector</h3>
+    </div>
+    <div class="numbers">
+      <img src="../../../../assets/images/numbers.PNG">
+    </div>
+    <div class="chart-bars">
+      <div *ngFor="let sectorFunction of sectorFunction" class="chart-1bar">
+        <div class="bar" [id]="formatId(sectorFunction.SectorType)">
+          <div class="countOfBar">
+            {{ sectorFunction.TotalFirms }}
+          </div>
+        </div>
+        <div class="barTitle">
+          {{ sectorFunction.SectorType }}
+        </div>
+      </div>
+    </div>
+  </div>
