@@ -1,111 +1,21 @@
 <div class="chart">
     <div class="chartTitle">
-        <h3>AI by Functions</h3>
+      <h3>AI by Functions</h3>
     </div>
     <div class="numbers">
-        <img src="../../../../assets/images/numbers.PNG">
+      <img src="../../../../assets/images/numbers.PNG">
     </div>
     <div class="chart-bars">
-        <div class="chart-1bar">
-            <div class="bar" id="ActuarialFunction">
-                <!-- <div class="countOfBar">
-                    10
-                </div> -->
-            </div>
-            <div class="barTitle">
-                Actuarial
-            </div>
+      <div *ngFor="let aiFunction of AIFunction" class="chart-1bar">
+        <div class="bar" [id]="formatId(aiFunction.Controlled_Function)">
+          <div class="countOfBar">
+            {{ aiFunction.Total_AI }}
+          </div>
         </div>
-        <!---->
-        <div class="chart-1bar">
-            <div class="bar" id="ComplianceOversightFunction">
-                <div class="countOfBar">
-                    70
-                </div>
-            </div>
-            <div class="barTitle">
-                Compliance Oversight
-            </div>
+        <div class="barTitle">
+          {{ aiFunction.Controlled_Function }}
         </div>
-        <div class="chart-1bar">
-            <div class="bar" id="ExecutiveGeovernceFunction">
-                <div class="countOfBar">
-                    80
-                </div>
-            </div>
-            <div class="barTitle">
-                Executive Geovernce
-            </div>
-        </div>
-        <div class="chart-1bar">
-            <div class="bar" id="FinanceFunction">
-                <div class="countOfBar">
-                    140
-                </div>
-            </div>
-            <div class="barTitle">
-                Finance
-            </div>
-        </div>
-        <div class="chart-1bar">
-            <div class="bar" id="InternalAuditFunction">
-                <div class="countOfBar">
-                   90
-                </div>
-            </div>
-            <div class="barTitle">
-                Internal Audit
-            </div>
-        </div>
-        <div class="chart-1bar">
-            <div class="bar" id="MIROFunction">
-                <div class="countOfBar">
-                    130
-                </div>
-            </div>
-            <div class="barTitle">
-                MIRO Function
-            </div>
-        </div>
-        <div class="chart-1bar">
-            <div class="bar" id="Non-ExecutiveGovernanceFunction">
-                <div class="countOfBar">
-                    130
-                </div>
-            </div>
-            <div class="barTitle">
-                Non-Executive Governance
-            </div>
-        </div>
-        <div class="chart-1bar">
-            <div class="bar" id="RiskManager">
-                <div class="countOfBar">
-                    60
-                </div>
-            </div>
-            <div class="barTitle">
-                Risk Manager 
-            </div>
-        </div>
-        <div class="chart-1bar">
-            <div class="bar" id="SeniorExecutiveFunction">
-                <div class="countOfBar">
-                    40
-                </div>
-            </div>
-            <div class="barTitle">
-                Senior Executive
-            </div>
-        </div>
-        <div class="chart-1bar">
-            <div class="bar" id="SeniorManagementFunction">
-                <div class="countOfBar">
-                    100
-                </div>
-            </div>
-            <div class="barTitle">
-                Senior Management
-            </div>
-        </div>  
+      </div>
     </div>
-</div>
+  </div>
+  

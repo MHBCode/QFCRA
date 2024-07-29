@@ -3,7 +3,7 @@
         <span> Home ></span> Firm Details
     </div>
     <div class="edit-btn">
-        <button (click)=" editFirm()" >
+        <button (click)=" editFirm()">
             <i class="bi bi-pen"></i>
             Edit
         </button>
@@ -12,18 +12,21 @@
 <div class="page">
     <div class="menu" [ngStyle]="{ 'width': menuWidth }">
         <!-- <button (click)="toggleFulMenu()" class="menu-item menu-item-btn-ce"> -->
-            <i (click)="toggleFulMenu()" *ngIf="menuWidth.match(width1)"  class="menu-icons bi bi-arrow-left-square-fill"></i>
-            <!-- <p *ngIf="menuWidth.match('20%')">Close Menu</p> -->
-            <i (click)="toggleFulMenu()" *ngIf="menuWidth.match(width2)"  class="menu-icons bi bi-arrow-right-square-fill"></i>
+        <i (click)="toggleFulMenu()" *ngIf="menuWidth.match(width1)"
+            class="menu-icons bi bi-arrow-left-square-fill"></i>
+        <!-- <p *ngIf="menuWidth.match('20%')">Close Menu</p> -->
+        <i (click)="toggleFulMenu()" *ngIf="menuWidth.match(width2)"
+            class="menu-icons bi bi-arrow-right-square-fill"></i>
         <!-- </button> -->
         <div class="menu-item">
-            <h3 *ngIf="menuWidth.match(width1)"  id="1-item" (click)="toggleMenu(1)" [ngClass]="{'active': menuId === 1}">
+            <h3 *ngIf="menuWidth.match(width1)" id="1-item" (click)="toggleMenu(1)"
+                [ngClass]="{'active': menuId === 1}">
                 FIRM Details
             </h3>
             <i *ngIf="menuWidth.match(width2)" (click)="toggleMenu(1)" class="menu-icons bi bi-info-square"></i>
             <div class="sub-menu" *ngIf="menuId === 1 && menuWidth.match(width1)">
                 <a (click)="switchTab('CD')" class="menu-sub-item">
-                    Core Details 
+                    Core Details
                 </a>
                 <a (click)="switchTab('Scope')" class="menu-sub-item">
                     Scope
@@ -40,30 +43,53 @@
             </div>
         </div>
         <div class="menu-item">
-            <h3 *ngIf="menuWidth.match(width1)"  id="2-item" (click)="toggleMenu(2)" [ngClass]="{'active': menuId === 2}">
+            <h3 *ngIf="menuWidth.match(width1)" id="2-item" (click)="toggleMenu(2)"
+                [ngClass]="{'active': menuId === 2}">
                 Individuals
             </h3>
-            <i *ngIf="menuWidth.match(width2)" (click)="toggleMenu(2)"  class="menu-icons bi bi-people"></i>
+            <i *ngIf="menuWidth.match(width2)" (click)="toggleMenu(2)" class="menu-icons bi bi-people"></i>
             <div class="sub-menu" *ngIf="menuId === 2 && menuWidth.match(width1)">
-                <a (click)="switchTab('INDCD')" class="menu-sub-item">
-                    Core Details 
-                </a>
-                <a (click)="switchTab('INDScope')" class="menu-sub-item">
-                    Scope
+                <a (click)="switchTab('INDDetails')" class="menu-sub-item">
+                    Individual Details
                 </a>
             </div>
         </div>
         <div class="menu-item">
-            <h3 *ngIf="menuWidth.match(width1)"  id="2-item" (click)="toggleMenu(3)" [ngClass]="{'active': menuId === 3}">
+            <h3 *ngIf="menuWidth.match(width1)" id="2-item" (click)="toggleMenu(3)"
+                [ngClass]="{'active': menuId === 3}">
                 Supervision
             </h3>
             <i *ngIf="menuWidth.match(width2)" (click)="toggleMenu(3)" class="menu-icons bi bi-kanban"></i>
             <div class="sub-menu" *ngIf="menuId === 3 && menuWidth.match(width1)">
-                <a (click)="switchTab('SPCD')" class="menu-sub-item">
-                    Core Details 
+                <a (click)="switchTab('SPRS')" class="menu-sub-item">
+                    Reporting Schedule
                 </a>
-                <a (click)="switchTab('SPScope')" class="menu-sub-item">
-                    Scope
+                <a (click)="switchTab('SPReview')" class="menu-sub-item">
+                    Return Review
+                </a>
+                <a (click)="switchTab('SPNotices')" class="menu-sub-item">
+                    Notices
+                </a>
+                <a (click)="switchTab('SPAdminFee')" class="menu-sub-item">
+                    Admin Fee
+                </a>
+                <a (click)="switchTab('SPRMPs')" class="menu-sub-item">
+                    RMPs
+                </a>
+                <a (click)="switchTab('SPBreaches')" class="menu-sub-item">
+                    Breaches
+                </a>
+                <a (click)="switchTab('SPWaivers')" class="menu-sub-item">
+                    Waivers
+                </a>
+                <a (click)="switchTab('SPENFAction')" class="menu-sub-item">
+                    Enf. Actions
+                </a>
+                <a (click)="switchTab('SPRegFunds')" class="menu-sub-item">
+                    Reg. Funds
+                </a>
+                <a (click)="switchTab('SPJournal')" class="menu-sub-item">
+                    Journal
                 </a>
             </div>
         </div>
@@ -93,25 +119,29 @@
                     <label for="lagalStatus">
                         Legal Status
                     </label>
-                    <input disabled name="lagalStatus" id="lagalStatus" type="text" value="{{firmDetails?.legalStatusType}}">
+                    <input disabled name="lagalStatus" id="lagalStatus" type="text"
+                        value="{{firmDetails?.legalStatusType}}">
                 </div>
                 <div class="input-field">
                     <label for="PrudentialCategory">
                         Prudential Category
                     </label>
-                    <input disabled name="PrudentialCategory" id="PrudentialCategory" type="text" value="{{firmDetails?.firmPrudentialCategory}}">
+                    <input disabled name="PrudentialCategory" id="PrudentialCategory" type="text"
+                        value="{{firmDetails?.firmPrudentialCategory}}">
                 </div>
                 <div class="input-field">
                     <label for="qfctradingName">
                         QFC trading Name
                     </label>
-                    <input disabled name="qfctradingName" id="qfctradingName" type="text" value="{{firmDetails?.qfctradingName}}">
+                    <input disabled name="qfctradingName" id="qfctradingName" type="text"
+                        value="{{firmDetails?.qfctradingName}}">
                 </div>
                 <div class="input-field">
                     <label for="placeOfIncorporation">
                         Place Of Incorporation
                     </label>
-                    <input disabled name="placeOfIncorporation" id="placeOfIncorporation" type="text" value="{{firmDetails?.placeOfIncorporation}}">
+                    <input disabled name="placeOfIncorporation" id="placeOfIncorporation" type="text"
+                        value="{{firmDetails?.placeOfIncorporation}}">
                 </div>
                 <!--Cant find it the returned object!-->
                 <!-- <div class="input-field">
@@ -121,7 +151,7 @@
                     <input disabled name="financialYearEnd" id="financialYearEnd" type="text" value="Does Not Appear In the Integratoin">
                 </div> -->
             </div>
-    
+
         </div>
         <!---->
         <div class="inputs-field-set">
@@ -144,13 +174,15 @@
                     <label for="dateOfApplication">
                         Date of Application
                     </label>
-                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="{{firmDetails?.createdDate | date:'MM/dd/yyyy'}}">
-                </div> 
+                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text"
+                        value="{{firmDetails?.createdDate | date:'MM/dd/yyyy'}}">
+                </div>
                 <div class="input-field">
                     <label for="crocertificateLink">
                         Crocertificate Link
                     </label>
-                    <input type="text" disabled name="crocertificateLink" id="crocertificateLink" value="{{firmDetails?.crocertificateLink}}">
+                    <input type="text" disabled name="crocertificateLink" id="crocertificateLink"
+                        value="{{firmDetails?.crocertificateLink}}">
                 </div>
                 <!-- not found in integration response -->
                 <!-- <div class="input-field">
@@ -163,13 +195,15 @@
                     <label for="DateLicensed">
                         Date Licensed
                     </label>
-                    <input disabled name="DateLicensed" id="DateLicensed" type="text" value="{{firmDetails?.licensedDate | date:'MM/dd/yyyy'}}">
+                    <input disabled name="DateLicensed" id="DateLicensed" type="text"
+                        value="{{firmDetails?.licensedDate | date:'MM/dd/yyyy'}}">
                 </div>
                 <div class="input-field">
                     <label for="dateApplication">
                         Date Authorized
                     </label>
-                    <input disabled name="dateApplication" id="dateApplication" type="text" value="{{firmDetails?.authorisationDate | date:'MM/dd/yyyy'}}">
+                    <input disabled name="dateApplication" id="dateApplication" type="text"
+                        value="{{firmDetails?.authorisationDate | date:'MM/dd/yyyy'}}">
                 </div>
             </div>
         </div>
@@ -187,13 +221,15 @@
                     <label for="generalComments">
                         General Comments
                     </label>
-                    <textarea disabled name="generalComments" id="generalComments" placeholder="{{firmDetails?.firmApplicationDataComments}}"></textarea>
+                    <textarea disabled name="generalComments" id="generalComments"
+                        placeholder="{{firmDetails?.firmApplicationDataComments}}"></textarea>
                 </div>
                 <div class="input-field">
                     <label for="publicRegisterComments">
                         Public Register Comments
                     </label>
-                    <textarea disabled name="publicRegisterComments" id="publicRegisterComments" placeholder="{{firmDetails?.publicRegisterComments}}"></textarea>
+                    <textarea disabled name="publicRegisterComments" id="publicRegisterComments"
+                        placeholder="{{firmDetails?.publicRegisterComments}}"></textarea>
                 </div>
             </div>
         </div>
@@ -258,38 +294,43 @@
                 </h2>
             </div>
             <div class="edit-firms-inputs">
-               <div class="input-field">
+                <div class="input-field">
                     <label for="qfctradingName">
                         QFC Trading Name
                     </label>
-                    <input disabled name="qfctradingName" id="qfctradingName" type="text" value="{{firmDetails?.qfctradingName}}">
+                    <input disabled name="qfctradingName" id="qfctradingName" type="text"
+                        value="{{firmDetails?.qfctradingName}}">
                 </div>
                 <div class="input-field">
                     <label for="prevTradingName">
                         Prev. Trading Name
                     </label>
-                    <input disabled name="prevTradingName" id="prevTradingName" type="text" value="{{firmDetails?.prevTradingName}}">
+                    <input disabled name="prevTradingName" id="prevTradingName" type="text"
+                        value="{{firmDetails?.prevTradingName}}">
                 </div>
                 <div class="input-field">
                     <label for="dateOfIncorporation">
                         Date Of Incorporation
                     </label>
-                    <input disabled name="dateOfIncorporation" id="dateOfIncorporation" type="text" value="{{firmDetails?.dateOfIncorporation | date:'MM/dd/yyyy'}}">
+                    <input disabled name="dateOfIncorporation" id="dateOfIncorporation" type="text"
+                        value="{{firmDetails?.dateOfIncorporation | date:'MM/dd/yyyy'}}">
                 </div>
                 <div class="input-field">
                     <label for="firmAccountingStandards">
                         Firm Accounting Standards
                     </label>
-                    <input disabled name="firmAccountingStandards" id="firmAccountingStandards" type="text" value="{{firmDetails?.firmAccountingStandards}}">
+                    <input disabled name="firmAccountingStandards" id="firmAccountingStandards" type="text"
+                        value="{{firmDetails?.firmAccountingStandards}}">
                 </div>
                 <div class="input-field">
                     <label for="webSiteAddress">
                         Website Address
                     </label>
-                    <input disabled name="webSiteAddress" id="webSiteAddress" type="text" value="{{firmDetails?.webSiteAddress}}">
+                    <input disabled name="webSiteAddress" id="webSiteAddress" type="text"
+                        value="{{firmDetails?.webSiteAddress}}">
                 </div>
             </div>
-    
+
         </div>
         <!---->
         <div class="inputs-field-set">
@@ -307,7 +348,7 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOn" id="appliedOn" type="text" value="">
-                </div> 
+                </div>
                 <div class="input-field">
                     <label for="licensedOn">
                         Licensed On
@@ -324,7 +365,8 @@
                     <label for="currentStatusEffectiveDate">
                         Current Status Effective Date
                     </label>
-                    <input disabled name="currentStatusEffectiveDate" id="currentStatusEffectiveDate" type="text" value="">
+                    <input disabled name="currentStatusEffectiveDate" id="currentStatusEffectiveDate" type="text"
+                        value="">
                 </div>
                 <div class="input-field">
                     <label for="lastModifiedBy">
@@ -344,7 +386,7 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOnAuth" id="appliedOnAuth" type="text" value="">
-                </div> 
+                </div>
                 <div class="input-field">
                     <label for="AuthorizedOnAuth">
                         Authorized On
@@ -361,7 +403,8 @@
                     <label for="currentStatusEffectiveDateAuth">
                         Current Status Effective Date
                     </label>
-                    <input disabled name="currentStatusEffectiveDateAuth" id="currentStatusEffectiveDateAuth" type="text" value="">
+                    <input disabled name="currentStatusEffectiveDateAuth" id="currentStatusEffectiveDateAuth"
+                        type="text" value="">
                 </div>
                 <div class="input-field">
                     <label for="lastModifiedByAuth">
@@ -392,7 +435,7 @@
                         Address Type
                     </label>
                     <input disabled name="addressType" id="addressType" type="text" value="">
-                </div> 
+                </div>
                 <div class="input-field">
                     <label for="addressLine1">
                         Address Line 1
@@ -428,7 +471,7 @@
                         State
                     </label>
                     <input disabled name="state" id="state" type="text" value="">
-                </div> 
+                </div>
                 <div class="input-field">
                     <label for="country">
                         Country
@@ -466,9 +509,9 @@
                 </h2>
             </div>
             <div class="edit-firms-inputs">
-               <div class="input-field">
+                <div class="input-field">
                     <label for="formReff">
-                        Form Refferance: 
+                        Form Refferance:
                     </label>
                     <input disabled name="formReff" id="formReff" type="text" value="">
                 </div>
@@ -521,7 +564,7 @@
                     <input disabled name="modDate" id="modDate" type="text" value="">
                 </div>
             </div>
-    
+
         </div>
         <!---->
         <div class="inputs-field-set">
@@ -538,212 +581,177 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOn" id="appliedOn" type="text" value="">
-                </div> 
+                </div>
             </div>
         </div>
     </section>
 
     <!--Controllers-->
     <section id='Controllers' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
-            <div class="inputs-field-set">
-                <div class="edit-firm-actions">
-                    <h2 class="edit-firm-header">
-                       This is the controllers section
-                    </h2>
-                </div>
-                <div class="edit-firms-inputs">
-                   <div class="input-field">
-                        <label for="formReff">
-                            Form Refferance: 
-                        </label>
-                        <input disabled name="formReff" id="formReff" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="linkToScope">
-                            Link To Scope
-                        </label>
-                        <input disabled name="linkToScope" id="linkToScope" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="scopeRevNum">
-                            Scope Revision Number
-                        </label>
-                        <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="appDate">
-                            Application Date
-                        </label>
-                        <input disabled name="appDate" id="appDate" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="licenseDate">
-                            License Date
-                        </label>
-                        <input disabled name="licenseDate" id="licenseDate" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="createdBy">
-                            Created By
-                        </label>
-                        <input disabled name="createdBy" id="createdBy" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="createdDate">
-                            Creation Date
-                        </label>
-                        <input disabled name="createdDate" id="createdDate" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="modBy">
-                            Modified By
-                        </label>
-                        <input disabled name="modBy" id="modBy" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="modDate">
-                            Modification Date
-                        </label>
-                        <input disabled name="modDate" id="modDate" type="text" value="">
-                    </div>
-                </div>
-        
+
+        <div class="inputs-field-set">
+            <div class="section">
+                <h2>Controllers For firm</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Controller Type</th>
+                            <th>Registered Number</th>
+                            <th>Control Type</th>
+                            <th>% of Holding</th>
+                            <th>Effective Date</th>
+                            <th>Cessation Date</th>
+                            <th>Last Modified By</th>
+                            <th>Last Modified Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Name</td>
+                            <td>Controller Type</td>
+                            <td>Registered Number</td>
+                            <td>Control Type</td>
+                            <td>% of Holding</td>
+                            <td>Effective Date</td>
+                            <td>Cessation Date</td>
+                            <td>Last Modified By</td>
+                            <td>Last Modified Date</td>
+                        </tr>
+                        <tr>
+                            <td>Name</td>
+                            <td>Controller Type</td>
+                            <td>Registered Number</td>
+                            <td>Control Type</td>
+                            <td>% of Holding</td>
+                            <td>Effective Date</td>
+                            <td>Cessation Date</td>
+                            <td>Last Modified By</td>
+                            <td>Last Modified Date</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-    </section> 
+        </div>
+
+        <div class="inputs-field-set">
+            <div class="section">
+                <h2>Ultimate Beneficial Owners For</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Controller Type</th>
+                            <th>Registered Number</th>
+                            <th>Control Type</th>
+                            <th>% of Holding</th>
+                            <th>Effective Date</th>
+                            <th>Cessation Date</th>
+                            <th>Last Modified By</th>
+                            <th>Last Modified Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Name</td>
+                            <td>Controller Type</td>
+                            <td>Registered Number</td>
+                            <td>Control Type</td>
+                            <td>% of Holding</td>
+                            <td>Effective Date</td>
+                            <td>Cessation Date</td>
+                            <td>Last Modified By</td>
+                            <td>Last Modified Date</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
 
     <!--Auditors-->
     <section id='Auditors' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
-            <div class="inputs-field-set">
-                <div class="edit-firm-actions">
-                    <h2 class="edit-firm-header">
-                       This is the Auditors section
-                    </h2>
+
+        <div class="inputs-field-set">
+            <div class="section">
+                <div class="auditor-header">
+                    <h2>Auditors For</h2>
+                    <span>
+                        <input id="InactiveAuditors" type="checkbox">
+                        <label>Display Inactive Auditors</label>
+                    </span>
                 </div>
-                <div class="edit-firms-inputs">
-                   <div class="input-field">
-                        <label for="formReff">
-                            Form Refferance: 
-                        </label>
-                        <input disabled name="formReff" id="formReff" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="linkToScope">
-                            Link To Scope
-                        </label>
-                        <input disabled name="linkToScope" id="linkToScope" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="scopeRevNum">
-                            Scope Revision Number
-                        </label>
-                        <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="appDate">
-                            Application Date
-                        </label>
-                        <input disabled name="appDate" id="appDate" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="licenseDate">
-                            License Date
-                        </label>
-                        <input disabled name="licenseDate" id="licenseDate" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="createdBy">
-                            Created By
-                        </label>
-                        <input disabled name="createdBy" id="createdBy" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="createdDate">
-                            Creation Date
-                        </label>
-                        <input disabled name="createdDate" id="createdDate" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="modBy">
-                            Modified By
-                        </label>
-                        <input disabled name="modBy" id="modBy" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="modDate">
-                            Modification Date
-                        </label>
-                        <input disabled name="modDate" id="modDate" type="text" value="">
-                    </div>
-                </div>
-        
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Auditor Name</th>
+                            <th>Auditor Type</th>
+                            <th>Effective From Date</th>
+                            <th>Effective To Date</th>
+                            <th>Last Updated By</th>
+                            <th>Last Updated Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>Auditor Name</td>
+                            <td>Auditor Type</td>
+                            <td>Effective From Date</td>
+                            <td>Effective To Date</td>
+                            <td>Last Updated By</td>
+                            <td>Last Updated Date</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+        </div>
     </section>
 
     <!--Contacts-->
     <section id='Contacts' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
         <div class="inputs-field-set">
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                   This is the Contacts section
-                </h2>
+            <div class="section">
+                <div class="contacts-header">
+                    <h2>Contacts For</h2>
+                    <span>
+                        <input id="InactiveContacts" type="checkbox">
+                        <label>Display Inactive Contacts</label>
+                    </span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Name</th>
+                            <th>Contact Type</th>
+                            <th>Contact Form</th>
+                            <th>Position/Job Title</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>Name</td>
+                            <td>Contact Type</td>
+                            <td>Contact Form</td>
+                            <td>Position/Job Title</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="edit-firms-inputs">
-               <div class="input-field">
-                    <label for="formReff">
-                        Form Refferance: 
-                    </label>
-                    <input disabled name="formReff" id="formReff" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="linkToScope">
-                        Link To Scope
-                    </label>
-                    <input disabled name="linkToScope" id="linkToScope" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="scopeRevNum">
-                        Scope Revision Number
-                    </label>
-                    <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="appDate">
-                        Application Date
-                    </label>
-                    <input disabled name="appDate" id="appDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="licenseDate">
-                        License Date
-                    </label>
-                    <input disabled name="licenseDate" id="licenseDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="createdBy">
-                        Created By
-                    </label>
-                    <input disabled name="createdBy" id="createdBy" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="createdDate">
-                        Creation Date
-                    </label>
-                    <input disabled name="createdDate" id="createdDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="modBy">
-                        Modified By
-                    </label>
-                    <input disabled name="modBy" id="modBy" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="modDate">
-                        Modification Date
-                    </label>
-                    <input disabled name="modDate" id="modDate" type="text" value="">
-                </div>
-            </div>
-    
         </div>
     </section>
 
@@ -751,55 +759,100 @@
 
     <!--Start Individuals sub sections-->
 
-    <!--Individuals Core Details-->
-    <section id='INDCD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+    <!--Individuals Details-->
+    <section id='INDDetails' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
         <div class="inputs-field-set">
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                   This is the Individuals Core Details section
-                </h2>
-            </div>
-            <div class="edit-firms-inputs">
-               <div class="input-field">
-                    <label for="formReff">
-                        Form Refferance: 
-                    </label>
-                    <input disabled name="formReff" id="formReff" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="linkToScope">
-                        Link To Scope
-                    </label>
-                    <input disabled name="linkToScope" id="linkToScope" type="text" value="">
-                </div>
-            </div>
-    
-        </div>
-    </section>
+            <div class="section">
+                <h2>Applied For</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Individual Name</th>
+                            <th>Controlled Functions</th>
+                            <th>Form Type</th>
+                            <th>Applied Date</th>
+                            <th>Function Status</th>
+                            <th>RSG Assessment Completion Date</th>
+                            <th>Request Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-    <!--Individuals Scope-->
-    <section id='INDScope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="inputs-field-set">
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                   This is the Individuals Scope section
-                </h2>
+            <div class="section">
+                <h2>Approved Functions For</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Individual Name</th>
+                            <th>Controlled Functions</th>
+                            <th>Applied Date</th>
+                            <th>Conditionally Approved Date</th>
+                            <th>Conditional Approved Expiry Date</th>
+                            <th>Approved Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>Individual Name</td>
+                            <td>Controlled Functions</td>
+                            <td>Applied Date</td>
+                            <td>Conditionally Approved Date</td>
+                            <td>Conditional Approved Expiry Date</td>
+                            <td>Approved Date</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="edit-firms-inputs">
-               <div class="input-field">
-                    <label for="formReff">
-                        Form Refferance: 
-                    </label>
-                    <input disabled name="formReff" id="formReff" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="linkToScope">
-                        Link To Scope
-                    </label>
-                    <input disabled name="linkToScope" id="linkToScope" type="text" value="">
-                </div>
+        </div>
+
+        <div class="inputs-field-set">
+            <div class="section">
+                <h2>Withdraw Functions For</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Individual Name</th>
+                            <th>Controlled Functions</th>
+                            <th>Form Type</th>
+                            <th>Previous Status</th>
+                            <th>Current Status</th>
+                            <th>Current Status Effective Date</th>
+                            <th>Request Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>Individual Name</td>
+                            <td>Controlled Functions</td>
+                            <td>Form Type</td>
+                            <td>Previous Status</td>
+                            <td>Current Status</td>
+                            <td>Current Status Effective Date</td>
+                            <td>Request Status</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-    
         </div>
     </section>
 
@@ -807,56 +860,414 @@
 
     <!--Start Supervision sub sections-->
 
-        <!--Supervision Core Details-->
-    <section id='SPCD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
-            <div class="inputs-field-set">
-                <div class="edit-firm-actions">
-                    <h2 class="edit-firm-header">
-                       This is the Supervision Core Details section
-                    </h2>
-                </div>
-                <div class="edit-firms-inputs">
-                   <div class="input-field">
-                        <label for="formReff">
-                            Form Refferance: 
-                        </label>
-                        <input disabled name="formReff" id="formReff" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="linkToScope">
-                            Link To Scope
-                        </label>
-                        <input disabled name="linkToScope" id="linkToScope" type="text" value="">
-                    </div>
-                </div>
-        
+    <!--Supervision Reporting Schedule-->
+    <section id='SPRS' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="section">
+                <h2>Reporting Schedule For</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Reporting Schedule From</th>
+                            <th>Reporting Schedule To</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>12/10/2020</td>
+                            <td>5/8/2016</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+        </div>
     </section>
-    
-        <!--Supervision Scope-->
-    <section id='SPScope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
-            <div class="inputs-field-set">
-                <div class="edit-firm-actions">
-                    <h2 class="edit-firm-header">
-                       This is the Supervision Scope section
-                    </h2>
+
+    <!--Supervision Review-->
+    <section id='SPReview' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="section">
+                <div class="return-review-header">
+                    <h2>Return Review For</h2>
+                    <span>
+                        <label>Report Type : </label>
+                        <select name="reportType" id="reportType" class="SPReview-dropdown">
+                            <option>All</option>
+                        </select>
+                    </span>
                 </div>
-                <div class="edit-firms-inputs">
-                   <div class="input-field">
-                        <label for="formReff">
-                            Form Refferance: 
-                        </label>
-                        <input disabled name="formReff" id="formReff" type="text" value="">
-                    </div>
-                    <div class="input-field">
-                        <label for="linkToScope">
-                            Link To Scope
-                        </label>
-                        <input disabled name="linkToScope" id="linkToScope" type="text" value="">
-                    </div>
-                </div>
-        
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Ver</th>
+                            <th>Report</th>
+                            <th>Report Period Start Date</th>
+                            <th>Report Period End Date</th>
+                            <th>Received Date</th>
+                            <th>Review Status Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>Ver</td>
+                            <td>Report</td>
+                            <td>Report Period Start Date</td>
+                            <td>Report Period End Date</td>
+                            <td>Received Date</td>
+                            <td>Review Status Date</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+        </div>
+    </section>
+
+    <!--Supervision Notices-->
+    <section id='SPNotices' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="section">
+                <h2>Notices And Responses -</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Notice Type</th>
+                            <th>Notice Name</th>
+                            <th>Internal Reference Number</th>
+                            <th>Notice Issuer</th>
+                            <th>Notice Issued Date</th>
+                            <th>Issuer's Reference Number</th>
+                            <th>Subject</th>
+                            <th>Notice Finalized Date</th>
+                            <th>Date Published on Website</th>
+                            <th>Notice Sent Date</th>
+                            <th>Response Due Date</th>
+                            <th>Response Provided Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>Notice Type</td>
+                            <td>Notice Name</td>
+                            <td>Internal Reference Number</td>
+                            <td>Notice Issuer</td>
+                            <td>Notice Issued Date</td>
+                            <td>Issuer's Reference Number</td>
+                            <td>Subject</td>
+                            <td>Notice Finalized Date</td>
+                            <td>Date Published on Website</td>
+                            <td>Notice Sent Date</td>
+                            <td>Response Due Date</td>
+                            <td>Response Provided Date</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!--Supervision Admin Fee-->
+    <section id='SPAdminFee' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="section">
+                <h2>Admin Fees For</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Report Name</th>
+                            <th>Report Due Date</th>
+                            <th>Materially Complete Report Receive Date</th>
+                            <th>Fee Calculated</th>
+                            <th>Fee Imposed</th>
+                            <th>Review Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>Report Name</td>
+                            <td>Report Due Date</td>
+                            <td>Materially Complete Report Receive Date</td>
+                            <td>Fee Calculated</td>
+                            <td>Fee Imposed</td>
+                            <td>Review Status</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!--Supervision RMPs-->
+    <section id='SPRMPs' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="section">
+                <h2>RMPs For</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>RMP ID</th>
+                            <th>Date Created</th>
+                            <th>Type</th>
+                            <th>Date Firm Agreed</th>
+                            <th>Agreed By</th>
+                            <th>RMP Status</th>
+                            <th>Review Status</th>
+                            <th>Review Status Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>RMP ID</td>
+                            <td>Date Created</td>
+                            <td>Type</td>
+                            <td>Date Firm Agreed</td>
+                            <td>Agreed By</td>
+                            <td>RMP Status</td>
+                            <td>Review Status</td>
+                            <td>Review Status Date</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!--Supervision Breaches-->
+    <section id='SPBreaches' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="section">
+                <h2>Breaches For</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Breach Number</th>
+                            <th>Version</th>
+                            <th>Breach Type</th>
+                            <th>Breach Category</th>
+                            <th>Breach Level</th>
+                            <th>Date Of Breach</th>
+                            <th>Breach Status</th>
+                            <th>Last Updated By</th>
+                            <th>Last Updated Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>Breach Number</td>
+                            <td>Version</td>
+                            <td>Breach Type</td>
+                            <td>Breach Category</td>
+                            <td>Breach Level</td>
+                            <td>Date Of Breach</td>
+                            <td>Breach Status</td>
+                            <td>Last Updated By</td>
+                            <td>Last Updated Date</td>
+                        </tr>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>Breach Number</td>
+                            <td>Version</td>
+                            <td>Breach Type</td>
+                            <td>Breach Category</td>
+                            <td>Breach Level</td>
+                            <td>Date Of Breach</td>
+                            <td>Breach Status</td>
+                            <td>Last Updated By</td>
+                            <td>Last Updated Date</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!--Supervision Waivers-->
+    <section id='SPWaivers' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="section">
+                <h2>Waiver And/Or Modification For</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Waiver Number</th>
+                            <th>Version</th>
+                            <th>Waiver Type</th>
+                            <th>Subject</th>
+                            <th>Waiver Status</th>
+                            <th>Status Date</th>
+                            <th>Review Date</th>
+                            <th>Review Decision</th>
+                            <th>Expiration Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>Waiver Number</td>
+                            <td>Version</td>
+                            <td>Waiver Type</td>
+                            <td>Subject</td>
+                            <td>Waiver Status</td>
+                            <td>Status Date</td>
+                            <td>Review Date</td>
+                            <td>Review Decision</td>
+                            <td>Expiration Date</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!--Supervision ENF Actions-->
+    <section id='SPENFAction' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="section">
+                <div class="ENFAction-header">
+                    <h2>List Of Enforcement & Disciplinary Actions</h2>
+                    <span>
+                        <input id="deletedRecords" type="checkbox">
+                        <label>Display Deleted Records</label>
+                    </span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Action</th>
+                            <th>Type Of Action</th>
+                            <th>Date Of Action</th>
+                            <th>Firm Name</th>
+                            <th>Approved Individual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="radio-table">
+                                <label class="radioBtn">
+                                    <input type="radio">
+                                    <span></span>
+                                </label>      
+                            </td>
+                            <td>Action</td>
+                            <td>Type Of Action</td>
+                            <td>Date Of Action</td>
+                            <td>Firm Name</td>
+                            <td>Approved Individual</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!--Supervision Reg. Funds-->
+    <section id='SPRegFunds' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="section">
+                <h2>List Of Registered Funds For</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Fund Number</th>
+                            <th>Fund Name</th>
+                            <th>Type Of Fund</th>
+                            <th>Status</th>
+                            <th>Status Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                           
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!--Supervision Journal-->
+    <section id='SPJournal' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="inputs-field-set">
+            <div class="section">
+                <div class="Journal-header">
+                    <h2>Journal Entries For</h2>
+                    <span>
+                        <input id="deletedEntries" type="checkbox">
+                        <label>Display Deleted Entries</label>
+                    </span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th> <!--leave it empty-->
+                            <th>Entry Type</th>
+                            <th>Title</th>
+                            <th>Entry Date</th>
+                            <th>Last Modified Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                        
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </section>
 
     <!--End Supervision sub sections-->

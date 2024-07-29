@@ -30,9 +30,9 @@
             </a>
             <div class="menuOfTop" *ngIf="individuals == true">
                 <ul>
-                    <li>Open</li>
-                    <li>Change registration Status</li>
-                    <li>Pending Ai Application</li>
+                    <li (click)="goto(6)">Open</li>
+                    <li (click)="goto(7)">Change registration Status</li>
+                    <li (click)="goto(8)">Pending Ai Application</li>
                 </ul>
             </div>
         </li>
@@ -42,7 +42,7 @@
             </a>
             <div class="menuOfTop" *ngIf="reports == true">
                 <ul>
-                    <li>Firms Report</li>
+                    <li (click)="goto(9)">Firms Report</li>
                     <li>Contacts Report</li>
                     <li>AI Application Reports</li>
                     <li>Approved individuals Report </li>
@@ -64,8 +64,8 @@
             </a>
             <div class="menuOfTop" *ngIf="admin == true">
                 <ul>
-                    <li>User Access</li>
-                    <li>Re-assign Tasks</li>
+                    <li (click)="goto(22)">User Access</li>
+                    <li (click)="goto(23)">Re-assign Tasks</li>
                     <li>Credit Ratings Upload</li>
                 </ul>
             </div>
@@ -85,7 +85,7 @@
                 Mustafa Habayeb
             </h4>
             <p class="pd-details-email">
-                mhabayeb@email.com
+                mhabayeb&#64;email.com
             </p>
         </div>
     </div>

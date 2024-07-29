@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import { DashboardService } from 'src/app/ngServices/dashboard.service';
 
 @Component({
   selector: 'app-ai-by-function',
@@ -7,15 +8,12 @@ import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
 })
 export class AIByFunctionComponent implements OnInit {
 
-  barNumber: Number = 10;
-  barNumber1: Number = 80;
-  barNumber2: Number = 80;
+  AIFunction: any[] = [];
 
-  constructor(private renderer: Renderer2, private el: ElementRef) { }
-
+  constructor(private renderer: Renderer2, private el: ElementRef, private dashboard: DashboardService) { }
 
   ngOnInit(): void {
-      this.setBars();
+    this.loadAIByFunction();
   }
 
   // setBars(): void {
@@ -73,32 +71,46 @@ export class AIByFunctionComponent implements OnInit {
   // }
 
   setBars(): void {
-    const barElement = this.el.nativeElement.querySelector('#ActuarialFunction');
-    const barElement1 = this.el.nativeElement.querySelector('#ComplianceOversightFunction');
-    const barElement2 = this.el.nativeElement.querySelector('#ExecutiveGeovernceFunction');
-    const barElement3 = this.el.nativeElement.querySelector('#FinanceFunction');
-    const barElement4 = this.el.nativeElement.querySelector('#InternalAuditFunction');
-    const barElement5 = this.el.nativeElement.querySelector('#MIROFunction');
-    const barElement6 = this.el.nativeElement.querySelector('#Non-ExecutiveGovernanceFunction');
-    const barElement7 = this.el.nativeElement.querySelector('#RiskManager');
-    const barElement8 = this.el.nativeElement.querySelector('#SeniorExecutiveFunction');
-    const barElement9 = this.el.nativeElement.querySelector('#SeniorManagementFunction');
-  
+    if (!this.AIFunction || this.AIFunction.length === 0) {
+      return;
+    }
 
     const transitionStyle = 'height 0.7s ease-in-out';
-  
-    const elements = [barElement, barElement1, barElement2, barElement3, barElement4, barElement5, barElement6, barElement7, barElement8, barElement9];
-    const heights = ['10%', '40%', '70%', '30%', '50%', '70%', '70%', '40%', '20%', '40%'];
-  
-    elements.forEach((element, index) => {
-      if (element) {
-        this.renderer.setStyle(element, 'transition', transitionStyle);
-        this.renderer.setStyle(element, 'height', '0%');
-        setTimeout(() => {
-          this.renderer.setStyle(element, 'height', heights[index]);
-        }, 100);
+
+    this.AIFunction.forEach((data) => {
+      const elementId = this.formatId(data.Controlled_Function);
+      const barElement = this.el.nativeElement.querySelector(`#${elementId}`);
+      if (barElement) {
+        const barHeight = `${(data.Total_AI / 150) * 100 + 10}%`;
+        this.renderer.setStyle(barElement, 'transition', transitionStyle);
+        this.renderer.setStyle(barElement, 'height', '0%');
+       
+          this.renderer.setStyle(barElement, 'height', barHeight);
+       
+      } else {
+        console.error(`Element with ID ${elementId} not found`);
       }
     });
   }
-  
+
+  formatId(functionName: string): string { // this function removes spaces between words
+    return functionName.replace(/\s+/g, '').replace(/-/g, '');
+  }
+
+  loadAIByFunction() {
+    this.dashboard.getDashboardFirms(30).subscribe(
+      (data) => {
+        const resultSet2 = data.response.find((set: any) => set.key === 'ResultSet2');
+        if (resultSet2) {
+          this.AIFunction = resultSet2.value || [];
+        }
+        setTimeout(() => {
+        this.setBars();
+        },100)
+      },
+      (error) => {
+        console.error('API Error:', error);
+      }
+    );
+  }
 }
