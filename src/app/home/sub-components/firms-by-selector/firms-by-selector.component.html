@@ -84,17 +84,17 @@
       <h3>Firm by sector</h3>
     </div>
     <div class="numbers">
-      <img src="../../../../assets/images/numbers.PNG">
+      <img src="../../../../assets/images/number.png">
     </div>
     <div class="chart-bars">
-      <div *ngFor="let sectorFunction of sectorFunction" class="chart-1bar">
-        <div class="bar" [id]="formatId(sectorFunction.SectorType)">
+      <div *ngFor="let sectorfunction of sectorFunction" class="chart-1bar">
+        <div class="bar" [id]="formatId(sectorfunction.SectorType)">
           <div class="countOfBar">
-            {{ sectorFunction.TotalFirms }}
+            {{ sectorfunction.TotalFirms }}
           </div>
         </div>
         <div class="barTitle">
-          {{ sectorFunction.SectorType }}
+          {{ sectorfunction.SectorType }}
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { Component, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
+import { FontSizeService } from 'src/app/ngServices/font-size.service';
 
 @Component({
   selector: 'app-header',
@@ -7,13 +8,17 @@ import { Router } from '@angular/router';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
+  isIncreaseFontSizeEnabled: boolean = true;
+  isMaxFontSizeEnabled: boolean = true;
+  isDefaultEnabled: boolean = true;
 
   constructor(
-    private router: Router
+    private router: Router,
+    private fontSizeService: FontSizeService
   ){};
 
   ngOnInit(): void {
-      
+    this.isDefaultEnabled = false;
   }
 
   firms:boolean = false;
@@ -102,5 +107,29 @@ export class HeaderComponent implements OnInit {
     if (where == 23) {
       this.router.navigate(['home/re-assign-tasks'])
     }
+  }
+
+  increaseFontSize() {
+    if (this.isIncreaseFontSizeEnabled) {
+      this.fontSizeService.increaseFontSize();
+      this.isIncreaseFontSizeEnabled = false;
+      this.isMaxFontSizeEnabled = true;
+      this.isDefaultEnabled = true;
+    }
+  }
+
+  
+  setMaxFontSize() {
+    this.fontSizeService.setMaxFontSize();
+    this.isMaxFontSizeEnabled = false; 
+    this.isIncreaseFontSizeEnabled = true; 
+    this.isDefaultEnabled = true;
+  }
+
+  resetFontSize() {
+    this.fontSizeService.resetFontSize();
+    this.isMaxFontSizeEnabled = true; 
+    this.isIncreaseFontSizeEnabled = true;
+    this.isDefaultEnabled = false;
   }
 }
