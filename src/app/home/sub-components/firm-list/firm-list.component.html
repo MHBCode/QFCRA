@@ -17,15 +17,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let item of firms.slice(0, listCount)" (click)="viewFirm(item.firmID)" >
-                    <td>{{ item.qfcNum }}</td>
-                    <td>{{ item.firmName }}</td>
-                    <td>{{ item.legalStatusTypeDesc }}</td>
-                    <td>{{ item.licenseStatusTypeDesc }}</td>
-                    <td>{{ item.authorisationStatusTypeDesc }}</td>
-                    <td>{{ item.sectorTypeShortDesc }}</td>
-                    <td>{{ item.authorisationCategoryTypeDesc }}</td>
-                    <td>{{ item.assignmentLevel }}</td>
+                <tr *ngFor="let item of firms.slice(0, listCount)" (click)="viewFirm(item.FirmID)" >
+                    <td>{{ item.QFCNum }}</td>
+                    <td>{{ item.FirmName }}</td>
+                    <td>{{ item.LegalStatusTypeDesc }}</td>
+                    <td>{{ item.LicenseStatusTypeDesc }}</td>
+                    <td>{{ item.AuthorisationStatusTypeDesc }}</td>
+                    <td>{{ item.SectorTypeShortDesc }}</td>
+                    <td>{{ item.AuthorisationCategoryTypeDesc }}</td>
+                    <td>{{ item.AssignmentLevel }}</td>
                 </tr>
             </tbody>
         </table>

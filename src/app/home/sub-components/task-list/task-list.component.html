@@ -23,20 +23,20 @@
         </thead>
         <tbody>
             <tr *ngFor="let item of Tasks.slice(0, listCount)">
-                <td>{{item.taskType}}</td>
-                <td>{{item.link}}</td>
-                <td>{{item.firmName}}</td>
-                <td>{{item.shortDescription}}</td>
-                <td>{{item.taskDueDate}}</td>
-                <td *ngIf = "isMainView">{{item.objectID}}</td>
-                <td *ngIf = "isMainView">{{item.objectInstanceID}}</td>
-                <td *ngIf = "isMainView">{{item.objectInstanceNum}}</td>
-                <td *ngIf = "isMainView">{{item.taskInitiatedDate}}</td>
-                <td *ngIf = "isMainView">{{item.taskInitiatedBy}}</td>
-                <td *ngIf = "isMainView">{{item.isCommonTask}}</td>
-                <td *ngIf = "isMainView">{{item.firmID}}</td>
-                <td *ngIf = "isMainView">{{item.daysOverDue}}</td>
-                <td *ngIf = "isMainView">{{item.comments}}</td>
+                <td>{{item.TaskType}}</td>
+                <td>{{item.Link}}</td>
+                <td>{{item.FirmName}}</td>
+                <td>{{item.ShortDescription}}</td>
+                <td>{{item.TaskDueDate}}</td>
+                <td *ngIf = "isMainView">{{item.ObjectID}}</td>
+                <td *ngIf = "isMainView">{{item.ObjectInstanceID}}</td>
+                <td *ngIf = "isMainView">{{item.ObjectInstanceNum}}</td>
+                <td *ngIf = "isMainView">{{item.TaskInitiatedDate}}</td>
+                <td *ngIf = "isMainView">{{item.TaskInitiatedBy}}</td>
+                <td *ngIf = "isMainView">{{item.IsCommonTask}}</td>
+                <td *ngIf = "isMainView">{{item.FirmID}}</td>
+                <td *ngIf = "isMainView">{{item.DaysOverDue}}</td>
+                <td *ngIf = "isMainView">{{item.Comments}}</td>
             </tr>
             <!-- Add more rows as needed -->
         </tbody>

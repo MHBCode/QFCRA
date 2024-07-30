@@ -1,3 +1,64 @@
+import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import { DashboardService } from 'src/app/ngServices/dashboard.service';
+
+@Component({
+  selector: 'app-firms-by-selector',
+  templateUrl: './firms-by-selector.component.html',
+  styleUrls: ['./firms-by-selector.component.scss']
+})
+export class FirmsBySelectorComponent implements OnInit {
+  sectorFunction: any[] = [];
+
+  constructor(private renderer: Renderer2, private el: ElementRef, private dashboard: DashboardService) { }
+
+  ngOnInit(): void {
+    this.loadSectorByFunction();
+  }
+
+  setBars(): void {
+    if (!this.sectorFunction || this.sectorFunction.length === 0) {
+      return;
+    }
+
+    const transitionStyle = 'height 0.7s ease-in-out';
+
+    this.sectorFunction.forEach((data) => {
+      const elementId = this.formatId(data.SectorType);
+      const barElement = this.el.nativeElement.querySelector(`#${elementId}`);
+      if (barElement) {
+        const barHeight = `${(data.TotalFirms / 100) * 100 + 10}%`;
+        this.renderer.setStyle(barElement, 'transition', transitionStyle);
+        this.renderer.setStyle(barElement, 'height', '0%');
+         this.renderer.setStyle(barElement, 'height', barHeight);
+      } else {
+        console.error(`Element with ID ${elementId} not found`);
+      }
+    });
+  }
+
+  formatId(functionName: string): string { 
+    return functionName.replace(/\s+/g, '').replace(/-/g, '').replace(/[()]/g, '');
+  }
+
+  loadSectorByFunction() {
+    this.dashboard.getDashboardFirms(10044).subscribe(
+      (data) => {
+        const resultSet3 = data.response.find((set: any) => set.key === 'ResultSet3');
+        if (resultSet3) {
+          this.sectorFunction = resultSet3.value || [];
+        }
+        setTimeout(() => {
+          this.setBars();
+        }, 100);
+      },
+      (error) => {
+        console.error('API Error:', error);
+      }
+    );
+  }
+}
+
+
 
 // import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
 // @Component({
@@ -96,24 +157,7 @@
 // }
 
 
-import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
-import { DashboardService } from 'src/app/ngServices/dashboard.service';
-@Component({
-  selector: 'app-firms-by-selector',
-  templateUrl: './firms-by-selector.component.html',
-  styleUrls: ['./firms-by-selector.component.scss']
-})
-export class FirmsBySelectorComponent implements OnInit {
-  sectorFunction: any[] = [];
-
-  constructor(private renderer: Renderer2, private el: ElementRef, private dashboard: DashboardService) { }
-
-
-  ngOnInit(): void {
-    this.loadSectorByFunction();
-  }
-
-  // setBars(): void {
+ // setBars(): void {
   //   const barElement = this.el.nativeElement.querySelector('#ActuarialFunction');
   //   const barElement1 = this.el.nativeElement.querySelector('#ComplianceOversightFunction');
   //   const barElement2 = this.el.nativeElement.querySelector('#ExecutiveGeovernceFunction');
@@ -166,48 +210,3 @@ export class FirmsBySelectorComponent implements OnInit {
   //     this.renderer.setStyle(barElement9, 'height', barHeight);
   //   } 
   // }
-  setBars(): void {
-    if (!this.sectorFunction || this.sectorFunction.length === 0) {
-      return;
-    }
-
-    const transitionStyle = 'height 0.7s ease-in-out';
-
-    this.sectorFunction.forEach((data) => {
-      const elementId = this.formatId(data.SectorType);
-      const barElement = this.el.nativeElement.querySelector(`#${elementId}`);
-      if (barElement) {
-        const barHeight = `${(data.TotalFirms / 150) * 100 + 10}%`;
-        this.renderer.setStyle(barElement, 'transition', transitionStyle);
-        this.renderer.setStyle(barElement, 'height', '0%');
-
-        this.renderer.setStyle(barElement, 'height', barHeight);
-
-      } else {
-        console.error(`Element with ID ${elementId} not found`);
-      }
-    });
-  }
-
-  formatId(functionName: string): string { // this function removes spaces between words
-    return functionName.replace(/\s+/g, '').replace(/-/g, '');
-  }
-
-  loadSectorByFunction() {
-    this.dashboard.getDashboardFirms(30).subscribe(
-      (data) => {
-        const resultSet3 = data.response.find((set: any) => set.key === 'ResultSet3');
-        if (resultSet3) {
-          this.sectorFunction = resultSet3.value || [];
-        }
-        setTimeout(() => {
-        this.setBars();
-        },100)
-      },
-      (error) => {
-        console.error('API Error:', error);
-      }
-    );
-  }
-}
-

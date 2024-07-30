@@ -11,27 +11,11 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>XBRL Product Returns</td>
-                <td class="numbers">5</td>
-                <td class="numbers">2</td>
+            <tr *ngFor="let reportSubmissions of ReportSubmissions.slice(0,listCount)">
+                <td>{{reportSubmissions.ReportName}}</td>
+                <td class="numbers">{{reportSubmissions.Submitted.value}}</td>
+                <td class="numbers">{{reportSubmissions['Not Submitted']}}</td>
             </tr>
-            <tr>
-                <td>Lead Regulator Capital Resources Report</td>
-                <td class="numbers">12</td>
-                <td class="numbers">0</td>
-            </tr>
-            <tr>
-                <td>Form Q27 AML/CFT RETURN</td>
-                <td class="numbers">0</td>
-                <td class="numbers">28</td>
-            </tr>
-            <tr>
-                <td>Bank Return (Solo)</td>
-                <td class="numbers">5</td>
-                <td class="numbers">0</td>
-            </tr>
-            <!-- Add more rows as needed -->
         </tbody>
     </table>
 </div>

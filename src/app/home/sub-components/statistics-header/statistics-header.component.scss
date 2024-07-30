@@ -37,17 +37,17 @@
 }
 .ssd-title{
     color: #A3AED0;
-    font-size: 12px;
+    font-size: 0.75em;
     font-weight: 500; 
 }
 .ssd-count{
     color: #333333;
-    font-size: 24px;
+    font-size: 1.5em;
     font-weight: 700; 
 }
 .ssd-discreption{
     color: #A3AED0;
-    font-size: 11px;
+    font-size: 0.6875em;
     font-weight: 400; 
 }
 .ssd-discreption span{
@@ -56,11 +56,11 @@
 }
 @media (max-width: 1450px) {
     .ssd-discreption{
-        font-size: 9.5px;
+        font-size: 0.620em;
     }
 }
 @media (max-width: 1300px) {
     .ssd-discreption{
-        font-size: 8px;
+        font-size: 0.5em;
     }
 }

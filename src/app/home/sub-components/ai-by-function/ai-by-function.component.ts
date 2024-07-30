@@ -81,11 +81,10 @@ export class AIByFunctionComponent implements OnInit {
       const elementId = this.formatId(data.Controlled_Function);
       const barElement = this.el.nativeElement.querySelector(`#${elementId}`);
       if (barElement) {
-        const barHeight = `${(data.Total_AI / 150) * 100 + 10}%`;
+        const barHeight = `${(data.Total_AI / 100) * 100 + 10}%`;
         this.renderer.setStyle(barElement, 'transition', transitionStyle);
         this.renderer.setStyle(barElement, 'height', '0%');
-       
-          this.renderer.setStyle(barElement, 'height', barHeight);
+        this.renderer.setStyle(barElement, 'height', barHeight);
        
       } else {
         console.error(`Element with ID ${elementId} not found`);
@@ -98,7 +97,7 @@ export class AIByFunctionComponent implements OnInit {
   }
 
   loadAIByFunction() {
-    this.dashboard.getDashboardFirms(30).subscribe(
+    this.dashboard.getDashboardFirms(10044).subscribe(
       (data) => {
         const resultSet2 = data.response.find((set: any) => set.key === 'ResultSet2');
         if (resultSet2) {
