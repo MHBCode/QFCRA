@@ -103,6 +103,14 @@
                 </h2>
             </div>
             <div class="edit-firms-inputs">
+
+                <div class="input-field">
+                    <label for="FirmName">
+                        Firm Name
+                    </label>
+                    <input disabled name="firmName" id="firmName" type="text"
+                        value="{{firmDetails?.placeOfIncorporation}}">
+                </div>
                 <div class="input-field">
                     <label for="QFCNumber">
                         QFC Number
@@ -130,19 +138,13 @@
                         value="{{firmDetails?.firmPrudentialCategory}}">
                 </div>
                 <div class="input-field">
-                    <label for="qfctradingName">
-                        QFC trading Name
+                    <label for="FinancialYearEnd">
+                        Financial Year End
                     </label>
-                    <input disabled name="qfctradingName" id="qfctradingName" type="text"
+                    <input disabled name="financialYearEnd" id="financialYearEnd" type="text"
                         value="{{firmDetails?.qfctradingName}}">
                 </div>
-                <div class="input-field">
-                    <label for="placeOfIncorporation">
-                        Place Of Incorporation
-                    </label>
-                    <input disabled name="placeOfIncorporation" id="placeOfIncorporation" type="text"
-                        value="{{firmDetails?.placeOfIncorporation}}">
-                </div>
+                
                 <!--Cant find it the returned object!-->
                 <!-- <div class="input-field">
                     <label for="financialYearEnd">
@@ -177,11 +179,34 @@
                     <input disabled name="dateOfApplication" id="dateOfApplication" type="text"
                         value="{{firmDetails?.createdDate | date:'MM/dd/yyyy'}}">
                 </div>
+
                 <div class="input-field">
-                    <label for="crocertificateLink">
-                        Crocertificate Link
+                    <label for="firmApplicationType">
+                        Firm Application Type
                     </label>
-                    <input type="text" disabled name="crocertificateLink" id="crocertificateLink"
+                    <input type="text" disabled name="firmApplicationType" id="firmApplicationType" value="Authorisasion">
+                </div>
+
+                <div class="input-field">
+                    <label for="qfcLicenseStatus">
+                        QFC License Status
+                    </label>
+                    <input disabled type="text" name="qfcLicenseStatus" id="qfcLicenseStatus" value="Not In Integration!">
+                </div>
+
+                <div class="input-field">
+                    <label for="DateLicensed">
+                        Date Licensed
+                    </label>
+                    <input disabled name="DateLicensed" id="DateLicensed" type="text"
+                        value="{{firmDetails?.licensedDate | date:'MM/dd/yyyy'}}">
+                </div>
+
+                <div class="input-field">
+                    <label for="authorisationStatus">
+                       Authorisation Status
+                    </label>
+                    <input type="text" disabled name="authorisationStatus" id="authorisationStatus"
                         value="{{firmDetails?.crocertificateLink}}">
                 </div>
                 <!-- not found in integration response -->
@@ -191,13 +216,17 @@
                     </label>
                     <input type="text" disabled name="firmApplicationType" id="firmApplicationType" value="Authorithasion">
                 </div> -->
-                <div class="input-field">
-                    <label for="DateLicensed">
-                        Date Licensed
-                    </label>
-                    <input disabled name="DateLicensed" id="DateLicensed" type="text"
-                        value="{{firmDetails?.licensedDate | date:'MM/dd/yyyy'}}">
-                </div>
+
+               
+
+
+
+
+
+                
+
+
+               
                 <div class="input-field">
                     <label for="dateApplication">
                         Date Authorized
@@ -211,25 +240,35 @@
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    Comments
+                   Operational Information
                 </h2>
                 <div class="edit-btn">
                 </div>
             </div>
             <div class="edit-firms-inputs">
+                
                 <div class="input-field">
-                    <label for="generalComments">
-                        General Comments
+                    <label for="noOfStaffInQatar">
+                        No. Of Staff In Qatar :
                     </label>
-                    <textarea disabled name="generalComments" id="generalComments"
-                        placeholder="{{firmDetails?.firmApplicationDataComments}}"></textarea>
+                    <input disabled name="noOfStaffInQatar" id="noOfStaffInQatar" type="text"
+                        value="{{firmDetails?.createdDate | date:'MM/dd/yyyy'}}">
                 </div>
+
                 <div class="input-field">
-                    <label for="publicRegisterComments">
-                        Public Register Comments
+                    <label for="staffTotal">
+                        Staff total :
                     </label>
-                    <textarea disabled name="publicRegisterComments" id="publicRegisterComments"
-                        placeholder="{{firmDetails?.publicRegisterComments}}"></textarea>
+                    <input disabled name="staffTotal" id="staffTotal" type="text"
+                        value="{{firmDetails?.licensedDate | date:'MM/dd/yyyy'}}">
+                </div>
+
+                <div class="input-field">
+                    <label for="notes">
+                       Notes :
+                    </label>
+                    <input type="text" disabled name="notes" id="notes"
+                        value="{{firmDetails?.crocertificateLink}}">
                 </div>
             </div>
         </div>
