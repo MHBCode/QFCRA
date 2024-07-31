@@ -9,7 +9,7 @@ import { FontSizeService } from 'src/app/ngServices/font-size.service';
 })
 export class HeaderComponent implements OnInit {
   isIncreaseFontSizeEnabled: boolean = true;
-  isMaxFontSizeEnabled: boolean = true;
+  isDecreaseFontSizeEnabled: boolean = true;
   isDefaultEnabled: boolean = true;
 
   constructor(
@@ -115,24 +115,24 @@ export class HeaderComponent implements OnInit {
   increaseFontSize() {
     if (this.isIncreaseFontSizeEnabled) {
       this.fontSizeService.increaseFontSize();
-      this.isIncreaseFontSizeEnabled = false;
-      this.isMaxFontSizeEnabled = true;
-      this.isDefaultEnabled = true;
+      // this.isIncreaseFontSizeEnabled = false;
+      // this.isDecreaseFontSizeEnabled = true;
+      // this.isDefaultEnabled = true;
     }
   }
 
   
-  setMaxFontSize() {
-    this.fontSizeService.setMaxFontSize();
-    this.isMaxFontSizeEnabled = false; 
-    this.isIncreaseFontSizeEnabled = true; 
-    this.isDefaultEnabled = true;
+  decreaseFontSize() {
+    this.fontSizeService.decreaseFontSize();
+    // this.isDecreaseFontSizeEnabled = false; 
+    // this.isIncreaseFontSizeEnabled = true; 
+    // this.isDefaultEnabled = true;
   }
 
   resetFontSize() {
     this.fontSizeService.resetFontSize();
-    this.isMaxFontSizeEnabled = true; 
-    this.isIncreaseFontSizeEnabled = true;
-    this.isDefaultEnabled = false;
+    // this.isDecreaseFontSizeEnabled = true; 
+    // this.isIncreaseFontSizeEnabled = true;
+    // this.isDefaultEnabled = false;
   }
 }

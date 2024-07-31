@@ -74,9 +74,9 @@
         </ul>
     </div>
     <div class="change-font">
-        <button class="font-btn reset-font-btn" (click)="resetFontSize()" [disabled]="!isDefaultEnabled">A</button>
-        <button class="font-btn increase-font-btn" (click)="increaseFontSize()" [disabled]="!isIncreaseFontSizeEnabled">A+</button>
-        <button class="font-btn max-font-btn" (click)="setMaxFontSize()" [disabled]="!isMaxFontSizeEnabled">A++</button>
+        <button class="font-btn decrease-font-size" (click)="decreaseFontSize()">A-</button>
+        <button class="font-btn reset-font-btn" (click)="resetFontSize()">A</button>
+        <button class="font-btn increase-font-btn" (click)="increaseFontSize()">A+</button>
     </div>
     <div class="profile-access">
         <div class="notifications">

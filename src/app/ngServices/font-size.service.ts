@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,22 +11,22 @@ export class FontSizeService {
   private fontSizeSubject = new BehaviorSubject<number>(16); // Default font size
   fontSize$ = this.fontSizeSubject.asObservable();
 
-  private resetSize = 16; // Default reset size
-
   private currentSize = 16; // Track current font size
-  
+
   increaseFontSize() {
-    this.currentSize = this.resetSize + 2;
+    if (this.currentSize < 25)
+    this.currentSize += 2;
     this.fontSizeSubject.next(this.currentSize);
   }
 
-  setMaxFontSize() {
-    this.currentSize = this.resetSize + 4;
+  decreaseFontSize() {
+    if (this.currentSize > 8)
+    this.currentSize -= 2;
     this.fontSizeSubject.next(this.currentSize);
   }
 
   resetFontSize() {
-    this.currentSize = this.resetSize;
+    this.currentSize = 16;
     this.fontSizeSubject.next(this.currentSize);
   }
 
