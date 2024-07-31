@@ -12,6 +12,7 @@ import { IndividualPendingAiAppsComponent } from './sub-pages/individualPages/in
 import { UserAccessComponent } from './sub-pages/adminPages/user-access/user-access.component';
 import { ReAssignTasksComponent } from './sub-pages/adminPages/re-assign-tasks/re-assign-tasks.component';
 import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm-reports.component';
+import { NoticesAndResponsesComponent } from './sub-pages/notices-and-responses/notices-and-responses.component';
 const routes: Routes = [
   { path: '', component: MainPageComponent},
   { path: 'firms-page', component: FirmsPageComponent},
@@ -24,7 +25,8 @@ const routes: Routes = [
   { path: 'individual-pending-ai-apps', component: IndividualPendingAiAppsComponent},
   { path: 'firm-reports', component: FirmReportsComponent},
   { path: 'userAccess', component: UserAccessComponent},
-  { path: 're-assign-tasks', component: ReAssignTasksComponent}
+  { path: 're-assign-tasks', component: ReAssignTasksComponent},
+  { path: 'notices-and-responses', component: NoticesAndResponsesComponent}
 ];
 
 @NgModule({

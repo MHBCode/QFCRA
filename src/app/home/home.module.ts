@@ -25,6 +25,7 @@ import { IndividualPendingAiAppsComponent } from './sub-pages/individualPages/in
 import { UserAccessComponent } from './sub-pages/adminPages/user-access/user-access.component';
 import { ReAssignTasksComponent } from './sub-pages/adminPages/re-assign-tasks/re-assign-tasks.component';
 import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm-reports.component';
+import { NoticesAndResponsesComponent } from './sub-pages/notices-and-responses/notices-and-responses.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm
     FirmReportsComponent,
     UserAccessComponent,
     ReAssignTasksComponent,
+    NoticesAndResponsesComponent,
   ],
   imports: [
     CommonModule,
