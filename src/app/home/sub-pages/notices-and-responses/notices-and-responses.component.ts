@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-notices-and-responses',
@@ -6,5 +7,13 @@ import { Component } from '@angular/core';
   styleUrls: ['./notices-and-responses.component.scss']
 })
 export class NoticesAndResponsesComponent {
-
+  
+  constructor( private router: Router) {
+   
+    
+  }
+  createNotice() {
+    this.router.navigate(['home/create-notices']);
+  }
 }
+

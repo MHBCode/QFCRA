@@ -13,6 +13,8 @@ import { UserAccessComponent } from './sub-pages/adminPages/user-access/user-acc
 import { ReAssignTasksComponent } from './sub-pages/adminPages/re-assign-tasks/re-assign-tasks.component';
 import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm-reports.component';
 import { NoticesAndResponsesComponent } from './sub-pages/notices-and-responses/notices-and-responses.component';
+import { CreateNoticesComponent } from './sub-pages/create-notices/create-notices.component';
+import { EnforcementAndDisciplinaryActionComponent } from './sub-pages/enforcement-and-disciplinary-action/enforcement-and-disciplinary-action.component';
 const routes: Routes = [
   { path: '', component: MainPageComponent},
   { path: 'firms-page', component: FirmsPageComponent},
@@ -26,7 +28,9 @@ const routes: Routes = [
   { path: 'firm-reports', component: FirmReportsComponent},
   { path: 'userAccess', component: UserAccessComponent},
   { path: 're-assign-tasks', component: ReAssignTasksComponent},
-  { path: 'notices-and-responses', component: NoticesAndResponsesComponent}
+  { path: 'notices-and-responses', component: NoticesAndResponsesComponent},
+  { path: 'create-notices' , component: CreateNoticesComponent},
+  { path: 'enforcement-and-disciplinary' , component:EnforcementAndDisciplinaryActionComponent}
 ];
 
 @NgModule({

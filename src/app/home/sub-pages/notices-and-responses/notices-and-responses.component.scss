@@ -141,12 +141,13 @@ tr:nth-child(even) {
 .brid-crump{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     padding: 0.5rem 1rem;
     padding-bottom: 0;
 }
-.edit-btn button{
+
+.btns button{
     background: #A51E36;
     padding: 0.5rem 1rem;
     display: flex;
@@ -158,8 +159,12 @@ tr:nth-child(even) {
     min-width: 6rem;
     min-height: 40px;;
 }
-.edit-btn button i{
+.btns button i{
     margin: 0 2px;
+}
+.btn-group {
+    display: flex;
+    gap: 0 1%;
 }
 /*Added*/
 .edit-firm-section{
