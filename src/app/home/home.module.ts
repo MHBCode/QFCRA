@@ -28,6 +28,7 @@ import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm
 import { NoticesAndResponsesComponent } from './sub-pages/notices-and-responses/notices-and-responses.component';
 import { CreateNoticesComponent } from './sub-pages/create-notices/create-notices.component';
 import { EnforcementAndDisciplinaryActionComponent } from './sub-pages/enforcement-and-disciplinary-action/enforcement-and-disciplinary-action.component';
+import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisors.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +54,7 @@ import { EnforcementAndDisciplinaryActionComponent } from './sub-pages/enforceme
     NoticesAndResponsesComponent,
     CreateNoticesComponent,
     EnforcementAndDisciplinaryActionComponent,
+    CoSupervisorsComponent,
   ],
   imports: [
     CommonModule,

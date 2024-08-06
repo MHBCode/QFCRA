@@ -15,6 +15,7 @@ import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm
 import { NoticesAndResponsesComponent } from './sub-pages/notices-and-responses/notices-and-responses.component';
 import { CreateNoticesComponent } from './sub-pages/create-notices/create-notices.component';
 import { EnforcementAndDisciplinaryActionComponent } from './sub-pages/enforcement-and-disciplinary-action/enforcement-and-disciplinary-action.component';
+import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisors.component';
 const routes: Routes = [
   { path: '', component: MainPageComponent},
   { path: 'firms-page', component: FirmsPageComponent},
@@ -30,7 +31,8 @@ const routes: Routes = [
   { path: 're-assign-tasks', component: ReAssignTasksComponent},
   { path: 'notices-and-responses', component: NoticesAndResponsesComponent},
   { path: 'create-notices' , component: CreateNoticesComponent},
-  { path: 'enforcement-and-disciplinary' , component:EnforcementAndDisciplinaryActionComponent}
+  { path: 'enforcement-and-disciplinary' , component:EnforcementAndDisciplinaryActionComponent},
+  { path: 'co-supervisors' , component:CoSupervisorsComponent}
 ];
 
 @NgModule({
