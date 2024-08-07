@@ -34,7 +34,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 20px;
+    font-size: 1.25em;
     cursor: pointer;
     z-index: 999;
 }
@@ -50,7 +50,7 @@
 }
 .menu-item h3{
     color: #333333;
-    font-size: 18px;
+    font-size: 1.125em;
     font-weight: 500;
     line-height: 27px;
     word-wrap: break-word;
@@ -63,7 +63,7 @@
 }
 .menu-item a{
     color: #333333;
-    font-size: 16px;
+    font-size: 1em;
     font-weight: 400;
     line-height: 24px;
     word-wrap: break-word;
@@ -110,7 +110,7 @@
 }
 .section h2 {
     color: #A51E36;
-    font-size: 20px;
+    font-size: 1.25em;
     font-weight: 500;
     line-height: 30px;
     word-wrap: break-word 
@@ -199,14 +199,14 @@ tr:nth-child(even) {
 }
 .edit-firm-header{
     color: #A51E36;
-    font-size: 20px;
+    font-size: 1.25em;
     font-weight: 500;
     line-height: 30px;
     word-wrap: break-word 
 }
 .edit-firm-header span{
     color: black;
-    font-size: 16px;
+    font-size: 1em;
     font-weight: 500;
     line-height: 24px;
     word-wrap: break-word 
@@ -257,7 +257,7 @@ tr:nth-child(even) {
 }
 .menu-icons{
     color: #A51E36 !important;
-    font-size: 30px;
+    font-size: 1.875em;
     width: 30px;
     height: 30px;
     display: flex;

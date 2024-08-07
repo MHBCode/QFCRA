@@ -12,11 +12,11 @@ export class FirmService {
   constructor(private http: HttpClient) { }
 
   getAssignedFirms(userId: number): Observable<any> {
-    const url = `${this.baseUrl}get-assign-firms?userId=${userId}`;  // Construct full URL
+    const url = `${this.baseUrl}get_assign_firms?userId=${userId}`;  // Construct full URL
     return this.http.get<any>(url);
   }
   getFirmDetails(firmId: number): Observable<any> {
-    const url = `${this.baseUrl}getFirm?firmID=${firmId}`;
+    const url = `${this.baseUrl}get_firm?firmID=${firmId}`;
     return this.http.get<any>(url);
   }
 }
