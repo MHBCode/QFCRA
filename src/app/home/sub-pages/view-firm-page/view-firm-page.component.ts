@@ -9,6 +9,7 @@ import { FirmService } from 'src/app/ngServices/firm.service';  // Import FirmSe
 })
 export class ViewFirmPageComponent implements OnInit {
 
+  call: Boolean = false;
   menuId: Number = 0;
   menuWidth: string = '2%';
   dataWidth: string = '98%';
@@ -18,6 +19,10 @@ export class ViewFirmPageComponent implements OnInit {
   widthData2: string = '85%';
   firmId: number = 0;  // Add firmId property
   firmDetails: any;  // Add firmDetails property
+  firmOPDetails: any;
+  firmFYearHistory: any;
+  FIRMAuditors: any[] = [];
+  FIRMContacts: any[] = [];
 
   constructor(
     private router: Router,
@@ -35,6 +40,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.firmId = +params['id'];  // Retrieve the firm ID from the route parameters
       console.log(`Loaded firm with ID: ${this.firmId}`);
       this.loadFirmDetails(this.firmId);  // Fetch the firm details
+      this.loadFirmOPDetails(this.firmId); // Fetch Operational Data
     });
   }
 
@@ -67,7 +73,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   editFirm() {
-    this.router.navigate(['home/edit-firm']);
+    this.router.navigate(['home/edit-firm', this.firmId]);
   }
 
   // Method to load firm details
@@ -76,6 +82,39 @@ export class ViewFirmPageComponent implements OnInit {
       data => {
         this.firmDetails = data.response;
         console.log('Firm details:', this.firmDetails);
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+      }
+    );
+  }
+  loadFirmOPDetails(firmId: number) {
+    this.firmService.getFIRMOPData(firmId).subscribe(
+      data => {
+        this.firmOPDetails = data.response;
+        console.log('Firm Operational details:', this.firmOPDetails);
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+      }
+    );
+  }
+  loadAuditors(){
+    this.firmService.getFIRMAuditors(this.firmId).subscribe(
+      data => {
+        this.FIRMAuditors = data.response;
+        console.log('Firm Auditors details:', this.FIRMAuditors);
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+      }
+    );
+  }
+  loadContacts(){
+    this.firmService.getContactsOfFIRM(this.firmId).subscribe(
+      data => {
+        this.FIRMContacts = data.response;
+        console.log('Firm FIRM Contacts details:', this.FIRMContacts);
       },
       error => {
         console.error('Error fetching firm details', error);
@@ -94,6 +133,13 @@ export class ViewFirmPageComponent implements OnInit {
         console.log('yes its', tabId)
         const neededSection = document.getElementById(tabId);
         this.renderer.setStyle(neededSection, 'display', 'flex');
+
+        if(tabId == 'Auditors'){
+          this.loadAuditors();
+        }
+        if(tabId == 'Contacts'){
+          this.loadContacts();
+        }
         // if(tabId == 'CD'){
 
         // }
@@ -102,6 +148,33 @@ export class ViewFirmPageComponent implements OnInit {
         //   const neededSection = document.getElementById(tabId);
         //   this.renderer.setStyle(neededSection, 'display', 'flex');
         // }
+  }
+
+  getFYearHistory(){
+    this.call = true;
+    this.firmService.getFYearEndHistory(this.firmId).subscribe(
+      data => {
+        this.firmFYearHistory = data.response;
+        console.log('Firm Finance year end history details:', this.firmFYearHistory);
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+      }
+    );
+    const popupWrapper = document.querySelector('.popup-wrapper') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'flex'; 
+    } else {
+      console.error('Element with class .popup-wrapper not found');
+    }
+  }
+  closeFYearHistory(){
+    const popupWrapper = document.querySelector('.popup-wrapper') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none'; 
+    } else {
+      console.error('Element with class .popup-wrapper not found');
+    }
   }
 
 }

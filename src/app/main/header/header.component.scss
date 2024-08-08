@@ -184,4 +184,18 @@ header{
     .search-bar{
         display: none;
     }
+    .nav{
+        height: 50px;
+        background: #A51E36;
+        position: relative;
+        width: 96%;
+        border-radius: 40px;
+        position: absolute;
+        top: 14vh;
+        left: 2%;
+    }
+    .navigation-ul{
+        justify-content: space-between;
+        gap: 0.4rem;
+    }
 }

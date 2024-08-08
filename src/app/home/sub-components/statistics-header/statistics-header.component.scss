@@ -64,3 +64,17 @@
         font-size: 0.5em;
     }
 }
+
+@media (max-width: 1080px) {
+    .statistics-header-wrapper {
+        flex-direction: row;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        padding: 0.5rem;
+        margin-top: 3rem;
+        gap: 1rem;
+    }
+    .statistics-square[_ngcontent-ng-c1414527404] {
+        width: 44%;
+    }
+}

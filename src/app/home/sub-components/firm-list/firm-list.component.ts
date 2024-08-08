@@ -24,7 +24,7 @@ export class FirmListComponent implements OnInit {
   }
 
   loadFirms(): void {
-    this.firmService.getAssignedFirms(30).subscribe(
+    this.firmService.getAssignedFirms(10044).subscribe(
       data => {
         this.firms = data.response;
         console.log(this.firms);

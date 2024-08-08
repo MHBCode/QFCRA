@@ -6,7 +6,7 @@
       <img src="../../../../assets/images/number.png">
     </div>
     <div class="chart-bars">
-      <div *ngFor="let aiFunction of AIFunction" class="chart-1bar">
+      <div *ngFor="let aiFunction of AIFunction.slice(0,8)" class="chart-1bar">
         <div class="bar" [id]="formatId(aiFunction.Controlled_Function)">
           <div class="countOfBar">
             {{ aiFunction.Total_AI }}

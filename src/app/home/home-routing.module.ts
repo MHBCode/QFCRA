@@ -16,7 +16,7 @@ const routes: Routes = [
   { path: '', component: MainPageComponent},
   { path: 'firms-page', component: FirmsPageComponent},
   { path: 'view-firm/:id', component: ViewFirmPageComponent},
-  { path: 'edit-firm', component: EditFirmComponent},
+  { path: 'edit-firm/:id', component: EditFirmComponent},
   { path: 'new-firm', component: NewFirmComponent},
   { path: 'tasks-page', component: TasksPageComponent},
   { path: 'individual-page', component: IndividualPageComponent},

@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeRoutingModule } from './home-routing.module';
 import { HttpClientModule } from '@angular/common/http';  // Import HttpClientModule
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MainPageComponent } from './main-page/main-page.component';
 import { StatisticsHeaderComponent } from './sub-components/statistics-header/statistics-header.component';
@@ -50,6 +50,7 @@ import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm
   ],
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     SharedModule,
     HomeRoutingModule,
     FormsModule,
