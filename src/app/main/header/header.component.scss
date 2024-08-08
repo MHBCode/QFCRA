@@ -164,38 +164,37 @@ header{
 }
 
 .change-font {
-    gap: 5px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: #f5f5f5; 
+    border-radius: 10px; 
 }
 
 .font-btn {
-    height: 30px;
-    width: 30px;
+    background-color: rgb(190, 190, 190);
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 0.75em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
-.font-btn:disabled {
-    background-color: #A51E36;
+.font-btn:hover {
+    background-color: #A51E36; 
+    transform: translateY(-2px);
     color: white;
-    border: 1px solid;
-    border-color: black;
-    border-radius: 2px;
 }
+
+.font-btn:active {
+    transform: translateY(0); 
+}
+
 
 @media  (max-width: 1080px){
     .search-bar{
         display: none;
-    }
-    .nav{
-        height: 50px;
-        background: #A51E36;
-        position: relative;
-        width: 96%;
-        border-radius: 40px;
-        position: absolute;
-        top: 14vh;
-        left: 2%;
-    }
-    .navigation-ul{
-        justify-content: space-between;
-        gap: 0.4rem;
     }
 }

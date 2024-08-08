@@ -1,13 +1,22 @@
 <div class="brid-crump">
-    <div class="btns">
-        <button (click)="toggleSearch()">
-            <i class="bi bi-search"></i>
-            Search
-        </button>
+    <div class="btn-group">
+        <div class="btns">
+            <button (click)="toggleSearch()">
+                <i class="bi bi-search"></i>
+                Search
+            </button>
+        </div>
+        <div class="btns">
+            <button (click)="createIndividual()">
+                <i class="bi bi-plus"></i>
+                Create
+            </button>
+        </div>
     </div>
 </div>
 <section *ngIf="showSearchSection" class="search-firm-section">
     <div class="inputs-field-set">
+        <h3 class="search-title">Individual Search</h3>
         <div class="search-firms-inputs">
             <div class="input-field">
                 <label for="firstName">
@@ -42,7 +51,8 @@
             <div class="input-checkboxes">
                 <div class="input-checkboxes-title">Controlled functions :</div>
                 <div class="checkbox-grid">
-                    <label><input type="checkbox" value="nonExecutiveGovernance"> Non-Executive Governance Function</label>
+                    <label><input type="checkbox" value="nonExecutiveGovernance"> Non-Executive Governance
+                        Function</label>
                     <label><input type="checkbox" value="executiveGovernance"> Executive Governance Function</label>
                     <label><input type="checkbox" value="seniorExecutive"> Senior Executive Function</label>
                     <label><input type="checkbox" value="seniorManagment"> Senior Management Function</label>
@@ -55,7 +65,7 @@
                     <label><input type="checkbox" value="customerFacing"> Customer Facing Function</label>
                 </div>
             </div>
-            
+
             <div class="input-checkboxes">
                 <div class="input-checkboxes-title">Current Function Status :</div>
                 <div class="checkbox-grid">
@@ -67,23 +77,27 @@
                     <label><input type="checkbox" value="conditionallyApproved"> Conditionally Approved</label>
                     <label><input type="checkbox" value="nocSubmitted"> NOC Submitted</label>
                     <label><input type="checkbox" value="conditionalApprovalCeased"> Conditional Approval Ceased</label>
-                    <label><input type="checkbox" value="appliedForChangeOfApprovalStatus"> Applied for change of approval status</label>
-                    <label><input type="checkbox" value="appliedForChangeOfWithdrawalStatus"> Applied for change of withdrawal status</label>
+                    <label><input type="checkbox" value="appliedForChangeOfApprovalStatus"> Applied for change of
+                        approval status</label>
+                    <label><input type="checkbox" value="appliedForChangeOfWithdrawalStatus"> Applied for change of
+                        withdrawal status</label>
                     <label><input type="checkbox" value="withdrawnTerminated"> Withdrawn (Terminated by firm)</label>
                     <label><input type="checkbox" value="withdrawnInactive"> Withdrawn (Inactive)</label>
-                    <label><input type="checkbox" value="withdrawnNoLongerControlled"> Withdrawn (No longer a controlled function)</label>
+                    <label><input type="checkbox" value="withdrawnNoLongerControlled"> Withdrawn (No longer a controlled
+                        function)</label>
                     <label><input type="checkbox" value="approvedInactiveFirm"> Approved – Inactive Firm</label>
                     <label><input type="checkbox" value="suspended"> Suspended</label>
-                    <label><input type="checkbox" value="approvedFirmInLiquidation"> Approved – Firm in Liquidation</label>
+                    <label><input type="checkbox" value="approvedFirmInLiquidation"> Approved – Firm in
+                        Liquidation</label>
                 </div>
             </div>
-            
+
             <div class="input-checkboxes-buttons">
                 <button type="button">Reset</button>
                 <button type="button">Search</button>
             </div>
         </div>
-            
+
     </div>
 </section>
 <app-individual-list></app-individual-list>

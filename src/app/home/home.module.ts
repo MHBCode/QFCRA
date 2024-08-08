@@ -5,6 +5,7 @@ import { HomeRoutingModule } from './home-routing.module';
 import { HttpClientModule } from '@angular/common/http';  // Import HttpClientModule
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+
 import { MainPageComponent } from './main-page/main-page.component';
 import { StatisticsHeaderComponent } from './sub-components/statistics-header/statistics-header.component';
 import { AIByFunctionComponent } from './sub-components/ai-by-function/ai-by-function.component';
@@ -25,6 +26,14 @@ import { IndividualPendingAiAppsComponent } from './sub-pages/individualPages/in
 import { UserAccessComponent } from './sub-pages/adminPages/user-access/user-access.component';
 import { ReAssignTasksComponent } from './sub-pages/adminPages/re-assign-tasks/re-assign-tasks.component';
 import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm-reports.component';
+import { NoticesAndResponsesComponent } from './sub-pages/notices-and-responses/notices-and-responses.component';
+import { CreateNoticesComponent } from './sub-pages/create-notices/create-notices.component';
+import { EnforcementAndDisciplinaryActionComponent } from './sub-pages/enforcement-and-disciplinary-action/enforcement-and-disciplinary-action.component';
+import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisors.component';
+import { CreateIndividualComponent } from './sub-pages/individualPages/create-individual/create-individual.component';
+import { ViewIndividualComponent } from './sub-pages/individualPages/view-individual/view-individual.component';
+import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages/view-individual-status-change/view-individual-status-change.component';
+
 
 @NgModule({
   declarations: [
@@ -47,6 +56,13 @@ import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm
     FirmReportsComponent,
     UserAccessComponent,
     ReAssignTasksComponent,
+    NoticesAndResponsesComponent,
+    CreateNoticesComponent,
+    EnforcementAndDisciplinaryActionComponent,
+    CoSupervisorsComponent,
+    CreateIndividualComponent,
+    ViewIndividualComponent,
+    ViewIndividualStatusChangeComponent,
   ],
   imports: [
     CommonModule,
