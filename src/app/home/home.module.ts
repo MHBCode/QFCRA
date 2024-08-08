@@ -3,7 +3,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeRoutingModule } from './home-routing.module';
 import { HttpClientModule } from '@angular/common/http';  // Import HttpClientModule
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 
 import { MainPageComponent } from './main-page/main-page.component';
 import { StatisticsHeaderComponent } from './sub-components/statistics-header/statistics-header.component';
@@ -29,6 +30,10 @@ import { NoticesAndResponsesComponent } from './sub-pages/notices-and-responses/
 import { CreateNoticesComponent } from './sub-pages/create-notices/create-notices.component';
 import { EnforcementAndDisciplinaryActionComponent } from './sub-pages/enforcement-and-disciplinary-action/enforcement-and-disciplinary-action.component';
 import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisors.component';
+import { CreateIndividualComponent } from './sub-pages/individualPages/create-individual/create-individual.component';
+import { ViewIndividualComponent } from './sub-pages/individualPages/view-individual/view-individual.component';
+import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages/view-individual-status-change/view-individual-status-change.component';
+
 
 @NgModule({
   declarations: [
@@ -55,9 +60,13 @@ import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisor
     CreateNoticesComponent,
     EnforcementAndDisciplinaryActionComponent,
     CoSupervisorsComponent,
+    CreateIndividualComponent,
+    ViewIndividualComponent,
+    ViewIndividualStatusChangeComponent,
   ],
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     SharedModule,
     HomeRoutingModule,
     FormsModule,

@@ -23,14 +23,55 @@
                                 <span></span>
                             </label>
                         </td>
-                        <td>123</td>
-                        <td>test</td>
-                        <td>Test</td>
-                        <td>SMF</td>
-                        <td><a href="#">More</a></td>
+                        <td (click)="viewIndividual()">AI 02042</td>
+                        <td (click)="viewIndividual()"></td>
+                        <td (click)="viewIndividual()">Abe Abe Maggio</td>
+                        <td (click)="viewIndividual()">NEGF</td>
+                        <td><button class="more-btn" (click)="showModal()">More...</button></td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" [class.show]="isModalVisible">
+    <div class="modal-content" id="draggableModal">
+        <p class="modal-header" id="modalHeader">QFCRA Registration/Rejection(s) History for name</p>
+        <div class="individualList-modal-wrapper">
+            <div class="table">
+                <div class="modaltableTitle">
+                    <h3>Firm name</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Functions</th>
+                            <th>Request For Approval</th>
+                            <th>Approval Details</th>
+                            <th>Withdrawal Details</th>
+                            <th>Most Recent Status</th>
+                            <th>Most Recent Status Date</th>
+                            <th>Status Change Reasons</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>123</td>
+                            <td>test</td>
+                            <td>Test</td>
+                            <td>SMF</td>
+                            <td>SMF</td>
+                            <td>SMF</td>
+                            <td>SMF</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="close-modal">
+        <button (click)="hideModal()">Close</button>
         </div>
     </div>
 </div>

@@ -6,5 +6,13 @@ import { Component } from '@angular/core';
   styleUrls: ['./individual-pending-ai-apps.component.scss']
 })
 export class IndividualPendingAiAppsComponent {
+ isModalVisible: boolean = false;
 
+ showModal() {
+  this.isModalVisible = true;
+ }
+
+ hideModal() {
+  this.isModalVisible = false;
+ }
 }

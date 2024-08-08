@@ -6,6 +6,10 @@
     padding: 0.5rem 1rem;
     padding-bottom: 0;
 }
+.btn-group {
+    display: flex;
+    gap: 0 1%;
+}
 
 .btns button{
     background: #A51E36;
@@ -86,7 +90,7 @@
 }
 
 .search-title {
-    color: #222529;
+    color: #A51E36;
     font-size: 1em;
     font-weight: 500;
     margin: 10px;
@@ -128,7 +132,4 @@
     cursor: pointer;
 }
 
-.input-checkboxes-buttons button:hover {
-    background-color: darkorange;
-}
 /* */
