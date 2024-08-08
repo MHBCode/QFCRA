@@ -89,8 +89,14 @@ export class HeaderComponent implements OnInit {
     else if(where == 1){
       this.router.navigate(['home/firms-page'])
     }
+    if(where == 2){
+      this.router.navigate(['home/co-supervisors'])
+    }
     if (where == 3) {
       this.router.navigate(['home/notices-and-responses'])
+    }
+    if(where == 4){
+      this.router.navigate(['home/enforcement-and-disciplinary'])
     }
     if (where == 6) {
       this.router.navigate(['home/individual-page'])

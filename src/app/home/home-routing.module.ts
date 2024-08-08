@@ -21,6 +21,9 @@ import { IndividualComponent } from './sub-pages/individualPages/individual-regi
 import { RecommendationComponent } from './sub-pages/individualPages/individual-registration-status-subpages/recommendation/recommendation.component';
 import { ReportsComponent } from './sub-pages/individualPages/individual-registration-status-subpages/reports/reports.component';
 import { TrackingComponent } from './sub-pages/individualPages/individual-registration-status-subpages/tracking/tracking.component';
+import { CreateNoticesComponent } from './sub-pages/create-notices/create-notices.component';
+import { EnforcementAndDisciplinaryActionComponent } from './sub-pages/enforcement-and-disciplinary-action/enforcement-and-disciplinary-action.component';
+import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisors.component';
 const routes: Routes = [
   { path: '', component: MainPageComponent},
   { path: 'firms-page', component: FirmsPageComponent},
@@ -48,7 +51,11 @@ const routes: Routes = [
       { path: 'view-individual-status-change/docs', component: DocsComponent },
       { path: 'view-individual-status-change/reports', component: ReportsComponent }
     ]
-  }
+  },
+  { path: 'notices-and-responses', component: NoticesAndResponsesComponent},
+  { path: 'create-notices' , component: CreateNoticesComponent},
+  { path: 'enforcement-and-disciplinary' , component:EnforcementAndDisciplinaryActionComponent},
+  { path: 'co-supervisors' , component:CoSupervisorsComponent}
 ];
 
 @NgModule({

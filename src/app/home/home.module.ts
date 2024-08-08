@@ -27,6 +27,9 @@ import { UserAccessComponent } from './sub-pages/adminPages/user-access/user-acc
 import { ReAssignTasksComponent } from './sub-pages/adminPages/re-assign-tasks/re-assign-tasks.component';
 import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm-reports.component';
 import { NoticesAndResponsesComponent } from './sub-pages/notices-and-responses/notices-and-responses.component';
+import { CreateNoticesComponent } from './sub-pages/create-notices/create-notices.component';
+import { EnforcementAndDisciplinaryActionComponent } from './sub-pages/enforcement-and-disciplinary-action/enforcement-and-disciplinary-action.component';
+import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisors.component';
 import { CreateIndividualComponent } from './sub-pages/individualPages/create-individual/create-individual.component';
 import { ViewIndividualComponent } from './sub-pages/individualPages/view-individual/view-individual.component';
 import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages/view-individual-status-change/view-individual-status-change.component';
@@ -54,6 +57,9 @@ import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages
     UserAccessComponent,
     ReAssignTasksComponent,
     NoticesAndResponsesComponent,
+    CreateNoticesComponent,
+    EnforcementAndDisciplinaryActionComponent,
+    CoSupervisorsComponent,
     CreateIndividualComponent,
     ViewIndividualComponent,
     ViewIndividualStatusChangeComponent,
