@@ -149,19 +149,16 @@ tr:nth-child(even) {
     padding: 0.5rem 1rem;
     padding-bottom: 0;
 }
-.edit-btn button{
+.btn button{
     background: #A51E36;
     padding: 0.5rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     border: none;
     border-radius: 10px;
     color: white;
     min-width: 6rem;
     min-height: 40px;;
 }
-.edit-btn button i{
+.btn button i{
     margin: 0 2px;
 }
 /*Added*/
@@ -169,7 +166,7 @@ tr:nth-child(even) {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: end;
     justify-content: flex-start;
     gap: 2rem;
     width: 80%;

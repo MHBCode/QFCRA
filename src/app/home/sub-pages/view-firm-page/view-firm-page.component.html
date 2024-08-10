@@ -274,6 +274,12 @@
 
     <!--Core Details-->
     <section id='CD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="btn">
+            <button (click)=" editFirm()">
+                <i class="bi bi-pen"></i>
+                Edit
+            </button>
+        </div>
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
@@ -949,9 +955,9 @@
 
     <!--Controllers-->
     <section id='Controllers' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
-        <div class="edit-btn">
+        <div class="btn">
             <button>
-                <i class="bi bi-plus"></i>
+                <i class="bi bi-pen"></i>
                 Create
             </button>
         </div>
