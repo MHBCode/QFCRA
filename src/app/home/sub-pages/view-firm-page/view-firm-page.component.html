@@ -132,7 +132,6 @@
                 <div class="input-field">
                     <label for="FinancialYearEnd">
                         Financial Year End
-                        <button class="subbutton" (click)="getFYearHistory()">History</button>
                     </label>
                     <input disabled name="financialYearEnd" id="financialYearEnd" type="text"
                         value="{{firmDetails?.FinYearEndTypeDesc}}">
@@ -151,13 +150,6 @@
                 </div>
             </div>
             <div class="edit-firms-inputs">
-                <!-- not found in integration response -->
-                <!-- <div class="input-field">
-                    <label for="qfcLicenseStatus">
-                        QFC License Status
-                    </label>
-                    <input disabled type="text" name="qfcLicenseStatus" id="qfcLicenseStatus" value="Not In Integration!">
-                </div> -->
                 <div class="input-field">
                     <label for="dateOfApplication">
                         Date of Application
@@ -195,24 +187,6 @@
                     <input type="text" disabled name="authorisationStatus" id="authorisationStatus"
                         value="{{firmDetails?.AuthorisationStatusTypeDesc}}">
                 </div>
-                <!-- not found in integration response -->
-                <!-- <div class="input-field">
-                    <label for="firmApplicationType">
-                        Firm Application Type
-                    </label>
-                    <input type="text" disabled name="firmApplicationType" id="firmApplicationType" value="Authorithasion">
-                </div> -->
-
-               
-
-
-
-
-
-                
-
-
-               
                 <div class="input-field">
                     <label for="dateApplication">
                         Date Authorized
@@ -261,7 +235,7 @@
         <!---->
         <div class="inputs-field-set">
             <div class="section">
-                <h2>RA Personal Assigned</h2>
+                <h2>RA Personal Assigned <button class="subbutton" (click)="getInactiveUsers()">Open History</button></h2> 
                 <table>
                     <thead>
                         <tr>
@@ -276,7 +250,7 @@
                             <td>{{RA.FirmUserAssnTypeDesc}}</td>
                             <td>{{RA.Name}}</td>
                             <td>{{RA.FirmUserAssnDateFrom | date:'MM/dd/yyyy'}}</td>
-                            <td>{{RA.FirmUserAssnDateTo | date:'MM/dd/yyyy'}}</td>
+                            <td>{{RA.FirmUserAssnDateTo}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -663,27 +637,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Name</td>
-                            <td>Controller Type</td>
-                            <td>Registered Number</td>
-                            <td>Control Type</td>
-                            <td>% of Holding</td>
-                            <td>Effective Date</td>
-                            <td>Cessation Date</td>
-                            <td>Last Modified By</td>
-                            <td>Last Modified Date</td>
-                        </tr>
-                        <tr>
-                            <td>Name</td>
-                            <td>Controller Type</td>
-                            <td>Registered Number</td>
-                            <td>Control Type</td>
-                            <td>% of Holding</td>
-                            <td>Effective Date</td>
-                            <td>Cessation Date</td>
-                            <td>Last Modified By</td>
-                            <td>Last Modified Date</td>
+                        <tr *ngFor="let controller of FIRMControllers">
+                            <td>{{controller.OtherEntityName}}</td>
+                            <td>{{controller.EntityTypeDesc}}</td>
+                            <td>{{controller.RegisteredNum}}</td>
+                            <td>{{controller.ControllerControlTypeDesc}}</td>
+                            <td>{{controller.PctOfShares}}</td>
+                            <td>{{controller.AssnDateFrom}}</td>
+                            <td>{{controller.AssnDateTo}}</td>
+                            <td>{{controller.LastModifiedByOfOtherEntities}}</td>
+                            <td>{{controller.LastModifiedDate}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -709,15 +672,15 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Name</td>
-                            <td>Controller Type</td>
-                            <td>Registered Number</td>
-                            <td>Control Type</td>
-                            <td>% of Holding</td>
-                            <td>Effective Date</td>
-                            <td>Cessation Date</td>
-                            <td>Last Modified By</td>
-                            <td>Last Modified Date</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                         </tr>
                     </tbody>
                 </table>
@@ -1286,8 +1249,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                           
+                        <tr *ngFor="let fund of RegisteredFund">
+                            <td></td>
+                            <td>{{fund.RegisteredFundNumber}}</td>
+                            <td>{{fund.FundName}}</td>
+                            <td>{{fund.RegisteredFundTypeDesc}}</td>
+                            <td>{{fund.RegisteredFundStatusTypeDesc}}</td>
+                            <td>{{fund.RegisteredFundStatusDate}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1333,43 +1301,51 @@
 <!--Financial Year End History-->
 <div *ngIf="call" class="popup-wrapper">
     <div class="popup-info-place">
-        <div class="input-field">
-            <label for="">
-                Firm Financial Year End Effective From
-            </label>
-            <input  disabled name="" id="" type="text"
-                value="{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}">
-        </div>
-        <div class="input-field">
-            <label for="">
-                Username
-            </label>
-            <input disabled name="" id="" type="text"
-                value="{{firmFYearHistory.UserName}}">
-        </div>
-        <div class="input-field">
-            <label for="">
-                Latest Update date
-            </label>
-            <input disabled name="" id="" type="text"
-                value="{{firmFYearHistory.Column1}}">
-        </div>
-        <!-- <div class="input-field">
-            <label for="">
-                Accounting Standards Effective From
-            </label>
-            <input disabled name="" id="" type="text"
-                value="{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}">
-        </div>
-        <div class="input-field">
-            <label for="">
-                Accounting Standards Effective From
-            </label>
-            <input disabled name="" id="" type="text"
-                value="{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}">
-        </div> -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Effective from</th>
+                    <th>Name</th>
+                    <th>Latest update</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--*ngFor="let FR of firmFYearHistory"-->
+                <tr>
+                    <td>{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}</td>
+                    <td>{{firmFYearHistory.UserName}}</td>
+                    <td>{{firmFYearHistory.Column1}}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     <div class="popup-operations-place">
         <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeFYearHistory()">Close</button>
+    </div>
+</div>
+<!--Inactive Users-->
+<div *ngIf="callInactiveUsers" class="InactiveUsersPopUp">
+    <div class="popup-info-place">
+        <table>
+            <thead>
+                <tr>
+                    <th>Function / Role</th>
+                    <th>Name</th>
+                    <th>Date Form</th>
+                    <th>Date to</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let RA of firmInactiveUsers">
+                    <td>{{RA.FirmUserAssnTypeDesc}}</td>
+                    <td>{{RA.Name}}</td>
+                    <td>{{RA.FirmUserAssnDateFrom}}</td>
+                    <td>{{RA.FirmUserAssnDateTo}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeInactiveUsers()">Close</button>
     </div>
 </div>

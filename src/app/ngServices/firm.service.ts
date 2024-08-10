@@ -10,6 +10,8 @@ export class FirmService {
 
   private baseUrl = environment.API_URL+'/api/Firms/';  // Base URL 
   private baseUrlContact = environment.API_URL+'/api/Contact/'; // Without FIRMS
+  private baseUrlControllers = environment.API_URL+'/api/OtherEntity/'; //Controllers
+  private baseUrlRegisteredFund = environment.API_URL+'/api/RegisteredFund/' // Funds
   constructor(private http: HttpClient) { }
 
   getFIRMOPData(firmId:number): Observable<any> {
@@ -33,6 +35,10 @@ export class FirmService {
     const url = `${this.baseUrl}get_firms_end_year_history?firmId=${firmId}&flag=1`;  // Construct full URL https://localhost:7091/api/Firms/get_firms_end_year_history?firmId=66&flag=1
     return this.http.get<any>(url);
   }
+  getInactiveUsersHistory(firmId:number): Observable<any> {
+    const url = `${this.baseUrl}get_inactive_firm_users?firmId=${firmId}`;  // Construct full URL https://localhost:7091/api/Firms/get_inactive_firm_users?firmId=66
+    return this.http.get<any>(url);
+  }
   getFIRMAuditors(firmId:number): Observable<any> {
     const url = `${this.baseUrl}get_auditors?firmId=${firmId}`;  // Construct full URL https://localhost:7091/api/Firms/get_auditors?firmID=66
     return this.http.get<any>(url);
@@ -43,6 +49,14 @@ export class FirmService {
   }
   getFIRMUsersRAFunctions(firmId:number, assiLevel:number): Observable<any> {
     const url = `${this.baseUrl}get_firm_user?firmId=${firmId}`;
+    return this.http.get<any>(url);
+  } 
+  getFIRMControllers(firmId:number): Observable<any> {
+    const url = `${this.baseUrlControllers}get_corporate_controller_details_list?firmId=${firmId}`; //https://localhost:7091/api/OtherEntity/get_corporate_controller_details_list?firmId=66
+    return this.http.get<any>(url);
+  } 
+  getFIRMRegisteredFund(firmId:number): Observable<any> {
+    const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?firmId=${firmId}`; //https://localhost:7091/api/RegisteredFund/get_registered_fund_data?firmId=69
     return this.http.get<any>(url);
   }
 }

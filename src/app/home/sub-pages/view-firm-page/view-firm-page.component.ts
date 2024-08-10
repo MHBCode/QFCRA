@@ -10,6 +10,7 @@ import { FirmService } from 'src/app/ngServices/firm.service';  // Import FirmSe
 export class ViewFirmPageComponent implements OnInit {
 
   call: Boolean = false;
+  callInactiveUsers: Boolean = false;
   menuId: Number = 0;
   menuWidth: string = '2%';
   dataWidth: string = '98%';
@@ -22,8 +23,11 @@ export class ViewFirmPageComponent implements OnInit {
   firmDetails: any;  // Add firmDetails property
   firmOPDetails: any;
   firmFYearHistory: any;
+  firmInactiveUsers: any[] = [];
   FIRMAuditors: any[] = [];
   FIRMContacts: any[] = [];
+  FIRMControllers: any[] = [];
+  RegisteredFund: any [] = [];
   FIRMRA: any[] = [];
 
   constructor(
@@ -124,6 +128,17 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
+  loadControllers(){ 
+    this.firmService.getFIRMControllers(this.firmId).subscribe(
+      data => {
+        this.FIRMControllers = data.response;
+        console.log('Firm FIRM Controllers details:', this.FIRMControllers);
+      },
+      error => {
+        console.error('Error fetching firm controllers', error);
+      }
+    );
+  }
   loadAssiRA(){
     this.firmService.getFIRMUsersRAFunctions(this.firmId,this.ASSILevel).subscribe(
       data => {
@@ -132,6 +147,20 @@ export class ViewFirmPageComponent implements OnInit {
       },
       error => {
         console.error('Error get Firm RA Functionsdetails', error);
+      }
+    );
+  }
+
+  loadRegisteredFund(){
+    this.firmService.getFIRMRegisteredFund(this.firmId).subscribe(
+      data => {
+        this.RegisteredFund = data.response;
+        console.log('Firm FIRM RegisteredFund details:', this.RegisteredFund);
+      },
+      error => {
+        console.error('Error fetching firm RegisteredFund', error);
+        this.RegisteredFund.push('No Registered Funds Yet');
+        console.log('Firm FIRM RegisteredFund details:', this.RegisteredFund);
       }
     );
   }
@@ -153,6 +182,12 @@ export class ViewFirmPageComponent implements OnInit {
         }
         if(tabId == 'Contacts'){
           this.loadContacts();
+        }
+        if(tabId = 'Controllers'){
+          this.loadControllers();
+        }
+        if(tabId = 'SPRegFunds'){
+          this.loadRegisteredFund();
         }
         // if(tabId == 'CD'){
 
@@ -191,4 +226,31 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  getInactiveUsers(){
+    this.callInactiveUsers = true;
+    this.firmService.getInactiveUsersHistory(this.firmId).subscribe(
+      data => {
+        this.firmInactiveUsers = data.response;
+        console.log('FirmInactive users history details:', this.firmInactiveUsers);
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+      }
+    );
+    const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'flex'; 
+    } else {
+      console.error('Element with class not found');
+    }
+  }
+
+  closeInactiveUsers(){
+    const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none'; 
+    } else {
+      console.error('Element with class not found');
+    }
+  }
 }
