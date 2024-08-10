@@ -1586,8 +1586,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                           
+                        <tr *ngFor="let fund of RegisteredFund">
+                            <td></td>
+                           <td>{{fund.RegisteredFundNumber}}</td>
+                           <td>{{fund.FundName}}</td>
+                           <td>{{fund.RegisteredFundTypeDesc}}</td>
+                           <td>{{fund.RegisteredFundStatusTypeDesc}}</td>
+                           <td>{{fund.RegisteredFundStatusDate}}</td>
                         </tr>
                     </tbody>
                 </table>
