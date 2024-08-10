@@ -12,6 +12,10 @@ export class FirmService {
   private baseUrlContact = environment.API_URL+'/api/Contact/'; // Without FIRMS
   private baseUrlControllers = environment.API_URL+'/api/OtherEntity/'; //Controllers
   private baseUrlRegisteredFund = environment.API_URL+'/api/RegisteredFund/' // Funds
+  private baseUrlActivity = environment.API_URL+'/api/Activity/'; //Activities
+  private baseUrlWaiver = environment.API_URL+'/api/Waiver/' //Waiver
+  private baseUrlRisk = environment.API_URL+'/api/Risk/' //Risk
+  private baseUrlNotice = environment.API_URL+'/api/Notice/' //Notice
   constructor(private http: HttpClient) { }
 
   getFIRMOPData(firmId:number): Observable<any> {
@@ -61,6 +65,22 @@ export class FirmService {
   } 
   getFIRMAdminFees(firmId:number): Observable<any> {
     const url = `${this.baseUrl}get_admin_fee_list?firmId=${firmId}`;  //https://localhost:7091/api/Firms/get_admin_fee_list?firmId=66
+    return this.http.get<any>(url);
+  }
+  getFirmActivityLicensed(firmId:number): Observable<any> {
+    const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmApplicationTypeId=2&isWithdrawnActivityReqdFlag=86`;  //'https://localhost:7091/api/Activity/get_firm_activities?firmId=66&firmApplicationTypeId=2&isWithdrawnActivityReqdFlag=86'
+    return this.http.get<any>(url);
+  }
+  getFirmwaiver(firmId:number): Observable<any> {
+    const url = `${this.baseUrlWaiver}get_waiver_list?firmId=${firmId}`;  //https://localhost:7091/api/Waiver/get_waiver_list?firmId=86
+    return this.http.get<any>(url);
+  }
+  getFirmRisk(firmId:number): Observable<any> {
+    const url = `${this.baseUrlRisk}get_rmp_list?firmId=${firmId}`;  //https://localhost:7091/api/Risk/get_rmp_list?firmId=40
+    return this.http.get<any>(url);
+  }
+  getNotices(firmId:number): Observable<any> {
+    const url = `${this.baseUrlNotice}get_firm_notice_response_details?firmId=10&firmNoticeID=4043`; //https://localhost:7091/api/Notice/get_firm_notice_response_details?firmId=10&firmNoticeID=4043
     return this.http.get<any>(url);
   }
 }

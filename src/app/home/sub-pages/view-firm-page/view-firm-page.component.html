@@ -182,24 +182,6 @@
                     <input type="text" disabled name="authorisationStatus" id="authorisationStatus"
                         value="{{firmDetails?.AuthorisationStatusTypeDesc}}">
                 </div>
-                <!-- not found in integration response -->
-                <!-- <div class="input-field">
-                    <label for="firmApplicationType">
-                        Firm Application Type
-                    </label>
-                    <input type="text" disabled name="firmApplicationType" id="firmApplicationType" value="Authorithasion">
-                </div> -->
-
-
-
-
-
-
-
-
-
-
-
                 <div class="input-field">
                     <label for="dateApplication">
                         Date Authorized
@@ -277,7 +259,7 @@
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    FIRM Details > <span>{{firmDetails?.firmName}}</span>
+                    FIRM Details > <span>{{firmDetails?.FirmName}}</span>
                 </h2>
             </div>
             <div class="edit-firms-inputs">
@@ -554,17 +536,17 @@
     </section>
 
     <!--Scope Section-->
-    <section id='Scope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+    <section id='Scope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;" *ngFor="let license of ActivityLicensed">
         <div class="inputs-field-set">
             <div class="licensed-header">
                 Licensed
             </div>
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    Scope for firm name
+                    Scope for {{firmDetails?.FirmName}}
                 </h2>
             </div>
-            <div class="edit-firms-inputs">
+            <div class="edit-firms-inputs" *ngFor="let license of ActivityLicensed">
                 <div class="input-field">
                     <label for="formReff">
                         Form Reference
@@ -575,49 +557,49 @@
                     <label for="linkToScope">
                         Link To Scope
                     </label>
-                    <input disabled name="linkToScope" id="linkToScope" type="text" value="">
+                    <input disabled name="linkToScope" id="linkToScope" type="text" value="{{license?.ScopeCertificateLink}}">
                 </div>
                 <div class="input-field">
                     <label for="scopeRevNum">
                         Scope Revision Number
                     </label>
-                    <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="">
+                    <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="{{license?.ScopeRevNum}}">
                 </div>
                 <div class="input-field">
                     <label for="appDate">
                         Application Date
                     </label>
-                    <input disabled name="appDate" id="appDate" type="text" value="">
+                    <input disabled name="appDate" id="appDate" type="text" value="{{license?.ScopeAppliedDate}}">
                 </div>
                 <div class="input-field">
                     <label for="licenseDate">
                         License Date
                     </label>
-                    <input disabled name="licenseDate" id="licenseDate" type="text" value="">
+                    <input disabled name="licenseDate" id="licenseDate" type="text" value="{{license?.ScopeLicensedDate}}">
                 </div>
                 <div class="input-field">
                     <label for="createdBy">
                         Created By
                     </label>
-                    <input disabled name="createdBy" id="createdBy" type="text" value="">
+                    <input disabled name="createdBy" id="createdBy" type="text" value="{{license?.ScopeCreatedByName}}">
                 </div>
                 <div class="input-field">
                     <label for="createdDate">
                         Creation Date
                     </label>
-                    <input disabled name="createdDate" id="createdDate" type="text" value="">
+                    <input disabled name="createdDate" id="createdDate" type="text" value="{{license?.ScopeCreatedDate}}">
                 </div>
                 <div class="input-field">
                     <label for="modBy">
                         Modified By
                     </label>
-                    <input disabled name="modBy" id="modBy" type="text" value="">
+                    <input disabled name="modBy" id="modBy" type="text" value="{{license?.ModifiedBy}}">
                 </div>
                 <div class="input-field">
                     <label for="modDate">
                         Modification Date
                     </label>
-                    <input disabled name="modDate" id="modDate" type="text" value="">
+                    <input disabled name="modDate" id="modDate" type="text" value="{{license?.LastModifiedDate}}">
                 </div>
             </div>
 
@@ -640,9 +622,9 @@
                 <div class="permitted-activity-body">
                     <p>The Regulated Activities set out in its scope of Authorisation</p>
                     <strong>Activity Details: </strong>
-                    <p>The Regulated Activities set out in its scope of Authorisation</p>
+                    <p>{{license?.ActivityTypeDesc}}</p>
                     <strong>Specific Conditions and Restrictions: </strong>
-                    <p>None</p>
+                    <p>{{license?.Column1}}</p>
                 </div>
             </div>
 
@@ -652,7 +634,7 @@
                 </div>
 
                 <div class="permitted-activity-body">
-                    <p>None</p>
+                    <p>{{license?.GeneralConditions}}</p>
                 </div>
             </div>
 
@@ -677,16 +659,16 @@
                     <input disabled name="formReff" id="formReff" type="text" value="">
                 </div>
                 <div class="input-field">
-                    <label for="linkToScope">
+                    <label for="">
                         Link To Scope
                     </label>
-                    <input disabled name="linkToScope" id="linkToScope" type="text" value="">
+                    <input disabled name="" id="" type="text" value="">
                 </div>
                 <div class="input-field">
-                    <label for="scopeRevNum">
+                    <label for="">
                         Scope Revision Number
                     </label>
-                    <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="">
+                    <input disabled name="" id="" type="text" value="">
                 </div>
                 <div class="input-field">
                     <label for="q13AppDate">
@@ -713,40 +695,40 @@
                     <input disabled name="effectiveDate" id="effectiveDate" type="text" value="">
                 </div>
                 <div class="input-field">
-                    <label for="appDate">
+                    <label for="">
                         Application Date
                     </label>
-                    <input disabled name="appDate" id="appDate" type="text" value="">
+                    <input disabled name="" id="" type="text" value="">
                 </div>
                 <div class="input-field">
-                    <label for="licenseDate">
+                    <label for="">
                         License Date
                     </label>
-                    <input disabled name="licenseDate" id="licenseDate" type="text" value="">
+                    <input disabled name="" id="" type="text" value="">
                 </div>
                 <div class="input-field">
-                    <label for="createdBy">
+                    <label for="">
                         Created By
                     </label>
-                    <input disabled name="createdBy" id="createdBy" type="text" value="">
+                    <input disabled name="" id="" type="text" value="">
                 </div>
                 <div class="input-field">
-                    <label for="createdDate">
+                    <label for="">
                         Creation Date
                     </label>
-                    <input disabled name="createdDate" id="createdDate" type="text" value="">
+                    <input disabled name="" id="" type="text" value="">
                 </div>
                 <div class="input-field">
-                    <label for="modBy">
+                    <label for="">
                         Modified By
                     </label>
-                    <input disabled name="modBy" id="modBy" type="text" value="">
+                    <input disabled name="" id="" type="text" value="">
                 </div>
                 <div class="input-field">
-                    <label for="modDate">
+                    <label for="">
                         Modification Date
                     </label>
-                    <input disabled name="modDate" id="modDate" type="text" value="">
+                    <input disabled name="" id="" type="text" value="">
                 </div>
             </div>
         </div>
@@ -1229,15 +1211,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr *ngFor="let dates of FirmAdminFees">
                             <td class="radio-table">
                                 <label class="radioBtn">
                                     <input type="radio">
                                     <span></span>
                                 </label>
                             </td>
-                            <td>12/10/2020</td>
-                            <td>5/8/2016</td>
+                            <td>{{dates?.RptPeriodFromDate}}</td>
+                            <td>{{dates?.RptPeriodToDate}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1293,7 +1275,7 @@
 
     <!--Supervision Notices-->
     <section id='SPNotices' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
-        <div class="inputs-field-set">
+        <div class="inputs-field-set" style="overflow-x: scroll;">
             <div class="section">
                 <h2>Notices And Responses -</h2>
                 <table>
@@ -1315,25 +1297,25 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr *ngFor="let notice of FIRMNotices">
                             <td class="radio-table">
                                 <label class="radioBtn">
                                     <input type="radio">
                                     <span></span>
                                 </label>
                             </td>
-                            <td>Notice Type</td>
-                            <td>Notice Name</td>
-                            <td>Internal Reference Number</td>
-                            <td>Notice Issuer</td>
-                            <td>Notice Issued Date</td>
-                            <td>Issuer's Reference Number</td>
-                            <td>Subject</td>
-                            <td>Notice Finalized Date</td>
-                            <td>Date Published on Website</td>
-                            <td>Notice Sent Date</td>
-                            <td>Response Due Date</td>
-                            <td>Response Provided Date</td>
+                            <td>{{notice?.TypeOfNotice}}</td>
+                            <td>{{notice?.NoticeName}}</td>
+                            <td>{{notice?.InternalReferenceNumber}}</td>
+                            <td>{{notice?.NoticeIssuedBy}}</td>
+                            <td>{{notice?.NoticeIssuedDate}}</td>
+                            <td>{{notice?.IssuersReferenceNumber}}</td>
+                            <td>{{notice?.Subject}}</td>
+                            <td>{{notice?.NoticeFinalizedDate}}</td>
+                            <td>{{notice?.DatePublishedonWebsite}}</td>
+                            <td>{{notice?.NotificationSentDate}}</td>
+                            <td>{{notice?.ResponseDueDate}}</td>
+                            <td>{{notice?.ResponseProvidedDate}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1399,21 +1381,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr *ngFor="let rmp of FIRMRMP">
                             <td class="radio-table">
                                 <label class="radioBtn">
                                     <input type="radio">
                                     <span></span>
                                 </label>
                             </td>
-                            <td>RMP ID</td>
-                            <td>Date Created</td>
-                            <td>Type</td>
-                            <td>Date Firm Agreed</td>
-                            <td>Agreed By</td>
-                            <td>RMP Status</td>
-                            <td>Review Status</td>
-                            <td>Review Status Date</td>
+                            <td>{{rmp?.FirmRMPID}}</td>
+                            <td>{{rmp?.RMPCreatedDate}}</td>
+                            <td>{{rmp?.FirmRMPTypeDesc}}</td>
+                            <td>{{rmp?.DateFirmAgreedOn}}</td>
+                            <td>{{rmp?.AgreedBy}}</td>
+                            <td>{{rmp?.RMPStatus}}</td>
+                            <td>{{rmp?.SignOffStatus}}</td>
+                            <td>{{rmp?.SignOffDate}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1503,22 +1485,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr *ngFor="let waiver of FirmWaivers">
                             <td class="radio-table">
                                 <label class="radioBtn">
                                     <input type="radio">
                                     <span></span>
                                 </label>
                             </td>
-                            <td>Waiver Number</td>
-                            <td>Version</td>
-                            <td>Waiver Type</td>
-                            <td>Subject</td>
-                            <td>Waiver Status</td>
-                            <td>Status Date</td>
-                            <td>Review Date</td>
-                            <td>Review Decision</td>
-                            <td>Expiration Date</td>
+                            <td>{{waiver?.WaiverNumber}}</td>
+                            <td>{{waiver?.WaiverRevNum}}</td>
+                            <td>{{waiver?.WaiverTypeDesc}}</td>
+                            <td>{{waiver?.WaiverSubject}}</td>
+                            <td>{{waiver?.WaiverStatusTypeDesc}}</td>
+                            <td>{{waiver?.WaiverStatusDate}}</td>
+                            <td>{{waiver?.ReviewMeetingDate}}</td>
+                            <td>{{waiver?.WaiverDecisionTypeDesc}}</td>
+                            <td>{{waiver?.WaiverExpirationDate}}</td>
                         </tr>
                     </tbody>
                 </table>

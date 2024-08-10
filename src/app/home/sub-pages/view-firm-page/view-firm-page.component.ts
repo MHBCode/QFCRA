@@ -23,6 +23,7 @@ export class ViewFirmPageComponent implements OnInit {
   firmDetails: any;  // Add firmDetails property
   firmOPDetails: any;
   firmFYearHistory: any;
+  ActivityLicensed: any;
   firmInactiveUsers: any[] = [];
   FIRMAuditors: any[] = [];
   FIRMContacts: any[] = [];
@@ -30,6 +31,9 @@ export class ViewFirmPageComponent implements OnInit {
   RegisteredFund: any [] = [];
   FIRMRA: any[] = [];
   FirmAdminFees: any[] = [];
+  FirmWaivers: any;
+  FIRMRMP: any;
+  FIRMNotices: any;
 
   constructor(
     private router: Router,
@@ -50,6 +54,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadFirmOPDetails(this.firmId); // Fetch Operational Data
       this.loadAssiRA();
       this.loadAdminFees();
+      this.loadActivitiesLicensed();
     });
   }
 
@@ -152,7 +157,6 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-
   loadRegisteredFund(){
     this.firmService.getFIRMRegisteredFund(this.firmId).subscribe(
       data => {
@@ -161,8 +165,6 @@ export class ViewFirmPageComponent implements OnInit {
       },
       error => {
         console.error('Error fetching firm RegisteredFund', error);
-        this.RegisteredFund.push('No Registered Funds Yet');
-        console.log('Firm FIRM RegisteredFund details:', this.RegisteredFund);
       }
     );
   }
@@ -174,7 +176,50 @@ export class ViewFirmPageComponent implements OnInit {
       },
       error => {
         console.error('Error fetching firm Admin Fees', error);
-        this.RegisteredFund.push('No Admin Fees');
+      }
+    );
+  }
+  loadActivitiesLicensed(){
+    this.firmService.getFirmActivityLicensed(this.firmId).subscribe(
+      data => {
+        this.ActivityLicensed = data.response;
+        console.log('Firm FIRM License scope details:', this.ActivityLicensed);
+      },
+      error => {
+        console.error('Error fetching License scope ', error);
+      }
+    );
+  }
+  loadWaivers(){
+    this.firmService.getFirmwaiver(this.firmId).subscribe(
+      data => {
+        this.FirmWaivers = data.response;
+        console.log('Firm FIRM Waivers details:', this.FirmWaivers);
+      },
+      error => {
+        console.error('Error fetching Firm Waivers ', error);
+      }
+    );
+  }
+  loadRMPs(){
+    this.firmService.getFirmRisk(this.firmId).subscribe(
+      data => {
+        this.FIRMRMP = data.response;
+        console.log('Firm FIRM RRM details:', this.FIRMRMP);
+      },
+      error => {
+        console.error('Error fetching Firm Waivers ', error);
+      }
+    );
+  }
+  loadNotices(){
+    this.firmService.getNotices(this.firmId).subscribe(
+      data => {
+        this.FIRMNotices = data.response;
+        console.log('Firm FIRMNotices details:', this.FIRMNotices);
+      },
+      error => {
+        console.error('Error fetching FIRMNotices ', error);
       }
     );
   }
@@ -201,6 +246,15 @@ export class ViewFirmPageComponent implements OnInit {
         }
         if(tabId = 'SPRegFunds'){
           this.loadRegisteredFund();
+        }
+        if(tabId = 'SPWaivers'){
+          this.loadWaivers();
+        }
+        if(tabId ='SPRMPs'){
+          this.loadRMPs();
+        }
+        if(tabId = 'SPNotices'){
+          this.loadNotices();
         }
         // if(tabId == 'CD'){
 
@@ -270,4 +324,5 @@ export class ViewFirmPageComponent implements OnInit {
   viewController() {
     this.router.navigate(['home/view-controller']);
   }
+
 }
