@@ -33,6 +33,7 @@ import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisor
 import { CreateIndividualComponent } from './sub-pages/individualPages/create-individual/create-individual.component';
 import { ViewIndividualComponent } from './sub-pages/individualPages/view-individual/view-individual.component';
 import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages/view-individual-status-change/view-individual-status-change.component';
+import { ViewControllerComponent } from './sub-pages/view-controller/view-controller.component';
 
 
 @NgModule({
@@ -63,6 +64,7 @@ import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages
     CreateIndividualComponent,
     ViewIndividualComponent,
     ViewIndividualStatusChangeComponent,
+    ViewControllerComponent,
   ],
   imports: [
     CommonModule,

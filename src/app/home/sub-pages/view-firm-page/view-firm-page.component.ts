@@ -253,4 +253,8 @@ export class ViewFirmPageComponent implements OnInit {
       console.error('Element with class not found');
     }
   }
+
+  viewController() {
+    this.router.navigate(['home/view-controller']);
+  }
 }
