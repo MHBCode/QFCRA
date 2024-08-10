@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirmService {
 
-  private baseUrl = 'https://localhost:7091/api/Firms/';  // Base URL 
-  private baseUrlContact = 'https://localhost:7091/api/Contact/'; // Without FIRMS
-
+  private baseUrl = environment.API_URL+'/api/Firms/';  // Base URL 
+  private baseUrlContact = environment.API_URL+'/api/Contact/'; // Without FIRMS
   constructor(private http: HttpClient) { }
 
   getFIRMOPData(firmId:number): Observable<any> {
@@ -39,6 +39,10 @@ export class FirmService {
   }
   getContactsOfFIRM(firmId:number): Observable<any> {
     const url = `${this.baseUrlContact}get_all_contact_details?firmId=${firmId}`;  // Construct full URL https://localhost:7091/api/Contact/get_all_contact_details?firmId=66
+    return this.http.get<any>(url);
+  }
+  getFIRMUsersRAFunctions(firmId:number, assiLevel:number): Observable<any> {
+    const url = `${this.baseUrl}get_firm_user?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
 }

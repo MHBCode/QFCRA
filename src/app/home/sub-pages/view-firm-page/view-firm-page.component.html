@@ -272,35 +272,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Function / Role</td>
-                            <td>Name</td>
-                            <td>Date Form</td>
-                            <td>Date to</td>
-                        </tr>
-                        <tr>
-                            <td>Function / Role</td>
-                            <td>Name</td>
-                            <td>Date Form</td>
-                            <td>Date to</td>
-                        </tr>
-                        <tr>
-                            <td>Function / Role</td>
-                            <td>Name</td>
-                            <td>Date Form</td>
-                            <td>Date to</td>
-                        </tr>
-                        <tr>
-                            <td>Function / Role</td>
-                            <td>Name</td>
-                            <td>Date Form</td>
-                            <td>Date to</td>
-                        </tr>
-                        <tr>
-                            <td>Function / Role</td>
-                            <td>Name</td>
-                            <td>Date Form</td>
-                            <td>Date to</td>
+                        <tr *ngFor="let RA of FIRMRA">
+                            <td>{{RA.FirmUserAssnTypeDesc}}</td>
+                            <td>{{RA.Name}}</td>
+                            <td>{{RA.FirmUserAssnDateFrom | date:'MM/dd/yyyy'}}</td>
+                            <td>{{RA.FirmUserAssnDateTo | date:'MM/dd/yyyy'}}</td>
                         </tr>
                     </tbody>
                 </table>
