@@ -349,6 +349,25 @@ tr:nth-child(even) {
     top: 25vh;
     left: 20vw;
     width: 60vw;
+    height: 50vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    padding: 2rem;
+    background: white;
+    color: #A51E36;
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+    gap: 2rem;
+    display: none;
+}
+.InactiveUsersPopUp{
+    position: fixed;
+    top: 25vh;
+    left: 20vw;
+    width: 60vw;
+    height: 50vh;
     overflow-y: scroll;
     overflow-x: hidden;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
@@ -438,6 +457,9 @@ tr:nth-child(even) {
     margin: 0;
 }
 
+.scrolablebody{
+    overflow-x: scroll;
+}
 /**/
 
 
