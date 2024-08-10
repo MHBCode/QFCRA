@@ -380,3 +380,58 @@ tr:nth-child(even) {
     border: none;
     border-radius: 5px;
 }
+
+/* permitted activities */
+
+.licensed-header, .authorised-header {
+    padding: 5px 0px;
+    text-align: center;
+    background-color: #A51E36;
+    color: white;
+}
+
+.scope-permitted-activity-header {
+    background-color: #F2B6C0;
+    padding: 5px 0px;
+}
+
+.scope-permitted-activity-header p {
+    text-align: center;
+}
+
+.permitted-activity-body {
+    padding: 5px 15px;
+    line-height: 25px
+}
+
+/* regulated-activities */
+.regulated-activities-header {
+    display: flex;
+    justify-content: space-evenly;
+    background-color: #F2B6C0;
+    padding: 5px 0px;
+}
+
+.regulated-activities-header p {
+    margin: 0;
+}
+
+.conditions-and-restrictions-header {
+    background-color: #F2B6C0;
+    padding: 5px 0px;
+    text-align: center;
+}
+
+.conditions-and-restrictions-header p {
+    margin: 0;
+}
+
+.specific-conditions-and-restrictions-header {
+    background-color: #F2B6C0;
+    padding: 5px 0px;
+    text-align: center;
+}
+
+.specific-conditions-and-restrictions-header p {
+    margin: 0;
+}
