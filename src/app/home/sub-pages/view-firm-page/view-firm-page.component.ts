@@ -18,11 +18,13 @@ export class ViewFirmPageComponent implements OnInit {
   widthData1: string = '98%';
   widthData2: string = '85%';
   firmId: number = 0;  // Add firmId property
+  ASSILevel: number = 4;
   firmDetails: any;  // Add firmDetails property
   firmOPDetails: any;
   firmFYearHistory: any;
   FIRMAuditors: any[] = [];
   FIRMContacts: any[] = [];
+  FIRMRA: any[] = [];
 
   constructor(
     private router: Router,
@@ -41,6 +43,7 @@ export class ViewFirmPageComponent implements OnInit {
       console.log(`Loaded firm with ID: ${this.firmId}`);
       this.loadFirmDetails(this.firmId);  // Fetch the firm details
       this.loadFirmOPDetails(this.firmId); // Fetch Operational Data
+      this.loadAssiRA();
     });
   }
 
@@ -118,6 +121,17 @@ export class ViewFirmPageComponent implements OnInit {
       },
       error => {
         console.error('Error fetching firm details', error);
+      }
+    );
+  }
+  loadAssiRA(){
+    this.firmService.getFIRMUsersRAFunctions(this.firmId,this.ASSILevel).subscribe(
+      data => {
+        this.FIRMRA = data.response;
+        console.log('Firm RA Functions details:', this.FIRMRA);
+      },
+      error => {
+        console.error('Error get Firm RA Functionsdetails', error);
       }
     );
   }

@@ -116,6 +116,10 @@ export class HeaderComponent implements OnInit {
     if (where == 23) {
       this.router.navigate(['home/re-assign-tasks'])
     }
+    this.firms = false;
+    this.admin = false;
+    this.individuals = false;
+    this.reports = false;
   }
 
   increaseFontSize() {
