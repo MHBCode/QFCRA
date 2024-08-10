@@ -29,6 +29,7 @@ export class ViewFirmPageComponent implements OnInit {
   FIRMControllers: any[] = [];
   RegisteredFund: any [] = [];
   FIRMRA: any[] = [];
+  FirmAdminFees: any[] = [];
 
   constructor(
     private router: Router,
@@ -48,6 +49,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadFirmDetails(this.firmId);  // Fetch the firm details
       this.loadFirmOPDetails(this.firmId); // Fetch Operational Data
       this.loadAssiRA();
+      this.loadAdminFees();
     });
   }
 
@@ -164,7 +166,18 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-
+  loadAdminFees(){
+    this.firmService.getFIRMAdminFees(this.firmId).subscribe(
+      data => {
+        this.FirmAdminFees = data.response;
+        console.log('Firm FIRM Admin Fees details:', this.FirmAdminFees);
+      },
+      error => {
+        console.error('Error fetching firm Admin Fees', error);
+        this.RegisteredFund.push('No Admin Fees');
+      }
+    );
+  }
   switchTab(tabId: string){
         // Get all section elements
         const sections = this.el.nativeElement.getElementsByTagName('section');

@@ -1359,19 +1359,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr *ngFor="let fee of FirmAdminFees">
                             <td class="radio-table">
                                 <label class="radioBtn">
                                     <input type="radio">
                                     <span></span>
                                 </label>
                             </td>
-                            <td>Report Name</td>
-                            <td>Report Due Date</td>
-                            <td>Materially Complete Report Receive Date</td>
-                            <td>Fee Calculated</td>
-                            <td>Fee Imposed</td>
-                            <td>Review Status</td>
+                            <td>{{fee.RptName}}</td>
+                            <td>{{fee.FirmRptDueDate}}</td>
+                            <td>{{fee.FirstMateriallyCompleteRptReceivedDate}}</td>
+                            <td>{{fee.CalculatedAmount}}</td>
+                            <td>{{fee.ImposedAmount}}</td>
+                            <td>{{fee.ObjectWFStatusTypeDesc}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1680,38 +1680,6 @@
                 </tr>
             </tbody>
         </table>
-        <div class="input-field">
-            <label for="">
-                Firm Financial Year End Effective From
-            </label>
-            <input disabled name="" id="" type="text" value="{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}">
-        </div>
-        <div class="input-field">
-            <label for="">
-                Username
-            </label>
-            <input disabled name="" id="" type="text" value="{{firmFYearHistory.UserName}}">
-        </div>
-        <div class="input-field">
-            <label for="">
-                Latest Update date
-            </label>
-            <input disabled name="" id="" type="text" value="{{firmFYearHistory.Column1}}">
-        </div>
-        <!-- <div class="input-field">
-            <label for="">
-                Accounting Standards Effective From
-            </label>
-            <input disabled name="" id="" type="text"
-                value="{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}">
-        </div>
-        <div class="input-field">
-            <label for="">
-                Accounting Standards Effective From
-            </label>
-            <input disabled name="" id="" type="text"
-                value="{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}">
-        </div> -->
     </div>
     <div class="popup-operations-place">
         <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeInactiveUsers()">Close</button>

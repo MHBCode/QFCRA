@@ -58,5 +58,9 @@ export class FirmService {
   getFIRMRegisteredFund(firmId:number): Observable<any> {
     const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?firmId=${firmId}`; //https://localhost:7091/api/RegisteredFund/get_registered_fund_data?firmId=69
     return this.http.get<any>(url);
+  } 
+  getFIRMAdminFees(firmId:number): Observable<any> {
+    const url = `${this.baseUrl}get_admin_fee_list?firmId=${firmId}`;  //https://localhost:7091/api/Firms/get_admin_fee_list?firmId=66
+    return this.http.get<any>(url);
   }
 }
