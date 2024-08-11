@@ -26,6 +26,7 @@ import { EnforcementAndDisciplinaryActionComponent } from './sub-pages/enforceme
 import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisors.component';
 import { ViewControllerComponent } from './sub-pages/view-controller/view-controller.component';
 import { EditControllerComponent } from './sub-pages/edit-controller/edit-controller.component';
+import { CreateControllerComponent } from './sub-pages/create-controller/create-controller.component';
 const routes: Routes = [
   { path: '', component: MainPageComponent},
   { path: 'firms-page', component: FirmsPageComponent},
@@ -59,7 +60,8 @@ const routes: Routes = [
   { path: 'enforcement-and-disciplinary' , component:EnforcementAndDisciplinaryActionComponent},
   { path: 'co-supervisors' , component:CoSupervisorsComponent},
   { path: 'view-controller', component: ViewControllerComponent},
-  { path: 'edit-controller', component: EditControllerComponent}
+  { path: 'edit-controller', component: EditControllerComponent},
+  { path: 'create-controller', component: CreateControllerComponent}
 ];
 
 @NgModule({

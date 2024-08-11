@@ -35,6 +35,7 @@ import { ViewIndividualComponent } from './sub-pages/individualPages/view-indivi
 import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages/view-individual-status-change/view-individual-status-change.component';
 import { ViewControllerComponent } from './sub-pages/view-controller/view-controller.component';
 import { EditControllerComponent } from './sub-pages/edit-controller/edit-controller.component';
+import { CreateControllerComponent } from './sub-pages/create-controller/create-controller.component';
 
 
 @NgModule({
@@ -67,6 +68,7 @@ import { EditControllerComponent } from './sub-pages/edit-controller/edit-contro
     ViewIndividualStatusChangeComponent,
     ViewControllerComponent,
     EditControllerComponent,
+    CreateControllerComponent,
   ],
   imports: [
     CommonModule,

@@ -14,7 +14,8 @@
                 <label for="controllerType">
                     Controller Type <span style="color: red;">*</span>
                 </label>
-                <select disabled name="controllerType" id="controllerType">
+                <select name="controllerType" id="controllerType" [(ngModel)]="selectedControlType"
+                    (change)="changeControlType()">
                     <option value="select" selected>Select</option>
                     <option value="parentEntity">Parent Entity</option>
                     <option value="corporateController">Corporate Controller</option>
@@ -24,15 +25,17 @@
                     <option value="individualController">Individual Controller</option>
                 </select>
             </div>
-            <ng-container>
-                <div class="input-field">
+            <ng-container *ngIf="!hideForms">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'parentEntity' || selectedControlType === 'corporateController' || selectedControlType === 'uboCorporate' || selectedControlType === 'headOfficeBranch'">
                     <label for="entityName">
                         Full Name of Entity <span style="color: red;">*</span>
                     </label>
                     <input name="entityName" id="entityName" type="text">
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'uboIndividual' || selectedControlType === 'individualController'">
                     <label for="individualTitle">
                         Title
                     </label>
@@ -42,49 +45,56 @@
                     </select>
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'uboIndividual' || selectedControlType === 'individualController'">
                     <label for="firstName">
                         First Name <span style="color: red;">*</span>
                     </label>
                     <input name="firstName" id="firstName" type="text">
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'uboIndividual' || selectedControlType === 'individualController'">
                     <label for="secondName">
                         Second Name <span style="color: red;">*</span>
                     </label>
                     <input name="secondName" id="secondName" type="text">
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'uboIndividual' || selectedControlType === 'individualController'">
                     <label for="familyName">
                         Family Name <span style="color: red;">*</span>
                     </label>
                     <input name="familyName" id="familyName" type="text">
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'uboIndividual' || selectedControlType === 'individualController'">
                     <label for="placeOfBirth">
                         Place of birth
                     </label>
                     <input name="placeOfBirth" id="placeOfBirth" type="text">
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'uboIndividual' || selectedControlType === 'individualController'">
                     <label for="dateOfBirth">
                         Date of birth <span style="color: red;">*</span>
                     </label>
                     <input name="dateOfBirth" id="dateOfBirth" type="date">
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'uboIndividual' || selectedControlType === 'individualController'">
                     <label for="passportNum">
                         Passport Number
                     </label>
                     <input name="passportNum" id="passportNum" type="date">
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'uboIndividual' || selectedControlType === 'individualController'">
                     <label for="jurisdictionIssue">
                         Jurisdiction of Issue
                     </label>
@@ -93,7 +103,8 @@
                     </select>
                 </div>
                 <!---->
-                <div class="input-field" style="width: 100%;">
+                <div class="input-field" style="width: 100%;"
+                    *ngIf="selectedControlType === 'uboIndividual' || selectedControlType === 'individualController'">
                     <label for="isPEP">
                         Is Politically Exposed Person (PEP)? <span style="color: red;">*</span>
                     </label>
@@ -103,7 +114,8 @@
                     </div>
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'parentEntity' || selectedControlType === 'corporateController' || selectedControlType === 'uboCorporate' || selectedControlType === 'headOfficeBranch'">
                     <label for="legalStatus">
                         Legal Status
                     </label>
@@ -115,14 +127,15 @@
                     </select>
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'parentEntity' || selectedControlType === 'corporateController' || selectedControlType === 'uboCorporate' || selectedControlType === 'headOfficeBranch'">
                     <label for="registeredNumber">
                         Registered Number
                     </label>
                     <input name="registeredNumber" id="registeredNumber" type="text">
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field" *ngIf="selectedControlType === 'parentEntity' || selectedControlType === 'corporateController' || selectedControlType === 'uboCorporate' || selectedControlType === 'headOfficeBranch'">
                     <label for="establishmentPlace">
                         Place of Establishment <span style="color: red;">*</span>
                     </label>
@@ -135,14 +148,14 @@
                     <label for="controlType">
                         Type of Control <span style="color: red;">*</span>
                     </label>
-                    <select name="controlType" id="controlType">
+                    <select name="controlType" id="controlType" [(ngModel)]="selectedType" (change)="changeType()">
                         <option value="">Select</option>
                         <option value="percentage">Percentage</option>
                         <option value="exerciseControl">Exercise Control</option>
                     </select>
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field" [ngStyle]="{'visibility': showHoldingsPercentage ? 'visible' : 'hidden'}">
                     <label for="holdingsPercentage">
                         % of Holding
                     </label>
@@ -163,7 +176,8 @@
                     <input name="cessationDate" id="cessationDate" type="date">
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'parentEntity' || selectedControlType === 'corporateController' || selectedControlType === 'uboCorporate' || selectedControlType === 'headOfficeBranch'">
                     <label for="isRegulated">
                         Is the company regulated :
                     </label>
@@ -175,7 +189,7 @@
                     </div>
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field" *ngIf="selectedControlType === 'uboCorporate'">
                     <label for="isParent">
                         Is it also Parent / Corporate Controller? :
                     </label>
@@ -185,7 +199,7 @@
                     </div>
                 </div>
                 <!---->
-                <div class="input-field">
+                <div class="input-field" *ngIf="selectedControlType === 'uboCorporate'">
                     <label for="isCompanyTraded">
                         Is the company publicly traded :
                     </label>
@@ -197,7 +211,7 @@
                     </div>
                 </div>
                 <!---->
-                <div class="input-field" *ngIf="isCompanyTraded === false">
+                <div class="input-field" *ngIf="isCompanyTraded === false && selectedControlType === 'uboCorporate'">
                     <label for="more10UBOs">
                         Are there any UBOs that own more than 10% of this entity? :
                     </label>
@@ -207,7 +221,7 @@
                     </div>
                 </div>
                 <!---->
-                <div class="input-field" *ngIf="more10UBOs === true">
+                <div class="input-field" *ngIf="more10UBOs === true && selectedControlType === 'uboCorporate'">
                     <label for="controllers">
                         Controllers
                     </label>
@@ -224,7 +238,7 @@
             </ng-container>
         </div>
     </div>
-    <div class="inputs-field-set">
+    <div *ngIf="!hideForms" class="inputs-field-set">
         <div class="create-controller-actions">
             <h2 class="create-controller-header">
                 Addresses
@@ -235,7 +249,7 @@
                 <label for="addressType">
                     Address Type
                 </label>
-                <select disabled name="addressType" id="addressType">
+                <select name="addressType" id="addressType">
                     <option value="">Select</option>
                 </select>
             </div>
@@ -307,7 +321,7 @@
                     <label for="regulators">
                         Regulator <span style="color: red;">*</span>
                     </label>
-                    <select disabled name="regulators" id="regulators">
+                    <select name="regulators" id="regulators">
                         <option value="select">Select</option>
                     </select>
                 </div>

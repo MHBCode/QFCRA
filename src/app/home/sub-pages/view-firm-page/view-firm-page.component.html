@@ -229,7 +229,8 @@
         <!---->
         <div class="inputs-field-set">
             <div class="section">
-                <h2>RA Personal Assigned <button class="subbutton" (click)="getInactiveUsers()">Open History</button></h2> 
+                <h2>RA Personal Assigned <button class="subbutton" (click)="getInactiveUsers()">Open History</button>
+                </h2>
                 <table>
                     <thead>
                         <tr>
@@ -542,7 +543,8 @@
     </section>
 
     <!--Scope Section-->
-    <section id='Scope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;" *ngFor="let license of ActivityLicensed">
+    <section id='Scope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;"
+        *ngFor="let license of ActivityLicensed">
         <div class="inputs-field-set">
             <div class="licensed-header">
                 Licensed
@@ -551,6 +553,12 @@
                 <h2 class="edit-firm-header">
                     Scope for {{firmDetails?.FirmName}}
                 </h2>
+                <div class="btn">
+                    <button class="edit-btn">
+                        <i class="bi bi-pen"></i>
+                        Edit
+                    </button>
+                </div>
             </div>
             <div class="edit-firms-inputs" *ngFor="let license of ActivityLicensed">
                 <div class="input-field">
@@ -563,7 +571,8 @@
                     <label for="linkToScope">
                         Link To Scope
                     </label>
-                    <input disabled name="linkToScope" id="linkToScope" type="text" value="{{license?.ScopeCertificateLink}}">
+                    <input disabled name="linkToScope" id="linkToScope" type="text"
+                        value="{{license?.ScopeCertificateLink}}">
                 </div>
                 <div class="input-field">
                     <label for="scopeRevNum">
@@ -581,7 +590,8 @@
                     <label for="licenseDate">
                         License Date
                     </label>
-                    <input disabled name="licenseDate" id="licenseDate" type="text" value="{{license?.ScopeLicensedDate}}">
+                    <input disabled name="licenseDate" id="licenseDate" type="text"
+                        value="{{license?.ScopeLicensedDate}}">
                 </div>
                 <div class="input-field">
                     <label for="createdBy">
@@ -593,7 +603,8 @@
                     <label for="createdDate">
                         Creation Date
                     </label>
-                    <input disabled name="createdDate" id="createdDate" type="text" value="{{license?.ScopeCreatedDate}}">
+                    <input disabled name="createdDate" id="createdDate" type="text"
+                        value="{{license?.ScopeCreatedDate}}">
                 </div>
                 <div class="input-field">
                     <label for="modBy">
@@ -789,14 +800,14 @@
                             <tr>&nbsp;&nbsp;&nbsp;&nbsp;Rights in Investments</tr>
                         </tbody>
                     </table>
-                <!--specific conditions and restrictions-->
-                <div class="specific-conditions-and-restrictions">
-                    <div class="specific-conditions-and-restrictions-header">
-                        <p>Specific Conditions and Restrictions</p>
-                    </div>
+                    <!--specific conditions and restrictions-->
+                    <div class="specific-conditions-and-restrictions">
+                        <div class="specific-conditions-and-restrictions-header">
+                            <p>Specific Conditions and Restrictions</p>
+                        </div>
 
-                    <p>&nbsp;&nbsp;&nbsp;&nbsp;None</p>
-                </div>    
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;None</p>
+                    </div>
                 </div>
                 <!--Conditions and Restrictions-->
                 <div class="conditions-and-restrictions-section">
@@ -938,14 +949,14 @@
     <!--Controllers-->
     <section id='Controllers' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
         <div class="btn">
-            <button>
+            <button (click)="createController()">
                 <i class="bi bi-pen"></i>
                 Create
             </button>
         </div>
         <div class="inputs-field-set">
             <div class="section">
-                <h2>Controllers For firm</h2>
+                <h2>Controllers For {{firmDetails?.FirmName}}</h2>
                 <table>
                     <thead>
                         <tr>
@@ -961,7 +972,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let controller of FIRMControllers">
+                        <tr *ngFor="let controller of FIRMControllers" (click)="viewController()">
                             <td>{{controller.OtherEntityName}}</td>
                             <td>{{controller.EntityTypeDesc}}</td>
                             <td>{{controller.RegisteredNum}}</td>
@@ -1015,11 +1026,26 @@
 
     <!--Auditors-->
     <section id='Auditors' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="btn">
+            <button (click)="createAuditor()">
+                <i class="bi bi-plus"></i>
+                Create
+            </button>
+            <button (click)="editAuditor()">
+                <i class="bi bi-pen"></i>
+                Edit
+            </button>
+            <!--popup message for edit-->
 
+            <button>
+                <i class="bi bi-trash"></i>
+                Delete
+            </button>
+        </div>
         <div class="inputs-field-set">
             <div class="section">
                 <div class="auditor-header">
-                    <h2>Auditors For</h2>
+                    <h2>Auditors For {{firmDetails?.FirmName}}</h2>
                     <span>
                         <input id="InactiveAuditors" type="checkbox">
                         <label>Display Inactive Auditors</label>
@@ -1041,20 +1067,153 @@
                         <tr *ngFor="let auditor of FIRMAuditors">
                             <td class="radio-table">
                                 <label class="radioBtn">
-                                    <input type="radio">
+                                    <input type="radio" name="auditor" #auditorRadio>
                                     <span></span>
                                 </label>
                             </td>
-                            <td>{{auditor.OtherEntityName}}</td>
-                            <td>{{auditor.EntitySubTypeDesc}}</td>
-                            <td>{{auditor.AssnDateFrom}}</td>
-                            <td>{{auditor.AssnDateTo}}</td>
-                            <td>{{auditor.LastMeodifiedBy}}</td>
-                            <td>{{auditor.LastModifiedDate}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.OtherEntityName}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.EntitySubTypeDesc}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.AssnDateFrom}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.AssnDateTo}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.LastMeodifiedBy}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.LastModifiedDate}}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+        </div>
+        <!--view auditor-->
+        <div class="inputs-field-set" *ngIf="IsViewAuditorVisible">
+            <div class="view-auditor-actions">
+                <h2 class="view-auditor-header">
+                    Auditor Details
+                </h2>
+            </div>
+            <div class="view-auditor-inputs">
+                <div class="input-field">
+                    <label for="auditorName">
+                        Auditor Name
+                    </label>
+                    <input disabled name="auditorName" id="auditorName" type="text"
+                        [value]="selectedAuditor.OtherEntityName">
+                </div>
+                <div class="input-field">
+                    <label for="auditorType">
+                        Auditor Type
+                    </label>
+                    <input disabled name="auditorType" id="auditorType" type="text"
+                        [value]="selectedAuditor.EntitySubTypeDesc">
+                </div>
+                <div class="input-field">
+                    <label for="address2">
+                        Effective From Date
+                    </label>
+                    <input disabled name="effectiveFromDate" id="effectiveFromDate" type="text"
+                        [value]="selectedAuditor.AssnDateFrom">
+                </div>
+                <div class="input-field">
+                    <label for="effectiveToDate">
+                        Effective To Date
+                    </label>
+                    <input disabled name="effectiveToDate" id="effectiveToDate" type="text"
+                        [value]="selectedAuditor.AssnDateTo">
+                </div>
+            </div>
+        </div>
+        <!--create auditor-->
+        <div class="inputs-field-set" *ngIf="IsCreateAuditorVisible">
+            <div class="view-auditor-actions">
+                <h2 class="view-auditor-header">
+                    Auditor Details
+                </h2>
+                <div class="btn">
+                    <button class="save-btn">Save</button>
+                </div>
+            </div>
+            <form>
+                <div class="view-auditor-inputs">
+                    <div class="input-field">
+                        <label for="auditorName">
+                            Auditor Name <span style="color: red;">*</span>
+                        </label>
+                        <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditorNameFromSelectBox">
+                            <option value="select">Select</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="input-field" *ngIf="selectedAuditorNameFromSelectBox === 'other'">
+                        <label for="auditorName">
+                            Auditor Name <span style="color: red;">*</span>
+                        </label>
+                        <input type="text">
+                    </div>
+                    <div class="input-field">
+                        <label for="auditorType">
+                            Auditor Type <span style="color: red;">*</span>
+                        </label>
+                        <select name="auditorType" id="auditorType">
+                            <option value="select">Select</option>
+                        </select>
+                    </div>
+                    <div class="input-field">
+                        <label for="address2">
+                            Effective From Date <span style="color: red;">*</span>
+                        </label>
+                        <input name="effectiveFromDate" id="effectiveFromDate" type="date">
+                    </div>
+                    <div class="input-field">
+                        <label for="effectiveToDate">
+                            Effective To Date
+                        </label>
+                        <input name="effectiveToDate" id="effectiveToDate" type="date">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!--edit auditor-->
+        <div class="inputs-field-set" *ngIf="IsEditAuditorVisible">
+            <div class="view-auditor-actions">
+                <h2 class="view-auditor-header">
+                    Auditor Details
+                </h2>
+                <div class="btn">
+                    <button class="save-btn">Save</button>
+                </div>
+            </div>
+            <form>
+                <div class="view-auditor-inputs">
+                    <div class="input-field">
+                        <label for="auditorName">
+                            Auditor Name <span style="color: red;">*</span>
+                        </label>
+                        <select disabled name="auditorName" id="auditorName" [(ngModel)]="selectedAuditorNameFromSelectBox" [value]="selectedAuditor.OtherEntityName">
+                            <option value="select">Select</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="input-field">
+                        <label for="auditorType">
+                            Auditor Type <span style="color: red;">*</span>
+                        </label>
+                        <select name="auditorType" id="auditorType">
+                            <option value="select">Select</option>
+                        </select>
+                    </div>
+                    <div class="input-field">
+                        <label for="address2">
+                            Effective From Date <span style="color: red;">*</span>
+                        </label>
+                        <input name="effectiveFromDate" id="effectiveFromDate" type="date">
+                    </div>
+                    <div class="input-field">
+                        <label for="effectiveToDate">
+                            Effective To Date
+                        </label>
+                        <input name="effectiveToDate" id="effectiveToDate" type="date">
+                    </div>
+                </div>
+            </form>
         </div>
     </section>
 
@@ -1083,7 +1242,7 @@
                         <tr *ngFor="let contact of FIRMContacts">
                             <td class="radio-table">
                                 <label class="radioBtn">
-                                    <input type="radio">
+                                    <input type="radio" name="contact">
                                     <span></span>
                                 </label>
                             </td>
@@ -1390,7 +1549,7 @@
                         <tr *ngFor="let rmp of FIRMRMP">
                             <td class="radio-table">
                                 <label class="radioBtn">
-                                    <input type="radio">
+                                    <input type="radio" name="rmp">
                                     <span></span>
                                 </label>
                             </td>
@@ -1433,24 +1592,7 @@
                         <tr>
                             <td class="radio-table">
                                 <label class="radioBtn">
-                                    <input type="radio">
-                                    <span></span>
-                                </label>
-                            </td>
-                            <td>Breach Number</td>
-                            <td>Version</td>
-                            <td>Breach Type</td>
-                            <td>Breach Category</td>
-                            <td>Breach Level</td>
-                            <td>Date Of Breach</td>
-                            <td>Breach Status</td>
-                            <td>Last Updated By</td>
-                            <td>Last Updated Date</td>
-                        </tr>
-                        <tr>
-                            <td class="radio-table">
-                                <label class="radioBtn">
-                                    <input type="radio">
+                                    <input type="radio" name="breach">
                                     <span></span>
                                 </label>
                             </td>
@@ -1494,7 +1636,7 @@
                         <tr *ngFor="let waiver of FirmWaivers">
                             <td class="radio-table">
                                 <label class="radioBtn">
-                                    <input type="radio">
+                                    <input type="radio" name="waiver">
                                     <span></span>
                                 </label>
                             </td>
@@ -1575,11 +1717,11 @@
                     <tbody>
                         <tr *ngFor="let fund of RegisteredFund">
                             <td></td>
-                           <td>{{fund.RegisteredFundNumber}}</td>
-                           <td>{{fund.FundName}}</td>
-                           <td>{{fund.RegisteredFundTypeDesc}}</td>
-                           <td>{{fund.RegisteredFundStatusTypeDesc}}</td>
-                           <td>{{fund.RegisteredFundStatusDate}}</td>
+                            <td>{{fund.RegisteredFundNumber}}</td>
+                            <td>{{fund.FundName}}</td>
+                            <td>{{fund.RegisteredFundTypeDesc}}</td>
+                            <td>{{fund.RegisteredFundStatusTypeDesc}}</td>
+                            <td>{{fund.RegisteredFundStatusDate}}</td>
                         </tr>
                     </tbody>
                 </table>

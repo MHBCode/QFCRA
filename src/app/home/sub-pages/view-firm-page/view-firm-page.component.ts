@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, Renderer2, ViewChildren } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';  // Import ActivatedRoute
 import { FirmService } from 'src/app/ngServices/firm.service';  // Import FirmService
 
@@ -8,7 +8,14 @@ import { FirmService } from 'src/app/ngServices/firm.service';  // Import FirmSe
   styleUrls: ['./view-firm-page.component.scss']
 })
 export class ViewFirmPageComponent implements OnInit {
-
+  /* for Auditors */
+  IsViewAuditorVisible: boolean = false;
+  IsCreateAuditorVisible: boolean = false;
+  IsEditAuditorVisible: boolean = false;
+  selectedAuditor: any = null;
+  selectedAuditorNameFromSelectBox: string = 'select'
+  @ViewChildren('auditorRadio') auditorRadios!: QueryList<any>;
+  /* */
   call: Boolean = false;
   callInactiveUsers: Boolean = false;
   menuId: Number = 0;
@@ -235,25 +242,25 @@ export class ViewFirmPageComponent implements OnInit {
         const neededSection = document.getElementById(tabId);
         this.renderer.setStyle(neededSection, 'display', 'flex');
 
-        if(tabId == 'Auditors'){
+        if(tabId == 'Auditors' && this.FIRMAuditors.length === 0){
           this.loadAuditors();
         }
-        if(tabId == 'Contacts'){
+        if(tabId == 'Contacts' && this.FIRMContacts.length === 0){
           this.loadContacts();
         }
-        if(tabId = 'Controllers'){
+        if(tabId == 'Controllers' && this.FIRMControllers.length === 0){
           this.loadControllers();
         }
-        if(tabId = 'SPRegFunds'){
+        if(tabId == 'SPRegFunds' && this.RegisteredFund.length === 0){
           this.loadRegisteredFund();
         }
-        if(tabId = 'SPWaivers'){
+        if(tabId == 'SPWaivers'){
           this.loadWaivers();
         }
-        if(tabId ='SPRMPs'){
+        if(tabId == 'SPRMPs'){
           this.loadRMPs();
         }
-        if(tabId = 'SPNotices'){
+        if(tabId == 'SPNotices'){
           this.loadNotices();
         }
         // if(tabId == 'CD'){
@@ -325,4 +332,34 @@ export class ViewFirmPageComponent implements OnInit {
     this.router.navigate(['home/view-controller']);
   }
 
+  createController() {
+    this.router.navigate(['home/create-controller']);
+  }
+
+  viewAuditor(auditor: any) {
+    this.selectedAuditor = auditor; 
+    this.IsViewAuditorVisible = true;
+    this.IsCreateAuditorVisible = false; 
+    this.IsEditAuditorVisible = false;
+  }
+
+  createAuditor() {
+    this.IsCreateAuditorVisible = true;
+    this.IsViewAuditorVisible = false;
+    this.IsEditAuditorVisible = false;
+  }
+
+  editAuditor() {
+    const selectedRadio = this.auditorRadios.find(radio => radio.nativeElement.checked);
+
+    if (selectedRadio) {
+      // Proceed with edit logic
+      this.IsEditAuditorVisible = true;
+      this.IsCreateAuditorVisible = false;
+      this.IsViewAuditorVisible = false;
+      this.selectedAuditor = selectedRadio.nativeElement.value; // Or fetch the auditor details
+    } else {
+      alert('Please select a record from the list of Auditors displayed.');
+    }
+  }
 }
