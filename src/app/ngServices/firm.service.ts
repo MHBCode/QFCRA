@@ -16,6 +16,7 @@ export class FirmService {
   private baseUrlWaiver = environment.API_URL+'/api/Waiver/' //Waiver
   private baseUrlRisk = environment.API_URL+'/api/Risk/' //Risk
   private baseUrlNotice = environment.API_URL+'/api/Notice/' //Notice
+  private baseUrlApplication = environment.API_URL+'/api/Application/' //Application
   constructor(private http: HttpClient) { }
 
   getFIRMOPData(firmId:number): Observable<any> {
@@ -42,6 +43,10 @@ export class FirmService {
   getInactiveUsersHistory(firmId:number): Observable<any> {
     const url = `${this.baseUrl}get_inactive_firm_users?firmId=${firmId}`;  // Construct full URL https://localhost:7091/api/Firms/get_inactive_firm_users?firmId=66
     return this.http.get<any>(url);
+  }
+  getAppDetailsLicensedAndAuthHistory(firmId: number, firmAppTypeID: any, getLatestRecord: boolean): Observable<any> {
+     const url = `${this.baseUrlApplication}get_application_status?firmId=${firmId}&firmApplTypeID=${firmAppTypeID}&getLatest=${getLatestRecord}`;
+     return this.http.get<any>(url);
   }
   getFIRMAuditors(firmId:number): Observable<any> {
     const url = `${this.baseUrl}get_auditors?firmId=${firmId}`;  // Construct full URL https://localhost:7091/api/Firms/get_auditors?firmID=66

@@ -12,6 +12,7 @@ export class ViewFirmPageComponent implements OnInit {
   IsViewAuditorVisible: boolean = false;
   IsCreateAuditorVisible: boolean = false;
   IsEditAuditorVisible: boolean = false;
+  isCollapsed: boolean = false;
   selectedAuditor: any = null;
   selectedAuditorNameFromSelectBox: string = 'select'
   @ViewChildren('auditorRadio') auditorRadios!: QueryList<any>;
@@ -30,8 +31,13 @@ export class ViewFirmPageComponent implements OnInit {
   firmDetails: any;  // Add firmDetails property
   firmOPDetails: any;
   firmFYearHistory: any;
+
   ActivityLicensed: any;
   firmInactiveUsers: any[] = [];
+  firmAppDetailsLicensed: any[] = [];
+  firmAppDetailsAuthorization: any[] = [];
+  firmAppDetailsLatestLicensed: any;
+  firmAppDetailsLatestAuthorized: any;
   FIRMAuditors: any[] = [];
   FIRMContacts: any[] = [];
   FIRMControllers: any[] = [];
@@ -68,6 +74,10 @@ export class ViewFirmPageComponent implements OnInit {
   scrollToTop(): void {
     console.log('scrollToTop called');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  toggleCollapse() {
+    this.isCollapsed = !this.isCollapsed;
   }
 
   toggleMenu(inputNumber: Number) {
@@ -107,6 +117,7 @@ export class ViewFirmPageComponent implements OnInit {
       error => {
         console.error('Error fetching firm details', error);
       }
+      
     );
   }
   loadFirmOPDetails(firmId: number) {
@@ -230,6 +241,27 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
+
+  loadApplicationDetails() {
+    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId,2,true).subscribe(
+      data => {
+        this.firmAppDetailsLatestLicensed = data.response[0];
+        console.log('Firm app details licensed history:', this.firmAppDetailsLatestLicensed);
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+      }
+    );
+    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId,3,true).subscribe(
+      data => {
+        this.firmAppDetailsLatestAuthorized = data.response[0];
+        console.log('Firm app details licensed history:', this.firmAppDetailsLatestAuthorized);
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+      }
+    );
+  }
   switchTab(tabId: string){
         // Get all section elements
         const sections = this.el.nativeElement.getElementsByTagName('section');
@@ -241,6 +273,10 @@ export class ViewFirmPageComponent implements OnInit {
         console.log('yes its', tabId)
         const neededSection = document.getElementById(tabId);
         this.renderer.setStyle(neededSection, 'display', 'flex');
+
+        if (tabId == 'CD') {
+          this.loadApplicationDetails();
+        }
 
         if(tabId == 'Auditors' && this.FIRMAuditors.length === 0){
           this.loadAuditors();
@@ -284,12 +320,14 @@ export class ViewFirmPageComponent implements OnInit {
         console.error('Error fetching firm details', error);
       }
     );
+    setTimeout(() => {
     const popupWrapper = document.querySelector('.popup-wrapper') as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'flex'; 
     } else {
       console.error('Element with class .popup-wrapper not found');
     }
+  },0);
   }
   closeFYearHistory(){
     const popupWrapper = document.querySelector('.popup-wrapper') as HTMLElement;
@@ -311,7 +349,47 @@ export class ViewFirmPageComponent implements OnInit {
         console.error('Error fetching firm details', error);
       }
     );
+    setTimeout(() => {
     const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'flex'; 
+    } else {
+      console.error('Element with class not found');
+    }
+  },0);
+  }
+
+
+  closeInactiveUsers(){
+    const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none'; 
+    } else {
+      console.error('Element with class not found');
+    }
+  }
+
+ 
+  getApplicationDetailsHistory() {
+    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId,2,false).subscribe(
+      data => {
+        this.firmAppDetailsLicensed = data.response;
+        console.log('Firm app details licensed history:', this.firmAppDetailsLicensed);
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+      }
+    );
+    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId,3,false).subscribe(
+      data => {
+        this.firmAppDetailsAuthorization = data.response;
+        console.log('Firm app details licensed history:', this.firmAppDetailsAuthorization);
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+      }
+    );
+    const popupWrapper = document.querySelector('.ApplicationDetailsPopUp') as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'flex'; 
     } else {
@@ -319,8 +397,48 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  closeInactiveUsers(){
-    const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
+  closeApplicationDetails() {
+    const popupWrapper = document.querySelector(".ApplicationDetailsPopUp") as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none'; 
+    } else {
+      console.error('Element with class not found');
+    }
+  }
+
+  getPrevFirmName() {
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.prevFirmNamePopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex'; 
+      } else {
+        console.error('Element with class .prevFirmNamePopUp not found');
+      }
+    },0);
+  }
+
+  closePrevFirmName() {
+    const popupWrapper = document.querySelector(".prevFirmNamePopUp") as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none'; 
+    } else {
+      console.error('Element with class not found');
+    }
+  }
+
+  getAccountingStandard() {
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.accountingStandardsPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex'; 
+      } else {
+        console.error('Element with class .prevFirmNamePopUp not found');
+      }
+    },0);
+  }
+
+  closeAccountingStandard() {
+    const popupWrapper = document.querySelector(".accountingStandardsPopUp") as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none'; 
     } else {

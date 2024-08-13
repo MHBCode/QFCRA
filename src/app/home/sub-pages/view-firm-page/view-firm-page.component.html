@@ -266,10 +266,17 @@
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    FIRM Details > <span>{{firmDetails?.FirmName}}</span>
+                    FIRM Details
                 </h2>
             </div>
             <div class="edit-firms-inputs">
+                <div class="input-field">
+                    <label for="firmName">
+                        Firm Name
+                    </label>
+                    <input disabled name="firmName" id="firmName" type="text" value="{{firmDetails?.FirmName}}">
+                </div>
+
                 <div class="input-field">
                     <label for="code">
                         Code
@@ -313,7 +320,7 @@
                         Home Country
                     </label>
                     <input disabled name="homeCountry" id="homeCountry" type="text"
-                        value="{{firmDetails?.CountryName}}">
+                        value="{{firmDetails?.CountyOfIncorporationDesc}}">
                 </div>
 
                 <div class="input-field">
@@ -343,7 +350,8 @@
 
                 <div class="input-field">
                     <label for="accountingStandards">
-                        Accounting Standards
+                        Accounting Standards <button class="subbutton"
+                            (click)="getAccountingStandard()">History</button>
                     </label>
                     <input disabled name="accountingStandards" id="accountingStandards" type="text"
                         value="{{firmDetails?.FinAccStdTypeDesc}}">
@@ -361,8 +369,22 @@
                     <label for="websiteLink">
                         Website Link
                     </label>
-                    <input disabled name="websiteLink" id="websiteLink" type="text"
-                        value="{{firmDetails?.WebSiteAddress}}">
+                    <a id="websiteLink" [href]="firmDetails?.WebSiteAddress" target="_blank" rel="noopener noreferrer">
+                        {{ firmDetails?.WebSiteAddress || 'No Website Available' }}
+                    </a>
+                </div>
+                <div class="input-field" *ngIf="firmDetails.PrevTradingName !== ''">
+                    <label for="prevFirmName">
+                        Prev. Firm Name <button class="subbutton" (click)="getPrevFirmName()">History</button>
+                    </label>
+                    <input disabled name="prevFirmName" id="prevFirmName" type="text"
+                        [value]="firmDetails?.PrevTradingName">
+                </div>
+                <div class="input-field" *ngIf="firmDetails.PrevTradingName !== ''">
+                    <label for="prevFirmNameEffectiveTo">
+                        Prev. Firm Name Effective To
+                    </label>
+                    <input disabled name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo" type="date">
                 </div>
             </div>
 
@@ -371,7 +393,8 @@
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    Application Details
+                    Application Details <button class="subbutton" (click)="getApplicationDetailsHistory()">Open
+                        History</button>
                 </h2>
                 <div class="edit-btn">
                 </div>
@@ -383,7 +406,7 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOn" id="appliedOn" type="text"
-                        value="{{firmDetails?.LicenseApplStatusDate}}">
+                        value="{{firmDetails?.FirmLicApplDate}}">
                 </div>
                 <div class="input-field">
                     <label for="licensedOn">
@@ -396,28 +419,28 @@
                         Current Status
                     </label>
                     <input disabled name="currentStatus" id="currentStatus" type="text"
-                        value="{{firmDetails?.LicenseStatusTypeDesc}}">
+                        value="{{firmAppDetailsLatestLicensed?.FirmApplStatusTypeDesc}}">
                 </div>
-                <!-- <div class="input-field">
+                <div class="input-field">
                     <label for="currentStatusEffectiveDate">
                         Current Status Effective Date
                     </label>
                     <input disabled name="currentStatusEffectiveDate" id="currentStatusEffectiveDate" type="text"
-                        value="Cant Find In Integration">
-                </div> -->
+                        value="{{firmAppDetailsLatestLicensed?.FirmApplStatusDate}}">
+                </div>
                 <div class="input-field">
                     <label for="lastModifiedBy">
                         Last Modified By
                     </label>
                     <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
-                        value="{{firmDetails?.LastModifiedBy}}">
+                        value="{{firmAppDetailsLatestLicensed?.LastModifiedByUser}}">
                 </div>
                 <div class="input-field">
                     <label for="lastModifiedDate">
                         Last Modified Date
                     </label>
                     <input disabled name="lastModifiedDate" id="lastModifiedDate" type="text"
-                        value="{{firmDetails?.LastModifiedDate}}">
+                        value="{{firmAppDetailsLatestLicensed?.LastModifiedDate}}">
                 </div>
                 <h3 class="subTitle-firmDetails">Authorization Status</h3>
                 <div class="input-field">
@@ -439,41 +462,67 @@
                         Current Status
                     </label>
                     <input disabled name="currentStatusAuth" id="currentStatusAuth" type="text"
-                        value="{{firmDetails?.AuthorisationStatusTypeDesc}}">
+                        value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusTypeDesc}}">
                 </div>
-                <!-- <div class="input-field">
+                <div class="input-field">
                     <label for="currentStatusEffectiveDateAuth">
                         Current Status Effective Date
                     </label>
                     <input disabled name="currentStatusEffectiveDateAuth" id="currentStatusEffectiveDateAuth"
-                        type="text" value="Cant Find In Integration">
-                </div> -->
+                        type="text" value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusDate}}">
+                </div>
                 <div class="input-field">
                     <label for="lastModifiedByAuth">
                         Last Modified By
                     </label>
                     <input disabled name="lastModifiedByAuth" id="lastModifiedByAuth" type="text"
-                        value="{{firmDetails?.lastModifiedBy}}">
+                        value="{{firmAppDetailsLatestAuthorized?.LastModifiedByUser}}">
                 </div>
                 <div class="input-field">
                     <label for="lastModifiedDateAuth">
                         Last Modified Date
                     </label>
                     <input disabled name="lastModifiedDateAuth" id="lastModifiedDateAuth" type="text"
-                        value="{{firmDetails?.LastModifiedDate}}">
+                        value="{{firmAppDetailsLatestAuthorized?.LastModifiedDate}}">
                 </div>
             </div>
         </div>
         <!---->
-        <div class="inputs-field-set">
+        <div class="inputs-field-set comments">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">Comments</h2>
+            </div>
+            <div class="edit-firms-inputs">
+                <div class="input-field">
+                    <label for="generalComments">
+                        <strong>General Comments:</strong>
+                    </label>
+                    <div class="text-container">
+                        <p>{{firmDetails?.FirmApplicationDataComments}}</p>
+                    </div>
+                </div>
+                <div class="input-field">
+                    <label for="publicRegisterComments">
+                        <strong>Public Register Comments:</strong>
+                    </label>
+                    <div class="text-container">
+                        <p>{{firmDetails?.PublicRegisterComments}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!---->
+        <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed}">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
                     Addresses
                 </h2>
-                <div class="edit-btn">
-                </div>
+                <button class="collapse-button" (click)="toggleCollapse()">
+                    {{ isCollapsed ? '▲' : '▼'}}
+                </button>
             </div>
-            <div class="edit-firms-inputs">
+            <div class="edit-firms-inputs" *ngIf="!isCollapsed">
                 <div class="input-field">
                     <label for="addressType">
                         Address Type
@@ -539,6 +588,7 @@
                     <input disabled name="fax" id="fax" type="text" value="">
                 </div>
             </div>
+            <hr style="background-color: #A51E36;height: 0.5px;">
         </div>
     </section>
 
@@ -1187,7 +1237,8 @@
                         <label for="auditorName">
                             Auditor Name <span style="color: red;">*</span>
                         </label>
-                        <select disabled name="auditorName" id="auditorName" [(ngModel)]="selectedAuditorNameFromSelectBox" [value]="selectedAuditor.OtherEntityName">
+                        <select disabled name="auditorName" id="auditorName"
+                            [(ngModel)]="selectedAuditorNameFromSelectBox" [value]="selectedAuditor.OtherEntityName">
                             <option value="select">Select</option>
                             <option value="other">Other</option>
                         </select>
@@ -1767,18 +1818,27 @@
 <!--Financial Year End History-->
 <div *ngIf="call" class="popup-wrapper">
     <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Financial Year End History</h3>
+        </div>
         <table>
             <thead>
                 <tr>
-                    <th>Effective from</th>
-                    <th>Name</th>
-                    <th>Latest update</th>
+                    <th>Firm</th>
+                    <th>Financial Year End</th>
+                    <th>Financial Year Effective From</th>
+                    <th>Financial Year Effective To</th>
+                    <th>Modified By</th>
+                    <th>Modified Date</th>
                 </tr>
             </thead>
             <tbody>
                 <!--*ngFor="let FR of firmFYearHistory"-->
-                <tr>
+                <tr *ngIf="firmFYearHistory">
+                    <td>{{firmFYearHistory.FirmName}}</td>
+                    <td>{{firmFYearHistory.FirmFinYearEndTypeDesc}}</td>
                     <td>{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}</td>
+                    <td>{{firmFYearHistory.FirmFinYearEndEffectiveTo}}</td>
                     <td>{{firmFYearHistory.UserName}}</td>
                     <td>{{firmFYearHistory.Column1}}</td>
                 </tr>
@@ -1792,6 +1852,9 @@
 <!--Inactive Users-->
 <div *ngIf="callInactiveUsers" class="InactiveUsersPopUp">
     <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Inactive Users</h3>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -1813,5 +1876,125 @@
     </div>
     <div class="popup-operations-place">
         <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeInactiveUsers()">Close</button>
+    </div>
+</div>
+
+<!--Accounting Standards-->
+<div class="accountingStandardsPopUp">
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Accounting Standards History</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Firm</th>
+                    <th>Financial Standard</th>
+                    <th>Financial Standard Effective From</th>
+                    <th>Financial Standard Effective To</th>
+                    <th>Modified By</th>
+                    <th>Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeAccountingStandard()">Close</button>
+    </div>
+</div>
+<!--Previous Firm Name-->
+<div class="prevFirmNamePopUp">
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>File Name History</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Prev. Firm Name</th>
+                    <th>Date Effective To</th>
+                    <th>Modified By</th>
+                    <th>Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closePrevFirmName()">Close</button>
+    </div>
+</div>
+<!--Application Details-->
+<div class="ApplicationDetailsPopUp">
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Application Details History</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <td style="background: #A51E36;color: white;" colspan="4">
+                        Licensed Status
+                    </td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <th>Status Date</th>
+                    <th>Last Modified By</th>
+                    <th>Last Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let LicenseDetailsHistory of firmAppDetailsLicensed">
+                    <td>{{LicenseDetailsHistory.FirmApplStatusTypeDesc}}</td>
+                    <td>{{LicenseDetailsHistory.FirmApplStatusDate}}</td>
+                    <td>{{LicenseDetailsHistory.LastModifiedByUser}}</td>
+                    <td>{{LicenseDetailsHistory.LastModifiedDate}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <td style="background: #A51E36;color: white;" colspan="5">
+                        Authorization Status
+                    </td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <th>Status Date</th>
+                    <th>Press Release</th>
+                    <th>Last Modified By</th>
+                    <th>Last Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let AuthDetailsHistory of firmAppDetailsAuthorization">
+                    <td>{{AuthDetailsHistory.FirmApplStatusTypeDesc}}</td>
+                    <td>{{AuthDetailsHistory.FirmApplStatusDate}}</td>
+                    <td>{{AuthDetailsHistory.PressReleaseLink}}</td>
+                    <td>{{AuthDetailsHistory.LastModifiedByUser}}</td>
+                    <td>{{AuthDetailsHistory.LastModifiedDate}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeApplicationDetails()">Close</button>
     </div>
 </div>

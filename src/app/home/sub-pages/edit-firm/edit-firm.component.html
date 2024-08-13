@@ -2,16 +2,13 @@
     <div class="text">
         <span> Home > Firm Details ></span> Edit Firm
     </div>
-    <div class="edit-btn">
-
-    </div>
 </div>
 <section class="edit-firm-section">
     <form class="edit-firm-form" [formGroup]="editFIRM" (ngSubmit)="onSubmitEditFirm()">
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    <!-- FIRM Details > <span>Firm name</span> -->
+                    FIRM Details
                 </h2>
                 <div class="edit-btn">
                     <button type="submit" class="save-btn">Save</button>
@@ -38,10 +35,27 @@
                     <input name="code" id="code" type="text" formControlName="firmCode">
                 </div>
                 <div class="input-field">
+                    <label for="legalStatus">
+                        Legal Status
+                    </label>
+                    <select id="legalStatus" formControlName="legalStatusTypeID" class="form-control">
+                        <option value="select">Select</option>
+                        <option>Type 1</option>
+                        <option>Type 2</option>
+                        <option>Type 3</option>
+                      </select>
+                </div>
+                <div class="input-field">
                     <label for="qfcTradingName">
                         QFC Trading Name
                     </label>
                     <input name="qfcTradingName" id="qfcTradingName" type="text" formControlName="qfcTradingName">
+                </div>
+                <div class="input-field">
+                    <label for="preTradingName">
+                        Pre. Trading Name(s)
+                    </label>
+                    <input name="preTradingName" id="preTradingName" type="text" formControlName="prevTradingName">
                 </div>
                 <div class="input-field">
                     <label for="placeOfIncorporation">
@@ -49,18 +63,66 @@
                     </label>
                     <input name="placeOfIncorporation" id="placeOfIncorporation" formControlName="placeOfIncorporation" type="text">
                 </div>
-                <!-- <div class="input-field">
+                <div class="input-field">
+                    <label for="homeCountry">
+                        Home Country
+                    </label>
+                    <select id="homeCountry" formControlName="countryOfIncorporation" class="form-control">
+                        <option value="select">Select</option>
+                        <option>Type 1</option>
+                        <option>Type 2</option>
+                        <option>Type 3</option>
+                      </select>
+                </div>
+                <div class="input-field">
+                    <label for="isDateDifferent">
+                        Is Date of Incorporation different from Date of Licensing or Authorisation : <span style="color: red;">*</span>
+                    </label>
+                    <div class="radio-wrapper">
+                        <input name="isIncorporationDateDifferent" id="yes" type="radio" formControlName="isIncorporationDateDifferent" [(ngModel)]="isDateDifferent" [value]="true">
+                        Yes
+                        <input name="isIncorporationDateDifferent" id="no" type="radio" formControlName="isIncorporationDateDifferent" [(ngModel)]="isDateDifferent" [value]="false">
+                        No
+                    </div>
+                </div>
+                <div class="input-field" *ngIf="isDateDifferent">
+                    <label for="incorporationDate">
+                        Incorporation Date
+                    </label>
+                    <input name="incorporationDate" id="incorporationDate" formControlName="incorporationDate" type="date">
+                </div>
+                <div class="input-field">
                     <label for="financialYearEnd">
                         Financial Year End
                     </label>
-                    <input name="financialYearEnd" id="financialYearEnd" type="text">
+                    <select id="financialYearEnd" formControlName="FYearEnd" class="form-control">
+                        <option>Type 1</option>
+                        <option>Type 2</option>
+                        <option>Type 3</option>
+                      </select>
+                </div>
+                <div class="input-field">
+                    <label for="FinancialYearEndEffectiveFrom">
+                        Financial Year End Effective From <button class="subbutton" (click)="getFYearHistory()">History</button>
+                    </label>
+                    <input name="FinancialYearEndEffectiveFrom" id="FinancialYearEndEffectiveFrom" formControlName="FYearEffectiveFrom" type="date">
                 </div>
                 <div class="input-field">
                     <label for="accountingStandards">
                         Accounting Standards
                     </label>
-                    <input name="accountingStandards" id="accountingStandards" type="text">
-                </div> -->
+                    <select id="accountingStandards" formControlName="accountingStandards" class="form-control">
+                        <option>Type 1</option>
+                        <option>Type 2</option>
+                        <option>Type 3</option>
+                      </select>
+                </div>
+                <div class="input-field">
+                    <label for="accountingStandardsEffectiveFrom">
+                        Accounting Standards Effective From
+                    </label>
+                    <input name="accountingStandardsEffectiveFrom" id="accountingStandardsEffectiveFrom" formControlName="accountingStandardsEffectiveFrom" type="date">
+                </div>
                 <div class="input-field">
                     <label for="websiteLink">
                         Website Link
@@ -68,20 +130,16 @@
                     <input name="websiteLink" id="websiteLink" type="text" formControlName="websiteAddress">
                 </div>
                 <div class="input-field">
-                    <label for="legalStatus">
-                        Legal Status
+                    <label for="prevFirmName">
+                        Prev. Firm Name <button class="subbutton">History</button>
                     </label>
-                    <select id="legalStatus" formControlName="legalStatusTypeID" class="form-control">
-                        <option [value]="1">Type 1</option>
-                        <option [value]="2">Type 2</option>
-                        <option [value]="3">Type 3</option>
-                      </select>
+                    <input name="prevFirmName" id="prevFirmName" type="text" formControlName="prevFirmName">
                 </div>
                 <div class="input-field">
-                    <label for="preTradingName">
-                        Pre. Trading Name (S)
+                    <label for="prevFirmNameEffectiveTo">
+                        Prev. Firm Name Effective To
                     </label>
-                    <input name="preTradingName" id="preTradingName" type="text" formControlName="prevTradingName">
+                    <input name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo" type="date" formControlName="prevFirmNameEffectiveTo">
                 </div>
             </div>
         </div>
@@ -89,22 +147,11 @@
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    Application Details <span>Display History</span>
+                    Application Details <button class="subbutton" (click)="getApplicationDetailsHistory()">Open History</button>
                 </h2>
-                <div class="edit-btn">
-                </div>
+                
             </div>
             <div class="edit-firms-inputs">
-                <div class="input-field">
-                    <label for="qfcLicenseStatus">
-                        QFC License Status
-                    </label>
-                    <select name="qfcLicenseStatus" id="qfcLicenseStatus" formControlName="licenseStatusTypeID" class="form-control">
-                            <option [value]="1">Type 1</option>
-                            <option [value]="2">Type 2</option>
-                            <option [value]="3">Type 3</option>
-                    </select>
-                </div>
                 <div class="input-field">
                     <label for="dateOfApplication">
                         Date of Application
@@ -116,10 +163,84 @@
                         Firm Application Type
                     </label>
                     <select name="firmApplicationType" id="firmApplicationType" formControlName="firmAppTypeID" class="form-control">
-                        <option [value]="1">Type 1</option>
-                        <option [value]="2">Type 2</option>
-                        <option [value]="3">Type 3</option>
+                        <option value="1"></option>
                     </select>
+                </div>
+                <div class="input-field">
+                    <label for="qfcLicenseStatus">
+                        QFC License Status
+                    </label>
+                    <select name="qfcLicenseStatus" id="qfcLicenseStatus" formControlName="licenseStatusTypeID" class="form-control">
+                            
+                    </select>
+                </div>
+                <div class="input-field">
+                    <label for="dateLicensed">
+                        Date Licensed
+                    </label>
+                    <input name="dateLicensed" id="dateLicensed" type="date" formControlName="dateLicensed">
+                </div>
+                <div class="input-field">
+                    <label for="authorizationStatus">
+                        Authorization Status
+                    </label>
+                    <select name="authorizationStatus" id="authorizationStatus" formControlName="authorizationStatus" class="form-control">
+                        <option value="1"></option>
+                    </select>
+                </div>
+                <div class="input-field">
+                    <label for="dateNoLongerAuthorized">
+                        Date No Longer Authorized
+                    </label>
+                    <input name="dateNoLongerAuthorized" id="dateNoLongerAuthorized" type="date" formControlName="dateNoLongerAuthorized">
+                </div>
+            </div>
+        </div>
+        <!---->
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">Press Releases</h2>
+            </div>
+            <div class="edit-firms-inputs">
+                <div class="file-container">
+                    <div class="input-field">
+                        <label for="documentType">
+                            Document Type
+                        </label>
+                        <select class="document-type-select" name="documentType" id="documentType">
+                            <option value="">Press Release</option>
+                        </select>
+                    </div>
+    
+                    <div>Uploaded documents goes here</div>
+    
+                    <div class="btns-container">
+                        <div class="upload-container">
+                            <input type="file" #fileInput style="display: none;"/>
+                            <button class="choose-document-btn" id="uploadButton">Choose Document</button>
+                        </div>
+                        <button class="upload-document-btn">Upload the Document</button>
+                    </div>
+                </div>
+                <div class="inputs-field-set">
+                    <div class="section">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Document Type</th>
+                                    <th>File Name</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Attachment</td>
+                                    <td>askdoasdasdsadasdasdasdassssssssssssssssssssssssssss</td>
+                                    <td><button class="delete-file">Delete</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -129,8 +250,7 @@
                 <h2 class="edit-firm-header">
                     Comments
                 </h2>
-                <div class="edit-btn">
-                </div>
+                
             </div>
             <div class="edit-firms-inputs">
                 <div class="input-field">
@@ -147,6 +267,179 @@
                 </div>
             </div>
         </div>
+        <!---->
+        <div class="inputs-field-set">
+            <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">
+                    Addresses
+                </h2>
+                <div class="edit-btn">
+                </div>
+            </div>
+            <div class="edit-firms-inputs">
+                <div class="input-field">
+                    <label for="addressType">
+                        Address Type
+                    </label>
+                    <select disabled name="addressType" id="addressType">
+                        <option value=""></option>
+                    </select>
+                </div>
+                <div class="input-field">
+                    <label for="addressLine1">
+                        Address Line 1
+                    </label>
+                    <input type="text"  name="addressLine1" id="addressLine1"
+                        value="">
+                </div>
+                <div class="input-field">
+                    <label for="addressLine2">
+                        Address Line 2
+                    </label>
+                    <input  name="addressLine2" id="addressLine2" type="text"
+                        value="">
+                </div>
+                <div class="input-field">
+                    <label for="addressLine3">
+                        Address Line 3
+                    </label>
+                    <input  name="addressLine3" id="addressLine3" type="text"
+                        value="">
+                </div>
+                <div class="input-field">
+                    <label for="addressLine4">
+                        Address Line 4
+                    </label>
+                    <input  name="addressLine4" id="addressLine4" type="text"
+                        value="">
+                </div>
+                <div class="input-field">
+                    <label for="city">
+                        City
+                    </label>
+                    <input  name="city" id="city" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="country">
+                        Country
+                    </label>
+                    <select name="country" id="country">
+                        <option value=""></option>
+                    </select>
+                </div>
+                <div class="input-field">
+                    <label for="zip">
+                        Zip
+                    </label>
+                    <input  name="zip" id="zip" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="phone">
+                        Phone
+                    </label>
+                    <input  name="phone" id="phone" type="text" value="">
+                </div>
+                <div class="input-field">
+                    <label for="fax">
+                        Fax
+                    </label>
+                    <input  name="fax" id="fax" type="text" value="">
+                </div>
+            </div>
+            <hr style="background-color: #A51E36;height: 0.5px;">
+        </div>
     </form> 
 </section>
+
+<!--Popups-->
+<!--Financial Year End History-->
+<div *ngIf="call" class="popup-wrapper">
+    <div class="popup-info-place">
+        <table>
+            <thead>
+                <tr>
+                    <th>Firm</th>
+                    <th>Financial Year End</th>
+                    <th>Financial Year Effective From</th>
+                    <th>Financial Year Effective To</th>
+                    <th>Modified By</th>
+                    <th>Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngIf="firmFYearHistory">
+                    <td>{{firmFYearHistory.FirmName}}</td>
+                    <td>{{firmFYearHistory.FirmFinYearEndTypeDesc}}</td>
+                    <td>{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}</td>
+                    <td>{{firmFYearHistory.FirmFinYearEndEffectiveTo}}</td>
+                    <td>{{firmFYearHistory.UserName}}</td>
+                    <td>{{firmFYearHistory.Column1}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeFYearHistory()">Close</button>
+    </div>
+</div>
+
+<!--Application Details-->
+<div class="ApplicationDetailsPopUp">
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Application Details History</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <td style="background: #A51E36;color: white;" colspan="4">
+                        Licensed Status
+                    </td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <th>Status Date</th>
+                    <th>Last Modified By</th>
+                    <th>Last Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let LicenseDetailsHistory of firmAppDetailsLicensed">
+                    <td>{{LicenseDetailsHistory.FirmApplStatusTypeDesc}}</td>
+                    <td>{{LicenseDetailsHistory.FirmApplStatusDate}}</td>
+                    <td>{{LicenseDetailsHistory.LastModifiedByUser}}</td>
+                    <td>{{LicenseDetailsHistory.LastModifiedDate}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <td style="background: #A51E36;color: white;" colspan="5">
+                        Authorization Status
+                    </td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <th>Status Date</th>
+                    <th>Press Release</th>
+                    <th>Last Modified By</th>
+                    <th>Last Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let AuthDetailsHistory of firmAppDetailsAuthorization">
+                    <td>{{AuthDetailsHistory.FirmApplStatusTypeDesc}}</td>
+                    <td>{{AuthDetailsHistory.FirmApplStatusDate}}</td>
+                    <td>{{AuthDetailsHistory.PressReleaseLink}}</td>
+                    <td>{{AuthDetailsHistory.LastModifiedByUser}}</td>
+                    <td>{{AuthDetailsHistory.LastModifiedDate}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeApplicationDetails()">Close</button>
+    </div>
+</div>
 
