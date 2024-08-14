@@ -148,8 +148,7 @@
                     <label for="dateOfApplication">
                         Date of Application
                     </label>
-                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text" 
-                    value="{{firmDetails?.AuthorisationStatusTypeID == 0 
+                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="{{firmDetails?.AuthorisationStatusTypeID == 0 
                     ? (firmDetails?.FirmLicApplDate | date: 'dd/MMM/y')
                     : (firmDetails?. FirmAuthApplDate | date: 'dd/MMM/y')}}">
                 </div>
@@ -390,7 +389,8 @@
                     <input disabled name="prevFirmName" id="prevFirmName" type="text"
                         value="{{firmNamesHistory?.PrevFirmName}}">
                 </div>
-                <div class="input-field" *ngIf="showPrevFirmNameandDateFields && firmNamesHistory?.DateEffectiveTo !== ''">
+                <div class="input-field"
+                    *ngIf="showPrevFirmNameandDateFields && firmNamesHistory?.DateEffectiveTo !== ''">
                     <label for="prevFirmNameEffectiveTo">
                         Prev. Firm Name Effective To
                     </label>
@@ -417,13 +417,14 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOn" id="appliedOn" type="text"
-                        value="{{firmDetails?.FirmLicApplDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
+                        value="{{firmDetails?.FirmLicApplDate | date: 'dd/MMM/y'}}">
                 </div>
                 <div class="input-field">
                     <label for="licensedOn">
                         Licensed On
                     </label>
-                    <input type="text" disabled name="licensedOn" id="licensedOn" value="{{firmDetails?.LicensedDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
+                    <input type="text" disabled name="licensedOn" id="licensedOn"
+                        value="{{firmDetails?.LicensedDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="currentStatus">
@@ -459,7 +460,7 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOnAuth" id="appliedOnAuth" type="text"
-                        value="{{firmDetails?.AuthApplStatusDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
+                        value="{{firmDetails?.FirmAuthApplDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="AuthorizedOnAuth">
@@ -525,7 +526,7 @@
 
         <!---->
         <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed}">
-            <div class="edit-firm-actions">
+            <div class="edit-firm-actions collapse-container">
                 <h2 class="edit-firm-header">
                     Addresses
                 </h2>
@@ -588,7 +589,7 @@
                 </div>
                 <div class="input-field">
                     <label for="zip">
-                        Zip
+                        Zip/Postal Code
                     </label>
                     <input disabled name="zip" id="zip" type="text" value="{{firmDetails?.PostalCode}}">
                 </div>
@@ -618,7 +619,7 @@
             </div>
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    Scope for {{firmDetails?.FirmName}}
+                    <small>Scope for</small> {{firmDetails?.FirmName}}
                 </h2>
                 <div class="btn">
                     <button class="edit-btn">
@@ -635,11 +636,10 @@
                     <input disabled name="formReff" id="formReff" type="text" value="">
                 </div>
                 <div class="input-field">
-                    <label for="linkToScope">
+                    <label for="">
                         Link To Scope
                     </label>
-                    <input disabled name="linkToScope" id="linkToScope" type="text"
-                        value="{{license?.ScopeCertificateLink}}">
+                    <input disabled name="" id="" type="text" value="{{license?.ScopeCertificateLink || 'No Link'}}">
                 </div>
                 <div class="input-field">
                     <label for="scopeRevNum">
@@ -704,9 +704,9 @@
                 </div>
 
                 <div class="permitted-activity-body">
-                    <p>The Regulated Activities set out in its scope of Authorisation</p>
-                    <strong>Activity Details: </strong>
                     <p>{{license?.ActivityTypeDesc}}</p>
+                    <strong>Activity Details: </strong>
+                    <p>{{license?.FirmActivityDetails}}</p>
                     <strong>Specific Conditions and Restrictions: </strong>
                     <p>{{license?.Column1}}</p>
                 </div>
@@ -724,16 +724,14 @@
 
         </div>
         <!---->
-        <div class="inputs-field-set">
+        <div class="inputs-field-set" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
             <div class="authorised-header">
                 Authorised
             </div>
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    Scope for firm name
+                    <small>Scope for</small> {{firmDetails?.FirmName}}
                 </h2>
-                <div class="edit-btn">
-                </div>
             </div>
             <div class="edit-firms-inputs">
                 <div class="input-field">
@@ -746,79 +744,67 @@
                     <label for="">
                         Link To Scope
                     </label>
-                    <input disabled name="" id="" type="text" value="">
+                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCertificateLink || 'No Link'}}">
                 </div>
                 <div class="input-field">
                     <label for="">
                         Scope Revision Number
                     </label>
-                    <input disabled name="" id="" type="text" value="">
+                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeRevNum}}">
                 </div>
                 <div class="input-field">
                     <label for="q13AppDate">
                         Q13 Application Date for revisions
                     </label>
-                    <input disabled name="q13AppDate" id="q13AppDate" type="text" value="">
+                    <input disabled name="q13AppDate" id="q13AppDate" type="text" value="{{ActivityAuth?.ScopeAppliedDate}}">
                 </div>
                 <div class="input-field">
                     <label for="incorporationDate">
                         Incorporation Date
                     </label>
-                    <input disabled name="incorporationDate" id="incorporationDate" type="text" value="">
+                    <input disabled name="incorporationDate" id="incorporationDate" type="text" value="{{ActivityAuth?.ScopeLicensedDate}}">
                 </div>
                 <div class="input-field">
                     <label for="authorisedDate">
                         Authorised Date
                     </label>
-                    <input disabled name="authorisedDate" id="authorisedDate" type="text" value="">
+                    <input disabled name="authorisedDate" id="authorisedDate" type="text" value="{{ActivityAuth?.ScopeLicensedDate}}">
                 </div>
                 <div class="input-field">
                     <label for="effectiveDate">
                         Effective Date
                     </label>
-                    <input disabled name="effectiveDate" id="effectiveDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Application Date
-                    </label>
-                    <input disabled name="" id="" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        License Date
-                    </label>
-                    <input disabled name="" id="" type="text" value="">
+                    <input disabled name="effectiveDate" id="effectiveDate" type="text" value="{{ActivityAuth?.ScopeEffectiveDate}}">
                 </div>
                 <div class="input-field">
                     <label for="">
                         Created By
                     </label>
-                    <input disabled name="" id="" type="text" value="">
+                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCreatedByName}}">
                 </div>
                 <div class="input-field">
                     <label for="">
                         Creation Date
                     </label>
-                    <input disabled name="" id="" type="text" value="">
+                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCreatedDate}}">
                 </div>
                 <div class="input-field">
                     <label for="">
-                        Modified By
+                        Last Modified By
                     </label>
-                    <input disabled name="" id="" type="text" value="">
+                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.ModifiedBy}}">
                 </div>
                 <div class="input-field">
                     <label for="">
-                        Modification Date
+                        Last Modified Date
                     </label>
-                    <input disabled name="" id="" type="text" value="">
+                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.LastModifiedDate}}">
                 </div>
             </div>
         </div>
 
         <!--Scope of Authorization-->
-        <div class="inputs-field-set">
+        <div class="inputs-field-set" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
             <div class="section">
                 <h2>Scope of Authorization</h2>
                 <table>
@@ -839,7 +825,7 @@
         </div>
 
         <!--Regulated Activities-->
-        <div class="inputs-field-set">
+        <div class="inputs-field-set" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
             <div class="section">
                 <h2>Regulated Activities</h2>
                 <div class="regulated-activities-PIIB">
@@ -889,7 +875,7 @@
         </div>
 
         <!--Prudential Category-->
-        <div class="inputs-field-set">
+        <div class="inputs-field-set" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
                     Prudential Category
@@ -955,7 +941,7 @@
         </div>
 
         <!--Prudential Return Type-->
-        <div class="inputs-field-set">
+        <div class="inputs-field-set" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
                     Prudential Return Type

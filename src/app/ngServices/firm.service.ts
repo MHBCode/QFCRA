@@ -80,8 +80,8 @@ export class FirmService {
     const url = `${this.baseUrl}get_admin_fee_list?firmId=${firmId}`;  //https://localhost:7091/api/Firms/get_admin_fee_list?firmId=66
     return this.http.get<any>(url);
   }
-  getFirmActivityLicensed(firmId:number): Observable<any> {
-    const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmApplicationTypeId=2&isWithdrawnActivityReqdFlag=86`;  //'https://localhost:7091/api/Activity/get_firm_activities?firmId=66&firmApplicationTypeId=2&isWithdrawnActivityReqdFlag=86'
+  getFirmActivityLicensedAndAuthorized(firmId:number,firmAppTypeID: number): Observable<any> {
+    const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmApplicationTypeId=${firmAppTypeID}`;  //'https://localhost:7091/api/Activity/get_firm_activities?firmId=66&firmApplicationTypeId=2or3'
     return this.http.get<any>(url);
   }
   getFirmwaiver(firmId:number): Observable<any> {

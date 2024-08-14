@@ -211,6 +211,7 @@ tr:nth-child(even) {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     padding: 0.5rem 1rem;
     padding-bottom: 0;
 }
@@ -327,6 +328,7 @@ tr:nth-child(even) {
 
 .subTitle-firmDetails {
     width: 100%;
+    color: red;
 }
 
 .inputs-field-set .section table tr th,
@@ -587,6 +589,10 @@ tr:nth-child(even) {
 
 .inputs-field-set.collapsed .edit-firms-inputs, .inputs-field-set.collapsed hr {
     display: none;
+}
+
+.collapse-container {
+    justify-content: flex-start;
 }
 
 /**/

@@ -36,6 +36,7 @@ import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages
 import { ViewControllerComponent } from './sub-pages/view-controller/view-controller.component';
 import { EditControllerComponent } from './sub-pages/edit-controller/edit-controller.component';
 import { CreateControllerComponent } from './sub-pages/create-controller/create-controller.component';
+import { EditScopeComponent } from './sub-pages/edit-scope/edit-scope.component';
 
 
 @NgModule({
@@ -69,6 +70,7 @@ import { CreateControllerComponent } from './sub-pages/create-controller/create-
     ViewControllerComponent,
     EditControllerComponent,
     CreateControllerComponent,
+    EditScopeComponent,
   ],
   imports: [
     CommonModule,

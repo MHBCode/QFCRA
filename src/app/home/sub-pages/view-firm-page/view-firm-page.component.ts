@@ -36,6 +36,7 @@ export class ViewFirmPageComponent implements OnInit {
   firmNamesHistory: any;
   firmAccountingStandard: any;
   ActivityLicensed: any;
+  ActivityAuth: any;
   firmInactiveUsers: any[] = [];
   firmAppDetailsLicensed: any[] = [];
   firmAppDetailsAuthorization: any[] = [];
@@ -73,6 +74,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadAssiRA();
       this.loadAdminFees();
       this.loadActivitiesLicensed();
+      this.loadActivitiesAuthorized();
     });
   }
 
@@ -202,10 +204,21 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
   loadActivitiesLicensed(){
-    this.firmService.getFirmActivityLicensed(this.firmId).subscribe(
+    this.firmService.getFirmActivityLicensedAndAuthorized(this.firmId,2).subscribe(
       data => {
         this.ActivityLicensed = data.response;
         console.log('Firm FIRM License scope details:', this.ActivityLicensed);
+      },
+      error => {
+        console.error('Error fetching License scope ', error);
+      }
+    );
+  }
+  loadActivitiesAuthorized() {
+    this.firmService.getFirmActivityLicensedAndAuthorized(this.firmId,3).subscribe(
+      data => {
+        this.ActivityAuth = data.response[0];
+        console.log('Firm FIRM License scope details:', this.ActivityAuth);
       },
       error => {
         console.error('Error fetching License scope ', error);
