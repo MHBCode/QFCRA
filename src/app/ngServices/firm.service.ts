@@ -40,6 +40,14 @@ export class FirmService {
     const url = `${this.baseUrl}get_firms_end_year_history?firmId=${firmId}&flag=1`;  // Construct full URL https://localhost:7091/api/Firms/get_firms_end_year_history?firmId=66&flag=1
     return this.http.get<any>(url);
   }
+  getFirmsNameHistory(firmId: number): Observable<any> {
+    const url = `${this.baseUrl}get_firms_name_history?firmId=${firmId}`
+    return this.http.get<any>(url);
+  }
+  getAccountingStandardsHistory(firmId: number): Observable<any> {
+    const url = `${this.baseUrl}get_firms_end_year_history?firmId=${firmId}&flag=2`; // Construct full URL https://localhost:7091/api/Firms/get_firms_end_year_history?firmId=66&flag=2
+    return this.http.get<any>(url);
+  }
   getInactiveUsersHistory(firmId:number): Observable<any> {
     const url = `${this.baseUrl}get_inactive_firm_users?firmId=${firmId}`;  // Construct full URL https://localhost:7091/api/Firms/get_inactive_firm_users?firmId=66
     return this.http.get<any>(url);

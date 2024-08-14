@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, OnInit, QueryList, Renderer2, ViewChildren } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';  // Import ActivatedRoute
 import { FirmService } from 'src/app/ngServices/firm.service';  // Import FirmService
@@ -13,6 +14,7 @@ export class ViewFirmPageComponent implements OnInit {
   IsCreateAuditorVisible: boolean = false;
   IsEditAuditorVisible: boolean = false;
   isCollapsed: boolean = false;
+  showPrevFirmNameandDateFields = true;
   selectedAuditor: any = null;
   selectedAuditorNameFromSelectBox: string = 'select'
   @ViewChildren('auditorRadio') auditorRadios!: QueryList<any>;
@@ -31,7 +33,8 @@ export class ViewFirmPageComponent implements OnInit {
   firmDetails: any;  // Add firmDetails property
   firmOPDetails: any;
   firmFYearHistory: any;
-
+  firmNamesHistory: any;
+  firmAccountingStandard: any;
   ActivityLicensed: any;
   firmInactiveUsers: any[] = [];
   firmAppDetailsLicensed: any[] = [];
@@ -47,6 +50,8 @@ export class ViewFirmPageComponent implements OnInit {
   FirmWaivers: any;
   FIRMRMP: any;
   FIRMNotices: any;
+  License: string = 'License';
+  Authorize: string = 'Authorisation';
 
   constructor(
     private router: Router,
@@ -117,7 +122,6 @@ export class ViewFirmPageComponent implements OnInit {
       error => {
         console.error('Error fetching firm details', error);
       }
-      
     );
   }
   loadFirmOPDetails(firmId: number) {
@@ -262,6 +266,21 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
+
+  loadPrevFirmAndDate() {
+    this.firmService.getFirmsNameHistory(this.firmId).subscribe(
+      data => {
+        this.firmNamesHistory = data.response;
+        console.log('Firm app details licensed history:', this.firmNamesHistory);
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Error fetching firm details', error);
+        if (error.status === 404) {
+          this.showPrevFirmNameandDateFields = false; // Hide fields if 404 error occurs
+        }
+      }
+    );
+  }
   switchTab(tabId: string){
         // Get all section elements
         const sections = this.el.nativeElement.getElementsByTagName('section');
@@ -275,6 +294,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.renderer.setStyle(neededSection, 'display', 'flex');
 
         if (tabId == 'CD') {
+          this.loadPrevFirmAndDate();
           this.loadApplicationDetails();
         }
 
@@ -407,6 +427,14 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getPrevFirmName() {
+    this.firmService.getFirmsNameHistory(this.firmId).subscribe(
+      data => {
+        this.firmNamesHistory = data.response;
+        console.log('Firm app details licensed history:', this.firmNamesHistory);
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+    })
     setTimeout(() => {
       const popupWrapper = document.querySelector('.prevFirmNamePopUp') as HTMLElement;
       if (popupWrapper) {
@@ -426,7 +454,15 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  getAccountingStandard() {
+  getAccountingStandardHistory() {
+    this.firmService.getAccountingStandardsHistory(this.firmId).subscribe(
+      data => {
+        this.firmAccountingStandard = data.response;
+        console.log('Firm app details licensed history:', this.firmAccountingStandard);
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+    })
     setTimeout(() => {
       const popupWrapper = document.querySelector('.accountingStandardsPopUp') as HTMLElement;
       if (popupWrapper) {
@@ -479,5 +515,16 @@ export class ViewFirmPageComponent implements OnInit {
     } else {
       alert('Please select a record from the list of Auditors displayed.');
     }
+  }
+
+  getCleanedNotes(notes: string): string {
+    if (typeof notes !== 'string') return '';
+    
+    // Remove <p> tags and replace <br> with newline
+    let cleanedNotes = notes
+      .replace(/<p\s*\/?>/gi, '\n') // <p> or <p />
+      .replace(/<\/p>/gi, '\n') // </p>
+      .replace(/<br\s*\/?>/gi, '\n'); // <br> or <br />
+    return cleanedNotes;
   }
 }

@@ -287,6 +287,8 @@ tr:nth-child(even) {
     border-radius: 7.20px;
     border: 0.72px #B1B1B1 solid;
     resize: vertical;
+    min-height: 20px;
+    max-height: 100px;
 }
 
 .radio-wrapper {
@@ -558,6 +560,10 @@ tr:nth-child(even) {
     white-space: normal;
 }
 
+.notes {
+    width: 100%!important;
+}
+
 /* collapse section */
 .collapse-button {
     background: #A51E36;
@@ -582,3 +588,5 @@ tr:nth-child(even) {
 .inputs-field-set.collapsed .edit-firms-inputs, .inputs-field-set.collapsed hr {
     display: none;
 }
+
+/**/

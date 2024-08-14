@@ -148,15 +148,18 @@
                     <label for="dateOfApplication">
                         Date of Application
                     </label>
-                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text"
-                        value="{{firmDetails?.CreatedDate | date:'MM/dd/yyyy'}}">
+                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text" 
+                    value="{{firmDetails?.AuthorisationStatusTypeID == 0 
+                    ? (firmDetails?.FirmLicApplDate | date: 'dd/MMM/y')
+                    : (firmDetails?. FirmAuthApplDate | date: 'dd/MMM/y')}}">
                 </div>
 
                 <div class="input-field">
                     <label for="firmApplicationType">
                         Firm Application Type
                     </label>
-                    <input type="text" disabled name="firmApplicationType" id="firmApplicationType" value="Can't find">
+                    <input type="text" disabled name="firmApplicationType" id="firmApplicationType"
+                        value="{{firmDetails?.AuthorisationStatusTypeID == 0 ? License : Authorize}}">
                 </div>
 
                 <div class="input-field">
@@ -169,25 +172,25 @@
 
                 <div class="input-field">
                     <label for="DateLicensed">
-                        Date Licensed
+                        {{firmDetails?.LicenseStatusTypeLabelDesc}}
                     </label>
                     <input disabled name="DateLicensed" id="DateLicensed" type="text"
-                        value="{{firmDetails?.LicensedDate | date:'MM/dd/yyyy'}}">
+                        value="{{firmDetails?.LicenseApplStatusDate | date: 'dd/MMM/y'}}">
                 </div>
 
-                <div class="input-field">
+                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
                     <label for="authorisationStatus">
                         Authorisation Status
                     </label>
                     <input type="text" disabled name="authorisationStatus" id="authorisationStatus"
                         value="{{firmDetails?.AuthorisationStatusTypeDesc}}">
                 </div>
-                <div class="input-field">
+                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
                     <label for="dateApplication">
-                        Date Authorized
+                        {{firmDetails?.AuthorisationStatusTypeLabelDesc}}
                     </label>
                     <input disabled name="dateApplication" id="dateApplication" type="text"
-                        value="{{firmDetails?.AuthorisationDate | date:'MM/dd/yyyy'}}">
+                        value="{{firmDetails?.AuthApplStatusDate | date: 'dd/MMM/y'}}">
                 </div>
             </div>
         </div>
@@ -204,7 +207,7 @@
 
                 <div class="input-field">
                     <label for="noOfStaffInQatar">
-                        No. Of Staff In Qatar (Local Staff) :
+                        No. Of Staff In Qatar (Local Staff)
                     </label>
                     <input disabled name="noOfStaffInQatar" id="noOfStaffInQatar" type="text"
                         value="{{firmOPDetails?.NumOfLocalStaff}}">
@@ -212,17 +215,17 @@
 
                 <div class="input-field">
                     <label for="staffTotal">
-                        Staff total :
+                        Staff total
                     </label>
                     <input disabled name="staffTotal" id="staffTotal" type="text"
                         value="{{firmOPDetails?.NumOfTotalStaff}}">
                 </div>
 
-                <div class="input-field">
+                <div class="input-field notes">
                     <label for="notes">
                         Notes :
                     </label>
-                    <input type="text" disabled name="notes" id="notes" value="{{firmOPDetails?.Notes}}">
+                    <textarea disabled name="notes" id="notes">{{getCleanedNotes(firmOPDetails?.Notes)}}</textarea>
                 </div>
             </div>
         </div>
@@ -278,17 +281,17 @@
                 </div>
 
                 <div class="input-field">
-                    <label for="code">
-                        Code
-                    </label>
-                    <input disabled name="code" id="code" type="text" value="{{firmDetails?.FirmCode}}">
-                </div>
-
-                <div class="input-field">
                     <label for="qfcNumber">
                         QFC Number
                     </label>
                     <input disabled name="qfcNumber" id="qfcNumber" type="text" value="{{firmDetails?.QFCNum}}">
+                </div>
+
+                <div class="input-field">
+                    <label for="code">
+                        Code
+                    </label>
+                    <input disabled name="code" id="code" type="text" value="{{firmDetails?.FirmCode}}">
                 </div>
 
                 <div class="input-field">
@@ -300,11 +303,11 @@
                 </div>
 
                 <div class="input-field">
-                    <label for="placeOfIncorporation">
-                        Place of Incorporation
+                    <label for="qfcTradingName">
+                        QFC Trading Name
                     </label>
-                    <input disabled name="placeOfIncorporation" id="placeOfIncorporation" type="text"
-                        value="{{firmDetails?.PlaceOfIncorporation}}">
+                    <input disabled name="qfcTradingName" id="qfcTradingName" type="text"
+                        value="{{firmDetails?.QFCTradingName}}">
                 </div>
 
                 <div class="input-field">
@@ -314,7 +317,15 @@
                     <input disabled name="prevTradingNames" id="prevTradingNames" type="text"
                         value="{{firmDetails?.PrevTradingName}}">
                 </div>
-                <!--Cant Find In Integration-->
+
+                <div class="input-field">
+                    <label for="placeOfIncorporation">
+                        Place of Incorporation
+                    </label>
+                    <input disabled name="placeOfIncorporation" id="placeOfIncorporation" type="text"
+                        value="{{firmDetails?.PlaceOfIncorporation}}">
+                </div>
+
                 <div class="input-field">
                     <label for="homeCountry">
                         Home Country
@@ -330,7 +341,6 @@
                     <input disabled name="incorporationDate" id="incorporationDate" type="text"
                         value="{{firmDetails?.DateOfIncorporation}}">
                 </div>
-                <!--Cant Find iIN iNTEGRATION-->
                 <div class="input-field">
                     <label for="financialYearEnd">
                         Financial Year End
@@ -350,8 +360,8 @@
 
                 <div class="input-field">
                     <label for="accountingStandards">
-                        Accounting Standards <button class="subbutton"
-                            (click)="getAccountingStandard()">History</button>
+                        Accounting Standards <button *ngIf="firmDetails?.FinAccStdTypeDesc" class="subbutton"
+                            (click)="getAccountingStandardHistory()">History</button>
                     </label>
                     <input disabled name="accountingStandards" id="accountingStandards" type="text"
                         value="{{firmDetails?.FinAccStdTypeDesc}}">
@@ -373,18 +383,19 @@
                         {{ firmDetails?.WebSiteAddress || 'No Website Available' }}
                     </a>
                 </div>
-                <div class="input-field" *ngIf="firmDetails.PrevTradingName !== ''">
+                <div class="input-field" *ngIf="showPrevFirmNameandDateFields && firmNamesHistory?.PrevFirmName !== ''">
                     <label for="prevFirmName">
                         Prev. Firm Name <button class="subbutton" (click)="getPrevFirmName()">History</button>
                     </label>
                     <input disabled name="prevFirmName" id="prevFirmName" type="text"
-                        [value]="firmDetails?.PrevTradingName">
+                        value="{{firmNamesHistory?.PrevFirmName}}">
                 </div>
-                <div class="input-field" *ngIf="firmDetails.PrevTradingName !== ''">
+                <div class="input-field" *ngIf="showPrevFirmNameandDateFields && firmNamesHistory?.DateEffectiveTo !== ''">
                     <label for="prevFirmNameEffectiveTo">
                         Prev. Firm Name Effective To
                     </label>
-                    <input disabled name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo" type="date">
+                    <input disabled name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo" type="text"
+                        value="{{firmNamesHistory?.DateEffectiveTo}}">
                 </div>
             </div>
 
@@ -406,13 +417,13 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOn" id="appliedOn" type="text"
-                        value="{{firmDetails?.FirmLicApplDate}}">
+                        value="{{firmDetails?.FirmLicApplDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="licensedOn">
                         Licensed On
                     </label>
-                    <input type="text" disabled name="licensedOn" id="licensedOn" value="{{firmDetails?.LicensedDate}}">
+                    <input type="text" disabled name="licensedOn" id="licensedOn" value="{{firmDetails?.LicensedDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="currentStatus">
@@ -448,14 +459,14 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOnAuth" id="appliedOnAuth" type="text"
-                        value="{{firmDetails?.AuthApplStatusDate}}">
+                        value="{{firmDetails?.AuthApplStatusDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="AuthorizedOnAuth">
                         Authorized On
                     </label>
                     <input type="text" disabled name="AuthorizedOnAuth" id="AuthorizedOnAuth"
-                        value="{{firmDetails?.AuthorisationDate}}">
+                        value="{{firmDetails?.AuthorisationDate}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="currentStatusAuth">
@@ -564,6 +575,12 @@
                     <input disabled name="city" id="city" type="text" value="{{firmDetails?.City}}">
                 </div>
                 <div class="input-field">
+                    <label for="state">
+                        state/province
+                    </label>
+                    <input disabled name="state" id="state" type="text" value="{{firmDetails?.Province}}">
+                </div>
+                <div class="input-field">
                     <label for="country">
                         Country
                     </label>
@@ -573,7 +590,7 @@
                     <label for="zip">
                         Zip
                     </label>
-                    <input disabled name="zip" id="zip" type="text" value="">
+                    <input disabled name="zip" id="zip" type="text" value="{{firmDetails?.PostalCode}}">
                 </div>
                 <div class="input-field">
                     <label for="phone">
@@ -1145,28 +1162,28 @@
                         Auditor Name
                     </label>
                     <input disabled name="auditorName" id="auditorName" type="text"
-                        [value]="selectedAuditor.OtherEntityName">
+                        value="{{selectedAuditor.OtherEntityName}}">
                 </div>
                 <div class="input-field">
                     <label for="auditorType">
                         Auditor Type
                     </label>
                     <input disabled name="auditorType" id="auditorType" type="text"
-                        [value]="selectedAuditor.EntitySubTypeDesc">
+                        value="{{selectedAuditor.EntitySubTypeDesc}}">
                 </div>
                 <div class="input-field">
                     <label for="address2">
                         Effective From Date
                     </label>
                     <input disabled name="effectiveFromDate" id="effectiveFromDate" type="text"
-                        [value]="selectedAuditor.AssnDateFrom">
+                        value="{{selectedAuditor.AssnDateFrom}}">
                 </div>
                 <div class="input-field">
                     <label for="effectiveToDate">
                         Effective To Date
                     </label>
                     <input disabled name="effectiveToDate" id="effectiveToDate" type="text"
-                        [value]="selectedAuditor.AssnDateTo">
+                        value="{{selectedAuditor.AssnDateTo}}">
                 </div>
             </div>
         </div>
@@ -1238,7 +1255,7 @@
                             Auditor Name <span style="color: red;">*</span>
                         </label>
                         <select disabled name="auditorName" id="auditorName"
-                            [(ngModel)]="selectedAuditorNameFromSelectBox" [value]="selectedAuditor.OtherEntityName">
+                            [(ngModel)]="selectedAuditorNameFromSelectBox" value="{{selectedAuditor.OtherEntityName}}">
                             <option value="select">Select</option>
                             <option value="other">Other</option>
                         </select>
@@ -1898,10 +1915,12 @@
             </thead>
             <tbody>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>{{firmAccountingStandard?.FirmName}}</td>
+                    <td>{{firmAccountingStandard?.FinAccStdTypeDesc}}</td>
+                    <td>{{firmAccountingStandard?.FirmFinYearEndEffectiveFrom}}</td>
+                    <td>{{firmAccountingStandard?.FirmFinYearEndEffectiveTo}}</td>
+                    <td>{{firmAccountingStandard?.UserName}}</td>
+                    <td>{{firmAccountingStandard?.Column1}}</td>
                 </tr>
             </tbody>
         </table>
@@ -1927,10 +1946,10 @@
             </thead>
             <tbody>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>{{firmNamesHistory?.PrevFirmName}}</td>
+                    <td>{{firmNamesHistory?.DateEffectiveTo}}</td>
+                    <td>{{firmNamesHistory?.LastModifiedBy}}</td>
+                    <td>{{firmNamesHistory?.LastModifiedDate}}</td>
                 </tr>
             </tbody>
         </table>
