@@ -29,7 +29,7 @@ export class ViewFirmPageComponent implements OnInit {
   widthData2: string = '85%';
   firmId: number = 0;  // Add firmId property
   ASSILevel: number = 4;
-  firmDetails: any;  // Add firmDetails property
+  firmDetails: any = {};  // Add firmDetails property
   firmOPDetails: any;
   firmFYearHistory: any;
   firmNamesHistory: any;
@@ -55,6 +55,7 @@ export class ViewFirmPageComponent implements OnInit {
   FIRMNotices: any;
   License: string = 'License';
   Authorize: string = 'Authorisation';
+  allowEditFirmDetails: string | boolean = true;
 
   isCollapsed: { [key: string]: boolean } = {};
 
@@ -116,12 +117,67 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  editFirm() {
+    //this.router.navigate(['home/edit-firm', this.firmId]);
+    console.log("allowEditFirmDetails :", this.allowEditFirmDetails);
+
+    this.allowEditFirmDetails = !this.allowEditFirmDetails;
+
+    if (this.allowEditFirmDetails){
+      console.log("firms details after edit:", this.firmDetails);
+      const userId = 10044; // Replace with dynamic userId as needed
+      if ((Object.keys(this.firmDetails.FirmApplicationDataComments).length === 0) ){
+        this.firmDetails.FirmApplicationDataComments = "";
+      };
+      if ((Object.keys(this.firmDetails.PublicRegisterComments).length === 0) ){
+        this.firmDetails.PublicRegisterComments = "";
+      };
+
+      if(this.firmDetails?.AuthorisationStatusTypeID == 0){
+        this.firmDetails.FirmApplDate = this.firmDetails?.FirmLicApplDate;
+      }
+      else{
+        this.firmDetails.FirmApplDate = this.firmDetails?.FirmAuthApplDate;
+      }
+      this.firmDetails.firmId = this.firmId;
+      this.firmDetails.FirmAccDataId = this.firmDetails.FirmAccountingDataID;
+      this.firmDetails.FirmStandardID = this.firmDetails.FirmAccountingStandardID;
+      this.firmDetails.FirmApplTypeID = this.firmDetails.FirmTypeID;
+      this.firmDetails.FirmFinStandardTypeID = this.firmDetails.FinAccStdTypeID;
+
+      this.firmService.editFirm(userId, this.firmDetails).subscribe(response => {
+        console.log('Row edited successfully:', response);
+      }, error => {
+        console.error('Error editing row:', error);
+      });
+
+    }
+  }
+
+  convertDate(oldFormate:any) {
+    const months = {
+        "Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04",
+        "May": "05", "Jun": "06", "Jul": "07", "Aug": "08",
+        "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"
+    };
+
+    const [day, month, year] = oldFormate.split('/');
+    const formattedMonth = months[month];
+    return `${year}-${formattedMonth}-${day}`;
+}
+
+
   // Method to load firm details
   loadFirmDetails(firmId: number) {
     this.firmService.getFirmDetails(firmId).subscribe(
       data => {
         this.firmDetails = data.response;
-        console.log('Firm details:', this.firmDetails);
+        this.firmDetails.LicensedDate = this.convertDate(this.firmDetails.LicensedDate);
+        this.firmDetails.AuthorisationDate = this.convertDate(this.firmDetails.AuthorisationDate);
+        this.firmDetails.DateOfIncorporation = this.convertDate(this.firmDetails.DateOfIncorporation);
+        this.firmDetails.FinAccStdTypeEffectiveFrom = this.convertDate(this.firmDetails.FinAccStdTypeEffectiveFrom);
+        this.firmDetails.FirmFinYearEndEffectiveFrom = this.convertDate(this.firmDetails.FirmFinYearEndEffectiveFrom);
+        console.log('1) Firm details:', this.firmDetails);
       },
       error => {
         console.error('Error fetching firm details', error);
@@ -132,7 +188,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.firmService.getFIRMOPData(firmId).subscribe(
       data => {
         this.firmOPDetails = data.response;
-        console.log('Firm Operational details:', this.firmOPDetails);
+        console.log('2) Firm Operational details:', this.firmOPDetails);
       },
       error => {
         console.error('Error fetching firm details', error);
@@ -431,13 +487,13 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
     setTimeout(() => {
-      const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
-      if (popupWrapper) {
-        popupWrapper.style.display = 'flex';
-      } else {
-        console.error('Element with class not found');
-      }
-    }, 0);
+    const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'flex';
+    } else {
+      console.error('Element with class not found');
+    }
+  },0);
   }
 
 
@@ -541,10 +597,6 @@ export class ViewFirmPageComponent implements OnInit {
     } else {
       console.error('Element with class not found');
     }
-  }
-
-  editFirm() {
-    this.router.navigate(['home/edit-firm', this.firmId]);
   }
 
   editScopeLicensed() {

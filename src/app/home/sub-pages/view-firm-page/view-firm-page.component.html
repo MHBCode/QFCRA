@@ -148,7 +148,7 @@
                     <label for="dateOfApplication">
                         Date of Application
                     </label>
-                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="{{firmDetails?.AuthorisationStatusTypeID == 0 
+                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="{{firmDetails?.AuthorisationStatusTypeID == 0
                     ? (firmDetails?.FirmLicApplDate | date: 'dd/MMM/y')
                     : (firmDetails?. FirmAuthApplDate | date: 'dd/MMM/y')}}">
                 </div>
@@ -260,9 +260,9 @@
     <!--Core Details-->
     <section id='CD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
         <div class="btn">
-            <button (click)=" editFirm()">
+            <button (click)="editFirm()">
                 <i class="bi bi-pen"></i>
-                Edit
+                {{ allowEditFirmDetails ? 'Edit' : 'Save'}}
             </button>
         </div>
         <div class="inputs-field-set">
@@ -276,44 +276,44 @@
                     <label for="firmName">
                         Firm Name
                     </label>
-                    <input disabled name="firmName" id="firmName" type="text" value="{{firmDetails?.FirmName}}">
+                    <input [disabled]="allowEditFirmDetails" name="firmName" id="firmName" type="text" [(ngModel)]="firmDetails.FirmName">
                 </div>
 
                 <div class="input-field">
                     <label for="qfcNumber">
                         QFC Number
                     </label>
-                    <input disabled name="qfcNumber" id="qfcNumber" type="text" value="{{firmDetails?.QFCNum}}">
+                    <input [disabled]="allowEditFirmDetails" name="qfcNumber" id="qfcNumber" type="text" [(ngModel)]="firmDetails.QFCNum">
                 </div>
 
                 <div class="input-field">
                     <label for="code">
                         Code
                     </label>
-                    <input disabled name="code" id="code" type="text" value="{{firmDetails?.FirmCode}}">
+                    <input [disabled]="allowEditFirmDetails" name="code" id="code" type="text" [(ngModel)]="firmDetails.FirmCode">
                 </div>
 
                 <div class="input-field">
                     <label for="legalStatus">
                         Legal Status
                     </label>
-                    <input disabled name="legalStatus" id="legalStatus" type="text"
-                        value="{{firmDetails?.LegalStatusTypeDesc}}">
+                    <input [disabled]="allowEditFirmDetails" name="legalStatus" id="legalStatus" type="text"
+                    [(ngModel)]="firmDetails.LegalStatusTypeDesc">
                 </div>
 
                 <div class="input-field">
                     <label for="qfcTradingName">
                         QFC Trading Name
                     </label>
-                    <input disabled name="qfcTradingName" id="qfcTradingName" type="text"
-                        value="{{firmDetails?.QFCTradingName}}">
+                    <input [disabled]="allowEditFirmDetails" name="qfcTradingName" id="qfcTradingName" type="text"
+                    [(ngModel)]="firmDetails.QFCTradingName">
                 </div>
 
                 <div class="input-field">
                     <label for="prevTradingNames">
                         Prev. Trading Name(s)
                     </label>
-                    <input disabled name="prevTradingNames" id="prevTradingNames" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="prevTradingNames" id="prevTradingNames" type="text"
                         value="{{firmDetails?.PrevTradingName}}">
                 </div>
 
@@ -321,7 +321,7 @@
                     <label for="placeOfIncorporation">
                         Place of Incorporation
                     </label>
-                    <input disabled name="placeOfIncorporation" id="placeOfIncorporation" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="placeOfIncorporation" id="placeOfIncorporation" type="text"
                         value="{{firmDetails?.PlaceOfIncorporation}}">
                 </div>
 
@@ -329,7 +329,7 @@
                     <label for="homeCountry">
                         Home Country
                     </label>
-                    <input disabled name="homeCountry" id="homeCountry" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="homeCountry" id="homeCountry" type="text"
                         value="{{firmDetails?.CountyOfIncorporationDesc}}">
                 </div>
 
@@ -337,7 +337,7 @@
                     <label for="incorporationDate">
                         Incorporation Date
                     </label>
-                    <input disabled name="incorporationDate" id="incorporationDate" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="incorporationDate" id="incorporationDate" type="text"
                         value="{{firmDetails?.DateOfIncorporation}}">
                 </div>
                 <div class="input-field">
@@ -345,7 +345,7 @@
                         Financial Year End
                         <button class="subbutton" (click)="getFYearHistory()">History</button>
                     </label>
-                    <input disabled name="financialYearEnd" id="financialYearEnd" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="financialYearEnd" id="financialYearEnd" type="text"
                         value="{{firmDetails?.FinYearEndTypeDesc}}">
                 </div>
 
@@ -353,7 +353,7 @@
                     <label for="financialYearEndEffectiveFrom">
                         Financial Year End Effective From
                     </label>
-                    <input disabled name="financialYearEndEffectiveFrom" id="financialYearEndEffectiveFrom" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="financialYearEndEffectiveFrom" id="financialYearEndEffectiveFrom" type="text"
                         value="{{firmDetails?.FirmFinYearEndEffectiveFrom}}">
                 </div>
 
@@ -362,7 +362,7 @@
                         Accounting Standards <button *ngIf="firmDetails?.FinAccStdTypeDesc" class="subbutton"
                             (click)="getAccountingStandardHistory()">History</button>
                     </label>
-                    <input disabled name="accountingStandards" id="accountingStandards" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="accountingStandards" id="accountingStandards" type="text"
                         value="{{firmDetails?.FinAccStdTypeDesc}}">
                 </div>
 
@@ -370,7 +370,7 @@
                     <label for="accountingStandardsEffectiveFrom">
                         Accounting Standards Effective From
                     </label>
-                    <input disabled name="accountingStandardsEffectiveFrom" id="accountingStandardsEffectiveFrom"
+                    <input [disabled]="allowEditFirmDetails" name="accountingStandardsEffectiveFrom" id="accountingStandardsEffectiveFrom"
                         type="text" value="{{firmDetails?.FinAccStdTypeEffectiveFrom}}">
                 </div>
 
@@ -378,15 +378,17 @@
                     <label for="websiteLink">
                         Website Link
                     </label>
-                    <a id="websiteLink" [href]="firmDetails?.WebSiteAddress" target="_blank" rel="noopener noreferrer">
+                    <input [disabled]="allowEditFirmDetails" type="text" value="{{firmDetails?.WebSiteAddress}}" id="websiteLink">
+
+                    <!-- <a id="websiteLink" [href]="firmDetails?.WebSiteAddress" target="_blank" rel="noopener noreferrer">
                         {{ firmDetails?.WebSiteAddress || 'No Website Available' }}
-                    </a>
+                    </a> -->
                 </div>
                 <div class="input-field" *ngIf="showPrevFirmNameandDateFields && firmNamesHistory?.PrevFirmName !== ''">
                     <label for="prevFirmName">
                         Prev. Firm Name <button class="subbutton" (click)="getPrevFirmName()">History</button>
                     </label>
-                    <input disabled name="prevFirmName" id="prevFirmName" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="prevFirmName" id="prevFirmName" type="text"
                         value="{{firmNamesHistory?.PrevFirmName}}">
                 </div>
                 <div class="input-field"
@@ -394,7 +396,7 @@
                     <label for="prevFirmNameEffectiveTo">
                         Prev. Firm Name Effective To
                     </label>
-                    <input disabled name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo" type="text"
                         value="{{firmNamesHistory?.DateEffectiveTo}}">
                 </div>
             </div>

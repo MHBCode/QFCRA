@@ -8,15 +8,16 @@ import { environment } from 'src/environments/environment';
 })
 export class FirmService {
 
-  private baseUrl = environment.API_URL + '/api/Firms/';  // Base URL 
-  private baseUrlContact = environment.API_URL + '/api/Contact/'; // Without FIRMS
-  private baseUrlControllers = environment.API_URL + '/api/OtherEntity/'; //Controllers
-  private baseUrlRegisteredFund = environment.API_URL + '/api/RegisteredFund/' // Funds
-  private baseUrlActivity = environment.API_URL + '/api/Activity/'; //Activities
-  private baseUrlWaiver = environment.API_URL + '/api/Waiver/' //Waiver
-  private baseUrlRisk = environment.API_URL + '/api/Risk/' //Risk
-  private baseUrlNotice = environment.API_URL + '/api/Notice/' //Notice
-  private baseUrlApplication = environment.API_URL + '/api/Application/' //Application
+  private baseUrl = environment.API_URL+'/api/Firms/';  // Base URL
+  private baseUrlContact = environment.API_URL+'/api/Contact/'; // Without FIRMS
+  private baseUrlControllers = environment.API_URL+'/api/OtherEntity/'; //Controllers
+  private baseUrlRegisteredFund = environment.API_URL+'/api/RegisteredFund/' // Funds
+  private baseUrlActivity = environment.API_URL+'/api/Activity/'; //Activities
+  private baseUrlWaiver = environment.API_URL+'/api/Waiver/' //Waiver
+  private baseUrlRisk = environment.API_URL+'/api/Risk/' //Risk
+  private baseUrlNotice = environment.API_URL+'/api/Notice/' //Notice
+  private baseUrlApplication = environment.API_URL+'/api/Application/' //Application
+
   constructor(private http: HttpClient) { }
 
   getFIRMOPData(firmId: number): Observable<any> {
@@ -34,7 +35,7 @@ export class FirmService {
   }
   editFirm(userId: number, rowData: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<any>(`${this.baseUrl}api/Firms/insert_update_firm_details`, rowData, { headers: headers });
+    return this.http.post<any>(`${this.baseUrl}insert_update_firm_details`, rowData, { headers: headers });
   }
   getFYearEndHistory(firmId: number): Observable<any> {
     const url = `${this.baseUrl}get_firms_end_year_history?firmId=${firmId}&flag=1`;  // Construct full URL https://localhost:7091/api/Firms/get_firms_end_year_history?firmId=66&flag=1
@@ -93,14 +94,15 @@ export class FirmService {
     const url = `${this.baseUrl}get_firm_user?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
-  getFIRMControllers(firmId: number): Observable<any> {
+  getFIRMControllers(firmId:number): Observable<any> {
     const url = `${this.baseUrlControllers}get_corporate_controller_details_list?firmId=${firmId}`; //https://localhost:7091/api/OtherEntity/get_corporate_controller_details_list?firmId=66
     return this.http.get<any>(url);
   }
-  getFIRMRegisteredFund(firmId: number): Observable<any> {
+  getFIRMRegisteredFund(firmId:number): Observable<any> {
     const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?firmId=${firmId}`; //https://localhost:7091/api/RegisteredFund/get_registered_fund_data?firmId=69
     return this.http.get<any>(url);
   }
+
   getFIRMAdminFees(firmId: number): Observable<any> {
     const url = `${this.baseUrl}get_admin_fee_list?firmId=${firmId}`;  //https://localhost:7091/api/Firms/get_admin_fee_list?firmId=66
     return this.http.get<any>(url);
