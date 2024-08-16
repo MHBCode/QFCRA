@@ -655,8 +655,8 @@
                             <label for="appDate">
                                 Application Date
                             </label>
-                            <input disabled name="appDate" id="appDate" type="text"
-                                value="{{license?.ScopeAppliedDate}}">
+                            <input disabled name="appDate" id="appDate" type="date"
+                                value="{{license?.ScopeAppliedDate | date:'yyyy-MM-dd'}}">
                         </div>
                         <div class="input-field">
                             <label for="licenseDate">
@@ -713,9 +713,17 @@
                         <div class="permitted-activity-body">
                             <p>{{license?.ActivityTypeDesc}}</p>
                             <strong>Activity Details: </strong>
-                            <p>{{license?.FirmActivityDetails}}</p>
+                            <div class="input-field conditions-textarea">
+                                <textarea disabled>
+                                    {{license?.FirmActivityDetails}}
+                                </textarea>
+                            </div>
                             <strong>Specific Conditions and Restrictions: </strong>
-                            <p>{{license?.Column1}}</p>
+                            <div  class="input-field conditions-textarea">
+                                <textarea disabled>
+                                    {{license?.column1}}
+                                </textarea>
+                            </div>
                         </div>
                     </div>
 
@@ -725,7 +733,11 @@
                         </div>
 
                         <div class="permitted-activity-body">
-                            <p>{{license?.GeneralConditions}}</p>
+                            <div class="input-field conditions-textarea">
+                                <textarea disabled>
+                                    {{license?.GeneralConditions}}
+                                </textarea>
+                            </div>
                         </div>
                     </div>
 
@@ -774,8 +786,8 @@
                             <label for="q13AppDate">
                                 Q13 Application Date for revisions
                             </label>
-                            <input disabled name="q13AppDate" id="q13AppDate" type="text"
-                                value="{{ActivityAuth?.ScopeAppliedDate}}">
+                            <input disabled name="q13AppDate" id="q13AppDate" type="date"
+                                value="{{ActivityAuth?.ScopeAppliedDate | date:'yyyy-MM-dd'}}">
                         </div>
                         <div class="input-field">
                             <label for="incorporationDate">
@@ -795,8 +807,8 @@
                             <label for="effectiveDate">
                                 Effective Date
                             </label>
-                            <input disabled name="effectiveDate" id="effectiveDate" type="text"
-                                value="{{ActivityAuth?.ScopeEffectiveDate}}">
+                            <input disabled name="effectiveDate" id="effectiveDate" type="date"
+                                value="{{ActivityAuth?.ScopeEffectiveDate | date:'yyyy-MM-dd'}}">
                         </div>
                         <div class="input-field">
                             <label for="">
@@ -898,10 +910,17 @@
                                 <div class="conditions-and-restrictions-header">
                                     <p>Conditions and Restrictions</p>
                                 </div>
-                                <p><strong>Retail Restriction</strong></p> &nbsp;&nbsp;
-                                <span>test</span>
-                                <p><strong>General Authorisation Conditions or Restrictions</strong></p> &nbsp;&nbsp;
-                                <span>{{ActivityAuth?.GeneralConditions}}</span>
+                                <p>
+                                    <strong>Retail Restriction</strong> &nbsp;&nbsp;
+                                    <input disabled type="checkbox">
+                                </p> 
+                                
+                                <p><strong>General Authorisation Conditions or Restrictions</strong></p>
+                                <div class="input-field conditions-textarea">
+                                    <textarea disabled>
+                                        {{ActivityAuth?.GeneralConditions}}
+                                    </textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -932,8 +951,9 @@
                             <label for="islamicFinanceType">
                                 Type
                             </label>
-                            <input disabled name="islamicFinanceType" id="islamicFinanceType" type="text"
-                                value="{{islamicFinance?.IFinTypeDesc}}">
+                            <select disabled name="islamicFinanceType" id="islamicFinanceType">
+                                <option value="">{{islamicFinance?.IFinTypeDesc}}</option>
+                            </select>
                         </div>
                         <div class="input-field endorsement">
                             <label for="effectiveDate">
@@ -974,21 +994,25 @@
                             <label for="prudentialCategory">
                                 Prudential Category
                             </label>
-                            <input disabled name="prudentialCategory" id="prudentialCategory" type="text"
-                                value="{{ActivityAuth?.PrudentialCategoryTypeDesc}}">
+                            <select disabled name="prudentialCategory" id="prudentialCategory">
+                                <option value="">{{ActivityAuth?.PrudentialCategoryTypeDesc}}</option>
+                                <!--More options will be integrated here-->
+                            </select>
                         </div>
                         <div class="input-field">
                             <label for="authorisationCategory">
                                 Authorisation Category
                             </label>
-                            <input disabled name="authorisationCategory" id="authorisationCategory" type="text"
-                                value="{{ActivityAuth?.AuthorisationCategoryTypeDesc}}">
+                            <select disabled name="prudentialCategory" id="prudentialCategory">
+                                <option value="">{{ActivityAuth?.AuthorisationCategoryTypeDesc}}</option>
+                                <!--More options will be integrated here-->
+                            </select>
                         </div>
                         <div class="input-field">
                             <label for="effectiveDate">
                                 Effective Date
                             </label>
-                            <input disabled name="effectiveDate" id="effectiveDate" type="text"
+                            <input disabled name="effectiveDate" id="effectiveDate" type="date"
                                 value="{{ActivityAuth?.PrudentialCategoryEffectiveDate}}">
                         </div>
                         <div class="input-field">
@@ -1046,15 +1070,17 @@
                             <label for="prudentialReturnType">
                                 Prudential Return Type
                             </label>
-                            <input disabled name="prudentialReturnType" id="prudentialReturnType" type="text"
-                                value="{{ActivityAuth?.SectorTypeDesc}}">
+                            <select disabled name="prudentialReturnType" id="prudentialReturnType">
+                                <option value="">{{ActivityAuth?.SectorTypeDesc}}</option>
+                                <!--More options will be integrated here-->
+                            </select>
                         </div>
                         <div class="input-field">
                             <label for="effectiveDate">
                                 Effective Date
                             </label>
-                            <input disabled name="effectiveDate" id="effectiveDate" type="text"
-                                value="{{ActivityAuth?.SectorEffectiveDate}}">
+                            <input disabled name="effectiveDate" id="effectiveDate" type="date"
+                                value="{{ActivityAuth?.SectorEffectiveDate | date:'yyyy-MM-dd'}}">
                         </div>
                         <div class="input-field">
                             <label for="lastModifiedBy">

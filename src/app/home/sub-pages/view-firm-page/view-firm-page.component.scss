@@ -498,6 +498,7 @@ tr:nth-child(even) {
     background-color: #F2B6C0;
     padding: 5px 0px;
     text-align: center;
+    margin-bottom: 10px;
 }
 
 .conditions-and-restrictions-header p {
@@ -628,5 +629,9 @@ tr:nth-child(even) {
 }
 
 .endorsement {
+    width: 100%;
+}
+
+.conditions-textarea {
     width: 100%;
 }
