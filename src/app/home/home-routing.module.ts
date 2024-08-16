@@ -27,6 +27,8 @@ import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisor
 import { ViewControllerComponent } from './sub-pages/view-controller/view-controller.component';
 import { EditControllerComponent } from './sub-pages/edit-controller/edit-controller.component';
 import { CreateControllerComponent } from './sub-pages/create-controller/create-controller.component';
+import { EditScopeLicensedComponent } from './sub-pages/edit-scope-licensed/edit-scope-licensed.component';
+import { EditScopeAuthorizedComponent } from './sub-pages/edit-scope-authorized/edit-scope-authorized.component';
 const routes: Routes = [
   { path: '', component: MainPageComponent},
   { path: 'firms-page', component: FirmsPageComponent},
@@ -61,7 +63,9 @@ const routes: Routes = [
   { path: 'co-supervisors' , component:CoSupervisorsComponent},
   { path: 'view-controller', component: ViewControllerComponent},
   { path: 'edit-controller', component: EditControllerComponent},
-  { path: 'create-controller', component: CreateControllerComponent}
+  { path: 'create-controller', component: CreateControllerComponent},
+  { path: 'edit-scope-licensed/:id', component: EditScopeLicensedComponent},
+  { path: 'edit-scope-authorized/:id', component: EditScopeAuthorizedComponent}
 ];
 
 @NgModule({

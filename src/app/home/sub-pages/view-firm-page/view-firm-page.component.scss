@@ -188,7 +188,7 @@ tr:nth-child(even) {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: end;
+    align-items: flex-end;
     justify-content: flex-start;
     gap: 2rem;
     width: 80%;
@@ -587,12 +587,46 @@ tr:nth-child(even) {
     min-height: 50px;
 }
 
-.inputs-field-set.collapsed .edit-firms-inputs, .inputs-field-set.collapsed hr {
+.inputs-field-set.collapsed .edit-firms-inputs,
+.inputs-field-set.collapsed hr,
+.inputs-field-set.collapsed .regulated-activities-container,
+.authorized-body.collapsed,
+.licensed-body.collapsed {
     display: none;
+}
+
+.authorized-section, .licensed-section {
+    width: 100%;
+}
+
+.authorised-header, .licensed-header {
+    cursor: pointer;
+    width: 100%;
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+}
+
+.authorized-body, .licensed-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
 .collapse-container {
     justify-content: flex-start;
 }
 
+.scopeFor {
+    border-top-left-radius: 0!important;
+    border-top-right-radius: 0!important;
+}
 /**/
+
+.prudentialTable td,
+.prudentialTable th {
+    text-align: center;
+}
+
+.endorsement {
+    width: 100%;
+}
