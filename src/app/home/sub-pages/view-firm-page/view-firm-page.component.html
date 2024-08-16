@@ -525,16 +525,16 @@
         </div>
 
         <!---->
-        <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed}">
+        <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['Addresses']}">
             <div class="edit-firm-actions collapse-container">
                 <h2 class="edit-firm-header">
                     Addresses
                 </h2>
-                <button class="collapse-button" (click)="toggleCollapse()">
-                    {{ isCollapsed ? '▲' : '▼'}}
+                <button class="collapse-button" (click)="toggleCollapse('Addresses')">
+                    {{ isCollapsed['Addresses'] ? '▲' : '▼'}}
                 </button>
             </div>
-            <div class="edit-firms-inputs" *ngIf="!isCollapsed">
+            <div class="edit-firms-inputs">
                 <div class="input-field">
                     <label for="addressType">
                         Address Type
@@ -613,388 +613,486 @@
     <!--Scope Section-->
     <section id='Scope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;"
         *ngFor="let license of ActivityLicensed">
-        <div class="inputs-field-set">
-            <div class="licensed-header">
+        <div class="licensed-section">
+            <div class="licensed-header" (click)="toggleCollapse('LicensedSection')">
                 Licensed
             </div>
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                    <small>Scope for</small> {{firmDetails?.FirmName}}
-                </h2>
-                <div class="btn">
-                    <button class="edit-btn">
-                        <i class="bi bi-pen"></i>
-                        Edit
-                    </button>
-                </div>
-            </div>
-            <div class="edit-firms-inputs" *ngFor="let license of ActivityLicensed">
-                <div class="input-field">
-                    <label for="formReff">
-                        Form Reference
-                    </label>
-                    <input disabled name="formReff" id="formReff" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Link To Scope
-                    </label>
-                    <input disabled name="" id="" type="text" value="{{license?.ScopeCertificateLink || 'No Link'}}">
-                </div>
-                <div class="input-field">
-                    <label for="scopeRevNum">
-                        Scope Revision Number
-                    </label>
-                    <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="{{license?.ScopeRevNum}}">
-                </div>
-                <div class="input-field">
-                    <label for="appDate">
-                        Application Date
-                    </label>
-                    <input disabled name="appDate" id="appDate" type="text" value="{{license?.ScopeAppliedDate}}">
-                </div>
-                <div class="input-field">
-                    <label for="licenseDate">
-                        License Date
-                    </label>
-                    <input disabled name="licenseDate" id="licenseDate" type="text"
-                        value="{{license?.ScopeLicensedDate}}">
-                </div>
-                <div class="input-field">
-                    <label for="createdBy">
-                        Created By
-                    </label>
-                    <input disabled name="createdBy" id="createdBy" type="text" value="{{license?.ScopeCreatedByName}}">
-                </div>
-                <div class="input-field">
-                    <label for="createdDate">
-                        Creation Date
-                    </label>
-                    <input disabled name="createdDate" id="createdDate" type="text"
-                        value="{{license?.ScopeCreatedDate}}">
-                </div>
-                <div class="input-field">
-                    <label for="modBy">
-                        Modified By
-                    </label>
-                    <input disabled name="modBy" id="modBy" type="text" value="{{license?.ModifiedBy}}">
-                </div>
-                <div class="input-field">
-                    <label for="modDate">
-                        Modification Date
-                    </label>
-                    <input disabled name="modDate" id="modDate" type="text" value="{{license?.LastModifiedDate}}">
-                </div>
-            </div>
-
-        </div>
-        <!---->
-        <div class="inputs-field-set">
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                    Permitted Activities
-                </h2>
-                <div class="edit-btn">
-                </div>
-            </div>
-
-            <div class="permitted-activity-container">
-                <div class="scope-permitted-activity-header">
-                    <p>Activity</p>
-                </div>
-
-                <div class="permitted-activity-body">
-                    <p>{{license?.ActivityTypeDesc}}</p>
-                    <strong>Activity Details: </strong>
-                    <p>{{license?.FirmActivityDetails}}</p>
-                    <strong>Specific Conditions and Restrictions: </strong>
-                    <p>{{license?.Column1}}</p>
-                </div>
-            </div>
-
-            <div class="permitted-activity-container">
-                <div class="scope-permitted-activity-header">
-                    <p>General License Conditions or restrictions</p>
-                </div>
-
-                <div class="permitted-activity-body">
-                    <p>{{license?.GeneralConditions}}</p>
-                </div>
-            </div>
-
-        </div>
-        <!---->
-        <div class="inputs-field-set" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
-            <div class="authorised-header">
-                Authorised
-            </div>
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                    <small>Scope for</small> {{firmDetails?.FirmName}}
-                </h2>
-            </div>
-            <div class="edit-firms-inputs">
-                <div class="input-field">
-                    <label for="formReff">
-                        Form Reference
-                    </label>
-                    <input disabled name="formReff" id="formReff" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Link To Scope
-                    </label>
-                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCertificateLink || 'No Link'}}">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Scope Revision Number
-                    </label>
-                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeRevNum}}">
-                </div>
-                <div class="input-field">
-                    <label for="q13AppDate">
-                        Q13 Application Date for revisions
-                    </label>
-                    <input disabled name="q13AppDate" id="q13AppDate" type="text" value="{{ActivityAuth?.ScopeAppliedDate}}">
-                </div>
-                <div class="input-field">
-                    <label for="incorporationDate">
-                        Incorporation Date
-                    </label>
-                    <input disabled name="incorporationDate" id="incorporationDate" type="text" value="{{ActivityAuth?.ScopeLicensedDate}}">
-                </div>
-                <div class="input-field">
-                    <label for="authorisedDate">
-                        Authorised Date
-                    </label>
-                    <input disabled name="authorisedDate" id="authorisedDate" type="text" value="{{ActivityAuth?.ScopeLicensedDate}}">
-                </div>
-                <div class="input-field">
-                    <label for="effectiveDate">
-                        Effective Date
-                    </label>
-                    <input disabled name="effectiveDate" id="effectiveDate" type="text" value="{{ActivityAuth?.ScopeEffectiveDate}}">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Created By
-                    </label>
-                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCreatedByName}}">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Creation Date
-                    </label>
-                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCreatedDate}}">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Last Modified By
-                    </label>
-                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.ModifiedBy}}">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Last Modified Date
-                    </label>
-                    <input disabled name="" id="" type="text" value="{{ActivityAuth?.LastModifiedDate}}">
-                </div>
-            </div>
-        </div>
-
-        <!--Scope of Authorization-->
-        <div class="inputs-field-set" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
-            <div class="section">
-                <h2>Scope of Authorization</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Document Type</th>
-                            <th>File Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!--Regulated Activities-->
-        <div class="inputs-field-set" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
-            <div class="section">
-                <h2>Regulated Activities</h2>
-                <div class="regulated-activities-PIIB">
-                    <div class="regulated-activities-header">
-                        <p>Category : PIIB-Regulated Activities</p> <!--Category is dynamic-->
-                        <p>Activity : Advising on Investments</p> <!--Activity is dynamic-->
+            <div class="licensed-body" [ngClass]="{'collapsed': isCollapsed['LicensedSection']}">
+                <div class="inputs-field-set scopeFor">
+                    <div class="edit-firm-actions">
+                        <h2 class="edit-firm-header">
+                            <small>Scope for</small> {{firmDetails?.FirmName}}
+                        </h2>
+                        <div class="btn">
+                            <button class="edit-btn" (click)="editScopeLicensed()">
+                                <i class="bi bi-pen"></i>
+                                Edit
+                            </button>
+                        </div>
                     </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="text-align: center;">Product(s)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                &nbsp;Products
-                            </tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Shares</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Debt Instruments</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Warrants</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Securities Receipts</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Options</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Futures</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Contracts for Differences</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Rights in Investments</tr>
-                        </tbody>
-                    </table>
-                    <!--specific conditions and restrictions-->
-                    <div class="specific-conditions-and-restrictions">
-                        <div class="specific-conditions-and-restrictions-header">
-                            <p>Specific Conditions and Restrictions</p>
+                    <div class="edit-firms-inputs" *ngFor="let license of ActivityLicensed">
+                        <div class="input-field">
+                            <label for="formReff">
+                                Form Reference
+                            </label>
+                            <input disabled name="formReff" id="formReff" type="text" value="">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Link To Scope
+                            </label>
+                            <input disabled name="" id="" type="text"
+                                value="{{license?.ScopeCertificateLink || 'No Link'}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="scopeRevNum">
+                                Scope Revision Number
+                            </label>
+                            <input disabled name="scopeRevNum" id="scopeRevNum" type="text"
+                                value="{{license?.ScopeRevNum}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="appDate">
+                                Application Date
+                            </label>
+                            <input disabled name="appDate" id="appDate" type="text"
+                                value="{{license?.ScopeAppliedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="licenseDate">
+                                License Date
+                            </label>
+                            <input disabled name="licenseDate" id="licenseDate" type="text"
+                                value="{{license?.ScopeLicensedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="createdBy">
+                                Created By
+                            </label>
+                            <input disabled name="createdBy" id="createdBy" type="text"
+                                value="{{license?.ScopeCreatedByName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="createdDate">
+                                Creation Date
+                            </label>
+                            <input disabled name="createdDate" id="createdDate" type="text"
+                                value="{{license?.ScopeCreatedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="modBy">
+                                Modified By
+                            </label>
+                            <input disabled name="modBy" id="modBy" type="text" value="{{license?.ModifiedBy}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="modDate">
+                                Modification Date
+                            </label>
+                            <input disabled name="modDate" id="modDate" type="text"
+                                value="{{license?.LastModifiedDate}}">
+                        </div>
+                    </div>
+
+                </div>
+                <!---->
+                <div class="inputs-field-set">
+                    <div class="edit-firm-actions">
+                        <h2 class="edit-firm-header">
+                            Permitted Activities
+                        </h2>
+                        <div class="edit-btn">
+                        </div>
+                    </div>
+
+                    <div class="permitted-activity-container">
+                        <div class="scope-permitted-activity-header">
+                            <p>Activity</p>
                         </div>
 
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;None</p>
+                        <div class="permitted-activity-body">
+                            <p>{{license?.ActivityTypeDesc}}</p>
+                            <strong>Activity Details: </strong>
+                            <p>{{license?.FirmActivityDetails}}</p>
+                            <strong>Specific Conditions and Restrictions: </strong>
+                            <p>{{license?.Column1}}</p>
+                        </div>
                     </div>
-                </div>
-                <!--Conditions and Restrictions-->
-                <div class="conditions-and-restrictions-section">
-                    <div class="conditions-and-restrictions-header">
-                        <p>Conditions and Restrictions</p>
+
+                    <div class="permitted-activity-container">
+                        <div class="scope-permitted-activity-header">
+                            <p>General License Conditions or restrictions</p>
+                        </div>
+
+                        <div class="permitted-activity-body">
+                            <p>{{license?.GeneralConditions}}</p>
+                        </div>
                     </div>
-                    <p><strong>General Authorisation Conditions or Restrictions</strong></p> &nbsp;&nbsp;
-                    <span>The firm is prohibited from conducting Regulated Activities with or on behalf of Retail
-                        Customers unless it has received the prior authorisation of the Regulatory Authority.</span>
+
                 </div>
             </div>
         </div>
-
-        <!--Prudential Category-->
-        <div class="inputs-field-set" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                    Prudential Category
-                </h2>
-                <div class="edit-btn">
-                </div>
+        <!---->
+        <div class="authorized-section" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
+            <div class="authorised-header" (click)="toggleCollapse('authorizeSection')">
+                Authorised
             </div>
-            <div class="edit-firms-inputs">
-                <div class="input-field">
-                    <label for="prudentialCategory">
-                        Prudential Category
-                    </label>
-                    <input disabled name="prudentialCategory" id="prudentialCategory" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="authorisationCategory">
-                        Authorisation Category
-                    </label>
-                    <input disabled name="authorisationCategory" id="authorisationCategory" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="effectiveDate">
-                        Effective Date
-                    </label>
-                    <input disabled name="effectiveDate" id="effectiveDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="lastModifiedBy">
-                        Last Modified By
-                    </label>
-                    <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="lastModificationDate">
-                        Last Modification Date
-                    </label>
-                    <input disabled name="lastModificationDate" id="lastModificationDate" type="text" value="">
-                </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Prudential Category</th>
-                            <th>Authorisation Category</th>
-                            <th>Effective Date</th>
-                            <th>Expiration Date</th>
-                            <th>Last Modified By</th>
-                            <th>Last Modified Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!--Prudential Return Type-->
-        <div class="inputs-field-set" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                    Prudential Return Type
-                </h2>
-                <div class="edit-btn">
-                </div>
-            </div>
-            <div class="edit-firms-inputs">
-                <div class="input-field">
-                    <label for="prudentialReturnType">
-                        Prudential Return Type
-                    </label>
-                    <input disabled name="prudentialReturnType" id="prudentialReturnType" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="effectiveDate">
-                        Effective Date
-                    </label>
-                    <input disabled name="effectiveDate" id="effectiveDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="lastModifiedBy">
-                        Last Modified By
-                    </label>
-                    <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="lastModificationDate">
-                        Last Modification Date
-                    </label>
-                    <input disabled name="lastModificationDate" id="lastModificationDate" type="text" value="">
+            <div class="authorized-body" [ngClass]="{'collapsed': isCollapsed['authorizeSection']}">
+                <div class="inputs-field-set scopeFor">
+                    <div class="edit-firm-actions">
+                        <h2 class="edit-firm-header">
+                            <small>Scope for</small> {{firmDetails?.FirmName}}
+                        </h2>
+                        <div class="btn">
+                            <button class="edit-btn" (click)="editScopeAuthorized()">
+                                <i class="bi bi-pen"></i>
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                    <div class="edit-firms-inputs">
+                        <div class="input-field">
+                            <label for="formReff">
+                                Form Reference
+                            </label>
+                            <input disabled name="formReff" id="formReff" type="text" value="">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Link To Scope
+                            </label>
+                            <input disabled name="" id="" type="text"
+                                value="{{ActivityAuth?.ScopeCertificateLink || 'No Link'}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Scope Revision Number
+                            </label>
+                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeRevNum}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="q13AppDate">
+                                Q13 Application Date for revisions
+                            </label>
+                            <input disabled name="q13AppDate" id="q13AppDate" type="text"
+                                value="{{ActivityAuth?.ScopeAppliedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="incorporationDate">
+                                Incorporation Date
+                            </label>
+                            <input disabled name="incorporationDate" id="incorporationDate" type="text"
+                                value="{{ActivityAuth?.ScopeLicensedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="authorisedDate">
+                                Authorised Date
+                            </label>
+                            <input disabled name="authorisedDate" id="authorisedDate" type="text"
+                                value="{{ActivityAuth?.ScopeLicensedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="effectiveDate">
+                                Effective Date
+                            </label>
+                            <input disabled name="effectiveDate" id="effectiveDate" type="text"
+                                value="{{ActivityAuth?.ScopeEffectiveDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Created By
+                            </label>
+                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCreatedByName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Creation Date
+                            </label>
+                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCreatedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Last Modified By
+                            </label>
+                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.ModifiedBy}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Last Modified Date
+                            </label>
+                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.LastModifiedDate}}">
+                        </div>
+                    </div>
                 </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Prudential Return Type</th>
-                            <th>Effective Date</th>
-                            <th>Expiration Date</th>
-                            <th>Last Modified By</th>
-                            <th>Last Modified Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!--Scope of Authorization-->
+                <div class="inputs-field-set" [ngClass]="{'collapsed': isCollapsed['scopeOfAuthorization']}">
+                    <div class="section">
+                        <div class="edit-firm-actions collapse-container">
+                            <h2 class="edit-firm-header">
+                                Scope of Authorization
+                            </h2>
+                            <button class="collapse-button" (click)="toggleCollapse('scopeOfAuthorization')">
+                                {{ isCollapsed['scopeOfAuthorization'] ? '▲' : '▼'}}
+                            </button>
+                        </div>
+                        <div class="edit-firms-inputs">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Document Type</th>
+                                        <th>File Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--Regulated Activities-->
+                <div class="inputs-field-set" [ngClass]="{'collapsed': isCollapsed['regulatedActivitiesSection']}">
+                    <div class="section">
+                        <div class="edit-firm-actions collapse-container">
+                            <h2>Regulated Activities</h2>
+                            <button class="collapse-button" (click)="toggleCollapse('regulatedActivitiesSection')">
+                                {{ isCollapsed['regulatedActivitiesSection'] ? '▲' : '▼'}}
+                            </button>
+                        </div>
+                        <div class="regulated-activities-container">
+                            <div class="regulated-activities-PIIB"
+                                *ngFor="let regulatedActivity of AuthRegulatedActivities">
+                                <div class="regulated-activities-header">
+                                    <p>Category : <strong>{{regulatedActivity?.ActivityCategoryDesc}}</strong></p>
+                                    <p>Activity : <strong>{{regulatedActivity?.ActivityTypeDesc}}</strong></p>
+                                </div>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: center;">Product(s)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let product of activityProducts[regulatedActivity.ActivityTypeID]">
+                                            {{ product.ProductCategoryTypeDesc }}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <!--specific conditions and restrictions-->
+                                <div class="specific-conditions-and-restrictions">
+                                    <div class="specific-conditions-and-restrictions-header">
+                                        <p>Specific Conditions and Restrictions</p>
+                                    </div>
+
+                                    <p>&nbsp;&nbsp;&nbsp;&nbsp;None</p>
+                                </div>
+                            </div>
+                            <!--Conditions and Restrictions-->
+                            <div class="conditions-and-restrictions-section">
+                                <div class="conditions-and-restrictions-header">
+                                    <p>Conditions and Restrictions</p>
+                                </div>
+                                <p><strong>Retail Restriction</strong></p> &nbsp;&nbsp;
+                                <span>test</span>
+                                <p><strong>General Authorisation Conditions or Restrictions</strong></p> &nbsp;&nbsp;
+                                <span>{{ActivityAuth?.GeneralConditions}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Islamic Finance-->
+                <div class="inputs-field-set"
+                    *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0 && islamicFinance?.IFinTypeId"
+                    [ngClass]="{'collapsed': isCollapsed['islamicFinanceSection']}">
+                    <div class="edit-firm-actions collapse-container">
+                        <h2 class="edit-firm-header">
+                            Islamic Finance
+                        </h2>
+                        <button class="collapse-button" (click)="toggleCollapse('islamicFinanceSection')">
+                            {{ isCollapsed['islamicFinanceSection'] ? '▲' : '▼'}}
+                        </button>
+                    </div>
+                    <div class="edit-firms-inputs">
+                        <div class="input-field">
+                            <label for="isIslamicFinanceExist">
+                                Islamic Finance
+                            </label>
+                            <input disabled name="isIslamicFinanceExist" id="isIslamicFinanceExist" type="text"
+                                value="Yes">
+                        </div>
+                        <div class="input-field">
+                            <label for="islamicFinanceType">
+                                Type
+                            </label>
+                            <input disabled name="islamicFinanceType" id="islamicFinanceType" type="text"
+                                value="{{islamicFinance?.IFinTypeDesc}}">
+                        </div>
+                        <div class="input-field endorsement">
+                            <label for="effectiveDate">
+                                Endorsement
+                            </label>
+                            <textarea disabled name="islamicEndorsement"
+                                id="islamicEndorsement">{{islamicFinance?.Endorsement}}</textarea>
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModifiedBy">
+                                Last Modified By
+                            </label>
+                            <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
+                                value="{{islamicFinance?.IFinLastModifiedByName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModificationDate">
+                                Last Modified Date
+                            </label>
+                            <input disabled name="lastModificationDate" id="lastModificationDate" type="text"
+                                value="{{islamicFinance?.LastModifiedDate}}">
+                        </div>
+                    </div>
+                </div>
+
+                <!--Prudential Category-->
+                <div class="inputs-field-set" [ngClass]="{'collapsed': isCollapsed['prudentialCategorySection']}">
+                    <div class="edit-firm-actions collapse-container">
+                        <h2 class="edit-firm-header">
+                            Prudential Category
+                        </h2>
+                        <button class="collapse-button" (click)="toggleCollapse('prudentialCategorySection')">
+                            {{ isCollapsed['prudentialCategorySection'] ? '▲' : '▼'}}
+                        </button>
+                    </div>
+                    <div class="edit-firms-inputs">
+                        <div class="input-field">
+                            <label for="prudentialCategory">
+                                Prudential Category
+                            </label>
+                            <input disabled name="prudentialCategory" id="prudentialCategory" type="text"
+                                value="{{ActivityAuth?.PrudentialCategoryTypeDesc}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="authorisationCategory">
+                                Authorisation Category
+                            </label>
+                            <input disabled name="authorisationCategory" id="authorisationCategory" type="text"
+                                value="{{ActivityAuth?.AuthorisationCategoryTypeDesc}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="effectiveDate">
+                                Effective Date
+                            </label>
+                            <input disabled name="effectiveDate" id="effectiveDate" type="text"
+                                value="{{ActivityAuth?.PrudentialCategoryEffectiveDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModifiedBy">
+                                Last Modified By
+                            </label>
+                            <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
+                                value="{{ActivityAuth?.PrudentialModifiedByName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModificationDate">
+                                Last Modification Date
+                            </label>
+                            <input disabled name="lastModificationDate" id="lastModificationDate" type="text"
+                                value="{{ActivityAuth?.PrudentialCategoryLastModifiedDate}}">
+                        </div>
+
+                        <table class="prudentialTable">
+                            <thead>
+                                <tr>
+                                    <th>Prudential Category</th>
+                                    <th>Authorisation Category</th>
+                                    <th>Effective Date</th>
+                                    <th>Expiration Date</th>
+                                    <th>Last Modified By</th>
+                                    <th>Last Modified Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ActivityAuth?.PrudentialCategoryTypeDesc}}</td>
+                                    <td>{{ActivityAuth?.AuthorisationCategoryTypeDesc}}</td>
+                                    <td>{{ActivityAuth?.PrudentialCategoryEffectiveDate}}</td>
+                                    <td></td>
+                                    <td>{{ActivityAuth?.PrudentialModifiedByName}}y</td>
+                                    <td>{{ActivityAuth?.PrudentialCategoryLastModifiedDate}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!--Prudential Return Type-->
+                <div class="inputs-field-set" [ngClass]="{'collapsed': isCollapsed['prudentialReturnTypeSection']}">
+                    <div class="edit-firm-actions collapse-container">
+                        <h2 class="edit-firm-header">
+                            Prudential Return Type
+                        </h2>
+                        <button class="collapse-button" (click)="toggleCollapse('prudentialReturnTypeSection')">
+                            {{ isCollapsed['prudentialReturnTypeSection'] ? '▲' : '▼'}}
+                        </button>
+                    </div>
+                    <div class="edit-firms-inputs">
+                        <div class="input-field">
+                            <label for="prudentialReturnType">
+                                Prudential Return Type
+                            </label>
+                            <input disabled name="prudentialReturnType" id="prudentialReturnType" type="text"
+                                value="{{ActivityAuth?.SectorTypeDesc}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="effectiveDate">
+                                Effective Date
+                            </label>
+                            <input disabled name="effectiveDate" id="effectiveDate" type="text"
+                                value="{{ActivityAuth?.SectorEffectiveDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModifiedBy">
+                                Last Modified By
+                            </label>
+                            <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
+                                value="{{ActivityAuth?.SectorModifiedByName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModificationDate">
+                                Last Modification Date
+                            </label>
+                            <input disabled name="lastModificationDate" id="lastModificationDate" type="text"
+                                value="{{ActivityAuth?.SectorLastModifiedDate}}">
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Prudential Return Type</th>
+                                    <th>Effective Date</th>
+                                    <th>Expiration Date</th>
+                                    <th>Last Modified By</th>
+                                    <th>Last Modified Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ActivityAuth?.SectorTypeDesc}}</td>
+                                    <td>{{ActivityAuth?.SectorEffectiveDate}}</td>
+                                    <td></td>
+                                    <td>{{ActivityAuth?.SectorModifiedByName}}</td>
+                                    <td>{{ActivityAuth?.SectorLastModifiedDate}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

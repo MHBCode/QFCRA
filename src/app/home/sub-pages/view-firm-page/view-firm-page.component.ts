@@ -13,7 +13,6 @@ export class ViewFirmPageComponent implements OnInit {
   IsViewAuditorVisible: boolean = false;
   IsCreateAuditorVisible: boolean = false;
   IsEditAuditorVisible: boolean = false;
-  isCollapsed: boolean = false;
   showPrevFirmNameandDateFields = true;
   selectedAuditor: any = null;
   selectedAuditorNameFromSelectBox: string = 'select'
@@ -37,6 +36,9 @@ export class ViewFirmPageComponent implements OnInit {
   firmAccountingStandard: any;
   ActivityLicensed: any;
   ActivityAuth: any;
+  islamicFinance: any;
+  activityProducts: { [key: number]: any[] } = {};
+  AuthRegulatedActivities: any[] = [];
   firmInactiveUsers: any[] = [];
   firmAppDetailsLicensed: any[] = [];
   firmAppDetailsAuthorization: any[] = [];
@@ -45,7 +47,7 @@ export class ViewFirmPageComponent implements OnInit {
   FIRMAuditors: any[] = [];
   FIRMContacts: any[] = [];
   FIRMControllers: any[] = [];
-  RegisteredFund: any [] = [];
+  RegisteredFund: any[] = [];
   FIRMRA: any[] = [];
   FirmAdminFees: any[] = [];
   FirmWaivers: any;
@@ -54,11 +56,13 @@ export class ViewFirmPageComponent implements OnInit {
   License: string = 'License';
   Authorize: string = 'Authorisation';
 
+  isCollapsed: { [key: string]: boolean } = {};
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,  // Inject ActivatedRoute
     private firmService: FirmService,  // Inject FirmService
-    private el: ElementRef, 
+    private el: ElementRef,
     private renderer: Renderer2
   ) { }
 
@@ -75,6 +79,8 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadAdminFees();
       this.loadActivitiesLicensed();
       this.loadActivitiesAuthorized();
+      this.loadRegulatedActivities();
+      this.loadIslamicFinance();
     });
   }
 
@@ -83,9 +89,9 @@ export class ViewFirmPageComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  toggleCollapse() {
-    this.isCollapsed = !this.isCollapsed;
-  }
+  toggleCollapse(section: string) {
+    this.isCollapsed[section] = !this.isCollapsed[section];
+}
 
   toggleMenu(inputNumber: Number) {
     if (this.menuId == 0) {
@@ -108,10 +114,6 @@ export class ViewFirmPageComponent implements OnInit {
       this.menuWidth = this.width1;
       this.dataWidth = this.widthData2;
     }
-  }
-
-  editFirm() {
-    this.router.navigate(['home/edit-firm', this.firmId]);
   }
 
   // Method to load firm details
@@ -137,7 +139,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadAuditors(){
+  loadAuditors() {
     this.firmService.getFIRMAuditors(this.firmId).subscribe(
       data => {
         this.FIRMAuditors = data.response;
@@ -148,7 +150,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadContacts(){
+  loadContacts() {
     this.firmService.getContactsOfFIRM(this.firmId).subscribe(
       data => {
         this.FIRMContacts = data.response;
@@ -159,7 +161,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadControllers(){ 
+  loadControllers() {
     this.firmService.getFIRMControllers(this.firmId).subscribe(
       data => {
         this.FIRMControllers = data.response;
@@ -170,8 +172,8 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadAssiRA(){
-    this.firmService.getFIRMUsersRAFunctions(this.firmId,this.ASSILevel).subscribe(
+  loadAssiRA() {
+    this.firmService.getFIRMUsersRAFunctions(this.firmId, this.ASSILevel).subscribe(
       data => {
         this.FIRMRA = data.response;
         console.log('Firm RA Functions details:', this.FIRMRA);
@@ -181,7 +183,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadRegisteredFund(){
+  loadRegisteredFund() {
     this.firmService.getFIRMRegisteredFund(this.firmId).subscribe(
       data => {
         this.RegisteredFund = data.response;
@@ -192,7 +194,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadAdminFees(){
+  loadAdminFees() {
     this.firmService.getFIRMAdminFees(this.firmId).subscribe(
       data => {
         this.FirmAdminFees = data.response;
@@ -203,8 +205,8 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadActivitiesLicensed(){
-    this.firmService.getFirmActivityLicensedAndAuthorized(this.firmId,2).subscribe(
+  loadActivitiesLicensed() {
+    this.firmService.getFirmActivityLicensedAndAuthorized(this.firmId, 2).subscribe(
       data => {
         this.ActivityLicensed = data.response;
         console.log('Firm FIRM License scope details:', this.ActivityLicensed);
@@ -215,7 +217,7 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
   loadActivitiesAuthorized() {
-    this.firmService.getFirmActivityLicensedAndAuthorized(this.firmId,3).subscribe(
+    this.firmService.getFirmActivityLicensedAndAuthorized(this.firmId, 3).subscribe(
       data => {
         this.ActivityAuth = data.response[0];
         console.log('Firm FIRM License scope details:', this.ActivityAuth);
@@ -225,7 +227,49 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadWaivers(){
+
+  loadRegulatedActivities() {
+    this.firmService.getFirmActivityLicensedAndAuthorized(this.firmId, 3).subscribe(
+      data => {
+        this.AuthRegulatedActivities = data.response;
+        console.log('Firm License scope details:', this.AuthRegulatedActivities);
+
+        // Iterate over each activity and fetch available products
+        this.AuthRegulatedActivities.forEach(data => {
+          this.firmService.getAuthAvailableProducts(data.ActivityTypeID).subscribe(
+            productData => {
+              // Initialize the array if not already done
+              if (!this.activityProducts[data.ActivityTypeID]) {
+                this.activityProducts[data.ActivityTypeID] = [];
+              }
+
+              // Add each product to the specific activity's product list
+              this.activityProducts[data.ActivityTypeID].push(...productData.response);
+              console.log(`Products for activity ${data.ActivityTypeID}:`, productData.response);
+            },
+            error => {
+              console.error('Error fetching available products', error);
+            }
+          );
+        });
+      },
+      error => {
+        console.error('Error fetching License scope', error);
+      }
+    );
+  }
+
+  loadIslamicFinance() {
+    this.firmService.getIslamicFinance(this.firmId).subscribe(
+      data => {
+        this.islamicFinance = data.response;
+        console.log('Firm Islamic Finance:', this.islamicFinance);
+    }, error => {
+        console.error('Error Fetching islamic finance',error);
+    })
+  }
+
+  loadWaivers() {
     this.firmService.getFirmwaiver(this.firmId).subscribe(
       data => {
         this.FirmWaivers = data.response;
@@ -236,7 +280,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadRMPs(){
+  loadRMPs() {
     this.firmService.getFirmRisk(this.firmId).subscribe(
       data => {
         this.FIRMRMP = data.response;
@@ -247,7 +291,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadNotices(){
+  loadNotices() {
     this.firmService.getNotices(this.firmId).subscribe(
       data => {
         this.FIRMNotices = data.response;
@@ -260,7 +304,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   loadApplicationDetails() {
-    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId,2,true).subscribe(
+    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId, 2, true).subscribe(
       data => {
         this.firmAppDetailsLatestLicensed = data.response[0];
         console.log('Firm app details licensed history:', this.firmAppDetailsLatestLicensed);
@@ -269,7 +313,7 @@ export class ViewFirmPageComponent implements OnInit {
         console.error('Error fetching firm details', error);
       }
     );
-    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId,3,true).subscribe(
+    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId, 3, true).subscribe(
       data => {
         this.firmAppDetailsLatestAuthorized = data.response[0];
         console.log('Firm app details licensed history:', this.firmAppDetailsLatestAuthorized);
@@ -294,55 +338,59 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  switchTab(tabId: string){
-        // Get all section elements
-        const sections = this.el.nativeElement.getElementsByTagName('section');
-    
-        // Loop through all section elements and set display to none
-        for (let i = 0; i < sections.length; i++) {
-          this.renderer.setStyle(sections[i], 'display', 'none');
-        }
-        console.log('yes its', tabId)
-        const neededSection = document.getElementById(tabId);
-        this.renderer.setStyle(neededSection, 'display', 'flex');
+  switchTab(tabId: string) {
+    // Get all section elements
+    const sections = this.el.nativeElement.getElementsByTagName('section');
 
-        if (tabId == 'CD') {
-          this.loadPrevFirmAndDate();
-          this.loadApplicationDetails();
-        }
+    // Loop through all section elements and set display to none
+    for (let i = 0; i < sections.length; i++) {
+      this.renderer.setStyle(sections[i], 'display', 'none');
+    }
+    console.log('yes its', tabId)
+    const neededSection = document.getElementById(tabId);
+    this.renderer.setStyle(neededSection, 'display', 'flex');
 
-        if(tabId == 'Auditors' && this.FIRMAuditors.length === 0){
-          this.loadAuditors();
-        }
-        if(tabId == 'Contacts' && this.FIRMContacts.length === 0){
-          this.loadContacts();
-        }
-        if(tabId == 'Controllers' && this.FIRMControllers.length === 0){
-          this.loadControllers();
-        }
-        if(tabId == 'SPRegFunds' && this.RegisteredFund.length === 0){
-          this.loadRegisteredFund();
-        }
-        if(tabId == 'SPWaivers'){
-          this.loadWaivers();
-        }
-        if(tabId == 'SPRMPs'){
-          this.loadRMPs();
-        }
-        if(tabId == 'SPNotices'){
-          this.loadNotices();
-        }
-        // if(tabId == 'CD'){
+    if (tabId == 'CD') {
+      this.loadPrevFirmAndDate();
+      this.loadApplicationDetails();
+    }
 
-        // }
-        // if(tabId == 'CD'){
-        //   console.log('yes its', tabId)
-        //   const neededSection = document.getElementById(tabId);
-        //   this.renderer.setStyle(neededSection, 'display', 'flex');
-        // }
+    if (tabId == 'Scope') {
+      this.isCollapsed['LicensedSection'] = true
+    }
+
+    if (tabId == 'Auditors' && this.FIRMAuditors.length === 0) {
+      this.loadAuditors();
+    }
+    if (tabId == 'Contacts' && this.FIRMContacts.length === 0) {
+      this.loadContacts();
+    }
+    if (tabId == 'Controllers' && this.FIRMControllers.length === 0) {
+      this.loadControllers();
+    }
+    if (tabId == 'SPRegFunds' && this.RegisteredFund.length === 0) {
+      this.loadRegisteredFund();
+    }
+    if (tabId == 'SPWaivers') {
+      this.loadWaivers();
+    }
+    if (tabId == 'SPRMPs') {
+      this.loadRMPs();
+    }
+    if (tabId == 'SPNotices') {
+      this.loadNotices();
+    }
+    // if(tabId == 'CD'){
+
+    // }
+    // if(tabId == 'CD'){
+    //   console.log('yes its', tabId)
+    //   const neededSection = document.getElementById(tabId);
+    //   this.renderer.setStyle(neededSection, 'display', 'flex');
+    // }
   }
 
-  getFYearHistory(){
+  getFYearHistory() {
     this.call = true;
     this.firmService.getFYearEndHistory(this.firmId).subscribe(
       data => {
@@ -354,24 +402,24 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
     setTimeout(() => {
-    const popupWrapper = document.querySelector('.popup-wrapper') as HTMLElement;
-    if (popupWrapper) {
-      popupWrapper.style.display = 'flex'; 
-    } else {
-      console.error('Element with class .popup-wrapper not found');
-    }
-  },0);
+      const popupWrapper = document.querySelector('.popup-wrapper') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .popup-wrapper not found');
+      }
+    }, 0);
   }
-  closeFYearHistory(){
+  closeFYearHistory() {
     const popupWrapper = document.querySelector('.popup-wrapper') as HTMLElement;
     if (popupWrapper) {
-      popupWrapper.style.display = 'none'; 
+      popupWrapper.style.display = 'none';
     } else {
       console.error('Element with class .popup-wrapper not found');
     }
   }
 
-  getInactiveUsers(){
+  getInactiveUsers() {
     this.callInactiveUsers = true;
     this.firmService.getInactiveUsersHistory(this.firmId).subscribe(
       data => {
@@ -383,28 +431,28 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
     setTimeout(() => {
-    const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
-    if (popupWrapper) {
-      popupWrapper.style.display = 'flex'; 
-    } else {
-      console.error('Element with class not found');
-    }
-  },0);
+      const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class not found');
+      }
+    }, 0);
   }
 
 
-  closeInactiveUsers(){
+  closeInactiveUsers() {
     const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
     if (popupWrapper) {
-      popupWrapper.style.display = 'none'; 
+      popupWrapper.style.display = 'none';
     } else {
       console.error('Element with class not found');
     }
   }
 
- 
+
   getApplicationDetailsHistory() {
-    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId,2,false).subscribe(
+    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId, 2, false).subscribe(
       data => {
         this.firmAppDetailsLicensed = data.response;
         console.log('Firm app details licensed history:', this.firmAppDetailsLicensed);
@@ -413,7 +461,7 @@ export class ViewFirmPageComponent implements OnInit {
         console.error('Error fetching firm details', error);
       }
     );
-    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId,3,false).subscribe(
+    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId, 3, false).subscribe(
       data => {
         this.firmAppDetailsAuthorization = data.response;
         console.log('Firm app details licensed history:', this.firmAppDetailsAuthorization);
@@ -424,7 +472,7 @@ export class ViewFirmPageComponent implements OnInit {
     );
     const popupWrapper = document.querySelector('.ApplicationDetailsPopUp') as HTMLElement;
     if (popupWrapper) {
-      popupWrapper.style.display = 'flex'; 
+      popupWrapper.style.display = 'flex';
     } else {
       console.error('Element with class not found');
     }
@@ -433,7 +481,7 @@ export class ViewFirmPageComponent implements OnInit {
   closeApplicationDetails() {
     const popupWrapper = document.querySelector(".ApplicationDetailsPopUp") as HTMLElement;
     if (popupWrapper) {
-      popupWrapper.style.display = 'none'; 
+      popupWrapper.style.display = 'none';
     } else {
       console.error('Element with class not found');
     }
@@ -447,21 +495,21 @@ export class ViewFirmPageComponent implements OnInit {
       },
       error => {
         console.error('Error fetching firm details', error);
-    })
+      })
     setTimeout(() => {
       const popupWrapper = document.querySelector('.prevFirmNamePopUp') as HTMLElement;
       if (popupWrapper) {
-        popupWrapper.style.display = 'flex'; 
+        popupWrapper.style.display = 'flex';
       } else {
         console.error('Element with class .prevFirmNamePopUp not found');
       }
-    },0);
+    }, 0);
   }
 
   closePrevFirmName() {
     const popupWrapper = document.querySelector(".prevFirmNamePopUp") as HTMLElement;
     if (popupWrapper) {
-      popupWrapper.style.display = 'none'; 
+      popupWrapper.style.display = 'none';
     } else {
       console.error('Element with class not found');
     }
@@ -475,24 +523,36 @@ export class ViewFirmPageComponent implements OnInit {
       },
       error => {
         console.error('Error fetching firm details', error);
-    })
+      })
     setTimeout(() => {
       const popupWrapper = document.querySelector('.accountingStandardsPopUp') as HTMLElement;
       if (popupWrapper) {
-        popupWrapper.style.display = 'flex'; 
+        popupWrapper.style.display = 'flex';
       } else {
         console.error('Element with class .prevFirmNamePopUp not found');
       }
-    },0);
+    }, 0);
   }
 
   closeAccountingStandard() {
     const popupWrapper = document.querySelector(".accountingStandardsPopUp") as HTMLElement;
     if (popupWrapper) {
-      popupWrapper.style.display = 'none'; 
+      popupWrapper.style.display = 'none';
     } else {
       console.error('Element with class not found');
     }
+  }
+
+  editFirm() {
+    this.router.navigate(['home/edit-firm', this.firmId]);
+  }
+
+  editScopeLicensed() {
+    this.router.navigate(['home/edit-scope-licensed',this.firmId]);
+  }
+
+  editScopeAuthorized() {
+    this.router.navigate(['home/edit-scope-authorized',this.firmId]);
   }
 
   viewController() {
@@ -504,9 +564,9 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   viewAuditor(auditor: any) {
-    this.selectedAuditor = auditor; 
+    this.selectedAuditor = auditor;
     this.IsViewAuditorVisible = true;
-    this.IsCreateAuditorVisible = false; 
+    this.IsCreateAuditorVisible = false;
     this.IsEditAuditorVisible = false;
   }
 
@@ -532,7 +592,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   getCleanedNotes(notes: string): string {
     if (typeof notes !== 'string') return '';
-    
+
     // Remove <p> tags and replace <br> with newline
     let cleanedNotes = notes
       .replace(/<p\s*\/?>/gi, '\n') // <p> or <p />
