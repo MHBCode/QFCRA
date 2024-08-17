@@ -2233,6 +2233,7 @@
 <!--Popups-->
 <!--Financial Year End History-->
 <div *ngIf="call" class="popup-wrapper">
+    <i class="bi bi-x-circle close-icon" (click)="closeFYearHistory()"></i>
     <div class="popup-info-place">
         <div class="popup-header">
             <h3>Financial Year End History</h3>
@@ -2267,6 +2268,7 @@
 </div>
 <!--Inactive Users-->
 <div *ngIf="callInactiveUsers" class="InactiveUsersPopUp">
+    <i class="bi bi-x-circle close-icon" (click)="closeInactiveUsers()"></i>
     <div class="popup-info-place">
         <div class="popup-header">
             <h3>Inactive Users</h3>
@@ -2297,6 +2299,7 @@
 
 <!--Accounting Standards-->
 <div class="accountingStandardsPopUp">
+    <i class="bi bi-x-circle close-icon" (click)="closeAccountingStandard()"></i>
     <div class="popup-info-place">
         <div class="popup-header">
             <h3>Accounting Standards History</h3>
@@ -2330,6 +2333,7 @@
 </div>
 <!--Previous Firm Name-->
 <div class="prevFirmNamePopUp">
+    <i class="bi bi-x-circle close-icon" (click)="closePrevFirmName()"></i>
     <div class="popup-info-place">
         <div class="popup-header">
             <h3>File Name History</h3>
@@ -2359,6 +2363,7 @@
 </div>
 <!--Application Details-->
 <div class="ApplicationDetailsPopUp">
+    <i class="bi bi-x-circle close-icon" (click)="closeApplicationDetails()"></i>
     <div class="popup-info-place">
         <div class="popup-header">
             <h3>Application Details History</h3>
