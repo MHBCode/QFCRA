@@ -141,17 +141,24 @@ export class ViewFirmPageComponent implements OnInit {
       }
       this.firmDetails.firmId = this.firmId;
       this.firmDetails.FirmAccDataId = this.firmDetails.FirmAccountingDataID;
-      this.firmDetails.FirmStandardID = this.firmDetails.FirmAccountingStandardID;
+      this.firmDetails.FirmStandardID = (Object.keys(this.firmDetails.FirmAccountingStandardID).length != 0) ? this.firmDetails.FirmAccountingStandardID : 0;
       this.firmDetails.FirmApplTypeID = this.firmDetails.FirmTypeID;
       this.firmDetails.FirmFinStandardTypeID = this.firmDetails.FinAccStdTypeID;
+      this.firmDetails.FirmFinStandardEffectiveFrom = this.firmDetails.FinAccStdTypeEffectiveFrom;
+      this.firmDetails.LoginuserId = userId;
 
       this.firmService.editFirm(userId, this.firmDetails).subscribe(response => {
         console.log('Row edited successfully:', response);
+        //this.switchTab('Scope');
       }, error => {
         console.error('Error editing row:', error);
       });
 
     }
+  }
+
+  cancelEditFirm(){
+    this.allowEditFirmDetails = true;
   }
 
   convertDate(oldFormate:any) {
@@ -172,12 +179,21 @@ export class ViewFirmPageComponent implements OnInit {
     this.firmService.getFirmDetails(firmId).subscribe(
       data => {
         this.firmDetails = data.response;
-        this.firmDetails.LicensedDate = this.convertDate(this.firmDetails.LicensedDate);
+        console.log('1) Firm details:', this.firmDetails);
+
+        if ((Object.keys(this.firmDetails.LicensedDate).length != 0) ){
+          this.firmDetails.LicensedDate = this.convertDate(this.firmDetails.LicensedDate);
+        }
+
         this.firmDetails.AuthorisationDate = this.convertDate(this.firmDetails.AuthorisationDate);
         this.firmDetails.DateOfIncorporation = this.convertDate(this.firmDetails.DateOfIncorporation);
-        this.firmDetails.FinAccStdTypeEffectiveFrom = this.convertDate(this.firmDetails.FinAccStdTypeEffectiveFrom);
+
+        if ((Object.keys(this.firmDetails.FinAccStdTypeEffectiveFrom).length != 0) ){
+          this.firmDetails.FinAccStdTypeEffectiveFrom = this.convertDate(this.firmDetails.FinAccStdTypeEffectiveFrom);
+        }
+
         this.firmDetails.FirmFinYearEndEffectiveFrom = this.convertDate(this.firmDetails.FirmFinYearEndEffectiveFrom);
-        console.log('1) Firm details:', this.firmDetails);
+        console.log('2) Firm details:', this.firmDetails);
       },
       error => {
         console.error('Error fetching firm details', error);
