@@ -14,7 +14,8 @@
         <!-- </button> -->
         <div class="menu-item">
             <h3 *ngIf="menuWidth.match(width1)" id="1-item" (click)="toggleMenu(1)"
-                [ngClass]="{'active': menuId === 1}">
+                [ngClass]="{'active': menuId === 1}"
+                (click)="switchTab('main')">
                 FIRM Details
             </h3>
             <i *ngIf="menuWidth.match(width2)" (click)="toggleMenu(1)" class="menu-icons bi bi-info-square"></i>
@@ -270,7 +271,24 @@
                 <h2 class="edit-firm-header">
                     FIRM Details
                 </h2>
+
+                <div style="display: flex; gap:10px">
+                  <div class="btn">
+                    <button (click)="editFirm()">
+                        <i class="bi bi-pen"></i>
+                        {{ allowEditFirmDetails ? 'Edit' : 'Save'}}
+                    </button>
+                </div>
+
+                <div class="btn">
+                  <button *ngIf="!allowEditFirmDetails" (click)="cancelEditFirm()">
+                      Cancel
+                  </button>
+              </div>
+                </div>
+
             </div>
+
             <div class="edit-firms-inputs">
                 <div class="input-field">
                     <label for="firmName">
@@ -693,13 +711,6 @@
                                 value="{{license?.ScopeCreatedByName}}">
                         </div>
                         <div class="input-field">
-                            <label for="createdDate">
-                                Creation Date
-                            </label>
-                            <input disabled name="createdDate" id="createdDate" type="text"
-                                value="{{license?.ScopeCreatedDate}}">
-                        </div>
-                        <div class="input-field">
                             <label for="modBy">
                                 Modified By
                             </label>
@@ -711,6 +722,13 @@
                             </label>
                             <input disabled name="modDate" id="modDate" type="text"
                                 value="{{license?.LastModifiedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="createdDate">
+                                Creation Date
+                            </label>
+                            <input disabled name="createdDate" id="createdDate" type="text"
+                                value="{{license?.ScopeCreatedDate}}">
                         </div>
                         <div [hidden]="allowEditScopeDetailsLic" class="vary-scope">
                             <button>Vary Scope</button>
@@ -879,12 +897,6 @@
                         </div>
                         <div class="input-field">
                             <label for="">
-                                Creation Date
-                            </label>
-                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCreatedDate}}">
-                        </div>
-                        <div class="input-field">
-                            <label for="">
                                 Last Modified By
                             </label>
                             <input disabled name="" id="" type="text" value="{{ActivityAuth?.ModifiedBy}}">
@@ -894,6 +906,12 @@
                                 Last Modified Date
                             </label>
                             <input disabled name="" id="" type="text" value="{{ActivityAuth?.LastModifiedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Creation Date
+                            </label>
+                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCreatedDate}}">
                         </div>
                         <div [hidden]="allowEditScopeDetailsAuth" class="vary-scope">
                             <button>Vary Scope</button>
@@ -963,7 +981,7 @@
                                             </option>
                                         </select>
                                     </div>
-                                    
+
                                     <div class="activity-select">
                                         <label for="activity" style="display: flex; gap: 5px;">
                                             Activity <span style="color: red;">*</span>:
