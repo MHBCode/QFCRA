@@ -45,6 +45,7 @@ header{
     flex-direction: row;
     height: 80%;
     gap: 0.5rem;
+    cursor: pointer;
 }
 .profile-details{
     height: 80px;
@@ -192,6 +193,18 @@ header{
     transform: translateY(0); 
 }
 
+.profile-icon-submenu{
+    position: absolute;
+    top: 5.1rem;
+    right: 1rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 0 0 10px 10px;
+    display: none;
+}
 
 @media  (max-width: 1080px){
     .search-bar{

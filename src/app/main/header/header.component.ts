@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit,ElementRef} from '@angular/core';
 import { Router } from '@angular/router';
 import { FontSizeService } from 'src/app/ngServices/font-size.service';
 
@@ -14,7 +14,8 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private fontSizeService: FontSizeService
+    private fontSizeService: FontSizeService,
+    private el: ElementRef
   ){};
 
   ngOnInit(): void {
@@ -144,5 +145,14 @@ export class HeaderComponent implements OnInit {
     // this.isDecreaseFontSizeEnabled = true; 
     // this.isIncreaseFontSizeEnabled = true;
     // this.isDefaultEnabled = false;
+  }
+
+  openCloseProfileMenu(){
+    const menu = document.getElementById('profile-icon-submenu');
+    if (menu.style.display === 'none' || menu.style.display === '') {
+      menu.style.display = 'flex';
+    } else {
+      menu.style.display = 'none';
+    }
   }
 }
