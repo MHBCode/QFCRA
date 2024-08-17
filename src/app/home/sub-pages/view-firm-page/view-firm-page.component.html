@@ -261,7 +261,7 @@
     <section id='CD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
         <div class="btn">
             <button (click)="editFirm()">
-                <i class="bi bi-pen"></i>
+                <i [class]="allowEditFirmDetails ? 'bi bi-pen' : ''"></i>
                 {{ allowEditFirmDetails ? 'Edit' : 'Save'}}
             </button>
         </div>
@@ -276,29 +276,34 @@
                     <label for="firmName">
                         Firm Name
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="firmName" id="firmName" type="text" [(ngModel)]="firmDetails.FirmName">
+                    <input [disabled]="allowEditFirmDetails" name="firmName" id="firmName" type="text"
+                        [(ngModel)]="firmDetails.FirmName">
                 </div>
 
                 <div class="input-field">
                     <label for="qfcNumber">
                         QFC Number
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="qfcNumber" id="qfcNumber" type="text" [(ngModel)]="firmDetails.QFCNum">
+                    <input [disabled]="allowEditFirmDetails" name="qfcNumber" id="qfcNumber" type="text"
+                        [(ngModel)]="firmDetails.QFCNum">
                 </div>
 
                 <div class="input-field">
                     <label for="code">
                         Code
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="code" id="code" type="text" [(ngModel)]="firmDetails.FirmCode">
+                    <input [disabled]="allowEditFirmDetails" name="code" id="code" type="text"
+                        [(ngModel)]="firmDetails.FirmCode">
                 </div>
 
                 <div class="input-field">
                     <label for="legalStatus">
                         Legal Status
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="legalStatus" id="legalStatus" type="text"
-                    [(ngModel)]="firmDetails.LegalStatusTypeDesc">
+                    <select [disabled]="allowEditFirmDetails" id="legalStatus">
+                        <option value="select">Select</option>
+                        <option value="" selected>{{firmDetails?.LegalStatusTypeDesc}}</option>
+                      </select>
                 </div>
 
                 <div class="input-field">
@@ -306,7 +311,7 @@
                         QFC Trading Name
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="qfcTradingName" id="qfcTradingName" type="text"
-                    [(ngModel)]="firmDetails.QFCTradingName">
+                        [(ngModel)]="firmDetails.QFCTradingName">
                 </div>
 
                 <div class="input-field">
@@ -321,39 +326,54 @@
                     <label for="placeOfIncorporation">
                         Place of Incorporation
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="placeOfIncorporation" id="placeOfIncorporation" type="text"
-                        value="{{firmDetails?.PlaceOfIncorporation}}">
+                    <input [disabled]="allowEditFirmDetails" name="placeOfIncorporation" id="placeOfIncorporation"
+                        type="text" value="{{firmDetails?.PlaceOfIncorporation}}">
                 </div>
 
                 <div class="input-field">
                     <label for="homeCountry">
                         Home Country
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="homeCountry" id="homeCountry" type="text"
-                        value="{{firmDetails?.CountyOfIncorporationDesc}}">
+                    <select [disabled]="allowEditFirmDetails" id="homeCountry">
+                        <option value="select">Select</option>
+                        <option value="" selected>{{firmDetails?.CountyOfIncorporationDesc}}</option>
+                      </select>
                 </div>
 
-                <div class="input-field">
+                <div class="input-field" [hidden]="allowEditFirmDetails">
+                    <label for="isDateDifferent">
+                        Is Date of Incorporation different from Date of Licensing or Authorisation : <span style="color: red;">*</span>
+                    </label>
+                    <div class="radio-wrapper">
+                        <input name="isIncorporationDateDifferent" id="yes" type="radio" [(ngModel)]="isDateDifferent" [value]="true">
+                        Yes
+                        <input name="isIncorporationDateDifferent" id="no" type="radio"  [(ngModel)]="isDateDifferent" [value]="false">
+                        No
+                    </div>
+                </div>
+
+                <div class="input-field" *ngIf="isDateDifferent">
                     <label for="incorporationDate">
                         Incorporation Date
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="incorporationDate" id="incorporationDate" type="text"
-                        value="{{firmDetails?.DateOfIncorporation}}">
+                    <input [disabled]="allowEditFirmDetails" name="incorporationDate" id="incorporationDate" type="date" value="{{firmDetails?.DateOfIncorporation}}">
                 </div>
+
                 <div class="input-field">
                     <label for="financialYearEnd">
-                        Financial Year End
-                        <button class="subbutton" (click)="getFYearHistory()">History</button>
+                        Financial Year End <button class="subbutton" (click)="getFYearHistory()">History</button>
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="financialYearEnd" id="financialYearEnd" type="text"
-                        value="{{firmDetails?.FinYearEndTypeDesc}}">
+                    <select [disabled]="allowEditFirmDetails"  id="financialYearEnd">
+                        <option selected>{{firmDetails?.FinYearEndTypeDesc}}</option>
+                      </select>
                 </div>
 
                 <div class="input-field">
                     <label for="financialYearEndEffectiveFrom">
                         Financial Year End Effective From
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="financialYearEndEffectiveFrom" id="financialYearEndEffectiveFrom" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="financialYearEndEffectiveFrom"
+                        id="financialYearEndEffectiveFrom" type="date"
                         value="{{firmDetails?.FirmFinYearEndEffectiveFrom}}">
                 </div>
 
@@ -362,23 +382,26 @@
                         Accounting Standards <button *ngIf="firmDetails?.FinAccStdTypeDesc" class="subbutton"
                             (click)="getAccountingStandardHistory()">History</button>
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="accountingStandards" id="accountingStandards" type="text"
-                        value="{{firmDetails?.FinAccStdTypeDesc}}">
+                    <select [disabled]="allowEditFirmDetails" id="accountingStandards">
+                        <option selected>{{firmDetails?.FinAccStdTypeDesc}}</option>
+                      </select>
                 </div>
 
                 <div class="input-field">
                     <label for="accountingStandardsEffectiveFrom">
                         Accounting Standards Effective From
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="accountingStandardsEffectiveFrom" id="accountingStandardsEffectiveFrom"
-                        type="text" value="{{firmDetails?.FinAccStdTypeEffectiveFrom}}">
+                    <input [disabled]="allowEditFirmDetails" name="accountingStandardsEffectiveFrom"
+                        id="accountingStandardsEffectiveFrom" type="text"
+                        value="{{firmDetails?.FinAccStdTypeEffectiveFrom}}">
                 </div>
 
                 <div class="input-field">
                     <label for="websiteLink">
                         Website Link
                     </label>
-                    <input [disabled]="allowEditFirmDetails" type="text" value="{{firmDetails?.WebSiteAddress}}" id="websiteLink">
+                    <input [disabled]="allowEditFirmDetails" type="text" value="{{firmDetails?.WebSiteAddress}}"
+                        id="websiteLink">
 
                     <!-- <a id="websiteLink" [href]="firmDetails?.WebSiteAddress" target="_blank" rel="noopener noreferrer">
                         {{ firmDetails?.WebSiteAddress || 'No Website Available' }}
@@ -396,8 +419,8 @@
                     <label for="prevFirmNameEffectiveTo">
                         Prev. Firm Name Effective To
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo" type="text"
-                        value="{{firmNamesHistory?.DateEffectiveTo}}">
+                    <input [disabled]="allowEditFirmDetails" name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo"
+                        type="text" value="{{firmNamesHistory?.DateEffectiveTo}}">
                 </div>
             </div>
 
@@ -409,8 +432,6 @@
                     Application Details <button class="subbutton" (click)="getApplicationDetailsHistory()">Open
                         History</button>
                 </h2>
-                <div class="edit-btn">
-                </div>
             </div>
             <div class="edit-firms-inputs">
                 <h3 class="subTitle-firmDetails">License Status</h3>
@@ -627,8 +648,8 @@
                         </h2>
                         <div class="btn">
                             <button class="edit-btn" (click)="editScopeLicensed()">
-                                <i class="bi bi-pen"></i>
-                                Edit
+                                <i [class]="allowEditScopeDetailsLic ? 'bi bi-pen' : ''"></i>
+                                {{ allowEditScopeDetailsLic ? 'Edit' : 'Save'}}
                             </button>
                         </div>
                     </div>
@@ -637,13 +658,14 @@
                             <label for="formReff">
                                 Form Reference
                             </label>
-                            <input disabled name="formReff" id="formReff" type="text" value="">
+                            <input [disabled]="allowEditScopeDetailsLic" name="formReff" id="formReff" type="text"
+                                value="">
                         </div>
                         <div class="input-field">
                             <label for="">
                                 Link To Scope
                             </label>
-                            <input disabled name="" id="" type="text"
+                            <input [disabled]="allowEditScopeDetailsLic" name="" id="" type="text"
                                 value="{{license?.ScopeCertificateLink || 'No Link'}}">
                         </div>
                         <div class="input-field">
@@ -657,7 +679,7 @@
                             <label for="appDate">
                                 Application Date
                             </label>
-                            <input disabled name="appDate" id="appDate" type="date"
+                            <input [disabled]="allowEditScopeDetailsLic" name="appDate" id="appDate" type="date"
                                 value="{{license?.ScopeAppliedDate | date:'yyyy-MM-dd'}}">
                         </div>
                         <div class="input-field">
@@ -694,6 +716,9 @@
                             <input disabled name="modDate" id="modDate" type="text"
                                 value="{{license?.LastModifiedDate}}">
                         </div>
+                        <div [hidden]="allowEditScopeDetailsLic" class="vary-scope">
+                            <button>Vary Scope</button>
+                        </div>
                     </div>
 
                 </div>
@@ -703,42 +728,80 @@
                         <h2 class="edit-firm-header">
                             Permitted Activities
                         </h2>
-                        <div class="edit-btn">
-                        </div>
                     </div>
 
-                    <div class="permitted-activity-container">
-                        <div class="scope-permitted-activity-header">
-                            <p>Activity</p>
-                        </div>
-
+                    <div class="permitted-activity-container1"
+                        *ngIf="showPermittedActivitiesTable;else showActivityDesc">
                         <div class="permitted-activity-body">
-                            <p>{{license?.ActivityTypeDesc}}</p>
-                            <strong>Activity Details: </strong>
-                            <div class="input-field conditions-textarea">
-                                <textarea disabled>
-                                    {{license?.FirmActivityDetails}}
-                                </textarea>
-                            </div>
-                            <strong>Specific Conditions and Restrictions: </strong>
-                            <div  class="input-field conditions-textarea">
-                                <textarea disabled>
-                                    {{license?.column1}}
-                                </textarea>
-                            </div>
+                            <button class="add-permitted-activity"
+                                style="width: 30px;height: 30px;margin-left: auto;">+</button>
+
+
+                            <table>
+                                <tr>
+                                    <th style="width: 70%;">Activity</th>
+                                    <th style="width: 30%;">Action</th>
+                                    <th></th>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <div class="input-field">
+                                            <select name="activities" id="activities">
+                                                <option value="">Select</option>
+                                                <option *ngFor="let licensedActivity of licensedActivities" [value]="licensedActivity">{{licensedActivity.ActivityTypeDesc}}</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="input-field">
+                                            <select disabled name="action" id="action">
+                                                <option value="add">Add</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button style="width: 30px;height: 30px;">
+                                            <i class="bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
 
-                    <div class="permitted-activity-container">
+                    <ng-template #showActivityDesc>
+                        <div class="permitted-activity-container">
+                            <div class="scope-permitted-activity-header">
+                                <p>Activity</p>
+                            </div>
+
+                            <div class="permitted-activity-body">
+                                <p>{{license?.ActivityTypeDesc}}</p>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <div class="permitted-activity-body">
+                        <strong>Activity Details: </strong>
+                        <div class="input-field conditions-textarea">
+                            <textarea [disabled]="allowEditScopeDetailsLic"
+                                value="{{license?.FirmActivityDetails}}"></textarea>
+                        </div>
+                        <strong>Specific Conditions and Restrictions: </strong>
+                        <div class="input-field conditions-textarea">
+                            <textarea [disabled]="allowEditScopeDetailsLic" value="{{license?.column1}}"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="permitted-activity-container2">
                         <div class="scope-permitted-activity-header">
                             <p>General License Conditions or restrictions</p>
                         </div>
 
                         <div class="permitted-activity-body">
                             <div class="input-field conditions-textarea">
-                                <textarea disabled>
-                                    {{license?.GeneralConditions}}
-                                </textarea>
+                                <textarea disabled value="{{license?.GeneralConditions}}"></textarea>
                             </div>
                         </div>
                     </div>
@@ -759,8 +822,8 @@
                         </h2>
                         <div class="btn">
                             <button class="edit-btn" (click)="editScopeAuthorized()">
-                                <i class="bi bi-pen"></i>
-                                Edit
+                                <i [class]="allowEditScopeDetailsAuth ? 'bi bi-pen' : ''"></i>
+                                {{allowEditScopeDetailsAuth ? 'Edit' : 'Save'}}
                             </button>
                         </div>
                     </div>
@@ -788,7 +851,7 @@
                             <label for="q13AppDate">
                                 Q13 Application Date for revisions
                             </label>
-                            <input disabled name="q13AppDate" id="q13AppDate" type="date"
+                            <input [disabled]="allowEditScopeDetailsAuth" name="q13AppDate" id="q13AppDate" type="date"
                                 value="{{ActivityAuth?.ScopeAppliedDate | date:'yyyy-MM-dd'}}">
                         </div>
                         <div class="input-field">
@@ -809,8 +872,8 @@
                             <label for="effectiveDate">
                                 Effective Date
                             </label>
-                            <input disabled name="effectiveDate" id="effectiveDate" type="date"
-                                value="{{ActivityAuth?.ScopeEffectiveDate | date:'yyyy-MM-dd'}}">
+                            <input [disabled]="allowEditScopeDetailsAuth" name="effectiveDate" id="effectiveDate"
+                                type="date" value="{{ActivityAuth?.ScopeEffectiveDate | date:'yyyy-MM-dd'}}">
                         </div>
                         <div class="input-field">
                             <label for="">
@@ -835,6 +898,9 @@
                                 Last Modified Date
                             </label>
                             <input disabled name="" id="" type="text" value="{{ActivityAuth?.LastModifiedDate}}">
+                        </div>
+                        <div [hidden]="allowEditScopeDetailsAuth" class="vary-scope">
+                            <button>Vary Scope</button>
                         </div>
                     </div>
                 </div>
@@ -882,20 +948,234 @@
                         <div class="regulated-activities-container">
                             <div class="regulated-activities-PIIB"
                                 *ngFor="let regulatedActivity of AuthRegulatedActivities">
-                                <div class="regulated-activities-header">
+                                <div class="regulated-activities-header" *ngIf="allowEditScopeDetailsAuth">
                                     <p>Category : <strong>{{regulatedActivity?.ActivityCategoryDesc}}</strong></p>
                                     <p>Activity : <strong>{{regulatedActivity?.ActivityTypeDesc}}</strong></p>
                                 </div>
-                                <table>
+                                <!--or-->
+                                <div class="regulated-activities-header" *ngIf="!allowEditScopeDetailsAuth">
+                                    <div class="category-select">
+                                        <label for="category" style="display: flex; gap: 5px;">
+                                            Category <span style="color: red;">*</span>:
+                                        </label>
+                                        <select [(ngModel)]="regulatedActivity.selectedCategory"
+                                                (ngModelChange)="onCategoryChange(regulatedActivity)"
+                                                name="category" id="category">
+                                            <!-- <option value="" disabled>Select</option> -->
+                                            <option *ngFor="let category of activityCategories" [ngValue]="category">
+                                                {{ category.ActivityCategoryDesc }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="activity-select">
+                                        <label for="activity" style="display: flex; gap: 5px;">
+                                            Activity <span style="color: red;">*</span>:
+                                        </label>
+                                        <select [(ngModel)]="regulatedActivity.selectedActivity" name="activity" id="activity">
+                                            <!-- <option value="" disabled>Select</option> -->
+                                            <option *ngFor="let activity of regulatedActivity.activities" [value]="activity.ActivityTypeID">
+                                                {{ activity.ActivityTypeDesc }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <table class="regulated-activity-table" *ngIf="allowEditScopeDetailsAuth">
                                     <thead>
                                         <tr>
-                                            <th style="text-align: center;">Product(s)</th>
+                                            <th>Product(s)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr *ngFor="let product of activityProducts[regulatedActivity.ActivityTypeID]">
-                                            {{ product.ProductCategoryTypeDesc }}
+                                        <!--integration loop will be inside this tr for products-->
+                                        <tr>
+                                            <td>
+                                                <label>
+                                                    Products
+                                                </label>
+                                                <table class="nested-table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    Shares
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+                                                        <!--Add more products here-->
+                                                    </tbody>
+                                                </table>
+                                            </td>
                                         </tr>
+                                        <tr>
+                                            <td>
+                                                <label>
+                                                    Products
+                                                </label>
+
+                                                <table class="nested-table">
+                                                    <tbody>
+                                                        <!--integration loop will be inside this tr for products-->
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    Shares
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    Shares
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    Shares
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    Shares
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    Shares
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+                                                        <!--Add more products here-->
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <!--Add more categories here-->
+                                    </tbody>
+                                </table>
+                                <!--or-->
+                                <table class="regulated-activity-table" *ngIf="!allowEditScopeDetailsAuth">
+                                    <thead>
+                                        <tr>
+                                            <th>Product(s)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!--integration loop will be inside this tr for products-->
+                                        <tr>
+                                            <td>
+                                                <label>
+                                                    <input type="checkbox"> Products
+                                                </label>
+
+                                                <table class="nested-table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    <input type="checkbox"> Shares
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select class="action-column" name="action">
+                                                                    <option value="Add">Add</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <!--Add more products here-->
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label>
+                                                    <input type="checkbox"> Products
+                                                </label>
+
+                                                <table class="nested-table">
+                                                    <tbody>
+                                                        <!--integration loop will be inside this tr for products-->
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    <input type="checkbox"> Shares
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select class="action-column" name="action">
+                                                                    <option value="Add">Add</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    <input type="checkbox"> Shares
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select class="action-column" name="action">
+                                                                    <option value="Add">Add</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    <input type="checkbox"> Shares
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select class="action-column" name="action">
+                                                                    <option value="Add">Add</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    <input type="checkbox"> Shares
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select class="action-column" name="action">
+                                                                    <option value="Add">Add</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <label>
+                                                                    <input type="checkbox"> Shares
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <select class="action-column" name="action">
+                                                                    <option value="Add">Add</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <!--Add more products here-->
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <!--Add more categories here-->
                                     </tbody>
                                 </table>
                                 <!--specific conditions and restrictions-->
@@ -915,13 +1195,11 @@
                                 <p>
                                     <strong>Retail Restriction</strong> &nbsp;&nbsp;
                                     <input disabled type="checkbox">
-                                </p> 
-                                
+                                </p>
+
                                 <p><strong>General Authorisation Conditions or Restrictions</strong></p>
                                 <div class="input-field conditions-textarea">
-                                    <textarea disabled>
-                                        {{ActivityAuth?.GeneralConditions}}
-                                    </textarea>
+                                    <textarea disabled value="{{ActivityAuth?.GeneralConditions}}"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -942,18 +1220,27 @@
                         </button>
                     </div>
                     <div class="edit-firms-inputs">
-                        <div class="input-field">
+                        <div class="input-field" *ngIf="allowEditScopeDetailsAuth">
                             <label for="isIslamicFinanceExist">
                                 Islamic Finance
                             </label>
                             <input disabled name="isIslamicFinanceExist" id="isIslamicFinanceExist" type="text"
                                 value="Yes">
                         </div>
+                        <!--or-->
+                        <div class="input-field" *ngIf="!allowEditScopeDetailsAuth">
+                            <div style="display: flex ; gap: 15px;">
+                                <label for="isIslamicFinanceExist">
+                                    Islamic Finance
+                                </label>
+                                <input style="width: 15px;" type="checkbox" name="isIslamicFinanceExist" id="isIslamicFinanceExist" [checked]="islamicFinance?.IFinTypeId">
+                            </div>
+                        </div>
                         <div class="input-field">
                             <label for="islamicFinanceType">
                                 Type
                             </label>
-                            <select disabled name="islamicFinanceType" id="islamicFinanceType">
+                            <select [disabled]="allowEditScopeDetailsAuth" name="islamicFinanceType" id="islamicFinanceType">
                                 <option value="">{{islamicFinance?.IFinTypeDesc}}</option>
                             </select>
                         </div>
@@ -961,7 +1248,7 @@
                             <label for="effectiveDate">
                                 Endorsement
                             </label>
-                            <textarea disabled name="islamicEndorsement"
+                            <textarea [disabled]="allowEditScopeDetailsAuth" name="islamicEndorsement"
                                 id="islamicEndorsement">{{islamicFinance?.Endorsement}}</textarea>
                         </div>
                         <div class="input-field">
@@ -996,7 +1283,7 @@
                             <label for="prudentialCategory">
                                 Prudential Category
                             </label>
-                            <select disabled name="prudentialCategory" id="prudentialCategory">
+                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialCategory" id="prudentialCategory">
                                 <option value="">{{ActivityAuth?.PrudentialCategoryTypeDesc}}</option>
                                 <!--More options will be integrated here-->
                             </select>
@@ -1005,7 +1292,7 @@
                             <label for="authorisationCategory">
                                 Authorisation Category
                             </label>
-                            <select disabled name="prudentialCategory" id="prudentialCategory">
+                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialCategory" id="prudentialCategory">
                                 <option value="">{{ActivityAuth?.AuthorisationCategoryTypeDesc}}</option>
                                 <!--More options will be integrated here-->
                             </select>
@@ -1014,7 +1301,7 @@
                             <label for="effectiveDate">
                                 Effective Date
                             </label>
-                            <input disabled name="effectiveDate" id="effectiveDate" type="date"
+                            <input [disabled]="allowEditScopeDetailsAuth" name="effectiveDate" id="effectiveDate" type="date"
                                 value="{{ActivityAuth?.PrudentialCategoryEffectiveDate}}">
                         </div>
                         <div class="input-field">
@@ -1032,7 +1319,7 @@
                                 value="{{ActivityAuth?.PrudentialCategoryLastModifiedDate}}">
                         </div>
 
-                        <table class="prudentialTable">
+                        <table class="prudentialTable" [hidden]="!allowEditScopeDetailsAuth">
                             <thead>
                                 <tr>
                                     <th>Prudential Category</th>
@@ -1072,7 +1359,7 @@
                             <label for="prudentialReturnType">
                                 Prudential Return Type
                             </label>
-                            <select disabled name="prudentialReturnType" id="prudentialReturnType">
+                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialReturnType" id="prudentialReturnType">
                                 <option value="">{{ActivityAuth?.SectorTypeDesc}}</option>
                                 <!--More options will be integrated here-->
                             </select>
@@ -1081,7 +1368,7 @@
                             <label for="effectiveDate">
                                 Effective Date
                             </label>
-                            <input disabled name="effectiveDate" id="effectiveDate" type="date"
+                            <input [disabled]="allowEditScopeDetailsAuth" name="effectiveDate" id="effectiveDate" type="date"
                                 value="{{ActivityAuth?.SectorEffectiveDate | date:'yyyy-MM-dd'}}">
                         </div>
                         <div class="input-field">
@@ -1099,7 +1386,7 @@
                                 value="{{ActivityAuth?.SectorLastModifiedDate}}">
                         </div>
 
-                        <table>
+                        <table class="prudentialTable" [hidden]="!allowEditScopeDetailsAuth">
                             <thead>
                                 <tr>
                                     <th>Prudential Return Type</th>

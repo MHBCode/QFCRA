@@ -477,8 +477,32 @@ tr:nth-child(even) {
 
 .permitted-activity-body {
     padding: 5px 15px;
-    line-height: 25px
+    line-height: 25px;
+    display: flex;
+    flex-direction: column;
 }
+
+.permitted-activity-body table tr th {
+    text-align: center;
+}
+
+.permitted-activity-body table tr th,.permitted-activity-body table tr td {
+    padding: 0px 3px;
+}
+
+.permitted-activity-body table tr {
+    background-color: transparent;
+}
+
+.permitted-activity-body table {
+    box-shadow: none;
+    border-radius: 0;
+}
+
+table .input-field {
+    width: 100%;
+}
+
 
 /**/
 
@@ -517,6 +541,43 @@ tr:nth-child(even) {
 
 .scrolablebody {
     overflow-x: scroll;
+}
+
+.category-select,
+.activity-select {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.category-select select,
+.activity-select select {
+    padding: 6px 5px;
+    border-radius: 7.2px;
+    border: 0.72px #B1B1B1 solid;
+    width: 400px;
+}
+
+.regulated-activity-table tr{
+    background-color: transparent;
+}
+
+.regulated-activity-table thead tr td {
+    text-align: center;
+}
+
+.regulated-activity-table tbody tr td {
+    text-align: left!important;
+    cursor: default;
+}
+
+.nested-table tr td, .nested-table tr th{
+    text-align: left!important;
+    cursor: default;
+}
+
+.nested-table tr:nth-child(even) {
+    background-color: #F2F2F2;
 }
 
 /**/
@@ -635,3 +696,20 @@ tr:nth-child(even) {
 .conditions-textarea {
     width: 100%;
 }
+
+.vary-scope {
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.vary-scope button {
+    background: #A51E36;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    min-width: 6rem;
+    min-height: 40px;
+}
+
