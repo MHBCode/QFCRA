@@ -38,6 +38,8 @@ export class ViewFirmPageComponent implements OnInit {
   ActivityAuth: any;
   islamicFinance: any;
   activityProducts: { [key: number]: any[] } = {};
+  activityCategories: any[] = [];
+  licensedActivities: any[] = [];
   AuthRegulatedActivities: any[] = [];
   firmInactiveUsers: any[] = [];
   firmAppDetailsLicensed: any[] = [];
@@ -56,6 +58,13 @@ export class ViewFirmPageComponent implements OnInit {
   License: string = 'License';
   Authorize: string = 'Authorisation';
   allowEditFirmDetails: string | boolean = true;
+  isDateDifferent: string | boolean = false;
+  /* for scope */
+  allowEditScopeDetailsAuth: string | boolean = true;
+  allowEditScopeDetailsLic: string | boolean = true;
+  showPermittedActivitiesTable: string | boolean = false;
+  selectedCategory: string;
+  selectedActivity: string;
 
   isCollapsed: { [key: string]: boolean } = {};
 
@@ -82,6 +91,8 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadActivitiesAuthorized();
       this.loadRegulatedActivities();
       this.loadIslamicFinance();
+      this.loadActivityCategories();
+      this.loadActivitiesTypesForLicensed();
     });
   }
 
@@ -92,7 +103,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   toggleCollapse(section: string) {
     this.isCollapsed[section] = !this.isCollapsed[section];
-}
+  }
 
   toggleMenu(inputNumber: Number) {
     if (this.menuId == 0) {
@@ -123,20 +134,20 @@ export class ViewFirmPageComponent implements OnInit {
 
     this.allowEditFirmDetails = !this.allowEditFirmDetails;
 
-    if (this.allowEditFirmDetails){
+    if (this.allowEditFirmDetails) {
       console.log("firms details after edit:", this.firmDetails);
       const userId = 10044; // Replace with dynamic userId as needed
-      if ((Object.keys(this.firmDetails.FirmApplicationDataComments).length === 0) ){
+      if ((Object.keys(this.firmDetails.FirmApplicationDataComments).length === 0)) {
         this.firmDetails.FirmApplicationDataComments = "";
       };
-      if ((Object.keys(this.firmDetails.PublicRegisterComments).length === 0) ){
+      if ((Object.keys(this.firmDetails.PublicRegisterComments).length === 0)) {
         this.firmDetails.PublicRegisterComments = "";
       };
 
-      if(this.firmDetails?.AuthorisationStatusTypeID == 0){
+      if (this.firmDetails?.AuthorisationStatusTypeID == 0) {
         this.firmDetails.FirmApplDate = this.firmDetails?.FirmLicApplDate;
       }
-      else{
+      else {
         this.firmDetails.FirmApplDate = this.firmDetails?.FirmAuthApplDate;
       }
       this.firmDetails.firmId = this.firmId;
@@ -161,17 +172,39 @@ export class ViewFirmPageComponent implements OnInit {
     this.allowEditFirmDetails = true;
   }
 
-  convertDate(oldFormate:any) {
+
+  editScopeLicensed() {
+    // this.router.navigate(['home/edit-scope-licensed',this.firmId]);
+    this.allowEditScopeDetailsLic = !this.allowEditScopeDetailsLic;
+    this.showPermittedActivitiesTable = !this.showPermittedActivitiesTable;
+    if (this.allowEditScopeDetailsLic) {
+
+    }
+
+  }
+
+  editScopeAuthorized() {
+    // this.router.navigate(['home/edit-scope-authorized',this.firmId]);
+    this.allowEditScopeDetailsAuth = !this.allowEditScopeDetailsAuth;
+    if (!this.allowEditScopeDetailsAuth) {
+      // Populate activities when entering edit mode
+      this.AuthRegulatedActivities.forEach(activity => {
+        this.onCategoryChange(activity); // Load activities for each category again if needed
+      });
+    }
+  }
+
+  convertDate(oldFormate: any) {
     const months = {
-        "Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04",
-        "May": "05", "Jun": "06", "Jul": "07", "Aug": "08",
-        "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"
+      "Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04",
+      "May": "05", "Jun": "06", "Jul": "07", "Aug": "08",
+      "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"
     };
 
     const [day, month, year] = oldFormate.split('/');
     const formattedMonth = months[month];
     return `${year}-${formattedMonth}-${day}`;
-}
+  }
 
 
   // Method to load firm details
@@ -304,25 +337,18 @@ export class ViewFirmPageComponent implements OnInit {
     this.firmService.getFirmActivityLicensedAndAuthorized(this.firmId, 3).subscribe(
       data => {
         this.AuthRegulatedActivities = data.response;
-        console.log('Firm License scope details:', this.AuthRegulatedActivities);
 
-        // Iterate over each activity and fetch available products
-        this.AuthRegulatedActivities.forEach(data => {
-          this.firmService.getAuthAvailableProducts(data.ActivityTypeID).subscribe(
-            productData => {
-              // Initialize the array if not already done
-              if (!this.activityProducts[data.ActivityTypeID]) {
-                this.activityProducts[data.ActivityTypeID] = [];
-              }
+        this.AuthRegulatedActivities.forEach(activity => {
+          // Only set selectedCategory if it hasn't been set already
+          if (!activity.selectedCategory) {
+            activity.selectedCategory = this.activityCategories.find(
+              category => category.ActivityCategoryDesc === activity.ActivityCategoryDesc
+            );
 
-              // Add each product to the specific activity's product list
-              this.activityProducts[data.ActivityTypeID].push(...productData.response);
-              console.log(`Products for activity ${data.ActivityTypeID}:`, productData.response);
-            },
-            error => {
-              console.error('Error fetching available products', error);
+            if (!this.allowEditScopeDetailsAuth) {
+              this.onCategoryChange(activity); // Load activities for the selected category
             }
-          );
+          }
         });
       },
       error => {
@@ -331,14 +357,47 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
 
+
+
+  // loadRegulatedActivities() {
+  //   this.firmService.getFirmActivityLicensedAndAuthorized(this.firmId, 3).subscribe(
+  //     data => {
+  //       this.AuthRegulatedActivities = data.response;
+  //       console.log('Firm License scope details:', this.AuthRegulatedActivities);
+
+  //       // Iterate over each activity and fetch available products
+  //       this.AuthRegulatedActivities.forEach(data => {
+  //         this.firmService.getAuthAvailableProducts(data.ActivityTypeID).subscribe(
+  //           productData => {
+  //             // Initialize the array if not already done
+  //             if (!this.activityProducts[data.ActivityTypeID]) {
+  //               this.activityProducts[data.ActivityTypeID] = [];
+  //             }
+
+  //             // Add each product to the specific activity's product list
+  //             this.activityProducts[data.ActivityTypeID].push(...productData.response);
+  //             console.log(`Products for activity ${data.ActivityTypeID}:`, productData.response);
+  //           },
+  //           error => {
+  //             console.error('Error fetching available products', error);
+  //           }
+  //         );
+  //       });
+  //     },
+  //     error => {
+  //       console.error('Error fetching License scope', error);
+  //     }
+  //   );
+  // }
+
   loadIslamicFinance() {
     this.firmService.getIslamicFinance(this.firmId).subscribe(
       data => {
         this.islamicFinance = data.response;
         console.log('Firm Islamic Finance:', this.islamicFinance);
-    }, error => {
-        console.error('Error Fetching islamic finance',error);
-    })
+      }, error => {
+        console.error('Error Fetching islamic finance', error);
+      })
   }
 
   loadWaivers() {
@@ -410,6 +469,44 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
+
+  loadActivityCategories() {
+    this.firmService.getActivityCategories().subscribe(
+      data => {
+        this.activityCategories = data.response;
+        console.log('Firm activity categories details:', this.activityCategories);
+      }, error => {
+        console.error('Error fetching activity categories', error);
+      }
+    );
+  }
+
+  loadActivitiesTypesForLicensed() {
+    this.firmService.getLicActivityTypes().subscribe(data => {
+      this.licensedActivities = data.response;
+      console.log('Firm activity types for licensed', this.licensedActivities);
+    }, error => {
+      console.error('Error fetching activity types for licensed',error)
+    })
+  }
+
+
+  onCategoryChange(regulatedActivity: any) {
+    const selectedCategory = regulatedActivity.selectedCategory;
+    if (selectedCategory) {
+      console.log('Selected Category ID:', selectedCategory.ActivityCategoryID);
+      this.firmService.getAuthActivityTypes(selectedCategory.ActivityCategoryID).subscribe(data => {
+        console.log('Fetched Activities for Category:', selectedCategory.ActivityCategoryDesc, data.response);
+        regulatedActivity.activities = data.response; // Populate activities array
+        regulatedActivity.selectedActivity = ''; // Reset activity dropdown to 'Select'
+      });
+    }
+  }
+
+
+
+
+
   switchTab(tabId: string) {
     // Get all section elements
     const sections = this.el.nativeElement.getElementsByTagName('section');
@@ -503,13 +600,13 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
     setTimeout(() => {
-    const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
-    if (popupWrapper) {
-      popupWrapper.style.display = 'flex';
-    } else {
-      console.error('Element with class not found');
-    }
-  },0);
+      const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class not found');
+      }
+    }, 0);
   }
 
 
@@ -613,14 +710,6 @@ export class ViewFirmPageComponent implements OnInit {
     } else {
       console.error('Element with class not found');
     }
-  }
-
-  editScopeLicensed() {
-    this.router.navigate(['home/edit-scope-licensed',this.firmId]);
-  }
-
-  editScopeAuthorized() {
-    this.router.navigate(['home/edit-scope-authorized',this.firmId]);
   }
 
   viewController() {

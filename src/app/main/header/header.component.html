@@ -4,7 +4,8 @@
     </div>
     <div class="nav">
         <div class="my-invention" (click)="openMenu(0)"
-            *ngIf="firms == true || admin == true || individuals == true || reports == true"></div>
+            *ngIf="firms == true || admin == true || individuals == true || reports == true">
+        </div>
         <ul class="navigation-ul">
             <li>
                 <a (click)="goHome()">
@@ -72,16 +73,18 @@
             </li>
         </ul>
     </div>
-    <div class="change-font">
-        <button class="font-btn decrease-font-size" (click)="decreaseFontSize()">A-</button>
-        <button class="font-btn reset-font-btn" (click)="resetFontSize()">A</button>
-        <button class="font-btn increase-font-btn" (click)="increaseFontSize()">A+</button>
+    <div class="profile-icon-submenu" id="profile-icon-submenu">
+        <div class="change-font">
+            <button class="font-btn decrease-font-size" (click)="decreaseFontSize()">A-</button>
+            <button class="font-btn reset-font-btn" (click)="resetFontSize()">A</button>
+            <button class="font-btn increase-font-btn" (click)="increaseFontSize()">A+</button>
+        </div>
     </div>
     <div class="profile-access">
         <div class="notifications">
             <i class="bi bi-bell"></i>
         </div>
-        <div class="profile-details">
+        <div class="profile-details" (click)="openCloseProfileMenu()">
             <div class="pd-img">
                 <img src="../../../assets/images/emp-img.png" alt="profile img">
             </div>

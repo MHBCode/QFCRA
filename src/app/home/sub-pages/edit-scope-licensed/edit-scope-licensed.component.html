@@ -96,14 +96,16 @@
 
                     <div class="permitted-activity-container">
                         <div class="permitted-activity-body">
+                            <button class="add-permitted-activity" style="width: 30px;height: 30px;margin-left: auto;">+</button>
                         <table>
                             <tr>
-                                <th>Activity</th>
-                                <th>Action</th>
+                                <th style="width: 70%;">Activity</th>
+                                <th style="width: 30%;">Action</th>
+                                <th></th>
                             </tr>
 
                             <tr>
-                                <td style="padding-right: 100px;">
+                                <td>
                                     <div class="input-field">
                                         <select name="activities" id="activities">
                                             <option value="select">select</option>
@@ -116,6 +118,11 @@
                                             <option value="add">Add</option>
                                         </select>
                                     </div>
+                                </td>
+                                <td>
+                                    <button style="width: 30px;height: 30px;">
+                                        <i class="bi-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                         </table>
