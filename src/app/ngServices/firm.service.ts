@@ -58,7 +58,19 @@ export class FirmService {
     return this.http.get<any>(url);
   }
   getFirmActivityLicensedAndAuthorized(firmId: number, firmAppTypeID: number): Observable<any> {
-    const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmApplicationTypeId=${firmAppTypeID}`;  //'https://localhost:7091/api/Activity/get_firm_activities?firmId=66&firmApplicationTypeId=2or3'
+    const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmApplicationTypeId=${firmAppTypeID}`;  //'https://localhost:7091/api/Activity/get_firm_activities?firmId=66&firmApplicationTypeId=2or3' 2: Licensed, 3:Authorized
+    return this.http.get<any>(url);
+  }
+  getActivityCategories(): Observable<any> {
+    const url = `${this.baseUrlActivity}get_activity_categories?userId=${''}}`;
+    return this.http.get<any>(url);
+  }
+  getAuthActivityTypes(categoryId: number): Observable<any>  { //BasedOnCategoryID
+    const url = `${this.baseUrlActivity}get_activity_types?activityCategoryId=${categoryId}`
+    return this.http.get<any>(url);
+  }
+  getLicActivityTypes(): Observable<any>  { 
+    const url = `${this.baseUrlActivity}get_activity_types?activityCategoryId=1`
     return this.http.get<any>(url);
   }
   getFirmScopeId(firmId: number): Observable<number> {
