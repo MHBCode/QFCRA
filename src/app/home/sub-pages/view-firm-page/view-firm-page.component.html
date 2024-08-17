@@ -148,15 +148,17 @@
                     <label for="dateOfApplication">
                         Date of Application
                     </label>
-                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text"
-                        value="{{firmDetails?.CreatedDate | date:'MM/dd/yyyy'}}">
+                    <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="{{firmDetails?.AuthorisationStatusTypeID == 0
+                    ? (firmDetails?.FirmLicApplDate | date: 'dd/MMM/y')
+                    : (firmDetails?. FirmAuthApplDate | date: 'dd/MMM/y')}}">
                 </div>
 
                 <div class="input-field">
                     <label for="firmApplicationType">
                         Firm Application Type
                     </label>
-                    <input type="text" disabled name="firmApplicationType" id="firmApplicationType" value="Can't find">
+                    <input type="text" disabled name="firmApplicationType" id="firmApplicationType"
+                        value="{{firmDetails?.AuthorisationStatusTypeID == 0 ? License : Authorize}}">
                 </div>
 
                 <div class="input-field">
@@ -169,25 +171,25 @@
 
                 <div class="input-field">
                     <label for="DateLicensed">
-                        Date Licensed
+                        {{firmDetails?.LicenseStatusTypeLabelDesc}}
                     </label>
                     <input disabled name="DateLicensed" id="DateLicensed" type="text"
-                        value="{{firmDetails?.LicensedDate | date:'MM/dd/yyyy'}}">
+                        value="{{firmDetails?.LicenseApplStatusDate | date: 'dd/MMM/y'}}">
                 </div>
 
-                <div class="input-field">
+                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
                     <label for="authorisationStatus">
                         Authorisation Status
                     </label>
                     <input type="text" disabled name="authorisationStatus" id="authorisationStatus"
                         value="{{firmDetails?.AuthorisationStatusTypeDesc}}">
                 </div>
-                <div class="input-field">
+                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
                     <label for="dateApplication">
-                        Date Authorized
+                        {{firmDetails?.AuthorisationStatusTypeLabelDesc}}
                     </label>
                     <input disabled name="dateApplication" id="dateApplication" type="text"
-                        value="{{firmDetails?.AuthorisationDate | date:'MM/dd/yyyy'}}">
+                        value="{{firmDetails?.AuthApplStatusDate | date: 'dd/MMM/y'}}">
                 </div>
             </div>
         </div>
@@ -204,7 +206,7 @@
 
                 <div class="input-field">
                     <label for="noOfStaffInQatar">
-                        No. Of Staff In Qatar (Local Staff) :
+                        No. Of Staff In Qatar (Local Staff)
                     </label>
                     <input disabled name="noOfStaffInQatar" id="noOfStaffInQatar" type="text"
                         value="{{firmOPDetails?.NumOfLocalStaff}}">
@@ -212,24 +214,25 @@
 
                 <div class="input-field">
                     <label for="staffTotal">
-                        Staff total :
+                        Staff total
                     </label>
                     <input disabled name="staffTotal" id="staffTotal" type="text"
                         value="{{firmOPDetails?.NumOfTotalStaff}}">
                 </div>
 
-                <div class="input-field">
+                <div class="input-field notes">
                     <label for="notes">
                         Notes :
                     </label>
-                    <input type="text" disabled name="notes" id="notes" value="{{firmOPDetails?.Notes}}">
+                    <textarea disabled name="notes" id="notes">{{getCleanedNotes(firmOPDetails?.Notes)}}</textarea>
                 </div>
             </div>
         </div>
         <!---->
         <div class="inputs-field-set">
             <div class="section">
-                <h2>RA Personal Assigned <button class="subbutton" (click)="getInactiveUsers()">Open History</button></h2> 
+                <h2>RA Personal Assigned <button class="subbutton" (click)="getInactiveUsers()">Open History</button>
+                </h2>
                 <table>
                     <thead>
                         <tr>
@@ -256,73 +259,93 @@
 
     <!--Core Details-->
     <section id='CD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="btn">
+            <button (click)="editFirm()">
+                <i class="bi bi-pen"></i>
+                {{ allowEditFirmDetails ? 'Edit' : 'Save'}}
+            </button>
+        </div>
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    FIRM Details > <span>{{firmDetails?.FirmName}}</span>
+                    FIRM Details
                 </h2>
             </div>
             <div class="edit-firms-inputs">
                 <div class="input-field">
-                    <label for="code">
-                        Code
+                    <label for="firmName">
+                        Firm Name
                     </label>
-                    <input disabled name="code" id="code" type="text" value="{{firmDetails?.FirmCode}}">
+                    <input [disabled]="allowEditFirmDetails" name="firmName" id="firmName" type="text" [(ngModel)]="firmDetails.FirmName">
                 </div>
 
                 <div class="input-field">
                     <label for="qfcNumber">
                         QFC Number
                     </label>
-                    <input disabled name="qfcNumber" id="qfcNumber" type="text" value="{{firmDetails?.QFCNum}}">
+                    <input [disabled]="allowEditFirmDetails" name="qfcNumber" id="qfcNumber" type="text" [(ngModel)]="firmDetails.QFCNum">
+                </div>
+
+                <div class="input-field">
+                    <label for="code">
+                        Code
+                    </label>
+                    <input [disabled]="allowEditFirmDetails" name="code" id="code" type="text" [(ngModel)]="firmDetails.FirmCode">
                 </div>
 
                 <div class="input-field">
                     <label for="legalStatus">
                         Legal Status
                     </label>
-                    <input disabled name="legalStatus" id="legalStatus" type="text"
-                        value="{{firmDetails?.LegalStatusTypeDesc}}">
+                    <input [disabled]="allowEditFirmDetails" name="legalStatus" id="legalStatus" type="text"
+                    [(ngModel)]="firmDetails.LegalStatusTypeDesc">
                 </div>
 
                 <div class="input-field">
-                    <label for="placeOfIncorporation">
-                        Place of Incorporation
+                    <label for="qfcTradingName">
+                        QFC Trading Name
                     </label>
-                    <input disabled name="placeOfIncorporation" id="placeOfIncorporation" type="text"
-                        value="{{firmDetails?.PlaceOfIncorporation}}">
+                    <input [disabled]="allowEditFirmDetails" name="qfcTradingName" id="qfcTradingName" type="text"
+                    [(ngModel)]="firmDetails.QFCTradingName">
                 </div>
 
                 <div class="input-field">
                     <label for="prevTradingNames">
                         Prev. Trading Name(s)
                     </label>
-                    <input disabled name="prevTradingNames" id="prevTradingNames" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="prevTradingNames" id="prevTradingNames" type="text"
                         value="{{firmDetails?.PrevTradingName}}">
                 </div>
-                <!--Cant Find In Integration-->
+
+                <div class="input-field">
+                    <label for="placeOfIncorporation">
+                        Place of Incorporation
+                    </label>
+                    <input [disabled]="allowEditFirmDetails" name="placeOfIncorporation" id="placeOfIncorporation" type="text"
+                        value="{{firmDetails?.PlaceOfIncorporation}}">
+                </div>
+
                 <div class="input-field">
                     <label for="homeCountry">
                         Home Country
                     </label>
-                    <input disabled name="homeCountry" id="homeCountry" type="text"
-                        value="{{firmDetails?.CountryName}}">
+                    <input [disabled]="allowEditFirmDetails" name="homeCountry" id="homeCountry" type="text"
+                        value="{{firmDetails?.CountyOfIncorporationDesc}}">
                 </div>
 
                 <div class="input-field">
                     <label for="incorporationDate">
                         Incorporation Date
                     </label>
-                    <input disabled name="incorporationDate" id="incorporationDate" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="incorporationDate" id="incorporationDate" type="text"
                         value="{{firmDetails?.DateOfIncorporation}}">
                 </div>
-                <!--Cant Find iIN iNTEGRATION-->
                 <div class="input-field">
                     <label for="financialYearEnd">
                         Financial Year End
                         <button class="subbutton" (click)="getFYearHistory()">History</button>
                     </label>
-                    <input disabled name="financialYearEnd" id="financialYearEnd" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="financialYearEnd" id="financialYearEnd" type="text"
                         value="{{firmDetails?.FinYearEndTypeDesc}}">
                 </div>
 
@@ -330,15 +353,16 @@
                     <label for="financialYearEndEffectiveFrom">
                         Financial Year End Effective From
                     </label>
-                    <input disabled name="financialYearEndEffectiveFrom" id="financialYearEndEffectiveFrom" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="financialYearEndEffectiveFrom" id="financialYearEndEffectiveFrom" type="text"
                         value="{{firmDetails?.FirmFinYearEndEffectiveFrom}}">
                 </div>
 
                 <div class="input-field">
                     <label for="accountingStandards">
-                        Accounting Standards
+                        Accounting Standards <button *ngIf="firmDetails?.FinAccStdTypeDesc" class="subbutton"
+                            (click)="getAccountingStandardHistory()">History</button>
                     </label>
-                    <input disabled name="accountingStandards" id="accountingStandards" type="text"
+                    <input [disabled]="allowEditFirmDetails" name="accountingStandards" id="accountingStandards" type="text"
                         value="{{firmDetails?.FinAccStdTypeDesc}}">
                 </div>
 
@@ -346,7 +370,7 @@
                     <label for="accountingStandardsEffectiveFrom">
                         Accounting Standards Effective From
                     </label>
-                    <input disabled name="accountingStandardsEffectiveFrom" id="accountingStandardsEffectiveFrom"
+                    <input [disabled]="allowEditFirmDetails" name="accountingStandardsEffectiveFrom" id="accountingStandardsEffectiveFrom"
                         type="text" value="{{firmDetails?.FinAccStdTypeEffectiveFrom}}">
                 </div>
 
@@ -354,8 +378,26 @@
                     <label for="websiteLink">
                         Website Link
                     </label>
-                    <input disabled name="websiteLink" id="websiteLink" type="text"
-                        value="{{firmDetails?.WebSiteAddress}}">
+                    <input [disabled]="allowEditFirmDetails" type="text" value="{{firmDetails?.WebSiteAddress}}" id="websiteLink">
+
+                    <!-- <a id="websiteLink" [href]="firmDetails?.WebSiteAddress" target="_blank" rel="noopener noreferrer">
+                        {{ firmDetails?.WebSiteAddress || 'No Website Available' }}
+                    </a> -->
+                </div>
+                <div class="input-field" *ngIf="showPrevFirmNameandDateFields && firmNamesHistory?.PrevFirmName !== ''">
+                    <label for="prevFirmName">
+                        Prev. Firm Name <button class="subbutton" (click)="getPrevFirmName()">History</button>
+                    </label>
+                    <input [disabled]="allowEditFirmDetails" name="prevFirmName" id="prevFirmName" type="text"
+                        value="{{firmNamesHistory?.PrevFirmName}}">
+                </div>
+                <div class="input-field"
+                    *ngIf="showPrevFirmNameandDateFields && firmNamesHistory?.DateEffectiveTo !== ''">
+                    <label for="prevFirmNameEffectiveTo">
+                        Prev. Firm Name Effective To
+                    </label>
+                    <input [disabled]="allowEditFirmDetails" name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo" type="text"
+                        value="{{firmNamesHistory?.DateEffectiveTo}}">
                 </div>
             </div>
 
@@ -364,7 +406,8 @@
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
-                    Application Details
+                    Application Details <button class="subbutton" (click)="getApplicationDetailsHistory()">Open
+                        History</button>
                 </h2>
                 <div class="edit-btn">
                 </div>
@@ -376,41 +419,42 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOn" id="appliedOn" type="text"
-                        value="{{firmDetails?.LicenseApplStatusDate}}">
+                        value="{{firmDetails?.FirmLicApplDate | date: 'dd/MMM/y'}}">
                 </div>
                 <div class="input-field">
                     <label for="licensedOn">
                         Licensed On
                     </label>
-                    <input type="text" disabled name="licensedOn" id="licensedOn" value="{{firmDetails?.LicensedDate}}">
+                    <input type="text" disabled name="licensedOn" id="licensedOn"
+                        value="{{firmDetails?.LicensedDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="currentStatus">
                         Current Status
                     </label>
                     <input disabled name="currentStatus" id="currentStatus" type="text"
-                        value="{{firmDetails?.LicenseStatusTypeDesc}}">
+                        value="{{firmAppDetailsLatestLicensed?.FirmApplStatusTypeDesc}}">
                 </div>
-                <!-- <div class="input-field">
+                <div class="input-field">
                     <label for="currentStatusEffectiveDate">
                         Current Status Effective Date
                     </label>
                     <input disabled name="currentStatusEffectiveDate" id="currentStatusEffectiveDate" type="text"
-                        value="Cant Find In Integration">
-                </div> -->
+                        value="{{firmAppDetailsLatestLicensed?.FirmApplStatusDate}}">
+                </div>
                 <div class="input-field">
                     <label for="lastModifiedBy">
                         Last Modified By
                     </label>
                     <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
-                        value="{{firmDetails?.LastModifiedBy}}">
+                        value="{{firmAppDetailsLatestLicensed?.LastModifiedByUser}}">
                 </div>
                 <div class="input-field">
                     <label for="lastModifiedDate">
                         Last Modified Date
                     </label>
                     <input disabled name="lastModifiedDate" id="lastModifiedDate" type="text"
-                        value="{{firmDetails?.LastModifiedDate}}">
+                        value="{{firmAppDetailsLatestLicensed?.LastModifiedDate}}">
                 </div>
                 <h3 class="subTitle-firmDetails">Authorization Status</h3>
                 <div class="input-field">
@@ -418,53 +462,79 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOnAuth" id="appliedOnAuth" type="text"
-                        value="{{firmDetails?.AuthApplStatusDate}}">
+                        value="{{firmDetails?.FirmAuthApplDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="AuthorizedOnAuth">
                         Authorized On
                     </label>
                     <input type="text" disabled name="AuthorizedOnAuth" id="AuthorizedOnAuth"
-                        value="{{firmDetails?.AuthorisationDate}}">
+                        value="{{firmDetails?.AuthorisationDate}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="currentStatusAuth">
                         Current Status
                     </label>
                     <input disabled name="currentStatusAuth" id="currentStatusAuth" type="text"
-                        value="{{firmDetails?.AuthorisationStatusTypeDesc}}">
+                        value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusTypeDesc}}">
                 </div>
-                <!-- <div class="input-field">
+                <div class="input-field">
                     <label for="currentStatusEffectiveDateAuth">
                         Current Status Effective Date
                     </label>
                     <input disabled name="currentStatusEffectiveDateAuth" id="currentStatusEffectiveDateAuth"
-                        type="text" value="Cant Find In Integration">
-                </div> -->
+                        type="text" value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusDate}}">
+                </div>
                 <div class="input-field">
                     <label for="lastModifiedByAuth">
                         Last Modified By
                     </label>
                     <input disabled name="lastModifiedByAuth" id="lastModifiedByAuth" type="text"
-                        value="{{firmDetails?.lastModifiedBy}}">
+                        value="{{firmAppDetailsLatestAuthorized?.LastModifiedByUser}}">
                 </div>
                 <div class="input-field">
                     <label for="lastModifiedDateAuth">
                         Last Modified Date
                     </label>
                     <input disabled name="lastModifiedDateAuth" id="lastModifiedDateAuth" type="text"
-                        value="{{firmDetails?.LastModifiedDate}}">
+                        value="{{firmAppDetailsLatestAuthorized?.LastModifiedDate}}">
                 </div>
             </div>
         </div>
         <!---->
-        <div class="inputs-field-set">
+        <div class="inputs-field-set comments">
             <div class="edit-firm-actions">
+                <h2 class="edit-firm-header">Comments</h2>
+            </div>
+            <div class="edit-firms-inputs">
+                <div class="input-field">
+                    <label for="generalComments">
+                        <strong>General Comments:</strong>
+                    </label>
+                    <div class="text-container">
+                        <p>{{firmDetails?.FirmApplicationDataComments}}</p>
+                    </div>
+                </div>
+                <div class="input-field">
+                    <label for="publicRegisterComments">
+                        <strong>Public Register Comments:</strong>
+                    </label>
+                    <div class="text-container">
+                        <p>{{firmDetails?.PublicRegisterComments}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!---->
+        <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['Addresses']}">
+            <div class="edit-firm-actions collapse-container">
                 <h2 class="edit-firm-header">
                     Addresses
                 </h2>
-                <div class="edit-btn">
-                </div>
+                <button class="collapse-button" (click)="toggleCollapse('Addresses')">
+                    {{ isCollapsed['Addresses'] ? '▲' : '▼'}}
+                </button>
             </div>
             <div class="edit-firms-inputs">
                 <div class="input-field">
@@ -508,6 +578,12 @@
                     <input disabled name="city" id="city" type="text" value="{{firmDetails?.City}}">
                 </div>
                 <div class="input-field">
+                    <label for="state">
+                        state/province
+                    </label>
+                    <input disabled name="state" id="state" type="text" value="{{firmDetails?.Province}}">
+                </div>
+                <div class="input-field">
                     <label for="country">
                         Country
                     </label>
@@ -515,9 +591,9 @@
                 </div>
                 <div class="input-field">
                     <label for="zip">
-                        Zip
+                        Zip/Postal Code
                     </label>
-                    <input disabled name="zip" id="zip" type="text" value="">
+                    <input disabled name="zip" id="zip" type="text" value="{{firmDetails?.PostalCode}}">
                 </div>
                 <div class="input-field">
                     <label for="phone">
@@ -532,414 +608,534 @@
                     <input disabled name="fax" id="fax" type="text" value="">
                 </div>
             </div>
+            <hr style="background-color: #A51E36;height: 0.5px;">
         </div>
     </section>
 
     <!--Scope Section-->
-    <section id='Scope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;" *ngFor="let license of ActivityLicensed">
-        <div class="inputs-field-set">
-            <div class="licensed-header">
+    <section id='Scope' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;"
+        *ngFor="let license of ActivityLicensed">
+        <div class="licensed-section">
+            <div class="licensed-header" (click)="toggleCollapse('LicensedSection')">
                 Licensed
             </div>
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                    Scope for {{firmDetails?.FirmName}}
-                </h2>
-            </div>
-            <div class="edit-firms-inputs" *ngFor="let license of ActivityLicensed">
-                <div class="input-field">
-                    <label for="formReff">
-                        Form Reference
-                    </label>
-                    <input disabled name="formReff" id="formReff" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="linkToScope">
-                        Link To Scope
-                    </label>
-                    <input disabled name="linkToScope" id="linkToScope" type="text" value="{{license?.ScopeCertificateLink}}">
-                </div>
-                <div class="input-field">
-                    <label for="scopeRevNum">
-                        Scope Revision Number
-                    </label>
-                    <input disabled name="scopeRevNum" id="scopeRevNum" type="text" value="{{license?.ScopeRevNum}}">
-                </div>
-                <div class="input-field">
-                    <label for="appDate">
-                        Application Date
-                    </label>
-                    <input disabled name="appDate" id="appDate" type="text" value="{{license?.ScopeAppliedDate}}">
-                </div>
-                <div class="input-field">
-                    <label for="licenseDate">
-                        License Date
-                    </label>
-                    <input disabled name="licenseDate" id="licenseDate" type="text" value="{{license?.ScopeLicensedDate}}">
-                </div>
-                <div class="input-field">
-                    <label for="createdBy">
-                        Created By
-                    </label>
-                    <input disabled name="createdBy" id="createdBy" type="text" value="{{license?.ScopeCreatedByName}}">
-                </div>
-                <div class="input-field">
-                    <label for="createdDate">
-                        Creation Date
-                    </label>
-                    <input disabled name="createdDate" id="createdDate" type="text" value="{{license?.ScopeCreatedDate}}">
-                </div>
-                <div class="input-field">
-                    <label for="modBy">
-                        Modified By
-                    </label>
-                    <input disabled name="modBy" id="modBy" type="text" value="{{license?.ModifiedBy}}">
-                </div>
-                <div class="input-field">
-                    <label for="modDate">
-                        Modification Date
-                    </label>
-                    <input disabled name="modDate" id="modDate" type="text" value="{{license?.LastModifiedDate}}">
-                </div>
-            </div>
+            <div class="licensed-body" [ngClass]="{'collapsed': isCollapsed['LicensedSection']}">
+                <div class="inputs-field-set scopeFor">
+                    <div class="edit-firm-actions">
+                        <h2 class="edit-firm-header">
+                            <small>Scope for</small> {{firmDetails?.FirmName}}
+                        </h2>
+                        <div class="btn">
+                            <button class="edit-btn" (click)="editScopeLicensed()">
+                                <i class="bi bi-pen"></i>
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                    <div class="edit-firms-inputs" *ngFor="let license of ActivityLicensed">
+                        <div class="input-field">
+                            <label for="formReff">
+                                Form Reference
+                            </label>
+                            <input disabled name="formReff" id="formReff" type="text" value="">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Link To Scope
+                            </label>
+                            <input disabled name="" id="" type="text"
+                                value="{{license?.ScopeCertificateLink || 'No Link'}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="scopeRevNum">
+                                Scope Revision Number
+                            </label>
+                            <input disabled name="scopeRevNum" id="scopeRevNum" type="text"
+                                value="{{license?.ScopeRevNum}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="appDate">
+                                Application Date
+                            </label>
+                            <input disabled name="appDate" id="appDate" type="date"
+                                value="{{license?.ScopeAppliedDate | date:'yyyy-MM-dd'}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="licenseDate">
+                                License Date
+                            </label>
+                            <input disabled name="licenseDate" id="licenseDate" type="text"
+                                value="{{license?.ScopeLicensedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="createdBy">
+                                Created By
+                            </label>
+                            <input disabled name="createdBy" id="createdBy" type="text"
+                                value="{{license?.ScopeCreatedByName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="createdDate">
+                                Creation Date
+                            </label>
+                            <input disabled name="createdDate" id="createdDate" type="text"
+                                value="{{license?.ScopeCreatedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="modBy">
+                                Modified By
+                            </label>
+                            <input disabled name="modBy" id="modBy" type="text" value="{{license?.ModifiedBy}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="modDate">
+                                Modification Date
+                            </label>
+                            <input disabled name="modDate" id="modDate" type="text"
+                                value="{{license?.LastModifiedDate}}">
+                        </div>
+                    </div>
 
+                </div>
+                <!---->
+                <div class="inputs-field-set">
+                    <div class="edit-firm-actions">
+                        <h2 class="edit-firm-header">
+                            Permitted Activities
+                        </h2>
+                        <div class="edit-btn">
+                        </div>
+                    </div>
+
+                    <div class="permitted-activity-container">
+                        <div class="scope-permitted-activity-header">
+                            <p>Activity</p>
+                        </div>
+
+                        <div class="permitted-activity-body">
+                            <p>{{license?.ActivityTypeDesc}}</p>
+                            <strong>Activity Details: </strong>
+                            <div class="input-field conditions-textarea">
+                                <textarea disabled>
+                                    {{license?.FirmActivityDetails}}
+                                </textarea>
+                            </div>
+                            <strong>Specific Conditions and Restrictions: </strong>
+                            <div  class="input-field conditions-textarea">
+                                <textarea disabled>
+                                    {{license?.column1}}
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="permitted-activity-container">
+                        <div class="scope-permitted-activity-header">
+                            <p>General License Conditions or restrictions</p>
+                        </div>
+
+                        <div class="permitted-activity-body">
+                            <div class="input-field conditions-textarea">
+                                <textarea disabled>
+                                    {{license?.GeneralConditions}}
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
         <!---->
-        <div class="inputs-field-set">
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                    Permitted Activities
-                </h2>
-                <div class="edit-btn">
-                </div>
-            </div>
-
-            <div class="permitted-activity-container">
-                <div class="scope-permitted-activity-header">
-                    <p>Activity</p>
-                </div>
-
-                <div class="permitted-activity-body">
-                    <p>The Regulated Activities set out in its scope of Authorisation</p>
-                    <strong>Activity Details: </strong>
-                    <p>{{license?.ActivityTypeDesc}}</p>
-                    <strong>Specific Conditions and Restrictions: </strong>
-                    <p>{{license?.Column1}}</p>
-                </div>
-            </div>
-
-            <div class="permitted-activity-container">
-                <div class="scope-permitted-activity-header">
-                    <p>General License Conditions or restrictions</p>
-                </div>
-
-                <div class="permitted-activity-body">
-                    <p>{{license?.GeneralConditions}}</p>
-                </div>
-            </div>
-
-        </div>
-        <!---->
-        <div class="inputs-field-set">
-            <div class="authorised-header">
+        <div class="authorized-section" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
+            <div class="authorised-header" (click)="toggleCollapse('authorizeSection')">
                 Authorised
             </div>
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                    Scope for firm name
-                </h2>
-                <div class="edit-btn">
-                </div>
-            </div>
-            <div class="edit-firms-inputs">
-                <div class="input-field">
-                    <label for="formReff">
-                        Form Reference
-                    </label>
-                    <input disabled name="formReff" id="formReff" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Link To Scope
-                    </label>
-                    <input disabled name="" id="" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Scope Revision Number
-                    </label>
-                    <input disabled name="" id="" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="q13AppDate">
-                        Q13 Application Date for revisions
-                    </label>
-                    <input disabled name="q13AppDate" id="q13AppDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="incorporationDate">
-                        Incorporation Date
-                    </label>
-                    <input disabled name="incorporationDate" id="incorporationDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="authorisedDate">
-                        Authorised Date
-                    </label>
-                    <input disabled name="authorisedDate" id="authorisedDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="effectiveDate">
-                        Effective Date
-                    </label>
-                    <input disabled name="effectiveDate" id="effectiveDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Application Date
-                    </label>
-                    <input disabled name="" id="" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        License Date
-                    </label>
-                    <input disabled name="" id="" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Created By
-                    </label>
-                    <input disabled name="" id="" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Creation Date
-                    </label>
-                    <input disabled name="" id="" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Modified By
-                    </label>
-                    <input disabled name="" id="" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="">
-                        Modification Date
-                    </label>
-                    <input disabled name="" id="" type="text" value="">
-                </div>
-            </div>
-        </div>
-
-        <!--Scope of Authorization-->
-        <div class="inputs-field-set">
-            <div class="section">
-                <h2>Scope of Authorization</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Document Type</th>
-                            <th>File Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!--Regulated Activities-->
-        <div class="inputs-field-set">
-            <div class="section">
-                <h2>Regulated Activities</h2>
-                <div class="regulated-activities-PIIB">
-                    <div class="regulated-activities-header">
-                        <p>Category : PIIB-Regulated Activities</p> <!--Category is dynamic-->
-                        <p>Activity : Advising on Investments</p> <!--Activity is dynamic-->
+            <div class="authorized-body" [ngClass]="{'collapsed': isCollapsed['authorizeSection']}">
+                <div class="inputs-field-set scopeFor">
+                    <div class="edit-firm-actions">
+                        <h2 class="edit-firm-header">
+                            <small>Scope for</small> {{firmDetails?.FirmName}}
+                        </h2>
+                        <div class="btn">
+                            <button class="edit-btn" (click)="editScopeAuthorized()">
+                                <i class="bi bi-pen"></i>
+                                Edit
+                            </button>
+                        </div>
                     </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="text-align: center;">Product(s)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                &nbsp;Products
-                            </tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Shares</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Debt Instruments</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Warrants</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Securities Receipts</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Options</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Futures</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Contracts for Differences</tr>
-                            <tr>&nbsp;&nbsp;&nbsp;&nbsp;Rights in Investments</tr>
-                        </tbody>
-                    </table>
-                <!--specific conditions and restrictions-->
-                <div class="specific-conditions-and-restrictions">
-                    <div class="specific-conditions-and-restrictions-header">
-                        <p>Specific Conditions and Restrictions</p>
+                    <div class="edit-firms-inputs">
+                        <div class="input-field">
+                            <label for="formReff">
+                                Form Reference
+                            </label>
+                            <input disabled name="formReff" id="formReff" type="text" value="">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Link To Scope
+                            </label>
+                            <input disabled name="" id="" type="text"
+                                value="{{ActivityAuth?.ScopeCertificateLink || 'No Link'}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Scope Revision Number
+                            </label>
+                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeRevNum}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="q13AppDate">
+                                Q13 Application Date for revisions
+                            </label>
+                            <input disabled name="q13AppDate" id="q13AppDate" type="date"
+                                value="{{ActivityAuth?.ScopeAppliedDate | date:'yyyy-MM-dd'}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="incorporationDate">
+                                Incorporation Date
+                            </label>
+                            <input disabled name="incorporationDate" id="incorporationDate" type="text"
+                                value="{{ActivityAuth?.ScopeLicensedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="authorisedDate">
+                                Authorised Date
+                            </label>
+                            <input disabled name="authorisedDate" id="authorisedDate" type="text"
+                                value="{{ActivityAuth?.ScopeLicensedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="effectiveDate">
+                                Effective Date
+                            </label>
+                            <input disabled name="effectiveDate" id="effectiveDate" type="date"
+                                value="{{ActivityAuth?.ScopeEffectiveDate | date:'yyyy-MM-dd'}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Created By
+                            </label>
+                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCreatedByName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Creation Date
+                            </label>
+                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCreatedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Last Modified By
+                            </label>
+                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.ModifiedBy}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Last Modified Date
+                            </label>
+                            <input disabled name="" id="" type="text" value="{{ActivityAuth?.LastModifiedDate}}">
+                        </div>
                     </div>
-
-                    <p>&nbsp;&nbsp;&nbsp;&nbsp;None</p>
-                </div>    
                 </div>
-                <!--Conditions and Restrictions-->
-                <div class="conditions-and-restrictions-section">
-                    <div class="conditions-and-restrictions-header">
-                        <p>Conditions and Restrictions</p>
+
+                <!--Scope of Authorization-->
+                <div class="inputs-field-set" [ngClass]="{'collapsed': isCollapsed['scopeOfAuthorization']}">
+                    <div class="section">
+                        <div class="edit-firm-actions collapse-container">
+                            <h2 class="edit-firm-header">
+                                Scope of Authorization
+                            </h2>
+                            <button class="collapse-button" (click)="toggleCollapse('scopeOfAuthorization')">
+                                {{ isCollapsed['scopeOfAuthorization'] ? '▲' : '▼'}}
+                            </button>
+                        </div>
+                        <div class="edit-firms-inputs">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Document Type</th>
+                                        <th>File Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <p><strong>General Authorisation Conditions or Restrictions</strong></p> &nbsp;&nbsp;
-                    <span>The firm is prohibited from conducting Regulated Activities with or on behalf of Retail
-                        Customers unless it has received the prior authorisation of the Regulatory Authority.</span>
-                </div>
-            </div>
-        </div>
-
-        <!--Prudential Category-->
-        <div class="inputs-field-set">
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                    Prudential Category
-                </h2>
-                <div class="edit-btn">
-                </div>
-            </div>
-            <div class="edit-firms-inputs">
-                <div class="input-field">
-                    <label for="prudentialCategory">
-                        Prudential Category
-                    </label>
-                    <input disabled name="prudentialCategory" id="prudentialCategory" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="authorisationCategory">
-                        Authorisation Category
-                    </label>
-                    <input disabled name="authorisationCategory" id="authorisationCategory" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="effectiveDate">
-                        Effective Date
-                    </label>
-                    <input disabled name="effectiveDate" id="effectiveDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="lastModifiedBy">
-                        Last Modified By
-                    </label>
-                    <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="lastModificationDate">
-                        Last Modification Date
-                    </label>
-                    <input disabled name="lastModificationDate" id="lastModificationDate" type="text" value="">
                 </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Prudential Category</th>
-                            <th>Authorisation Category</th>
-                            <th>Effective Date</th>
-                            <th>Expiration Date</th>
-                            <th>Last Modified By</th>
-                            <th>Last Modified Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
-        <!--Prudential Return Type-->
-        <div class="inputs-field-set">
-            <div class="edit-firm-actions">
-                <h2 class="edit-firm-header">
-                    Prudential Return Type
-                </h2>
-                <div class="edit-btn">
-                </div>
-            </div>
-            <div class="edit-firms-inputs">
-                <div class="input-field">
-                    <label for="prudentialReturnType">
-                        Prudential Return Type
-                    </label>
-                    <input disabled name="prudentialReturnType" id="prudentialReturnType" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="effectiveDate">
-                        Effective Date
-                    </label>
-                    <input disabled name="effectiveDate" id="effectiveDate" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="lastModifiedBy">
-                        Last Modified By
-                    </label>
-                    <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="lastModificationDate">
-                        Last Modification Date
-                    </label>
-                    <input disabled name="lastModificationDate" id="lastModificationDate" type="text" value="">
+                <!--Regulated Activities-->
+                <div class="inputs-field-set" [ngClass]="{'collapsed': isCollapsed['regulatedActivitiesSection']}">
+                    <div class="section">
+                        <div class="edit-firm-actions collapse-container">
+                            <h2>Regulated Activities</h2>
+                            <button class="collapse-button" (click)="toggleCollapse('regulatedActivitiesSection')">
+                                {{ isCollapsed['regulatedActivitiesSection'] ? '▲' : '▼'}}
+                            </button>
+                        </div>
+                        <div class="regulated-activities-container">
+                            <div class="regulated-activities-PIIB"
+                                *ngFor="let regulatedActivity of AuthRegulatedActivities">
+                                <div class="regulated-activities-header">
+                                    <p>Category : <strong>{{regulatedActivity?.ActivityCategoryDesc}}</strong></p>
+                                    <p>Activity : <strong>{{regulatedActivity?.ActivityTypeDesc}}</strong></p>
+                                </div>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: center;">Product(s)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let product of activityProducts[regulatedActivity.ActivityTypeID]">
+                                            {{ product.ProductCategoryTypeDesc }}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <!--specific conditions and restrictions-->
+                                <div class="specific-conditions-and-restrictions">
+                                    <div class="specific-conditions-and-restrictions-header">
+                                        <p>Specific Conditions and Restrictions</p>
+                                    </div>
+
+                                    <p>&nbsp;&nbsp;&nbsp;&nbsp;None</p>
+                                </div>
+                            </div>
+                            <!--Conditions and Restrictions-->
+                            <div class="conditions-and-restrictions-section">
+                                <div class="conditions-and-restrictions-header">
+                                    <p>Conditions and Restrictions</p>
+                                </div>
+                                <p>
+                                    <strong>Retail Restriction</strong> &nbsp;&nbsp;
+                                    <input disabled type="checkbox">
+                                </p> 
+                                
+                                <p><strong>General Authorisation Conditions or Restrictions</strong></p>
+                                <div class="input-field conditions-textarea">
+                                    <textarea disabled>
+                                        {{ActivityAuth?.GeneralConditions}}
+                                    </textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Prudential Return Type</th>
-                            <th>Effective Date</th>
-                            <th>Expiration Date</th>
-                            <th>Last Modified By</th>
-                            <th>Last Modified Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+
+                <!-- Islamic Finance-->
+                <div class="inputs-field-set"
+                    *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0 && islamicFinance?.IFinTypeId"
+                    [ngClass]="{'collapsed': isCollapsed['islamicFinanceSection']}">
+                    <div class="edit-firm-actions collapse-container">
+                        <h2 class="edit-firm-header">
+                            Islamic Finance
+                        </h2>
+                        <button class="collapse-button" (click)="toggleCollapse('islamicFinanceSection')">
+                            {{ isCollapsed['islamicFinanceSection'] ? '▲' : '▼'}}
+                        </button>
+                    </div>
+                    <div class="edit-firms-inputs">
+                        <div class="input-field">
+                            <label for="isIslamicFinanceExist">
+                                Islamic Finance
+                            </label>
+                            <input disabled name="isIslamicFinanceExist" id="isIslamicFinanceExist" type="text"
+                                value="Yes">
+                        </div>
+                        <div class="input-field">
+                            <label for="islamicFinanceType">
+                                Type
+                            </label>
+                            <select disabled name="islamicFinanceType" id="islamicFinanceType">
+                                <option value="">{{islamicFinance?.IFinTypeDesc}}</option>
+                            </select>
+                        </div>
+                        <div class="input-field endorsement">
+                            <label for="effectiveDate">
+                                Endorsement
+                            </label>
+                            <textarea disabled name="islamicEndorsement"
+                                id="islamicEndorsement">{{islamicFinance?.Endorsement}}</textarea>
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModifiedBy">
+                                Last Modified By
+                            </label>
+                            <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
+                                value="{{islamicFinance?.IFinLastModifiedByName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModificationDate">
+                                Last Modified Date
+                            </label>
+                            <input disabled name="lastModificationDate" id="lastModificationDate" type="text"
+                                value="{{islamicFinance?.LastModifiedDate}}">
+                        </div>
+                    </div>
+                </div>
+
+                <!--Prudential Category-->
+                <div class="inputs-field-set" [ngClass]="{'collapsed': isCollapsed['prudentialCategorySection']}">
+                    <div class="edit-firm-actions collapse-container">
+                        <h2 class="edit-firm-header">
+                            Prudential Category
+                        </h2>
+                        <button class="collapse-button" (click)="toggleCollapse('prudentialCategorySection')">
+                            {{ isCollapsed['prudentialCategorySection'] ? '▲' : '▼'}}
+                        </button>
+                    </div>
+                    <div class="edit-firms-inputs">
+                        <div class="input-field">
+                            <label for="prudentialCategory">
+                                Prudential Category
+                            </label>
+                            <select disabled name="prudentialCategory" id="prudentialCategory">
+                                <option value="">{{ActivityAuth?.PrudentialCategoryTypeDesc}}</option>
+                                <!--More options will be integrated here-->
+                            </select>
+                        </div>
+                        <div class="input-field">
+                            <label for="authorisationCategory">
+                                Authorisation Category
+                            </label>
+                            <select disabled name="prudentialCategory" id="prudentialCategory">
+                                <option value="">{{ActivityAuth?.AuthorisationCategoryTypeDesc}}</option>
+                                <!--More options will be integrated here-->
+                            </select>
+                        </div>
+                        <div class="input-field">
+                            <label for="effectiveDate">
+                                Effective Date
+                            </label>
+                            <input disabled name="effectiveDate" id="effectiveDate" type="date"
+                                value="{{ActivityAuth?.PrudentialCategoryEffectiveDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModifiedBy">
+                                Last Modified By
+                            </label>
+                            <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
+                                value="{{ActivityAuth?.PrudentialModifiedByName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModificationDate">
+                                Last Modification Date
+                            </label>
+                            <input disabled name="lastModificationDate" id="lastModificationDate" type="text"
+                                value="{{ActivityAuth?.PrudentialCategoryLastModifiedDate}}">
+                        </div>
+
+                        <table class="prudentialTable">
+                            <thead>
+                                <tr>
+                                    <th>Prudential Category</th>
+                                    <th>Authorisation Category</th>
+                                    <th>Effective Date</th>
+                                    <th>Expiration Date</th>
+                                    <th>Last Modified By</th>
+                                    <th>Last Modified Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ActivityAuth?.PrudentialCategoryTypeDesc}}</td>
+                                    <td>{{ActivityAuth?.AuthorisationCategoryTypeDesc}}</td>
+                                    <td>{{ActivityAuth?.PrudentialCategoryEffectiveDate}}</td>
+                                    <td></td>
+                                    <td>{{ActivityAuth?.PrudentialModifiedByName}}y</td>
+                                    <td>{{ActivityAuth?.PrudentialCategoryLastModifiedDate}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!--Prudential Return Type-->
+                <div class="inputs-field-set" [ngClass]="{'collapsed': isCollapsed['prudentialReturnTypeSection']}">
+                    <div class="edit-firm-actions collapse-container">
+                        <h2 class="edit-firm-header">
+                            Prudential Return Type
+                        </h2>
+                        <button class="collapse-button" (click)="toggleCollapse('prudentialReturnTypeSection')">
+                            {{ isCollapsed['prudentialReturnTypeSection'] ? '▲' : '▼'}}
+                        </button>
+                    </div>
+                    <div class="edit-firms-inputs">
+                        <div class="input-field">
+                            <label for="prudentialReturnType">
+                                Prudential Return Type
+                            </label>
+                            <select disabled name="prudentialReturnType" id="prudentialReturnType">
+                                <option value="">{{ActivityAuth?.SectorTypeDesc}}</option>
+                                <!--More options will be integrated here-->
+                            </select>
+                        </div>
+                        <div class="input-field">
+                            <label for="effectiveDate">
+                                Effective Date
+                            </label>
+                            <input disabled name="effectiveDate" id="effectiveDate" type="date"
+                                value="{{ActivityAuth?.SectorEffectiveDate | date:'yyyy-MM-dd'}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModifiedBy">
+                                Last Modified By
+                            </label>
+                            <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
+                                value="{{ActivityAuth?.SectorModifiedByName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="lastModificationDate">
+                                Last Modification Date
+                            </label>
+                            <input disabled name="lastModificationDate" id="lastModificationDate" type="text"
+                                value="{{ActivityAuth?.SectorLastModifiedDate}}">
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Prudential Return Type</th>
+                                    <th>Effective Date</th>
+                                    <th>Expiration Date</th>
+                                    <th>Last Modified By</th>
+                                    <th>Last Modified Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ActivityAuth?.SectorTypeDesc}}</td>
+                                    <td>{{ActivityAuth?.SectorEffectiveDate}}</td>
+                                    <td></td>
+                                    <td>{{ActivityAuth?.SectorModifiedByName}}</td>
+                                    <td>{{ActivityAuth?.SectorLastModifiedDate}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!--Controllers-->
     <section id='Controllers' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
-        <div class="edit-btn">
-            <button>
-                <i class="bi bi-plus"></i>
+        <div class="btn">
+            <button (click)="createController()">
+                <i class="bi bi-pen"></i>
                 Create
             </button>
         </div>
         <div class="inputs-field-set">
             <div class="section">
-                <h2>Controllers For firm</h2>
+                <h2>Controllers For {{firmDetails?.FirmName}}</h2>
                 <table>
                     <thead>
                         <tr>
@@ -955,7 +1151,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let controller of FIRMControllers">
+                        <tr *ngFor="let controller of FIRMControllers" (click)="viewController()">
                             <td>{{controller.OtherEntityName}}</td>
                             <td>{{controller.EntityTypeDesc}}</td>
                             <td>{{controller.RegisteredNum}}</td>
@@ -1009,11 +1205,26 @@
 
     <!--Auditors-->
     <section id='Auditors' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
+        <div class="btn">
+            <button (click)="createAuditor()">
+                <i class="bi bi-plus"></i>
+                Create
+            </button>
+            <button (click)="editAuditor()">
+                <i class="bi bi-pen"></i>
+                Edit
+            </button>
+            <!--popup message for edit-->
 
+            <button>
+                <i class="bi bi-trash"></i>
+                Delete
+            </button>
+        </div>
         <div class="inputs-field-set">
             <div class="section">
                 <div class="auditor-header">
-                    <h2>Auditors For</h2>
+                    <h2>Auditors For {{firmDetails?.FirmName}}</h2>
                     <span>
                         <input id="InactiveAuditors" type="checkbox">
                         <label>Display Inactive Auditors</label>
@@ -1035,20 +1246,154 @@
                         <tr *ngFor="let auditor of FIRMAuditors">
                             <td class="radio-table">
                                 <label class="radioBtn">
-                                    <input type="radio">
+                                    <input type="radio" name="auditor" #auditorRadio>
                                     <span></span>
                                 </label>
                             </td>
-                            <td>{{auditor.OtherEntityName}}</td>
-                            <td>{{auditor.EntitySubTypeDesc}}</td>
-                            <td>{{auditor.AssnDateFrom}}</td>
-                            <td>{{auditor.AssnDateTo}}</td>
-                            <td>{{auditor.LastMeodifiedBy}}</td>
-                            <td>{{auditor.LastModifiedDate}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.OtherEntityName}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.EntitySubTypeDesc}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.AssnDateFrom}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.AssnDateTo}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.LastMeodifiedBy}}</td>
+                            <td (click)="viewAuditor(auditor)">{{auditor.LastModifiedDate}}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+        </div>
+        <!--view auditor-->
+        <div class="inputs-field-set" *ngIf="IsViewAuditorVisible">
+            <div class="view-auditor-actions">
+                <h2 class="view-auditor-header">
+                    Auditor Details
+                </h2>
+            </div>
+            <div class="view-auditor-inputs">
+                <div class="input-field">
+                    <label for="auditorName">
+                        Auditor Name
+                    </label>
+                    <input disabled name="auditorName" id="auditorName" type="text"
+                        value="{{selectedAuditor.OtherEntityName}}">
+                </div>
+                <div class="input-field">
+                    <label for="auditorType">
+                        Auditor Type
+                    </label>
+                    <input disabled name="auditorType" id="auditorType" type="text"
+                        value="{{selectedAuditor.EntitySubTypeDesc}}">
+                </div>
+                <div class="input-field">
+                    <label for="address2">
+                        Effective From Date
+                    </label>
+                    <input disabled name="effectiveFromDate" id="effectiveFromDate" type="text"
+                        value="{{selectedAuditor.AssnDateFrom}}">
+                </div>
+                <div class="input-field">
+                    <label for="effectiveToDate">
+                        Effective To Date
+                    </label>
+                    <input disabled name="effectiveToDate" id="effectiveToDate" type="text"
+                        value="{{selectedAuditor.AssnDateTo}}">
+                </div>
+            </div>
+        </div>
+        <!--create auditor-->
+        <div class="inputs-field-set" *ngIf="IsCreateAuditorVisible">
+            <div class="view-auditor-actions">
+                <h2 class="view-auditor-header">
+                    Auditor Details
+                </h2>
+                <div class="btn">
+                    <button class="save-btn">Save</button>
+                </div>
+            </div>
+            <form>
+                <div class="view-auditor-inputs">
+                    <div class="input-field">
+                        <label for="auditorName">
+                            Auditor Name <span style="color: red;">*</span>
+                        </label>
+                        <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditorNameFromSelectBox">
+                            <option value="select">Select</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="input-field" *ngIf="selectedAuditorNameFromSelectBox === 'other'">
+                        <label for="auditorName">
+                            Auditor Name <span style="color: red;">*</span>
+                        </label>
+                        <input type="text">
+                    </div>
+                    <div class="input-field">
+                        <label for="auditorType">
+                            Auditor Type <span style="color: red;">*</span>
+                        </label>
+                        <select name="auditorType" id="auditorType">
+                            <option value="select">Select</option>
+                        </select>
+                    </div>
+                    <div class="input-field">
+                        <label for="address2">
+                            Effective From Date <span style="color: red;">*</span>
+                        </label>
+                        <input name="effectiveFromDate" id="effectiveFromDate" type="date">
+                    </div>
+                    <div class="input-field">
+                        <label for="effectiveToDate">
+                            Effective To Date
+                        </label>
+                        <input name="effectiveToDate" id="effectiveToDate" type="date">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!--edit auditor-->
+        <div class="inputs-field-set" *ngIf="IsEditAuditorVisible">
+            <div class="view-auditor-actions">
+                <h2 class="view-auditor-header">
+                    Auditor Details
+                </h2>
+                <div class="btn">
+                    <button class="save-btn">Save</button>
+                </div>
+            </div>
+            <form>
+                <div class="view-auditor-inputs">
+                    <div class="input-field">
+                        <label for="auditorName">
+                            Auditor Name <span style="color: red;">*</span>
+                        </label>
+                        <select disabled name="auditorName" id="auditorName"
+                            [(ngModel)]="selectedAuditorNameFromSelectBox" value="{{selectedAuditor.OtherEntityName}}">
+                            <option value="select">Select</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="input-field">
+                        <label for="auditorType">
+                            Auditor Type <span style="color: red;">*</span>
+                        </label>
+                        <select name="auditorType" id="auditorType">
+                            <option value="select">Select</option>
+                        </select>
+                    </div>
+                    <div class="input-field">
+                        <label for="address2">
+                            Effective From Date <span style="color: red;">*</span>
+                        </label>
+                        <input name="effectiveFromDate" id="effectiveFromDate" type="date">
+                    </div>
+                    <div class="input-field">
+                        <label for="effectiveToDate">
+                            Effective To Date
+                        </label>
+                        <input name="effectiveToDate" id="effectiveToDate" type="date">
+                    </div>
+                </div>
+            </form>
         </div>
     </section>
 
@@ -1077,7 +1422,7 @@
                         <tr *ngFor="let contact of FIRMContacts">
                             <td class="radio-table">
                                 <label class="radioBtn">
-                                    <input type="radio">
+                                    <input type="radio" name="contact">
                                     <span></span>
                                 </label>
                             </td>
@@ -1384,7 +1729,7 @@
                         <tr *ngFor="let rmp of FIRMRMP">
                             <td class="radio-table">
                                 <label class="radioBtn">
-                                    <input type="radio">
+                                    <input type="radio" name="rmp">
                                     <span></span>
                                 </label>
                             </td>
@@ -1427,24 +1772,7 @@
                         <tr>
                             <td class="radio-table">
                                 <label class="radioBtn">
-                                    <input type="radio">
-                                    <span></span>
-                                </label>
-                            </td>
-                            <td>Breach Number</td>
-                            <td>Version</td>
-                            <td>Breach Type</td>
-                            <td>Breach Category</td>
-                            <td>Breach Level</td>
-                            <td>Date Of Breach</td>
-                            <td>Breach Status</td>
-                            <td>Last Updated By</td>
-                            <td>Last Updated Date</td>
-                        </tr>
-                        <tr>
-                            <td class="radio-table">
-                                <label class="radioBtn">
-                                    <input type="radio">
+                                    <input type="radio" name="breach">
                                     <span></span>
                                 </label>
                             </td>
@@ -1488,7 +1816,7 @@
                         <tr *ngFor="let waiver of FirmWaivers">
                             <td class="radio-table">
                                 <label class="radioBtn">
-                                    <input type="radio">
+                                    <input type="radio" name="waiver">
                                     <span></span>
                                 </label>
                             </td>
@@ -1569,11 +1897,11 @@
                     <tbody>
                         <tr *ngFor="let fund of RegisteredFund">
                             <td></td>
-                           <td>{{fund.RegisteredFundNumber}}</td>
-                           <td>{{fund.FundName}}</td>
-                           <td>{{fund.RegisteredFundTypeDesc}}</td>
-                           <td>{{fund.RegisteredFundStatusTypeDesc}}</td>
-                           <td>{{fund.RegisteredFundStatusDate}}</td>
+                            <td>{{fund.RegisteredFundNumber}}</td>
+                            <td>{{fund.FundName}}</td>
+                            <td>{{fund.RegisteredFundTypeDesc}}</td>
+                            <td>{{fund.RegisteredFundStatusTypeDesc}}</td>
+                            <td>{{fund.RegisteredFundStatusDate}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1619,18 +1947,27 @@
 <!--Financial Year End History-->
 <div *ngIf="call" class="popup-wrapper">
     <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Financial Year End History</h3>
+        </div>
         <table>
             <thead>
                 <tr>
-                    <th>Effective from</th>
-                    <th>Name</th>
-                    <th>Latest update</th>
+                    <th>Firm</th>
+                    <th>Financial Year End</th>
+                    <th>Financial Year Effective From</th>
+                    <th>Financial Year Effective To</th>
+                    <th>Modified By</th>
+                    <th>Modified Date</th>
                 </tr>
             </thead>
             <tbody>
                 <!--*ngFor="let FR of firmFYearHistory"-->
-                <tr>
+                <tr *ngIf="firmFYearHistory">
+                    <td>{{firmFYearHistory.FirmName}}</td>
+                    <td>{{firmFYearHistory.FirmFinYearEndTypeDesc}}</td>
                     <td>{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}</td>
+                    <td>{{firmFYearHistory.FirmFinYearEndEffectiveTo}}</td>
                     <td>{{firmFYearHistory.UserName}}</td>
                     <td>{{firmFYearHistory.Column1}}</td>
                 </tr>
@@ -1644,6 +1981,9 @@
 <!--Inactive Users-->
 <div *ngIf="callInactiveUsers" class="InactiveUsersPopUp">
     <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Inactive Users</h3>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -1665,5 +2005,127 @@
     </div>
     <div class="popup-operations-place">
         <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeInactiveUsers()">Close</button>
+    </div>
+</div>
+
+<!--Accounting Standards-->
+<div class="accountingStandardsPopUp">
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Accounting Standards History</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Firm</th>
+                    <th>Financial Standard</th>
+                    <th>Financial Standard Effective From</th>
+                    <th>Financial Standard Effective To</th>
+                    <th>Modified By</th>
+                    <th>Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{firmAccountingStandard?.FirmName}}</td>
+                    <td>{{firmAccountingStandard?.FinAccStdTypeDesc}}</td>
+                    <td>{{firmAccountingStandard?.FirmFinYearEndEffectiveFrom}}</td>
+                    <td>{{firmAccountingStandard?.FirmFinYearEndEffectiveTo}}</td>
+                    <td>{{firmAccountingStandard?.UserName}}</td>
+                    <td>{{firmAccountingStandard?.Column1}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeAccountingStandard()">Close</button>
+    </div>
+</div>
+<!--Previous Firm Name-->
+<div class="prevFirmNamePopUp">
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>File Name History</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Prev. Firm Name</th>
+                    <th>Date Effective To</th>
+                    <th>Modified By</th>
+                    <th>Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{firmNamesHistory?.PrevFirmName}}</td>
+                    <td>{{firmNamesHistory?.DateEffectiveTo}}</td>
+                    <td>{{firmNamesHistory?.LastModifiedBy}}</td>
+                    <td>{{firmNamesHistory?.LastModifiedDate}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closePrevFirmName()">Close</button>
+    </div>
+</div>
+<!--Application Details-->
+<div class="ApplicationDetailsPopUp">
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Application Details History</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <td style="background: #A51E36;color: white;" colspan="4">
+                        Licensed Status
+                    </td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <th>Status Date</th>
+                    <th>Last Modified By</th>
+                    <th>Last Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let LicenseDetailsHistory of firmAppDetailsLicensed">
+                    <td>{{LicenseDetailsHistory.FirmApplStatusTypeDesc}}</td>
+                    <td>{{LicenseDetailsHistory.FirmApplStatusDate}}</td>
+                    <td>{{LicenseDetailsHistory.LastModifiedByUser}}</td>
+                    <td>{{LicenseDetailsHistory.LastModifiedDate}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <td style="background: #A51E36;color: white;" colspan="5">
+                        Authorization Status
+                    </td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <th>Status Date</th>
+                    <th>Press Release</th>
+                    <th>Last Modified By</th>
+                    <th>Last Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let AuthDetailsHistory of firmAppDetailsAuthorization">
+                    <td>{{AuthDetailsHistory.FirmApplStatusTypeDesc}}</td>
+                    <td>{{AuthDetailsHistory.FirmApplStatusDate}}</td>
+                    <td>{{AuthDetailsHistory.PressReleaseLink}}</td>
+                    <td>{{AuthDetailsHistory.LastModifiedByUser}}</td>
+                    <td>{{AuthDetailsHistory.LastModifiedDate}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeApplicationDetails()">Close</button>
     </div>
 </div>

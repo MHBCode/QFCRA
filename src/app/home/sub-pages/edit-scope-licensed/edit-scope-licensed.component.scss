@@ -1,0 +1,190 @@
+.edit-form-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1rem 1rem;
+    gap: 2rem;
+}
+
+.authorized-section {
+    width: 100%;
+}
+
+.licensed-header {
+    width: 100%;
+    padding: 5px 0px;
+    text-align: center;
+    background-color: #A51E36;
+    color: white;
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+}
+
+.licensed-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.inputs-field-set {
+    width: 100%;
+    background: #F1EBEC;
+    border-radius: 15px;
+    min-height: 200px;
+    transition: max-height 0.5s ease-out;
+    overflow: hidden;
+}
+
+.inputs-field-set .section table tr th,
+.inputs-field-set .section table tr td {
+    text-align: center;
+}
+
+.scopeFor {
+    border-top-left-radius: 0!important;
+    border-top-right-radius: 0!important;
+}
+
+.edit-firm-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    padding-bottom: 0;
+}
+
+.edit-firm-header {
+    color: #A51E36;
+    font-size: 1.25em;
+    font-weight: 500;
+    line-height: 30px;
+    word-wrap: break-word
+}
+
+.edit-btn {
+    display: inline-flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.edit-btn button {
+    background: #A51E36;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    min-width: 6rem;
+    min-height: 40px;
+}
+
+.cancel-btn {
+    background: transparent !important;
+    color: #A51E36 !important;
+    border: 1px solid #A51E36 !important;
+}
+
+.edit-firms-inputs {
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    justify-content: center;
+    align-items: flex-start;
+    width: 49%;
+    padding: 0.5rem 0;
+}
+
+.input-field input,
+.input-field select,
+.input-field a {
+    width: 100%;
+    padding: 0.5rem 2%;
+    border-radius: 7.20px;
+    border: 0.72px #B1B1B1 solid;
+}
+
+.input-field input {
+    width: 96%;
+}
+
+.permitted-activity-body select {
+    background: white;
+}
+
+.input-field a {
+    width: 96%;
+}
+
+.input-field textarea {
+    width: 96%;
+    height: 150px;
+    padding: 0.5rem 2%;
+    border-radius: 7.20px;
+    border: 0.72px #B1B1B1 solid;
+    resize: vertical;
+    min-height: 20px;
+    max-height: 100px;
+}
+
+
+/* permitted activities */
+
+.scope-permitted-activity-header {
+    background-color: #F2B6C0;
+    padding: 5px 0px;
+}
+
+.scope-permitted-activity-header p {
+    text-align: center;
+}
+
+.permitted-activity-body {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 15px;
+    line-height: 25px
+}
+
+.permitted-activity-textarea {
+    width: 100%;
+}
+
+/**/
+
+.vary-scope {
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.vary-scope button {
+    background: #A51E36;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    min-width: 6rem;
+    min-height: 40px;
+}
+
+table .input-field {
+    width: 100%;
+}
+
+.action-select {
+    padding-left: 20px;
+}

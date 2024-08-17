@@ -34,6 +34,10 @@ import { CreateIndividualComponent } from './sub-pages/individualPages/create-in
 import { ViewIndividualComponent } from './sub-pages/individualPages/view-individual/view-individual.component';
 import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages/view-individual-status-change/view-individual-status-change.component';
 import { ViewControllerComponent } from './sub-pages/view-controller/view-controller.component';
+import { EditControllerComponent } from './sub-pages/edit-controller/edit-controller.component';
+import { CreateControllerComponent } from './sub-pages/create-controller/create-controller.component';
+import { EditScopeLicensedComponent } from './sub-pages/edit-scope-licensed/edit-scope-licensed.component';
+import { EditScopeAuthorizedComponent } from './sub-pages/edit-scope-authorized/edit-scope-authorized.component';
 
 
 @NgModule({
@@ -65,6 +69,10 @@ import { ViewControllerComponent } from './sub-pages/view-controller/view-contro
     ViewIndividualComponent,
     ViewIndividualStatusChangeComponent,
     ViewControllerComponent,
+    EditControllerComponent,
+    CreateControllerComponent,
+    EditScopeLicensedComponent,
+    EditScopeAuthorizedComponent,
   ],
   imports: [
     CommonModule,

@@ -1,7 +1,7 @@
 <div class="brid-crump">
     <div class="btn-group">
         <div class="btns">
-            <button>
+            <button (click)="editController()">
                 <i class="bi bi-pen"></i>
                 Edit
             </button>
@@ -147,6 +147,28 @@
                 Zip/Postal Code
             </label>
             <input disabled name="zipCode" id="zipCode" type="text" value="">
+        </div>
+    </div>
+</div>
+
+<div class="inputs-field-set">
+    <div class="view-controller-actions">
+        <h2 class="view-controller-header">
+            Home State Regulators
+        </h2>
+    </div>
+    <div class="view-controller-inputs">
+        <div class="input-field">
+            <label for="regulator">
+                Regulator
+            </label>
+            <input disabled name="regulator" id="regulator" type="text" value="">
+        </div>
+        <div class="input-field">
+            <label for="regulatorContact">
+                Regulator Contact
+            </label>
+            <input disabled name="regulatorContact" id="regulatorContact" type="text" value="">
         </div>
     </div>
 </div>

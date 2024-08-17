@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-view-controller',
@@ -6,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./view-controller.component.scss']
 })
 export class ViewControllerComponent {
+  constructor(private router: Router) {}
 
+  editController() {
+    this.router.navigate(['home/edit-controller'])
+  }
 }

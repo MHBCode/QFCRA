@@ -1,0 +1,149 @@
+<!--Edit Licensed Scope Section-->
+<section id='Scope' class="edit-firm-section" *ngFor="let license of ActivityLicensed">
+    <form class="edit-form-section">
+        <div class="licensed-section">
+            <div class="licensed-header">
+                Licensed
+            </div>
+            <div class="licensed-body">
+                <div class="inputs-field-set scopeFor">
+                    <div class="edit-firm-actions">
+                        <h2 class="edit-firm-header">
+                            <small>Scope for</small> {{firmDetails?.FirmName}}
+                        </h2>
+                        <div class="edit-btn">
+                            <button type="submit" class="save-btn">
+                                Save
+                            </button>
+                            <button class="cancel-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="edit-firms-inputs" *ngFor="let license of ActivityLicensed">
+                        <div class="input-field">
+                            <label for="formReff">
+                                Form Reference
+                            </label>
+                            <input disabled name="formReff" id="formReff" type="text" value="">
+                        </div>
+                        <div class="input-field">
+                            <label for="">
+                                Link To Scope
+                            </label>
+                            <input name="" id="" type="text" value="{{license?.ScopeCertificateLink}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="scopeRevNum">
+                                Scope Revision Number
+                            </label>
+                            <input disabled name="scopeRevNum" id="scopeRevNum" type="text"
+                                value="{{license?.ScopeRevNum}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="appDate">
+                                Application Date
+                            </label>
+                            <input name="appDate" id="appDate" type="date" value="{{license?.ScopeAppliedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="licenseDate">
+                                License Date
+                            </label>
+                            <input disabled name="licenseDate" id="licenseDate" type="text"
+                                value="{{license?.ScopeLicensedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="createdBy">
+                                Created By
+                            </label>
+                            <input disabled name="createdBy" id="createdBy" type="text"
+                                value="{{license?.ScopeCreatedByName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="createdDate">
+                                Creation Date
+                            </label>
+                            <input disabled name="createdDate" id="createdDate" type="text"
+                                value="{{license?.ScopeCreatedDate}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="modBy">
+                                Modified By
+                            </label>
+                            <input disabled name="modBy" id="modBy" type="text" value="{{license?.ModifiedBy}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="modDate">
+                                Modification Date
+                            </label>
+                            <input disabled name="modDate" id="modDate" type="text"
+                                value="{{license?.LastModifiedDate}}">
+                        </div>
+                        <div class="vary-scope">
+                            <button>Vary Scope</button>
+                        </div>
+                    </div>
+
+                </div>
+                <!---->
+                <div class="inputs-field-set">
+                    <div class="edit-firm-actions">
+                        <h2 class="edit-firm-header">
+                            Permitted Activities
+                        </h2>
+                    </div>
+
+                    <div class="permitted-activity-container">
+                        <div class="permitted-activity-body">
+                        <table>
+                            <tr>
+                                <th>Activity</th>
+                                <th>Action</th>
+                            </tr>
+
+                            <tr>
+                                <td style="padding-right: 100px;">
+                                    <div class="input-field">
+                                        <select name="activities" id="activities">
+                                            <option value="select">select</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-field">
+                                        <select disabled name="action" id="action">
+                                            <option value="add">Add</option>
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                            <strong>Activity Details: </strong>
+                            <div class="input-field permitted-activity-textarea">
+                                <textarea>{{license?.FirmActivityDetails}}</textarea>
+                            </div>
+                            <strong>Specific Conditions and Restrictions: </strong>
+                            <div class="input-field permitted-activity-textarea">
+                                <textarea>{{license?.Column1}}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="permitted-activity-container">
+                        <div class="scope-permitted-activity-header">
+                            <p>General License Conditions or restrictions</p>
+                        </div>
+
+                        <div class="permitted-activity-body">
+                            <div class="input-field permitted-activity-textarea">
+                                <textarea>{{license?.GeneralConditions}}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
