@@ -271,7 +271,24 @@
                 <h2 class="edit-firm-header">
                     FIRM Details
                 </h2>
+
+                <div style="display: flex; gap:10px">
+                  <div class="btn">
+                    <button (click)="editFirm()">
+                        <i class="bi bi-pen"></i>
+                        {{ allowEditFirmDetails ? 'Edit' : 'Save'}}
+                    </button>
+                </div>
+
+                <div class="btn">
+                  <button *ngIf="!allowEditFirmDetails" (click)="cancelEditFirm()">
+                      Cancel
+                  </button>
+              </div>
+                </div>
+
             </div>
+
             <div class="edit-firms-inputs">
                 <div class="input-field">
                     <label for="firmName">
@@ -968,7 +985,7 @@
                                             </option>
                                         </select>
                                     </div>
-                                    
+
                                     <div class="activity-select">
                                         <label for="activity" style="display: flex; gap: 5px;">
                                             Activity <span style="color: red;">*</span>:
