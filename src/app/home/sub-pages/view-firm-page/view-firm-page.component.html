@@ -332,7 +332,7 @@
                         Prev. Trading Name(s)
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="prevTradingNames" id="prevTradingNames" type="text"
-                        value="{{firmDetails?.PrevTradingName}}">
+                    [(ngModel)]="firmDetails.PrevTradingName">
                 </div>
 
                 <div class="input-field">
@@ -340,7 +340,7 @@
                         Place of Incorporation
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="placeOfIncorporation" id="placeOfIncorporation"
-                        type="text" value="{{firmDetails?.PlaceOfIncorporation}}">
+                        type="text" [(ngModel)]="firmDetails.PlaceOfIncorporation">
                 </div>
 
                 <div class="input-field">
@@ -369,7 +369,7 @@
                     <label for="incorporationDate">
                         Incorporation Date
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="incorporationDate" id="incorporationDate" type="date" value="{{firmDetails?.DateOfIncorporation}}">
+                    <input [disabled]="allowEditFirmDetails" name="incorporationDate" id="incorporationDate" type="date" [(ngModel)]="firmDetails.DateOfIncorporation">
                 </div>
 
                 <div class="input-field">
@@ -387,7 +387,7 @@
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="financialYearEndEffectiveFrom"
                         id="financialYearEndEffectiveFrom" type="date"
-                        value="{{firmDetails?.FirmFinYearEndEffectiveFrom}}">
+                        [(ngModel)]="firmDetails.FirmFinYearEndEffectiveFrom">
                 </div>
 
                 <div class="input-field">
@@ -406,14 +406,14 @@
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="accountingStandardsEffectiveFrom"
                         id="accountingStandardsEffectiveFrom" type="text"
-                        value="{{firmDetails?.FinAccStdTypeEffectiveFrom}}">
+                        [(ngModel)]="firmDetails.FinAccStdTypeEffectiveFrom">
                 </div>
 
                 <div class="input-field">
                     <label for="websiteLink">
                         Website Link
                     </label>
-                    <input [disabled]="allowEditFirmDetails" type="text" value="{{firmDetails?.WebSiteAddress}}"
+                    <input [disabled]="allowEditFirmDetails" type="text" [(ngModel)]="firmDetails.WebSiteAddress"
                         id="websiteLink">
 
                     <!-- <a id="websiteLink" [href]="firmDetails?.WebSiteAddress" target="_blank" rel="noopener noreferrer">
