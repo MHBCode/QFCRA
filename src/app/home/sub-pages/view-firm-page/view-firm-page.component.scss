@@ -275,7 +275,11 @@ tr:nth-child(even) {
 }
 
 .input-field select {
-    background: white;
+    background-color: transparent;
+}
+
+.select-background-edited {
+    background-color: white!important;
 }
 
 .input-field a {
@@ -724,4 +728,16 @@ table .input-field {
 
 .input-field[hidden] {
     display: none !important;
+}
+
+.cancel-btn {
+    background: transparent !important;
+    color: #A51E36 !important;
+    border: 1px solid #A51E36 !important;
+}
+
+
+/* validations styling */
+.invalid {
+    border: 1px solid red;
 }
