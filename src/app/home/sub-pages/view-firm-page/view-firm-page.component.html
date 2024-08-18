@@ -259,12 +259,7 @@
 
     <!--Core Details-->
     <section id='CD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
-        <div class="btn">
-            <button (click)="editFirm()">
-                <i [class]="allowEditFirmDetails ? 'bi bi-pen' : ''"></i>
-                {{ allowEditFirmDetails ? 'Edit' : 'Save'}}
-            </button>
-        </div>
+
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
@@ -274,7 +269,7 @@
                 <div style="display: flex; gap:10px">
                   <div class="btn">
                     <button (click)="editFirm()">
-                        <i class="bi bi-pen"></i>
+                        <i [class]="allowEditFirmDetails ? 'bi bi-pen' : ''"></i>
                         {{ allowEditFirmDetails ? 'Edit' : 'Save'}}
                     </button>
                 </div>
