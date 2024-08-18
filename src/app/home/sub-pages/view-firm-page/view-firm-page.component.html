@@ -13,8 +13,7 @@
             class="menu-icons bi bi-arrow-right-square-fill"></i>
         <!-- </button> -->
         <div class="menu-item">
-            <h3 *ngIf="menuWidth.match(width1)" id="1-item" (click)="toggleMenu(1)"
-                [ngClass]="{'active': menuId === 1}"
+            <h3 *ngIf="menuWidth.match(width1)" id="1-item" (click)="toggleMenu(1)" [ngClass]="{'active': menuId === 1}"
                 (click)="switchTab('main')">
                 FIRM Details
             </h3>
@@ -260,12 +259,6 @@
 
     <!--Core Details-->
     <section id='CD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
-        <div class="btn">
-            <button (click)="editFirm()">
-                <i [class]="allowEditFirmDetails ? 'bi bi-pen' : ''"></i>
-                {{ allowEditFirmDetails ? 'Edit' : 'Save'}}
-            </button>
-        </div>
         <div class="inputs-field-set">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
@@ -273,18 +266,18 @@
                 </h2>
 
                 <div style="display: flex; gap:10px">
-                  <div class="btn">
-                    <button (click)="editFirm()">
-                        <i class="bi bi-pen"></i>
-                        {{ allowEditFirmDetails ? 'Edit' : 'Save'}}
-                    </button>
-                </div>
+                    <div class="btn">
+                        <button (click)="editFirm()">
+                            <i [class]="allowEditFirmDetails ? 'bi bi-pen' : ''"></i>
+                            {{ allowEditFirmDetails ? 'Edit' : 'Save'}}
+                        </button>
+                    </div>
 
-                <div class="btn">
-                  <button *ngIf="!allowEditFirmDetails" (click)="cancelEditFirm()">
-                      Cancel
-                  </button>
-              </div>
+                    <div class="btn">
+                        <button class="cancel-btn" *ngIf="!allowEditFirmDetails" (click)="cancelEditFirm()">
+                            Cancel
+                        </button>
+                    </div>
                 </div>
 
             </div>
@@ -316,12 +309,17 @@
 
                 <div class="input-field">
                     <label for="legalStatus">
-                        Legal Status
+                        Legal Status <span [hidden]="allowEditFirmDetails" style="color: red;">*</span>
                     </label>
-                    <select [disabled]="allowEditFirmDetails" id="legalStatus">
-                        <option value="select">Select</option>
-                        <option value="" selected>{{firmDetails?.LegalStatusTypeDesc}}</option>
-                      </select>
+                    <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}"
+                        [disabled]="allowEditFirmDetails" id="legalStatus" [(ngModel)]="firmDetails.LegalStatusTypeID"
+                        required>
+                        <option value="1">QFC-LLC</option>
+                        <option value="2">QFC-LLP</option>
+                        <option value="3">Branch</option>
+                        <option value="7">LP</option>
+                        <option value="8">GP</option>
+                    </select>
                 </div>
 
                 <div class="input-field">
@@ -337,7 +335,7 @@
                         Prev. Trading Name(s)
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="prevTradingNames" id="prevTradingNames" type="text"
-                        value="{{firmDetails?.PrevTradingName}}">
+                    [(ngModel)]="firmDetails.PrevTradingName">
                 </div>
 
                 <div class="input-field">
@@ -345,45 +343,64 @@
                         Place of Incorporation
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="placeOfIncorporation" id="placeOfIncorporation"
-                        type="text" value="{{firmDetails?.PlaceOfIncorporation}}">
+                        type="text" [(ngModel)]="firmDetails.PlaceOfIncorporation">
                 </div>
 
                 <div class="input-field">
                     <label for="homeCountry">
                         Home Country
                     </label>
-                    <select [disabled]="allowEditFirmDetails" id="homeCountry">
-                        <option value="select">Select</option>
+                    <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}"
+                        [disabled]="allowEditFirmDetails" id="homeCountry">
                         <option value="" selected>{{firmDetails?.CountyOfIncorporationDesc}}</option>
-                      </select>
+                        <!--not done yet-->
+                    </select>
                 </div>
 
                 <div class="input-field" [hidden]="allowEditFirmDetails">
                     <label for="isDateDifferent">
-                        Is Date of Incorporation different from Date of Licensing or Authorisation : <span style="color: red;">*</span>
+                        Is Date of Incorporation different from Date of Licensing or Authorisation : <span
+                            style="color: red;">*</span>
                     </label>
                     <div class="radio-wrapper">
-                        <input name="isIncorporationDateDifferent" id="yes" type="radio" [(ngModel)]="isDateDifferent" [value]="true">
+                        <input name="isIncorporationDateDifferent" id="yes" type="radio"
+                            [(ngModel)]="firmDetails.DifferentIncorporationDate" [value]="true">
                         Yes
-                        <input name="isIncorporationDateDifferent" id="no" type="radio"  [(ngModel)]="isDateDifferent" [value]="false">
+                        <input name="isIncorporationDateDifferent" id="no" type="radio"
+                            [(ngModel)]="firmDetails.DifferentIncorporationDate" [value]="false">
                         No
                     </div>
                 </div>
 
-                <div class="input-field" *ngIf="isDateDifferent">
+                <div class="input-field">
                     <label for="incorporationDate">
                         Incorporation Date
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="incorporationDate" id="incorporationDate" type="date" value="{{firmDetails?.DateOfIncorporation}}">
+                    <input [disabled]="allowEditFirmDetails" name="incorporationDate" id="incorporationDate" type="date"
+                        value="" [(ngModel)]="firmDetails.DateOfIncorporation">
                 </div>
 
                 <div class="input-field">
                     <label for="financialYearEnd">
                         Financial Year End <button class="subbutton" (click)="getFYearHistory()">History</button>
                     </label>
-                    <select [disabled]="allowEditFirmDetails"  id="financialYearEnd">
-                        <option selected>{{firmDetails?.FinYearEndTypeDesc}}</option>
-                      </select>
+                    <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}"
+                        [disabled]="allowEditFirmDetails" id="financialYearEnd"
+                        [(ngModel)]="firmDetails.FinYearEndTypeID">
+                        <option value="1">January 31</option>
+                        <option value="2">February 28/29</option>
+                        <option value="3">March 31</option>
+                        <option value="4">April 30</option>
+                        <option value="5">May 31</option>
+                        <option value="6">June 30</option>
+                        <option value="7">July 31</option>
+                        <option value="8">August 31</option>
+                        <option value="9">September 30</option>
+                        <option value="10">October 31</option>
+                        <option value="11">November 30</option>
+                        <option value="12">December 31</option>
+                        <option value="13">November 27</option>
+                    </select>
                 </div>
 
                 <div class="input-field">
@@ -392,7 +409,7 @@
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="financialYearEndEffectiveFrom"
                         id="financialYearEndEffectiveFrom" type="date"
-                        value="{{firmDetails?.FirmFinYearEndEffectiveFrom}}">
+                        [(ngModel)]="firmDetails.FirmFinYearEndEffectiveFrom">
                 </div>
 
                 <div class="input-field">
@@ -400,9 +417,15 @@
                         Accounting Standards <button *ngIf="firmDetails?.FinAccStdTypeDesc" class="subbutton"
                             (click)="getAccountingStandardHistory()">History</button>
                     </label>
-                    <select [disabled]="allowEditFirmDetails" id="accountingStandards">
-                        <option selected>{{firmDetails?.FinAccStdTypeDesc}}</option>
-                      </select>
+                    <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}"
+                        [disabled]="allowEditFirmDetails" id="accountingStandards"
+                        [(ngModel)]="firmDetails.FinAccStdTypeID">
+                        <option value="1">US GAAP</option>
+                        <option value="2">UK GAAP</option>
+                        <option value="3">IFRS</option>
+                        <option value="4">AAOIFI</option>
+                        <option value="5">IAS</option>
+                    </select>
                 </div>
 
                 <div class="input-field">
@@ -410,16 +433,16 @@
                         Accounting Standards Effective From
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="accountingStandardsEffectiveFrom"
-                        id="accountingStandardsEffectiveFrom" type="text"
-                        value="{{firmDetails?.FinAccStdTypeEffectiveFrom}}">
+                        id="accountingStandardsEffectiveFrom" type="date" value=""
+                        [(ngModel)]="firmDetails.FinAccStdTypeEffectiveFrom">
                 </div>
 
                 <div class="input-field">
                     <label for="websiteLink">
                         Website Link
                     </label>
-                    <input [disabled]="allowEditFirmDetails" type="text" value="{{firmDetails?.WebSiteAddress}}"
-                        id="websiteLink">
+                    <input [disabled]="allowEditFirmDetails" type="text" value=""
+                        [(ngModel)]="firmDetails.WebSiteAddress" id="websiteLink">
 
                     <!-- <a id="websiteLink" [href]="firmDetails?.WebSiteAddress" target="_blank" rel="noopener noreferrer">
                         {{ firmDetails?.WebSiteAddress || 'No Website Available' }}
@@ -438,7 +461,7 @@
                         Prev. Firm Name Effective To
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo"
-                        type="text" value="{{firmNamesHistory?.DateEffectiveTo}}">
+                        type="date" value="{{firmNamesHistory?.DateEffectiveTo | date: 'yyyy-MM-dd'}}">
                 </div>
             </div>
 
@@ -451,21 +474,21 @@
                         History</button>
                 </h2>
             </div>
-            <div class="edit-firms-inputs">
+            <div class="edit-firms-inputs" *ngIf="allowEditFirmDetails">
                 <h3 class="subTitle-firmDetails">License Status</h3>
                 <div class="input-field">
                     <label for="appliedOn">
                         Applied On
                     </label>
                     <input disabled name="appliedOn" id="appliedOn" type="text"
-                        value="{{firmDetails?.FirmLicApplDate | date: 'dd/MMM/y'}}">
+                        value="{{firmDetails?.FirmLicApplDate | date: 'MM/dd/yyyy'}}">
                 </div>
                 <div class="input-field">
                     <label for="licensedOn">
                         Licensed On
                     </label>
                     <input type="text" disabled name="licensedOn" id="licensedOn"
-                        value="{{firmDetails?.LicensedDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
+                        value="{{firmDetails?.LicensedDate | date: 'MM/dd/yyyy'}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="currentStatus">
@@ -479,7 +502,7 @@
                         Current Status Effective Date
                     </label>
                     <input disabled name="currentStatusEffectiveDate" id="currentStatusEffectiveDate" type="text"
-                        value="{{firmAppDetailsLatestLicensed?.FirmApplStatusDate}}">
+                        value="{{firmAppDetailsLatestLicensed?.FirmApplStatusDate | date: 'MM/dd/yyyy'}}">
                 </div>
                 <div class="input-field">
                     <label for="lastModifiedBy">
@@ -501,14 +524,14 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOnAuth" id="appliedOnAuth" type="text"
-                        value="{{firmDetails?.FirmAuthApplDate | date: 'dd/MMM/y'}}"> <!--wrong integration-->
+                        value="{{firmDetails?.FirmAuthApplDate | date: 'MM/dd/yyyy'}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="AuthorizedOnAuth">
                         Authorized On
                     </label>
                     <input type="text" disabled name="AuthorizedOnAuth" id="AuthorizedOnAuth"
-                        value="{{firmDetails?.AuthorisationDate}}"> <!--wrong integration-->
+                        value="{{firmDetails?.AuthorisationDate | date: 'MM/dd/yyyy'}}"> <!--wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="currentStatusAuth">
@@ -522,7 +545,7 @@
                         Current Status Effective Date
                     </label>
                     <input disabled name="currentStatusEffectiveDateAuth" id="currentStatusEffectiveDateAuth"
-                        type="text" value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusDate}}">
+                        type="text" value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusDate | date: 'MM/dd/yyyy'}}">
                 </div>
                 <div class="input-field">
                     <label for="lastModifiedByAuth">
@@ -539,6 +562,60 @@
                         value="{{firmAppDetailsLatestAuthorized?.LastModifiedDate}}">
                 </div>
             </div>
+            <!--or-->
+            <div class="edit-firms-inputs" *ngIf="!allowEditFirmDetails">
+                <div class="input-field">
+                    <label for="dateOfApplication">
+                        Date of Application
+                    </label>
+                    <input name="dateOfApplication" id="dateOfApplication" type="date" value="{{firmDetails?.AuthorisationStatusTypeID == 0
+                        ? firmDetails?.FirmLicApplDate
+                        : firmDetails?.FirmAuthApplDate}}">
+                </div>
+                <div class="input-field">
+                    <label for="firmApplicationType">
+                        Firm Application Type
+                    </label>
+                    <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}" name="firmApplicationType"
+                        id="firmApplicationType" [(ngModel)]="firmDetails.AuthorisationStatusTypeID">
+                        <option value="2">License</option>
+                        <option value="3">Authorisation</option>
+                    </select>
+                </div>
+                <div class="input-field">
+                    <label for="qfcLicenseStatus">
+                        QFC License Status
+                    </label>
+                    <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}" name="qfcLicenseStatus"
+                        id="qfcLicenseStatus" value="{{firmDetails?.LicenseStatusTypeDesc}}">
+                        <!-- options here -->
+                    </select>
+                </div>
+                <div class="input-field">
+                    <label for="DateLicensed">
+                        {{firmDetails?.LicenseStatusTypeLabelDesc}}
+                    </label>
+                    <input name="DateLicensed" id="DateLicensed" type="date"
+                        value="{{firmDetails?.LicenseApplStatusDate | date: 'dd/MMM/y'}}">
+                </div>
+                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
+                    <label for="authorisationStatus">
+                        Authorisation Status
+                    </label>
+                    <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}" name="authorisationStatus"
+                        id="authorisationStatus" value="{{firmDetails?.AuthorisationStatusTypeDesc}}">
+                        <!-- options here -->
+                    </select>
+                </div>
+                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
+                    <label for="dateAuthorized">
+                        {{firmDetails?.AuthorisationStatusTypeLabelDesc}}
+                    </label>
+                    <input name="dateAuthorized" id="dateAuthorized" type="date"
+                        value="{{firmDetails?.AuthApplStatusDate}}">
+                </div>
+            </div>
+
         </div>
         <!---->
         <div class="inputs-field-set comments">
@@ -550,17 +627,16 @@
                     <label for="generalComments">
                         <strong>General Comments:</strong>
                     </label>
-                    <div class="text-container">
-                        <p>{{firmDetails?.FirmApplicationDataComments}}</p>
-                    </div>
+                    <textarea [disabled]="allowEditFirmDetails" name="generalComments" id="generalComments"
+                        [(ngModel)]="isObjectEmpty(firmDetails.FirmApplicationDataComments) ? '' : firmDetails.FirmApplicationDataComments"></textarea>
                 </div>
                 <div class="input-field">
                     <label for="publicRegisterComments">
                         <strong>Public Register Comments:</strong>
                     </label>
-                    <div class="text-container">
-                        <p>{{firmDetails?.PublicRegisterComments}}</p>
-                    </div>
+                    <textarea [disabled]="allowEditFirmDetails" name="publicRegisterComments"
+                        id="publicRegisterComments"
+                        [(ngModel)]="isObjectEmpty(firmDetails.PublicRegisterComments) ? '' : firmDetails.PublicRegisterComments"></textarea>
                 </div>
             </div>
         </div>
@@ -767,7 +843,9 @@
                                         <div class="input-field">
                                             <select name="activities" id="activities">
                                                 <option value="">Select</option>
-                                                <option *ngFor="let licensedActivity of licensedActivities" [value]="licensedActivity">{{licensedActivity.ActivityTypeDesc}}</option>
+                                                <option *ngFor="let licensedActivity of licensedActivities"
+                                                    [value]="licensedActivity">{{licensedActivity.ActivityTypeDesc}}
+                                                </option>
                                             </select>
                                         </div>
                                     </td>
@@ -977,8 +1055,8 @@
                                             Category <span style="color: red;">*</span>:
                                         </label>
                                         <select [(ngModel)]="regulatedActivity.selectedCategory"
-                                                (ngModelChange)="onCategoryChange(regulatedActivity)"
-                                                name="category" id="category">
+                                            (ngModelChange)="onCategoryChange(regulatedActivity)" name="category"
+                                            id="category">
                                             <!-- <option value="" disabled>Select</option> -->
                                             <option *ngFor="let category of activityCategories" [ngValue]="category">
                                                 {{ category.ActivityCategoryDesc }}
@@ -990,9 +1068,11 @@
                                         <label for="activity" style="display: flex; gap: 5px;">
                                             Activity <span style="color: red;">*</span>:
                                         </label>
-                                        <select [(ngModel)]="regulatedActivity.selectedActivity" name="activity" id="activity">
+                                        <select [(ngModel)]="regulatedActivity.selectedActivity" name="activity"
+                                            id="activity">
                                             <!-- <option value="" disabled>Select</option> -->
-                                            <option *ngFor="let activity of regulatedActivity.activities" [value]="activity.ActivityTypeID">
+                                            <option *ngFor="let activity of regulatedActivity.activities"
+                                                [value]="activity.ActivityTypeID">
                                                 {{ activity.ActivityTypeDesc }}
                                             </option>
                                         </select>
@@ -1251,14 +1331,16 @@
                                 <label for="isIslamicFinanceExist">
                                     Islamic Finance
                                 </label>
-                                <input style="width: 15px;" type="checkbox" name="isIslamicFinanceExist" id="isIslamicFinanceExist" [checked]="islamicFinance?.IFinTypeId">
+                                <input style="width: 15px;" type="checkbox" name="isIslamicFinanceExist"
+                                    id="isIslamicFinanceExist" [checked]="islamicFinance?.IFinTypeId">
                             </div>
                         </div>
                         <div class="input-field">
                             <label for="islamicFinanceType">
                                 Type
                             </label>
-                            <select [disabled]="allowEditScopeDetailsAuth" name="islamicFinanceType" id="islamicFinanceType">
+                            <select [disabled]="allowEditScopeDetailsAuth" name="islamicFinanceType"
+                                id="islamicFinanceType">
                                 <option value="">{{islamicFinance?.IFinTypeDesc}}</option>
                             </select>
                         </div>
@@ -1301,7 +1383,8 @@
                             <label for="prudentialCategory">
                                 Prudential Category
                             </label>
-                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialCategory" id="prudentialCategory">
+                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialCategory"
+                                id="prudentialCategory">
                                 <option value="">{{ActivityAuth?.PrudentialCategoryTypeDesc}}</option>
                                 <!--More options will be integrated here-->
                             </select>
@@ -1310,7 +1393,8 @@
                             <label for="authorisationCategory">
                                 Authorisation Category
                             </label>
-                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialCategory" id="prudentialCategory">
+                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialCategory"
+                                id="prudentialCategory">
                                 <option value="">{{ActivityAuth?.AuthorisationCategoryTypeDesc}}</option>
                                 <!--More options will be integrated here-->
                             </select>
@@ -1319,8 +1403,8 @@
                             <label for="effectiveDate">
                                 Effective Date
                             </label>
-                            <input [disabled]="allowEditScopeDetailsAuth" name="effectiveDate" id="effectiveDate" type="date"
-                                value="{{ActivityAuth?.PrudentialCategoryEffectiveDate}}">
+                            <input [disabled]="allowEditScopeDetailsAuth" name="effectiveDate" id="effectiveDate"
+                                type="date" value="{{ActivityAuth?.PrudentialCategoryEffectiveDate}}">
                         </div>
                         <div class="input-field">
                             <label for="lastModifiedBy">
@@ -1377,7 +1461,8 @@
                             <label for="prudentialReturnType">
                                 Prudential Return Type
                             </label>
-                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialReturnType" id="prudentialReturnType">
+                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialReturnType"
+                                id="prudentialReturnType">
                                 <option value="">{{ActivityAuth?.SectorTypeDesc}}</option>
                                 <!--More options will be integrated here-->
                             </select>
@@ -1386,8 +1471,8 @@
                             <label for="effectiveDate">
                                 Effective Date
                             </label>
-                            <input [disabled]="allowEditScopeDetailsAuth" name="effectiveDate" id="effectiveDate" type="date"
-                                value="{{ActivityAuth?.SectorEffectiveDate | date:'yyyy-MM-dd'}}">
+                            <input [disabled]="allowEditScopeDetailsAuth" name="effectiveDate" id="effectiveDate"
+                                type="date" value="{{ActivityAuth?.SectorEffectiveDate | date:'yyyy-MM-dd'}}">
                         </div>
                         <div class="input-field">
                             <label for="lastModifiedBy">
@@ -2273,7 +2358,8 @@
                     <td>{{firmFYearHistory.FirmName}}</td>
                     <td>{{firmFYearHistory.FirmFinYearEndTypeDesc}}</td>
                     <td>{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}</td>
-                    <td>{{firmFYearHistory.FirmFinYearEndEffectiveTo}}</td>
+                    <td>{{isObjectEmpty(firmDetails?.FirmFinYearEndEffectiveTo) ? '' :
+                        firmDetails?.FirmFinYearEndEffectiveTo}}</td>
                     <td>{{firmFYearHistory.UserName}}</td>
                     <td>{{firmFYearHistory.Column1}}</td>
                 </tr>
@@ -2338,7 +2424,8 @@
                     <td>{{firmAccountingStandard?.FirmName}}</td>
                     <td>{{firmAccountingStandard?.FinAccStdTypeDesc}}</td>
                     <td>{{firmAccountingStandard?.FirmFinYearEndEffectiveFrom}}</td>
-                    <td>{{firmAccountingStandard?.FirmFinYearEndEffectiveTo}}</td>
+                    <td>{{isObjectEmpty(firmDetails?.FirmFinYearEndEffectiveTo) ? '' :
+                        firmDetails?.FirmFinYearEndEffectiveTo}}</td>
                     <td>{{firmAccountingStandard?.UserName}}</td>
                     <td>{{firmAccountingStandard?.Column1}}</td>
                 </tr>
@@ -2428,7 +2515,7 @@
                 <tr *ngFor="let AuthDetailsHistory of firmAppDetailsAuthorization">
                     <td>{{AuthDetailsHistory.FirmApplStatusTypeDesc}}</td>
                     <td>{{AuthDetailsHistory.FirmApplStatusDate}}</td>
-                    <td>{{AuthDetailsHistory.PressReleaseLink}}</td>
+                    <td>{{isObjectEmpty(firmDetails?.PressReleaseLink) ? '' : firmDetails?.PressReleaseLink}}</td>
                     <td>{{AuthDetailsHistory.LastModifiedByUser}}</td>
                     <td>{{AuthDetailsHistory.LastModifiedDate}}</td>
                 </tr>

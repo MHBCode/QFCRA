@@ -58,7 +58,6 @@ export class ViewFirmPageComponent implements OnInit {
   License: string = 'License';
   Authorize: string = 'Authorisation';
   allowEditFirmDetails: string | boolean = true;
-  isDateDifferent: string | boolean = false;
   /* for scope */
   allowEditScopeDetailsAuth: string | boolean = true;
   allowEditScopeDetailsLic: string | boolean = true;
@@ -94,6 +93,10 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadActivityCategories();
       this.loadActivitiesTypesForLicensed();
     });
+  }
+
+  isObjectEmpty(value): boolean {
+    return Object.keys(value || {}).length === 0;
   }
 
   scrollToTop(): void {
