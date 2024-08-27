@@ -17,6 +17,7 @@
     align-items: center;
     width: 100%;
     justify-content: flex-start;
+    border-bottom: 1px solid #E1E7EC;
 }
 .tableTitle h3{
     color: #222529;
@@ -28,15 +29,30 @@
     width: 100%;
     text-align: left;
 }
-.reportsTable th{
+.reportsTable th {
     border-bottom: 1px solid #E1E7EC;
-    color: rgba(18, 18, 18, 0.39);
-    font-size: 	0.875em;
-    font-weight: 500;
+    color: #333; /* Darker color for better contrast */
+    font-size: 0.9em;
+    font-weight: 600; /* Increase weight for more prominence */
+    padding-bottom: 8px; /* Add some padding for better spacing */
+    text-align: left;
 }
+
+.reportsTable th, .reportsTable td {
+    padding: 8px 12px; /* Add padding for better spacing */
+}
+
 .reportsTable tr{
     height: 3rem;
 }
 .numbers{
     color: #909090; 
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .reportsTable th, .reportsTable td {
+        padding: 6px 8px; /* Reduce padding for smaller screens */
+        font-size: 0.85em;
+    }
 }

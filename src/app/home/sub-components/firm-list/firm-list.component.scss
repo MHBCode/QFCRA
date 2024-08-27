@@ -82,3 +82,14 @@ tr:nth-child(even) {
 td{
     cursor: pointer;
 }
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Enables momentum scrolling on iOS */
+}
+
+.table-responsive table {
+    width: 100%;
+    min-width: 900px; /* Set a minimum width based on the number of columns */
+}

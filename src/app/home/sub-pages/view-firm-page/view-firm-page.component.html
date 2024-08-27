@@ -149,7 +149,7 @@
                         Date of Application
                     </label>
                     <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="{{firmDetails?.AuthorisationStatusTypeID == 0
-                    ? (firmDetails?.FirmLicApplDate | date: 'dd/MMM/y')
+                    ? (firmDetails?.FirmLicApplDate | date: 'dd/MMM/y') 
                     : (firmDetails?. FirmAuthApplDate | date: 'dd/MMM/y')}}">
                 </div>
 
@@ -177,14 +177,14 @@
                         value="{{firmDetails?.LicenseApplStatusDate | date: 'dd/MMM/y'}}">
                 </div>
 
-                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
+                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
                     <label for="authorisationStatus">
                         Authorisation Status
                     </label>
                     <input type="text" disabled name="authorisationStatus" id="authorisationStatus"
                         value="{{firmDetails?.AuthorisationStatusTypeDesc}}">
                 </div>
-                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
+                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
                     <label for="dateApplication">
                         {{firmDetails?.AuthorisationStatusTypeLabelDesc}}
                     </label>
@@ -206,7 +206,7 @@
 
                 <div class="input-field">
                     <label for="noOfStaffInQatar">
-                        No. Of Staff In Qatar (Local Staff)
+                        No. Of Staff In Qatar
                     </label>
                     <input disabled name="noOfStaffInQatar" id="noOfStaffInQatar" type="text"
                         value="{{firmOPDetails?.NumOfLocalStaff}}">
@@ -238,16 +238,18 @@
                         <tr>
                             <th>Function / Role</th>
                             <th>Name</th>
-                            <th>Date Form</th>
-                            <th>Date to</th>
+                            <th>Date From</th>
+                            <th>Date To</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngFor="let RA of FIRMRA">
-                            <td>{{RA.FirmUserAssnTypeDesc}}</td>
-                            <td>{{RA.Name}}</td>
-                            <td>{{RA.FirmUserAssnDateFrom | date:'MM/dd/yyyy'}}</td>
-                            <td>{{RA.FirmUserAssnDateTo}}</td>
+                            <td style="text-align: left">{{RA.FirmUserAssnTypeDesc}}</td>
+                            <td style="text-align: left">{{RA.Name}}</td>
+                            <td>{{RA.FirmUserAssnDateFrom |
+                                date:'dd/MMM/yyyy'}}</td>
+                            <td>{{RA.FirmUserAssnDateTo |
+                                date:'dd/MMM/yyyy'}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -259,10 +261,14 @@
 
     <!--Core Details-->
     <section id='CD' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
-        <div class="inputs-field-set">
+        <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['firmDetailsSection']}">
             <div class="edit-firm-actions">
                 <h2 class="edit-firm-header">
                     FIRM Details
+                    <button [ngClass]="{'hidden-button': allowEditFirmDetails}" class="collapse-button"
+                        (click)="toggleCollapse('firmDetailsSection')">
+                        {{ isCollapsed['firmDetailsSection'] ? '▲' : '▼'}}
+                    </button>
                 </h2>
 
                 <div style="display: flex; gap:10px">
@@ -335,7 +341,7 @@
                         Prev. Trading Name(s)
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="prevTradingNames" id="prevTradingNames" type="text"
-                    [(ngModel)]="firmDetails.PrevTradingName">
+                        [(ngModel)]="firmDetails.PrevTradingName">
                 </div>
 
                 <div class="input-field">
@@ -351,9 +357,9 @@
                         Home Country
                     </label>
                     <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}"
-                        [disabled]="allowEditFirmDetails" id="homeCountry">
-                        <option value="" selected>{{firmDetails?.CountyOfIncorporationDesc}}</option>
-                        <!--not done yet-->
+                        [disabled]="allowEditFirmDetails" id="homeCountry"
+                        [(ngModel)]="firmDetails.CountryID">
+                        <option *ngFor="let option of allCountries" [value]="option.CountryID">{{option?.CountryName}}</option>
                     </select>
                 </div>
 
@@ -372,17 +378,21 @@
                     </div>
                 </div>
 
-                <div class="input-field">
-                    <label for="incorporationDate">
-                        Incorporation Date
-                    </label>
-                    <input [disabled]="allowEditFirmDetails" name="incorporationDate" id="incorporationDate" type="date"
-                        value="" [(ngModel)]="firmDetails.DateOfIncorporation">
-                </div>
+                <ng-container *ngIf="firmDetails.DifferentIncorporationDate || allowEditFirmDetails">
+                    <div class="input-field">
+                        <label for="incorporationDate">
+                            Incorporation Date
+                        </label>
+                        <input [disabled]="allowEditFirmDetails" name="incorporationDate" id="incorporationDate"
+                            type="text" #dateInputs
+                            [(ngModel)]="firmDetails.DateOfIncorporation">
+                    </div>
+                </ng-container>
 
                 <div class="input-field">
                     <label for="financialYearEnd">
-                        Financial Year End <button class="subbutton" (click)="getFYearHistory()">History</button>
+                        Financial Year End <button *ngIf="firmDetails?.FinYearEndTypeDesc" class="subbutton"
+                            (click)="getFYearHistory()">History</button>
                     </label>
                     <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}"
                         [disabled]="allowEditFirmDetails" id="financialYearEnd"
@@ -407,8 +417,8 @@
                     <label for="financialYearEndEffectiveFrom">
                         Financial Year End Effective From
                     </label>
-                    <input [disabled]="allowEditFirmDetails" name="financialYearEndEffectiveFrom"
-                        id="financialYearEndEffectiveFrom" type="date"
+                    <input [disabled]="allowEditFirmDetails" name="financialYearEndEffectiveFrom" type="text"
+                        #dateInputs id="financialYearEndEffectiveFrom"
                         [(ngModel)]="firmDetails.FirmFinYearEndEffectiveFrom">
                 </div>
 
@@ -433,7 +443,7 @@
                         Accounting Standards Effective From
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="accountingStandardsEffectiveFrom"
-                        id="accountingStandardsEffectiveFrom" type="date" value=""
+                        id="accountingStandardsEffectiveFrom" type="text" #dateInputs
                         [(ngModel)]="firmDetails.FinAccStdTypeEffectiveFrom">
                 </div>
 
@@ -448,30 +458,33 @@
                         {{ firmDetails?.WebSiteAddress || 'No Website Available' }}
                     </a> -->
                 </div>
-                <div class="input-field" *ngIf="showPrevFirmNameandDateFields && firmNamesHistory?.PrevFirmName !== ''">
+                <div class="input-field" *ngIf="firmNamesHistory?.FirmNameHistoryID">
                     <label for="prevFirmName">
                         Prev. Firm Name <button class="subbutton" (click)="getPrevFirmName()">History</button>
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="prevFirmName" id="prevFirmName" type="text"
                         value="{{firmNamesHistory?.PrevFirmName}}">
                 </div>
-                <div class="input-field"
-                    *ngIf="showPrevFirmNameandDateFields && firmNamesHistory?.DateEffectiveTo !== ''">
+                <div class="input-field" *ngIf="firmNamesHistory?.FirmNameHistoryID">
                     <label for="prevFirmNameEffectiveTo">
                         Prev. Firm Name Effective To
                     </label>
                     <input [disabled]="allowEditFirmDetails" name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo"
-                        type="date" value="{{firmNamesHistory?.DateEffectiveTo | date: 'yyyy-MM-dd'}}">
+                        type="text" #dateInputs [(ngModel)]="firmNamesHistory.DateEffectiveTo">
                 </div>
             </div>
 
         </div>
         <!---->
-        <div class="inputs-field-set">
-            <div class="edit-firm-actions">
+        <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['appDetailsSection']}">
+            <div class="edit-firm-actions collapse-container">
                 <h2 class="edit-firm-header">
                     Application Details <button class="subbutton" (click)="getApplicationDetailsHistory()">Open
                         History</button>
+                    <button [ngClass]="{'hidden-button': allowEditFirmDetails}" class="collapse-button"
+                        (click)="toggleCollapse('appDetailsSection')">
+                        {{ isCollapsed['appDetailsSection'] ? '▲' : '▼'}}
+                    </button>
                 </h2>
             </div>
             <div class="edit-firms-inputs" *ngIf="allowEditFirmDetails">
@@ -481,14 +494,15 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOn" id="appliedOn" type="text"
-                        value="{{firmDetails?.FirmLicApplDate | date: 'MM/dd/yyyy'}}">
+                        value="{{firmDetails?.FirmLicApplDate | date: 'dd/MMM/y'}}">
                 </div>
                 <div class="input-field">
                     <label for="licensedOn">
                         Licensed On
                     </label>
                     <input type="text" disabled name="licensedOn" id="licensedOn"
-                        value="{{firmDetails?.LicensedDate | date: 'MM/dd/yyyy'}}"> <!--wrong integration-->
+                        value="{{firmDetails?.LicensedDate | date: 'dd/MMM/y'}}">
+                    <!--might have the wrong integration-->
                 </div>
                 <div class="input-field">
                     <label for="currentStatus">
@@ -502,7 +516,7 @@
                         Current Status Effective Date
                     </label>
                     <input disabled name="currentStatusEffectiveDate" id="currentStatusEffectiveDate" type="text"
-                        value="{{firmAppDetailsLatestLicensed?.FirmApplStatusDate | date: 'MM/dd/yyyy'}}">
+                        value="{{firmAppDetailsLatestLicensed?.FirmApplStatusDate}}">
                 </div>
                 <div class="input-field">
                     <label for="lastModifiedBy">
@@ -518,49 +532,55 @@
                     <input disabled name="lastModifiedDate" id="lastModifiedDate" type="text"
                         value="{{firmAppDetailsLatestLicensed?.LastModifiedDate}}">
                 </div>
-                <h3 class="subTitle-firmDetails">Authorization Status</h3>
-                <div class="input-field">
-                    <label for="appliedOnAuth">
-                        Applied On
-                    </label>
-                    <input disabled name="appliedOnAuth" id="appliedOnAuth" type="text"
-                        value="{{firmDetails?.FirmAuthApplDate | date: 'MM/dd/yyyy'}}"> <!--wrong integration-->
-                </div>
-                <div class="input-field">
-                    <label for="AuthorizedOnAuth">
-                        Authorized On
-                    </label>
-                    <input type="text" disabled name="AuthorizedOnAuth" id="AuthorizedOnAuth"
-                        value="{{firmDetails?.AuthorisationDate | date: 'MM/dd/yyyy'}}"> <!--wrong integration-->
-                </div>
-                <div class="input-field">
-                    <label for="currentStatusAuth">
-                        Current Status
-                    </label>
-                    <input disabled name="currentStatusAuth" id="currentStatusAuth" type="text"
-                        value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusTypeDesc}}">
-                </div>
-                <div class="input-field">
-                    <label for="currentStatusEffectiveDateAuth">
-                        Current Status Effective Date
-                    </label>
-                    <input disabled name="currentStatusEffectiveDateAuth" id="currentStatusEffectiveDateAuth"
-                        type="text" value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusDate | date: 'MM/dd/yyyy'}}">
-                </div>
-                <div class="input-field">
-                    <label for="lastModifiedByAuth">
-                        Last Modified By
-                    </label>
-                    <input disabled name="lastModifiedByAuth" id="lastModifiedByAuth" type="text"
-                        value="{{firmAppDetailsLatestAuthorized?.LastModifiedByUser}}">
-                </div>
-                <div class="input-field">
-                    <label for="lastModifiedDateAuth">
-                        Last Modified Date
-                    </label>
-                    <input disabled name="lastModifiedDateAuth" id="lastModifiedDateAuth" type="text"
-                        value="{{firmAppDetailsLatestAuthorized?.LastModifiedDate}}">
-                </div>
+                <ng-container *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
+                    <h3 class="subTitle-firmDetails">Authorisation Status</h3>
+                    <div class="input-field">
+                        <label for="appliedOnAuth">
+                            Applied On
+                        </label>
+                        <input disabled name="appliedOnAuth" id="appliedOnAuth" type="text"
+                            value="{{firmDetails?.FirmAuthApplDate | date: 'dd/MMM/y'}}">
+                        <!-- might have the wrong integration-->
+                    </div>
+
+                    <div class="input-field">
+                        <label for="AuthorizedOnAuth">
+                            Authorised On
+                        </label>
+                        <input type="text" disabled name="AuthorizedOnAuth" id="AuthorizedOnAuth"
+                            value="{{firmDetails?.AuthorisationDate}}">
+                        <!--might have the wrong integration-->
+                    </div>
+                    <div class="input-field">
+                        <label for="currentStatusAuth">
+                            Current Status
+                        </label>
+                        <input disabled name="currentStatusAuth" id="currentStatusAuth" type="text"
+                            value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusTypeDesc}}">
+                    </div>
+                    <div class="input-field">
+                        <label for="currentStatusEffectiveDateAuth">
+                            Current Status Effective Date
+                        </label>
+                        <input disabled name="currentStatusEffectiveDateAuth" id="currentStatusEffectiveDateAuth"
+                            type="text"
+                            value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusDate}}">
+                    </div>
+                    <div class="input-field">
+                        <label for="lastModifiedByAuth">
+                            Last Modified By
+                        </label>
+                        <input disabled name="lastModifiedByAuth" id="lastModifiedByAuth" type="text"
+                            value="{{firmAppDetailsLatestAuthorized?.LastModifiedByUser}}">
+                    </div>
+                    <div class="input-field">
+                        <label for="lastModifiedDateAuth">
+                            Last Modified Date
+                        </label>
+                        <input disabled name="lastModifiedDateAuth" id="lastModifiedDateAuth" type="text"
+                            value="{{firmAppDetailsLatestAuthorized?.LastModifiedDate}}">
+                    </div>
+                </ng-container>
             </div>
             <!--or-->
             <div class="edit-firms-inputs" *ngIf="!allowEditFirmDetails">
@@ -568,16 +588,16 @@
                     <label for="dateOfApplication">
                         Date of Application
                     </label>
-                    <input name="dateOfApplication" id="dateOfApplication" type="date" value="{{firmDetails?.AuthorisationStatusTypeID == 0
-                        ? firmDetails?.FirmLicApplDate
-                        : firmDetails?.FirmAuthApplDate}}">
+                    <input name="dateOfApplication" id="dateOfApplication" type="text" #dateInputs [(ngModel)]="firmDetails.AuthorisationStatusTypeID == 0
+                        ? firmDetails.FirmLicApplDate
+                        : firmDetails.FirmAuthApplDate">
                 </div>
                 <div class="input-field">
                     <label for="firmApplicationType">
                         Firm Application Type
                     </label>
                     <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}" name="firmApplicationType"
-                        id="firmApplicationType" [(ngModel)]="firmDetails.AuthorisationStatusTypeID">
+                        id="firmApplicationType" [(ngModel)]="firmAppTypeID" (ngModelChange)="onFirmCoreAppDetailsFieldsChanges($event)">
                         <option value="2">License</option>
                         <option value="3">Authorisation</option>
                     </select>
@@ -587,40 +607,100 @@
                         QFC License Status
                     </label>
                     <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}" name="qfcLicenseStatus"
-                        id="qfcLicenseStatus" value="{{firmDetails?.LicenseStatusTypeDesc}}">
-                        <!-- options here -->
+                        id="qfcLicenseStatus" [(ngModel)]="firmDetails.LicenseStatusTypeID"
+                        (ngModelChange)="onLicenseStatusChange($event)">
+                        <option *ngFor="let option of allQFCLicenseStatus" [value]="option.FirmApplStatusTypeID">{{ option.FirmApplStatusTypeDesc }}
+                        </option>
                     </select>
                 </div>
                 <div class="input-field">
                     <label for="DateLicensed">
                         {{firmDetails?.LicenseStatusTypeLabelDesc}}
                     </label>
-                    <input name="DateLicensed" id="DateLicensed" type="date"
-                        value="{{firmDetails?.LicenseApplStatusDate | date: 'dd/MMM/y'}}">
+                    <input name="DateLicensed" id="DateLicensed" type="text" #dateInputs
+                        [(ngModel)]="firmDetails.LicenseApplStatusDate">
                 </div>
-                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
+                <div class="input-field" *ngIf="firmAppTypeID == 3">
                     <label for="authorisationStatus">
                         Authorisation Status
                     </label>
                     <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}" name="authorisationStatus"
-                        id="authorisationStatus" value="{{firmDetails?.AuthorisationStatusTypeDesc}}">
-                        <!-- options here -->
+                        id="authorisationStatus" [(ngModel)]="firmDetails.AuthorisationStatusTypeID"
+                        (ngModelChange)="onAuthorizedStatusChange($event)">
+                        <option *ngFor="let option of allAuthorisationStatus" [value]="option.FirmApplStatusTypeID">{{ option.FirmApplStatusTypeDesc}}</option>
                     </select>
                 </div>
-                <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
+                <div class="input-field" *ngIf="firmAppTypeID == 3">
                     <label for="dateAuthorized">
                         {{firmDetails?.AuthorisationStatusTypeLabelDesc}}
                     </label>
-                    <input name="dateAuthorized" id="dateAuthorized" type="date"
-                        value="{{firmDetails?.AuthApplStatusDate}}">
+                    <input name="dateAuthorized" id="dateAuthorized" type="text" #dateInputs
+                        [(ngModel)]="firmDetails.AuthApplStatusDate">
                 </div>
             </div>
 
         </div>
         <!---->
-        <div class="inputs-field-set comments">
-            <div class="edit-firm-actions">
+        <div class="inputs-field-set" *ngIf="!allowEditFirmDetails && firmAppTypeID == 3"
+            [ngClass]="{collapsed: isCollapsed['pressReleaseSection']}">
+            <div class="edit-firm-actions collapse-container">
+                <h2 class="edit-firm-header">Press Releases</h2>
+                <button [ngClass]="{'hidden-button': allowEditFirmDetails}" class="collapse-button"
+                    (click)="toggleCollapse('pressReleaseSection')">
+                    {{ isCollapsed['pressReleaseSection'] ? '▲' : '▼'}}
+                </button>
+            </div>
+            <div class="edit-firms-inputs">
+                <div class="file-container">
+                    <div class="input-field">
+                        <label for="documentType">
+                            Document Type
+                        </label>
+                        <select [disabled]="allowEditFirmDetails"
+                            [ngClass]="{'select-background-edited': !allowEditFirmDetails}" class="document-type-select"
+                            name="documentType" id="documentType">
+                            <option value="263">Press Releases</option>
+                        </select>
+                    </div>
+
+                    <div id="uploaded-documents">Uploaded documents go here</div>
+
+                    <div class="btns-container">
+                        <div class="upload-container">
+                            <button class="choose-document-btn" (click)="uploadDocument()">Choose Document</button>
+                        </div>
+                        <button class="upload-document-btn">Upload the Document</button>
+                    </div>
+                </div>
+                <div class="file-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Document Type</th>
+                                <th>File Name</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Attachment</td>
+                                <td>askdoasdasdsadasdasdasdassssssssssssssssssssssssssss</td>
+                                <td><button class="delete-file">Delete</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!---->
+        <div class="inputs-field-set comments" [ngClass]="{collapsed: isCollapsed['commentsSection']}">
+            <div class="edit-firm-actions collapse-container">
                 <h2 class="edit-firm-header">Comments</h2>
+                <button [ngClass]="{'hidden-button': allowEditFirmDetails}" class="collapse-button"
+                    (click)="toggleCollapse('commentsSection')">
+                    {{ isCollapsed['commentsSection'] ? '▲' : '▼'}}
+                </button>
             </div>
             <div class="edit-firms-inputs">
                 <div class="input-field">
@@ -628,7 +708,7 @@
                         <strong>General Comments:</strong>
                     </label>
                     <textarea [disabled]="allowEditFirmDetails" name="generalComments" id="generalComments"
-                        [(ngModel)]="isObjectEmpty(firmDetails.FirmApplicationDataComments) ? '' : firmDetails.FirmApplicationDataComments"></textarea>
+                        [(ngModel)]="firmDetails.FirmApplicationDataComments"></textarea>
                 </div>
                 <div class="input-field">
                     <label for="publicRegisterComments">
@@ -636,94 +716,106 @@
                     </label>
                     <textarea [disabled]="allowEditFirmDetails" name="publicRegisterComments"
                         id="publicRegisterComments"
-                        [(ngModel)]="isObjectEmpty(firmDetails.PublicRegisterComments) ? '' : firmDetails.PublicRegisterComments"></textarea>
+                        [(ngModel)]="firmDetails.PublicRegisterComments"></textarea>
                 </div>
             </div>
         </div>
 
         <!---->
-        <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['Addresses']}">
+        <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['addressesSection']}">
             <div class="edit-firm-actions collapse-container">
                 <h2 class="edit-firm-header">
                     Addresses
                 </h2>
-                <button class="collapse-button" (click)="toggleCollapse('Addresses')">
-                    {{ isCollapsed['Addresses'] ? '▲' : '▼'}}
+                <button class="collapse-button" (click)="toggleCollapse('addressesSection')">
+                    {{ isCollapsed['addressesSection'] ? '▲' : '▼'}}
                 </button>
             </div>
             <div class="edit-firms-inputs">
-                <div class="input-field">
-                    <label for="addressType">
-                        Address Type
-                    </label>
-                    <input disabled name="addressType" id="addressType" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="addressLine1">
-                        Address Line 1
-                    </label>
-                    <input type="text" disabled name="addressLine1" id="addressLine1"
-                        value="{{firmDetails?.AddressLine1}}">
-                </div>
-                <div class="input-field">
-                    <label for="addressLine2">
-                        Address Line 2
-                    </label>
-                    <input disabled name="addressLine2" id="addressLine2" type="text"
-                        value="{{firmDetails?.AddressLine2}}">
-                </div>
-                <div class="input-field">
-                    <label for="addressLine3">
-                        Address Line 3
-                    </label>
-                    <input disabled name="addressLine3" id="addressLine3" type="text"
-                        value="{{firmDetails?.AddressLine3}}">
-                </div>
-                <div class="input-field">
-                    <label for="addressLine4">
-                        Address Line 4
-                    </label>
-                    <input disabled name="addressLine4" id="addressLine4" type="text"
-                        value="{{firmDetails?.AddressLine4}}">
-                </div>
-                <div class="input-field">
-                    <label for="city">
-                        City
-                    </label>
-                    <input disabled name="city" id="city" type="text" value="{{firmDetails?.City}}">
-                </div>
-                <div class="input-field">
-                    <label for="state">
-                        state/province
-                    </label>
-                    <input disabled name="state" id="state" type="text" value="{{firmDetails?.Province}}">
-                </div>
-                <div class="input-field">
-                    <label for="country">
-                        Country
-                    </label>
-                    <input type="text" disabled name="country" id="country" value="{{firmDetails?.CountryName}}">
-                </div>
-                <div class="input-field">
-                    <label for="zip">
-                        Zip/Postal Code
-                    </label>
-                    <input disabled name="zip" id="zip" type="text" value="{{firmDetails?.PostalCode}}">
-                </div>
-                <div class="input-field">
-                    <label for="phone">
-                        Phone
-                    </label>
-                    <input disabled name="phone" id="phone" type="text" value="">
-                </div>
-                <div class="input-field">
-                    <label for="fax">
-                        Fax
-                    </label>
-                    <input disabled name="fax" id="fax" type="text" value="">
-                </div>
+                <ng-container *ngFor="let address of firmAddresses; let i = index">
+                    <ng-container *ngIf="address.Valid === true">
+                        <div class="input-field">
+                            <label for="addressType">
+                                Address Type <button *ngIf="address.PreviousRecords !== 0" class="subbutton"
+                                    (click)="getAddressTypeHistory(address.AddressTypeID)">History</button>
+                            </label>
+                            <input disabled name="addressType" id="addressType" type="text"
+                                value="{{address?.AddressTypeDesc}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="addressLine1">
+                                Address Line 1
+                            </label>
+                            <input type="text" disabled name="addressLine1" id="addressLine1"
+                                value="{{address?.AddressLine1}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="addressLine2">
+                                Address Line 2
+                            </label>
+                            <input disabled name="addressLine2" id="addressLine2" type="text"
+                                value="{{address?.AddressLine2}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="addressLine3">
+                                Address Line 3
+                            </label>
+                            <input disabled name="addressLine3" id="addressLine3" type="text"
+                                value="{{address?.AddressLine3}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="addressLine4">
+                                Address Line 4
+                            </label>
+                            <input disabled name="addressLine4" id="addressLine4" type="text"
+                                value="{{address?.AddressLine4}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="city">
+                                City
+                            </label>
+                            <input disabled name="city" id="city" type="text"
+                                value="{{address?.City}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="state">
+                                state/province
+                            </label>
+                            <input disabled name="state" id="state" type="text"
+                                value="{{address?.Province}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="country">
+                                Country
+                            </label>
+                            <input type="text" disabled name="country" id="country"
+                                value="{{address?.CountryName}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="zip">
+                                Zip/Postal Code
+                            </label>
+                            <input disabled name="zip" id="zip" type="text"
+                                value="{{address?.PostalCode}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="phone">
+                                Phone
+                            </label>
+                            <input disabled name="phone" id="phone" type="text"
+                                value="{{address?.PhoneNum}}">
+                        </div>
+                        <div class="input-field">
+                            <label for="fax">
+                                Fax
+                            </label>
+                            <input disabled name="fax" id="fax" type="text"
+                                value="{{address?.FaxNum}}">
+                        </div>
+                        <hr *ngIf="i < firmAddresses.length - 1">
+                    </ng-container>
+                </ng-container>
             </div>
-            <hr style="background-color: #A51E36;height: 0.5px;">
         </div>
     </section>
 
@@ -732,18 +824,21 @@
         *ngFor="let license of ActivityLicensed">
         <div class="licensed-section">
             <div class="licensed-header" (click)="toggleCollapse('LicensedSection')">
-                Licensed
+                Licensed <span class="arrow"
+                    [ngClass]="{'down': !isCollapsed['LicensedSection'], 'up': isCollapsed['LicensedSection']}">{{isCollapsed['LicensedSection']
+                    ? '▲' : '▼'}}</span>
             </div>
-            <div class="licensed-body" [ngClass]="{'collapsed': isCollapsed['LicensedSection']}">
+            <div class="licensed-body"
+                [ngClass]="{'collapsed': isCollapsed['LicensedSection'] && firmDetails?.AuthorisationStatusTypeID > 0}">
                 <div class="inputs-field-set scopeFor">
                     <div class="edit-firm-actions">
                         <h2 class="edit-firm-header">
                             <small>Scope for</small> {{firmDetails?.FirmName}}
                         </h2>
                         <div class="btn">
-                            <button class="edit-btn" (click)="editScopeLicensed()">
-                                <i [class]="allowEditScopeDetailsLic ? 'bi bi-pen' : ''"></i>
-                                {{ allowEditScopeDetailsLic ? 'Edit' : 'Save'}}
+                            <button class="edit-btn" (click)="editScope()">
+                                <i [class]="allowEditScopeDetails ? 'bi bi-pen' : ''"></i>
+                                {{ allowEditScopeDetails ? 'Edit' : 'Save'}}
                             </button>
                         </div>
                     </div>
@@ -752,29 +847,29 @@
                             <label for="formReff">
                                 Form Reference
                             </label>
-                            <input [disabled]="allowEditScopeDetailsLic" name="formReff" id="formReff" type="text"
+                            <input [disabled]="allowEditScopeDetails" name="formReff" id="formReff" type="text"
                                 value="">
                         </div>
                         <div class="input-field">
-                            <label for="">
+                            <label for="linkScope">
                                 Link To Scope
                             </label>
-                            <input [disabled]="allowEditScopeDetailsLic" name="" id="" type="text"
-                                value="{{license?.ScopeCertificateLink || 'No Link'}}">
+                            <input [disabled]="allowEditScopeDetails" name="linkScope" id="linkScope" type="text"
+                                [(ngModel)]="license.ScopeCertificateLink">
                         </div>
                         <div class="input-field">
                             <label for="scopeRevNum">
                                 Scope Revision Number
                             </label>
                             <input disabled name="scopeRevNum" id="scopeRevNum" type="text"
-                                value="{{license?.ScopeRevNum}}">
+                                [(ngModel)]="license.ScopeRevNum">
                         </div>
                         <div class="input-field">
                             <label for="appDate">
                                 Application Date
                             </label>
-                            <input [disabled]="allowEditScopeDetailsLic" name="appDate" id="appDate" type="date"
-                                value="{{license?.ScopeAppliedDate | date:'yyyy-MM-dd'}}">
+                            <input [disabled]="allowEditScopeDetails" name="appDate" id="appDate" type="date"
+                                [(ngModel)]="license.ScopeAppliedDate">
                         </div>
                         <div class="input-field">
                             <label for="licenseDate">
@@ -810,7 +905,7 @@
                             <input disabled name="createdDate" id="createdDate" type="text"
                                 value="{{license?.ScopeCreatedDate}}">
                         </div>
-                        <div [hidden]="allowEditScopeDetailsLic" class="vary-scope">
+                        <div [hidden]="allowEditScopeDetails" class="vary-scope">
                             <button>Vary Scope</button>
                         </div>
                     </div>
@@ -841,7 +936,8 @@
                                 <tr>
                                     <td>
                                         <div class="input-field">
-                                            <select name="activities" id="activities">
+                                            <select name="activities" id="activities"
+                                                [ngClass]="{'select-background-edited': !allowEditScopeDetails}">
                                                 <option value="">Select</option>
                                                 <option *ngFor="let licensedActivity of licensedActivities"
                                                     [value]="licensedActivity">{{licensedActivity.ActivityTypeDesc}}
@@ -881,12 +977,13 @@
                     <div class="permitted-activity-body">
                         <strong>Activity Details: </strong>
                         <div class="input-field conditions-textarea">
-                            <textarea [disabled]="allowEditScopeDetailsLic"
+                            <textarea [disabled]="allowEditScopeDetails"
                                 value="{{license?.FirmActivityDetails}}"></textarea>
                         </div>
                         <strong>Specific Conditions and Restrictions: </strong>
                         <div class="input-field conditions-textarea">
-                            <textarea [disabled]="allowEditScopeDetailsLic" value="{{license?.column1}}"></textarea>
+                            <textarea [disabled]="allowEditScopeDetails"
+                                value="{{license?.column1}}"></textarea>
                         </div>
                     </div>
 
@@ -897,7 +994,8 @@
 
                         <div class="permitted-activity-body">
                             <div class="input-field conditions-textarea">
-                                <textarea disabled value="{{license?.GeneralConditions}}"></textarea>
+                                <textarea disabled
+                                    value="{{license?.GeneralConditions}}"></textarea>
                             </div>
                         </div>
                     </div>
@@ -906,9 +1004,11 @@
             </div>
         </div>
         <!---->
-        <div class="authorized-section" *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0">
+        <div class="authorized-section" *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
             <div class="authorised-header" (click)="toggleCollapse('authorizeSection')">
-                Authorised
+                Authorised <span class="arrow"
+                    [ngClass]="{'down': !isCollapsed['authorizeSection'], 'up': isCollapsed['authorizeSection']}">{{isCollapsed['authorizeSection']
+                    ? '▲' : '▼'}}</span>
             </div>
             <div class="authorized-body" [ngClass]="{'collapsed': isCollapsed['authorizeSection']}">
                 <div class="inputs-field-set scopeFor">
@@ -917,9 +1017,9 @@
                             <small>Scope for</small> {{firmDetails?.FirmName}}
                         </h2>
                         <div class="btn">
-                            <button class="edit-btn" (click)="editScopeAuthorized()">
-                                <i [class]="allowEditScopeDetailsAuth ? 'bi bi-pen' : ''"></i>
-                                {{allowEditScopeDetailsAuth ? 'Edit' : 'Save'}}
+                            <button class="edit-btn" (click)="editScope()">
+                                <i [class]="allowEditScopeDetails ? 'bi bi-pen' : ''"></i>
+                                {{allowEditScopeDetails ? 'Edit' : 'Save'}}
                             </button>
                         </div>
                     </div>
@@ -935,7 +1035,7 @@
                                 Link To Scope
                             </label>
                             <input disabled name="" id="" type="text"
-                                value="{{ActivityAuth?.ScopeCertificateLink || 'No Link'}}">
+                                value="{{ActivityAuth?.ScopeCertificateLink}}">
                         </div>
                         <div class="input-field">
                             <label for="">
@@ -947,15 +1047,16 @@
                             <label for="q13AppDate">
                                 Q13 Application Date for revisions
                             </label>
-                            <input [disabled]="allowEditScopeDetailsAuth" name="q13AppDate" id="q13AppDate" type="date"
-                                value="{{ActivityAuth?.ScopeAppliedDate | date:'yyyy-MM-dd'}}">
+                            <input [disabled]="allowEditScopeDetails" name="q13AppDate" id="q13AppDate" type="text"
+                                value="{{ActivityAuth?.ScopeAppliedDate}}">
                         </div>
                         <div class="input-field">
                             <label for="incorporationDate">
                                 Incorporation Date
                             </label>
                             <input disabled name="incorporationDate" id="incorporationDate" type="text"
-                                value="{{ActivityAuth?.ScopeLicensedDate}}">
+                                value="{{firmDetails?.DateOfIncorporation}}">
+                            <!--check integration-->
                         </div>
                         <div class="input-field">
                             <label for="authorisedDate">
@@ -968,8 +1069,9 @@
                             <label for="effectiveDate">
                                 Effective Date
                             </label>
-                            <input [disabled]="allowEditScopeDetailsAuth" name="effectiveDate" id="effectiveDate"
-                                type="date" value="{{ActivityAuth?.ScopeEffectiveDate | date:'yyyy-MM-dd'}}">
+                            <input [disabled]="allowEditScopeDetails" name="effectiveDate" id="effectiveDate"
+                                type="text"
+                                value="{{ActivityAuth?.ScopeEffectiveDate}}">
                         </div>
                         <div class="input-field">
                             <label for="">
@@ -995,7 +1097,7 @@
                             </label>
                             <input disabled name="" id="" type="text" value="{{ActivityAuth?.ScopeCreatedDate}}">
                         </div>
-                        <div [hidden]="allowEditScopeDetailsAuth" class="vary-scope">
+                        <div [hidden]="allowEditScopeDetails" class="vary-scope">
                             <button>Vary Scope</button>
                         </div>
                     </div>
@@ -1006,7 +1108,7 @@
                     <div class="section">
                         <div class="edit-firm-actions collapse-container">
                             <h2 class="edit-firm-header">
-                                Scope of Authorization
+                                Scope of Authorisation
                             </h2>
                             <button class="collapse-button" (click)="toggleCollapse('scopeOfAuthorization')">
                                 {{ isCollapsed['scopeOfAuthorization'] ? '▲' : '▼'}}
@@ -1042,21 +1144,20 @@
                             </button>
                         </div>
                         <div class="regulated-activities-container">
-                            <div class="regulated-activities-PIIB"
-                                *ngFor="let regulatedActivity of AuthRegulatedActivities">
-                                <div class="regulated-activities-header" *ngIf="allowEditScopeDetailsAuth">
-                                    <p>Category : <strong>{{regulatedActivity?.ActivityCategoryDesc}}</strong></p>
-                                    <p>Activity : <strong>{{regulatedActivity?.ActivityTypeDesc}}</strong></p>
+                            <div *ngFor="let activity of categorizedData">
+
+                                <div class="regulated-activities-header" *ngIf="allowEditScopeDetails">
+                                    <p>Category : <strong>{{activity?.ActivityCategoryDesc}}</strong></p>
+                                    <p>Activity : <strong>{{activity?.ActivityTypeDesc}}</strong></p>
                                 </div>
-                                <!--or-->
-                                <div class="regulated-activities-header" *ngIf="!allowEditScopeDetailsAuth">
+                                <!--on edit mode-->
+                                <div class="regulated-activities-header" *ngIf="!allowEditScopeDetails">
                                     <div class="category-select">
                                         <label for="category" style="display: flex; gap: 5px;">
                                             Category <span style="color: red;">*</span>:
                                         </label>
-                                        <select [(ngModel)]="regulatedActivity.selectedCategory"
-                                            (ngModelChange)="onCategoryChange(regulatedActivity)" name="category"
-                                            id="category">
+                                        <select [(ngModel)]="activity.selectedCategory"
+                                            (ngModelChange)="onCategoryChange(activity)" name="category" id="category">
                                             <!-- <option value="" disabled>Select</option> -->
                                             <option *ngFor="let category of activityCategories" [ngValue]="category">
                                                 {{ category.ActivityCategoryDesc }}
@@ -1068,17 +1169,32 @@
                                         <label for="activity" style="display: flex; gap: 5px;">
                                             Activity <span style="color: red;">*</span>:
                                         </label>
-                                        <select [(ngModel)]="regulatedActivity.selectedActivity" name="activity"
-                                            id="activity">
-                                            <!-- <option value="" disabled>Select</option> -->
-                                            <option *ngFor="let activity of regulatedActivity.activities"
-                                                [value]="activity.ActivityTypeID">
+                                        <select [(ngModel)]="activity.selectedActivity" name="activity" id="activity">
+                                            <option *ngFor="let activity of activity.activities" [ngValue]="activity">
                                                 {{ activity.ActivityTypeDesc }}
                                             </option>
                                         </select>
                                     </div>
                                 </div>
-                                <table class="regulated-activity-table" *ngIf="allowEditScopeDetailsAuth">
+                                <!---->
+
+                                <!-- Loop through Products under each Activity -->
+                                <div *ngIf="allowEditScopeDetails">
+                                    <div *ngFor="let product of activity.products">
+                                        <!-- Display Main Category (Product) -->
+                                        <h4>{{ product.mainCategory }} </h4>
+
+                                        <!-- Loop through Subcategories under each Product -->
+                                        <ul style="margin-left: 40px;">
+                                            <li *ngFor="let subCategory of product.subCategories">
+                                                {{ subCategory.ProductCategoryTypeDesc }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!--on Edit mode-->
+                                <table class="regulated-activity-table" *ngIf="!allowEditScopeDetails">
                                     <thead>
                                         <tr>
                                             <th>Product(s)</th>
@@ -1086,194 +1202,31 @@
                                     </thead>
                                     <tbody>
                                         <!--integration loop will be inside this tr for products-->
-                                        <tr>
+                                        <tr *ngFor="let product of activity.products">
                                             <td>
                                                 <label>
-                                                    Products
-                                                </label>
-                                                <table class="nested-table">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <label>
-                                                                    Shares
-                                                                </label>
-                                                            </td>
-                                                        </tr>
-                                                        <!--Add more products here-->
-                                                    </tbody>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <label>
-                                                    Products
+                                                    <input type="checkbox"> {{product.mainCategory}}
                                                 </label>
 
                                                 <table class="nested-table">
                                                     <tbody>
-                                                        <!--integration loop will be inside this tr for products-->
-                                                        <tr>
+                                                        <tr *ngFor="let subCategory of product.subCategories">
                                                             <td>
                                                                 <label>
-                                                                    Shares
+                                                                    <input type="checkbox">
+                                                                    {{subCategory.ProductCategoryTypeDesc}}
                                                                 </label>
                                                             </td>
-                                                        </tr>
-
-                                                        <tr>
                                                             <td>
-                                                                <label>
-                                                                    Shares
-                                                                </label>
+                                                                <select class="action-column" name="action">
+                                                                    <option value="1">Add</option>
+                                                                    <option value="2">Withdrawal</option>
+                                                                    <option value="3">Discontinue</option>
+                                                                </select>
                                                             </td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>
-                                                                <label>
-                                                                    Shares
-                                                                </label>
-                                                            </td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>
-                                                                <label>
-                                                                    Shares
-                                                                </label>
-                                                            </td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>
-                                                                <label>
-                                                                    Shares
-                                                                </label>
-                                                            </td>
-                                                        </tr>
-                                                        <!--Add more products here-->
                                                     </tbody>
                                                 </table>
                                             </td>
-                                        </tr>
-                                        <!--Add more categories here-->
-                                    </tbody>
-                                </table>
-                                <!--or-->
-                                <table class="regulated-activity-table" *ngIf="!allowEditScopeDetailsAuth">
-                                    <thead>
-                                        <tr>
-                                            <th>Product(s)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!--integration loop will be inside this tr for products-->
-                                        <tr>
-                                            <td>
-                                                <label>
-                                                    <input type="checkbox"> Products
-                                                </label>
-
-                                                <table class="nested-table">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <label>
-                                                                    <input type="checkbox"> Shares
-                                                                </label>
-                                                            </td>
-                                                            <td>
-                                                                <select class="action-column" name="action">
-                                                                    <option value="Add">Add</option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                        <!--Add more products here-->
-                                                    </tbody>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <label>
-                                                    <input type="checkbox"> Products
-                                                </label>
-
-                                                <table class="nested-table">
-                                                    <tbody>
-                                                        <!--integration loop will be inside this tr for products-->
-                                                        <tr>
-                                                            <td>
-                                                                <label>
-                                                                    <input type="checkbox"> Shares
-                                                                </label>
-                                                            </td>
-                                                            <td>
-                                                                <select class="action-column" name="action">
-                                                                    <option value="Add">Add</option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>
-                                                                <label>
-                                                                    <input type="checkbox"> Shares
-                                                                </label>
-                                                            </td>
-                                                            <td>
-                                                                <select class="action-column" name="action">
-                                                                    <option value="Add">Add</option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>
-                                                                <label>
-                                                                    <input type="checkbox"> Shares
-                                                                </label>
-                                                            </td>
-                                                            <td>
-                                                                <select class="action-column" name="action">
-                                                                    <option value="Add">Add</option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>
-                                                                <label>
-                                                                    <input type="checkbox"> Shares
-                                                                </label>
-                                                            </td>
-                                                            <td>
-                                                                <select class="action-column" name="action">
-                                                                    <option value="Add">Add</option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td>
-                                                                <label>
-                                                                    <input type="checkbox"> Shares
-                                                                </label>
-                                                            </td>
-                                                            <td>
-                                                                <select class="action-column" name="action">
-                                                                    <option value="Add">Add</option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                        <!--Add more products here-->
-                                                    </tbody>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <!--Add more categories here-->
                                     </tbody>
                                 </table>
                                 <!--specific conditions and restrictions-->
@@ -1282,7 +1235,7 @@
                                         <p>Specific Conditions and Restrictions</p>
                                     </div>
 
-                                    <p>&nbsp;&nbsp;&nbsp;&nbsp;None</p>
+                                    <p>&nbsp;&nbsp;&nbsp;&nbsp;{{activity?.specificCondition}}</p>
                                 </div>
                             </div>
                             <!--Conditions and Restrictions-->
@@ -1307,7 +1260,7 @@
 
                 <!-- Islamic Finance-->
                 <div class="inputs-field-set"
-                    *ngIf="firmDetails?.AuthorisationStatusTypeID !== 0 && islamicFinance?.IFinTypeId"
+                    *ngIf="(firmDetails?.AuthorisationStatusTypeID > 0 && islamicFinance?.IFinTypeId) || !allowEditScopeDetails"
                     [ngClass]="{'collapsed': isCollapsed['islamicFinanceSection']}">
                     <div class="edit-firm-actions collapse-container">
                         <h2 class="edit-firm-header">
@@ -1318,38 +1271,44 @@
                         </button>
                     </div>
                     <div class="edit-firms-inputs">
-                        <div class="input-field" *ngIf="allowEditScopeDetailsAuth">
+                        <div class="input-field" *ngIf="allowEditScopeDetails">
                             <label for="isIslamicFinanceExist">
                                 Islamic Finance
                             </label>
                             <input disabled name="isIslamicFinanceExist" id="isIslamicFinanceExist" type="text"
-                                value="Yes">
+                                [value]="islamicFinance?.IFinTypeId !== null ? 'Yes' : 'No'">
                         </div>
-                        <!--or-->
-                        <div class="input-field" *ngIf="!allowEditScopeDetailsAuth">
-                            <div style="display: flex ; gap: 15px;">
+                        <!-- or -->
+                        <div class="input-field" *ngIf="!allowEditScopeDetails">
+                            <div style="display: flex; gap: 15px;">
                                 <label for="isIslamicFinanceExist">
                                     Islamic Finance
                                 </label>
                                 <input style="width: 15px;" type="checkbox" name="isIslamicFinanceExist"
-                                    id="isIslamicFinanceExist" [checked]="islamicFinance?.IFinTypeId">
+                                    id="isIslamicFinanceExist" [checked]="islamicFinance?.IFinTypeId ? true : false" [(ngModel)]="isIslamicFinanceChecked">
                             </div>
                         </div>
                         <div class="input-field">
                             <label for="islamicFinanceType">
                                 Type
                             </label>
-                            <select [disabled]="allowEditScopeDetailsAuth" name="islamicFinanceType"
-                                id="islamicFinanceType">
-                                <option value="">{{islamicFinance?.IFinTypeDesc}}</option>
+                            <select [disabled]="!isIslamicFinanceChecked || allowEditScopeDetails"
+                                name="islamicFinanceType" id="islamicFinanceType"
+                                [ngClass]="{'select-background-edited': !allowEditScopeDetails}"
+                                [(ngModel)]="islamicFinance.IFinTypeId">
+                                <option value="0">Select</option>
+                                <option value="1">Islamic Institution</option>
+                                <option value="2">Islamic Window</option>
                             </select>
                         </div>
+
                         <div class="input-field endorsement">
-                            <label for="effectiveDate">
+                            <label for="endorsement">
                                 Endorsement
                             </label>
-                            <textarea [disabled]="allowEditScopeDetailsAuth" name="islamicEndorsement"
-                                id="islamicEndorsement">{{islamicFinance?.Endorsement}}</textarea>
+                            <textarea [disabled]="!isIslamicFinanceChecked || allowEditScopeDetails"
+                                name="islamicEndorsement" id="endorsement"
+                                [(ngModel)]="islamicFinance.Endorsement"></textarea>
                         </div>
                         <div class="input-field">
                             <label for="lastModifiedBy">
@@ -1368,6 +1327,7 @@
                     </div>
                 </div>
 
+
                 <!--Prudential Category-->
                 <div class="inputs-field-set" [ngClass]="{'collapsed': isCollapsed['prudentialCategorySection']}">
                     <div class="edit-firm-actions collapse-container">
@@ -1383,28 +1343,26 @@
                             <label for="prudentialCategory">
                                 Prudential Category
                             </label>
-                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialCategory"
-                                id="prudentialCategory">
-                                <option value="">{{ActivityAuth?.PrudentialCategoryTypeDesc}}</option>
-                                <!--More options will be integrated here-->
+                            <select [disabled]="allowEditScopeDetails" name="prudentialCategory" id="prudentialCategory"
+                                [ngClass]="{'select-background-edited': !allowEditScopeDetails}">
+                                <option value="">{{ActivityAuth.PrudentialCategoryTypeDesc}}</option>
                             </select>
                         </div>
                         <div class="input-field">
                             <label for="authorisationCategory">
                                 Authorisation Category
                             </label>
-                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialCategory"
-                                id="prudentialCategory">
+                            <select [disabled]="allowEditScopeDetails" name="prudentialCategory" id="prudentialCategory"
+                                [ngClass]="{'select-background-edited': !allowEditScopeDetails}">
                                 <option value="">{{ActivityAuth?.AuthorisationCategoryTypeDesc}}</option>
-                                <!--More options will be integrated here-->
                             </select>
                         </div>
                         <div class="input-field">
                             <label for="effectiveDate">
                                 Effective Date
                             </label>
-                            <input [disabled]="allowEditScopeDetailsAuth" name="effectiveDate" id="effectiveDate"
-                                type="date" value="{{ActivityAuth?.PrudentialCategoryEffectiveDate}}">
+                            <input [disabled]="allowEditScopeDetails" name="effectiveDate" id="effectiveDate"
+                                type="text" value="{{ActivityAuth?.PrudentialCategoryEffectiveDate}}">
                         </div>
                         <div class="input-field">
                             <label for="lastModifiedBy">
@@ -1421,7 +1379,7 @@
                                 value="{{ActivityAuth?.PrudentialCategoryLastModifiedDate}}">
                         </div>
 
-                        <table class="prudentialTable" [hidden]="!allowEditScopeDetailsAuth">
+                        <table class="prudentialTable" [hidden]="!allowEditScopeDetails">
                             <thead>
                                 <tr>
                                     <th>Prudential Category</th>
@@ -1437,8 +1395,8 @@
                                     <td>{{ActivityAuth?.PrudentialCategoryTypeDesc}}</td>
                                     <td>{{ActivityAuth?.AuthorisationCategoryTypeDesc}}</td>
                                     <td>{{ActivityAuth?.PrudentialCategoryEffectiveDate}}</td>
-                                    <td></td>
-                                    <td>{{ActivityAuth?.PrudentialModifiedByName}}y</td>
+                                    <td></td> <!--Expiration Date does exist -->
+                                    <td>{{ActivityAuth?.PrudentialModifiedByName}}</td>
                                     <td>{{ActivityAuth?.PrudentialCategoryLastModifiedDate}}</td>
                                 </tr>
                             </tbody>
@@ -1461,18 +1419,19 @@
                             <label for="prudentialReturnType">
                                 Prudential Return Type
                             </label>
-                            <select [disabled]="allowEditScopeDetailsAuth" name="prudentialReturnType"
-                                id="prudentialReturnType">
-                                <option value="">{{ActivityAuth?.SectorTypeDesc}}</option>
-                                <!--More options will be integrated here-->
+                            <select [(ngModel)]="ActivityAuth.SectorTypeID" [disabled]="allowEditScopeDetails"
+                                name="prudentialReturnType" id="prudentialReturnType"
+                                [ngClass]="{'select-background-edited': !allowEditScopeDetails}">
+                                <option *ngFor="let PrudReturnTypes of prudReturnTypesDropdown"
+                                    [value]="PrudReturnTypes.SectorTypeID">{{PrudReturnTypes?.SectorTypeDesc}}</option>
                             </select>
                         </div>
                         <div class="input-field">
                             <label for="effectiveDate">
                                 Effective Date
                             </label>
-                            <input [disabled]="allowEditScopeDetailsAuth" name="effectiveDate" id="effectiveDate"
-                                type="date" value="{{ActivityAuth?.SectorEffectiveDate | date:'yyyy-MM-dd'}}">
+                            <input [disabled]="allowEditScopeDetails" name="effectiveDate" id="effectiveDate"
+                                type="text" value="{{ActivityAuth?.SectorEffectiveDate}}">
                         </div>
                         <div class="input-field">
                             <label for="lastModifiedBy">
@@ -1489,7 +1448,7 @@
                                 value="{{ActivityAuth?.SectorLastModifiedDate}}">
                         </div>
 
-                        <table class="prudentialTable" [hidden]="!allowEditScopeDetailsAuth">
+                        <table class="prudentialTable" [hidden]="!allowEditScopeDetails">
                             <thead>
                                 <tr>
                                     <th>Prudential Return Type</th>
@@ -1517,15 +1476,17 @@
 
     <!--Controllers-->
     <section id='Controllers' class="edit-firm-section" [ngStyle]="{ 'width': dataWidth}" style="display: none;">
-        <div class="btn">
-            <button (click)="createController()">
-                <i class="bi bi-pen"></i>
-                Create
-            </button>
-        </div>
         <div class="inputs-field-set">
             <div class="section">
-                <h2>Controllers For {{firmDetails?.FirmName}}</h2>
+                <div class="edit-firm-actions">
+                    <h2>Controllers For {{firmDetails?.FirmName}}</h2>
+                    <div class="btn">
+                        <button (click)="createController()">
+                            <i class="bi bi-pen"></i>
+                            Create
+                        </button>
+                    </div>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -2353,15 +2314,13 @@
                 </tr>
             </thead>
             <tbody>
-                <!--*ngFor="let FR of firmFYearHistory"-->
-                <tr *ngIf="firmFYearHistory">
-                    <td>{{firmFYearHistory.FirmName}}</td>
-                    <td>{{firmFYearHistory.FirmFinYearEndTypeDesc}}</td>
-                    <td>{{firmFYearHistory.FirmFinYearEndEffectiveFrom}}</td>
-                    <td>{{isObjectEmpty(firmDetails?.FirmFinYearEndEffectiveTo) ? '' :
-                        firmDetails?.FirmFinYearEndEffectiveTo}}</td>
-                    <td>{{firmFYearHistory.UserName}}</td>
-                    <td>{{firmFYearHistory.Column1}}</td>
+                <tr *ngFor="let FR of firmFYearHistory">
+                    <td style="text-align: left">{{FR?.FirmName}}</td>
+                    <td style="text-align: left">{{FR?.FirmFinYearEndTypeDesc}}</td>
+                    <td>{{FR?.FirmFinYearEndEffectiveFrom}}</td>
+                    <td>{{firmDetails?.FirmFinYearEndEffectiveTo}}</td>
+                    <td style="text-align: left">{{FR?.UserName}}</td>
+                    <td>{{FR?.Column1}}</td>
                 </tr>
             </tbody>
         </table>
@@ -2382,16 +2341,19 @@
                 <tr>
                     <th>Function / Role</th>
                     <th>Name</th>
-                    <th>Date Form</th>
-                    <th>Date to</th>
+                    <th>Date From</th>
+                    <th>Date To</th>
+                    <th>Reason For Change</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let RA of firmInactiveUsers">
-                    <td>{{RA.FirmUserAssnTypeDesc}}</td>
-                    <td>{{RA.Name}}</td>
-                    <td>{{RA.FirmUserAssnDateFrom}}</td>
-                    <td>{{RA.FirmUserAssnDateTo}}</td>
+                <tr *ngFor="let FYE of firmInactiveUsers">
+                    <td style="text-align: left">{{FYE.FirmUserAssnTypeDesc}}</td>
+                    <td style="text-align: left">{{FYE.Name}}</td>
+                    <td>{{FYE.FirmUserAssnDateFrom | date: 'dd/MMM/yyyy'}}
+                    </td>
+                    <td>{{FYE.FirmUserAssnDateTo | date: 'dd/MMM/yyyy'}}</td>
+                    <td>{{FYE.FirmUserAssnReasonTypeDesc}}</td>
                 </tr>
             </tbody>
         </table>
@@ -2420,14 +2382,13 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>{{firmAccountingStandard?.FirmName}}</td>
-                    <td>{{firmAccountingStandard?.FinAccStdTypeDesc}}</td>
-                    <td>{{firmAccountingStandard?.FirmFinYearEndEffectiveFrom}}</td>
-                    <td>{{isObjectEmpty(firmDetails?.FirmFinYearEndEffectiveTo) ? '' :
-                        firmDetails?.FirmFinYearEndEffectiveTo}}</td>
-                    <td>{{firmAccountingStandard?.UserName}}</td>
-                    <td>{{firmAccountingStandard?.Column1}}</td>
+                <tr *ngFor= "let AS of firmAccountingStandardHistory">
+                    <td style="text-align: left">{{AS?.FirmName}}</td>
+                    <td style="text-align: left">{{AS?.FinAccStdTypeDesc}}</td>
+                    <td>{{AS?.FirmFinYearEndEffectiveFrom}}</td>
+                    <td>{{firmDetails?.FirmFinYearEndEffectiveTo}}</td>
+                    <td style="text-align: left">{{AS?.UserName}}</td>
+                    <td>{{AS?.Column1}}</td>
                 </tr>
             </tbody>
         </table>
@@ -2454,10 +2415,12 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>{{firmNamesHistory?.PrevFirmName}}</td>
-                    <td>{{firmNamesHistory?.DateEffectiveTo}}</td>
-                    <td>{{firmNamesHistory?.LastModifiedBy}}</td>
-                    <td>{{firmNamesHistory?.LastModifiedDate}}</td>
+                    <td style="text-align: left">{{firmNamesHistory?.PrevFirmName}}</td>
+                    <td>{{firmNamesHistory?.DateEffectiveTo}}
+                    </td>
+                    <td style="text-align: left">{{firmNamesHistory?.LastModifiedBy}}</td>
+                    <td>{{firmNamesHistory?.LastModifiedDate}}
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -2476,7 +2439,7 @@
         <table>
             <thead>
                 <tr>
-                    <td style="background: #A51E36;color: white;" colspan="4">
+                    <td style="background: #A51E36;color: white;cursor: default;" colspan="4">
                         Licensed Status
                     </td>
                 </tr>
@@ -2489,18 +2452,18 @@
             </thead>
             <tbody>
                 <tr *ngFor="let LicenseDetailsHistory of firmAppDetailsLicensed">
-                    <td>{{LicenseDetailsHistory.FirmApplStatusTypeDesc}}</td>
+                    <td style="text-align: left">{{LicenseDetailsHistory.FirmApplStatusTypeDesc}}</td>
                     <td>{{LicenseDetailsHistory.FirmApplStatusDate}}</td>
                     <td>{{LicenseDetailsHistory.LastModifiedByUser}}</td>
                     <td>{{LicenseDetailsHistory.LastModifiedDate}}</td>
                 </tr>
             </tbody>
         </table>
-        <table>
+        <table *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
             <thead>
                 <tr>
-                    <td style="background: #A51E36;color: white;" colspan="5">
-                        Authorization Status
+                    <td style="background: #A51E36;color: white;cursor: default;" colspan="5">
+                        Authorisation Status
                     </td>
                 </tr>
                 <tr>
@@ -2513,9 +2476,9 @@
             </thead>
             <tbody>
                 <tr *ngFor="let AuthDetailsHistory of firmAppDetailsAuthorization">
-                    <td>{{AuthDetailsHistory.FirmApplStatusTypeDesc}}</td>
+                    <td style="text-align: left">{{AuthDetailsHistory.FirmApplStatusTypeDesc}}</td>
                     <td>{{AuthDetailsHistory.FirmApplStatusDate}}</td>
-                    <td>{{isObjectEmpty(firmDetails?.PressReleaseLink) ? '' : firmDetails?.PressReleaseLink}}</td>
+                    <td>{{firmDetails?.PressReleaseLink}}</td>
                     <td>{{AuthDetailsHistory.LastModifiedByUser}}</td>
                     <td>{{AuthDetailsHistory.LastModifiedDate}}</td>
                 </tr>
@@ -2524,5 +2487,58 @@
     </div>
     <div class="popup-operations-place">
         <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeApplicationDetails()">Close</button>
+    </div>
+</div>
+<!--Upload document-->
+<div class="uploadDocumentPopUp">
+    <i class="bi bi-x-circle close-icon" (click)="closeUploadDocument()"></i>
+    <div class="popup-info-place upload-container">
+        <div class="popup-header">
+            <h3>Upload Document</h3>
+        </div>
+        <div class="upload-document-body">
+            <p>Please browse and upload/attach document: </p>
+            <input type="file" accept=".pdf" #fileInput (change)="onFileSelected($event)">
+        </div>
+        <small style="color:red" *ngIf="fileError">{{fileError}}</small>
+    </div>
+    <div class="popup-operations-place">
+        <button style="padding: 1rem; width: 30%;margin-right: 5px;" class="subbutton"
+            (click)="confirmUpload()">Ok</button>
+        <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeUploadDocument()">Close</button>
+    </div>
+</div>
+<!--Address Type History-->
+<div class="addressHistoryPopup">
+    <i class="bi bi-x-circle close-icon" (click)="closeAddressTypeHistory()"></i>
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Address History</h3>
+        </div>
+        <br>
+        <div class="address-type-info">
+            <span style="text-decoration: underline">{{firmAddressesTypeHistory[0]?.AddressTypeDesc}}</span> &nbsp;
+            (<span style="color: red">history includes the deleted record for
+                this address type.</span>)
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Address</th>
+                    <th>Created Date</th>
+                    <th>Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let addressHistory of firmAddressesTypeHistory">
+                    <td>{{addressHistory?.ShortAddress}}</td>
+                    <td style="text-align: center">{{addressHistory?.CreatedDate}}</td>
+                    <td style="text-align: center">{{addressHistory?.LastModifiedDate}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button style="padding: 1rem; width: 30%;" class="subbutton" (click)="closeAddressTypeHistory()">Close</button>
     </div>
 </div>

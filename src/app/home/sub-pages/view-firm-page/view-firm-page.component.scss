@@ -232,7 +232,10 @@ tr:nth-child(even) {
     font-size: 1.25em;
     font-weight: 500;
     line-height: 30px;
-    word-wrap: break-word
+    word-wrap: break-word;
+    display: flex;
+    gap: 5px;
+    align-items: center;
 }
 
 .edit-firm-header span {
@@ -279,7 +282,7 @@ tr:nth-child(even) {
 }
 
 .select-background-edited {
-    background-color: white!important;
+    background-color: white !important;
 }
 
 .input-field a {
@@ -412,7 +415,9 @@ tr:nth-child(even) {
 .InactiveUsersPopUp,
 .ApplicationDetailsPopUp,
 .prevFirmNamePopUp,
-.accountingStandardsPopUp {
+.accountingStandardsPopUp,
+.uploadDocumentPopUp,
+.addressHistoryPopup {
     position: fixed;
     top: 25vh;
     left: 20vw;
@@ -423,12 +428,23 @@ tr:nth-child(even) {
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     padding: 2rem;
     background: white;
-    color: #A51E36;
     align-items: center;
     justify-content: start;
     flex-direction: column;
     gap: 2rem;
     display: none;
+}
+
+.popup-wrapper table,
+.InactiveUsersPopUp table,
+.ApplicationDetailsPopUp table,
+.prevFirmNamePopUp table,
+.accountingStandardsPopUp table,
+.uploadDocumentPopUp table,
+.addressHistoryPopup table {
+    tr:nth-child(even) {
+        background-color: #F2F2F2;
+    }
 }
 
 .popup-info-place {
@@ -439,6 +455,10 @@ tr:nth-child(even) {
     justify-content: flex-start;
     gap: 1rem;
     flex-wrap: wrap;
+}
+
+.popup-header h3 {
+    color: #A51E36;
 }
 
 .popup-operations-place {
@@ -460,6 +480,24 @@ tr:nth-child(even) {
 
 .ApplicationDetailsPopUp .popup-header {
     width: 100%;
+}
+
+.addressHistoryPopup .popup-info-place {
+    display: block !important;
+}
+
+.addressHistoryPopup .address-type-info {
+    display: flex;
+    align-items: center;
+}
+
+.addressHistoryPopup table tr td,
+.addressHistoryPopup table tr th {
+    cursor: default;
+}
+
+.addressHistoryPopup table tr td {
+    text-align: left;
 }
 
 /* permitted activities */
@@ -492,8 +530,10 @@ tr:nth-child(even) {
     text-align: center;
 }
 
-.permitted-activity-body table tr th,.permitted-activity-body table tr td {
+.permitted-activity-body table tr th,
+.permitted-activity-body table tr td {
     padding: 0px 3px;
+    cursor: default;
 }
 
 .permitted-activity-body table tr {
@@ -564,7 +604,7 @@ table .input-field {
     width: 400px;
 }
 
-.regulated-activity-table tr{
+.regulated-activity-table tr {
     background-color: transparent;
 }
 
@@ -573,12 +613,13 @@ table .input-field {
 }
 
 .regulated-activity-table tbody tr td {
-    text-align: left!important;
+    text-align: left !important;
     cursor: default;
 }
 
-.nested-table tr td, .nested-table tr th{
-    text-align: left!important;
+.nested-table tr td,
+.nested-table tr th {
+    text-align: left !important;
     cursor: default;
 }
 
@@ -631,8 +672,9 @@ table .input-field {
 }
 
 .notes {
-    width: 100%!important;
+    width: 100% !important;
 }
+
 
 /* collapse section */
 .collapse-button {
@@ -658,23 +700,32 @@ table .input-field {
 .inputs-field-set.collapsed .edit-firms-inputs,
 .inputs-field-set.collapsed hr,
 .inputs-field-set.collapsed .regulated-activities-container,
+.inputs-field-set.collapsed .file-container,
+.inputs-field-set.collapsed .file-table-container,
 .authorized-body.collapsed,
 .licensed-body.collapsed {
     display: none;
 }
 
-.authorized-section, .licensed-section {
+hr {
+    background-color: #A51E36;
+    height: 1px;
     width: 100%;
 }
 
-.authorised-header, .licensed-header {
+.authorized-section,
+.licensed-section {
+    width: 100%;
+}
+
+.authorised-header,
+.licensed-header {
     cursor: pointer;
     width: 100%;
-    border-top-right-radius: 15px;
-    border-top-left-radius: 15px;
 }
 
-.authorized-body, .licensed-body {
+.authorized-body,
+.licensed-body {
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -685,9 +736,28 @@ table .input-field {
 }
 
 .scopeFor {
-    border-top-left-radius: 0!important;
-    border-top-right-radius: 0!important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
 }
+
+.hidden-button {
+    display: none;
+}
+
+.arrow {
+    transition: transform 0.3s ease;
+}
+
+
+.arrow.down {
+    transform: rotate(0deg);
+}
+
+
+.arrow.up {
+    transform: rotate(180deg);
+}
+
 /**/
 
 .prudentialTable td,
@@ -719,12 +789,13 @@ table .input-field {
     min-height: 40px;
 }
 
-.close-icon{
+.close-icon {
     position: absolute;
     right: 1rem;
     top: 2rem;
     font-size: 26px;
     cursor: pointer;
+    color: #A51E36;
 }
 
 .input-field[hidden] {
@@ -737,6 +808,78 @@ table .input-field {
     border: 1px solid #A51E36 !important;
 }
 
+/* press releases */
+.file-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.upload-container {
+    position: relative;
+    display: inline-block;
+}
+
+.press-release-container {
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+}
+
+.file-table-container {
+    width: 100%;
+}
+
+.document-type-select {
+    width: 70% !important;
+}
+
+.btns-container {
+    display: flex;
+    gap: 1%;
+}
+
+.btns-container button {
+    padding: 2px 0px;
+    background-color: #A51E36;
+    color: white;
+    border-radius: 10px;
+    border: 0;
+    font-size: 1em;
+}
+
+#fileInput {
+    display: none;
+}
+
+#uploadButton {
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.delete-file {
+    background-color: transparent;
+    border: 0;
+    outline: none;
+    color: blue;
+}
+
+/**/
+
+.upload-container {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* custom date picker */
+::ng-deep .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+    font-size: 13px !important;
+    background-color: white !important;
+}
 
 /* validations styling */
 .invalid {

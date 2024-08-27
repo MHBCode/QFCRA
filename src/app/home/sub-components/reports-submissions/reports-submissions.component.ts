@@ -22,6 +22,7 @@ export class ReportsSubmissionsComponent {
         if (resultSet4) {
           this.ReportSubmissions = resultSet4.value || [];
         }
+        console.log("resultset4: ",resultSet4);
       },
       (error) => {
         console.error('API Error:', error);

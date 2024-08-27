@@ -3,32 +3,44 @@
         <div (click)="goToAllFirms()" class="tableTitle">
             <h3>Firm List</h3>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>QFC Number</th>
-                    <th>Firm Name</th>
-                    <th>Legal Status</th>
-                    <th>License Status</th>
-                    <th>Authorization Status</th>
-                    <th>Sector</th>
-                    <th>Authorization Category</th>
-                    <th>AssignmentLevel</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let item of firms.slice(0, listCount)" (click)="viewFirm(item.FirmID)" >
-                    <td>{{ item.QFCNum }}</td>
-                    <td>{{ item.FirmName }}</td>
-                    <td>{{ item.LegalStatusTypeDesc }}</td>
-                    <td>{{ item.LicenseStatusTypeDesc }}</td>
-                    <td>{{ item.AuthorisationStatusTypeDesc }}</td>
-                    <td>{{ item.SectorTypeShortDesc }}</td>
-                    <td>{{ item.AuthorisationCategoryTypeDesc }}</td>
-                    <td>{{ item.AssignmentLevel }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>QFC Number</th>
+                        <th>Firm Name</th>
+                        <th>Legal Status</th>
+                        <th>License Status</th>
+                        <th>Authorization Status</th>
+                        <th>Sector</th>
+                        <th>Authorization Category</th>
+                        <th>Supervision Category</th>
+                        <th>Prudential Category</th>
+                        <th>Home Country</th>
+                        <th>Supervisor - Supervision</th>
+                        <th>Supervisor - AML</th>
+                        <!-- <th>AssignmentLevel</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of firms.slice(0, listCount)" (click)="viewFirm(item.FirmID)">
+                        <td>{{ item.QFCNum }}</td>
+                        <td>{{ item.FirmName }}</td>
+                        <td>{{ item.LegalStatusTypeDesc }}</td>
+                        <td>{{ item.LicenseStatusTypeDesc }}</td>
+                        <td>{{ item.AuthorisationStatusTypeDesc }}</td>
+                        <td>{{ item.SectorTypeShortDesc }}</td>
+                        <td>{{ item.AuthorisationCategoryTypeDesc }}</td>
+                        <td>{{ item.SupervisionCategory }}</td>
+                        <td>{{ item.PrudentialCategoryTypeDesc }}</td>
+                        <td>{{ item.Country }}</td>
+                        <td>{{ item.Supervisor }}</td>
+                        <td>{{ item.Supervisor_AML }}</td>
+                        <!-- <td>{{ item.AssignmentLevel }}</td> -->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    
+
 </div>

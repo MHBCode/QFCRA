@@ -209,6 +209,7 @@ ul.navigation-ul li a::after {
   background: white;
   border-radius: 0 0 10px 10px;
   display: none;
+    z-index: 100;
 }
 
 @media (max-width: 1080px) {

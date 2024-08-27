@@ -8,9 +8,9 @@ import { map, Observable, switchMap } from 'rxjs';
 })
 export class UsersService {
 
-  userId = 10044;
   private baseUrl = environment.API_URL+'/api/Users/';  // Base URL'
   private baseUrlAppRoles = environment.API_URL+'/api/AppRoles/';  // Approles URL
+  private baseUrlSecurity = environment.API_URL+'/api/Security/'; // Security URL
   
   constructor(private http: HttpClient) { }
 
@@ -20,6 +20,10 @@ export class UsersService {
   }
   getAllAppRoles(): Observable<any> {
     const url = `${this.baseUrlAppRoles}get_app_roles`;  // Construct full URL
+    return this.http.get<any>(url);
+  }
+  getAppRoleByUserId(userId: number) {
+    const url = `${this.baseUrlAppRoles}get_app_roles?userId=${userId}`;
     return this.http.get<any>(url);
   }
 }
