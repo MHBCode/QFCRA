@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map, Observable, switchMap } from 'rxjs';
+import { catchError, forkJoin, map, Observable, switchMap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -8,15 +8,17 @@ import { environment } from 'src/environments/environment';
 })
 export class FirmService {
 
-  private baseUrl = environment.API_URL+'/api/Firms/';  // Base URL
-  private baseUrlContact = environment.API_URL+'/api/Contact/'; // Without FIRMS
-  private baseUrlControllers = environment.API_URL+'/api/OtherEntity/'; //Controllers
-  private baseUrlRegisteredFund = environment.API_URL+'/api/RegisteredFund/' // Funds
-  private baseUrlActivity = environment.API_URL+'/api/Activity/'; //Activities
-  private baseUrlWaiver = environment.API_URL+'/api/Waiver/' //Waiver
-  private baseUrlRisk = environment.API_URL+'/api/Risk/' //Risk
-  private baseUrlNotice = environment.API_URL+'/api/Notice/' //Notice
-  private baseUrlApplication = environment.API_URL+'/api/Application/' //Application
+  private baseUrl = environment.API_URL + '/api/Firms/';  // Base URL
+  private baseUrlContact = environment.API_URL + '/api/Contact/'; // Without FIRMS
+  private baseUrlControllers = environment.API_URL + '/api/OtherEntity/'; //Controllers
+  private baseUrlRegisteredFund = environment.API_URL + '/api/RegisteredFund/' // Funds
+  private baseUrlActivity = environment.API_URL + '/api/Activity/'; //Activities
+  private baseUrlWaiver = environment.API_URL + '/api/Waiver/' //Waiver
+  private baseUrlRisk = environment.API_URL + '/api/Risk/' //Risk
+  private baseUrlNotice = environment.API_URL + '/api/Notice/' //Notice
+  private baseUrlApplication = environment.API_URL + '/api/Application/' //Application
+  private baseUrlAddress = environment.API_URL + '/api/Address/' // Address
+  private baseUrlSecurity = environment.API_URL + '/api/Security/' // Security
 
   constructor(private http: HttpClient) { }
 
@@ -33,9 +35,21 @@ export class FirmService {
     const url = `${this.baseUrl}get_firm?firmID=${firmId}`;
     return this.http.get<any>(url);
   }
+  getFirmAddresses(entityId: number): Observable<any> {
+    const url = `${this.baseUrlAddress}get_address_list?entityTypeId=1&entityId=${entityId}`
+    return this.http.get<any>(url);
+  }
+  getAddressesTypeHistory(firmId: number, addressTypeId: number) {
+    const url = `${this.baseUrlAddress}get_address_type_history?firmId=${firmId}&addressTypeId=${addressTypeId}&valId=false`
+    return this.http.get<any>(url);
+  }
   editFirm(userId: number, rowData: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrl}insert_update_firm_details`, rowData, { headers: headers });
+  }
+  editScope(userId: number, rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlActivity}save_update_author_scope`, rowData, { headers: headers });
   }
   getFYearEndHistory(firmId: number): Observable<any> {
     const url = `${this.baseUrl}get_firms_end_year_history?firmId=${firmId}&flag=1`;  // Construct full URL https://localhost:7091/api/Firms/get_firms_end_year_history?firmId=66&flag=1
@@ -62,38 +76,58 @@ export class FirmService {
     return this.http.get<any>(url);
   }
   getActivityCategories(): Observable<any> {
-    const url = `${this.baseUrlActivity}get_activity_categories?userId=${''}}`;
+    const url = `${this.baseUrlActivity}get_activity_categories`;
     return this.http.get<any>(url);
   }
-  getAuthActivityTypes(categoryId: number): Observable<any>  { //BasedOnCategoryID
+  getAuthActivityTypes(categoryId: number): Observable<any> { //BasedOnCategoryID
     const url = `${this.baseUrlActivity}get_activity_types?activityCategoryId=${categoryId}`
     return this.http.get<any>(url);
   }
-  getLicActivityTypes(): Observable<any>  { 
+  getLicActivityTypes(): Observable<any> {
     const url = `${this.baseUrlActivity}get_activity_types?activityCategoryId=1`
     return this.http.get<any>(url);
   }
-  getFirmScopeId(firmId: number): Observable<number> {
+  getFirmScopeIdAndRevNum(firmId: number): Observable<{ scopeId: number; scopeRevNum: number }> {
     const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmApplicationTypeId=3`;
     return this.http.get<any>(url).pipe(
       map(response => {
-        const scopeId = response.response?.[0]?.FirmScopeID;
-        return scopeId;
+        const firstItem = response.response?.[0];
+        if (firstItem) {
+          return {
+            scopeId: firstItem.FirmScopeID,
+            scopeRevNum: firstItem.ScopeRevNum
+          };
+        }
+        throw new Error('No data found');
       })
     );
   }
-  getAuthAvailableProducts(activityTypeID: number): Observable<any> {
-    const url = `${this.baseUrlActivity}get_available_products?activityTypeID=${activityTypeID}`;
-    return this.http.get<any>(url);
-  }
+
+
   getIslamicFinance(firmId: number): Observable<any> {
-    return this.getFirmScopeId(firmId).pipe(
-      switchMap((scopeId: number) => {
-        const url = `${this.baseUrlActivity}get_islamic_finance?firmId=${firmId}&firmScopeID=${scopeId}&scopeRevNo=4`;
+    return this.getFirmScopeIdAndRevNum(firmId).pipe(
+      switchMap(({ scopeId, scopeRevNum }) => {  // Destructure the object
+        const url = `${this.baseUrlActivity}get_islamic_finance?firmId=${firmId}&firmScopeID=${scopeId}&scopeRevNo=${scopeRevNum}`;
         return this.http.get<any>(url);
       })
     );
   }
+
+  getObjectTypeTable(dropdown: string): Observable<any> {
+    const url = `${this.baseUrlSecurity}get_object_type_table?objectTypeTable=${dropdown}`
+    return this.http.get<any>(url);
+  }
+
+  getPrudReturnTypes(): Observable<any> {
+    const url = `${this.baseUrlActivity}get_prud_ret_type?prudCatId=1`;
+    return this.http.get<any>(url);
+  }
+
+  getAllProducts(activityId: number): Observable<any> {
+    const url = `${this.baseUrlActivity}get_available_products?activityTypeID=${activityId}`;
+    return this.http.get<any>(url);
+  }
+
   getFIRMAuditors(firmId: number): Observable<any> {
     const url = `${this.baseUrl}get_auditors?firmId=${firmId}`;  // Construct full URL https://localhost:7091/api/Firms/get_auditors?firmID=66
     return this.http.get<any>(url);
@@ -106,11 +140,11 @@ export class FirmService {
     const url = `${this.baseUrl}get_firm_user?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
-  getFIRMControllers(firmId:number): Observable<any> {
+  getFIRMControllers(firmId: number): Observable<any> {
     const url = `${this.baseUrlControllers}get_corporate_controller_details_list?firmId=${firmId}`; //https://localhost:7091/api/OtherEntity/get_corporate_controller_details_list?firmId=66
     return this.http.get<any>(url);
   }
-  getFIRMRegisteredFund(firmId:number): Observable<any> {
+  getFIRMRegisteredFund(firmId: number): Observable<any> {
     const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?firmId=${firmId}`; //https://localhost:7091/api/RegisteredFund/get_registered_fund_data?firmId=69
     return this.http.get<any>(url);
   }

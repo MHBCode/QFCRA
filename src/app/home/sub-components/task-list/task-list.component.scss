@@ -19,10 +19,14 @@
     justify-content: flex-start;
 }
 .tableTitle h3{
+    cursor: pointer;
     color: #222529;
     font-size: 1em;
     font-weight: 500; 
     margin: 5px;
+}
+.tableTitle h3:hover{
+    color: #A51E36;
 }
 table {
     width: 100%;

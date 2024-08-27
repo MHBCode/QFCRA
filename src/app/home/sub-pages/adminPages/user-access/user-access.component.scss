@@ -162,8 +162,10 @@ input {
 
 textarea {
     width: 100%;
-    border-radius: 7.20px; 
+    border-radius: 7.2px;
     border: 0.72px #B1B1B1 solid;
     resize: vertical;
     max-height: 150px;
+    padding: 5px;
+    min-height: 20px;
 }

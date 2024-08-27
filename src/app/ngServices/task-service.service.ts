@@ -12,7 +12,7 @@ export class TaskServiceService {
   constructor(private http: HttpClient) { }
 
   getAssignedTaskReminders(userId: number): Observable<any> {
-    const url = `${this.baseUrl}get-task-reminder-list?userId=${userId}`;  // Construct full URL
+    const url = `${this.baseUrl}get_task-reminder_list?userId=${userId}`;  // Construct full URL
     return this.http.get<any>(url);
   }
 }

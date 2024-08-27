@@ -1,72 +1,74 @@
 <div class="useraccess-actions">
     <div class="btns">
-        <button class="save-btn">Save</button>
-        <button class="cancel-btn">Cancel</button>
+      <button class="save-btn">Save</button>
+      <button class="cancel-btn">Cancel</button>
     </div>
-</div>
-
-<section class="useraccess-section">
+  </div>
+  
+  <section class="useraccess-section">
     <div class="inputs-field-set">
-        <div class="section">
-            <h2>User Access Assigned</h2>
-            <div class="system-access-container">
-                <label>
-                    System Access Request For:
-                    <select name="" id="" class="system-access-select">
-                        <option value="">Select</option>
-                        <option *ngFor="let user of userData?.response" [value]="user?.UserID">{{user?.UserName}}</option>
-                    </select>
-                </label>
-                <a class="view-access-history" href="#">View User Access History</a>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Role</th>
-                        <th>Firm Level</th>
-                        <th>Effective Date <br> [DD/MON/YYYY]</th>
-                        <th>Expiration Date <br> [DD/MON/YYYY]</th>
-                        <th>Justification</th>
-                        <th><button class="addRowBtn" (click)="addRow()">+</button></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let row of rows; let i = index"> 
-                        <td>
-                            <select name="" id="userRole" [(ngModel)]="row.userRole">
-                                <option value="">Select Role</option>
-                                <option *ngFor="let role of appRoles?.response" [value]="role?.AppRoleID">{{role?.AppRoleDesc}}</option>
-                                <option value="Contact Viewer">Contact Viewer</option>
-                            </select>
-                        </td>
-
-                        <td>
-                            <select name="" id="firmLevel" [(ngModel)]="row.firmLevel">
-                                <option value="">Select Level</option>
-                                <option value="1">All Firms</option>
-                                <option value="2">Supervisory Firms</option>
-                                <option value="3">Specific Firms</option>
-                            </select>
-                        </td>
-
-                        <td>
-                            <input type="date" id="effectiveDate" [(ngModel)]="row.effectiveDate">
-                        </td>
-
-                        <td>
-                            <input type="date" id="expirationDate" [(ngModel)]="row.expirationDate">
-                        </td>
-
-                        <td>
-                            <textarea name="" id="" [(ngModel)]="row.justification"></textarea>
-                        </td>
-
-                        <td>
-                            <button class="removeRowBtn" (click)="removeRow(i)">x</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+      <div class="section">
+        <h2>User Access Assigned</h2>
+        <div class="system-access-container">
+          <label>
+            System Access Request For:
+            <select name="" id="" class="system-access-select" [(ngModel)]="selectedUserId" (change)="onUserChange()">
+              <option value="">Select</option>
+              <option *ngFor="let user of userData?.response" [value]="user?.UserID">{{ user?.UserName }}</option>
+            </select>
+          </label>
+          <a class="view-access-history" href="#">View User Access History</a>
         </div>
+  
+        <div *ngIf="noDataFound" class="no-data-found">
+          <p style="color: red;">No data found</p>
+        </div>
+  
+        <table *ngIf="rows.length > 0">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Firm Level</th>
+              <th>Effective Date <br> [DD/MON/YYYY]</th>
+              <th>Expiration Date <br> [DD/MON/YYYY]</th>
+              <th>Justification</th>
+              <th>
+                <button class="addRowBtn" (click)="addRow()">+</button>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of rows; let i = index">
+              <td>
+                <select name="" id="userRole" [(ngModel)]="row.userRole" [disabled]="!row.isEditable">
+                  <option value="">Select Role</option>
+                  <option *ngFor="let role of appRoles" [value]="role?.AppRoleID">{{ role?.AppRoleDesc }}</option>
+                </select>
+              </td>
+              <td>
+                <select name="" id="firmLevel" [(ngModel)]="row.firmLevel" [disabled]="!row.isEditable">
+                  <option value="">Select Level</option>
+                  <option value="1">All Firms</option>
+                  <option value="2">Supervisory Firms</option>
+                  <option value="3">Specific Firms</option>
+                </select>
+              </td>
+              <td>
+                <input type="date" id="effectiveDate" [(ngModel)]="isObjectEmpty(row.effectiveDate) ? '' : row.effectiveDate" [disabled]="!row.isEditable">
+              </td>
+              <td>
+                <input type="date" id="expirationDate" [(ngModel)]="isObjectEmpty(row.expirationDate) ? '' : row.expirationDate">
+              </td>
+              <td>
+                <textarea name="justification" id="justification" [(ngModel)]="isObjectEmpty(row.justification) ? '' : row.justification"></textarea>
+              </td>
+              <td>
+                <button *ngIf="row.isEditable" class="removeRowBtn" (click)="removeRow(i)">x</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-</section>
+  </section>
+  
