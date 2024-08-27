@@ -162,7 +162,7 @@ export class FirmService {
     return this.http.get<any>(url);
   }
   getNotices(firmId: number): Observable<any> {
-    const url = `${this.baseUrlNotice}get_firm_notice_response_details?firmId=${firmId}&firmNoticeID=4043`; //https://localhost:7091/api/Notice/get_firm_notice_response_details?firmId=10&firmNoticeID=4043
+    const url = `${this.baseUrlNotice}get_firm_notice_response_details?firmId=10&firmNoticeID=4043`; //https://localhost:7091/api/Notice/get_firm_notice_response_details?firmId=10&firmNoticeID=4043
     return this.http.get<any>(url);
   }
 }
