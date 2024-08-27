@@ -6,6 +6,7 @@ describe('ViewFirmPageComponent', () => {
   let component: ViewFirmPageComponent;
   let fixture: ComponentFixture<ViewFirmPageComponent>;
 
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ViewFirmPageComponent]

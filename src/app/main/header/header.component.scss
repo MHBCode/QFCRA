@@ -65,8 +65,8 @@ header {
 }
 ul.navigation-ul li a::after {
   content: " ▼";
-  font-size: 12px; /* يمكنك تعديل الحجم حسب حاجتك */
-  margin-left: 5px; /* يمكنك تعديل المسافة بين النص والسهم */
+  font-size: 12px; 
+  margin-left: 5px; 
 }
 
 .notifications i {

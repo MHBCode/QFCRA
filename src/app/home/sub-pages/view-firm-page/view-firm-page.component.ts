@@ -89,6 +89,7 @@ export class ViewFirmPageComponent implements OnInit {
   allQFCLicenseStatus: any = [];
   allAuthorisationStatus: any = [];
 
+  activeTab: string = '';
 
   isCollapsed: { [key: string]: boolean } = {};
   selectedFile: File | null = null;
@@ -302,7 +303,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.objPrudentialCategory.expirationDate = '';
       this.objPrudentialCategory.lastModifiedDate = this.ActivityAuth.PrudentialCategoryLastModifiedDate;
       this.objPrudentialCategory.authorisationCategoryTypeID = this.ActivityAuth.AuthorisationCategoryTypeID;
- 
+
 
       //objSector
       this.objSector.firmSectorID = this.ActivityAuth.FirmSectorID;
@@ -331,7 +332,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
       this.objFirmIslamicFinance.savedIFinTypeID = 0;
       this.objFirmIslamicFinance.scopeRevNum = this.ActivityAuth.ScopeRevNum;
-      
+
 
 
       //firmSectorID
@@ -387,7 +388,7 @@ export class ViewFirmPageComponent implements OnInit {
       data => {
         this.firmDetails = data.response;
         console.log('1) Firm details:', this.firmDetails);
-        
+
 
         this.firmAppTypeID = Number(this.firmDetails.AuthorisationStatusTypeID) > 0 ? 3 : 2; // if authorized then store 3 in firmAppTypeID else store 2, this is for Firm Application Type Field dropdown
 
@@ -766,6 +767,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   switchTab(tabId: string) {
+    this.activeTab = tabId; 
     // Get all section elements
     const sections = this.el.nativeElement.getElementsByTagName('section');
 
@@ -1090,7 +1092,7 @@ export class ViewFirmPageComponent implements OnInit {
   onFirmCoreAppDetailsFieldsChanges(selectedValue: number) {
     this.firmAppTypeID = selectedValue;
     console.log('Firm Application Type ID Changed:', this.firmAppTypeID);
-}
+  }
 
   toggleIslamicFinanceFields() {
     if (this.islamicFinance && this.islamicFinance.IFinTypeId !== undefined) {
@@ -1141,12 +1143,12 @@ export class ViewFirmPageComponent implements OnInit {
       this.authorisationStatusDates[this.selectedAuthStatusId] = this.firmDetails.AuthApplStatusDate;
     }
 
-      // Update AuthApplStatusDate based on new selection
-      if (this.authorisationStatusDates[numericValue] !== undefined) {
-        this.firmDetails.AuthApplStatusDate = this.authorisationStatusDates[numericValue];
-      } else {
-        this.firmDetails.AuthApplStatusDate = null;
-      }
+    // Update AuthApplStatusDate based on new selection
+    if (this.authorisationStatusDates[numericValue] !== undefined) {
+      this.firmDetails.AuthApplStatusDate = this.authorisationStatusDates[numericValue];
+    } else {
+      this.firmDetails.AuthApplStatusDate = null;
+    }
 
     // Update selectedStatusId for authorisation
     this.selectedAuthStatusId = numericValue;
