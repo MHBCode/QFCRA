@@ -8,15 +8,15 @@ import { environment } from 'src/environments/environment';
 })
 export class FirmService {
 
-  private baseUrl = environment.API_URL+'/api/Firms/';  // Base URL
-  private baseUrlContact = environment.API_URL+'/api/Contact/'; // Without FIRMS
-  private baseUrlControllers = environment.API_URL+'/api/OtherEntity/'; //Controllers
-  private baseUrlRegisteredFund = environment.API_URL+'/api/RegisteredFund/' // Funds
-  private baseUrlActivity = environment.API_URL+'/api/Activity/'; //Activities
-  private baseUrlWaiver = environment.API_URL+'/api/Waiver/' //Waiver
-  private baseUrlRisk = environment.API_URL+'/api/Risk/' //Risk
-  private baseUrlNotice = environment.API_URL+'/api/Notice/' //Notice
-  private baseUrlApplication = environment.API_URL+'/api/Application/' //Application
+  private baseUrl = environment.API_URL + '/api/Firms/';  // Base URL
+  private baseUrlContact = environment.API_URL + '/api/Contact/'; // Without FIRMS
+  private baseUrlControllers = environment.API_URL + '/api/OtherEntity/'; //Controllers
+  private baseUrlRegisteredFund = environment.API_URL + '/api/RegisteredFund/' // Funds
+  private baseUrlActivity = environment.API_URL + '/api/Activity/'; //Activities
+  private baseUrlWaiver = environment.API_URL + '/api/Waiver/' //Waiver
+  private baseUrlRisk = environment.API_URL + '/api/Risk/' //Risk
+  private baseUrlNotice = environment.API_URL + '/api/Notice/' //Notice
+  private baseUrlApplication = environment.API_URL + '/api/Application/' //Application
 
   constructor(private http: HttpClient) { }
 
@@ -65,11 +65,11 @@ export class FirmService {
     const url = `${this.baseUrlActivity}get_activity_categories?userId=${''}}`;
     return this.http.get<any>(url);
   }
-  getAuthActivityTypes(categoryId: number): Observable<any>  { //BasedOnCategoryID
+  getAuthActivityTypes(categoryId: number): Observable<any> { //BasedOnCategoryID
     const url = `${this.baseUrlActivity}get_activity_types?activityCategoryId=${categoryId}`
     return this.http.get<any>(url);
   }
-  getLicActivityTypes(): Observable<any>  { 
+  getLicActivityTypes(): Observable<any> {
     const url = `${this.baseUrlActivity}get_activity_types?activityCategoryId=1`
     return this.http.get<any>(url);
   }
@@ -106,11 +106,11 @@ export class FirmService {
     const url = `${this.baseUrl}get_firm_user?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
-  getFIRMControllers(firmId:number): Observable<any> {
+  getFIRMControllers(firmId: number): Observable<any> {
     const url = `${this.baseUrlControllers}get_corporate_controller_details_list?firmId=${firmId}`; //https://localhost:7091/api/OtherEntity/get_corporate_controller_details_list?firmId=66
     return this.http.get<any>(url);
   }
-  getFIRMRegisteredFund(firmId:number): Observable<any> {
+  getFIRMRegisteredFund(firmId: number): Observable<any> {
     const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?firmId=${firmId}`; //https://localhost:7091/api/RegisteredFund/get_registered_fund_data?firmId=69
     return this.http.get<any>(url);
   }
@@ -128,7 +128,7 @@ export class FirmService {
     return this.http.get<any>(url);
   }
   getNotices(firmId: number): Observable<any> {
-    const url = `${this.baseUrlNotice}get_firm_notice_response_details?firmId=10&firmNoticeID=4043`; //https://localhost:7091/api/Notice/get_firm_notice_response_details?firmId=10&firmNoticeID=4043
+    const url = `${this.baseUrlNotice}get_firm_notice_response_details?firmId=${firmId}&firmNoticeID=4043`; //https://localhost:7091/api/Notice/get_firm_notice_response_details?firmId=10&firmNoticeID=4043
     return this.http.get<any>(url);
   }
 }

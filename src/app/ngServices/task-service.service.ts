@@ -7,12 +7,12 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class TaskServiceService {
-  private baseUrl = environment.API_URL+'/api/Task/';  // Base URL
+  private baseUrl = environment.API_URL + '/api/Task/';  // Base URL
 
   constructor(private http: HttpClient) { }
 
   getAssignedTaskReminders(userId: number): Observable<any> {
-    const url = `${this.baseUrl}get-task-reminder-list?userId=${userId}`;  // Construct full URL
+    const url = `${this.baseUrl}get_task-reminder_list?userId=${userId}`;  // Construct full URL
     return this.http.get<any>(url);
   }
 }
