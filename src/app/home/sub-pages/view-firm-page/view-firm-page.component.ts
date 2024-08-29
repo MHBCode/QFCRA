@@ -206,7 +206,6 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   editFirm() {
-    //this.router.navigate(['home/edit-firm', this.firmId]);
     console.log("allowEditFirmDetails :", this.allowEditFirmDetails);
 
     this.allowEditFirmDetails = !this.allowEditFirmDetails;
@@ -216,8 +215,7 @@ export class ViewFirmPageComponent implements OnInit {
       const userId = 10044; // Replace with dynamic userId as needed
 
       if (this.firmDetails?.AuthorisationStatusTypeID > 0) {
-
-        this.firmDetails.firmApplDate = this.firmDetails.FirmAuthApplDate;
+        this.firmDetails.firmApplDate = this.firmDetails.FirmAuthApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmAuthApplDate) : null;
       } else {
         this.firmDetails.firmApplDate = this.firmDetails.FirmLicApplDate;
       }
@@ -237,16 +235,11 @@ export class ViewFirmPageComponent implements OnInit {
       this.firmDetails.dateOfIncorporation = this.firmDetails.DateOfIncorporation ? this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation) : null;
       this.firmDetails.firmAccDataId = this.firmDetails.FirmAccountingDataID;
       this.firmDetails.firmStandardID = this.firmDetails.FirmAccountingStandardID ? this.firmDetails.FirmAccountingStandardID : 0;
-      if (this.firmDetails.AuthorisationStatusTypeID > 0) {
-        this.firmDetails.authorisationStatusTypeID = this.firmDetails.AuthorisationStatusTypeID;
-      } else {
-        this.firmDetails.authorisationStatusTypeID = 0;
-      }
+      this.firmDetails.authorisationStatusTypeID = this.firmDetails.AuthorisationStatusTypeID > 0 ? this.firmDetails.AuthorisationStatusTypeID : 0;
       this.firmDetails.licenseStatusTypeID = this.firmDetails.LicenseStatusTypeID;
-      this.firmDetails.firmApplTypeID = 0 // check this one belongs to which field
+      this.firmDetails.firmApplTypeID = 0;
       this.firmDetails.finYearEndTypeId = this.firmDetails.FinYearEndTypeID;
       this.firmDetails.differentIncorporationDate = this.firmDetails.DifferentIncorporationDate;
-
       this.firmDetails.firmApplicationDataComments = this.firmDetails.FirmApplicationDataComments ? this.firmDetails.FirmApplicationDataComments : '';
       this.firmDetails.publicRegisterComments = this.firmDetails.PublicRegisterComments ? this.firmDetails.PublicRegisterComments : '';
       this.firmDetails.firmFinStandardTypeID = this.firmDetails.FinAccStdTypeID;
@@ -254,61 +247,13 @@ export class ViewFirmPageComponent implements OnInit {
       this.firmDetails.firmFinYearEndEffectiveFrom = this.firmDetails.FirmFinYearEndEffectiveFrom ? this.convertDateToYYYYMMDD(this.firmDetails.FirmFinYearEndEffectiveFrom) : null;
       this.firmDetails.loginuserId = userId;
 
-      // insert Addresses
-      // add condition for addresstypeID to check which one you want to edit
-      // Assuming originalFirmAddresses holds the original state of firmAddresses before editing
-      this.firmAddresses.forEach((address, index) => {
-        // Retrieve the original address for comparison
-        const originalAddress = this.originalFirmAddresses[index];
+      // Preparing the firmObj to send to the backend
+      const firmObj = {
+        ...this.firmDetails,
+        firmObj: this.firmDetails // Include firmObj
+      };
 
-        let addressChanged = false;
-
-        // Check if any address fields have changed
-        if (address.AddressLine1 !== originalAddress.AddressLine1 ||
-          address.AddressLine2 !== originalAddress.AddressLine2 ||
-          address.AddressLine3 !== originalAddress.AddressLine3 ||
-          address.AddressLine4 !== originalAddress.AddressLine4 ||
-          address.City !== originalAddress.City ||
-          address.Province !== originalAddress.Province ||
-          address.PostalCode !== originalAddress.PostalCode ||
-          address.CountryID !== originalAddress.CountryID ||
-          address.PhoneNum !== originalAddress.PhoneNum ||
-          address.PhoneExt !== originalAddress.PhoneExt ||
-          address.FaxNum !== originalAddress.FaxNum) {
-          addressChanged = true;
-        }
-        if (addressChanged) { // Change this to execute when changes are detected
-          this.firmAddress.addressId = address.AddressID;
-          this.firmAddress.addressAssnId = address.AddressAssnID;
-          this.firmAddress.addressTypeId = address.AddressTypeID;
-          this.firmAddress.addressLine1 = address.AddressLine1;
-          this.firmAddress.addressLine2 = address.AddressLine2;
-          this.firmAddress.addressLine3 = address.AddressLine3;
-          this.firmAddress.addressLine4 = address.AddressLine4;
-          this.firmAddress.city = address.City;
-          this.firmAddress.province = address.Province;
-          this.firmAddress.postalCode = address.PostalCode;
-          this.firmAddress.countryId = address.CountryID;
-          this.firmAddress.phone = address.PhoneNum;
-          this.firmAddress.phoneExt = address.PhoneExt;
-          this.firmAddress.fax = address.FaxNum;
-
-          // Assigning other properties
-          this.firmAddress.sameAsTypeId = address.SameAsTypeID;
-          this.firmAddress.modifiedBy = address.LastModifiedBy;
-          this.firmAddress.modifiedDate = address.LastModifiedDate;
-          this.firmAddress.dateFrom = address.FromDate;
-          this.firmAddress.dateTo = address.ToDate;
-          this.firmAddress.objectID = address.ObjectID;
-          this.firmAddress.objectInstanceID = address.ObjectInstanceID;
-          this.firmAddress.objectInstanceRevNum = address.ObjectInstanceRevNum;
-          this.firmAddress.sourceObjectID = address.SourceObjectID;
-          this.firmAddress.sourceObjectInstanceID = address.SourceObjectInstanceID;
-          this.firmAddress.sourceObjectInstanceRevNum = address.SourceObjectInstanceRevNum;
-        }
-      });
-
-      this.firmService.editFirm(userId, this.firmDetails).subscribe(response => {
+      this.firmService.editFirm(userId, firmObj).subscribe(response => {
         console.log('Row edited successfully:', response);
         this.loadFirmDetails(this.firmId);
         this.loadApplicationDetails();
@@ -317,17 +262,11 @@ export class ViewFirmPageComponent implements OnInit {
       }, error => {
         console.error('Error editing row:', error);
       });
-
-      this.firmService.editCoreAddress(userId, this.firmAddress).subscribe(response => {
-        console.log('Row edited successfully:', response);
-        this.loadApplicationDetails();
-        this.loadFirmAdresses();
-        this.cdr.detectChanges();
-      }, error => {
-        console.error('Error editing row:', error);
-      });
     }
   }
+
+
+
 
 
   cancelEditFirm() {
@@ -455,24 +394,27 @@ export class ViewFirmPageComponent implements OnInit {
     this.allowEditAuthScopeDetails = true;
   }
 
-  convertDateToYYYYMMDD(dateStr: any): string | null {
-    if (!dateStr || typeof dateStr !== 'string') {
-      return null; // Return null if dateStr is not a valid string
+  convertDateToYYYYMMDD(dateStr: string | Date): string | null {
+    if (!dateStr) {
+      return null; // Return null if the input is invalid or empty
     }
 
-    const months = {
-      "Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04",
-      "May": "05", "Jun": "06", "Jul": "07", "Aug": "08",
-      "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"
-    };
+    // If dateStr is already a Date object, use it directly
+    const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
 
-    const [day, month, year] = dateStr.split('/');
-    if (month && day && year) {
-      const formattedMonth = months[month];
-      return `${year}-${formattedMonth}-${day.padStart(2, '0')}`;
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      console.error('Invalid date format:', dateStr);
+      return null;
     }
-    return null;
+
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based in JS
+    const day = date.getDate().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
+
 
   private formatDateToCustomFormat(dateString: string): string {
     const date = new Date(dateString);
@@ -911,7 +853,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   switchTab(tabId: string) {
-    this.activeTab = tabId; 
+    this.activeTab = tabId;
     // Get all section elements
     const sections = this.el.nativeElement.getElementsByTagName('section');
 
