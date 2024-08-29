@@ -880,6 +880,36 @@ hr {
     background-color: white !important;
 }
 
+.addAddressBtn {
+    background: #A51E36;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px;
+    border-radius: 7px;
+    margin-right: 10px;
+}
+
+.RmvAddressBtn {
+    background: red;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px;
+    border-radius: 7px;
+    margin-right: 10px;
+}
+
+.add-address-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.del-address-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
 /* validations styling */
 .invalid {
     border: 1px solid red;
