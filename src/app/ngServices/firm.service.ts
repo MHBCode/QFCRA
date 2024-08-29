@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { catchError, forkJoin, map, Observable, switchMap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -47,9 +47,13 @@ export class FirmService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrl}insert_update_firm_details`, rowData, { headers: headers });
   }
-  editScope(userId: number, rowData: any): Observable<any> {
+  editCoreAddress(userId: number, rowData: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<any>(`${this.baseUrlActivity}save_update_author_scope`, rowData, { headers: headers });
+    return this.http.post<any>(`${this.baseUrlAddress}insert_update_address`, rowData, { headers: headers });
+  }
+  editLicenseScope(userId: number, rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlActivity}save_update_licensed_scope`, rowData, { headers: headers });
   }
   getFYearEndHistory(firmId: number): Observable<any> {
     const url = `${this.baseUrl}get_firms_end_year_history?firmId=${firmId}&flag=1`;  // Construct full URL https://localhost:7091/api/Firms/get_firms_end_year_history?firmId=66&flag=1
@@ -126,6 +130,16 @@ export class FirmService {
   getAllProducts(activityId: number): Observable<any> {
     const url = `${this.baseUrlActivity}get_available_products?activityTypeID=${activityId}`;
     return this.http.get<any>(url);
+  }
+
+  getFirmStatusValidation(firmId: number, statusId: number, statusDate: string, firmOpType: number): Observable<any> {
+    const params = new HttpParams()
+      .set('firmId', firmId.toString())
+      .set('currentFirmApplStatusTypeID', statusId.toString())
+      .set('currentFirmApplStatusDate', statusDate)
+      .set('firmOpType', firmOpType.toString());
+
+    return this.http.get<any>(`${this.baseUrl}is_valid_firm_current_status_date`, { params });
   }
 
   getFIRMAuditors(firmId: number): Observable<any> {

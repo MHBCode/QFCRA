@@ -14,7 +14,7 @@
             <tr *ngFor="let reportSubmissions of ReportSubmissions.slice(0,listCount)">
                 <td>{{reportSubmissions.ReportName}}</td>
                 <td class="numbers">{{reportSubmissions.Submitted}}</td>
-                <td class="numbers">{{reportSubmissions['Not Submitted']}}</td>
+                <td class="numbers">{{reportSubmissions.NotSubmitted}}</td>
             </tr>
         </tbody>
     </table>
