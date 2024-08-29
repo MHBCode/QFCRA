@@ -12,12 +12,13 @@ export class FirmListComponent implements OnInit {
 
   @Input() listCount: number = 50;
 
-  firms: any[] = [];
+  @Input() firms: any[] = [];
+
   v: any[] = this.firms.slice(5);
   constructor(
     private router: Router,
     private firmService: FirmService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadFirms();
@@ -44,7 +45,7 @@ export class FirmListComponent implements OnInit {
     }
   }
 
-  goToAllFirms(){
+  goToAllFirms() {
     this.router.navigate(['home/firms-page']);
   }
 }

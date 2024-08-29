@@ -1,1 +1,207 @@
-<app-firm-list></app-firm-list>
+  <!-- Search Form -->
+  <div class="brid-crump">
+    <div class="btn-group">
+      <div class="btns">
+        <button (click)="toggleSearch()">
+          <i class="bi bi-search"></i>
+          Search
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Search Section -->
+  <section *ngIf="showSearchSection" class="search-firm-section">
+    <div class="inputs-field-set">
+      <div class="search-firm-actions">
+        <h3 class="search-firm-header">Firms <span>Search</span></h3>
+      </div>
+      <div class="search-firms-inputs">
+        <!-- Firm Name (Dropdown) -->
+        <div class="input-field">
+          <div class="select-wrapper">
+            <label for="firmName">Firm Name</label>
+            <select name="firmName" id="firmName" [(ngModel)]="firmName">
+              <option value="all">All</option>
+              <option *ngFor="let firm of firms" [value]="firm.FirmName">
+                {{ firm.FirmName }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- QFC Number -->
+        <div class="input-field">
+          <label for="qfcNumber">QFC Number</label>
+          <input
+            name="qfcNumber"
+            id="qfcNumber"
+            type="text"
+            [(ngModel)]="qfcNumber"
+          />
+        </div>
+
+        <!-- Firm Type (Checkbox) -->
+        <div class="input-field" style="width: 100%">
+          <div class="checkbox-wrapper">
+            <label for="firmType">Firm Type</label>
+            <input type="checkbox" [(ngModel)]="firmType" />
+          </div>
+        </div>
+
+        <!-- Firm Status (Checkbox) -->
+        <div class="input-field" style="width: 100%">
+          <div class="checkbox-wrapper">
+            <label for="firmStatus">Firm Status</label>
+            <input type="checkbox" [(ngModel)]="firmStatus" />
+          </div>
+        </div>
+
+        <!-- License Status (Dropdown) -->
+        <div class="input-field">
+          <div class="select-wrapper">
+            <label for="licenseStatus">License Status</label>
+            <select
+              name="licenseStatus"
+              id="licenseStatus"
+              [(ngModel)]="licenseStatus"
+            >
+              <option value="all">All</option>
+              <option *ngFor="let status of licenseStatuses" [value]="status">
+                {{ status }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Authorisation Status (Dropdown) -->
+        <div class="input-field">
+          <div class="select-wrapper">
+            <label for="authorisationStatus">Authorisation Status</label>
+            <select
+              name="authorisationStatus"
+              id="authorisationStatus"
+              [(ngModel)]="authorisationStatus"
+            >
+              <option value="all">All</option>
+              <option
+                *ngFor="let status of authorisationStatuses"
+                [value]="status"
+              >
+                {{ status }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Supervisor - Supervision (Dropdown) -->
+        <div class="input-field">
+          <div class="select-wrapper">
+            <label for="supervisorSupervision">Supervisor - Supervision</label>
+            <select
+              name="supervisorSupervision"
+              id="supervisorSupervision"
+              [(ngModel)]="supervisorSupervision"
+            >
+              <option value="all">All</option>
+              <option
+                *ngFor="let supervisor of supervisorSupervisions"
+                [value]="supervisor"
+              >
+                {{ supervisor }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Supervisor - AML (Dropdown) -->
+        <div class="input-field">
+          <div class="select-wrapper">
+            <label for="supervisorAML">Supervisor - AML</label>
+            <select
+              name="supervisorAML"
+              id="supervisorAML"
+              [(ngModel)]="supervisorAML"
+            >
+              <option value="all">All</option>
+              <option
+                *ngFor="let amlSupervisor of amlSupervisors"
+                [value]="amlSupervisor"
+              >
+                {{ amlSupervisor }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Legal Status (Dropdown) -->
+        <div class="input-field">
+          <div class="select-wrapper">
+            <label for="legalStatus">Legal Status</label>
+            <select
+              name="legalStatus"
+              id="legalStatus"
+              [(ngModel)]="legalStatus"
+            >
+              <option value="all">All</option>
+              <option *ngFor="let status of legalStatuses" [value]="status">
+                {{ status }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Relevant Person (Checkbox) -->
+        <div class="input-field" style="width: 100%">
+          <div class="checkbox-wrapper">
+            <label for="relevantPerson">Relevant Person</label>
+            <input type="checkbox" [(ngModel)]="relevantPerson" />
+          </div>
+        </div>
+
+        <!-- Prudential Category (Checkbox) -->
+        <div class="input-field" style="width: 100%">
+          <div class="checkbox-wrapper">
+            <label for="prudentialCategory">Prudential Category</label>
+            <input type="checkbox" [(ngModel)]="prudentialCategory" />
+          </div>
+
+          <!-- Sectors (Checkbox) -->
+          <div class="input-field" style="width: 100%">
+            <div class="checkbox-wrapper">
+              <label for="sectors">Sectors</label>
+              <input type="checkbox" [(ngModel)]="sectors" />
+            </div>
+          </div>
+
+          <!-- Supervision Category (Checkbox) -->
+          <div class="input-field" style="width: 100%">
+            <div class="checkbox-wrapper">
+              <label for="supervisionCategory">Supervision Category</label>
+              <input type="checkbox" [(ngModel)]="supervisionCategory" />
+            </div>
+          </div>
+
+          <!-- Authorisation Category (Checkbox) -->
+          <div class="input-field" style="width: 100%">
+            <div class="checkbox-wrapper">
+              <label for="authorisationCategory">Authorisation Category</label>
+              <input type="checkbox" [(ngModel)]="authorisationCategory" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="input-search-buttons">
+        <button type="button" (click)="resetFilters()" class="reset">Reset</button>
+        <button type="button" (click)="searchFirms()" class="search">Search</button>
+      </div>
+    </div>
+  </section>
+
+    <div class="alphabet-filter">
+    <span *ngFor="let letter of alphabet" (click)="filterFirmsByLetter(letter)">
+      {{ letter }}
+    </span>
+  </div>
+<app-firm-list [firms]="filteredFirms"></app-firm-list>
