@@ -158,7 +158,7 @@
                         Firm Application Type
                     </label>
                     <input type="text" disabled name="firmApplicationType" id="firmApplicationType"
-                        value="{{firmDetails?.AuthorisationStatusTypeID != 0 ? Authorize : License}}">
+                        value="{{appDetails.FirmApplTypeDesc}}">
                 </div>
 
                 <div class="input-field">
@@ -479,44 +479,49 @@
                         Applied On
                     </label>
                     <input disabled name="appliedOn" id="appliedOn" type="text"
-                        value="{{firmDetails?.FirmLicApplDate | date: 'dd/MMM/y'}}">
+                        value="{{licensedAppDetails?.AppliedOn | date: 'dd/MMM/y'}}">
                 </div>
+                <!--not integrated yet-->
                 <div class="input-field">
                     <label for="licensedOn">
                         Licensed On
                     </label>
                     <input type="text" disabled name="licensedOn" id="licensedOn"
-                        value="{{firmAppDetailsLatestLicensed?.FirmApplStatusDate | date: 'dd/MMM/y'}}">
-                    <!--might have the wrong integration-->
+                        value="{{licensedAppDetails?.GrantedOn | date: 'dd/MMM/y'}}">
+                    <!--might have the wrong integration--> <!--not integrated yet-->
                 </div>
                 <div class="input-field">
                     <label for="currentStatus">
                         Current Status
                     </label>
                     <input disabled name="currentStatus" id="currentStatus" type="text"
-                        value="{{firmAppDetailsLatestLicensed?.FirmApplStatusTypeDesc}}">
+                        value="{{licensedAppDetails?.RecentStatus}}">
                 </div>
+                <!--not integrated yet-->
                 <div class="input-field">
                     <label for="currentStatusEffectiveDate">
                         Current Status Effective Date
                     </label>
                     <input disabled name="currentStatusEffectiveDate" id="currentStatusEffectiveDate" type="text"
-                        value="{{firmAppDetailsLatestLicensed?.FirmApplStatusDate | date: 'dd/MMM/y'}}">
+                        value="{{licensedAppDetails?.RecentStatusDate | date: 'dd/MMM/y'}}">
                 </div>
+                <!--not integrated yet-->
                 <div class="input-field">
                     <label for="lastModifiedBy">
                         Last Modified By
                     </label>
                     <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
-                        value="{{firmAppDetailsLatestLicensed?.LastModifiedByUser}}">
+                        value="{{licensedAppDetails?.LastModifiedBy}}">
                 </div>
+                <!--not integrated yet-->
                 <div class="input-field">
                     <label for="lastModifiedDate">
                         Last Modified Date
                     </label>
                     <input disabled name="lastModifiedDate" id="lastModifiedDate" type="text"
-                        value="{{firmAppDetailsLatestLicensed?.LastModifiedDate}}">
+                        value="{{licensedAppDetails?.LastModifiedDate}}">
                 </div>
+                <!--not integrated yet-->
                 <ng-container *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
                     <h3 class="subTitle-firmDetails">Authorisation Status</h3>
                     <div class="input-field">
@@ -524,67 +529,68 @@
                             Applied On
                         </label>
                         <input disabled name="appliedOnAuth" id="appliedOnAuth" type="text"
-                            value="{{firmDetails?.FirmAuthApplDate | date: 'dd/MMM/y'}}">
+                            value="{{licensedAppDetails?.AppliedOn | date: 'dd/MMM/y'}}">
                     </div>
-
+                    <!--not integrated yet-->
                     <div class="input-field">
                         <label for="AuthorizedOnAuth">
                             Authorised On
                         </label>
                         <input type="text" disabled name="AuthorizedOnAuth" id="AuthorizedOnAuth"
-                            value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusDate}}">
-                        <!--might have the wrong integration-->
+                            value="{{authorizedAppDetails?.GrantedOn}}">
+                        <!--might have the wrong integration--> <!--not integrated yet-->
                     </div>
                     <div class="input-field">
                         <label for="currentStatusAuth">
                             Current Status
                         </label>
                         <input disabled name="currentStatusAuth" id="currentStatusAuth" type="text"
-                            value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusTypeDesc}}">
+                            value="{{authorizedAppDetails?.RecentStatus}}">
                     </div>
+                    <!--not integrated yet-->
                     <div class="input-field">
                         <label for="currentStatusEffectiveDateAuth">
                             Current Status Effective Date
                         </label>
                         <input disabled name="currentStatusEffectiveDateAuth" id="currentStatusEffectiveDateAuth"
-                            type="text"
-                            value="{{firmAppDetailsLatestAuthorized?.FirmApplStatusDate | date: 'dd/MMM/y'}}">
+                            type="text" value="{{authorizedAppDetails?.RecentStatusDate | date: 'dd/MMM/y'}}">
                     </div>
+                    <!--not integrated yet-->
                     <div class="input-field">
                         <label for="lastModifiedByAuth">
                             Last Modified By
                         </label>
                         <input disabled name="lastModifiedByAuth" id="lastModifiedByAuth" type="text"
-                            value="{{firmAppDetailsLatestAuthorized?.LastModifiedByUser}}">
+                            value="{{authorizedAppDetails?.LastModifiedBy}}">
                     </div>
+                    <!--not integrated yet-->
                     <div class="input-field">
                         <label for="lastModifiedDateAuth">
                             Last Modified Date
                         </label>
                         <input disabled name="lastModifiedDateAuth" id="lastModifiedDateAuth" type="text"
-                            value="{{firmAppDetailsLatestAuthorized?.LastModifiedDate}}">
+                            value="{{authorizedAppDetails?.LastModifiedDate}}">
                     </div>
+                    <!--not integrated yet-->
                 </ng-container>
             </div>
-            <!--or-->
+            <!--or (edit mode)-->
             <div class="edit-firms-inputs" *ngIf="!allowEditFirmDetails">
                 <div class="input-field">
                     <label for="dateOfApplication">
                         Date of Application
                     </label>
-                    <input name="dateOfApplication" id="dateOfApplication" type="text" #dateInputs [(ngModel)]="firmDetails.AuthorisationStatusTypeID > 0
-                        ? firmDetails.FirmAuthApplDate
-                        : firmDetails.FirmLicApplDate">
+                    <input name="dateOfApplication" id="dateOfApplication" type="text" #dateInputs
+                        [(ngModel)]="dateOfApplication">
                 </div>
                 <div class="input-field">
                     <label for="firmApplicationType">
                         Firm Application Type
                     </label>
                     <select [ngClass]="{'select-background-edited': !allowEditFirmDetails}" name="firmApplicationType"
-                        id="firmApplicationType" [(ngModel)]="firmAppTypeID"
-                        (ngModelChange)="onFirmCoreAppDetailsFieldsChanges($event)">
-                        <option value="2">License</option>
-                        <option value="3">Authorisation</option>
+                        id="firmApplicationType" [(ngModel)]="selectedFirmTypeID">
+                        <option *ngFor="let firmType of allFirmTypes" [value]="firmType.FirmApplTypeID">
+                            {{firmType.FirmApplTypeDesc}}</option>
                     </select>
                 </div>
                 <div class="input-field">
@@ -604,9 +610,9 @@
                         {{firmDetails?.LicenseStatusTypeLabelDesc}}
                     </label>
                     <input name="DateLicensed" id="DateLicensed" type="text" #dateInputs
-                        [(ngModel)]="firmDetails.LicenseApplStatusDate">
+                        [(ngModel)]="formattedLicenseApplStatusDate">
                 </div>
-                <div class="input-field" *ngIf="firmAppTypeID == 3">
+                <div class="input-field" *ngIf="selectedFirmTypeID == 3">
                     <label for="authorisationStatus">
                         Authorisation Status
                     </label>
@@ -617,18 +623,18 @@
                             option.FirmApplStatusTypeDesc}}</option>
                     </select>
                 </div>
-                <div class="input-field" *ngIf="firmAppTypeID == 3">
+                <div class="input-field" *ngIf="selectedFirmTypeID == 3">
                     <label for="dateAuthorized">
                         {{firmDetails?.AuthorisationStatusTypeLabelDesc}}
                     </label>
                     <input name="dateAuthorized" id="dateAuthorized" type="text" #dateInputs
-                        [(ngModel)]="firmDetails.AuthApplStatusDate">
+                        [(ngModel)]="formattedAuthApplStatusDate">
                 </div>
             </div>
 
         </div>
         <!---->
-        <div class="inputs-field-set" *ngIf="!allowEditFirmDetails && firmAppTypeID == 3"
+        <div class="inputs-field-set" *ngIf="!allowEditFirmDetails && selectedFirmTypeID == 3"
             [ngClass]="{collapsed: isCollapsed['pressReleaseSection']}">
             <div class="edit-firm-actions collapse-container">
                 <h2 class="edit-firm-header">Press Releases</h2>
@@ -718,31 +724,48 @@
                 </button>
             </div>
             <div class="add-address-container">
-                <button [hidden]="isCollapsed['addressesSection']" class="addAddressBtn">Add Address</button>
+                <button *ngIf="!allowEditFirmDetails && !areAllAddressTypesAdded()" (click)="addAddress()"
+                    [hidden]="isCollapsed['addressesSection']" class="addAddressBtn">Add Address</button>
             </div>
             <div class="edit-firms-inputs">
                 <ng-container *ngFor="let address of firmAddresses; let i = index">
                     <ng-container *ngIf="address.Valid === true">
                         <div class="input-field" *ngIf="allowEditFirmDetails">
                             <label for="addressType">
-                                Address Type <button *ngIf="address.PreviousRecords !== 0" class="subbutton"
+                                Address Type <button *ngIf="address.PreviousRecords !== 0 && !address.isNew"
+                                    class="subbutton"
                                     (click)="getAddressTypeHistory(address.AddressTypeID)">History</button>
                             </label>
                             <input disabled name="addressType" id="addressType" type="text"
                                 value="{{address?.AddressTypeDesc}}">
                         </div>
+                        <div *ngIf="!allowEditFirmDetails" class="del-address-container">
+                            <button (click)="removeAddress(i)" class="RmvAddressBtn">x</button>
+                        </div>
                         <!-- address type on edit mode -->
                         <div class="input-field" *ngIf="!allowEditFirmDetails">
                             <label for="addressType">
-                                Address Type <button *ngIf="address.PreviousRecords !== 0" class="subbutton"
+                                Address Type <button *ngIf="address.PreviousRecords !== 0 && !address.isNew"
+                                    class="subbutton"
                                     (click)="getAddressTypeHistory(address.AddressTypeID)">History</button>
                             </label>
-                            <select disabled [(ngModel)]="address.AddressTypeID"
+                            <select [disabled]="!address.isNew && isAddressTypeUsed(address.AddressTypeID)"
+                                [(ngModel)]="address.AddressTypeID"
                                 [ngClass]="{'select-background-edited': !allowEditFirmDetails}">
+                                <option value="0">Select</option>
+                                <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
+                                    {{option.AddressTypeDesc}}</option>
+                            </select>
+                        </div>
+
+                        <div class="input-field" *ngIf="!allowEditFirmDetails && address.isNew">
+                            <label for="sameAsType">
+                                Same As Type
+                            </label>
+                            <select name="sameAsType" id="sameAsType" [ngClass]="{'select-background-edited': !allowEditFirmDetails}">
                                 <option value="0">select</option>
-                                <option value="1">Main Business</option>
-                                <option value="2">Head Office</option>
-                                <option value="12">Registered Office (RA)</option>
+                                <option *ngFor="let type of existingAddressTypes" [value]="type.AddressTypeID">
+                                    {{type.AddressTypeDesc}}</option>
                             </select>
                         </div>
                         <div class="input-field">
@@ -824,9 +847,6 @@
                             </label>
                             <input [disabled]="allowEditFirmDetails" name="fax" id="fax" type="text"
                                 [(ngModel)]="address.FaxNum">
-                        </div>
-                        <div class="del-address-container">
-                            <button class="RmvAddressBtn">Remove Address</button>
                         </div>
                         <hr *ngIf="i < firmAddresses.length - 1">
                     </ng-container>

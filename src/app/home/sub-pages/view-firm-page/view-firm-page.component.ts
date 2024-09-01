@@ -5,6 +5,7 @@ import flatpickr from 'flatpickr';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as constants from 'src/app/app-constants';
+import { Address } from 'src/app/models/address.model';
 
 
 
@@ -19,6 +20,7 @@ export class ViewFirmPageComponent implements OnInit {
   IsViewAuditorVisible: boolean = false;
   IsCreateAuditorVisible: boolean = false;
   IsEditAuditorVisible: boolean = false;
+  isAddingNewAddress: boolean = false;
   selectedAuditor: any = null;
   categorizedData = [];
   selectedAuditorNameFromSelectBox: string = 'select';
@@ -39,15 +41,18 @@ export class ViewFirmPageComponent implements OnInit {
   firmId: number = 0;  // Add firmId property
   ASSILevel: number = 4;
   firmDetails: any = {};  // Add firmDetails property
-  firmAddress: any = {};
+  firmAddress: any = {}; // Used to edit firm Address
   firmApp: any = {};
-  firmAppTypeID: number;
   firmOPDetails: any;
   prudReturnTypesDropdown: any;
   firmFYearHistory: any = [];
   firmNamesHistory: any = [];
   firmAccountingStandardHistory: any = [];
   firmAddresses: any = [];
+  existingAddressTypes: any[] = [];
+  appDetails: any = [];
+  applicationTypeId: number;
+  selectedFirmTypeID: number;
   originalFirmAddresses: any = [];
   firmAddressesTypeHistory: any = [];
   ActivityLicensed: any = [];
@@ -70,8 +75,6 @@ export class ViewFirmPageComponent implements OnInit {
   FirmWaivers: any;
   FIRMRMP: any;
   FIRMNotices: any;
-  License: string = 'License';
-  Authorize: string = 'Authorisation';
   allowEditFirmDetails: string | boolean = true;
   /* for scope */
   allowEditLicScopeDetails: string | boolean = true;
@@ -94,7 +97,9 @@ export class ViewFirmPageComponent implements OnInit {
   allLegalStatus: any = [];
   allFinYearEnd: any = [];
   allFinAccStd: any = [];
-
+  allFirmTypes: any = [];
+  allAddressTypes: any = [];
+  usedAddressTypes: Set<number> = new Set();
 
   isCollapsed: { [key: string]: boolean } = {};
   selectedFile: File | null = null;
@@ -149,6 +154,8 @@ export class ViewFirmPageComponent implements OnInit {
       this.populateLegalStatus();
       this.populateFinYearEnd();
       this.populateFinAccStd();
+      this.populateFirmAppTypes();
+      this.populateAddressTypes();
     });
   }
 
@@ -204,6 +211,58 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  switchTab(tabId: string) {
+    // Get all section elements
+    const sections = this.el.nativeElement.getElementsByTagName('section');
+
+    // Loop through all section elements and set display to none
+    for (let i = 0; i < sections.length; i++) {
+      this.renderer.setStyle(sections[i], 'display', 'none');
+    }
+    console.log('yes its', tabId)
+    const neededSection = document.getElementById(tabId);
+    this.renderer.setStyle(neededSection, 'display', 'flex');
+
+    if (tabId == 'CD') {
+      this.loadPrevFirmAndDate();
+      //this.loadApplicationDetails();
+    }
+
+    if (tabId == 'Scope') {
+      this.isCollapsed['LicensedSection'] = true
+    }
+
+    if (tabId == 'Auditors' && this.FIRMAuditors.length === 0) {
+      this.loadAuditors();
+    }
+    if (tabId == 'Contacts' && this.FIRMContacts.length === 0) {
+      this.loadContacts();
+    }
+    if (tabId == 'Controllers' && this.FIRMControllers.length === 0) {
+      this.loadControllers();
+    }
+    if (tabId == 'SPRegFunds' && this.RegisteredFund.length === 0) {
+      this.loadRegisteredFund();
+    }
+    if (tabId == 'SPWaivers') {
+      this.loadWaivers();
+    }
+    if (tabId == 'SPRMPs') {
+      this.loadRMPs();
+    }
+    if (tabId == 'SPNotices') {
+      this.loadNotices();
+    }
+    // if(tabId == 'CD'){
+
+    // }
+    // if(tabId == 'CD'){
+    //   console.log('yes its', tabId)
+    //   const neededSection = document.getElementById(tabId);
+    //   this.renderer.setStyle(neededSection, 'display', 'flex');
+    // }
+  }
+
   editFirm() {
     //this.router.navigate(['home/edit-firm', this.firmId]);
     console.log("allowEditFirmDetails :", this.allowEditFirmDetails);
@@ -221,39 +280,49 @@ export class ViewFirmPageComponent implements OnInit {
         this.firmDetails.firmApplDate = this.firmDetails.FirmLicApplDate;
       }
 
-      this.firmDetails.firmId = this.firmId;
-      this.firmDetails.qfcNum = this.firmDetails.QFCNum;
-      this.firmDetails.firmCode = this.firmDetails.FirmCode;
-      this.firmDetails.legalStatusTypeID = this.firmDetails.LegalStatusTypeID;
-      this.firmDetails.qfcTradingName = this.firmDetails.QFCTradingName;
-      this.firmDetails.prevTradingName = this.firmDetails.PrevTradingName;
-      this.firmDetails.placeOfIncorporation = this.firmDetails.PlaceOfIncorporation;
-      this.firmDetails.countyOfIncorporation = this.firmDetails.CountyOfIncorporation;
-      this.firmDetails.webSiteAddress = this.firmDetails.WebSiteAddress;
-      this.firmDetails.licenseStatusTypeID = this.firmDetails.LicenseStatusTypeID;
-      this.firmDetails.licensedDate = this.firmDetails.LicensedDate ? this.convertDateToYYYYMMDD(this.firmDetails.LicensedDate) : null;
-      this.firmDetails.authorisationDate = this.firmDetails.AuthorisationDate ? this.convertDateToYYYYMMDD(this.firmDetails.AuthorisationDate) : null;
-      this.firmDetails.dateOfIncorporation = this.firmDetails.DateOfIncorporation ? this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation) : null;
-      this.firmDetails.firmAccDataId = this.firmDetails.FirmAccountingDataID;
-      this.firmDetails.firmStandardID = this.firmDetails.FirmAccountingStandardID ? this.firmDetails.FirmAccountingStandardID : 0;
-      if (this.firmDetails.AuthorisationStatusTypeID > 0) {
-        this.firmDetails.authorisationStatusTypeID = this.firmDetails.AuthorisationStatusTypeID;
-      } else {
-        this.firmDetails.authorisationStatusTypeID = 0;
-      }
-      this.firmDetails.licenseStatusTypeID = this.firmDetails.LicenseStatusTypeID;
-      this.firmDetails.firmApplTypeID = 0 // check this one belongs to which field
-      this.firmDetails.finYearEndTypeId = this.firmDetails.FinYearEndTypeID;
-      this.firmDetails.differentIncorporationDate = this.firmDetails.DifferentIncorporationDate;
+      const firmObj = {
+        firmId: this.firmId,
+        firmName: this.firmDetails.FirmName,
+        qfcNum: this.firmDetails.QFCNum,
+        firmCode: this.firmDetails.FirmCode,
+        legalStatusTypeID: this.firmDetails.LegalStatusTypeID,
+        qfcTradingName: this.firmDetails.QFCTradingName,
+        prevTradingName: this.firmDetails.PrevTradingName,
+        placeOfIncorporation: this.firmDetails.PlaceOfIncorporation,
+        countyOfIncorporation: this.firmDetails.CountyOfIncorporation,
+        webSiteAddress: this.firmDetails.WebSiteAddress,
+        firmApplDate: this.firmDetails.firmApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.firmApplDate) : null,
+        firmApplTypeID: 0,
+        licenseStatusTypeID: this.firmDetails.LicenseStatusTypeID,
+        licensedDate: this.convertDateToYYYYMMDD(this.firmDetails.LicensedDate),
+        authorisationStatusTypeID: this.firmDetails.AuthorisationStatusTypeID,
+        authorisationDate: this.convertDateToYYYYMMDD(this.firmDetails.AuthorisationDate),
+        loginuserId: userId,
+        finYearEndTypeId: this.firmDetails.FinYearEndTypeID,
+        firmAccDataId: this.firmDetails.FirmAccountingDataID,
+        firmApplicationDataComments: this.firmDetails.FirmApplicationDataComments ? this.firmDetails.FirmApplicationDataComments : '',
+        firmFinYearEndEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FirmFinYearEndEffectiveFrom),
+        firmFinStandardTypeID: this.firmDetails.FinAccStdTypeID,
+        firmStandardID: this.firmDetails.FirmAccountingStandardID,
+        firmFinStandardEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FinAccStdTypeEffectiveFrom),
+        dateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
+        differentIncorporationDate: this.firmDetails.DifferentIncorporationDate,
+        firmNameAsInFactSheet: this.firmDetails.FirmNameAsinFactSheet ? this.firmDetails.FirmNameAsinFactSheet : '',
+        requiresCoIndex: this.firmDetails.RequiresCoOp ? this.firmDetails.RequiresCoOp : '',
+        publicRegisterComments: this.firmDetails.PublicRegisterComments ? this.firmDetails.PublicRegisterComments : ''
+      };
 
-      this.firmDetails.firmApplicationDataComments = this.firmDetails.FirmApplicationDataComments ? this.firmDetails.FirmApplicationDataComments : '';
-      this.firmDetails.publicRegisterComments = this.firmDetails.PublicRegisterComments ? this.firmDetails.PublicRegisterComments : '';
-      this.firmDetails.firmFinStandardTypeID = this.firmDetails.FinAccStdTypeID;
-      this.firmDetails.firmFinStandardEffectiveFrom = this.firmDetails.FinAccStdTypeEffectiveFrom ? this.convertDateToYYYYMMDD(this.firmDetails.FinAccStdTypeEffectiveFrom) : null;
-      this.firmDetails.firmFinYearEndEffectiveFrom = this.firmDetails.FirmFinYearEndEffectiveFrom ? this.convertDateToYYYYMMDD(this.firmDetails.FirmFinYearEndEffectiveFrom) : null;
-      this.firmDetails.loginuserId = userId;
+      // const appDetails = {
+      //   firmApplID: this.applicationTypeId == 2 ? this.appDetails.FirmApplID : this.appDetails.FirmApplID,
+      //   firmId: this.firmId,
+      //   firmApplTypeID: this.applicationTypeId == 2 ? this.appDetails.FirmApplTypeID : this.appDetails.FirmApplTypeID,
+      //   firmApplDate: "2024-08-31T19:51:00.278Z",
+      //   firmApplStatusID: this.appDetails.FirmApplStatusID,
+      //   loginuserId: userId,
+      //   output: 0
+      // }
 
-      // insert Addresses
+      // update Addresses
       // add condition for addresstypeID to check which one you want to edit
       // Assuming originalFirmAddresses holds the original state of firmAddresses before editing
       this.firmAddresses.forEach((address, index) => {
@@ -307,19 +376,27 @@ export class ViewFirmPageComponent implements OnInit {
         }
       });
 
-      this.firmService.editFirm(userId, this.firmDetails).subscribe(response => {
+      console.log("Final firm object to be sent:", firmObj);
+
+      this.firmService.editFirm(userId, firmObj).subscribe(response => {
         console.log('Row edited successfully:', response);
         this.loadFirmDetails(this.firmId);
-        this.loadApplicationDetails();
+        //this.loadApplicationDetails();
         this.loadFirmAdresses();
         this.cdr.detectChanges();
       }, error => {
         console.error('Error editing row:', error);
       });
 
+      // this.firmService.editAppDetails(userId, appDetails).subscribe(response => {
+      //   console.log('Row edited successfully:', response);
+      // },  error => {
+      //   console.error('Error editing row:', error);
+      // });
+
       this.firmService.editCoreAddress(userId, this.firmAddress).subscribe(response => {
         console.log('Row edited successfully:', response);
-        this.loadApplicationDetails();
+        //this.loadApplicationDetails();
         this.loadFirmAdresses();
         this.cdr.detectChanges();
       }, error => {
@@ -454,26 +531,31 @@ export class ViewFirmPageComponent implements OnInit {
     this.allowEditAuthScopeDetails = true;
   }
 
-  convertDateToYYYYMMDD(dateStr: any): string | null {
-    if (!dateStr || typeof dateStr !== 'string') {
-      return null; // Return null if dateStr is not a valid string
+  convertDateToYYYYMMDD(dateStr: string | Date): string | null {
+    console.log(dateStr);
+
+    if (!dateStr) {
+      return null; // Return null if the input is invalid or empty
     }
 
-    const months = {
-      "Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04",
-      "May": "05", "Jun": "06", "Jul": "07", "Aug": "08",
-      "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"
-    };
+    const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
 
-    const [day, month, year] = dateStr.split('/');
-    if (month && day && year) {
-      const formattedMonth = months[month];
-      return `${year}-${formattedMonth}-${day.padStart(2, '0')}`;
+    if (isNaN(date.getTime())) {
+      console.error('Invalid date format:', dateStr);
+      return null;
     }
-    return null;
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const day = String(date.getDate()).padStart(2, '0');
+
+    const formattedDate = `${year}-${month}-${day}`;
+
+    return formattedDate;
   }
 
-  private formatDateToCustomFormat(dateString: string): string {
+
+  formatDateToCustomFormat(dateString: string): string {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, '0');
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -488,19 +570,9 @@ export class ViewFirmPageComponent implements OnInit {
     this.firmService.getFirmDetails(firmId).subscribe(
       data => {
         this.firmDetails = data.response;
-        console.log('1) Firm details:', this.firmDetails);
-
-
-        this.firmAppTypeID = this.firmDetails.AuthorisationStatusTypeID > 0 ? 3 : 2; // if authorized then store 3 in firmAppTypeID else store 2, this is for Firm Application Type Field dropdown
-
-        // this.licenseStatusDates = {
-        //   [this.firmDetails.LicenseStatusTypeID]: this.firmDetails.LicenseApplStatusDate
-        // };
-
-        // // Set initial selected status ID
-        // this.selectedStatusId = this.firmDetails.LicenseStatusTypeID;
-
-        console.log('2) Firm details:', this.firmDetails);
+        this.selectedFirmTypeID = this.firmDetails.AuthorisationStatusTypeID != 0 ? 3 : 2;
+        this.getFirmTypes();
+        console.log('Firm details:', this.firmDetails);
       },
       error => {
         console.error('Error fetching firm details', error);
@@ -718,13 +790,97 @@ export class ViewFirmPageComponent implements OnInit {
       })
   }
 
+  getEmptyAddressObject(): Address {
+    return {
+      AddressID: this.generateGuid(),
+      AddressLine1: '',
+      AddressLine2: '',
+      City: '',
+      Province: '',
+      PostalCode: '',
+      PhoneNumber: '',
+      FaxNumber: '',
+      AddressTypeID: 0,
+      CountryID: 179,
+      LastModifiedBy: 30, // replace with the actual user ID
+      LastModifiedDate: new Date(),
+      ShowEditEnabled: true,
+      ShowEnabled: true,
+      ShowReadOnly: false,
+      FromDate: '',
+      ToDate: '',
+      Valid: true
+    };
+  }
+
+  generateGuid(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  addAddress(): void {
+    this.isAddingNewAddress = true;
+    const newAddress = this.getEmptyAddressObject();
+
+    newAddress.isNew = true;
+    // Find the first unused address type ID
+    const unusedType = this.allAddressTypes.find(type => !this.usedAddressTypes.has(type.AddressTypeID));
+    if (unusedType) {
+      newAddress.AddressTypeID = unusedType.AddressTypeID;
+    }
+
+    this.firmAddresses.unshift(newAddress); // Adds the new address at the beginning of the array
+    this.updateUsedAddressTypes(); // Update the used address types
+  }
+
+  updateUsedAddressTypes(): void {
+    this.usedAddressTypes = new Set(this.firmAddresses.map(addr => addr.AddressTypeID));
+  }
+
+  removeAddress(index: number): void {
+    const confirmDelete = window.confirm('Are you sure you want to delete this record?');
+    if (confirmDelete) {
+      if (index > -1 && index < this.firmAddresses.length) {
+        this.firmAddresses.splice(index, 1); // Removes the address at the specified index
+        this.updateUsedAddressTypes(); // Update used address types after removal
+      }
+    }
+  }
+
+  isAddressTypeUsed(addressTypeID: number): boolean {
+    return this.firmAddresses.some(addr => addr.AddressTypeID === addressTypeID && !addr.isNew);
+}
+
+  
+
+  // Method to check if all address types are present
+  areAllAddressTypesAdded(): boolean {
+    const existingTypes = new Set(this.firmAddresses.map(addr => addr.AddressTypeID));
+    return this.allAddressTypes.every(type => existingTypes.has(type.AddressTypeID));
+  }
+
+  filterExistingAddressTypes() {
+    // Get the unique AddressTypeID from the firmAddresses
+    const addressTypeIds = [...new Set(this.firmAddresses.map(address => address.AddressTypeID))];
+    console.log('Used AddressTypeIDs: ', addressTypeIds);  // Debugging line
+
+    // Filter allAddressTypes to include only those that match the existing AddressTypeIDs
+    this.existingAddressTypes = this.allAddressTypes.filter(type => addressTypeIds.includes(type.AddressTypeID));
+    console.log('Existing Address Types: ', this.existingAddressTypes);
+}
+
   loadFirmAdresses() {
     this.firmService.getFirmAddresses(this.firmId).subscribe(
       data => {
         this.firmAddresses = data.response;
         this.originalFirmAddresses = this.firmAddresses.map(address => ({
-          ...address
+          ...address,
+          isNew: false
         }));
+        this.filterExistingAddressTypes();
         console.log('Firm Addresses: ', this.firmAddresses);
       }, error => {
         console.error('Error Fetching Firm Addresses', error);
@@ -765,26 +921,101 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
 
-  loadApplicationDetails() {
-    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId, 2, true).subscribe(
+  // mock data for application details tables
+  licensedAppDetails = {
+
+    "FirmID": 78,
+    "AppliedOn": "12/Feb/2007",
+    "GrantedOn": "08/Aug/2007",
+    "RecentStatus": "Licensed",
+    "RecentStatusDate": "08/Aug/2007",
+    "LastModifiedBy": "System Account",
+    "LastModifiedDate": "23/Jan/2010 12:05PM",
+    "RecentStatusTypeID": 5,
+    "FirmApplStatusID": 380
+
+  }
+
+  authorizedAppDetails = {
+    "FirmID": 78,
+    "AppliedOn": "12/Feb/2007",
+    "GrantedOn": "08/Aug/2007",
+    "RecentStatus": "Authorised",
+    "RecentStatusDate": "08/Aug/2007",
+    "LastModifiedBy": "System Account",
+    "LastModifiedDate": "23/Jan/2010 12:05PM",
+    "RecentStatusTypeID": 13,
+    "FirmApplStatusID": 382
+  }
+  // We might remove this one
+  // loadApplicationDetails() {
+  //   this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId, 2, true).subscribe(
+  //     data => {
+  //       this.firmAppDetailsLatestLicensed = data.response[0];
+  //       console.log('Firm app details licensed history:', this.firmAppDetailsLatestLicensed);
+  //     },
+  //     error => {
+  //       console.error('Error fetching firm details', error);
+  //     }
+  //   );
+  //   this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId, 3, true).subscribe(
+  //     data => {
+  //       this.firmAppDetailsLatestAuthorized = data.response[0];
+  //       console.log('Firm app details licensed history:', this.firmAppDetailsLatestAuthorized);
+  //     },
+  //     error => {
+  //       console.error('Error fetching firm details', error);
+  //     }
+  //   );
+  // }
+
+  // Get Date Of Application Field for Application Details in Core Details
+  get dateOfApplication(): string {
+    return this.firmDetails.AuthorisationStatusTypeID > 0
+      ? this.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate)
+      : this.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate);
+  }
+
+  // Set Date Of Application Field for Application Details in Core Details
+  set dateOfApplication(value: string) {
+    if (this.firmDetails.AuthorisationStatusTypeID > 0) {
+      this.firmDetails.FirmAuthApplDate = this.convertDateToYYYYMMDD(value);
+    } else {
+      this.firmDetails.FirmLicApplDate = this.convertDateToYYYYMMDD(value);
+    }
+  }
+
+  // Get Licensed Date for Application Details in Core Details (edit mode)
+  get formattedLicenseApplStatusDate(): string {
+    return this.firmDetails.LicenseApplStatusDate ? this.formatDateToCustomFormat(this.firmDetails.LicenseApplStatusDate) : null;
+  }
+
+  set formattedLicenseApplStatusDate(value: string) {
+    this.firmDetails.LicenseApplStatusDate = this.convertDateToYYYYMMDD(value); // Assuming convertToDateObject is a method to parse the formatted string back to a Date object
+  }
+
+  // Get Authorized Date for Application Details in Core Details (edit mode)
+  get formattedAuthApplStatusDate(): string {
+    return this.firmDetails.AuthApplStatusDate ? this.formatDateToCustomFormat(this.firmDetails.AuthApplStatusDate) : null;
+  }
+
+  set formattedAuthApplStatusDate(value: string) {
+    this.firmDetails.AuthApplStatusDate = this.convertDateToYYYYMMDD(value); // Assuming convertToDateObject is a method to parse the formatted string back to a Date object
+  }
+
+  getFirmTypes() {
+    this.applicationTypeId = this.firmDetails.AuthorisationStatusTypeID != 0 ? 3 : 2;
+    this.firmService.getApplications(this.firmId, this.applicationTypeId).subscribe(
       data => {
-        this.firmAppDetailsLatestLicensed = data.response[0];
-        console.log('Firm app details licensed history:', this.firmAppDetailsLatestLicensed);
+        this.appDetails = data.response[0];
+        console.log('Loaded firm application types:', this.appDetails);
       },
       error => {
-        console.error('Error fetching firm details', error);
-      }
-    );
-    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId, 3, true).subscribe(
-      data => {
-        this.firmAppDetailsLatestAuthorized = data.response[0];
-        console.log('Firm app details licensed history:', this.firmAppDetailsLatestAuthorized);
-      },
-      error => {
-        console.error('Error fetching firm details', error);
+        console.error('Error fetching Application Types: ', error);
       }
     );
   }
+
 
   loadPrevFirmAndDate() {
     this.firmService.getFirmsNameHistory(this.firmId).subscribe(
@@ -872,13 +1103,23 @@ export class ViewFirmPageComponent implements OnInit {
     })
   }
 
-  // populateAddressTypes() {
-  //   this.firmService.getObjectTypeTable(constants.).subscribe(data => {
-  //     this. = data.response;
-  //   }, error => {
-  //     console.error('Error Fetching Address Types dropdown: ', error);
-  //   })
-  // }
+  populateFirmAppTypes() {
+    this.firmService.getObjectTypeTable(constants.firmAppTypes).subscribe(data => {
+      this.allFirmTypes = data.response;
+    }, error => {
+      console.error('Error Fetching Firm Application Types dropdown: ', error);
+    })
+  }
+
+  populateAddressTypes() {
+    this.firmService.getObjectTypeTable(constants.addressTypes).subscribe(data => {
+      this.allAddressTypes = data.response;
+     // this.updateUsedAddressTypes();
+    }, error => {
+      console.error('Error Fetching Address Types dropdown: ', error);
+    })
+  }
+
 
   onCategoryChange(activity: any) {
     const selectedCategory = activity.selectedCategory;
@@ -904,62 +1145,6 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-
-
-
-
-
-  switchTab(tabId: string) {
-    // Get all section elements
-    const sections = this.el.nativeElement.getElementsByTagName('section');
-
-    // Loop through all section elements and set display to none
-    for (let i = 0; i < sections.length; i++) {
-      this.renderer.setStyle(sections[i], 'display', 'none');
-    }
-    console.log('yes its', tabId)
-    const neededSection = document.getElementById(tabId);
-    this.renderer.setStyle(neededSection, 'display', 'flex');
-
-    if (tabId == 'CD') {
-      this.loadPrevFirmAndDate();
-      this.loadApplicationDetails();
-    }
-
-    if (tabId == 'Scope') {
-      this.isCollapsed['LicensedSection'] = true
-    }
-
-    if (tabId == 'Auditors' && this.FIRMAuditors.length === 0) {
-      this.loadAuditors();
-    }
-    if (tabId == 'Contacts' && this.FIRMContacts.length === 0) {
-      this.loadContacts();
-    }
-    if (tabId == 'Controllers' && this.FIRMControllers.length === 0) {
-      this.loadControllers();
-    }
-    if (tabId == 'SPRegFunds' && this.RegisteredFund.length === 0) {
-      this.loadRegisteredFund();
-    }
-    if (tabId == 'SPWaivers') {
-      this.loadWaivers();
-    }
-    if (tabId == 'SPRMPs') {
-      this.loadRMPs();
-    }
-    if (tabId == 'SPNotices') {
-      this.loadNotices();
-    }
-    // if(tabId == 'CD'){
-
-    // }
-    // if(tabId == 'CD'){
-    //   console.log('yes its', tabId)
-    //   const neededSection = document.getElementById(tabId);
-    //   this.renderer.setStyle(neededSection, 'display', 'flex');
-    // }
-  }
 
   getFYearHistory() {
     this.call = true;
@@ -1231,7 +1416,33 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
 
-  onFirmCoreAppDetailsFieldsChanges(selectedValue: number) {
+
+
+  toggleIslamicFinanceFields() {
+    if (this.islamicFinance && this.islamicFinance.IFinTypeId !== undefined) {
+      this.isIslamicFinanceChecked = true;
+    } else {
+      this.isIslamicFinanceChecked = false;
+    }
+  }
+
+  //   isFirmLicensed(): any { // logic must be changned, this should be an API
+  //     this.firmService.getApplications(this.firmId,2).subscribe(data => {
+  //         if (data.response[0].FirmApplStatusTypeID == data.response[0].FirmApplStatusGroupTypeID) {
+  //             console.log("Firm is licensed");
+  //             return true;
+  //         } else {
+  //             console.log("Firm is not licensed");
+  //             return false;
+  //         }
+  //     });
+  // }
+
+  FirmApplicationType_SelectedIndexChanged(selectedValue: number) {
+    // if(this.isFirmLicensed()) {
+    //   console.log('hello there');
+    // }
+
     // this.firmAppTypeID = selectedValue;
     // console.log('Firm Application Type ID Changed:', this.firmAppTypeID);
     // if (this.firmId) {
@@ -1252,15 +1463,6 @@ export class ViewFirmPageComponent implements OnInit {
     //     }
     //   }
     // }
-  }
-
-
-  toggleIslamicFinanceFields() {
-    if (this.islamicFinance && this.islamicFinance.IFinTypeId !== undefined) {
-      this.isIslamicFinanceChecked = true;
-    } else {
-      this.isIslamicFinanceChecked = false;
-    }
   }
 
   onLicenseStatusChange(selectedValue: any) {
@@ -1323,10 +1525,12 @@ export class ViewFirmPageComponent implements OnInit {
           // Update auth status label
           this.firmDetails.AuthorisationStatusTypeLabelDesc = `Date ${statusDescription}`;
 
-          // Set the date if available, otherwise make it null
-          this.firmDetails.AuthApplStatusDate = OldFirmApplStatusDate !== '1900-01-01T00:00:00'
-            ? this.formatDateToCustomFormat(OldFirmApplStatusDate)
-            : null;
+          // Ensure that the date is null if OldFirmApplStatusDate is invalid or equal to 1900-01-01
+          if (OldFirmApplStatusDate && OldFirmApplStatusDate !== '1900-01-01T00:00:00') {
+            this.firmDetails.AuthApplStatusDate = this.formatDateToCustomFormat(OldFirmApplStatusDate);
+          } else {
+            this.firmDetails.AuthApplStatusDate = null; // Set to null if date is invalid
+          }
 
           // Save the current status and date
           this.authorisationStatusDates[numericValue] = this.firmDetails.AuthApplStatusDate;
@@ -1334,10 +1538,11 @@ export class ViewFirmPageComponent implements OnInit {
           // Handle error or default case
           const selectedOption = this.allAuthorisationStatus.find(option => option.FirmApplStatusTypeID === numericValue);
           this.firmDetails.AuthorisationStatusTypeLabelDesc = `Date ${selectedOption?.FirmApplStatusTypeDesc || ''}`;
-          this.firmDetails.AuthApplStatusDate = null;
+          this.firmDetails.AuthApplStatusDate = null; // Ensure it's set to null
         }
       });
   }
+
 
 
 

@@ -710,6 +710,7 @@ hr {
     background-color: #A51E36;
     height: 1px;
     width: 100%;
+    margin: 10px 0px;
 }
 
 .authorized-section,
@@ -895,7 +896,7 @@ hr {
     color: white;
     border: none;
     font-size: 15px;
-    padding: 5px;
+    padding: 5px 10px;
     border-radius: 7px;
     margin-right: 10px;
 }
@@ -906,9 +907,11 @@ hr {
 }
 
 .del-address-container {
+    width: 100%;
     display: flex;
     justify-content: flex-end;
 }
+
 
 /* validations styling */
 .invalid {
