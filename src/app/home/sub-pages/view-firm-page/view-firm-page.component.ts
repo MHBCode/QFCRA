@@ -168,11 +168,14 @@ export class ViewFirmPageComponent implements OnInit {
         allowInput: true,
         dateFormat: 'd/M/Y', // Adjust date format as needed
         onChange: (selectedDates, dateStr) => {
-          input.nativeElement.value = dateStr; // Update the input value
+          console.log('Selected Date:', selectedDates);
+          console.log('Formatted Date String:', dateStr);
+          input.nativeElement.value = dateStr; 
         }
       });
     });
   }
+
   scrollToTop(): void {
     console.log('scrollToTop called');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -212,7 +215,7 @@ export class ViewFirmPageComponent implements OnInit {
 
     if (this.allowEditFirmDetails) {
       console.log("firms details after edit:", this.firmDetails);
-      const userId = 10044; // Replace with dynamic userId as needed
+      const userId = 10044; // Replace with dynamic userId as needed  //TODO: Remove hardcoded userId
 
       if (this.firmDetails?.AuthorisationStatusTypeID > 0) {
         this.firmDetails.firmApplDate = this.firmDetails.FirmAuthApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmAuthApplDate) : null;
@@ -220,38 +223,39 @@ export class ViewFirmPageComponent implements OnInit {
         this.firmDetails.firmApplDate = this.firmDetails.FirmLicApplDate;
       }
 
-      this.firmDetails.firmId = this.firmId;
-      this.firmDetails.qfcNum = this.firmDetails.QFCNum;
-      this.firmDetails.firmCode = this.firmDetails.FirmCode;
-      this.firmDetails.legalStatusTypeID = this.firmDetails.LegalStatusTypeID;
-      this.firmDetails.qfcTradingName = this.firmDetails.QFCTradingName;
-      this.firmDetails.prevTradingName = this.firmDetails.PrevTradingName;
-      this.firmDetails.placeOfIncorporation = this.firmDetails.PlaceOfIncorporation;
-      this.firmDetails.countyOfIncorporation = this.firmDetails.CountyOfIncorporation;
-      this.firmDetails.webSiteAddress = this.firmDetails.WebSiteAddress;
-      this.firmDetails.licenseStatusTypeID = this.firmDetails.LicenseStatusTypeID;
-      this.firmDetails.licensedDate = this.firmDetails.LicensedDate ? this.convertDateToYYYYMMDD(this.firmDetails.LicensedDate) : null;
-      this.firmDetails.authorisationDate = this.firmDetails.AuthorisationDate ? this.convertDateToYYYYMMDD(this.firmDetails.AuthorisationDate) : null;
-      this.firmDetails.dateOfIncorporation = this.firmDetails.DateOfIncorporation ? this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation) : null;
-      this.firmDetails.firmAccDataId = this.firmDetails.FirmAccountingDataID;
-      this.firmDetails.firmStandardID = this.firmDetails.FirmAccountingStandardID ? this.firmDetails.FirmAccountingStandardID : 0;
-      this.firmDetails.authorisationStatusTypeID = this.firmDetails.AuthorisationStatusTypeID > 0 ? this.firmDetails.AuthorisationStatusTypeID : 0;
-      this.firmDetails.licenseStatusTypeID = this.firmDetails.LicenseStatusTypeID;
-      this.firmDetails.firmApplTypeID = 0;
-      this.firmDetails.finYearEndTypeId = this.firmDetails.FinYearEndTypeID;
-      this.firmDetails.differentIncorporationDate = this.firmDetails.DifferentIncorporationDate;
-      this.firmDetails.firmApplicationDataComments = this.firmDetails.FirmApplicationDataComments ? this.firmDetails.FirmApplicationDataComments : '';
-      this.firmDetails.publicRegisterComments = this.firmDetails.PublicRegisterComments ? this.firmDetails.PublicRegisterComments : '';
-      this.firmDetails.firmFinStandardTypeID = this.firmDetails.FinAccStdTypeID;
-      this.firmDetails.firmFinStandardEffectiveFrom = this.firmDetails.FinAccStdTypeEffectiveFrom ? this.convertDateToYYYYMMDD(this.firmDetails.FinAccStdTypeEffectiveFrom) : null;
-      this.firmDetails.firmFinYearEndEffectiveFrom = this.firmDetails.FirmFinYearEndEffectiveFrom ? this.convertDateToYYYYMMDD(this.firmDetails.FirmFinYearEndEffectiveFrom) : null;
-      this.firmDetails.loginuserId = userId;
 
-      // Preparing the firmObj to send to the backend
       const firmObj = {
-        ...this.firmDetails,
-        firmObj: this.firmDetails // Include firmObj
+        firmId: this.firmId,
+        firmName: this.firmDetails.FirmName,
+        qfcNum: this.firmDetails.QFCNum,
+        firmCode: this.firmDetails.FirmCode,
+        legalStatusTypeID: this.firmDetails.LegalStatusTypeID,
+        qfcTradingName: this.firmDetails.QFCTradingName,
+        prevTradingName: this.firmDetails.PrevTradingName,
+        placeOfIncorporation: this.firmDetails.PlaceOfIncorporation,
+        countyOfIncorporation: this.firmDetails.CountyOfIncorporation,
+        webSiteAddress: this.firmDetails.WebSiteAddress,
+        firmApplDate: this.convertDateToYYYYMMDD(this.firmDetails.firmApplDate),
+        firmApplTypeID: 0,
+        licenseStatusTypeID: this.firmDetails.LicenseStatusTypeID,
+        licensedDate: this.convertDateToYYYYMMDD(this.firmDetails.LicensedDate),
+        authorisationStatusTypeID: this.firmDetails.AuthorisationStatusTypeID,
+        authorisationDate: this.convertDateToYYYYMMDD(this.firmDetails.AuthorisationDate),
+        loginuserId: userId,
+        finYearEndTypeId: this.firmDetails.FinYearEndTypeID,
+        firmAccDataId: this.firmDetails.FirmAccountingDataID,
+        firmApplicationDataComments: this.firmDetails.FirmApplicationDataComments ? this.firmDetails.FirmApplicationDataComments : '',
+        firmFinYearEndEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FirmFinYearEndEffectiveFrom),
+        firmFinStandardTypeID: this.firmDetails.FinAccStdTypeID,
+        firmStandardID: this.firmDetails.FirmAccountingStandardID,
+        firmFinStandardEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FinAccStdTypeEffectiveFrom),
+        dateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
+        differentIncorporationDate: this.firmDetails.DifferentIncorporationDate,
+        firmNameAsInFactSheet: this.firmDetails.FirmNameAsinFactSheet ? this.firmDetails.FirmNameAsinFactSheet : '',
+        requiresCoIndex: this.firmDetails.RequiresCoOp ? this.firmDetails.RequiresCoOp : '',
+        publicRegisterComments: this.firmDetails.PublicRegisterComments ? this.firmDetails.PublicRegisterComments : ''
       };
+      console.log("Final firm object to be sent:", firmObj);
 
       this.firmService.editFirm(userId, firmObj).subscribe(response => {
         console.log('Row edited successfully:', response);
@@ -395,24 +399,27 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   convertDateToYYYYMMDD(dateStr: string | Date): string | null {
+    console.log(dateStr);
+
     if (!dateStr) {
       return null; // Return null if the input is invalid or empty
     }
 
-    // If dateStr is already a Date object, use it directly
     const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
 
-    // Check if the date is valid
     if (isNaN(date.getTime())) {
       console.error('Invalid date format:', dateStr);
       return null;
     }
 
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based in JS
-    const day = date.getDate().toString().padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const day = String(date.getDate()).padStart(2, '0');
 
-    return `${year}-${month}-${day}`;
+    const formattedDate = `${year}-${month}-${day}`;
+    console.log(`formattedDate===============>: ${formattedDate}`);
+
+    return formattedDate;
   }
 
 
