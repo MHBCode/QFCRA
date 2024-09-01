@@ -47,6 +47,10 @@ export class FirmService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrl}insert_update_firm_details`, rowData, { headers: headers });
   }
+  editAppDetails(userId: number, rowData: any): Observable<any>  {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlApplication}insert_update_application`, rowData, { headers: headers });
+  }
   editCoreAddress(userId: number, rowData: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrlAddress}insert_update_address`, rowData, { headers: headers });
@@ -73,6 +77,10 @@ export class FirmService {
   }
   getAppDetailsLicensedAndAuthHistory(firmId: number, firmAppTypeID: any, getLatestRecord: boolean): Observable<any> {
     const url = `${this.baseUrlApplication}get_application_status?firmId=${firmId}&firmApplTypeID=${firmAppTypeID}&getLatest=${getLatestRecord}`;
+    return this.http.get<any>(url);
+  }
+  getApplications(firmId: number,applicationTypeId: number): Observable<any> {
+    const url = `${this.baseUrlApplication}get_applications?firmId=${firmId}&applicationTypeId=${applicationTypeId}`;
     return this.http.get<any>(url);
   }
   getFirmActivityLicensedAndAuthorized(firmId: number, firmAppTypeID: number): Observable<any> {
