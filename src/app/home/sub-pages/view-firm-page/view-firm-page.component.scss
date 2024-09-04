@@ -264,12 +264,15 @@ tr:nth-child(even) {
 }
 
 .input-field input,
-.input-field select,
-.input-field a {
+.input-field select {
   width: 100%;
   padding: 0.5rem 2%;
   border-radius: 7.2px;
   border: 0.72px #b1b1b1 solid;
+}
+
+.input-field div a {
+  font-size: 14px;
 }
 
 .input-field input {
@@ -284,19 +287,16 @@ tr:nth-child(even) {
   background-color: white !important;
 }
 
-.input-field a {
-  width: 96%;
-}
 
 .input-field textarea {
   width: 96%;
-  height: 150px;
+  height: 100px;
   padding: 0.5rem 2%;
   border-radius: 7.2px;
   border: 0.72px #b1b1b1 solid;
   resize: vertical;
   min-height: 20px;
-  max-height: 100px;
+  max-height: 70px;
 }
 
 .radio-wrapper {
@@ -386,7 +386,7 @@ tr:nth-child(even) {
   top: 8px;
 }
 
-.radioBtn input[type="radio"]:checked + span::after {
+.radioBtn input[type="radio"]:checked+span::after {
   content: "";
   height: 10px;
   width: 10px;
@@ -407,14 +407,17 @@ tr:nth-child(even) {
 .SPReview-dropdown {
   width: 150px;
 }
+
 .menu-sub-item.active {
   color: #a51e36 !important;
 }
+
 .menu-item h3::after {
   content: " ▼";
   font-size: 12px;
   margin-left: 5px;
 }
+
 /*Popup styles*/
 
 .popup-wrapper,
@@ -452,13 +455,16 @@ tr:nth-child(even) {
     background-color: #f2f2f2;
   }
 }
+
 .popup-info-place thead tr {
   background-color: #a51e36;
   color: white;
 }
+
 .addressHistoryPopup .popup-info-place tbody tr td:first-child {
   width: 44%;
 }
+
 .popup-info-place {
   width: 95%;
   display: flex;
@@ -485,9 +491,11 @@ tr:nth-child(even) {
   border: none;
   border-radius: 5px;
 }
+
 .ApplicationDetailsPopUp .popup-info-place thead tr {
   color: #000 !important;
 }
+
 .ApplicationDetailsPopUp p {
   color: black;
 }
@@ -720,10 +728,10 @@ table .input-field {
 }
 
 hr {
-    background-color: #A51E36;
-    height: 1px;
-    width: 100%;
-    margin: 10px 0px;
+  background-color: #A51E36;
+  height: 1px;
+  width: 100%;
+  margin: 10px 0px;
 }
 
 .authorized-section,
@@ -886,44 +894,47 @@ hr {
 }
 
 /* custom date picker */
-::ng-deep
-  .flatpickr-calendar
-  .flatpickr-current-month
-  .flatpickr-monthDropdown-months
-  .flatpickr-monthDropdown-month {
+::ng-deep .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
   font-size: 13px !important;
   background-color: white !important;
 }
 
 .addAddressBtn {
-    background: #A51E36;
-    color: white;
-    border: none;
-    font-size: 15px;
-    padding: 5px;
-    border-radius: 7px;
-    margin-right: 10px;
+  background: #A51E36;
+  color: white;
+  border: none;
+  font-size: 15px;
+  padding: 5px;
+  border-radius: 7px;
+  margin-right: 10px;
 }
 
 .RmvAddressBtn {
-    background: red;
-    color: white;
-    border: none;
-    font-size: 15px;
-    padding: 5px 10px;
-    border-radius: 7px;
-    margin-right: 10px;
+  background: red;
+  color: white;
+  border: none;
+  font-size: 15px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  margin-right: 10px;
 }
 
 .add-address-container {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .del-address-container {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.add-activity-container {
+  width: 99%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 5px;
 }
 
 

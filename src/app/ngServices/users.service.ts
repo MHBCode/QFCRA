@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { map, Observable, switchMap } from 'rxjs';
@@ -14,7 +14,7 @@ export class UsersService {
   
   constructor(private http: HttpClient) { }
 
-  getUserByAccess(userId: number): Observable<any> {
+  getAllUsersData(): Observable<any> {
     const url = `${this.baseUrl}get_users`;  // Construct full URL
     return this.http.get<any>(url);
   }
@@ -25,5 +25,9 @@ export class UsersService {
   getAppRoleByUserId(userId: number) {
     const url = `${this.baseUrlAppRoles}get_app_roles?userId=${userId}`;
     return this.http.get<any>(url);
+  }
+  saveUserAcess(rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlAppRoles}save_user_access`, rowData, { headers: headers });
   }
 }

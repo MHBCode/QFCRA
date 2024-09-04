@@ -1,5 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import flatpickr from 'flatpickr';
+import { FirmService } from 'src/app/ngServices/firm.service';
 import { UsersService } from 'src/app/ngServices/users.service';
+import * as constants from 'src/app/app-constants';
 
 @Component({
   selector: 'app-user-access',
@@ -7,102 +11,105 @@ import { UsersService } from 'src/app/ngServices/users.service';
   styleUrls: ['./user-access.component.scss']
 })
 export class UserAccessComponent implements OnInit {
-  rows: any[] = [];
 
-  userData: any = {}; // Property to store the fetched user data
-  appRoles: any[] = [];
-  filteredRoles: any[] = []; // For storing roles for selected user
+  userData: any = []; // Array to store the fetched user data
+  appRoles: any = [];
+  firmLevels: any = [];
   selectedUserId: number | string = ''; // Property to store the selected user ID
   noDataFound: boolean = false; // To track if no data was found
-  userId: number = 30; // this must be dynamic
 
-  constructor(private usersService: UsersService) { }
+  userAccessForm: FormGroup;
 
-  isObjectEmpty(value: any): boolean {
-    return Object.keys(value || {}).length === 0;
+
+  @ViewChildren('dateInputs') dateInputs: QueryList<ElementRef<HTMLInputElement>>;
+
+  constructor(private usersService: UsersService, private firmService: FirmService) {
+   
   }
 
-  addRow() {
-    // Add a new row with all fields enabled
-    this.rows.push({
-      userRole: '',
-      firmLevel: '',
-      UserRoleEffectiveDate: '',
-      UserRoleEndDate: '',
-      justification: '',
-      isEditable: true 
-    });
-  }
 
-  removeRow(index: number) {
-    if (this.rows.length > 1) {
-      this.rows.splice(index, 1);
-    }
-  }
   ngOnInit(): void {
-    this.loadUserData(); 
+    this.loadUserData();
     this.loadAppRoles();
+    this.populateFirmLevels();
   }
-  loadUserData() {
-    this.usersService.getUserByAccess(this.userId).subscribe({
-      next: (data) => {
-        this.userData = data;  // Store the user data
-        console.log('User Data:', this.userData);
-        // You can update the `rows` or other properties here based on the data
-      },
-      error: (error) => {
-        console.error('Error fetching user data:', error);
-      }
+
+  ngAfterViewInit() {
+    this.dateInputs.changes.subscribe(() => {
+      this.initializeFlatpickr();
+    });
+    this.initializeFlatpickr();
+  }
+
+  initializeFlatpickr() {
+    this.dateInputs.forEach((input: ElementRef<HTMLInputElement>) => {
+      flatpickr(input.nativeElement, {
+        allowInput: true,
+        dateFormat: 'd/M/Y', // Adjust date format as needed
+        onChange: (selectedDates, dateStr) => {
+          input.nativeElement.value = dateStr;
+        }
+      });
     });
   }
-  loadAppRoles(){
-    this.usersService.getAllAppRoles().subscribe({
-      next: (data) => {
-        this.appRoles = data.response;
-        console.log("App roles :", this.appRoles);
-      },
-      error: (error) =>{
-        console.error('Error fetching', error);
-      }
+
+  loadUserData() {
+    this.usersService.getAllUsersData().subscribe(data => {
+      this.userData = data.response; // Store the user data
+      console.log('User Data:', this.userData);
+    }, error => {
+      console.log("Error Fetching Users Data: ", error);
+    });
+  }
+
+  loadAppRoles() {
+    this.usersService.getAllAppRoles().subscribe(data => {
+      this.appRoles = data.response;
+      console.log("App roles:", this.appRoles);
+    }, error => {
+      console.log("Error Fetching App Roles: ", error);
+    });
+  }
+
+
+  populateFirmLevels() {
+    this.firmService.getObjectTypeTable(constants.firmLevels).subscribe(data => {
+      this.firmLevels = data.response;
+    }, error => {
+      console.error('Error Fetching Countries dropdown: ', error);
     })
   }
-  onUserChange(): void {
-    if (this.selectedUserId) {
-      if (Number(this.selectedUserId) === this.userId) {
-        this.usersService.getAppRoleByUserId(this.userId).subscribe({
-          next: (data) => {
-            // Map each role to include the required fields
-            this.filteredRoles = data.response.map(role => ({
-              userRole: role.AppRoleID,
-              firmLevel: role.FirmLevel,
-              effectiveDate: role.UserRoleEffectiveDate,
-              expirationDate: role.UserRoleEndDate,
-              justification: role.Justification,
-              isEditable: false // Set existing roles as non-editable
-            }));
 
-            this.noDataFound = this.filteredRoles.length === 0;
-            this.rows = [...this.filteredRoles]; // Set rows to filteredRoles
-            console.log('Filtered Roles:', this.filteredRoles);
-          },
-          error: (error) => {
-            console.error('Error fetching user roles:', error);
-            this.noDataFound = true;
-            this.filteredRoles = [];
-            this.rows = []; // Clear rows if error occurs
-          }
-        });
-      } else {
-        this.noDataFound = true;
-        this.filteredRoles = [];
-        this.rows = []; // Clear rows if no matching user
-      }
-    } else {
-      this.noDataFound = false;
-      this.filteredRoles = [];
-      this.rows = []; // Clear rows if no user selected
-    }
+  save() {
+    
   }
+
+  
+
+  cancel() {
+    // Handle cancel logic here
+  }
+
+
+  convertDateToYYYYMMDD(dateStr: string | Date): string | null {
+    console.log(dateStr);
+
+    if (!dateStr) {
+      return null; // Return null if the input is invalid or empty
+    }
+    const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+
+    if (isNaN(date.getTime())) {
+      console.error('Invalid date format:', dateStr);
+      return null;
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const day = String(date.getDate()).padStart(2, '0');
+
+    // Only return the date in YYYY-MM-DD format, stripping the time part
+    const formattedDate = `${year}-${month}-${day}`;
+
+    return formattedDate;
 }
-
-
+}

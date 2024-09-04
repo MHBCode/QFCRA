@@ -98,17 +98,18 @@ export class FirmsPageComponent {
 
   filterFirmsByLetter(letter: string): void {
     console.log('Filtering firms by letter:', letter);
-
+  
     if (letter === '#') {
+      // Filter firms that do not start with a letter
       this.filteredFirms = this.firms.filter(firm => !/^[A-Za-z]/.test(firm.FirmName));
-      console.log('Filtered firms:', this.filteredFirms);
-
     } else {
-      console.log('Filtered==============> firms:', this.firms.filter(firm => firm.FirmName.startsWith(letter)));
-
+      // Filter firms that start with the selected letter
       this.filteredFirms = this.firms.filter(firm => firm.FirmName.startsWith(letter));
     }
+  
+    console.log('Filtered firms:', this.filteredFirms);
   }
+  
 
 
   resetFilters(): void {

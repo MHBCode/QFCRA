@@ -39,7 +39,7 @@ export class EditScopeLicensedComponent implements OnInit{
   }
 
   loadActivitiesLicensed() {
-    this.firmService.getFirmActivityLicensedAndAuthorized(this.firmId, 2).subscribe(
+    this.firmService.getFirmActivityLicensed(this.firmId, 2).subscribe(
       data => {
         this.ActivityLicensed = data.response;
         console.log('Firm FIRM License scope details:', this.ActivityLicensed);

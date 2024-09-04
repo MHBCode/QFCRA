@@ -19,6 +19,8 @@ export class FirmService {
   private baseUrlApplication = environment.API_URL + '/api/Application/' //Application
   private baseUrlAddress = environment.API_URL + '/api/Address/' // Address
   private baseUrlSecurity = environment.API_URL + '/api/Security/' // Security
+  private baseUrlLogForm = environment.API_URL + '/api/LogForm/' // logform
+  private baseUrlObjectWF = environment.API_URL + 'api/ObjectWF/' // Object WF
 
   constructor(private http: HttpClient) { }
 
@@ -35,8 +37,8 @@ export class FirmService {
     const url = `${this.baseUrl}get_firm?firmID=${firmId}`;
     return this.http.get<any>(url);
   }
-  getFirmAddresses(entityId: number): Observable<any> {
-    const url = `${this.baseUrlAddress}get_address_list?entityTypeId=1&entityId=${entityId}`
+  getFirmAddresses(firmId: number): Observable<any> {
+    const url = `${this.baseUrlAddress}get_address_list?objectId=521&objectInstanceId=${firmId}&objectInstanceRevNum=1&sourceObjectID=521&sourceObjectInstanceId=${firmId}&sourceObjectInstanceRevNum=1`
     return this.http.get<any>(url);
   }
   getAddressesTypeHistory(firmId: number, addressTypeId: number) {
@@ -45,7 +47,7 @@ export class FirmService {
   }
   editFirm(userId: number, rowData: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<any>(`${this.baseUrl}insert_update_firm_details`, rowData, { headers: headers });
+    return this.http.post<any>(`${this.baseUrl}insert_update_firm_form`, rowData, { headers: headers });
   }
   editAppDetails(userId: number, rowData: any): Observable<any>  {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
@@ -75,16 +77,32 @@ export class FirmService {
     const url = `${this.baseUrl}get_inactive_firm_users?firmId=${firmId}`;  // Construct full URL https://localhost:7091/api/Firms/get_inactive_firm_users?firmId=66
     return this.http.get<any>(url);
   }
-  getAppDetailsLicensedAndAuthHistory(firmId: number, firmAppTypeID: any, getLatestRecord: boolean): Observable<any> {
+  getAppDetailsLicensedAndAuthHistory(firmId: number, firmAppTypeID: number, getLatestRecord: boolean): Observable<any> {
     const url = `${this.baseUrlApplication}get_application_status?firmId=${firmId}&firmApplTypeID=${firmAppTypeID}&getLatest=${getLatestRecord}`;
+    return this.http.get<any>(url);
+  }
+  getCurrentAppDetailsLicensedAndAuth(firmId:number ,applicationTypeId: number): Observable<any> {
+    const url = `${this.baseUrlApplication}get_application_status_current?firmId=${firmId}&applicationTypeId=${applicationTypeId}`;
     return this.http.get<any>(url);
   }
   getApplications(firmId: number,applicationTypeId: number): Observable<any> {
     const url = `${this.baseUrlApplication}get_applications?firmId=${firmId}&applicationTypeId=${applicationTypeId}`;
     return this.http.get<any>(url);
   }
-  getFirmActivityLicensedAndAuthorized(firmId: number, firmAppTypeID: number): Observable<any> {
-    const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmApplicationTypeId=${firmAppTypeID}`;  //'https://localhost:7091/api/Activity/get_firm_activities?firmId=66&firmApplicationTypeId=2or3' 2: Licensed, 3:Authorized
+  getFirmActivityLicensed(firmId: number, scopeRevNum: number): Observable<any> {
+    const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmScopeRevNo=${scopeRevNum}&firmApplicationTypeId=2`;  //'https://localhost:7091/api/Activity/get_firm_activities?firmId=66&firmApplicationTypeId=2' 2: Licensed
+    return this.http.get<any>(url);
+  }
+  getFirmActivityAuthorized(firmId: number, scopeRevNum: number): Observable<any> {
+    const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmScopeRevNo=${scopeRevNum}&firmApplicationTypeId=3`;  //'https://localhost:7091/api/Activity/get_firm_activities?firmId=66&firmApplicationTypeId=3' 3:Authorized
+    return this.http.get<any>(url);
+  }
+  getCurrentScopeRevNum(firmId: number, activityCategoryId: number): Observable<any> {
+    const url = `${this.baseUrlActivity}get_current_scope_revNum?firmId=${firmId}&activityCategoryId=${activityCategoryId}`;
+    return this.http.get<any>(url);
+  }
+  getDocumentDetails(docID: number): Observable<any> {
+    const url = `${this.baseUrlLogForm}get_document_details?docID=${docID}`;
     return this.http.get<any>(url);
   }
   getActivityCategories(): Observable<any> {
@@ -115,6 +133,11 @@ export class FirmService {
     );
   }
 
+
+  get_document(scopeId: number,scopeRevNum: number): Observable<any> {
+    const url = `${this.baseUrlObjectWF}get_document?objectId=524&objectInstanceId=${scopeId}&ObjectInstanceRevNum=${scopeRevNum}`
+    return this.http.get<any>(url);
+  }
 
   getIslamicFinance(firmId: number): Observable<any> {
     return this.getFirmScopeIdAndRevNum(firmId).pipe(

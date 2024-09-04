@@ -46,7 +46,7 @@ export class EditScopeAuthorizedComponent {
   }
 
   loadActivitiesAuthorized() {
-    this.firmService.getFirmActivityLicensedAndAuthorized(this.firmId, 3).subscribe(
+    this.firmService.getFirmActivityAuthorized(this.firmId, 2).subscribe(
       data => {
         this.ActivityAuth = data.response[0];
         console.log('Firm FIRM License scope details:', this.ActivityAuth);

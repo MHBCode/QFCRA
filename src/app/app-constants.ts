@@ -7,4 +7,5 @@ export const FinYearEnd = "FirmFinYearEndTypes";
 export const FinAccStd = "FinAccStdTypes";
 export const firmAppTypes = "v_FirmApplicationType";
 export const addressTypes = "v_EntityAddressTypes";
+export const firmLevels = "UserRoleFirmTypes";
 // export const 

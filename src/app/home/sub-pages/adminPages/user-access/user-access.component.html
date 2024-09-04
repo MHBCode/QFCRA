@@ -1,10 +1,10 @@
-<div class="useraccess-actions">
+<form [formGroup]="userAccessForm" (ngSubmit)="save()">
+  <div class="useraccess-actions">
     <div class="btns">
-      <button class="save-btn">Save</button>
-      <button class="cancel-btn">Cancel</button>
+      <button type="submit" class="save-btn">Save</button>
+      <button type="button" class="cancel-btn" (click)="cancel()">Cancel</button>
     </div>
   </div>
-  
   <section class="useraccess-section">
     <div class="inputs-field-set">
       <div class="section">
@@ -12,19 +12,19 @@
         <div class="system-access-container">
           <label>
             System Access Request For:
-            <select name="" id="" class="system-access-select" [(ngModel)]="selectedUserId" (change)="onUserChange()">
+            <select id="userSelect" class="system-access-select">
               <option value="">Select</option>
-              <option *ngFor="let user of userData?.response" [value]="user?.UserID">{{ user?.UserName }}</option>
+              <option *ngFor="let user of userData" [value]="user?.UserID">{{ user?.UserName }}</option>
             </select>
           </label>
           <a class="view-access-history" href="#">View User Access History</a>
         </div>
-  
+
         <div *ngIf="noDataFound" class="no-data-found">
           <p style="color: red;">No data found</p>
         </div>
-  
-        <table *ngIf="rows.length > 0">
+
+        <table>
           <thead>
             <tr>
               <th>Role</th>
@@ -33,37 +33,36 @@
               <th>Expiration Date <br> [DD/MON/YYYY]</th>
               <th>Justification</th>
               <th>
-                <button class="addRowBtn" (click)="addRow()">+</button>
+                <button class="addRowBtn">+</button>
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of rows; let i = index">
+            <tr>
               <td>
-                <select name="" id="userRole" [(ngModel)]="row.userRole" [disabled]="!row.isEditable">
+                <select formControlName="userRole">
                   <option value="">Select Role</option>
                   <option *ngFor="let role of appRoles" [value]="role?.AppRoleID">{{ role?.AppRoleDesc }}</option>
                 </select>
               </td>
               <td>
-                <select name="" id="firmLevel" [(ngModel)]="row.firmLevel" [disabled]="!row.isEditable">
+                <select formControlName="firmLevel">
                   <option value="">Select Level</option>
-                  <option value="1">All Firms</option>
-                  <option value="2">Supervisory Firms</option>
-                  <option value="3">Specific Firms</option>
+                  <option *ngFor="let levels of firmLevels" [value]="levels.UserRoleFirmTypeID">
+                    {{levels.UserRoleFirmTypeDesc}}</option>
                 </select>
               </td>
               <td>
-                <input type="date" id="effectiveDate" [(ngModel)]="isObjectEmpty(row.effectiveDate) ? '' : row.effectiveDate" [disabled]="!row.isEditable">
+                <input type="text" formControlName="effectiveDate" #dateInputs>
               </td>
               <td>
-                <input type="date" id="expirationDate" [(ngModel)]="isObjectEmpty(row.expirationDate) ? '' : row.expirationDate">
+                <input type="text" formControlName="expirationDate" #dateInputs>
               </td>
               <td>
-                <textarea name="justification" id="justification" [(ngModel)]="isObjectEmpty(row.justification) ? '' : row.justification"></textarea>
+                <textarea formControlName="justification"></textarea>
               </td>
               <td>
-                <button *ngIf="row.isEditable" class="removeRowBtn" (click)="removeRow(i)">x</button>
+                <button type="button" class="removeRowBtn">x</button>
               </td>
             </tr>
           </tbody>
@@ -71,4 +70,4 @@
       </div>
     </div>
   </section>
-  
+</form>
