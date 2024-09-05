@@ -426,7 +426,10 @@ tr:nth-child(even) {
 .prevFirmNamePopUp,
 .accountingStandardsPopUp,
 .uploadDocumentPopUp,
-.addressHistoryPopup {
+.addressHistoryPopup,
+.ScopeLicPreviousVersionsPopup,
+.ScopeAuthPreviousVersionsPopup
+ {
   position: fixed;
   top: 25vh;
   left: 20vw;
@@ -520,6 +523,39 @@ tr:nth-child(even) {
 
 .addressHistoryPopup table tr td {
   text-align: left;
+}
+
+.ScopeLicPreviousVersionsPopup,.ScopeAuthPreviousVersionsPopup {
+  padding: 1rem!important;
+  height: 20vh!important;
+}
+
+/* View Previous Versions Popup Style */
+.revision-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+
+.revision-list li {
+  margin-bottom: 0.5rem;
+}
+
+.change-button {
+  display: block;
+  padding: 0.5rem 1rem;
+  background-color: #A51E36;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.change-button:hover {
+  background-color: #bc3a52;
 }
 
 /* permitted activities */
@@ -937,8 +973,30 @@ hr {
   margin-top: 5px;
 }
 
+.view-prev-version {
+  color: blue;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.view-prev-version-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
 
 /* validations styling */
 .invalid {
   border: 1px solid red;
+}
+
+.error-messages {
+  margin-left: 15px;
+  margin-top: 10px;
+}
+
+.error-border {
+  border-color: red!important;
 }

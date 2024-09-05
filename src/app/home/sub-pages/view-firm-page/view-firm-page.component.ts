@@ -86,6 +86,13 @@ export class ViewFirmPageComponent implements OnInit {
   selectedCategory: string;
   selectedActivity: string;
   documentDetails: any = {}
+  LicPrevRevNumbers: any = []
+  AuthPrevRevNumbers: any = []
+  currentLicRevisionNumber: number | null = null;
+  lastLicRevisionNumber: number | null = null;
+  currentAuthRevisionNumber: number | null = null;
+  lastAuthRevisionNumber: number | null = null;
+
 
 
   selectedStatusId: number | null = null;
@@ -120,6 +127,8 @@ export class ViewFirmPageComponent implements OnInit {
   rstFirmSector: boolean;
   firmSectorID: any;
 
+  // flags validations
+  showError = false;
 
   AllProducts: any[] = [];
 
@@ -141,6 +150,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.firmId = +params['id']; // Retrieve the firm ID from the route parameters
       console.log(`Loaded firm with ID: ${this.firmId}`);
       this.loadFirmDetails(this.firmId);  // Fetch the firm details
+      this.loadPrevFirmAndDate();
       this.loadCurrentAppDetails();
       this.loadFirmOPDetails(this.firmId); // Fetch Operational Data
       this.loadAssiRA();
@@ -233,8 +243,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.renderer.setStyle(neededSection, 'display', 'flex');
 
     if (tabId == 'CD') {
-      this.loadPrevFirmAndDate();
-      //this.loadApplicationDetails();
+
     }
 
     if (tabId == 'Scope') {
@@ -272,20 +281,69 @@ export class ViewFirmPageComponent implements OnInit {
     // }
   }
 
+
+
   editFirm() {
+    const now = new Date();
+    const isoDateTime = now.toISOString();
+    // Outputs something like "2024-09-05T11:25:45.064Z"
+
+    const userId = 10044; // Replace with dynamic userId as needed  //TODO: Remove hardcoded userId
+
+
     console.log("allowEditFirmDetails :", this.allowEditFirmDetails);
 
-    this.allowEditFirmDetails = !this.allowEditFirmDetails;
     const existingAddresses = this.firmAddresses;
-
     if (this.allowEditFirmDetails) {
-      console.log("firms details after edit:", this.firmDetails);
-      const userId = 10044; // Replace with dynamic userId as needed  //TODO: Remove hardcoded userId
+      this.allowEditFirmDetails = !this.allowEditFirmDetails;
+    } else {
+      if (!this.firmDetails.FirmName || this.firmDetails.LegalStatusTypeID == 0) {
+        this.showError = true; // Show the error message
+        return; // Prevent further actions if validation fails
+      }
+
+      if (this.firmDetails.DifferentIncorporationDate == true) {
+        if (this.firmDetails.DateOfIncorporation == null || this.firmDetails.DateOfIncorporation == '') {
+          this.showError = true; // Show the error message
+          return; // Prevent further actions if validation fails
+        }
+      } else {
+        this.firmDetails.DateOfIncorporation = this.firmDetails.DateOfIncorporation;
+      }
+
+      this.showError = false;
+      this.allowEditFirmDetails = !this.allowEditFirmDetails; // Toggle to edit mode
 
       if (this.firmDetails?.AuthorisationStatusTypeID > 0) {
-        this.firmDetails.firmApplDate = this.firmDetails.FirmAuthApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmAuthApplDate) : null;
+        this.firmDetails.firmApplDate = this.firmDetails.FirmAuthApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmAuthApplDate) : isoDateTime;
       } else {
-        this.firmDetails.firmApplDate = this.firmDetails.FirmLicApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate) : null;
+        this.firmDetails.firmApplDate = this.firmDetails.FirmLicApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate) : isoDateTime;
+      }
+
+      if (this.firmDetails.LegalStatusTypeID == 1 || this.firmDetails.LegalStatusTypeID == 2 ||
+        this.firmDetails.LegalStatusTypeID == 7 || this.firmDetails.LegalStatusTypeID == 8
+      ) {
+        this.firmDetails.PlaceOfIncorporation = constants.PLACE_OF_INCORPORATION_QFC;
+      }
+
+      if (this.selectedFirmTypeID === 2) {
+        if (this.firmDetails.LicenseStatusTypeID === 4) { // 4: Application option in QFC License Status (Core Details)
+          this.firmDetails.LicensedDate = this.dateOfApplication;
+        } else {
+          this.firmDetails.LicensedDate = this.firmDetails.LicensedDate;
+        }
+      }
+
+      if (this.selectedFirmTypeID === 3) {
+        if (this.firmDetails.LicensedDate != null) {
+          this.firmDetails.LicensedDate = this.firmDetails.LicensedDate;
+        } else {
+          if (this.firmDetails.AuthorisationDate != null) {
+            this.firmDetails.LicensedDate = this.firmDetails.AuthorisationDate;
+          } else {
+            this.firmDetails.LicensedDate = isoDateTime;
+          }
+        }
       }
 
       const updatedAddresses = existingAddresses.map(address => ({
@@ -297,23 +355,23 @@ export class ViewFirmPageComponent implements OnInit {
         addressAssnID: address.AddressAssnID,
         entityTypeID: address.EntityTypeID,
         entityID: address.EntityID,
-        contactAssnID: 0,
-        contactID: 0,
+        contactAssnID: null,
+        contactID: null,
         addressID: address.AddressID.toString(),
         addressLine1: address.AddressLine1,
         addressLine2: address.AddressLine2,
         addressLine3: address.AddressLine3,
         addressLine4: address.AddressLine4,
         city: address.City,
-        province: '',
+        province: address.Province ?? '',
         postalCode: address.PostalCode,
         phoneNumber: address.PhoneNum,
-        phoneExt: '',
+        phoneExt: address.PhoneExt ?? '',
         faxNumber: address.FaxNum,
-        lastModifiedDate: address.LastModifiedDate, // Ensure date format is expected
+        lastModifiedDate: address.LastModifiedDate ?? '', // Ensure date format is expected
         addressState: 3,
-        fromDate: address.FromDate, // Ensure date format is expected
-        toDate: address.ToDate, // Ensure date format is expected
+        fromDate: address.FromDate ?? '', // Ensure date format is expected
+        toDate: address.ToDate ?? '', // Ensure date format is expected
         objectID: address.ObjectID,
         objectInstanceID: address.ObjectInstanceID,
         objectInstanceRevNumber: address.ObjectInstanceRevNum,
@@ -399,7 +457,7 @@ export class ViewFirmPageComponent implements OnInit {
           firmYearEndEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FirmFinYearEndEffectiveFrom),
           finAccStandardTypeID: this.firmDetails.FinAccStdTypeID,
           finAccStandardID: this.firmDetails.FirmAccountingStandardID ?? 0,
-          firmAccountingEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FinAccStdTypeEffectiveFrom) ?? '',
+          firmAccountingEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FinAccStdTypeEffectiveFrom) ?? null,
           dateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
           differentIncorporationDate: this.firmDetails.DifferentIncorporationDate,
           firmNameAsinFactSheet: this.firmDetails.FirmNameAsinFactSheet ? this.firmDetails.FirmNameAsinFactSheet : '',
@@ -499,8 +557,8 @@ export class ViewFirmPageComponent implements OnInit {
 
       this.firmService.editFirm(userId, firmObj).subscribe(response => {
         console.log('Row edited successfully:', response);
+        this.loadPrevFirmAndDate();
         this.loadFirmDetails(this.firmId);
-        //this.loadApplicationDetails();
         this.loadFirmAdresses();
         this.cdr.detectChanges();
       }, error => {
@@ -515,6 +573,9 @@ export class ViewFirmPageComponent implements OnInit {
 
   cancelEditFirm() {
     this.allowEditFirmDetails = true;
+    this.showError = false;
+    this.loadFirmDetails(this.firmId);
+    this.loadFirmAdresses();
   }
 
 
@@ -672,6 +733,14 @@ export class ViewFirmPageComponent implements OnInit {
     return `${day}/${month}/${year}`;
   }
 
+  onLegalStatusChange(value: number) {
+    this.firmDetails.LegalStatusTypeID = value;
+    if (value == 1 || value == 2 || value == 7 || value == 8) {
+      this.firmDetails.PlaceOfIncorporation = constants.PLACE_OF_INCORPORATION_QFC;
+    } else {
+      this.firmDetails.PlaceOfIncorporation = '';
+    }
+  }
 
   // Method to load firm details
   loadFirmDetails(firmId: number) {
@@ -680,6 +749,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.firmDetails = data.response;
         this.selectedFirmTypeID = this.firmDetails.AuthorisationStatusTypeID != 0 ? 3 : 2;
         this.getFirmTypes();
+        this.loadPrevFirmAndDate();
         console.log('Firm details:', this.firmDetails);
       },
       error => {
@@ -765,39 +835,13 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
 
-  // this will be replaced or removed
-  // fetchPreviousScopeVersions(firmId: number, firmApplicationTypeId: number) {
-  //   // Prompt user to input the ScopeRevNo or fetch it from somewhere dynamically
-  //   const scopeRevNum = parseInt(prompt('Enter Scope Revision Number:'));
-
-  //   if (isNaN(scopeRevNum)) {
-  //     alert('Invalid Scope Revision Number');
-  //     return;
-  //   }
-
-  //   // Determine which service function to call based on firmApplicationTypeId
-  //   if (firmApplicationTypeId === 2) {
-  //     this.firmService.getFirmActivityLicensed(firmId, scopeRevNum).subscribe(data => {
-  //       this.ActivityLicensed = data.response;
-  //       console.log('Licensed Activities:', this.ActivityLicensed);
-  //     });
-  //   } else if (firmApplicationTypeId === 3) {
-  //     this.firmService.getFirmActivityAuthorized(firmId, scopeRevNum).subscribe(data => {
-  //       this.ActivityAuth = data.response;
-  //       console.log('Authorized Activities:', this.ActivityAuth);
-  //     });
-  //   } else {
-  //     alert('Invalid Firm Application Type ID');
-  //   }
-  // }
-
 
   loadActivitiesLicensed() {
     this.loadFormReference();
     this.firmService.getCurrentScopeRevNum(this.firmId, 2).subscribe( // 2 here is: Licensed
       data => {
         this.scopeRevNum = data.response.Column1;
-        this.firmService.getFirmActivityLicensed(this.firmId, this.scopeRevNum).subscribe(
+        this.firmService.getFirmActivityLicensed(this.firmId).subscribe(
           data => {
             this.ActivityLicensed = data.response;
             console.log('Firm License scope details:', this.ActivityLicensed);
@@ -826,9 +870,9 @@ export class ViewFirmPageComponent implements OnInit {
     this.firmService.getCurrentScopeRevNum(this.firmId, 3).subscribe( // 3 here is: Authorized
       data => {
         this.scopeRevNum = data.response.Column1;
-        this.firmService.getFirmActivityAuthorized(this.firmId, this.scopeRevNum).subscribe(
+        this.firmService.getFirmActivityAuthorized(this.firmId).subscribe(
           data => {
-            this.ActivityAuth = data.response[0];
+            this.ActivityAuth = data.response;
             console.log('Firm Authorized scope details:', this.ActivityAuth);
           },
           error => {
@@ -861,7 +905,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   loadRegulatedActivities() {
-    this.firmService.getFirmActivityAuthorized(this.firmId, 2).subscribe(
+    this.firmService.getFirmActivityAuthorized(this.firmId).subscribe(
       data => {
         this.AuthRegulatedActivities = data.response;
 
@@ -1159,6 +1203,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.firmService.getFirmsNameHistory(this.firmId).subscribe(
       data => {
         this.firmNamesHistory = data.response;
+        this.cdr.detectChanges();
         console.log('Firm app details licensed history:', this.firmNamesHistory);
       },
     );
@@ -1480,27 +1525,109 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
 
-  // getScopePreviousVersions(firmId: number, firmApplicationTypeId: number) {
-  //   if (firmApplicationTypeId === 2) {
-  //     this.firmService.getFirmActivityLicensed(firmId, scopeRevNum).subscribe(data => {
-  //       this.ActivityLicensed = data.response;
-  //       console.log('Licensed Activities:', this.ActivityLicensed);
-  //     });
-  //     const popupWrapper = document.querySelector('.addressHistoryPopup') as HTMLElement;
-  //     if (popupWrapper) {
-  //       popupWrapper.style.display = 'flex';
-  //     } else {
-  //       console.error('Element with class .addressHistoryPopup not found');
-  //     }
-  //   }
-  // }
-  closeScopePreviousVersions() {
-    const popupWrapper = document.querySelector('.ScopePreviousVersionsPopup') as HTMLElement;
+  getLicScopePreviousVersions(firmId: number, firmApplicationTypeId: number) {
+    if (firmApplicationTypeId === 2) {
+      this.firmService.getFirmActivityLicensed(firmId).subscribe(data => {
+        this.ActivityLicensed = data.response;
+
+        if (this.ActivityLicensed) {
+
+          const scopeID = this.ActivityLicensed[0].FirmScopeID;
+
+          this.firmService.getRevision(scopeID).subscribe(revisions => {
+            console.log('Fetched revisions:', revisions);
+            this.LicPrevRevNumbers = revisions.response;
+          });
+        } else {
+          console.error('No activities found or scopeID is missing');
+        }
+      });
+    }
+    const popupWrapper = document.querySelector('.ScopeLicPreviousVersionsPopup') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'flex';
+    } else {
+      console.error('Element with class .ScopeLicPreviousVersionsPopup not found');
+    }
+  }
+
+  closeLicScopePreviousVersions() {
+    const popupWrapper = document.querySelector('.ScopeLicPreviousVersionsPopup') as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none';
     } else {
-      console.error('Element with class .ScopePreviousVersionsPopup not found');
+      console.error('Element with class .ScopeLicPreviousVersionsPopup not found');
     }
+  }
+
+  getAuthScopePreviousVersions(firmId: number, firmApplicationTypeId: number) {
+    if (firmApplicationTypeId === 3) {
+      this.firmService.getFirmActivityAuthorized(firmId).subscribe(data => {
+        this.ActivityAuth = data.response;
+
+        if (this.ActivityAuth) {
+
+          const scopeID = this.ActivityAuth[0].FirmScopeID;
+
+          this.firmService.getRevision(scopeID).subscribe(revisions => {
+            console.log('Fetched revisions:', revisions);
+            this.AuthPrevRevNumbers = revisions.response;
+          });
+        } else {
+          console.error('No activities found or scopeID is missing');
+        }
+      });
+    }
+    const popupWrapper = document.querySelector('.ScopeAuthPreviousVersionsPopup') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'flex';
+    } else {
+      console.error('Element with class .ScopeAuthPreviousVersionsPopup not found');
+    }
+  }
+
+  closeAuthScopePreviousVersions() {
+    const popupWrapper = document.querySelector('.ScopeAuthPreviousVersionsPopup') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none';
+    } else {
+      console.error('Element with class .ScopeAuthPreviousVersionsPopup not found');
+    }
+  }
+
+  fetchPreviousScopeVersions(firmId: number, firmApplicationTypeId: number) {
+    const scopeRevNum = parseInt(prompt('Enter Scope Revision Number:'));
+
+    if (isNaN(scopeRevNum)) {
+      alert('Invalid Scope Revision Number');
+      return;
+    }
+
+    if (firmApplicationTypeId === 2) {
+      this.firmService.getScopeNum(firmId, scopeRevNum, 2).subscribe(data => {
+        this.ActivityLicensed = data.response;
+        this.currentLicRevisionNumber = scopeRevNum;
+        console.log('Licensed Activities:', this.ActivityLicensed);
+        this.updateLicLastRevisionNumber(); // Update lastRevisionNumber based on the response
+      });
+    } else if (firmApplicationTypeId === 3) {
+      this.firmService.getScopeNum(firmId, scopeRevNum, 3).subscribe(data => {
+        this.ActivityAuth = data.response;
+        this.currentAuthRevisionNumber = scopeRevNum;
+        console.log('Authorized Activities:', this.ActivityAuth);
+        this.updateAuthLastRevisionNumber(); // Update lastRevisionNumber based on the response
+      });
+    } else {
+      alert('Invalid Firm Application Type ID');
+    }
+  }
+
+  updateLicLastRevisionNumber() {
+    this.lastLicRevisionNumber = Math.max(...this.LicPrevRevNumbers.map(r => r.ScopeRevNum));
+  }
+
+  updateAuthLastRevisionNumber() {
+    this.lastAuthRevisionNumber = Math.max(...this.AuthPrevRevNumbers.map(r => r.ScopeRevNum));
   }
 
   viewController() {
