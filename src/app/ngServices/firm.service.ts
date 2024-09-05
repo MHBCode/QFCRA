@@ -49,7 +49,7 @@ export class FirmService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrl}insert_update_firm_form`, rowData, { headers: headers });
   }
-  editAppDetails(userId: number, rowData: any): Observable<any>  {
+  editAppDetails(userId: number, rowData: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrlApplication}insert_update_application`, rowData, { headers: headers });
   }
@@ -81,11 +81,11 @@ export class FirmService {
     const url = `${this.baseUrlApplication}get_application_status?firmId=${firmId}&firmApplTypeID=${firmAppTypeID}&getLatest=${getLatestRecord}`;
     return this.http.get<any>(url);
   }
-  getCurrentAppDetailsLicensedAndAuth(firmId:number ,applicationTypeId: number): Observable<any> {
+  getCurrentAppDetailsLicensedAndAuth(firmId: number, applicationTypeId: number): Observable<any> {
     const url = `${this.baseUrlApplication}get_application_status_current?firmId=${firmId}&applicationTypeId=${applicationTypeId}`;
     return this.http.get<any>(url);
   }
-  getApplications(firmId: number,applicationTypeId: number): Observable<any> {
+  getApplications(firmId: number, applicationTypeId: number): Observable<any> {
     const url = `${this.baseUrlApplication}get_applications?firmId=${firmId}&applicationTypeId=${applicationTypeId}`;
     return this.http.get<any>(url);
   }
@@ -143,7 +143,7 @@ export class FirmService {
   }
 
 
-  get_document(scopeId: number,scopeRevNum: number): Observable<any> {
+  get_document(scopeId: number, scopeRevNum: number): Observable<any> {
     const url = `${this.baseUrlObjectWF}get_document?objectId=524&objectInstanceId=${scopeId}&ObjectInstanceRevNum=${scopeRevNum}`
     return this.http.get<any>(url);
   }

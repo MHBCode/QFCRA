@@ -579,64 +579,175 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
 
-  editLicenseScope() {
+  // editLicenseScope() {
+  //   this.allowEditLicScopeDetails = !this.allowEditLicScopeDetails;
+  //   this.showPermittedActivitiesTable = !this.showPermittedActivitiesTable;
+
+  //   const userId = 10044;
+  //   if (this.allowEditLicScopeDetails) {
+
+  //     // let container: any = {};
+  //     // // objFirmScope
+  //     // this.objFirmScope.firmScopeID = this.ActivityLicensed[0].FirmScopeID;
+  //     // this.objFirmScope.scopeRevNum = this.ActivityLicensed[0].ScopeRevNum;
+  //     // this.objFirmScope.docReferenceID = 0;
+  //     // this.objFirmScope.firmID = this.ActivityLicensed[0].FirmID;
+  //     // // this.objFirmScope.createdBy = this.ActivityLicensed[0].ScopeCreatedByName;
+  //     // this.objFirmScope.createdBy = 1;
+  //     // this.objFirmScope.objectID = 0;
+  //     // this.objFirmScope.docIDs = this.ActivityLicensed[0].DocID ? this.ActivityLicensed[0].DocID : null;
+  //     // this.objFirmScope.generalConditions = this.ActivityLicensed[0].GeneralConditions ? this.ActivityLicensed[0].GeneralConditions : null;
+  //     // this.objFirmScope.effectiveDate = this.ActivityLicensed[0].ScopeEffectiveDate ? this.ActivityLicensed[0].ScopeEffectiveDate : null;
+  //     // this.objFirmScope.scopeCertificateLink = this.ActivityLicensed[0].ScopeCertificateLink;
+  //     // this.objFirmScope.applicationDate = this.ActivityLicensed[0].ScopeAppliedDate ? this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate) : null;
+  //     // this.objFirmScope.licensedOrAuthorisedDate = this.ActivityLicensed[0].ScopeLicensedDate ? this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate) : null;;
+  //     // // this.objFirmScope.firmApplTypeID = 2
+
+
+  //     // //lstFirmActivities
+  //     // this.lstFirmActivities.createdBy = 1;
+  //     // this.lstFirmActivities.firmScopeTypeID = this.ActivityLicensed[0].FirmScopeTypeID;
+  //     // this.lstFirmActivities.activityTypeID = this.ActivityLicensed[0].ActivityTypeID;
+  //     // this.lstFirmActivities.effectiveDate = '';
+  //     // this.lstFirmActivities.firmActivityConditions = this.ActivityLicensed[0].Column1;
+  //     // this.lstFirmActivities.productTypeID = '';
+  //     // this.lstFirmActivities.appliedDate = this.ActivityLicensed[0].ApliedDate;
+  //     // this.lstFirmActivities.withDrawnDate = '';
+  //     // this.lstFirmActivities.activityDetails = '';
+  //     // // this.lstFirmActivities.objectProductActivity = [
+  //     // //   this.objectProductActivity.productTypeID = 
+  //     // //   this.objectProductActivity.appliedDate = 
+  //     // //   this.objectProductActivity.withDrawnDate = 
+  //     // //   this.objectProductActivity.effectiveDate = 
+  //     // //   this.objectProductActivity.firmScopeTypeID = 
+  //     // // ]
+
+  //     // container.objFirmScope = this.objFirmScope;
+  //     // container.lstFirmActivities = this.lstFirmActivities;
+  //     // container.objPrudentialCategory = this.objPrudentialCategory;
+  //     // container.objSector = this.objSector;
+  //     // container.objFirmIslamicFinance = this.objFirmIslamicFinance;
+  //     // container.lstFirmScopeCondition = this.lstFirmScopeCondition;
+  //     // container.firmSectorID = this.firmSectorID;
+
+  //     // this.firmService.editLicenseScope(userId, scopeLicensed).subscribe(response => {
+  //     //   console.log('Row edited successfully:', response);
+  //     // }, error => {
+  //     //   console.error('Error editing row:', error);
+  //     // })
+  //   }
+
+  // }
+  // editLicenseScope(): void {
+  //   this.allowEditLicScopeDetails = !this.allowEditLicScopeDetails;
+
+  //   if (!this.allowEditLicScopeDetails) {
+  //     // Save the changes when exiting edit mode
+  //     this.saveLicenseScopeDetails();
+  //   }
+  // }
+
+  // saveLicenseScopeDetails(): void {
+  //   const updatedLicenseScope = {
+  //     objFirmScope: {
+  //       firmScopeID: this.ActivityLicensed[0]?.firmScopeID || 0,
+  //       scopeRevNum: this.ActivityLicensed[0]?.scopeRevNum || 0,
+  //       firmID: this.firmDetails?.FirmID || 0,
+  //       objectID: this.ActivityLicensed[0]?.objectID || 0,
+  //       createdBy: this.ActivityLicensed[0]?.createdBy || 0,
+  //       docReferenceID: this.ActivityLicensed[0]?.docReferenceID || 0,
+  //       firmApplTypeID: this.ActivityLicensed[0]?.firmApplTypeID || 0,
+  //       docIDs: this.ActivityLicensed[0]?.docIDs || '',
+  //       generalConditions: this.ActivityLicensed[0]?.generalConditions || '',
+  //       scopeCertificateLink: this.ActivityLicensed[0]?.scopeCertificateLink || '',
+  //       applicationDate: this.ActivityLicensed[0]?.applicationDate || '',
+  //       licensedOrAuthorisedDate: this.ActivityLicensed[0]?.licensedOrAuthorisedDate || '',
+  //     },
+  //     lstFirmActivities: this.lstFirmActivities // Assuming these are activities already listed
+  //   };
+
+  //   // Call the API to save the changes
+  //   this.firmService.editLicenseScope(10044, updatedLicenseScope).subscribe(
+  //     response => {
+  //       console.log('License scope updated successfully:', response);
+  //       // Refresh the data or navigate to a confirmation page
+  //     },
+  //     error => {
+  //       console.error('Error updating license scope:', error);
+  //     }
+  //   );
+  // }
+
+  convertDateToISO(dateString: string): string {
+    // Convert the date string into a Date object
+    const months: { [key: string]: number } = {
+      Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+      Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+    };
+
+    const [day, month, year] = dateString.split('/');
+    const monthIndex = months[month as keyof typeof months];
+
+    const date = new Date(parseInt(year), monthIndex, parseInt(day));
+
+    // Convert the Date object to ISO string with milliseconds and Z for UTC time
+    return date.toISOString();
+  }
+  editLicenseScope(): void {
     this.allowEditLicScopeDetails = !this.allowEditLicScopeDetails;
-    this.showPermittedActivitiesTable = !this.showPermittedActivitiesTable;
-
-    const userId = 10044;
-    if (this.allowEditLicScopeDetails) {
-
-      // let container: any = {};
-      // // objFirmScope
-      // this.objFirmScope.firmScopeID = this.ActivityLicensed[0].FirmScopeID;
-      // this.objFirmScope.scopeRevNum = this.ActivityLicensed[0].ScopeRevNum;
-      // this.objFirmScope.docReferenceID = 0;
-      // this.objFirmScope.firmID = this.ActivityLicensed[0].FirmID;
-      // // this.objFirmScope.createdBy = this.ActivityLicensed[0].ScopeCreatedByName;
-      // this.objFirmScope.createdBy = 1;
-      // this.objFirmScope.objectID = 0;
-      // this.objFirmScope.docIDs = this.ActivityLicensed[0].DocID ? this.ActivityLicensed[0].DocID : null;
-      // this.objFirmScope.generalConditions = this.ActivityLicensed[0].GeneralConditions ? this.ActivityLicensed[0].GeneralConditions : null;
-      // this.objFirmScope.effectiveDate = this.ActivityLicensed[0].ScopeEffectiveDate ? this.ActivityLicensed[0].ScopeEffectiveDate : null;
-      // this.objFirmScope.scopeCertificateLink = this.ActivityLicensed[0].ScopeCertificateLink;
-      // this.objFirmScope.applicationDate = this.ActivityLicensed[0].ScopeAppliedDate ? this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate) : null;
-      // this.objFirmScope.licensedOrAuthorisedDate = this.ActivityLicensed[0].ScopeLicensedDate ? this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate) : null;;
-      // // this.objFirmScope.firmApplTypeID = 2
-
-
-      // //lstFirmActivities
-      // this.lstFirmActivities.createdBy = 1;
-      // this.lstFirmActivities.firmScopeTypeID = this.ActivityLicensed[0].FirmScopeTypeID;
-      // this.lstFirmActivities.activityTypeID = this.ActivityLicensed[0].ActivityTypeID;
-      // this.lstFirmActivities.effectiveDate = '';
-      // this.lstFirmActivities.firmActivityConditions = this.ActivityLicensed[0].Column1;
-      // this.lstFirmActivities.productTypeID = '';
-      // this.lstFirmActivities.appliedDate = this.ActivityLicensed[0].ApliedDate;
-      // this.lstFirmActivities.withDrawnDate = '';
-      // this.lstFirmActivities.activityDetails = '';
-      // // this.lstFirmActivities.objectProductActivity = [
-      // //   this.objectProductActivity.productTypeID = 
-      // //   this.objectProductActivity.appliedDate = 
-      // //   this.objectProductActivity.withDrawnDate = 
-      // //   this.objectProductActivity.effectiveDate = 
-      // //   this.objectProductActivity.firmScopeTypeID = 
-      // // ]
-
-      // container.objFirmScope = this.objFirmScope;
-      // container.lstFirmActivities = this.lstFirmActivities;
-      // container.objPrudentialCategory = this.objPrudentialCategory;
-      // container.objSector = this.objSector;
-      // container.objFirmIslamicFinance = this.objFirmIslamicFinance;
-      // container.lstFirmScopeCondition = this.lstFirmScopeCondition;
-      // container.firmSectorID = this.firmSectorID;
-
-      // this.firmService.editLicenseScope(userId, scopeLicensed).subscribe(response => {
-      //   console.log('Row edited successfully:', response);
-      // }, error => {
-      //   console.error('Error editing row:', error);
-      // })
+    if (!this.ActivityLicensed || this.ActivityLicensed.length === 0) {
+      console.error('No activities found to process.');
+      return;
     }
 
+    const updatedLicenseScope = {
+      objFirmScope: this.ActivityLicensed.map(activityLic =>
+      ({
+        firmScopeID: activityLic.FirmScopeID,
+        scopeRevNum: activityLic.ScopeRevNum,
+        firmID: activityLic.FirmID,
+        objectID: activityLic.objectID, // TODO: ????????????????????????????? unknown objectID
+        createdBy: activityLic.createdBy, // TODO: ????????????????????????????? unknown createdBy
+        docReferenceID: activityLic.docReferenceID, // TODO: ????????????????????????????? unknown docReferenceID
+        firmApplTypeID: activityLic.firmApplTypeID, // TODO: ????????????????????????????? unknown firmApplTypeID
+        docIDs: activityLic.DocID,
+        generalConditions: activityLic.GeneralConditions,
+        effectiveDate: this.convertDateToISO(activityLic.EffectiveDate),
+        scopeCertificateLink: activityLic.ScopeCertificateLink,
+        applicationDate: new Date().toISOString(),//TODO:???????????????????????????????? unknown applicationDate  ,
+        licensedOrAuthorisedDate: new Date().toISOString(),  //TODO:??????????????????????? unknown  licensedOrAuthorisedDate ,
+      }))[0],
+      lstFirmActivities: this.ActivityLicensed.map(activityLic => {
+        return {
+          createdBy: activityLic.createdBy, // TODO: ????????????????????????????? unknown createdBy
+          firmScopeTypeID: activityLic.FirmScopeTypeID,
+          activityTypeID: activityLic.ActivityTypeID,
+          effectiveDate: this.convertDateToISO(activityLic.EffectiveDate),
+          firmActivityConditions: activityLic.GeneralConditions, //TODO: ?????????????????? unknown GeneralConditions
+          productTypeID: activityLic.ProductTypeID,  //TODO: ?????????????????? unknown ProductTypeID
+          appliedDate: this.convertDateToISO(activityLic.ScopeAppliedDate),
+          withDrawnDate: this.convertDateToISO(activityLic.WithdrawnDate),
+          objectProductActivity: activityLic.ObjectProductActivity ? activityLic.ObjectProductActivity.map(product => ({
+            productTypeID: product.ProductTypeID,//TODO: ?????????????????? unknown ProductTypeID
+            appliedDate: product.AppliedDate, //TODO: ??????????????????  unknown AppliedDate
+            withDrawnDate: product.WithDrawnDate,   //TODO: ??????????????????  unknown WithDrawnDate
+            effectiveDate: product.EffectiveDate,   //TODO: ??????????????????  unknown EffectiveDate
+            firmScopeTypeID: product.FirmScopeTypeID    //TODO: ??????????????????  unknown FirmScopeTypeID
+          })) : [],
+          activityDetails: activityLic.FirmActivityDetails
+        };
+      })
+    };
+
+
+    this.firmService.editLicenseScope(10044, updatedLicenseScope).subscribe( // TODO 10044 here is: firmID Do forget to change it
+      response => {
+        console.log('License scope updated successfully:', response);
+      },
+      error => {
+        console.error('Error updating license scope:', error);
+      }
+    );
   }
 
   cancelEditLicScope() {
