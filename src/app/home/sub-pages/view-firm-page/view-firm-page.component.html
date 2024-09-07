@@ -654,14 +654,14 @@
                     <input disabled name="appliedOn" id="appliedOn" type="text"
                         value="{{firmAppDetailsCurrentLicensed?.AppliedOn | date: 'dd/MMM/y'}}">
                 </div>
-                <!--not integrated yet-->
+                
                 <div class="input-field">
                     <label for="licensedOn">
                         Licensed On
                     </label>
                     <input type="text" disabled name="licensedOn" id="licensedOn"
                         value="{{firmAppDetailsCurrentLicensed?.GrantedOn | date: 'dd/MMM/y'}}">
-                    <!--might have the wrong integration--> <!--not integrated yet-->
+                  
                 </div>
                 <div class="input-field">
                     <label for="currentStatus">
@@ -670,7 +670,7 @@
                     <input disabled name="currentStatus" id="currentStatus" type="text"
                         value="{{firmAppDetailsCurrentLicensed?.RecentStatus}}">
                 </div>
-                <!--not integrated yet-->
+                
                 <div class="input-field">
                     <label for="currentStatusEffectiveDate">
                         Current Status Effective Date
@@ -678,7 +678,7 @@
                     <input disabled name="currentStatusEffectiveDate" id="currentStatusEffectiveDate" type="text"
                         value="{{firmAppDetailsCurrentLicensed?.RecentStatusDate | date: 'dd/MMM/y'}}">
                 </div>
-                <!--not integrated yet-->
+                
                 <div class="input-field">
                     <label for="lastModifiedBy">
                         Last Modified By
@@ -686,7 +686,7 @@
                     <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
                         value="{{firmAppDetailsCurrentLicensed?.LastModifiedBy}}">
                 </div>
-                <!--not integrated yet-->
+                
                 <div class="input-field">
                     <label for="lastModifiedDate">
                         Last Modified Date
@@ -694,7 +694,7 @@
                     <input disabled name="lastModifiedDate" id="lastModifiedDate" type="text"
                         value="{{firmAppDetailsCurrentLicensed?.LastModifiedDate}}">
                 </div>
-                <!--not integrated yet-->
+               
                 <ng-container *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
                     <h3 class="subTitle-firmDetails">Authorisation Status</h3>
                     <div class="input-field">
@@ -704,14 +704,14 @@
                         <input disabled name="appliedOnAuth" id="appliedOnAuth" type="text"
                             value="{{firmAppDetailsCurrentAuthorized?.AppliedOn | date: 'dd/MMM/y'}}">
                     </div>
-                    <!--not integrated yet-->
+                    
                     <div class="input-field">
                         <label for="AuthorizedOnAuth">
                             Authorised On
                         </label>
                         <input type="text" disabled name="AuthorizedOnAuth" id="AuthorizedOnAuth"
                             value="{{firmAppDetailsCurrentAuthorized?.GrantedOn | date: 'dd/MMM/y'}}">
-                        <!--might have the wrong integration--> <!--not integrated yet-->
+                        
                     </div>
                     <div class="input-field">
                         <label for="currentStatusAuth">
@@ -720,7 +720,7 @@
                         <input disabled name="currentStatusAuth" id="currentStatusAuth" type="text"
                             value="{{firmAppDetailsCurrentAuthorized?.RecentStatus}}">
                     </div>
-                    <!--not integrated yet-->
+                    
                     <div class="input-field">
                         <label for="currentStatusEffectiveDateAuth">
                             Current Status Effective Date
@@ -729,7 +729,7 @@
                             type="text"
                             value="{{firmAppDetailsCurrentAuthorized?.RecentStatusDate | date: 'dd/MMM/y'}}">
                     </div>
-                    <!--not integrated yet-->
+                    
                     <div class="input-field">
                         <label for="lastModifiedByAuth">
                             Last Modified By
@@ -737,7 +737,7 @@
                         <input disabled name="lastModifiedByAuth" id="lastModifiedByAuth" type="text"
                             value="{{firmAppDetailsCurrentAuthorized?.LastModifiedBy}}">
                     </div>
-                    <!--not integrated yet-->
+                    
                     <div class="input-field">
                         <label for="lastModifiedDateAuth">
                             Last Modified Date
@@ -745,7 +745,7 @@
                         <input disabled name="lastModifiedDateAuth" id="lastModifiedDateAuth" type="text"
                             value="{{firmAppDetailsCurrentAuthorized?.LastModifiedDate}}">
                     </div>
-                    <!--not integrated yet-->
+                    
                 </ng-container>
             </div>
             <!--or (edit mode)-->
@@ -784,7 +784,7 @@
                         {{firmDetails?.LicenseStatusTypeLabelDesc}}
                     </label>
                     <input name="DateLicensed" id="DateLicensed" type="text" #dateInputs
-                        [(ngModel)]="formattedLicenseApplStatusDate">
+                        [(ngModel)]="firmDetails.LicensedDate">
                 </div>
                 <div class="input-field" *ngIf="selectedFirmTypeID == 3">
                     <label for="authorisationStatus">
@@ -802,7 +802,7 @@
                         {{firmDetails?.AuthorisationStatusTypeLabelDesc}}
                     </label>
                     <input name="dateAuthorized" id="dateAuthorized" type="text" #dateInputs
-                        [(ngModel)]="formattedAuthApplStatusDate">
+                        [(ngModel)]="formattedAuthDate">
                 </div>
             </div>
 

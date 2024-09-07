@@ -284,9 +284,6 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   editFirm() {
-    const now = new Date();
-    const isoDateTime = now.toISOString();
-    // Outputs something like "2024-09-05T11:25:45.064Z"
 
     const userId = 10044; // Replace with dynamic userId as needed  //TODO: Remove hardcoded userId
 
@@ -315,9 +312,9 @@ export class ViewFirmPageComponent implements OnInit {
       this.allowEditFirmDetails = !this.allowEditFirmDetails; // Toggle to edit mode
 
       if (this.firmDetails?.AuthorisationStatusTypeID > 0) {
-        this.firmDetails.firmApplDate = this.firmDetails.FirmAuthApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmAuthApplDate) : isoDateTime;
+        this.firmDetails.firmApplDate = this.firmDetails.FirmAuthApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmAuthApplDate) : null;
       } else {
-        this.firmDetails.firmApplDate = this.firmDetails.FirmLicApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate) : isoDateTime;
+        this.firmDetails.firmApplDate = this.firmDetails.FirmLicApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate) : null;
       }
 
       if (this.firmDetails.LegalStatusTypeID == 1 || this.firmDetails.LegalStatusTypeID == 2 ||
@@ -341,97 +338,11 @@ export class ViewFirmPageComponent implements OnInit {
           if (this.firmDetails.AuthorisationDate != null) {
             this.firmDetails.LicensedDate = this.firmDetails.AuthorisationDate;
           } else {
-            this.firmDetails.LicensedDate = isoDateTime;
+            this.firmDetails.LicensedDate = null;
           }
         }
       }
 
-      const updatedAddresses = existingAddresses.map(address => ({
-        firmID: this.firmId,
-        countryID: address.CountryID,
-        addressTypeID: address.AddressTypeID,
-        sameAsTypeID: address.SameAsTypeID,
-        lastModifiedBy: userId, // must be dynamic
-        addressAssnID: address.AddressAssnID,
-        entityTypeID: address.EntityTypeID,
-        entityID: address.EntityID,
-        contactAssnID: null,
-        contactID: null,
-        addressID: address.AddressID.toString(),
-        addressLine1: address.AddressLine1,
-        addressLine2: address.AddressLine2,
-        addressLine3: address.AddressLine3,
-        addressLine4: address.AddressLine4,
-        city: address.City,
-        province: address.Province ?? '',
-        postalCode: address.PostalCode,
-        phoneNumber: address.PhoneNum,
-        phoneExt: address.PhoneExt ?? '',
-        faxNumber: address.FaxNum,
-        lastModifiedDate: address.LastModifiedDate ?? '', // Ensure date format is expected
-        addressState: 3,
-        fromDate: address.FromDate ?? '', // Ensure date format is expected
-        toDate: address.ToDate ?? '', // Ensure date format is expected
-        objectID: address.ObjectID,
-        objectInstanceID: address.ObjectInstanceID,
-        objectInstanceRevNumber: address.ObjectInstanceRevNum,
-        sourceObjectID: address.SourceObjectID,
-        sourceObjectInstanceID: address.SourceObjectInstanceID,
-        sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNum,
-        objAis: {
-          ainId: 0,
-          contactId: 0,
-          natinality: 0,
-          countryOfResidence: 0,
-          functionId: 0,
-          formTypeId: 0,
-          formProcessorId: 0,
-          statusofApplicationId: 0,
-          applicatioState: 0,
-          fromType: 0,
-          contactAssId: 0,
-          firmId: 0,
-          prefferdMethod: 0,
-          customFacingId: 0,
-          ainNumber: "",
-          title: "",
-          firstName: "",
-          secondName: "",
-          thirdName: "",
-          familyname: "",
-          fullName: "",
-          previousName: "",
-          dateOfBirth: "",
-          placeOfBirth: "",
-          nationality: "",
-          copyOfResidence: "",
-          passportNumber: "",
-          nationalId: "",
-          functions: "",
-          conditions: "",
-          formType: "",
-          dateRecieved: "",
-          formProcessor: "",
-          paymentRequest: "",
-          paymentRecieved: "",
-          createdBy: "",
-          statusOfApplications: "",
-          statusDate: "",
-          appicationStatusDate: "",
-          customFacingActivity: "",
-          paymentRequestSenton: "",
-          paymentRecievedon: "",
-          conditionsRestriction: "",
-          applicationID: "",
-          createdDate: "",
-          mobilePhone: "",
-          bussinessEmail: "",
-          otherEmail: "",
-          prefferedMethodType: "",
-          showReadOnly: true,
-          showEnabled: true
-        }
-      }));
       const firmObj = {
         firmDetails: {
           firmID: this.firmId,
@@ -464,94 +375,43 @@ export class ViewFirmPageComponent implements OnInit {
           requiresCoOp: this.firmDetails.RequiresCoOp ? this.firmDetails.RequiresCoOp : '',
           prComments: this.firmDetails.PublicRegisterComments ? this.firmDetails.PublicRegisterComments : ''
         },
-        addressList: updatedAddresses
+        addressList: [
+          {
+            firmID: this.firmId,
+            countryID: this.firmAddresses.CountryID,
+            addressTypeID: this.firmAddresses.AddressTypeID,
+            sameAsTypeID: this.firmAddresses.SameAsTypeID,
+            lastModifiedBy: userId, // must be dynamic
+            addressAssnID: this.firmAddresses.AddressAssnID,
+            entityTypeID: this.firmAddresses.EntityTypeID,
+            entityID: this.firmAddresses.EntityID,
+            contactAssnID: null,
+            contactID: null,
+            addressID: this.firmAddresses.AddressID,
+            addressLine1: this.firmAddresses.AddressLine1,
+            addressLine2: this.firmAddresses.AddressLine2,
+            addressLine3: this.firmAddresses.AddressLine3,
+            addressLine4: this.firmAddresses.AddressLine4,
+            city: this.firmAddresses.City,
+            province: this.firmAddresses.Province ?? '',
+            postalCode: this.firmAddresses.PostalCode,
+            phoneNumber: this.firmAddresses.PhoneNum,
+            phoneExt: this.firmAddresses.PhoneExt ?? '',
+            faxNumber: this.firmAddresses.FaxNum,
+            lastModifiedDate: this.firmAddresses.LastModifiedDate ?? null,
+            addressState: 3,
+            fromDate: this.firmAddresses.FromDate ?? null,
+            toDate: this.firmAddresses.ToDate ?? null,
+            objectID: this.firmAddresses.ObjectID,
+            objectInstanceID: this.firmAddresses.ObjectInstanceID,
+            objectInstanceRevNumber: this.firmAddresses.ObjectInstanceRevNum,
+            sourceObjectID: this.firmAddresses.SourceObjectID,
+            sourceObjectInstanceID: this.firmAddresses.SourceObjectInstanceID,
+            sourceObjectInstanceRevNumber: this.firmAddresses.SourceObjectInstanceRevNum,
+            objAis: null
+          }
+        ]
       };
-
-      // const firmObj = {
-      //   firmId: this.firmId,
-      //   firmName: this.firmDetails.FirmName,
-      //   qfcNum: this.firmDetails.QFCNum,
-      //   firmCode: this.firmDetails.FirmCode,
-      //   legalStatusTypeID: this.firmDetails.LegalStatusTypeID,
-      //   qfcTradingName: this.firmDetails.QFCTradingName,
-      //   prevTradingName: this.firmDetails.PrevTradingName,
-      //   placeOfIncorporation: this.firmDetails.PlaceOfIncorporation,
-      //   countyOfIncorporation: this.firmDetails.CountyOfIncorporation,
-      //   webSiteAddress: this.firmDetails.WebSiteAddress,
-      //   firmApplDate: this.firmDetails.firmApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.firmApplDate) : null,
-      //   firmApplTypeID: 0,
-      //   licenseStatusTypeID: this.firmDetails.LicenseStatusTypeID,
-      //   licensedDate: this.convertDateToYYYYMMDD(this.firmDetails.LicensedDate),
-      //   authorisationStatusTypeID: this.firmDetails.AuthorisationStatusTypeID,
-      //   authorisationDate: this.convertDateToYYYYMMDD(this.firmDetails.AuthorisationDate),
-      //   loginuserId: userId,
-      //   finYearEndTypeId: this.firmDetails.FinYearEndTypeID,
-      //   firmAccDataId: this.firmDetails.FirmAccountingDataID,
-      //   firmApplicationDataComments: this.firmDetails.FirmApplicationDataComments ? this.firmDetails.FirmApplicationDataComments : '',
-      //   firmFinYearEndEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FirmFinYearEndEffectiveFrom),
-      //   firmFinStandardTypeID: this.firmDetails.FinAccStdTypeID,
-      //   firmStandardID: this.firmDetails.FirmAccountingStandardID,
-      //   firmFinStandardEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FinAccStdTypeEffectiveFrom),
-      //   dateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
-      //   differentIncorporationDate: this.firmDetails.DifferentIncorporationDate,
-      //   firmNameAsInFactSheet: this.firmDetails.FirmNameAsinFactSheet ? this.firmDetails.FirmNameAsinFactSheet : '',
-      //   requiresCoIndex: this.firmDetails.RequiresCoOp ? this.firmDetails.RequiresCoOp : '',
-      //   publicRegisterComments: this.firmDetails.PublicRegisterComments ? this.firmDetails.PublicRegisterComments : ''
-      // };
-
-      // update Addresses
-      // add condition for addresstypeID to check which one you want to edit
-      // Assuming originalFirmAddresses holds the original state of firmAddresses before editing
-      // this.firmAddresses.forEach((address, index) => {
-      //   // Retrieve the original address for comparison
-      //   const originalAddress = this.originalFirmAddresses[index];
-
-      //   let addressChanged = false;
-
-      //   // Check if any address fields have changed
-      //   if (address.AddressLine1 !== originalAddress.AddressLine1 ||
-      //     address.AddressLine2 !== originalAddress.AddressLine2 ||
-      //     address.AddressLine3 !== originalAddress.AddressLine3 ||
-      //     address.AddressLine4 !== originalAddress.AddressLine4 ||
-      //     address.City !== originalAddress.City ||
-      //     address.Province !== originalAddress.Province ||
-      //     address.PostalCode !== originalAddress.PostalCode ||
-      //     address.CountryID !== originalAddress.CountryID ||
-      //     address.PhoneNum !== originalAddress.PhoneNum ||
-      //     address.PhoneExt !== originalAddress.PhoneExt ||
-      //     address.FaxNum !== originalAddress.FaxNum) {
-      //     addressChanged = true;
-      //   }
-      //   if (addressChanged) { // Change this to execute when changes are detected
-      //     this.firmAddress.addressId = address.AddressID;
-      //     this.firmAddress.addressAssnId = address.AddressAssnID;
-      //     this.firmAddress.addressTypeId = address.AddressTypeID;
-      //     this.firmAddress.addressLine1 = address.AddressLine1;
-      //     this.firmAddress.addressLine2 = address.AddressLine2;
-      //     this.firmAddress.addressLine3 = address.AddressLine3;
-      //     this.firmAddress.addressLine4 = address.AddressLine4;
-      //     this.firmAddress.city = address.City;
-      //     this.firmAddress.province = address.Province;
-      //     this.firmAddress.postalCode = address.PostalCode;
-      //     this.firmAddress.countryId = address.CountryID;
-      //     this.firmAddress.phone = address.PhoneNum;
-      //     this.firmAddress.phoneExt = address.PhoneExt;
-      //     this.firmAddress.fax = address.FaxNum;
-
-      //     // Assigning other properties
-      //     this.firmAddress.sameAsTypeId = address.SameAsTypeID;
-      //     this.firmAddress.modifiedBy = address.LastModifiedBy;
-      //     this.firmAddress.modifiedDate = address.LastModifiedDate;
-      //     this.firmAddress.dateFrom = address.FromDate;
-      //     this.firmAddress.dateTo = address.ToDate;
-      //     this.firmAddress.objectID = address.ObjectID;
-      //     this.firmAddress.objectInstanceID = address.ObjectInstanceID;
-      //     this.firmAddress.objectInstanceRevNum = address.ObjectInstanceRevNum;
-      //     this.firmAddress.sourceObjectID = address.SourceObjectID;
-      //     this.firmAddress.sourceObjectInstanceID = address.SourceObjectInstanceID;
-      //     this.firmAddress.sourceObjectInstanceRevNum = address.SourceObjectInstanceRevNum;
-      //   }
-      // });
 
       console.log("Final firm object to be sent:", firmObj);
 
@@ -577,106 +437,6 @@ export class ViewFirmPageComponent implements OnInit {
     this.loadFirmDetails(this.firmId);
     this.loadFirmAdresses();
   }
-
-
-  // editLicenseScope() {
-  //   this.allowEditLicScopeDetails = !this.allowEditLicScopeDetails;
-  //   this.showPermittedActivitiesTable = !this.showPermittedActivitiesTable;
-
-  //   const userId = 10044;
-  //   if (this.allowEditLicScopeDetails) {
-
-  //     // let container: any = {};
-  //     // // objFirmScope
-  //     // this.objFirmScope.firmScopeID = this.ActivityLicensed[0].FirmScopeID;
-  //     // this.objFirmScope.scopeRevNum = this.ActivityLicensed[0].ScopeRevNum;
-  //     // this.objFirmScope.docReferenceID = 0;
-  //     // this.objFirmScope.firmID = this.ActivityLicensed[0].FirmID;
-  //     // // this.objFirmScope.createdBy = this.ActivityLicensed[0].ScopeCreatedByName;
-  //     // this.objFirmScope.createdBy = 1;
-  //     // this.objFirmScope.objectID = 0;
-  //     // this.objFirmScope.docIDs = this.ActivityLicensed[0].DocID ? this.ActivityLicensed[0].DocID : null;
-  //     // this.objFirmScope.generalConditions = this.ActivityLicensed[0].GeneralConditions ? this.ActivityLicensed[0].GeneralConditions : null;
-  //     // this.objFirmScope.effectiveDate = this.ActivityLicensed[0].ScopeEffectiveDate ? this.ActivityLicensed[0].ScopeEffectiveDate : null;
-  //     // this.objFirmScope.scopeCertificateLink = this.ActivityLicensed[0].ScopeCertificateLink;
-  //     // this.objFirmScope.applicationDate = this.ActivityLicensed[0].ScopeAppliedDate ? this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate) : null;
-  //     // this.objFirmScope.licensedOrAuthorisedDate = this.ActivityLicensed[0].ScopeLicensedDate ? this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate) : null;;
-  //     // // this.objFirmScope.firmApplTypeID = 2
-
-
-  //     // //lstFirmActivities
-  //     // this.lstFirmActivities.createdBy = 1;
-  //     // this.lstFirmActivities.firmScopeTypeID = this.ActivityLicensed[0].FirmScopeTypeID;
-  //     // this.lstFirmActivities.activityTypeID = this.ActivityLicensed[0].ActivityTypeID;
-  //     // this.lstFirmActivities.effectiveDate = '';
-  //     // this.lstFirmActivities.firmActivityConditions = this.ActivityLicensed[0].Column1;
-  //     // this.lstFirmActivities.productTypeID = '';
-  //     // this.lstFirmActivities.appliedDate = this.ActivityLicensed[0].ApliedDate;
-  //     // this.lstFirmActivities.withDrawnDate = '';
-  //     // this.lstFirmActivities.activityDetails = '';
-  //     // // this.lstFirmActivities.objectProductActivity = [
-  //     // //   this.objectProductActivity.productTypeID = 
-  //     // //   this.objectProductActivity.appliedDate = 
-  //     // //   this.objectProductActivity.withDrawnDate = 
-  //     // //   this.objectProductActivity.effectiveDate = 
-  //     // //   this.objectProductActivity.firmScopeTypeID = 
-  //     // // ]
-
-  //     // container.objFirmScope = this.objFirmScope;
-  //     // container.lstFirmActivities = this.lstFirmActivities;
-  //     // container.objPrudentialCategory = this.objPrudentialCategory;
-  //     // container.objSector = this.objSector;
-  //     // container.objFirmIslamicFinance = this.objFirmIslamicFinance;
-  //     // container.lstFirmScopeCondition = this.lstFirmScopeCondition;
-  //     // container.firmSectorID = this.firmSectorID;
-
-  //     // this.firmService.editLicenseScope(userId, scopeLicensed).subscribe(response => {
-  //     //   console.log('Row edited successfully:', response);
-  //     // }, error => {
-  //     //   console.error('Error editing row:', error);
-  //     // })
-  //   }
-
-  // }
-  // editLicenseScope(): void {
-  //   this.allowEditLicScopeDetails = !this.allowEditLicScopeDetails;
-
-  //   if (!this.allowEditLicScopeDetails) {
-  //     // Save the changes when exiting edit mode
-  //     this.saveLicenseScopeDetails();
-  //   }
-  // }
-
-  // saveLicenseScopeDetails(): void {
-  //   const updatedLicenseScope = {
-  //     objFirmScope: {
-  //       firmScopeID: this.ActivityLicensed[0]?.firmScopeID || 0,
-  //       scopeRevNum: this.ActivityLicensed[0]?.scopeRevNum || 0,
-  //       firmID: this.firmDetails?.FirmID || 0,
-  //       objectID: this.ActivityLicensed[0]?.objectID || 0,
-  //       createdBy: this.ActivityLicensed[0]?.createdBy || 0,
-  //       docReferenceID: this.ActivityLicensed[0]?.docReferenceID || 0,
-  //       firmApplTypeID: this.ActivityLicensed[0]?.firmApplTypeID || 0,
-  //       docIDs: this.ActivityLicensed[0]?.docIDs || '',
-  //       generalConditions: this.ActivityLicensed[0]?.generalConditions || '',
-  //       scopeCertificateLink: this.ActivityLicensed[0]?.scopeCertificateLink || '',
-  //       applicationDate: this.ActivityLicensed[0]?.applicationDate || '',
-  //       licensedOrAuthorisedDate: this.ActivityLicensed[0]?.licensedOrAuthorisedDate || '',
-  //     },
-  //     lstFirmActivities: this.lstFirmActivities // Assuming these are activities already listed
-  //   };
-
-  //   // Call the API to save the changes
-  //   this.firmService.editLicenseScope(10044, updatedLicenseScope).subscribe(
-  //     response => {
-  //       console.log('License scope updated successfully:', response);
-  //       // Refresh the data or navigate to a confirmation page
-  //     },
-  //     error => {
-  //       console.error('Error updating license scope:', error);
-  //     }
-  //   );
-  // }
 
   convertDateToISO(dateString: string): string {
     // Convert the date string into a Date object
@@ -759,90 +519,12 @@ export class ViewFirmPageComponent implements OnInit {
     if (this.allowEditAuthScopeDetails) {
 
     }
-    //   //objPrudentialCategory
-    //   this.objPrudentialCategory.firmPrudentialCategoryID = this.ActivityAuth.FirmPrudentialCategoryID;
-    //   this.objPrudentialCategory.firmID = this.ActivityAuth.FirmID;
-    //   this.objPrudentialCategory.prudentialCategoryTypeID = this.ActivityAuth.PrudentialCategoryTypeID;
-    //   this.objPrudentialCategory.firmScopeID = this.ActivityAuth.FirmScopeID;
-    //   this.objPrudentialCategory.scopeRevNum = this.ActivityAuth.ScopeRevNum;
-    //   this.objPrudentialCategory.lastModifiedByID = 0;
-    //   this.objPrudentialCategory.effectiveDate = this.ActivityAuth.PrudentialCategoryEffectiveDate;
-    //   this.objPrudentialCategory.expirationDate = '';
-    //   this.objPrudentialCategory.lastModifiedDate = this.ActivityAuth.PrudentialCategoryLastModifiedDate;
-    //   this.objPrudentialCategory.authorisationCategoryTypeID = this.ActivityAuth.AuthorisationCategoryTypeID;
-
-
-    //   //objSector
-    //   this.objSector.firmSectorID = this.ActivityAuth.FirmSectorID;
-    //   this.objSector.sectorTypeID = this.ActivityAuth.SectorTypeID;
-    //   this.objSector.lastModifiedByID = 0
-    //   this.objSector.effectiveDate = this.ActivityAuth.SectorEffectiveDate;
-
-
-    //   //lstFirmScopeCondition
-    //   this.lstFirmScopeCondition.scopeConditionTypeId = 0
-    //   this.lstFirmScopeCondition.lastModifiedBy = 0
-    //   this.lstFirmScopeCondition.restriction = 0
-
-    //   if (this.isIslamicFinanceChecked) {
-    //     this.objFirmIslamicFinance.iFinTypeId = this.islamicFinance?.IFinTypeId;
-    //     this.objFirmIslamicFinance.iFinTypeDesc = this.islamicFinance?.IFinTypeDesc;
-    //     this.objFirmIslamicFinance.endorsement = this.islamicFinance?.Endorsement;
-    //     this.objFirmIslamicFinance.lastModifiedByName = this.islamicFinance?.IFinLastModifiedByName;
-    //     this.objFirmIslamicFinance.iFinFlag = true;
-    //   } else {
-    //     this.objFirmIslamicFinance.iFinTypeId = 0;
-    //     this.objFirmIslamicFinance.iFinTypeDesc = '';
-    //     this.objFirmIslamicFinance.endorsement = '';
-    //     this.objFirmIslamicFinance.lastModifiedByName = '';
-    //     this.objFirmIslamicFinance.iFinFlag = false;
-    //   }
-    //   this.objFirmIslamicFinance.savedIFinTypeID = 0;
-    //   this.objFirmIslamicFinance.scopeRevNum = this.ActivityAuth.ScopeRevNum;
-
-
-
-    //   //firmSectorID
-    //   this.firmSectorID = '0';
   }
 
   cancelEditAuthScope() {
     this.allowEditAuthScopeDetails = true;
   }
 
-
-  convertDateToYYYYMMDD(dateStr: string | Date): string | null {
-    console.log(dateStr);
-
-    if (!dateStr) {
-      return null; // Return null if the input is invalid or empty
-    }
-    const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
-
-    if (isNaN(date.getTime())) {
-      console.error('Invalid date format:', dateStr);
-      return null;
-    }
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
-    const day = String(date.getDate()).padStart(2, '0');
-
-    // Only return the date in YYYY-MM-DD format, stripping the time part
-    const formattedDate = `${year}-${month}-${day}`;
-
-    return formattedDate;
-  }
-
-
-
-  formatDateToCustomFormat(dateString: string): string {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
 
   onLegalStatusChange(value: number) {
     this.firmDetails.LegalStatusTypeID = value;
@@ -1279,21 +961,21 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   // Get Licensed Date for Application Details in Core Details (edit mode)
-  get formattedLicenseApplStatusDate(): string {
-    return this.firmDetails.LicenseApplStatusDate ? this.formatDateToCustomFormat(this.firmDetails.LicenseApplStatusDate) : null;
+  get formattedLicensedDate(): string {
+    return this.firmDetails.LicensedDate ? this.formatDateToCustomFormat(this.firmDetails.LicensedDate) : null;
   }
 
-  set formattedLicenseApplStatusDate(value: string) {
-    this.firmDetails.LicenseApplStatusDate = this.convertDateToYYYYMMDD(value);
+  set formattedLicensedDate(value: string) {
+    this.firmDetails.LicensedDate = this.convertDateToYYYYMMDD(value);
   }
 
   // Get Authorized Date for Application Details in Core Details (edit mode)
-  get formattedAuthApplStatusDate(): string {
-    return this.firmDetails.AuthApplStatusDate ? this.formatDateToCustomFormat(this.firmDetails.AuthApplStatusDate) : null;
+  get formattedAuthDate(): string {
+    return this.firmDetails.AuthorisationDate ? this.formatDateToCustomFormat(this.firmDetails.AuthorisationDate) : null;
   }
 
-  set formattedAuthApplStatusDate(value: string) {
-    this.firmDetails.AuthApplStatusDate = this.convertDateToYYYYMMDD(value);
+  set formattedAuthDate(value: string) {
+    this.firmDetails.AuthorisationDate = this.convertDateToYYYYMMDD(value);
   }
 
   getFirmTypes() {
@@ -1942,7 +1624,38 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
 
+  convertDateToYYYYMMDD(dateStr: string | Date): string | null {
+    console.log(dateStr);
 
+    if (!dateStr) {
+      return null; // Return null if the input is invalid or empty
+    }
+    const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+
+    if (isNaN(date.getTime())) {
+      console.error('Invalid date format:', dateStr);
+      return null;
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const day = String(date.getDate()).padStart(2, '0');
+
+    // Only return the date in YYYY-MM-DD format, stripping the time part
+    const formattedDate = `${year}-${month}-${day}`;
+
+    return formattedDate;
+  }
+
+
+
+  formatDateToCustomFormat(dateString: string): string {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
 
 
 }
