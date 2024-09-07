@@ -617,69 +617,86 @@ export class ViewFirmPageComponent implements OnInit {
   //   );
   // }
 
-  convertDateToISO(dateString: string): string {
-    // Convert the date string into a Date object
+  convertDateToISO(dateString: string): string | null {
+    if (!dateString || typeof dateString !== 'string') {
+      console.error('Invalid date string:', dateString);
+      return null;
+    }
+
+    // قائمة بالأشهر بالصيغة المختصرة
     const months: { [key: string]: number } = {
       Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
       Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
     };
 
+    // تقسيم التاريخ إلى يوم، شهر، وسنة
     const [day, month, year] = dateString.split('/');
+
+    // التحقق من صحة الشهر
     const monthIndex = months[month as keyof typeof months];
-
-    const date = new Date(parseInt(year), monthIndex, parseInt(day));
-
-    // Convert the Date object to ISO string with milliseconds and Z for UTC time
-    return date.toISOString();
-  }
-  editLicenseScope(): void {
-    this.allowEditLicScopeDetails = !this.allowEditLicScopeDetails;
-    if (!this.ActivityLicensed || this.ActivityLicensed.length === 0) {
-      console.error('No activities found to process.');
-      return;
+    if (monthIndex === undefined) {
+      console.error('Invalid month:', month);
+      return null; // إذا كان الشهر غير صالح، نعيد null
     }
 
+    // إنشاء كائن Date
+    const date = new Date(parseInt(year), monthIndex, parseInt(day));
+
+    // التحقق من أن التاريخ صالح
+    if (isNaN(date.getTime())) {
+      console.error('Invalid date:', dateString);
+      return null; // إذا كان التاريخ غير صالح، نعيد null
+    }
+
+    // إرجاع التاريخ بصيغة ISO
+    return date.toISOString();
+  }
+
+  editLicenseScope(): void {
+    debugger
+    this.allowEditLicScopeDetails = !this.allowEditLicScopeDetails;
+    debugger
     const updatedLicenseScope = {
-      objFirmScope: this.ActivityLicensed.map(activityLic =>
-      ({
+      objFirmScope: this.ActivityLicensed.map(activityLic => ({
         firmScopeID: activityLic.FirmScopeID,
         scopeRevNum: activityLic.ScopeRevNum,
         firmID: activityLic.FirmID,
-        objectID: activityLic.objectID, // TODO: ????????????????????????????? unknown objectID
-        createdBy: activityLic.createdBy, // TODO: ????????????????????????????? unknown createdBy
-        docReferenceID: activityLic.docReferenceID, // TODO: ????????????????????????????? unknown docReferenceID
-        firmApplTypeID: activityLic.firmApplTypeID, // TODO: ????????????????????????????? unknown firmApplTypeID
+        objectID: 524,
+        createdBy: 10044,
+        docReferenceID: activityLic.docReferenceID,
+        firmApplTypeID: 1,
         docIDs: activityLic.DocID,
-        generalConditions: activityLic.GeneralConditions,
+        generalConditions: activityLic.GeneralConditions || "None",
         effectiveDate: this.convertDateToISO(activityLic.EffectiveDate),
         scopeCertificateLink: activityLic.ScopeCertificateLink,
-        applicationDate: new Date().toISOString(),//TODO:???????????????????????????????? unknown applicationDate  ,
-        licensedOrAuthorisedDate: new Date().toISOString(),  //TODO:??????????????????????? unknown  licensedOrAuthorisedDate ,
+        applicationDate: this.convertDateToISO(activityLic.ApplicationDate),
+        licensedOrAuthorisedDate: this.convertDateToISO(activityLic.LicensedOrAuthorisedDate),
       }))[0],
-      lstFirmActivities: this.ActivityLicensed.map(activityLic => {
-        return {
-          createdBy: activityLic.createdBy, // TODO: ????????????????????????????? unknown createdBy
-          firmScopeTypeID: activityLic.FirmScopeTypeID,
-          activityTypeID: activityLic.ActivityTypeID,
-          effectiveDate: this.convertDateToISO(activityLic.EffectiveDate),
-          firmActivityConditions: activityLic.GeneralConditions, //TODO: ?????????????????? unknown GeneralConditions
-          productTypeID: activityLic.ProductTypeID,  //TODO: ?????????????????? unknown ProductTypeID
-          appliedDate: this.convertDateToISO(activityLic.ScopeAppliedDate),
-          withDrawnDate: this.convertDateToISO(activityLic.WithdrawnDate),
-          objectProductActivity: activityLic.ObjectProductActivity ? activityLic.ObjectProductActivity.map(product => ({
-            productTypeID: product.ProductTypeID,//TODO: ?????????????????? unknown ProductTypeID
-            appliedDate: product.AppliedDate, //TODO: ??????????????????  unknown AppliedDate
-            withDrawnDate: product.WithDrawnDate,   //TODO: ??????????????????  unknown WithDrawnDate
-            effectiveDate: product.EffectiveDate,   //TODO: ??????????????????  unknown EffectiveDate
-            firmScopeTypeID: product.FirmScopeTypeID    //TODO: ??????????????????  unknown FirmScopeTypeID
-          })) : [],
-          activityDetails: activityLic.FirmActivityDetails
-        };
-      })
+
+      lstFirmActivities: this.ActivityLicensed.map(activityLic => ({
+        createdBy: 10044,
+        firmScopeTypeID: activityLic.FirmScopeTypeID,
+        activityTypeID: activityLic.ActivityTypeID,
+        effectiveDate: this.convertDateToISO(activityLic.EffectiveDate),
+        firmActivityConditions: activityLic.FirmActivityConditions || "None",
+        productTypeID: activityLic.ProductTypeID || null,
+        appliedDate: this.convertDateToISO(activityLic.AppliedDate),
+        withDrawnDate: this.convertDateToISO(activityLic.WithdrawnDate),
+        objectProductActivity: activityLic.ObjectProductActivity ? activityLic.ObjectProductActivity.map(product => ({
+          productTypeID: product.ProductTypeID,
+          appliedDate: this.convertDateToISO(product.AppliedDate),
+          withDrawnDate: this.convertDateToISO(product.WithdrawnDate),
+          effectiveDate: this.convertDateToISO(product.EffectiveDate),
+          firmScopeTypeID: product.FirmScopeTypeID
+        })) : [],
+        activityDetails: activityLic.FirmActivityDetails
+      }))
     };
 
 
-    this.firmService.editLicenseScope(10044, updatedLicenseScope).subscribe( // TODO 10044 here is: firmID Do forget to change it
+    console.log('Updated License Scope:', updatedLicenseScope);
+    debugger
+    this.firmService.editLicenseScope(10044, updatedLicenseScope).subscribe(
       response => {
         console.log('License scope updated successfully:', response);
       },
@@ -689,6 +706,8 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
 
+
+
   cancelEditLicScope() {
     this.allowEditLicScopeDetails = true;
   }
@@ -697,7 +716,14 @@ export class ViewFirmPageComponent implements OnInit {
     this.allowEditAuthScopeDetails = !this.allowEditAuthScopeDetails;
     if (this.allowEditAuthScopeDetails) {
 
+
     }
+
+
+
+
+
+
     //   //objPrudentialCategory
     //   this.objPrudentialCategory.firmPrudentialCategoryID = this.ActivityAuth.FirmPrudentialCategoryID;
     //   this.objPrudentialCategory.firmID = this.ActivityAuth.FirmID;
@@ -744,6 +770,102 @@ export class ViewFirmPageComponent implements OnInit {
     //   //firmSectorID
     //   this.firmSectorID = '0';
   }
+
+  updateFirmScope() {
+    if (!this.ActivityAuth || !this.ActivityAuth.FirmScopeID) {
+      console.log('Firm activity scope not found');
+
+      return;
+    }
+
+    const firmScopeData = {
+      objFirmScope: {
+        firmScopeID: this.ActivityAuth?.FirmScopeID,
+        scopeRevNum: this.ActivityAuth?.ScopeRevNum,
+        firmID: this.ActivityAuth?.FirmID,
+        objectID: this.ActivityAuth?.ObjectID,
+        createdBy: this.ActivityAuth?.CreatedBy,
+        docReferenceID: this.ActivityAuth?.DocID,
+        firmApplTypeID: this.ActivityAuth?.FirmApplTypeID,
+        docIDs: this.ActivityAuth?.DocIDs,
+        generalConditions: this.ActivityAuth?.GeneralConditions,
+        effectiveDate: this.ActivityAuth?.EffectiveDate,
+        scopeCertificateLink: 'http://intranet/sites/RSG/Shared%20Documents/REGISTERS/Licensed%20Firms/00129_Con%20Scope%20of%20Licence.pdf',
+        applicationDate: this.ActivityAuth?.ApplicationDate,
+        licensedOrAuthorisedDate: this.ActivityAuth?.LicensedDate
+      },
+      lstFirmActivities: [
+        {
+          createdBy: this.ActivityAuth?.CreatedBy,
+          firmScopeTypeID: this.ActivityAuth?.FirmScopeTypeID,
+          activityTypeID: this.ActivityAuth?.ActivityTypeID,
+          effectiveDate: this.ActivityAuth?.EffectiveDate,
+          firmActivityConditions: this.ActivityAuth?.FirmActivityConditions,
+          productTypeID: this.ActivityAuth?.ProductTypeID,
+          appliedDate: this.ActivityAuth?.AppliedDate,
+          withDrawnDate: this.ActivityAuth?.WithDrawnDate,
+          objectProductActivity: [
+            {
+              productTypeID: this.ActivityAuth?.ProductTypeID,
+              appliedDate: this.ActivityAuth?.AppliedDate,
+              withDrawnDate: this.ActivityAuth?.WithDrawnDate,
+              effectiveDate: this.ActivityAuth?.EffectiveDate,
+              firmScopeTypeID: this.ActivityAuth?.FirmScopeTypeID
+            }
+          ],
+          activityDetails: this.ActivityAuth?.ActivityDetails
+        }
+      ],
+      objPrudentialCategory: {
+        firmPrudentialCategoryID: this.ActivityAuth?.FirmPrudentialCategoryID,
+        firmID: this.ActivityAuth?.FirmID,
+        prudentialCategoryTypeID: this.ActivityAuth?.PrudentialCategoryTypeID,
+        firmScopeID: this.ActivityAuth?.FirmScopeID,
+        scopeRevNum: this.ActivityAuth?.ScopeRevNum,
+        lastModifiedByID: this.ActivityAuth?.LastModifiedByID,
+        effectiveDate: this.ActivityAuth?.PrudentialCategoryEffectiveDate,
+        expirationDate: this.ActivityAuth?.ExpirationDate,
+        lastModifiedDate: this.ActivityAuth?.PrudentialCategoryLastModifiedDate,
+        authorisationCategoryTypeID: this.ActivityAuth?.AuthorisationCategoryTypeID
+      },
+      objSector: {
+        firmSectorID: this.ActivityAuth?.FirmSectorID,
+        sectorTypeID: this.ActivityAuth?.SectorTypeID,
+        lastModifiedByID: this.ActivityAuth?.LastModifiedByID,
+        effectiveDate: this.ActivityAuth?.SectorEffectiveDate
+      },
+      lstFirmScopeCondition: [
+        {
+          scopeConditionTypeId: this.ActivityAuth?.ScopeConditionTypeId,
+          lastModifiedBy: this.ActivityAuth?.LastModifiedBy,
+          restriction: this.ActivityAuth?.Restriction
+        }
+      ],
+      objFirmIslamicFinance: {
+        iFinFlag: this.ActivityAuth?.IFinFlag,
+        iFinTypeId: this.ActivityAuth?.IFinTypeId,
+        iFinTypeDesc: this.ActivityAuth?.IFinTypeDesc,
+        endorsement: this.ActivityAuth?.Endorsement,
+        savedIFinTypeID: this.ActivityAuth?.SavedIFinTypeID,
+        scopeRevNum: this.ActivityAuth?.ScopeRevNum,
+        lastModifiedBy: this.ActivityAuth?.LastModifiedBy
+      },
+      resetFirmSector: this.ActivityAuth?.ResetFirmSector,
+      firmSectorID: this.ActivityAuth?.FirmSectorID
+    };
+
+
+    this.firmService.editAuthorizedScope(10044, firmScopeData).subscribe(
+      response => {
+        console.log('Firm scope updated successfully:', response);
+      },
+      error => {
+        console.error('Error updating firm scope:', error);
+      }
+    );
+  }
+
+
 
   cancelEditAuthScope() {
     this.allowEditAuthScopeDetails = true;
