@@ -8,4 +8,6 @@ export const FinAccStd = "FinAccStdTypes";
 export const firmAppTypes = "v_FirmApplicationType";
 export const addressTypes = "v_EntityAddressTypes";
 export const firmLevels = "UserRoleFirmTypes";
+export const prudentialCategoryTypes = "PrudentialCategoryTypes";
+export const authorisationCategoryTypes = "V_AuthorisationCategoryTypes";
 export const PLACE_OF_INCORPORATION_QFC = "QFC"; 

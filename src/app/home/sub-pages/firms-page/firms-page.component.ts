@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirmService } from 'src/app/ngServices/firm.service';
 
@@ -64,7 +64,6 @@ export class FirmsPageComponent {
         this.legalStatuses = [...new Set(this.firms.map(firm => firm.LegalStatusTypeDesc))];
         this.authorisationStatuses = [...new Set(this.firms.map(firm => firm.AuthorisationStatusTypeDesc))];
         this.amlSupervisors = [...new Set(this.firms.map(firm => firm.Supervisor_AML))];
-
         console.log(this.firms);
       },
       error => {
@@ -101,7 +100,7 @@ export class FirmsPageComponent {
   
     if (letter === '#') {
       // Filter firms that do not start with a letter
-      this.filteredFirms = this.firms.filter(firm => !/^[A-Za-z]/.test(firm.FirmName));
+      this.filteredFirms = this.firms;
     } else {
       // Filter firms that start with the selected letter
       this.filteredFirms = this.firms.filter(firm => firm.FirmName.startsWith(letter));

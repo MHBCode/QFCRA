@@ -61,6 +61,10 @@ export class FirmService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrlActivity}save_update_licensed_scope`, rowData, { headers: headers });
   }
+  editAuthorizedScope(userId: number, rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlActivity}save_update_author_scope`, rowData, { headers: headers });
+  }
   getFYearEndHistory(firmId: number): Observable<any> {
     const url = `${this.baseUrl}get_firms_end_year_history?firmId=${firmId}&flag=1`;  // Construct full URL https://localhost:7091/api/Firms/get_firms_end_year_history?firmId=66&flag=1
     return this.http.get<any>(url);
@@ -162,8 +166,8 @@ export class FirmService {
     return this.http.get<any>(url);
   }
 
-  getPrudReturnTypes(): Observable<any> {
-    const url = `${this.baseUrlActivity}get_prud_ret_type?prudCatId=1`;
+  getPrudReturnTypes(prudCategoryID: number): Observable<any> {
+    const url = `${this.baseUrlActivity}get_prud_ret_type?prudCatId=${prudCategoryID}`;
     return this.http.get<any>(url);
   }
 
