@@ -223,4 +223,49 @@ export class FirmService {
     const url = `${this.baseUrlNotice}get_firm_notice_response_details?firmId=10&firmNoticeID=4043`; //https://localhost:7091/api/Notice/get_firm_notice_response_details?firmId=10&firmNoticeID=4043
     return this.http.get<any>(url);
   }
+
+  getFirmsList(criteria: any): Observable<any> {
+    let params = new HttpParams();
+
+    if (criteria.firmName && criteria.firmName !== 'all') {
+      params = params.append('FirmName', criteria.firmName);
+    }
+    if (criteria.qfcNumber) {
+      params = params.append('QFCNumber', criteria.qfcNumber);
+    }
+    if (criteria.firmType !== undefined) {
+      params = params.append('CSVFirmTypes', criteria.firmType.toString()); // تعديل الاسم هنا
+    }
+    if (criteria.firmStatus !== undefined) {
+      params = params.append('CSVFirmStatus', criteria.firmStatus.toString()); // تعديل الاسم هنا
+    }
+    if (criteria.licenseStatus && criteria.licenseStatus !== 'all') {
+      params = params.append('CSVLicenseStatus', criteria.licenseStatus); // تعديل الاسم هنا
+    }
+    if (criteria.supervisorSupervision && criteria.supervisorSupervision !== 'all') {
+      params = params.append('SupervisionCaseOfficerId', criteria.supervisorSupervision); // تعديل الاسم هنا
+    }
+    if (criteria.legalStatus && criteria.legalStatus !== 'all') {
+      params = params.append('CSVLegalStatus', criteria.legalStatus); // تعديل الاسم هنا
+    }
+    if (criteria.prudentialCategory !== undefined) {
+      params = params.append('CSVPrudentialCategory', criteria.prudentialCategory.toString()); // تعديل الاسم هنا
+    }
+    if (criteria.sectors !== undefined) {
+      params = params.append('CSVSectorTypes', criteria.sectors.toString()); // تعديل الاسم هنا
+    }
+    if (criteria.supervisionCategory !== undefined) {
+      params = params.append('CSVAuthorisationCategories', criteria.supervisionCategory.toString()); // تعديل الاسم هنا
+    }
+    if (criteria.authorisationStatus && criteria.authorisationStatus !== 'all') {
+      params = params.append('CSVAuthorisationStatus', criteria.authorisationStatus); // تعديل الاسم هنا
+    }
+    if (criteria.relevantPerson !== undefined) {
+      params = params.append('RelevantPerson', criteria.relevantPerson.toString()); // تعديل الاسم هنا
+    }
+
+    return this.http.get<any>(`${this.baseUrl}get_firms_list`, { params });
+  }
+
+
 }
