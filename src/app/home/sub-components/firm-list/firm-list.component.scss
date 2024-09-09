@@ -73,6 +73,12 @@ td {
   max-width: 80px;
   text-wrap: nowrap;
 }
+
+.custom-style-firm-page td { //dynamic style for the firm-page-component firms list table
+  max-width: unset;
+  text-wrap: wrap;
+}
+
 .taskDesc {
   width: 40px;
 }
@@ -85,7 +91,7 @@ td {
 
 .table-responsive {
   width: 100%;
-  overflow-x: auto;
+  overflow: hidden;
   -webkit-overflow-scrolling: touch;
 }
 

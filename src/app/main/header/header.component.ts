@@ -11,6 +11,7 @@ export class HeaderComponent implements OnInit {
   isIncreaseFontSizeEnabled: boolean = true;
   isDecreaseFontSizeEnabled: boolean = true;
   isDefaultEnabled: boolean = true;
+  activeMenuIndex: Number = null;
 
   constructor(
     private router: Router,
@@ -27,7 +28,12 @@ export class HeaderComponent implements OnInit {
   reports:Boolean = false;
   admin:Boolean = false;
 
-  openMenu (value:Number) {
+  openMenu (value: Number) {
+    if (this.activeMenuIndex === value) {
+      this.activeMenuIndex = null; // Collapse the menu if it's already active
+    } else {
+      this.activeMenuIndex = value; // Set the active menu
+    }
     if (value == 1){
       if(this.firms == true){
         this.firms = false;
@@ -117,6 +123,7 @@ export class HeaderComponent implements OnInit {
     if (where == 23) {
       this.router.navigate(['home/re-assign-tasks'])
     }
+    this.activeMenuIndex = null;
     this.firms = false;
     this.admin = false;
     this.individuals = false;
@@ -126,25 +133,15 @@ export class HeaderComponent implements OnInit {
   increaseFontSize() {
     if (this.isIncreaseFontSizeEnabled) {
       this.fontSizeService.increaseFontSize();
-      // this.isIncreaseFontSizeEnabled = false;
-      // this.isDecreaseFontSizeEnabled = true;
-      // this.isDefaultEnabled = true;
     }
   }
 
-  
   decreaseFontSize() {
     this.fontSizeService.decreaseFontSize();
-    // this.isDecreaseFontSizeEnabled = false; 
-    // this.isIncreaseFontSizeEnabled = true; 
-    // this.isDefaultEnabled = true;
   }
 
   resetFontSize() {
     this.fontSizeService.resetFontSize();
-    // this.isDecreaseFontSizeEnabled = true; 
-    // this.isIncreaseFontSizeEnabled = true;
-    // this.isDefaultEnabled = false;
   }
 
   openCloseProfileMenu(){

@@ -15,7 +15,7 @@
         <a (click)="goHome()"> Home </a>
       </li>
       <li>
-        <a (click)="openMenu(1)"> Firms </a>
+        <a (click)="openMenu(1)" [class.active]="activeMenuIndex === 1"> Firms </a>
         <div class="menuOfTop" *ngIf="firms == true">
           <ul>
             <li (click)="goto(1)">Open</li>
@@ -27,7 +27,7 @@
         </div>
       </li>
       <li>
-        <a (click)="openMenu(2)"> Individuals </a>
+        <a (click)="openMenu(2)" [class.active]="activeMenuIndex === 2"> Individuals </a>
         <div class="menuOfTop" *ngIf="individuals == true">
           <ul>
             <li (click)="goto(6)">Open</li>
@@ -37,7 +37,7 @@
         </div>
       </li>
       <li>
-        <a (click)="openMenu(3)"> Reports </a>
+        <a (click)="openMenu(3)" [class.active]="activeMenuIndex === 3"> Reports </a>
         <div class="menuOfTop" *ngIf="reports == true">
           <ul>
             <li (click)="goto(9)">Firms Report</li>
@@ -57,7 +57,7 @@
         </div>
       </li>
       <li>
-        <a (click)="openMenu(4)"> Admin </a>
+        <a (click)="openMenu(4)" [class.active]="activeMenuIndex === 4"> Admin </a>
         <div class="menuOfTop" *ngIf="admin == true">
           <ul>
             <li (click)="goto(22)">User Access</li>

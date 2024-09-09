@@ -14,6 +14,8 @@ export class FirmListComponent implements OnInit {
 
   @Input() firms: any[] = [];
 
+  @Input() customClass: string = '';
+
   v: any[] = this.firms.slice(5);
   constructor(
     private router: Router,

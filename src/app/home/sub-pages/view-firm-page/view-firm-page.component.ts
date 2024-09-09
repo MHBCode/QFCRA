@@ -429,6 +429,11 @@ export class ViewFirmPageComponent implements OnInit {
   cancelEditFirm() {
     this.allowEditFirmDetails = true;
     this.showError = false;
+    this.isCollapsed['firmDetailsSection'] = false;
+    this.isCollapsed['appDetailsSection'] = false;
+    this.isCollapsed['pressReleaseSection'] = false;
+    this.isCollapsed['commentsSection'] = false;
+    this.isCollapsed['addressesSection'] = false;
     this.loadPrevFirmAndDate();
     this.loadFirmDetails(this.firmId);
     this.loadCurrentAppDetails();
@@ -1003,20 +1008,6 @@ export class ViewFirmPageComponent implements OnInit {
       console.log(error)
     })
   }
-
-
-  //Get Date Of Application Field for Application Details in Core Details
-  // dateOfApplication = this.firmDetails.AuthorisationStatusTypeID > 0 ? this.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate) : this.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate);
-
-
-  // // Set Date Of Application Field for Application Details in Core Details
-  // set dateOfApplication(value: string) {
-  //   if (this.firmDetails.AuthorisationStatusTypeID > 0) {
-  //     this.firmDetails.FirmAuthApplDate = this.convertDateToYYYYMMDD(value);
-  //   } else {
-  //     this.firmDetails.FirmLicApplDate = this.convertDateToYYYYMMDD(value);
-  //   }
-  // }
 
   getFirmTypes() {
     this.applicationTypeId = this.firmDetails.AuthorisationStatusTypeID != 0 ? 3 : 2;
