@@ -24,8 +24,8 @@ export class FirmsPageComponent implements OnInit {
   // Form search fields with defaults
   firmName: string = 'all';
   qfcNumber: string = '';
-  firmTypeAll: boolean = false;
-  firmStatusAll: boolean = false;
+  firmType: boolean = true;
+  firmStatus: boolean = true;
   licenseStatus: string = 'all';
   supervisorSupervision: string = 'all';
   prudentialCategory: boolean = true;
@@ -33,6 +33,8 @@ export class FirmsPageComponent implements OnInit {
 
   // Toggling Options for expanded views
   toggleOptions = {
+    firmType: false,
+    firmStatus: false,
     prudentialCategory: false,
     sectors: false
   };
@@ -109,8 +111,8 @@ export class FirmsPageComponent implements OnInit {
     const searchCriteria = {
       firmName: this.firmName !== 'all' ? this.firmName : null,
       qfcNumber: this.qfcNumber || null,
-      firmTypeAll: this.firmTypeAll,
-      firmStatusAll: this.firmStatusAll,
+      firmType: this.firmType,
+      firmStatus: this.firmStatus,
       licenseStatus: this.licenseStatus !== 'all' ? this.licenseStatus : null,
       supervisorSupervision: this.supervisorSupervision !== 'all' ? this.supervisorSupervision : null,
       prudentialCategory: this.prudentialCategory,
@@ -151,8 +153,8 @@ export class FirmsPageComponent implements OnInit {
   setDefaultFilters(): void {
     this.firmName = 'all';
     this.qfcNumber = '';
-    this.firmTypeAll = false;
-    this.firmStatusAll = false;
+    this.firmType = true;
+    this.firmStatus = true;
     this.licenseStatus = 'all';
     this.supervisorSupervision = 'all';
     this.prudentialCategory = true;

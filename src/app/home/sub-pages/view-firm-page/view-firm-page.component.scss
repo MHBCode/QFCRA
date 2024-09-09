@@ -428,8 +428,7 @@ tr:nth-child(even) {
 .uploadDocumentPopUp,
 .addressHistoryPopup,
 .ScopeLicPreviousVersionsPopup,
-.ScopeAuthPreviousVersionsPopup
- {
+.ScopeAuthPreviousVersionsPopup {
   position: fixed;
   top: 25vh;
   left: 20vw;
@@ -525,12 +524,28 @@ tr:nth-child(even) {
   text-align: left;
 }
 
-.ScopeLicPreviousVersionsPopup,.ScopeAuthPreviousVersionsPopup {
-  padding: 1rem!important;
-  height: 20vh!important;
+.ScopeLicPreviousVersionsPopup,
+.ScopeAuthPreviousVersionsPopup {
+  padding: 0 !important;
+  height: 15vh !important;
+  overflow-y: visible; 
+  overflow-x: visible;
+  top: 35vh;
 }
 
 /* View Previous Versions Popup Style */
+.ScopeLicPreviousVersionsPopup .popup-header, .ScopeAuthPreviousVersionsPopup .popup-header {
+  width: 100% !important;
+  background-color: #a51e36 !important;
+}
+
+.ScopeLicPreviousVersionsPopup .popup-header h3,.ScopeAuthPreviousVersionsPopup .popup-header h3 {
+  color: white!important;
+  width: 50%!important;
+  margin: auto!important;
+  text-align: center;
+}
+
 .revision-list {
   list-style-type: none;
   padding: 0;
@@ -544,18 +559,14 @@ tr:nth-child(even) {
   margin-bottom: 0.5rem;
 }
 
-.change-button {
-  display: block;
-  padding: 0.5rem 1rem;
-  background-color: #A51E36;
-  color: white;
-  border: none;
-  border-radius: 0.25rem;
+.revision-list li a:hover {
+  color: #bc3a52;
   cursor: pointer;
 }
 
-.change-button:hover {
-  background-color: #bc3a52;
+.change-rev {
+  padding: 10px 15px;
+  border: 0;
 }
 
 /* permitted activities */
@@ -820,6 +831,14 @@ hr {
   text-align: center;
 }
 
+.prudentialTable {
+  border-radius: 0;
+}
+
+.prudentialTable > thead > tr {
+  background-color: #f2b6c0;
+}
+
 .endorsement {
   width: 100%;
 }
@@ -986,6 +1005,14 @@ hr {
   margin-right: 10px;
 }
 
+/* scope of authorization table */
+.scope-of-auth {
+  border-radius: 0;
+}
+.scope-of-auth > thead > tr {
+  background-color: #f2b6c0;
+}
+
 
 /* validations styling */
 .invalid {
@@ -998,5 +1025,5 @@ hr {
 }
 
 .error-border {
-  border-color: red!important;
+  border-color: red !important;
 }

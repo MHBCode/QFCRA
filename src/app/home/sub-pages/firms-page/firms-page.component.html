@@ -41,10 +41,10 @@
         <div class="input-field" style="width: 100%">
           <div class="checkbox-wrapper">
             <label for="firmType">Firm Type:</label>
-            <input type="checkbox" [(ngModel)]="firmTypeAll" (change)="toggleCategoryOptions('firmType')" />
+            <input type="checkbox" [(ngModel)]="firmType" (change)="toggleCategoryOptions('firmType')" />
             All&nbsp;&nbsp;
           </div>
-          <div class="checkbox-options">
+          <div *ngIf="toggleOptions.firmType" class="checkbox-options">
             <label><input type="checkbox" [(ngModel)]="checkboxes.authorized" />
               Authorized</label>
             <label><input type="checkbox" [(ngModel)]="checkboxes.dnfbp" />
@@ -58,10 +58,10 @@
         <div class="input-field" style="width: 100%">
           <div class="checkbox-wrapper">
             <label for="firmStatus">Firm Status:</label>
-            <input type="checkbox" [(ngModel)]="firmStatusAll" (change)="toggleCategoryOptions('firmStatus')" />
+            <input type="checkbox" [(ngModel)]="firmStatus" (change)="toggleCategoryOptions('firmStatus')" />
             All&nbsp;&nbsp;
           </div>
-          <div class="checkbox-options">
+          <div *ngIf="toggleOptions.firmStatus" class="checkbox-options">
             <label><input type="checkbox" [(ngModel)]="checkboxes.applicant" />
               Applicant</label>
             <label><input type="checkbox" [(ngModel)]="checkboxes.applicationWithdrawn" />

@@ -24,6 +24,11 @@ export class FirmService {
 
   constructor(private http: HttpClient) { }
 
+  isFirmLicensed(firmId: number): Observable<any> {
+    const url = `${this.baseUrlApplication}is_firmLicensed?firmId=${firmId}`
+    return this.http.get<any>(url);
+  }
+
   getFIRMOPData(firmId: number): Observable<any> {
     const url = `${this.baseUrl}get_operational_data?firmID=${firmId}`;  // Construct full URL
     return this.http.get<any>(url);
@@ -147,7 +152,7 @@ export class FirmService {
   }
 
 
-  get_document(scopeId: number, scopeRevNum: number): Observable<any> {
+  getDocument(scopeId: number, scopeRevNum: number): Observable<any> {
     const url = `${this.baseUrlObjectWF}get_document?objectId=524&objectInstanceId=${scopeId}&ObjectInstanceRevNum=${scopeRevNum}`
     return this.http.get<any>(url);
   }

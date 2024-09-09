@@ -692,7 +692,7 @@
           <ng-container *ngIf="address.Valid === true">
             <div class="input-field" *ngIf="allowEditFirmDetails">
               <label for="addressType">
-                Address Type <button *ngIf="address.PreviousRecords !== 0 && !address.isNew" class="subbutton"
+                Address Type <button *ngIf="address.PreviousRecords !== 0" class="subbutton"
                   (click)="getAddressTypeHistory(address.AddressTypeID)">History</button>
               </label>
               <input disabled name="addressType" id="addressType" type="text" value="{{address?.AddressTypeDesc}}">
@@ -1082,7 +1082,7 @@
               </button>
             </div>
             <div class="edit-firms-inputs">
-              <table>
+              <table class="scope-of-auth">
                 <thead>
                   <tr>
                     <th>Document Type</th>
@@ -1091,8 +1091,8 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td></td>
-                    <td></td>
+                    <td>{{AuthTableDocument?.DocSubTypeDesc}}</td>
+                    <td><a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{AuthTableDocument?.FileLoc}}" target="_blank">{{AuthTableDocument?.FileName}}</a></td>
                   </tr>
                 </tbody>
               </table>
@@ -1379,7 +1379,7 @@
           <div class="edit-firms-inputs">
             <div class="input-field">
               <label for="prudentialReturnType"> Prudential Return Type </label>
-              <select [disabled]="allowEditAuthScopeDetails" [(ngModel)]="prudReturnTypesDropdown.SectorTypeID"
+              <select [disabled]="allowEditAuthScopeDetails" [(ngModel)]="ActivityAuth[0].SectorTypeID"
                 name="prudentialReturnType" id="prudentialReturnType" [ngClass]="{
                   'select-background-edited': !allowEditAuthScopeDetails
                 }">
@@ -2526,15 +2526,13 @@
 
   <div style="width: 50%" class="popup-info-place">
     <ul class="revision-list">
-      <li *ngFor="let scopeNum of LicPrevRevNumbers">
-        {{scopeNum.ScopeRevNum}}
+      <li *ngFor="let rev of LicPrevRevNumbers">
+        <button class="change-rev" (click)="fetchPreviousScopeVersions(firmId,2,rev.ScopeRevNum)">
+          {{rev.ScopeRevNum}}
+        </button>
       </li>
     </ul>
   </div>
-
-  <button (click)="fetchPreviousScopeVersions(firmId, 2)" class="change-button">
-    Change
-  </button>
 </div>
 
 <!--Scope Previous Versions for Authorize popup-->
@@ -2547,13 +2545,11 @@
 
   <div style="width: 50%" class="popup-info-place">
     <ul class="revision-list">
-      <li *ngFor="let scopeNum of AuthPrevRevNumbers">
-        {{scopeNum.ScopeRevNum}}
+      <li *ngFor="let rev of AuthPrevRevNumbers">
+        <button class="change-rev" (click)="fetchPreviousScopeVersions(firmId,3,rev.ScopeRevNum)">
+          {{rev.ScopeRevNum}}
+        </button>
       </li>
     </ul>
   </div>
-
-  <button (click)="fetchPreviousScopeVersions(firmId, 3)" class="change-button">
-    Change
-  </button>
 </div>

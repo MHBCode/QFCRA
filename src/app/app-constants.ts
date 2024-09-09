@@ -11,3 +11,21 @@ export const firmLevels = "UserRoleFirmTypes";
 export const prudentialCategoryTypes = "PrudentialCategoryTypes";
 export const authorisationCategoryTypes = "V_AuthorisationCategoryTypes";
 export const PLACE_OF_INCORPORATION_QFC = "QFC"; 
+export enum FirmLicenseApplStatusType
+{
+    Application = 4,
+    Licensed = 5,
+    ApplicationWithdrawn = 6,
+    Rejected = 7,
+    LicensedWithdrawn = 8,
+    LicensedWithdrawnInvolunatary = 9
+}
+export enum FirmAuthorizationApplStatusType
+{
+    Application = 10,
+    ApplicationWithdrawn = 11,
+    Rejected = 12,
+    Authorised = 13,
+    AuthorisedWithdrawnVoluntary = 14,
+    AuthorisedWithdrawnInvoluntary = 15
+}
