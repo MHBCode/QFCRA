@@ -444,6 +444,7 @@ tr:nth-child(even) {
   flex-direction: column;
   gap: 2rem;
   display: none;
+  z-index: 100;
 }
 
 .popup-wrapper table,
@@ -456,6 +457,17 @@ tr:nth-child(even) {
   tr:nth-child(even) {
     background-color: #f2f2f2;
   }
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* Dark transparent background */
+  z-index: 99; /* Ensure it stays behind the popup */
 }
 
 .popup-info-place thead tr {

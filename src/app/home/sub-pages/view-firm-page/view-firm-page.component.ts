@@ -5,8 +5,6 @@ import flatpickr from 'flatpickr';
 import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import * as constants from 'src/app/app-constants';
-import { Address } from 'src/app/models/address.model';
-
 
 
 
@@ -30,8 +28,15 @@ export class ViewFirmPageComponent implements OnInit {
   @ViewChildren('auditorRadio') auditorRadios!: QueryList<any>;
   @ViewChildren('dateInputs') dateInputs: QueryList<ElementRef<HTMLInputElement>>;
   /* */
-  call: Boolean = false;
-  callInactiveUsers: Boolean = false;
+  callFYear: boolean = false;
+  callInactiveUsers: boolean = false;
+  callAppDetails: boolean = false;
+  callPrevFirmName: boolean = false;
+  callAccStandard: boolean = false;
+  callUploadDoc: boolean = false;
+  callAddressType: boolean = false;
+  callLicScopePrev: boolean = false;
+  callAuthScopePrev: boolean = false;
   menuId: Number = 0;
   menuWidth: string = '2%';
   dataWidth: string = '98%';
@@ -1167,7 +1172,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getFYearHistory() {
-    this.call = true;
+    this.callFYear = true;
     this.firmService.getFYearEndHistory(this.firmId).subscribe(
       data => {
         this.firmFYearHistory = data.response;
@@ -1187,6 +1192,7 @@ export class ViewFirmPageComponent implements OnInit {
     }, 0);
   }
   closeFYearHistory() {
+    this.callFYear = false;
     const popupWrapper = document.querySelector('.popup-wrapper') as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none';
@@ -1218,6 +1224,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   closeInactiveUsers() {
+    this.callInactiveUsers = false;
     const popupWrapper = document.querySelector('.InactiveUsersPopUp') as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none';
@@ -1228,6 +1235,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   getApplicationDetailsHistory() {
+    this.callAppDetails = true;
     this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId, 2, false).subscribe(
       data => {
         this.firmAppDetailsLicensed = data.response;
@@ -1246,15 +1254,18 @@ export class ViewFirmPageComponent implements OnInit {
         console.error('Error fetching firm details', error);
       }
     );
-    const popupWrapper = document.querySelector('.ApplicationDetailsPopUp') as HTMLElement;
-    if (popupWrapper) {
-      popupWrapper.style.display = 'flex';
-    } else {
-      console.error('Element with class not found');
-    }
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.ApplicationDetailsPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class not found');
+      }
+    }, 0)
   }
 
   closeApplicationDetails() {
+    this.callAppDetails = false;
     const popupWrapper = document.querySelector(".ApplicationDetailsPopUp") as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none';
@@ -1264,6 +1275,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getPrevFirmName() {
+    this.callPrevFirmName = true;
     this.firmService.getFirmsNameHistory(this.firmId).subscribe(
       data => {
         this.firmNamesHistory = data.response;
@@ -1283,6 +1295,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   closePrevFirmName() {
+    this.callPrevFirmName = false;
     const popupWrapper = document.querySelector(".prevFirmNamePopUp") as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none';
@@ -1292,6 +1305,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getAccountingStandardHistory() {
+    this.callAccStandard = true;
     this.firmService.getAccountingStandardsHistory(this.firmId).subscribe(
       data => {
         this.firmAccountingStandardHistory = data.response;
@@ -1311,6 +1325,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   closeAccountingStandard() {
+    this.callAccStandard = false;
     const popupWrapper = document.querySelector(".accountingStandardsPopUp") as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none';
@@ -1320,24 +1335,31 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   uploadDocument() {
-    const popupWrapper = document.querySelector('.uploadDocumentPopUp') as HTMLElement;
-    if (popupWrapper) {
-      popupWrapper.style.display = 'flex';
-    } else {
-      console.error('Element with class .uploadDocumentPopUp not found');
-    }
+    this.callUploadDoc = true;
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.uploadDocumentPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .uploadDocumentPopUp not found');
+      }
+    }, 0)
   }
 
   closeUploadDocument() {
+    this.callUploadDoc = false;
     const popupWrapper = document.querySelector(".uploadDocumentPopUp") as HTMLElement;
-    if (popupWrapper) {
-      popupWrapper.style.display = 'none';
-    } else {
-      console.error('Element with class not found');
-    }
+    setTimeout(() => {
+      if (popupWrapper) {
+        popupWrapper.style.display = 'none';
+      } else {
+        console.error('Element with class not found');
+      }
+    }, 0)
   }
 
   getAddressTypeHistory(addressTypeId: number) {
+    this.callAddressType = true;
     this.firmService.getAddressesTypeHistory(this.firmId, addressTypeId).subscribe(
       data => {
         this.firmAddressesTypeHistory = data.response;
@@ -1345,15 +1367,18 @@ export class ViewFirmPageComponent implements OnInit {
       }, error => {
         console.error('Error Fetching Firm History Addresses Type', error);
       })
-    const popupWrapper = document.querySelector('.addressHistoryPopup') as HTMLElement;
-    if (popupWrapper) {
-      popupWrapper.style.display = 'flex';
-    } else {
-      console.error('Element with class .addressHistoryPopup not found');
-    }
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.addressHistoryPopup') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .addressHistoryPopup not found');
+      }
+    }, 0)
   }
 
   closeAddressTypeHistory() {
+    this.callAddressType = false;
     const popupWrapper = document.querySelector('.addressHistoryPopup') as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none';
@@ -1364,18 +1389,21 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   getLicScopePreviousVersions(firmId: number, firmApplicationTypeId: number) {
+    this.callLicScopePrev = true;
     // Only fetch previous revisions if not already loaded
     if (!this.LicPrevRevNumbers || this.LicPrevRevNumbers.length === 0) {
       this.loadLicScopeRevisions(firmId, firmApplicationTypeId);
     }
 
     // Just show the popup without prompting the user or fetching new data
-    const popupWrapper = document.querySelector('.ScopeLicPreviousVersionsPopup') as HTMLElement;
-    if (popupWrapper) {
-      popupWrapper.style.display = 'flex';
-    } else {
-      console.error('Element with class .ScopeLicPreviousVersionsPopup not found');
-    }
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.ScopeLicPreviousVersionsPopup') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .ScopeLicPreviousVersionsPopup not found');
+      }
+    }, 0)
   }
 
   loadLicScopeRevisions(firmId: number, firmApplicationTypeId: number) {
@@ -1398,6 +1426,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   closeLicScopePreviousVersions() {
+    this.callLicScopePrev = false;
     const popupWrapper = document.querySelector('.ScopeLicPreviousVersionsPopup') as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none';
@@ -1407,18 +1436,21 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getAuthScopePreviousVersions(firmId: number, firmApplicationTypeId: number) {
+    this.callAuthScopePrev = true;
     // Only fetch previous revisions if not already loaded
     if (!this.AuthPrevRevNumbers || this.AuthPrevRevNumbers.length === 0) {
       this.loadAuthScopeRevisions(firmId, firmApplicationTypeId);
     }
 
     // Just show the popup without prompting the user or fetching new data
-    const popupWrapper = document.querySelector('.ScopeAuthPreviousVersionsPopup') as HTMLElement;
-    if (popupWrapper) {
-      popupWrapper.style.display = 'flex';
-    } else {
-      console.error('Element with class .ScopeAuthPreviousVersionsPopup not found');
-    }
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.ScopeAuthPreviousVersionsPopup') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .ScopeAuthPreviousVersionsPopup not found');
+      }
+    }, 0)
   }
 
   loadAuthScopeRevisions(firmId: number, firmApplicationTypeId: number) {
@@ -1441,6 +1473,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   closeAuthScopePreviousVersions() {
+    this.callAuthScopePrev = false;
     const popupWrapper = document.querySelector('.ScopeAuthPreviousVersionsPopup') as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none';
@@ -1456,6 +1489,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.currentLicRevisionNumber = scopeRevNum;
         console.log('Licensed Activities:', this.ActivityLicensed);
         this.updateLicLastRevisionNumber(); // Update lastRevisionNumber based on the response
+        this.closeLicScopePreviousVersions();
       });
     } else if (firmApplicationTypeId === 3) {
       this.firmService.getScopeNum(firmId, scopeRevNum, 3).subscribe(data => {
@@ -1463,11 +1497,12 @@ export class ViewFirmPageComponent implements OnInit {
         this.currentAuthRevisionNumber = scopeRevNum;
         console.log('Authorized Activities:', this.ActivityAuth);
         this.updateAuthLastRevisionNumber(); // Update lastRevisionNumber based on the response
+        this.closeAuthScopePreviousVersions();
       });
     } else {
       alert('Invalid Firm Application Type ID');
     }
-}
+  }
 
 
   updateLicLastRevisionNumber() {
@@ -1571,11 +1606,11 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  
+
 
   onFirmApplicationTypeChange(selectedFirmTypeID: number) {
     const applicationAuthStatus = this.allAuthorisationStatus.find(option => option.FirmApplStatusTypeID === constants.FirmAuthorizationApplStatusType.Application);
-    const applicationLicStatus = this.allQFCLicenseStatus.find(option => option.FirmApplStatusTypeID === constants.FirmLicenseApplStatusType.Application); 
+    const applicationLicStatus = this.allQFCLicenseStatus.find(option => option.FirmApplStatusTypeID === constants.FirmLicenseApplStatusType.Application);
     if (!this.isLicensed) {
       this.firmDetails.LicenseStatusTypeID = applicationLicStatus.FirmApplStatusTypeID;
       this.firmDetails.AuthorisationStatusTypeID = applicationAuthStatus.FirmApplStatusTypeID;
@@ -1589,7 +1624,7 @@ export class ViewFirmPageComponent implements OnInit {
     // Check if the selected firm type is "Authorize"
     if (selectedFirmTypeID == 3) { //  3 corresponds to 'Authorize'
       // Automatically set the Authorization Status to 'Application'
-      
+
 
       if (applicationAuthStatus) {
         this.firmDetails.AuthorisationStatusTypeID = applicationAuthStatus.FirmApplStatusTypeID;
@@ -1657,7 +1692,7 @@ export class ViewFirmPageComponent implements OnInit {
         [constants.FirmAuthorizationApplStatusType.AuthorisedWithdrawnVoluntary]: constants.FirmLicenseApplStatusType.LicensedWithdrawn,
         [constants.FirmAuthorizationApplStatusType.AuthorisedWithdrawnInvoluntary]: constants.FirmLicenseApplStatusType.LicensedWithdrawnInvolunatary,
       };
-  
+
       const QFCLicStatus = this.allQFCLicenseStatus.find(option => option.FirmApplStatusTypeID === statusTypes[numericValue]);
       if (QFCLicStatus) {
         this.firmDetails.LicenseStatusTypeID = QFCLicStatus.FirmApplStatusTypeID;

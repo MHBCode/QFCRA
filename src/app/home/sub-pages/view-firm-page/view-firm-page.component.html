@@ -2250,7 +2250,8 @@
 
 <!--Popups-->
 <!--Financial Year End History-->
-<div *ngIf="call" class="popup-wrapper">
+<div *ngIf="callFYear" class="overlay show"></div>
+<div *ngIf="callFYear" class="popup-wrapper">
   <i class="bi bi-x-circle close-icon" (click)="closeFYearHistory()"></i>
   <div class="popup-info-place">
     <div class="popup-header">
@@ -2286,6 +2287,7 @@
   </div>
 </div>
 <!--Inactive Users-->
+<div *ngIf="callInactiveUsers" class="overlay show"></div>
 <div *ngIf="callInactiveUsers" class="InactiveUsersPopUp">
   <i class="bi bi-x-circle close-icon" (click)="closeInactiveUsers()"></i>
   <div class="popup-info-place">
@@ -2321,7 +2323,8 @@
 </div>
 
 <!--Accounting Standards-->
-<div class="accountingStandardsPopUp">
+<div *ngIf="callAccStandard" class="overlay show"></div>
+<div *ngIf="callAccStandard" class="accountingStandardsPopUp">
   <i class="bi bi-x-circle close-icon" (click)="closeAccountingStandard()"></i>
   <div class="popup-info-place">
     <div class="popup-header">
@@ -2357,7 +2360,8 @@
   </div>
 </div>
 <!--Previous Firm Name-->
-<div class="prevFirmNamePopUp">
+<div *ngIf="callPrevFirmName" class="overlay show"></div>
+<div *ngIf="callPrevFirmName" class="prevFirmNamePopUp">
   <i class="bi bi-x-circle close-icon" (click)="closePrevFirmName()"></i>
   <div class="popup-info-place">
     <div class="popup-header">
@@ -2389,7 +2393,8 @@
   </div>
 </div>
 <!--Application Details-->
-<div class="ApplicationDetailsPopUp">
+<div *ngIf="callAppDetails" class="overlay show"></div>
+<div *ngIf="callAppDetails" class="ApplicationDetailsPopUp">
   <i class="bi bi-x-circle close-icon" (click)="closeApplicationDetails()"></i>
   <div class="popup-info-place">
     <div class="popup-header">
@@ -2455,7 +2460,8 @@
   </div>
 </div>
 <!--Upload document-->
-<div class="uploadDocumentPopUp">
+<div *ngIf="callUploadDoc" class="overlay show"></div>
+<div *ngIf="callUploadDoc" class="uploadDocumentPopUp">
   <i class="bi bi-x-circle close-icon" (click)="closeUploadDocument()"></i>
   <div class="popup-info-place upload-container">
     <div class="popup-header">
@@ -2477,7 +2483,8 @@
   </div>
 </div>
 <!--Address Type History-->
-<div class="addressHistoryPopup">
+<div *ngIf="callAddressType" class="overlay show"></div>
+<div *ngIf="callAddressType" class="addressHistoryPopup">
   <i class="bi bi-x-circle close-icon" (click)="closeAddressTypeHistory()"></i>
   <div class="popup-info-place">
     <div class="popup-header">
@@ -2517,7 +2524,8 @@
 </div>
 
 <!--Scope Previous Versions for License popup-->
-<div class="ScopeLicPreviousVersionsPopup">
+<div *ngIf="callLicScopePrev" class="overlay show"></div>
+<div *ngIf="callLicScopePrev" class="ScopeLicPreviousVersionsPopup">
   <i class="bi bi-x-circle close-icon" (click)="closeLicScopePreviousVersions()"></i>
 
   <div class="popup-header">
@@ -2536,7 +2544,8 @@
 </div>
 
 <!--Scope Previous Versions for Authorize popup-->
-<div class="ScopeAuthPreviousVersionsPopup">
+<div *ngIf="callAuthScopePrev" class="overlay show"></div>
+<div *ngIf="callAuthScopePrev" class="ScopeAuthPreviousVersionsPopup">
   <i class="bi bi-x-circle close-icon" (click)="closeAuthScopePreviousVersions()"></i>
 
   <div class="popup-header">
