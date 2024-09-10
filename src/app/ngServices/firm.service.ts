@@ -271,6 +271,9 @@ export class FirmService {
 
     return this.http.get<any>(`${this.baseUrl}get_firms_list`, { params });
   }
-
+  deleteAddress(addressId: any) {
+    const url = `${this.baseUrlAddress}delete_address/${addressId}`;
+    return this.http.delete(url);
+  }
 
 }

@@ -18,7 +18,7 @@ export class ViewFirmPageComponent implements OnInit {
   IsViewAuditorVisible: boolean = false;
   IsCreateAuditorVisible: boolean = false;
   IsEditAuditorVisible: boolean = false;
-  isAddingNewAddress: boolean = false;
+  canAddNewAddress: boolean = true;
   isLicensed: boolean;
   selectedAuditor: any = null;
   categorizedData = [];
@@ -48,7 +48,6 @@ export class ViewFirmPageComponent implements OnInit {
   ASSILevel: number = 4;
   firmDetails: any = {};  // Add firmDetails property
   dateOfApplication: any;
-  firmAddress: any = {}; // Used to edit firm Address
   existingAddresses: any = [];
   firmApp: any = {};
   firmOPDetails: any;
@@ -140,6 +139,8 @@ export class ViewFirmPageComponent implements OnInit {
   showError = false;
 
   AllProducts: any[] = [];
+
+  newAddress: any = {};
 
 
   constructor(
@@ -294,6 +295,14 @@ export class ViewFirmPageComponent implements OnInit {
 
     console.log("allowEditFirmDetails :", this.allowEditFirmDetails);
 
+    // check if any address type field has 'select' option selected and return alert message if so
+    const invalidAddress = this.firmAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
+
+    if (invalidAddress) {
+      alert('Please select a value for AddressTypeID.');
+      return; // Prevent further action if validation fails
+    }
+
     this.existingAddresses = this.firmAddresses.filter(address => address.Valid === true);
     if (this.allowEditFirmDetails) {
       this.allowEditFirmDetails = !this.allowEditFirmDetails;
@@ -379,37 +388,40 @@ export class ViewFirmPageComponent implements OnInit {
           requiresCoOp: this.firmDetails.RequiresCoOp ? this.firmDetails.RequiresCoOp : '',
           prComments: this.firmDetails.PublicRegisterComments ? this.firmDetails.PublicRegisterComments : ''
         },
-        addressList: this.existingAddresses.map(address => ({
-          firmID: this.firmId,
-          countryID: address.CountryID,
-          addressTypeID: address.AddressTypeID,
-          sameAsTypeID: address.SameAsTypeID,
-          lastModifiedBy: userId, // must be dynamic
-          addressAssnID: address.AddressAssnID,
-          entityTypeID: address.EntityTypeID,
-          entityID: address.EntityID,
-          addressID: address.AddressID.toString(),
-          addressLine1: address.AddressLine1,
-          addressLine2: address.AddressLine2,
-          addressLine3: address.AddressLine3,
-          addressLine4: address.AddressLine4,
-          city: address.City,
-          province: address.Province || '',
-          postalCode: address.PostalCode,
-          phoneNumber: address.PhoneNum,
-          phoneExt: address.PhoneExt || '',
-          faxNumber: address.FaxNum,
-          lastModifiedDate: address.LastModifiedDate || null,
-          addressState: 6,
-          fromDate: address.FromDate || null,
-          toDate: address.ToDate || null,
-          objectID: address.ObjectID,
-          objectInstanceID: address.ObjectInstanceID,
-          objectInstanceRevNumber: address.ObjectInstanceRevNum,
-          sourceObjectID: address.SourceObjectID,
-          sourceObjectInstanceID: address.SourceObjectInstanceID,
-          sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNum
-        }))
+        addressList: this.existingAddresses.map(address => {
+          const isNew = !address.AddressID || address.AddressID === '';
+          return {
+            firmID: this.firmId,
+            countryID: Number(address.CountryID) || 0, // Ensure a number is provided, default to 0 if missing
+            addressTypeID: address.AddressTypeID || 0, // Default to 0 if missing
+            sameAsTypeID: address.SameAsTypeID || null, // Allow null for optional fields
+            lastModifiedBy: userId, // must be dynamic
+            addressAssnID: address.AddressAssnID || null, // Default to null if missing
+            entityTypeID: address.EntityTypeID || 1, // Assign a default entityTypeID if undefined
+            entityID: address.EntityID || this.firmId, // Default to firmId if entityID is undefined
+            addressID: address.AddressID?.toString() || '', // Ensure it's a string, default to empty if null
+            addressLine1: address.AddressLine1 || '', // Ensure a valid string is passed
+            addressLine2: address.AddressLine2 || '',
+            addressLine3: address.AddressLine3 || '',
+            addressLine4: address.AddressLine4 || '',
+            city: address.City || '',
+            province: address.Province || '', // Default to empty string if province is not provided
+            postalCode: address.PostalCode || '',
+            phoneNumber: address.PhoneNum || '',
+            phoneExt: address.PhoneExt || '',
+            faxNumber: address.FaxNum || '',
+            lastModifiedDate: address.LastModifiedDate || new Date().toISOString(), // Default to current date
+            addressState: isNew ? 2 : 6, // New address state is 2, existing is 6
+            fromDate: address.FromDate || null,
+            toDate: address.ToDate || null,
+            objectID: address.ObjectID || 521, // Default to firmId if objectID is undefined
+            objectInstanceID: address.ObjectInstanceID || this.firmId, // Same for objectInstanceID
+            objectInstanceRevNumber: address.ObjectInstanceRevNum || 1, // Default revision number
+            sourceObjectID: address.SourceObjectID || 521,
+            sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
+            sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNum || 1, // Default revision number
+          };
+        })
       };
 
       console.log("Final firm object to be sent:", firmObj);
@@ -420,6 +432,11 @@ export class ViewFirmPageComponent implements OnInit {
         this.loadFirmDetails(this.firmId);
         this.loadCurrentAppDetails();
         this.loadFirmAdresses();
+        this.isCollapsed['firmDetailsSection'] = false;
+        this.isCollapsed['appDetailsSection'] = false;
+        this.isCollapsed['pressReleaseSection'] = false;
+        this.isCollapsed['commentsSection'] = false;
+        this.isCollapsed['addressesSection'] = false;
         this.cdr.detectChanges();
       }, error => {
         console.error('Error editing row:', error);
@@ -893,8 +910,25 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   addNewAddress() {
-    const newAddress = {
-      AddressTypeID: this.generateGuid(),
+    const now = new Date();
+    const isoString = now.toISOString();
+
+    // Define the total number of address types
+    const totalAddressTypes = this.allAddressTypes.length;
+
+    // Get the count of valid addresses
+    const validAddressCount = this.firmAddresses.filter(addr => addr.Valid).length;
+
+    // Check if the number of valid addresses is equal to the number of address types
+    if (validAddressCount >= totalAddressTypes) {
+      // Disable the button if all address types are added
+      this.canAddNewAddress = false;
+      return;
+    }
+
+    this.newAddress = {
+      AddressID: null,
+      AddressTypeID: 0,
       AddressTypeDesc: '',
       AddressLine1: '',
       AddressLine2: '',
@@ -907,56 +941,89 @@ export class ViewFirmPageComponent implements OnInit {
       PostalCode: '',
       PhoneNum: '',
       FaxNum: '',
+      LastModifiedBy: 0, //todo _userId;
+      LastModifiedDate: isoString,
+      addressState: 0,
+      FromDate: null,
+      ToDate: null,
       Valid: true,
-      isNew: true   // This helps you know it's a newly added address
     };
-    this.firmAddresses.unshift(newAddress);
+
+    // Add the new address to the list
+    this.firmAddresses.unshift(this.newAddress);
+
+    // Update the count of valid addresses
+    const updatedValidAddressCount = this.firmAddresses.filter(addr => addr.Valid).length;
+
+    // Disable the button if the count of valid addresses matches the number of address types
+    this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
   }
 
-
-  generateGuid(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      const r = (Math.random() * 16) | 0;
-      const v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
+  areAllAddressTypesAdded() {
+    const existingTypes = new Set(this.firmAddresses.map(addr => Number(addr.AddressTypeID)));
+    return this.allAddressTypes.every(type => existingTypes.has(type.AddressTypeID));
   }
+
 
   removeAddress(index: number): void {
     const confirmDelete = window.confirm('Are you sure you want to delete this record?');
     if (confirmDelete) {
       if (index > -1 && index < this.firmAddresses.length) {
         this.firmAddresses.splice(index, 1); // Removes the address at the specified index
+
+        // Re-check if all address types have been added after removal
+        const validAddressCount = this.firmAddresses.filter(addr => addr.Valid).length;
+
+        // Update the canAddNewAddress flag after removing the address
+        this.canAddNewAddress = validAddressCount < this.allAddressTypes.length;
       }
     }
   }
 
-  canAddNewAddress() {
 
+
+  onAddressTypeChange(event: any, address: any) {
+    const selectedAddressTypeId = Number(event.target.value);
+
+    if (selectedAddressTypeId === 0) {
+      // Do nothing if the "Select" option is chosen
+      return;
+    }
+
+    // Get all valid addresses
+    const validAddresses = this.firmAddresses.filter(addr => addr.Valid);
+
+    // Check if the selected address type already exists in valid addresses
+    const isDuplicate = validAddresses.some(addr => addr.AddressTypeID === selectedAddressTypeId);
+
+    if (isDuplicate) {
+      // Show an alert message if duplicate is found
+      alert("This address type already exists. Please choose another.");
+
+      // Reset the dropdown to default ("Select" option)
+      event.target.value = "0";
+      address.AddressTypeID = 0;  // Also reset the AddressTypeID in the model
+      address.AddressTypeDesc = ''; // Reset the description as well
+      return;
+    }
+
+    // Update the AddressTypeID and AddressTypeDesc based on the selection
+    const selectedAddressType = this.allAddressTypes.find(type => type.AddressTypeID === selectedAddressTypeId);
+
+    if (selectedAddressType) {
+      // Update the Address model
+      address.AddressTypeID = selectedAddressType.AddressTypeID;
+      address.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
+    }
   }
 
-
-  // // Method to check if all address types are present
-  // areAllAddressTypesAdded(): boolean {
-  //   const existingTypes = new Set(this.firmAddresses.map(addr => addr.AddressTypeID));
-  //   return this.allAddressTypes.every(type => existingTypes.has(type.AddressTypeID));
-  // }
-
-  // filterExistingAddressTypes() {
-  //   // Get the unique AddressTypeID from the firmAddresses
-  //   const addressTypeIds = [...new Set(this.firmAddresses.map(address => address.AddressTypeID))];
-  //   console.log('Used AddressTypeIDs: ', addressTypeIds);  // Debugging line
-
-  //   // Filter allAddressTypes to include only those that match the existing AddressTypeIDs
-  //   this.existingAddressTypes = this.allAddressTypes.filter(type => addressTypeIds.includes(type.AddressTypeID));
-  //   console.log('Existing Address Types: ', this.existingAddressTypes);
-  // }
 
 
   loadFirmAdresses() {
     this.firmService.getFirmAddresses(this.firmId).subscribe(
       data => {
         this.firmAddresses = data.response;
+        // this.canAddNewAddress = !this.areAllAddressTypesAdded();
         console.log('Firm Addresses: ', this.firmAddresses);
       }, error => {
         console.error('Error Fetching Firm Addresses', error);

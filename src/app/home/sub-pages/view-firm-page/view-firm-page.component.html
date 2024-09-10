@@ -684,7 +684,7 @@
         </button>
       </div>
       <div class="add-address-container">
-        <button *ngIf="!allowEditFirmDetails" (click)="addNewAddress()"
+        <button *ngIf="!allowEditFirmDetails && canAddNewAddress" (click)="addNewAddress()"
           [hidden]="isCollapsed['addressesSection']" class="addAddressBtn">Add Address</button>
       </div>
       <div class="edit-firms-inputs">
@@ -703,10 +703,10 @@
             <!-- address type on edit mode -->
             <div class="input-field" *ngIf="!allowEditFirmDetails">
               <label for="addressType">
-                Address Type <button *ngIf="address.PreviousRecords !== 0 && !address.isNew" class="subbutton"
+                Address Type <button *ngIf="address.PreviousRecords !== 0" class="subbutton"
                   (click)="getAddressTypeHistory(address.AddressTypeID)">History</button>
               </label>
-              <select [disabled]="!address.isNew" [(ngModel)]="address.AddressTypeID"
+              <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID" (change)="onAddressTypeChange($event, address)"
                 [ngClass]="{'select-background-edited': !allowEditFirmDetails}">
                 <option value="0">Select</option>
                 <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
