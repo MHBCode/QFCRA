@@ -2,9 +2,10 @@ import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, QueryList, Ren
 import { Router, ActivatedRoute } from '@angular/router';  // Import ActivatedRoute
 import { FirmService } from 'src/app/ngServices/firm.service';  // Import FirmService
 import flatpickr from 'flatpickr';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import * as constants from 'src/app/app-constants';
+import Swal from 'sweetalert2';
 
 
 
@@ -14,11 +15,39 @@ import * as constants from 'src/app/app-constants';
   styleUrls: ['./view-firm-page.component.scss']
 })
 export class ViewFirmPageComponent implements OnInit {
+  showErrorAlert(messageKey: number) {
+    this.firmService.errorMessages(messageKey).subscribe(
+      (response) => {
+        Swal.fire({
+          title: 'Alert!',
+          text: response.response,
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      },
+    );
+  }
+
+  showFirmDetailsSaveSuccessAlert(messageKey: number) {
+    this.firmService.errorMessages(messageKey).subscribe(
+      (response) => {
+        Swal.fire({
+          title: 'Success!',
+          text: response.response,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
+      },
+    );
+  }
+
+  errorMessages: { [key: string]: string } = {};
   /* for Auditors */
   IsViewAuditorVisible: boolean = false;
   IsCreateAuditorVisible: boolean = false;
   IsEditAuditorVisible: boolean = false;
   canAddNewAddress: boolean = true;
+  disableAddressFields: boolean = false;
   isLicensed: boolean;
   selectedAuditor: any = null;
   categorizedData = [];
@@ -68,6 +97,7 @@ export class ViewFirmPageComponent implements OnInit {
   activityCategories: any[] = [];
   licensedActivities: any = [];
   AuthRegulatedActivities: any = [];
+  AllProducts: any[] = [];
   firmInactiveUsers: any[] = [];
   firmAppDetailsLicensed: any[] = [];
   firmAppDetailsAuthorization: any[] = [];
@@ -83,6 +113,8 @@ export class ViewFirmPageComponent implements OnInit {
   FIRMRMP: any;
   FIRMNotices: any;
   usedAddressTypes: Set<string> = new Set();
+  newAddress: any = {};
+  newActivity: any = {};
   allowEditFirmDetails: string | boolean = true;
   /* for scope */
   allowEditLicScopeDetails: string | boolean = true;
@@ -136,11 +168,8 @@ export class ViewFirmPageComponent implements OnInit {
   firmSectorID: any;
 
   // flags validations
-  showError = false;
-
-  AllProducts: any[] = [];
-
-  newAddress: any = {};
+  hasValidationErrors: boolean = false;
+  invalidAddress: boolean;
 
 
   constructor(
@@ -289,178 +318,353 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   editFirm() {
+    const userId = 10044; // Replace with dynamic userId as needed
+    this.hasValidationErrors = false;
+  
+    this.firmDetails.FirmName = this.firmDetails.FirmName.trim();
+  
+    // FIRM NAME VALIDATION
+    if (!this.firmDetails.FirmName) {
+      this.getErrorMessages('FirmName', constants.Firm_CoreDetails_Messages.ENTER_FIRMNAME);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['FirmName'];
+    }
+  
+    // QFC VALIDATION
 
-    const userId = 10044; // Replace with dynamic userId as needed  //TODO: Remove hardcoded userId
-
-
-    console.log("allowEditFirmDetails :", this.allowEditFirmDetails);
-
-    // check if any address type field has 'select' option selected and return alert message if so
-    const invalidAddress = this.firmAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
-
-    if (invalidAddress) {
-      alert('Please select a value for AddressTypeID.');
-      return; // Prevent further action if validation fails
+    if (this.firmDetails.QFCNum) {
+      this.firmDetails.QFCNum = this.padNumber(this.firmDetails.QFCNum);
     }
 
-    this.existingAddresses = this.firmAddresses.filter(address => address.Valid === true);
-    if (this.allowEditFirmDetails) {
-      this.allowEditFirmDetails = !this.allowEditFirmDetails;
-    } else {
-      if (!this.firmDetails.FirmName || this.firmDetails.LegalStatusTypeID == 0) {
-        this.showError = true; // Show the error message
-        return; // Prevent further actions if validation fails
+    if (this.selectedFirmTypeID === 2 && this.firmDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Licensed) {
+      if (this.firmDetails.QFCNum == null || this.firmDetails.QFCNum == '') {
+        this.getErrorMessages('QFCNum', constants.Firm_CoreDetails_Messages.ENTER_QFCNUMBER);
+        this.hasValidationErrors = true;
       }
+    }
 
-      if (this.firmDetails.DifferentIncorporationDate == true) {
-        if (this.firmDetails.DateOfIncorporation == null || this.firmDetails.DateOfIncorporation == '') {
-          this.showError = true; // Show the error message
-          return; // Prevent further actions if validation fails
-        }
+    if (this.selectedFirmTypeID === 3 && this.firmDetails.AuthorisationStatusTypeID === constants.FirmAuthorizationApplStatusType.Authorised) {
+      if (this.firmDetails.QFCNum == null || this.firmDetails.QFCNum == '') {
+        this.getErrorMessages('QFCNum', constants.Firm_CoreDetails_Messages.ENTER_QFCNUMBER);
+        this.hasValidationErrors = true;
+      }
+    }
+  
+    // Validate QFC Number
+    this.validateQFCNum().then(() => {
+      // Continue with the rest of the validations only after QFC validation is complete
+  
+      // LEGAL STATUS VALIDATION
+      if (this.firmDetails.LegalStatusTypeID == 0) {
+        this.getErrorMessages('LegalStatusTypeID', constants.Firm_CoreDetails_Messages.ENTER_LEGAL_STATUS);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['LegalStatusTypeID'];
+      }
+  
+      // DATE OF INCORPORATION VALIDATION
+      if (this.firmDetails.DifferentIncorporationDate && !this.firmDetails.DateOfIncorporation) {
+        this.getErrorMessages('DateOfIncorporation', constants.FirmActivitiesEnum.DATEOFINCORPORATION_ERROR); // Adjust the message key as needed
+        this.hasValidationErrors = true;
       } else {
         this.firmDetails.DateOfIncorporation = this.firmDetails.DateOfIncorporation;
+        delete this.errorMessages['DateOfIncorporation'];
       }
 
-      this.showError = false;
-      this.allowEditFirmDetails = !this.allowEditFirmDetails; // Toggle to edit mode
-
-      if (this.firmDetails?.AuthorisationStatusTypeID > 0) {
-        this.firmDetails.firmApplDate = this.firmDetails.FirmAuthApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmAuthApplDate) : null;
+      // FINANCIAL YEAR END EFFECTIVE FROM VALIDATION
+      if (this.firmDetails.FirmFinYearEndEffectiveFrom == null || this.firmDetails.FirmFinYearEndEffectiveFrom == '') {
+        if (this.firmDetails.FinYearEndTypeID > 0) {
+        this.getErrorMessages('FYearEndDate',constants.InvoicesMessages.INVALID_DATA,"Financial Year End Effective From");
+        this.hasValidationErrors = true;
+        }
       } else {
-        this.firmDetails.firmApplDate = this.firmDetails.FirmLicApplDate ? this.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate) : null;
+        delete this.errorMessages['FYearEndDate'];
       }
 
-      if (this.firmDetails.LegalStatusTypeID == 1 || this.firmDetails.LegalStatusTypeID == 2 ||
-        this.firmDetails.LegalStatusTypeID == 7 || this.firmDetails.LegalStatusTypeID == 8
-      ) {
-        this.firmDetails.PlaceOfIncorporation = constants.PLACE_OF_INCORPORATION_QFC;
+      // ACCOUNTING STANDARDS EFFECTIVE FROM VALIDATION
+      if (this.firmDetails.FinAccStdTypeEffectiveFrom == null || this.firmDetails.FinAccStdTypeEffectiveFrom == '') {
+        this.getErrorMessages('AccStandDate',constants.InvoicesMessages.INVALID_DATA,"Accounting Standards Effective From");
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['AccStandDate'];
       }
 
-      if (this.selectedFirmTypeID === 2) {
-        if (this.firmDetails.LicenseStatusTypeID === 4) { // 4: Application option in QFC License Status (Core Details)
-          this.firmDetails.LicensedDate = this.firmDetails.firmApplDate;
+      // PREV. FRIM NAME EFFECTIVE TO
+      if (this.firmNamesHistory[0]?.FirmNameHistoryID) {
+        if (this.firmNamesHistory[0].DateEffectiveTo == null || this.firmNamesHistory[0].DateEffectiveTo == '') {
+          this.getErrorMessages('PrevFirmNameEffectiveTo',constants.InvoicesMessages.INVALID_DATA,"Prev Firm Name Effective To");
+        this.hasValidationErrors = true;
         } else {
-          this.firmDetails.LicensedDate = this.firmDetails.LicensedDate;
+          delete this.errorMessages['PrevFirmNameEffectiveTo'];
         }
       }
-
-      if (this.selectedFirmTypeID === 3) {
-        if (this.firmDetails.LicensedDate != null) {
-          this.firmDetails.LicensedDate = this.firmDetails.LicensedDate;
+  
+      // APPLICATION DETAILS SECTION VALIDATION
+      // DATE OF APPLICATION VALIDATION
+      if (!this.dateOfApplication) {
+        this.getErrorMessages('DateOfApplication', constants.Firm_CoreDetails_Messages.ENTER_DATE_OF_APPLICATION);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['DateOfApplication'];
+      }
+  
+      // QFC LICENSED DATE VALIDATION
+      if (!this.firmDetails.LicensedDate) {
+        this.getErrorMessages('LicensedDate', constants.FirmActivitiesEnum.ENTER_VALID_DATE, "QFC License Status date");
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['LicensedDate'];
+      }
+  
+      // AUTHORIZATION DATE VALIDATION
+      if (!this.firmDetails.AuthorisationDate) {
+        this.getErrorMessages('AuthorisationDate', constants.FirmActivitiesEnum.ENTER_VALID_DATE, "Authorisation Status date");
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['AuthorisationDate'];
+      }
+  
+      // ADDRESS TYPE VALIDATION
+      this.invalidAddress = this.firmAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
+      if (this.invalidAddress) {
+        this.getErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['AddressTypeID'];
+      }
+  
+      // Additional validation logic can go here for other fields as needed
+  
+      // Step 2: Handle Validation Errors
+      if (this.hasValidationErrors) {
+        this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+        return; // Prevent further action if validation fails
+      }
+  
+      // Step 3: Process Firm Addresses
+      this.firmAddresses.forEach(address => {
+        if (address.isRemoved) {
+          address.addressState = 4; // Set addressState to 4 if the address is marked as removed
+        } else if (address.AddressID) {
+          address.addressState = 6; // Set addressState to 6 for existing addresses
         } else {
-          if (this.firmDetails.AuthorisationDate != null) {
-            this.firmDetails.LicensedDate = this.firmDetails.AuthorisationDate;
-          } else {
-            this.firmDetails.LicensedDate = null;
-          }
+          address.addressState = 2; // Set addressState to 2 for new addresses
+        }
+      });
+  
+      this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
+  
+      // Step 4: Toggle Edit Mode
+      if (this.allowEditFirmDetails) {
+        this.allowEditFirmDetails = !this.allowEditFirmDetails;
+      } else {
+        this.allowEditFirmDetails = !this.allowEditFirmDetails; // Toggle to edit mode
+  
+        // Step 5: Set Additional Firm Details
+        this.setAdditionalFirmDetails();
+  
+        // Step 6: Prepare Firm Object
+        const firmObj = this.prepareFirmObject(userId);
+  
+        // Step 7: Save Firm Details
+        this.saveFirmDetails(firmObj, userId);
+        this.showFirmDetailsSaveSuccessAlert(constants.Firm_CoreDetails_Messages.FIRMDETAILS_SAVED_SUCCESSFULLY);
+      }
+    });
+  }
+  
+
+  onSameAsTypeChange(selectedTypeID: number) {
+    const numericTypeID = Number(selectedTypeID);
+    if (selectedTypeID && selectedTypeID !== 0) {
+      // flag to disable address fields after you select exisiting address type from same on as type field
+      this.disableAddressFields = true;
+      const selectedAddress = this.existingAddresses.find(address => address.AddressTypeID === numericTypeID);
+      if (selectedAddress) {
+        this.populateNewAddressFields(selectedAddress);
+      }
+    } else {
+      // enable address fields if 'select' is selected
+      this.disableAddressFields = false;
+    }
+  }
+
+  populateNewAddressFields(address: any) {
+    this.newAddress.AddressLine1 = address.AddressLine1;
+    this.newAddress.AddressLine2 = address.AddressLine2;
+    this.newAddress.AddressLine3 = address.AddressLine2;
+    this.newAddress.AddressLine4 = address.AddressLine2;
+    this.newAddress.City = address.City;
+    this.newAddress.CountryID = address.CountryID;
+    this.newAddress.State = address.State;
+    this.newAddress.ZipCode = address.ZipCode;
+    this.newAddress.Province = address.Province;
+    this.newAddress.PostalCode = address.PostalCode;
+    this.newAddress.PhoneNum = address.PhoneNum;
+    this.newAddress.FaxNum = address.FaxNum;
+  }
+
+  // Function to set additional firm details
+  setAdditionalFirmDetails() {
+    if (this.firmDetails?.AuthorisationStatusTypeID > 0) {
+      this.firmDetails.firmApplDate = this.firmDetails.FirmAuthApplDate
+        ? this.convertDateToYYYYMMDD(this.firmDetails.FirmAuthApplDate)
+        : null;
+    } else {
+      this.firmDetails.firmApplDate = this.firmDetails.FirmLicApplDate
+        ? this.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate)
+        : null;
+    }
+
+    if (
+      this.firmDetails.LegalStatusTypeID == 1 ||
+      this.firmDetails.LegalStatusTypeID == 2 ||
+      this.firmDetails.LegalStatusTypeID == 7 ||
+      this.firmDetails.LegalStatusTypeID == 8
+    ) {
+      this.firmDetails.PlaceOfIncorporation = constants.PLACE_OF_INCORPORATION_QFC;
+    }
+
+    if (this.selectedFirmTypeID === 2) { // 2: Licensed for firm app type dropdown
+      if (this.firmDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Application) { // 4: Application option in QFC License Status (Core Details)
+        this.firmDetails.LicensedDate = this.firmDetails.firmApplDate;
+      } else {
+        this.firmDetails.LicensedDate = this.firmDetails.LicensedDate;
+      }
+    }
+
+    if (this.selectedFirmTypeID === 3) { // 3: Authorization for firm app type dropdown
+      if (this.firmDetails.LicensedDate != null) {
+        this.firmDetails.LicensedDate = this.firmDetails.LicensedDate;
+      } else {
+        if (this.firmDetails.AuthorisationDate != null) {
+          this.firmDetails.LicensedDate = this.firmDetails.AuthorisationDate;
+        } else {
+          this.firmDetails.LicensedDate = null;
         }
       }
+    }
+  }
 
-      const firmObj = {
-        firmDetails: {
+  // Function to prepare the firm object for saving
+  prepareFirmObject(userId: number) {
+    return {
+      firmDetails: {
+        firmID: this.firmId,
+        firmName: this.firmDetails.FirmName,
+        qfcNumber: this.firmDetails.QFCNum,
+        firmCode: this.firmDetails.FirmCode,
+        legalStatusTypeID: this.firmDetails.LegalStatusTypeID,
+        qfcTradingName: this.firmDetails.QFCTradingName,
+        prevTradingName: this.firmDetails.PrevTradingName,
+        placeOfIncorporation: this.firmDetails.PlaceOfIncorporation,
+        countyOfIncorporation: this.firmDetails.CountyOfIncorporation,
+        webSiteAddress: this.firmDetails.WebSiteAddress,
+        firmApplDate: this.firmDetails.firmApplDate,
+        firmApplTypeID: this.selectedFirmTypeID,
+        licenseStatusTypeID: this.firmDetails.LicenseStatusTypeID,
+        licensedDate: this.convertDateToYYYYMMDD(this.firmDetails.LicensedDate),
+        authorisationStatusTypeID: this.firmDetails.AuthorisationStatusTypeID,
+        authorisationDate: this.convertDateToYYYYMMDD(this.firmDetails.AuthorisationDate),
+        createdBy: userId,
+        finYearEndTypeID: this.firmDetails.FinYearEndTypeID,
+        firmAccountingDataID: this.firmDetails.FirmAccountingDataID,
+        firmApplicationDataComments: this.firmDetails.FirmApplicationDataComments || '',
+        firmYearEndEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FirmFinYearEndEffectiveFrom),
+        finAccStandardTypeID: this.firmDetails.FinAccStdTypeID,
+        finAccStandardID: this.firmDetails.FirmAccountingStandardID ?? 0,
+        firmAccountingEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FinAccStdTypeEffectiveFrom) ?? null,
+        dateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
+        differentIncorporationDate: this.firmDetails.DifferentIncorporationDate,
+        firmNameAsinFactSheet: this.firmDetails.FirmNameAsinFactSheet || '',
+        requiresCoOp: this.firmDetails.RequiresCoOp || '',
+        prComments: this.firmDetails.PublicRegisterComments || ''
+      },
+      addressList: this.existingAddresses.map(address => {
+        return {
           firmID: this.firmId,
-          firmName: this.firmDetails.FirmName,
-          qfcNumber: this.firmDetails.QFCNum,
-          firmCode: this.firmDetails.FirmCode,
-          legalStatusTypeID: this.firmDetails.LegalStatusTypeID,
-          qfcTradingName: this.firmDetails.QFCTradingName,
-          prevTradingName: this.firmDetails.PrevTradingName,
-          placeOfIncorporation: this.firmDetails.PlaceOfIncorporation,
-          countyOfIncorporation: this.firmDetails.CountyOfIncorporation,
-          webSiteAddress: this.firmDetails.WebSiteAddress,
-          firmApplDate: this.firmDetails.firmApplDate,
-          firmApplTypeID: this.selectedFirmTypeID,
-          licenseStatusTypeID: this.firmDetails.LicenseStatusTypeID,
-          licensedDate: this.convertDateToYYYYMMDD(this.firmDetails.LicensedDate),
-          authorisationStatusTypeID: this.firmDetails.AuthorisationStatusTypeID,
-          authorisationDate: this.convertDateToYYYYMMDD(this.firmDetails.AuthorisationDate),
-          createdBy: userId,
-          finYearEndTypeID: this.firmDetails.FinYearEndTypeID,
-          firmAccountingDataID: this.firmDetails.FirmAccountingDataID,
-          firmApplicationDataComments: this.firmDetails.FirmApplicationDataComments ? this.firmDetails.FirmApplicationDataComments : '',
-          firmYearEndEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FirmFinYearEndEffectiveFrom),
-          finAccStandardTypeID: this.firmDetails.FinAccStdTypeID,
-          finAccStandardID: this.firmDetails.FirmAccountingStandardID ?? 0,
-          firmAccountingEffectiveFrom: this.convertDateToYYYYMMDD(this.firmDetails.FinAccStdTypeEffectiveFrom) ?? null,
-          dateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
-          differentIncorporationDate: this.firmDetails.DifferentIncorporationDate,
-          firmNameAsinFactSheet: this.firmDetails.FirmNameAsinFactSheet ? this.firmDetails.FirmNameAsinFactSheet : '',
-          requiresCoOp: this.firmDetails.RequiresCoOp ? this.firmDetails.RequiresCoOp : '',
-          prComments: this.firmDetails.PublicRegisterComments ? this.firmDetails.PublicRegisterComments : ''
-        },
-        addressList: this.existingAddresses.map(address => {
-          const isNew = !address.AddressID || address.AddressID === '';
-          return {
-            firmID: this.firmId,
-            countryID: Number(address.CountryID) || 0, // Ensure a number is provided, default to 0 if missing
-            addressTypeID: address.AddressTypeID || 0, // Default to 0 if missing
-            sameAsTypeID: address.SameAsTypeID || null, // Allow null for optional fields
-            lastModifiedBy: userId, // must be dynamic
-            addressAssnID: address.AddressAssnID || null, // Default to null if missing
-            entityTypeID: address.EntityTypeID || 1, // Assign a default entityTypeID if undefined
-            entityID: address.EntityID || this.firmId, // Default to firmId if entityID is undefined
-            addressID: address.AddressID?.toString() || '', // Ensure it's a string, default to empty if null
-            addressLine1: address.AddressLine1 || '', // Ensure a valid string is passed
-            addressLine2: address.AddressLine2 || '',
-            addressLine3: address.AddressLine3 || '',
-            addressLine4: address.AddressLine4 || '',
-            city: address.City || '',
-            province: address.Province || '', // Default to empty string if province is not provided
-            postalCode: address.PostalCode || '',
-            phoneNumber: address.PhoneNum || '',
-            phoneExt: address.PhoneExt || '',
-            faxNumber: address.FaxNum || '',
-            lastModifiedDate: address.LastModifiedDate || new Date().toISOString(), // Default to current date
-            addressState: isNew ? 2 : 6, // New address state is 2, existing is 6
-            fromDate: address.FromDate || null,
-            toDate: address.ToDate || null,
-            objectID: address.ObjectID || 521, // Default to firmId if objectID is undefined
-            objectInstanceID: address.ObjectInstanceID || this.firmId, // Same for objectInstanceID
-            objectInstanceRevNumber: address.ObjectInstanceRevNum || 1, // Default revision number
-            sourceObjectID: address.SourceObjectID || 521,
-            sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
-            sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNum || 1, // Default revision number
-          };
-        })
-      };
+          countryID: Number(address.CountryID) || 0,
+          addressTypeID: address.AddressTypeID || 0,
+          sameAsTypeID: address.SameAsTypeID || null,
+          lastModifiedBy: userId, // must be dynamic
+          addressAssnID: address.AddressAssnID || null,
+          entityTypeID: address.EntityTypeID || 1,
+          entityID: address.EntityID || this.firmId,
+          addressID: address.AddressID?.toString() || '',
+          addressLine1: address.AddressLine1 || '',
+          addressLine2: address.AddressLine2 || '',
+          addressLine3: address.AddressLine3 || '',
+          addressLine4: address.AddressLine4 || '',
+          city: address.City || '',
+          province: address.Province || '',
+          postalCode: address.PostalCode || '',
+          phoneNumber: address.PhoneNum || '',
+          phoneExt: address.PhoneExt || '',
+          faxNumber: address.FaxNum || '',
+          lastModifiedDate: address.LastModifiedDate || new Date().toISOString(), // Default to current date
+          addressState: address.addressState, // New address state is 2, existing is 6
+          fromDate: address.FromDate || null,
+          toDate: address.ToDate || null,
+          objectID: address.ObjectID || 521,
+          objectInstanceID: address.ObjectInstanceID || this.firmId,
+          objectInstanceRevNumber: address.ObjectInstanceRevNum || 1,
+          sourceObjectID: address.SourceObjectID || 521,
+          sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
+          sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNum || 1,
+          objAis: null,
+        };
+      }),
+      objFirmNameHistory: null
+    };
+  }
 
-      console.log("Final firm object to be sent:", firmObj);
+  // Function to save firm details
+  saveFirmDetails(firmObj: any, userId: number) {
+    console.log("Final firm object to be sent:", firmObj);
 
-      this.firmService.editFirm(userId, firmObj).subscribe(response => {
+    this.firmService.editFirm(userId, firmObj).subscribe(
+      response => {
         console.log('Row edited successfully:', response);
         this.loadPrevFirmAndDate();
         this.loadFirmDetails(this.firmId);
         this.loadCurrentAppDetails();
         this.loadFirmAdresses();
-        this.isCollapsed['firmDetailsSection'] = false;
-        this.isCollapsed['appDetailsSection'] = false;
-        this.isCollapsed['pressReleaseSection'] = false;
-        this.isCollapsed['commentsSection'] = false;
-        this.isCollapsed['addressesSection'] = false;
+        this.resetCollapsibleSections();
         this.cdr.detectChanges();
-      }, error => {
+      },
+      error => {
         console.error('Error editing row:', error);
-      });
-    }
+      }
+    );
   }
-
-
-
 
 
   cancelEditFirm() {
     this.allowEditFirmDetails = true;
-    this.showError = false;
-    this.isCollapsed['firmDetailsSection'] = false;
-    this.isCollapsed['appDetailsSection'] = false;
-    this.isCollapsed['pressReleaseSection'] = false;
-    this.isCollapsed['commentsSection'] = false;
-    this.isCollapsed['addressesSection'] = false;
+    this.errorMessages = {};
+    this.selectedFile = null;
+    this.resetCollapsibleSections();
     this.loadPrevFirmAndDate();
     this.loadFirmDetails(this.firmId);
     this.loadCurrentAppDetails();
     this.loadFirmAdresses();
   }
+
+  // Function to reset the collapsible sections
+  resetCollapsibleSections() {
+    this.isCollapsed['firmDetailsSection'] = false;
+    this.isCollapsed['appDetailsSection'] = false;
+    this.isCollapsed['pressReleaseSection'] = false;
+    this.isCollapsed['commentsSection'] = false;
+    this.isCollapsed['addressesSection'] = false;
+  }
+
+  isPositiveNonDecimal(value: string): boolean {
+    const regex = /^[0-9][0-9]*$/;
+    return regex.test(value);
+  }
+
 
   editLicenseScope(): void {
     this.allowEditLicScopeDetails = !this.allowEditLicScopeDetails;
@@ -474,11 +678,11 @@ export class ViewFirmPageComponent implements OnInit {
         docReferenceID: activityLic.docReferenceID,
         firmApplTypeID: 1,
         docIDs: activityLic.DocID,
-        generalConditions: activityLic.GeneralConditions || "None",
-        effectiveDate: this.convertDateToYYYYMMDD(activityLic.EffectiveDate),
+        generalConditions: activityLic.GeneralConditions,
+        effectiveDate: this.convertDateToYYYYMMDD(activityLic.ScopeEffectiveDate),
         scopeCertificateLink: activityLic.ScopeCertificateLink,
         applicationDate: this.convertDateToYYYYMMDD(activityLic.ApplicationDate),
-        licensedOrAuthorisedDate: this.convertDateToYYYYMMDD(activityLic.LicensedOrAuthorisedDate),
+        licensedOrAuthorisedDate: this.convertDateToYYYYMMDD(activityLic.LicensedOrAuthorisedDate), //wrong
       }))[0],
 
       lstFirmActivities: this.ActivityLicensed.map(activityLic => ({
@@ -490,13 +694,7 @@ export class ViewFirmPageComponent implements OnInit {
         productTypeID: activityLic.ProductTypeID || null,
         appliedDate: this.convertDateToYYYYMMDD(activityLic.AppliedDate),
         withDrawnDate: this.convertDateToYYYYMMDD(activityLic.WithdrawnDate),
-        objectProductActivity: activityLic.ObjectProductActivity ? activityLic.ObjectProductActivity.map(product => ({
-          productTypeID: product.ProductTypeID,
-          appliedDate: this.convertDateToYYYYMMDD(product.AppliedDate),
-          withDrawnDate: this.convertDateToYYYYMMDD(product.WithdrawnDate),
-          effectiveDate: this.convertDateToYYYYMMDD(product.EffectiveDate),
-          firmScopeTypeID: product.FirmScopeTypeID
-        })) : [],
+        objectProductActivity: null,
         activityDetails: activityLic.FirmActivityDetails
       }))
     };
@@ -639,6 +837,55 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  padNumber(value: string): string {
+    const strValue = value.toString();
+    return strValue.padStart(5, '0'); // Ensure the value has a length of 5 digits
+  }
+
+
+  validateQFCNum(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (this.allowEditFirmDetails) {
+        // If not, toggle to edit mode and resolve the promise
+        this.allowEditFirmDetails = true;
+        resolve();
+        return;
+      }
+      if (this.firmDetails.QFCNum) {
+        if (!this.isPositiveNonDecimal(this.firmDetails.QFCNum)) {
+          this.getErrorMessages('QFCNum', constants.Firm_CoreDetails_Messages.INVALID_QFCNUMBER);
+          this.hasValidationErrors = true;
+          resolve(); // Proceed with validation, but hasValidationErrors is true
+        } else {
+          this.isQFCNumExist(this.firmDetails.QFCNum, this.firmId).then(isExist => {
+            if (isExist) {
+              this.getErrorMessages('QFCNum', constants.Firm_CoreDetails_Messages.QFCNUMBEREXISTS);
+              this.hasValidationErrors = true;
+            } else {
+              delete this.errorMessages['QFCNum'];
+            }
+            resolve(); // Proceed with validation
+          }).catch(error => {
+            console.error('Error checking QFC number existence', error);
+            this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+            this.hasValidationErrors = true;
+            resolve(); // Proceed with validation, but hasValidationErrors is true
+          });
+        }
+      } else {
+        resolve(); // If no QFCNum, proceed with validation
+      }
+    });
+  }
+  
+  
+  isQFCNumExist(qfcNum: string, firmId: number): Promise<boolean> {
+    return this.firmService.isQFCNumExist(qfcNum, firmId).toPromise().then(response => {
+      return response.response.Column1 === 1;
+    });
+  }
+  
+
   // Method to load firm details
   loadFirmDetails(firmId: number) {
     this.firmService.getFirmDetails(firmId).subscribe(
@@ -646,6 +893,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.firmDetails = data.response;
         this.selectedFirmTypeID = this.firmDetails.AuthorisationStatusTypeID != 0 ? 3 : 2;
         this.dateOfApplication = this.firmDetails.AuthorisationStatusTypeID > 0 ? this.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate) : this.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate);
+        this.firmDetails.AuthorisationDate = this.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate);
         this.getFirmTypes();
         this.loadPrevFirmAndDate();
         console.log('Firm details:', this.firmDetails);
@@ -732,7 +980,6 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-
 
   loadActivitiesLicensed() {
     this.loadFormReference();
@@ -909,121 +1156,10 @@ export class ViewFirmPageComponent implements OnInit {
       })
   }
 
-  addNewAddress() {
-    const now = new Date();
-    const isoString = now.toISOString();
-
-    // Define the total number of address types
-    const totalAddressTypes = this.allAddressTypes.length;
-
-    // Get the count of valid addresses
-    const validAddressCount = this.firmAddresses.filter(addr => addr.Valid).length;
-
-    // Check if the number of valid addresses is equal to the number of address types
-    if (validAddressCount >= totalAddressTypes) {
-      // Disable the button if all address types are added
-      this.canAddNewAddress = false;
-      return;
-    }
-
-    this.newAddress = {
-      AddressID: null,
-      AddressTypeID: 0,
-      AddressTypeDesc: '',
-      AddressLine1: '',
-      AddressLine2: '',
-      AddressLine3: '',
-      AddressLine4: '',
-      City: '',
-      Province: '',
-      CountryID: 0,
-      CountryName: '',
-      PostalCode: '',
-      PhoneNum: '',
-      FaxNum: '',
-      LastModifiedBy: 0, //todo _userId;
-      LastModifiedDate: isoString,
-      addressState: 0,
-      FromDate: null,
-      ToDate: null,
-      Valid: true,
-    };
-
-    // Add the new address to the list
-    this.firmAddresses.unshift(this.newAddress);
-
-    // Update the count of valid addresses
-    const updatedValidAddressCount = this.firmAddresses.filter(addr => addr.Valid).length;
-
-    // Disable the button if the count of valid addresses matches the number of address types
-    this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
-  }
-
-  areAllAddressTypesAdded() {
-    const existingTypes = new Set(this.firmAddresses.map(addr => Number(addr.AddressTypeID)));
-    return this.allAddressTypes.every(type => existingTypes.has(type.AddressTypeID));
-  }
-
-
-  removeAddress(index: number): void {
-    const confirmDelete = window.confirm('Are you sure you want to delete this record?');
-    if (confirmDelete) {
-      if (index > -1 && index < this.firmAddresses.length) {
-        this.firmAddresses.splice(index, 1); // Removes the address at the specified index
-
-        // Re-check if all address types have been added after removal
-        const validAddressCount = this.firmAddresses.filter(addr => addr.Valid).length;
-
-        // Update the canAddNewAddress flag after removing the address
-        this.canAddNewAddress = validAddressCount < this.allAddressTypes.length;
-      }
-    }
-  }
-
-
-
-  onAddressTypeChange(event: any, address: any) {
-    const selectedAddressTypeId = Number(event.target.value);
-
-    if (selectedAddressTypeId === 0) {
-      // Do nothing if the "Select" option is chosen
-      return;
-    }
-
-    // Get all valid addresses
-    const validAddresses = this.firmAddresses.filter(addr => addr.Valid);
-
-    // Check if the selected address type already exists in valid addresses
-    const isDuplicate = validAddresses.some(addr => addr.AddressTypeID === selectedAddressTypeId);
-
-    if (isDuplicate) {
-      // Show an alert message if duplicate is found
-      alert("This address type already exists. Please choose another.");
-
-      // Reset the dropdown to default ("Select" option)
-      event.target.value = "0";
-      address.AddressTypeID = 0;  // Also reset the AddressTypeID in the model
-      address.AddressTypeDesc = ''; // Reset the description as well
-      return;
-    }
-
-    // Update the AddressTypeID and AddressTypeDesc based on the selection
-    const selectedAddressType = this.allAddressTypes.find(type => type.AddressTypeID === selectedAddressTypeId);
-
-    if (selectedAddressType) {
-      // Update the Address model
-      address.AddressTypeID = selectedAddressType.AddressTypeID;
-      address.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
-    }
-  }
-
-
-
   loadFirmAdresses() {
     this.firmService.getFirmAddresses(this.firmId).subscribe(
       data => {
         this.firmAddresses = data.response;
-        // this.canAddNewAddress = !this.areAllAddressTypesAdded();
         console.log('Firm Addresses: ', this.firmAddresses);
       }, error => {
         console.error('Error Fetching Firm Addresses', error);
@@ -1123,6 +1259,168 @@ export class ViewFirmPageComponent implements OnInit {
     }, error => {
       console.error('Error fetching activity types for licensed', error)
     })
+  }
+
+  addNewActivity() {
+    this.newActivity = {
+      ActivityTypeID: 0,
+      ActivityTypeDesc: '',
+      FirmScopeTypeID: 0,
+      FirmScopeTypeDesc: 1,
+      FirmActivityID: 0,
+      FirmActivityDetails: '',
+      Column1: '',
+
+    };
+    this.ActivityLicensed.unshift(this.newActivity);
+  }
+
+  removeLicActivity(index: number) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to delete this activity?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.errorMessages = {};
+        if (index > -1 && index < this.ActivityLicensed.length) {
+          const activity = this.ActivityLicensed[index];
+          if (!activity.FirmActivityID) { // means newly added activity
+            this.ActivityLicensed.splice(index, 1);
+          }
+        }
+      }
+    });
+  }
+
+  addNewAddress() {
+    const now = new Date();
+    const isoString = now.toISOString();
+
+    // Define the total number of address types
+    const totalAddressTypes = this.allAddressTypes.length;
+
+    // Get the count of valid addresses
+    const validAddressCount = this.firmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+    // Check if the number of valid addresses is equal to the number of address types
+    if (validAddressCount >= totalAddressTypes) {
+      // Disable the button if all address types are added
+      this.canAddNewAddress = false;
+      return;
+    }
+
+    this.newAddress = {
+      AddressID: null,
+      AddressTypeID: 0,
+      AddressTypeDesc: '',
+      AddressLine1: '',
+      AddressLine2: '',
+      AddressLine3: '',
+      AddressLine4: '',
+      City: '',
+      Province: '',
+      CountryID: 0,
+      CountryName: '',
+      PostalCode: '',
+      PhoneNum: '',
+      FaxNum: '',
+      LastModifiedBy: 0, //todo _userId;
+      LastModifiedDate: isoString,
+      addressState: 0,
+      FromDate: null,
+      ToDate: null,
+      Valid: true,
+    };
+
+    // Add the new address to the list
+    this.firmAddresses.unshift(this.newAddress);
+
+    // Update the count of valid addresses
+    const updatedValidAddressCount = this.firmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+    // Disable the button if the count of valid addresses matches the number of address types
+    this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+  }
+
+  areAllAddressTypesAdded() {
+    const existingTypes = new Set(this.firmAddresses.map(addr => Number(addr.AddressTypeID)));
+    return this.allAddressTypes.every(type => existingTypes.has(type.AddressTypeID));
+  }
+
+  removeAddress(index: number) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to delete this record?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.errorMessages = {};
+        if (index > -1 && index < this.firmAddresses.length) {
+          const address = this.firmAddresses[index];
+          if (!address.AddressID) { // means newly added address
+            // If the address doesn't have an AddressID, completely remove it from the array
+            this.firmAddresses.splice(index, 1);
+          } else {
+            // Otherwise, just mark it as removed
+            address.isRemoved = true;
+          }
+          // Re-check if all address types have been added after removal
+          const validAddressCount = this.firmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+          this.canAddNewAddress = validAddressCount < this.allAddressTypes.length;
+        }
+      }
+      // No action needed if the user cancels
+    });
+  }
+
+
+
+  get filteredFirmAddresses() {
+    return this.firmAddresses.filter(addr => !addr.isRemoved);
+  }
+
+  onAddressTypeChange(event: any, address: any) {
+    const selectedAddressTypeId = Number(event.target.value);
+
+    if (selectedAddressTypeId === 0) {
+      // Do nothing if the "Select" option is chosen
+      return;
+    }
+
+    // Get all valid addresses
+    const validAddresses = this.firmAddresses.filter(addr => addr.Valid);
+
+    // Check if the selected address type already exists in valid addresses
+    const isDuplicate = validAddresses.some(addr => addr.AddressTypeID === selectedAddressTypeId);
+
+    if (isDuplicate) {
+      // Show an alert message if duplicate is found
+      this.showErrorAlert(constants.AddressControlMessages.DUPLICATE_ADDRESSTYPES);
+
+      // Reset the dropdown to default ("Select" option)
+      event.target.value = "0";
+      address.AddressTypeID = 0;  // Also reset the AddressTypeID in the model
+      address.AddressTypeDesc = ''; // Reset the description as well
+      return;
+    }
+
+    // Update the AddressTypeID and AddressTypeDesc based on the selection
+    const selectedAddressType = this.allAddressTypes.find(type => type.AddressTypeID === selectedAddressTypeId);
+
+    if (selectedAddressType) {
+      // Update the Address model
+      address.AddressTypeID = selectedAddressType.AddressTypeID;
+      address.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
+    }
   }
 
   loadPrudReturnTypes(prudCategID: number) {
@@ -1401,21 +1699,21 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  uploadDocument() {
+  selectDocument() {
     this.callUploadDoc = true;
     setTimeout(() => {
-      const popupWrapper = document.querySelector('.uploadDocumentPopUp') as HTMLElement;
+      const popupWrapper = document.querySelector('.selectDocumentPopUp') as HTMLElement;
       if (popupWrapper) {
         popupWrapper.style.display = 'flex';
       } else {
-        console.error('Element with class .uploadDocumentPopUp not found');
+        console.error('Element with class .selectDocumentPopUp not found');
       }
     }, 0)
   }
 
-  closeUploadDocument() {
+  closeSelectDocument() {
     this.callUploadDoc = false;
-    const popupWrapper = document.querySelector(".uploadDocumentPopUp") as HTMLElement;
+    const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
     setTimeout(() => {
       if (popupWrapper) {
         popupWrapper.style.display = 'none';
@@ -1566,8 +1864,6 @@ export class ViewFirmPageComponent implements OnInit {
         this.updateAuthLastRevisionNumber(); // Update lastRevisionNumber based on the response
         this.closeAuthScopePreviousVersions();
       });
-    } else {
-      alert('Invalid Firm Application Type ID');
     }
   }
 
@@ -1647,7 +1943,7 @@ export class ViewFirmPageComponent implements OnInit {
       if (uploadedDocumentsDiv) {
         uploadedDocumentsDiv.textContent = `Uploaded Document: ${this.selectedFile.name}`;
       }
-      this.closeUploadDocument();
+      this.closeSelectDocument();
     } else {
       console.error('No valid PDF file selected.');
     }
@@ -1658,6 +1954,15 @@ export class ViewFirmPageComponent implements OnInit {
       this.isIslamicFinanceChecked = true;
     } else {
       this.isIslamicFinanceChecked = false;
+    }
+  }
+
+  uploadDocument() {
+    if (!this.selectedFile) {
+      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
+    } else {
+      delete this.errorMessages['uploadDocument'];
     }
   }
 
@@ -1700,6 +2005,16 @@ export class ViewFirmPageComponent implements OnInit {
         // Set the date of authorization to match the date of application
         this.firmDetails.AuthorisationDate = this.dateOfApplication;
       }
+    }
+  }
+
+  onDateOfApplicationChange(newDate: string) {
+    if (newDate && this.firmDetails.AuthorisationStatusTypeID == constants.FirmAuthorizationApplStatusType.Application) {
+      this.dateOfApplication = newDate;
+      this.firmDetails.AuthorisationDate = newDate;
+    } else if (!newDate && this.firmDetails.AuthorisationStatusTypeID == constants.FirmAuthorizationApplStatusType.Application) {
+      this.dateOfApplication = newDate;
+      this.firmDetails.AuthorisationDate = newDate;
     }
   }
 
@@ -1831,5 +2146,20 @@ export class ViewFirmPageComponent implements OnInit {
     return `${day}/${month}/${year}`;
   }
 
+  getErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+    this.firmService.errorMessages(msgKey).subscribe(
+      (response) => {
+        let errorMessage = response.response;
+        // If a placeholder value is provided, replace the placeholder with the actual value
+        if (placeholderValue) {
+          errorMessage = errorMessage.replace("#Date#", placeholderValue).replace("##DateFieldLabel##", placeholderValue);
+        }
+        this.errorMessages[fieldName] = errorMessage;
+      },
+      (error) => {
+        console.error(`Failed to load error message for ${fieldName}.`, error);
+      }
+    );
+  }
 
 }

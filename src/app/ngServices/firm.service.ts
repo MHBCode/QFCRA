@@ -42,6 +42,10 @@ export class FirmService {
     const url = `${this.baseUrl}get_firm?firmID=${firmId}`;
     return this.http.get<any>(url);
   }
+  isQFCNumExist(qfcNum:string, firmId: number,): Observable<any> {
+    const url = `${this.baseUrl}is_existing_qfc?qfcNum=${qfcNum}&firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
   getFirmAddresses(firmId: number): Observable<any> {
     const url = `${this.baseUrlAddress}get_address_list?objectId=521&objectInstanceId=${firmId}&objectInstanceRevNum=1&sourceObjectID=521&sourceObjectInstanceId=${firmId}&sourceObjectInstanceRevNum=1`
     return this.http.get<any>(url);
@@ -239,41 +243,42 @@ export class FirmService {
       params = params.append('QFCNumber', criteria.qfcNumber);
     }
     if (criteria.firmType !== undefined) {
-      params = params.append('CSVFirmTypes', criteria.firmType.toString()); // تعديل الاسم هنا
+      params = params.append('CSVFirmTypes', criteria.firmType.toString()); 
     }
     if (criteria.firmStatus !== undefined) {
-      params = params.append('CSVFirmStatus', criteria.firmStatus.toString()); // تعديل الاسم هنا
+      params = params.append('CSVFirmStatus', criteria.firmStatus.toString()); 
     }
     if (criteria.licenseStatus && criteria.licenseStatus !== 'all') {
-      params = params.append('CSVLicenseStatus', criteria.licenseStatus); // تعديل الاسم هنا
+      params = params.append('CSVLicenseStatus', criteria.licenseStatus); 
     }
     if (criteria.supervisorSupervision && criteria.supervisorSupervision !== 'all') {
-      params = params.append('SupervisionCaseOfficerId', criteria.supervisorSupervision); // تعديل الاسم هنا
+      params = params.append('SupervisionCaseOfficerId', criteria.supervisorSupervision); 
     }
     if (criteria.legalStatus && criteria.legalStatus !== 'all') {
-      params = params.append('CSVLegalStatus', criteria.legalStatus); // تعديل الاسم هنا
+      params = params.append('CSVLegalStatus', criteria.legalStatus); 
     }
     if (criteria.prudentialCategory !== undefined) {
-      params = params.append('CSVPrudentialCategory', criteria.prudentialCategory.toString()); // تعديل الاسم هنا
+      params = params.append('CSVPrudentialCategory', criteria.prudentialCategory.toString()); 
     }
     if (criteria.sectors !== undefined) {
-      params = params.append('CSVSectorTypes', criteria.sectors.toString()); // تعديل الاسم هنا
+      params = params.append('CSVSectorTypes', criteria.sectors.toString()); 
     }
     if (criteria.supervisionCategory !== undefined) {
-      params = params.append('CSVAuthorisationCategories', criteria.supervisionCategory.toString()); // تعديل الاسم هنا
+      params = params.append('CSVAuthorisationCategories', criteria.supervisionCategory.toString()); 
     }
     if (criteria.authorisationStatus && criteria.authorisationStatus !== 'all') {
-      params = params.append('CSVAuthorisationStatus', criteria.authorisationStatus); // تعديل الاسم هنا
+      params = params.append('CSVAuthorisationStatus', criteria.authorisationStatus); 
     }
     if (criteria.relevantPerson !== undefined) {
-      params = params.append('RelevantPerson', criteria.relevantPerson.toString()); // تعديل الاسم هنا
+      params = params.append('RelevantPerson', criteria.relevantPerson.toString()); 
     }
 
     return this.http.get<any>(`${this.baseUrl}get_firms_list`, { params });
   }
-  deleteAddress(addressId: any) {
-    const url = `${this.baseUrlAddress}delete_address/${addressId}`;
-    return this.http.delete(url);
+
+  errorMessages(messageKey: number): Observable<any> {
+    const url = `${this.baseUrlLogForm}get_message_property?messageKey=${messageKey}`
+    return this.http.get<any>(url);
   }
 
 }

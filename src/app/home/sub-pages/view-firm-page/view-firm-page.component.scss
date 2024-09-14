@@ -296,7 +296,7 @@ tr:nth-child(even) {
   border: 0.72px #b1b1b1 solid;
   resize: vertical;
   min-height: 20px;
-  max-height: 70px;
+  max-height: 100px;
 }
 
 .radio-wrapper {
@@ -425,7 +425,7 @@ tr:nth-child(even) {
 .ApplicationDetailsPopUp,
 .prevFirmNamePopUp,
 .accountingStandardsPopUp,
-.uploadDocumentPopUp,
+.selectDocumentPopUp,
 .addressHistoryPopup,
 .ScopeLicPreviousVersionsPopup,
 .ScopeAuthPreviousVersionsPopup {
@@ -452,7 +452,7 @@ tr:nth-child(even) {
 .ApplicationDetailsPopUp table,
 .prevFirmNamePopUp table,
 .accountingStandardsPopUp table,
-.uploadDocumentPopUp table,
+.selectDocumentPopUp table,
 .addressHistoryPopup table {
   tr:nth-child(even) {
     background-color: #f2f2f2;
@@ -466,8 +466,10 @@ tr:nth-child(even) {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5); /* Dark transparent background */
-  z-index: 99; /* Ensure it stays behind the popup */
+  background: rgba(0, 0, 0, 0.5);
+  /* Dark transparent background */
+  z-index: 99;
+  /* Ensure it stays behind the popup */
 }
 
 .popup-info-place thead tr {
@@ -540,21 +542,25 @@ tr:nth-child(even) {
 .ScopeAuthPreviousVersionsPopup {
   padding: 0 !important;
   height: 15vh !important;
-  overflow-y: visible; 
+  left: 30vw !important;
+  width: 40vw !important;
+  overflow-y: visible;
   overflow-x: visible;
   top: 35vh;
 }
 
 /* View Previous Versions Popup Style */
-.ScopeLicPreviousVersionsPopup .popup-header, .ScopeAuthPreviousVersionsPopup .popup-header {
+.ScopeLicPreviousVersionsPopup .popup-header,
+.ScopeAuthPreviousVersionsPopup .popup-header {
   width: 100% !important;
   background-color: #a51e36 !important;
 }
 
-.ScopeLicPreviousVersionsPopup .popup-header h3,.ScopeAuthPreviousVersionsPopup .popup-header h3 {
-  color: white!important;
-  width: 50%!important;
-  margin: auto!important;
+.ScopeLicPreviousVersionsPopup .popup-header h3,
+.ScopeAuthPreviousVersionsPopup .popup-header h3 {
+  color: white !important;
+  width: 50% !important;
+  margin: auto !important;
   text-align: center;
 }
 
@@ -628,6 +634,28 @@ tr:nth-child(even) {
 
 table .input-field {
   width: 100%;
+}
+
+.add-permitted-activity {
+  margin-top: 5px;
+  border: none;
+  font-size: 15px;
+  padding: 5px;
+  border-radius: 7px;
+  background: #A51E36;
+  margin-right: 10px;
+  color: white;
+}
+
+.rmvActivityLicBtn {
+  height: 30px;
+  background: red;
+  color: white;
+  border: none;
+  font-size: 15px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  margin-right: 10px;
 }
 
 /**/
@@ -788,7 +816,6 @@ table .input-field {
 
 hr {
   background-color: #A51E36;
-  height: 1px;
   width: 100%;
   margin: 10px 0px;
 }
@@ -847,7 +874,7 @@ hr {
   border-radius: 0;
 }
 
-.prudentialTable > thead > tr {
+.prudentialTable>thead>tr {
   background-color: #f2b6c0;
 }
 
@@ -1021,7 +1048,8 @@ hr {
 .scope-of-auth {
   border-radius: 0;
 }
-.scope-of-auth > thead > tr {
+
+.scope-of-auth>thead>tr {
   background-color: #f2b6c0;
 }
 
@@ -1038,4 +1066,5 @@ hr {
 
 .error-border {
   border-color: red !important;
+  outline: 0;
 }

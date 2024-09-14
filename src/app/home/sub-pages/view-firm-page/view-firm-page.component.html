@@ -220,15 +220,18 @@
   <!--Core Details-->
   <section id="CD" class="edit-firm-section" [ngStyle]="{ width: dataWidth }" style="display: none">
     <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['firmDetailsSection'] }">
-      <!--Error messages-->
+      <!--Error messages for firm details-->
       <div class="error-messages" style="color: red">
-        <p *ngIf="showError && !firmDetails.FirmName">Please specify a valid entry for the "Firm Name" field.
-        </p>
-        <p *ngIf="showError && firmDetails.LegalStatusTypeID == 0">Please select a value for the "Legal Status"
-          field.</p>
-        <p *ngIf="showError && firmDetails.DateOfIncorporation == null || firmDetails.DateOfIncorporation == ''">Please
-          specify a valid date for the
-          "Incorporation Date" field.</p>
+        <p *ngIf="errorMessages['FirmName']">{{ errorMessages['FirmName'] }}</p>
+        <p *ngIf="errorMessages['LegalStatusTypeID']">{{ errorMessages['LegalStatusTypeID'] }}</p>
+        <p *ngIf="errorMessages['DateOfIncorporation']">{{ errorMessages['DateOfIncorporation'] }}</p>
+        <p *ngIf="errorMessages['DateOfApplication']">{{ errorMessages['DateOfApplication'] }}</p>
+        <p *ngIf="errorMessages['LicensedDate']">{{ errorMessages['LicensedDate'] }}</p>
+        <p *ngIf="errorMessages['AuthorisationDate']">{{ errorMessages['AuthorisationDate'] }}</p>
+        <p *ngIf="errorMessages['QFCNum']">{{ errorMessages['QFCNum'] }}</p>
+        <p *ngIf="errorMessages['FYearEndDate']">{{ errorMessages['FYearEndDate'] }}</p>
+        <p *ngIf="errorMessages['AccStandDate']">{{ errorMessages['AccStandDate'] }}</p>
+        <p *ngIf="errorMessages['PrevFirmNameEffectiveTo']">{{ errorMessages['PrevFirmNameEffectiveTo'] }}</p>
       </div>
       <div class="edit-firm-actions">
         <h2 class="edit-firm-header">
@@ -261,13 +264,13 @@
             <span [hidden]="allowEditFirmDetails" style="color: red">*</span>
           </label>
           <input [disabled]="allowEditFirmDetails" name="firmName" id="firmName" type="text"
-            [(ngModel)]="firmDetails.FirmName" [ngClass]="{ 'error-border': showError && !firmDetails.FirmName }" />
+            [(ngModel)]="firmDetails.FirmName" [ngClass]="{ 'error-border': errorMessages['FirmName'] }" />
         </div>
 
         <div class="input-field">
           <label for="qfcNumber"> QFC Number </label>
           <input [disabled]="allowEditFirmDetails" name="qfcNumber" id="qfcNumber" type="text"
-            [(ngModel)]="firmDetails.QFCNum" />
+            [(ngModel)]="firmDetails.QFCNum" [ngClass]="{ 'error-border': errorMessages['QFCNum'] }"/>
         </div>
 
         <div class="input-field">
@@ -282,7 +285,7 @@
             <span [hidden]="allowEditFirmDetails" style="color: red">*</span>
           </label>
           <select
-            [ngClass]="{ 'select-background-edited': !allowEditFirmDetails, 'error-border': showError && firmDetails.LegalStatusTypeID == 0 }"
+            [ngClass]="{ 'select-background-edited': !allowEditFirmDetails, 'error-border': errorMessages['LegalStatusTypeID'] }"
             [disabled]="allowEditFirmDetails" id="legalStatus" (ngModelChange)="onLegalStatusChange($event)"
             [(ngModel)]="firmDetails.LegalStatusTypeID">
             <option value="0">Select</option>
@@ -338,7 +341,7 @@
         <ng-container *ngIf="firmDetails.DifferentIncorporationDate || allowEditFirmDetails">
           <div class="input-field">
             <label for="incorporationDate"> Incorporation Date </label>
-            <input [ngClass]="{ 'error-border': showError && !firmDetails.DateOfIncorporation }"
+            <input [ngClass]="{ 'error-border': errorMessages['DateOfIncorporation'] }"
               [disabled]="allowEditFirmDetails" name="incorporationDate" id="incorporationDate" type="text" #dateInputs
               [(ngModel)]="firmDetails.DateOfIncorporation" />
           </div>
@@ -364,7 +367,7 @@
             Financial Year End Effective From
           </label>
           <input [disabled]="allowEditFirmDetails" name="financialYearEndEffectiveFrom" type="text" #dateInputs
-            id="financialYearEndEffectiveFrom" [(ngModel)]="firmDetails.FirmFinYearEndEffectiveFrom" />
+            id="financialYearEndEffectiveFrom" [(ngModel)]="firmDetails.FirmFinYearEndEffectiveFrom" [ngClass]="{ 'error-border': errorMessages['FYearEndDate'] }"/>
         </div>
 
         <div class="input-field">
@@ -388,7 +391,7 @@
           </label>
           <input [disabled]="allowEditFirmDetails" name="accountingStandardsEffectiveFrom"
             id="accountingStandardsEffectiveFrom" type="text" #dateInputs
-            [(ngModel)]="firmDetails.FinAccStdTypeEffectiveFrom" />
+            [(ngModel)]="firmDetails.FinAccStdTypeEffectiveFrom" [ngClass]="{ 'error-border': errorMessages['AccStandDate'] }"/>
         </div>
 
         <div class="input-field">
@@ -414,7 +417,7 @@
             Prev. Firm Name Effective To
           </label>
           <input [disabled]="allowEditFirmDetails" name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo"
-            type="text" #dateInputs [(ngModel)]="firmNamesHistory[0].DateEffectiveTo">
+            type="text" #dateInputs [(ngModel)]="firmNamesHistory[0].DateEffectiveTo" [ngClass]="{ 'error-border': errorMessages['PrevFirmNameEffectiveTo'] }">
         </div>
       </div>
 
@@ -540,7 +543,8 @@
             Date of Application
           </label>
           <input name="dateOfApplication" id="dateOfApplication" type="text" #dateInputs
-            [(ngModel)]="dateOfApplication">
+            (ngModelChange)="onDateOfApplicationChange($event)" [(ngModel)]="dateOfApplication"
+            [ngClass]="{'error-border': errorMessages['DateOfApplication']}">
         </div>
         <div class="input-field">
           <label for="firmApplicationType">
@@ -569,7 +573,8 @@
           <label for="DateLicensed">
             {{firmDetails?.LicenseStatusTypeLabelDesc}}
           </label>
-          <input name="DateLicensed" id="DateLicensed" type="text" #dateInputs [(ngModel)]="firmDetails.LicensedDate">
+          <input name="DateLicensed" id="DateLicensed" type="text" #dateInputs [(ngModel)]="firmDetails.LicensedDate"
+            [ngClass]="{'error-border': errorMessages['LicensedDate']}">
         </div>
         <div class="input-field" *ngIf="selectedFirmTypeID == 3">
           <label for="authorisationStatus">
@@ -587,7 +592,8 @@
             {{firmDetails?.AuthorisationStatusTypeLabelDesc}}
           </label>
           <input name="dateAuthorized" id="dateAuthorized" type="text" #dateInputs
-            [(ngModel)]="firmDetails.AuthorisationDate">
+            [(ngModel)]="firmDetails.AuthorisationDate"
+            [ngClass]="{'error-border': errorMessages['AuthorisationDate']}">
         </div>
       </div>
 
@@ -595,6 +601,9 @@
     <!---->
     <div class="inputs-field-set" *ngIf="!allowEditFirmDetails && selectedFirmTypeID == 3"
       [ngClass]="{collapsed: isCollapsed['pressReleaseSection']}">
+      <div class="error-messages" style="color: red">
+        <p *ngIf="errorMessages['uploadDocument']">{{ errorMessages['uploadDocument'] }}</p>
+      </div>
       <div class="edit-firm-actions collapse-container">
         <h2 class="edit-firm-header">Press Releases</h2>
         <button [ngClass]="{'hidden-button': allowEditFirmDetails}" class="collapse-button"
@@ -618,11 +627,11 @@
 
           <div class="btns-container">
             <div class="upload-container">
-              <button class="choose-document-btn" (click)="uploadDocument()">
+              <button class="choose-document-btn" (click)="selectDocument()">
                 Choose Document
               </button>
             </div>
-            <button class="upload-document-btn">Upload the Document</button>
+            <button class="upload-document-btn" (click)="uploadDocument()">Upload the Document</button>
           </div>
         </div>
         <div class="file-table-container">
@@ -675,6 +684,11 @@
 
     <!---->
     <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['addressesSection']}">
+      <!--Error messages for addresses-->
+      <div class="error-messages" style="color: red">
+        <p *ngIf="errorMessages['AddressTypeID']">{{ errorMessages['AddressTypeID'] }}</p>
+        <p *ngIf="errorMessages['DuplicatedAddressTypeID']">{{ errorMessages['DuplicatedAddressTypeID'] }}</p>
+      </div>
       <div class="edit-firm-actions collapse-container">
         <h2 class="edit-firm-header">
           Addresses
@@ -688,7 +702,7 @@
           [hidden]="isCollapsed['addressesSection']" class="addAddressBtn">Add Address</button>
       </div>
       <div class="edit-firms-inputs">
-        <ng-container *ngFor="let address of firmAddresses; let i = index">
+        <ng-container *ngFor="let address of filteredFirmAddresses; let i = index">
           <ng-container *ngIf="address.Valid === true">
             <div class="input-field" *ngIf="allowEditFirmDetails">
               <label for="addressType">
@@ -698,70 +712,74 @@
               <input disabled name="addressType" id="addressType" type="text" value="{{address?.AddressTypeDesc}}">
             </div>
             <div *ngIf="!allowEditFirmDetails" class="del-address-container">
-              <button (click)="removeAddress(i)" class="RmvAddressBtn">x</button>
+              <button (click)="removeAddress(i)" class="RmvAddressBtn bi-trash"></button>
             </div>
             <!-- address type on edit mode -->
             <div class="input-field" *ngIf="!allowEditFirmDetails">
               <label for="addressType">
-                Address Type <button *ngIf="address.PreviousRecords !== 0" class="subbutton"
+                Address Type <button *ngIf="address.PreviousRecords !== 0 && address.AddressID" class="subbutton"
                   (click)="getAddressTypeHistory(address.AddressTypeID)">History</button>
               </label>
-              <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID" (change)="onAddressTypeChange($event, address)"
-                [ngClass]="{'select-background-edited': !allowEditFirmDetails}">
+              <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID"
+                (change)="onAddressTypeChange($event, address)" [ngClass]="{
+                'error-border': errorMessages['AddressTypeID'] ,'select-background-edited': !allowEditFirmDetails}">
                 <option value="0">Select</option>
                 <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
                   {{option.AddressTypeDesc}}</option>
               </select>
             </div>
 
-            <!-- <div class="input-field" *ngIf="!allowEditFirmDetails && address.isNew">
-                            <label for="sameAsType">
-                                Same As Type
-                            </label>
-                            <select name="sameAsType" id="sameAsType"
-                                [ngClass]="{'select-background-edited': !allowEditFirmDetails}">
-                                <option value="0">select</option>
-                                <option *ngFor="let type of existingAddressTypes" [value]="type.AddressTypeID">
-                                    {{type.AddressTypeDesc}}</option>
-                            </select>
-            </div> -->
+            <div class="input-field" *ngIf="!allowEditFirmDetails && (!address.AddressID || address.AddressID === '')">
+              <label for="sameAsType">
+                Same As Type
+              </label>
+              <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChange($event)" name="sameAsType"
+                id="sameAsType" [ngClass]="{'select-background-edited': !allowEditFirmDetails}">
+                <option value="0">Select</option>
+                <option *ngFor="let type of existingAddresses" [value]="type.AddressTypeID">
+                  {{type.AddressTypeDesc}}</option>
+              </select>
+            </div>
+
             <div class="input-field">
               <label for="addressLine1"> Address Line 1 </label>
-              <input type="text" [disabled]="allowEditFirmDetails" name="addressLine1" id="addressLine1"
-                [(ngModel)]="address.AddressLine1" />
+              <input type="text" [disabled]="allowEditFirmDetails || (disableAddressFields && !address.AddressID)"
+                name="addressLine1" id="addressLine1" [(ngModel)]="address.AddressLine1" />
             </div>
             <div class="input-field">
               <label for="addressLine2"> Address Line 2 </label>
-              <input [disabled]="allowEditFirmDetails" name="addressLine2" id="addressLine2" type="text"
-                [(ngModel)]="address.AddressLine2" />
+              <input [disabled]="allowEditFirmDetails || (disableAddressFields && !address.AddressID)"
+                name="addressLine2" id="addressLine2" type="text" [(ngModel)]="address.AddressLine2" />
             </div>
             <div class="input-field">
               <label for="addressLine3"> Address Line 3 </label>
-              <input [disabled]="allowEditFirmDetails" name="addressLine3" id="addressLine3" type="text"
-                [(ngModel)]="address.AddressLine3" />
+              <input [disabled]="allowEditFirmDetails || (disableAddressFields && !address.AddressID)"
+                name="addressLine3" id="addressLine3" type="text" [(ngModel)]="address.AddressLine3" />
             </div>
             <div class="input-field">
               <label for="addressLine4"> Address Line 4 </label>
-              <input [disabled]="allowEditFirmDetails" name="addressLine4" id="addressLine4" type="text"
-                [(ngModel)]="address.AddressLine4" />
+              <input [disabled]="allowEditFirmDetails || (disableAddressFields && !address.AddressID)"
+                name="addressLine4" id="addressLine4" type="text" [(ngModel)]="address.AddressLine4" />
             </div>
             <div class="input-field">
               <label for="city"> City </label>
-              <input [disabled]="allowEditFirmDetails" name="city" id="city" type="text" [(ngModel)]="address.City" />
+              <input [disabled]="allowEditFirmDetails || (disableAddressFields && !address.AddressID)" name="city"
+                id="city" type="text" [(ngModel)]="address.City" />
             </div>
             <div class="input-field">
               <label for="state"> state/province </label>
-              <input [disabled]="allowEditFirmDetails" name="state" id="state" type="text"
-                [(ngModel)]="address.Province" />
+              <input [disabled]="allowEditFirmDetails || (disableAddressFields && !address.AddressID)" name="state"
+                id="state" type="text" [(ngModel)]="address.Province" />
             </div>
             <div class="input-field" *ngIf="allowEditFirmDetails">
               <label for="country"> Country </label>
-              <input type="text" disabled name="country" id="country" [(ngModel)]="address.CountryName" />
+              <input disabled type="text" name="country" id="country" [(ngModel)]="address.CountryName" />
             </div>
             <!-- countries on edit mode-->
             <div class="input-field" *ngIf="!allowEditFirmDetails">
               <label for="country"> Country </label>
-              <select [(ngModel)]="address.CountryID" [ngClass]="{
+              <select [disabled]="allowEditFirmDetails || (disableAddressFields && !address.AddressID)"
+                [(ngModel)]="address.CountryID" [ngClass]="{
                   'select-background-edited': !allowEditFirmDetails
                 }">
                 <option *ngFor="let option of allCountries" [value]="option.CountryID">
@@ -771,19 +789,20 @@
             </div>
             <div class="input-field">
               <label for="zip"> Zip/Postal Code </label>
-              <input [disabled]="allowEditFirmDetails" name="zip" id="zip" type="text"
-                [(ngModel)]="address.PostalCode" />
+              <input [disabled]="allowEditFirmDetails || (disableAddressFields && !address.AddressID)" name="zip"
+                id="zip" type="text" [(ngModel)]="address.PostalCode" />
             </div>
             <div class="input-field">
               <label for="phone"> Phone </label>
-              <input [disabled]="allowEditFirmDetails" name="phone" id="phone" type="text"
-                [(ngModel)]="address.PhoneNum" />
+              <input [disabled]="allowEditFirmDetails || (disableAddressFields && !address.AddressID)" name="phone"
+                id="phone" type="text" [(ngModel)]="address.PhoneNum" />
             </div>
             <div class="input-field">
               <label for="fax"> Fax </label>
-              <input [disabled]="allowEditFirmDetails" name="fax" id="fax" type="text" [(ngModel)]="address.FaxNum" />
+              <input [disabled]="allowEditFirmDetails || (disableAddressFields && !address.AddressID)" name="fax"
+                id="fax" type="text" [(ngModel)]="address.FaxNum" />
             </div>
-            <hr *ngIf="i < firmAddresses.length - 1" />
+            <hr *ngIf="i < filteredFirmAddresses.length - 4" />
           </ng-container>
         </ng-container>
       </div>
@@ -851,7 +870,7 @@
                 [(ngModel)]="ActivityLicensed[0].ScopeRevNum" />
             </div>
             <div class="input-field">
-              <label for="q13AppDate" *ngIf="ActivityLicensed[0]?.ScopeRevNum > 1">
+              <label for="q13AppDate" *ngIf="ActivityLicensed[0]?.ScopeRevNum > 1 && ActivityLicensed[0]?.ScopeRevNum">
                 Q13 Application Date for revisions
               </label>
               <label *ngIf="ActivityLicensed[0]?.ScopeRevNum == 1">Application Date</label>
@@ -859,9 +878,14 @@
                 [(ngModel)]="ActivityLicensed[0].ScopeAppliedDate" />
             </div>
             <div class="input-field">
-              <label for="licenseDate"> License Date </label>
+              <label for="licenseDate"> Licensed Date </label>
               <input disabled name="licenseDate" id="licenseDate" type="text"
                 value="{{ ActivityLicensed[0]?.ScopeLicensedDate }}" />
+            </div>
+            <div *ngIf="ActivityLicensed[0]?.ScopeEffectiveDate" class="input-field">
+              <label for="effectiveDate"> Effective Date </label>
+              <input [disabled]="allowEditLicScopeDetails" disabled name="effectiveDate" id="effectiveDate" type="text" #dateInputs
+                [(ngModel)]="ActivityLicensed[0].ScopeEffectiveDate"/>
             </div>
             <div class="input-field">
               <label for="createdBy"> Created By </label>
@@ -903,13 +927,12 @@
 
           <!--on edit mode-->
           <div class="add-activity-container">
-            <button *ngIf="!allowEditLicScopeDetails" class="add-permitted-activity"
-              style="width: 30px; height: 30px; margin-left: auto">
-              +
+            <button *ngIf="!allowEditLicScopeDetails" class="add-permitted-activity" (click)="addNewActivity()">
+              Add Activity
             </button>
           </div>
 
-          <div class="permitted-activity-body" *ngFor="let activityLic of ActivityLicensed">
+          <div class="permitted-activity-body" *ngFor="let activityLic of ActivityLicensed; let i = index">
             <table *ngIf="!allowEditLicScopeDetails">
               <tr>
                 <th style="width: 70%">Activity</th>
@@ -934,17 +957,14 @@
                 </td>
                 <td>
                   <div class="input-field">
-                    <select [ngClass]="{
-                                            'select-background-edited': !allowEditLicScopeDetails
-                                          }" name="action" id="action" [(ngModel)]="ActivityLicensed.FirmScopeTypeID">
+                    <select disabled [ngClass]="{'select-background-edited': !allowEditLicScopeDetails}" name="action" id="action" [(ngModel)]="ActivityLicensed.FirmScopeTypeID">
                       <option [value]="ActivityLicensed.FirmScopeTypeDesc"></option>
                       <!--could be wrong-->
                     </select>
                   </div>
                 </td>
                 <td>
-                  <button style="width: 30px; height: 30px">
-                    <i class="bi-trash"></i>
+                  <button class="rmvActivityLicBtn bi-trash" (click)="removeLicActivity(i)">
                   </button>
                 </td>
               </tr>
@@ -1034,7 +1054,6 @@
               <label for="incorporationDate"> Incorporation Date </label>
               <input disabled name="incorporationDate" id="incorporationDate" type="text"
                 value="{{ firmDetails?.DateOfIncorporation }}" />
-              <!--check integration-->
             </div>
             <div class="input-field">
               <label for="authorisedDate"> Authorised Date </label>
@@ -1092,7 +1111,8 @@
                 <tbody>
                   <tr>
                     <td>{{AuthTableDocument?.DocSubTypeDesc}}</td>
-                    <td><a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{AuthTableDocument?.FileLoc}}" target="_blank">{{AuthTableDocument?.FileName}}</a></td>
+                    <td><a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{AuthTableDocument?.FileLoc}}"
+                        target="_blank">{{AuthTableDocument?.FileName}}</a></td>
                   </tr>
                 </tbody>
               </table>
@@ -1302,8 +1322,8 @@
           <div class="edit-firms-inputs">
             <div class="input-field">
               <label for="prudentialCategory"> Prudential Category </label>
-              <select [disabled]="allowEditAuthScopeDetails" name="prudentialCategory" id="prudentialCategory" [(ngModel)]="ActivityAuth[0].PrudentialCategoryTypeID"
-                [ngClass]="{
+              <select [disabled]="allowEditAuthScopeDetails" name="prudentialCategory" id="prudentialCategory"
+                [(ngModel)]="ActivityAuth[0].PrudentialCategoryTypeID" [ngClass]="{
                   'select-background-edited': !allowEditAuthScopeDetails
                 }">
                 <option *ngFor="let option of allPrudentialCategoryTypes" [value]="option.PrudentialCategoryTypeID">
@@ -1315,19 +1335,20 @@
               <label for="authorisationCategory">
                 Authorisation Category
               </label>
-              <select [disabled]="allowEditAuthScopeDetails" name="prudentialCategory" id="prudentialCategory" [(ngModel)]="ActivityAuth[0].AuthorisationCategoryTypeID"
-                [ngClass]="{
+              <select [disabled]="allowEditAuthScopeDetails" name="prudentialCategory" id="prudentialCategory"
+                [(ngModel)]="ActivityAuth[0].AuthorisationCategoryTypeID" [ngClass]="{
                   'select-background-edited': !allowEditAuthScopeDetails
                 }">
-                <option *ngFor="let option of allAuthorisationCategoryTypes" [value]="option?.AuthorisationCategoryTypeID">
+                <option *ngFor="let option of allAuthorisationCategoryTypes"
+                  [value]="option?.AuthorisationCategoryTypeID">
                   {{ option?.AuthorisationCategoryTypeDesc }}
                 </option>
               </select>
             </div>
             <div class="input-field">
               <label for="effectiveDate"> Effective Date </label>
-              <input [disabled]="allowEditAuthScopeDetails" name="effectiveDate" id="effectiveDate" type="text" #dateInputs
-                value="{{ ActivityAuth[0]?.PrudentialCategoryEffectiveDate }}" />
+              <input [disabled]="allowEditAuthScopeDetails" name="effectiveDate" id="effectiveDate" type="text"
+                #dateInputs value="{{ ActivityAuth[0]?.PrudentialCategoryEffectiveDate }}" />
             </div>
             <div class="input-field">
               <label for="lastModifiedBy"> Last Modified By </label>
@@ -1390,8 +1411,8 @@
             </div>
             <div class="input-field">
               <label for="effectiveDate"> Effective Date </label>
-              <input [disabled]="allowEditAuthScopeDetails" name="effectiveDate" id="effectiveDate" type="text" #dateInputs
-                value="{{ ActivityAuth[0]?.SectorEffectiveDate }}" />
+              <input [disabled]="allowEditAuthScopeDetails" name="effectiveDate" id="effectiveDate" type="text"
+                #dateInputs value="{{ ActivityAuth[0]?.SectorEffectiveDate }}" />
             </div>
             <div class="input-field">
               <label for="lastModifiedBy"> Last Modified By </label>
@@ -2459,10 +2480,10 @@
     </button>
   </div>
 </div>
-<!--Upload document-->
+<!--Select Document PopUp-->
 <div *ngIf="callUploadDoc" class="overlay show"></div>
-<div *ngIf="callUploadDoc" class="uploadDocumentPopUp">
-  <i class="bi bi-x-circle close-icon" (click)="closeUploadDocument()"></i>
+<div *ngIf="callUploadDoc" class="selectDocumentPopUp">
+  <i class="bi bi-x-circle close-icon" (click)="closeSelectDocument()"></i>
   <div class="popup-info-place upload-container">
     <div class="popup-header">
       <h3>Upload Document</h3>
@@ -2477,7 +2498,7 @@
     <button style="padding: 1rem; width: 30%; margin-right: 5px" class="subbutton" (click)="confirmUpload()">
       Ok
     </button>
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeUploadDocument()">
+    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeSelectDocument()">
       Close
     </button>
   </div>
