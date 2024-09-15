@@ -41,6 +41,19 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
 
+  showFirmScopeSaveSuccessAlert(messageKey: number) {
+    this.firmService.errorMessages(messageKey).subscribe(
+      (response) => {
+        Swal.fire({
+          title: 'Success!',
+          text: response.response,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
+      },
+    );
+  }
+
   errorMessages: { [key: string]: string } = {};
   /* for Auditors */
   IsViewAuditorVisible: boolean = false;
@@ -115,18 +128,20 @@ export class ViewFirmPageComponent implements OnInit {
   usedAddressTypes: Set<string> = new Set();
   newAddress: any = {};
   newActivity: any = {};
-  allowEditFirmDetails: string | boolean = true;
+  allowEditFirmDetails: string | boolean = false;
   /* for scope */
-  allowEditLicScopeDetails: string | boolean = true;
+  allowEditLicScopeDetails: string | boolean = false;
   allowEditAuthScopeDetails: string | boolean = true;
   showPermittedActivitiesTable: string | boolean = false;
   isIslamicFinanceChecked: boolean = true;
+  disableApplicationDate: boolean = true;
   scopeRevNum: number;
   selectedCategory: string;
   selectedActivity: string;
-  documentDetails: any = {}
-  LicPrevRevNumbers: any = []
-  AuthPrevRevNumbers: any = []
+  documentDetails: any = {};
+  LicPrevRevNumbers: any = [];
+  AuthPrevRevNumbers: any = [];
+  existingActivities: any = [];
   currentLicRevisionNumber: number | null = null;
   lastLicRevisionNumber: number | null = null;
   currentAuthRevisionNumber: number | null = null;
@@ -319,42 +334,49 @@ export class ViewFirmPageComponent implements OnInit {
 
   editFirm() {
     const userId = 10044; // Replace with dynamic userId as needed
+
+    if (!this.allowEditFirmDetails) {
+      // If the form is not in edit mode, toggle to edit mode
+      this.allowEditFirmDetails = true;
+      return; // Exit the function to prevent running validations
+    }
+
+    // If the form is in edit mode, proceed with validations and saving
+
     this.hasValidationErrors = false;
-  
-    this.firmDetails.FirmName = this.firmDetails.FirmName.trim();
-  
+
     // FIRM NAME VALIDATION
+    this.firmDetails.FirmName = this.firmDetails.FirmName.trim();
     if (!this.firmDetails.FirmName) {
       this.getErrorMessages('FirmName', constants.Firm_CoreDetails_Messages.ENTER_FIRMNAME);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['FirmName'];
     }
-  
-    // QFC VALIDATION
 
+    // QFC VALIDATION
     if (this.firmDetails.QFCNum) {
       this.firmDetails.QFCNum = this.padNumber(this.firmDetails.QFCNum);
     }
 
     if (this.selectedFirmTypeID === 2 && this.firmDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Licensed) {
-      if (this.firmDetails.QFCNum == null || this.firmDetails.QFCNum == '') {
+      if (this.firmDetails.QFCNum == null || this.firmDetails.QFCNum === '') {
         this.getErrorMessages('QFCNum', constants.Firm_CoreDetails_Messages.ENTER_QFCNUMBER);
         this.hasValidationErrors = true;
       }
     }
 
     if (this.selectedFirmTypeID === 3 && this.firmDetails.AuthorisationStatusTypeID === constants.FirmAuthorizationApplStatusType.Authorised) {
-      if (this.firmDetails.QFCNum == null || this.firmDetails.QFCNum == '') {
+      if (this.firmDetails.QFCNum == null || this.firmDetails.QFCNum === '') {
         this.getErrorMessages('QFCNum', constants.Firm_CoreDetails_Messages.ENTER_QFCNUMBER);
         this.hasValidationErrors = true;
       }
     }
-  
+
     // Validate QFC Number
     this.validateQFCNum().then(() => {
       // Continue with the rest of the validations only after QFC validation is complete
-  
+
       // LEGAL STATUS VALIDATION
       if (this.firmDetails.LegalStatusTypeID == 0) {
         this.getErrorMessages('LegalStatusTypeID', constants.Firm_CoreDetails_Messages.ENTER_LEGAL_STATUS);
@@ -362,7 +384,7 @@ export class ViewFirmPageComponent implements OnInit {
       } else {
         delete this.errorMessages['LegalStatusTypeID'];
       }
-  
+
       // DATE OF INCORPORATION VALIDATION
       if (this.firmDetails.DifferentIncorporationDate && !this.firmDetails.DateOfIncorporation) {
         this.getErrorMessages('DateOfIncorporation', constants.FirmActivitiesEnum.DATEOFINCORPORATION_ERROR); // Adjust the message key as needed
@@ -375,31 +397,33 @@ export class ViewFirmPageComponent implements OnInit {
       // FINANCIAL YEAR END EFFECTIVE FROM VALIDATION
       if (this.firmDetails.FirmFinYearEndEffectiveFrom == null || this.firmDetails.FirmFinYearEndEffectiveFrom == '') {
         if (this.firmDetails.FinYearEndTypeID > 0) {
-        this.getErrorMessages('FYearEndDate',constants.InvoicesMessages.INVALID_DATA,"Financial Year End Effective From");
-        this.hasValidationErrors = true;
+          this.getErrorMessages('FYearEndDate', constants.InvoicesMessages.INVALID_DATA, "Financial Year End Effective From");
+          this.hasValidationErrors = true;
         }
       } else {
         delete this.errorMessages['FYearEndDate'];
       }
 
       // ACCOUNTING STANDARDS EFFECTIVE FROM VALIDATION
-      if (this.firmDetails.FinAccStdTypeEffectiveFrom == null || this.firmDetails.FinAccStdTypeEffectiveFrom == '') {
-        this.getErrorMessages('AccStandDate',constants.InvoicesMessages.INVALID_DATA,"Accounting Standards Effective From");
-        this.hasValidationErrors = true;
+      if (this.firmDetails.FinAccStdTypeEffectiveFrom == null || this.firmDetails.FinAccStdTypeEffectiveFrom === '') {
+        if (this.firmDetails.FinAccStdTypeID > 0) {
+          this.getErrorMessages('AccStandDate', constants.InvoicesMessages.INVALID_DATA, "Accounting Standards Effective From");
+          this.hasValidationErrors = true;
+        }
       } else {
         delete this.errorMessages['AccStandDate'];
       }
 
-      // PREV. FRIM NAME EFFECTIVE TO
+      // PREV. FIRM NAME EFFECTIVE TO VALIDATION
       if (this.firmNamesHistory[0]?.FirmNameHistoryID) {
-        if (this.firmNamesHistory[0].DateEffectiveTo == null || this.firmNamesHistory[0].DateEffectiveTo == '') {
-          this.getErrorMessages('PrevFirmNameEffectiveTo',constants.InvoicesMessages.INVALID_DATA,"Prev Firm Name Effective To");
-        this.hasValidationErrors = true;
+        if (this.firmNamesHistory[0].DateEffectiveTo == null || this.firmNamesHistory[0].DateEffectiveTo === '') {
+          this.getErrorMessages('PrevFirmNameEffectiveTo', constants.InvoicesMessages.INVALID_DATA, "Prev Firm Name Effective To");
+          this.hasValidationErrors = true;
         } else {
           delete this.errorMessages['PrevFirmNameEffectiveTo'];
         }
       }
-  
+
       // APPLICATION DETAILS SECTION VALIDATION
       // DATE OF APPLICATION VALIDATION
       if (!this.dateOfApplication) {
@@ -408,7 +432,7 @@ export class ViewFirmPageComponent implements OnInit {
       } else {
         delete this.errorMessages['DateOfApplication'];
       }
-  
+
       // QFC LICENSED DATE VALIDATION
       if (!this.firmDetails.LicensedDate) {
         this.getErrorMessages('LicensedDate', constants.FirmActivitiesEnum.ENTER_VALID_DATE, "QFC License Status date");
@@ -416,7 +440,7 @@ export class ViewFirmPageComponent implements OnInit {
       } else {
         delete this.errorMessages['LicensedDate'];
       }
-  
+
       // AUTHORIZATION DATE VALIDATION
       if (!this.firmDetails.AuthorisationDate) {
         this.getErrorMessages('AuthorisationDate', constants.FirmActivitiesEnum.ENTER_VALID_DATE, "Authorisation Status date");
@@ -424,7 +448,7 @@ export class ViewFirmPageComponent implements OnInit {
       } else {
         delete this.errorMessages['AuthorisationDate'];
       }
-  
+
       // ADDRESS TYPE VALIDATION
       this.invalidAddress = this.firmAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
       if (this.invalidAddress) {
@@ -433,15 +457,15 @@ export class ViewFirmPageComponent implements OnInit {
       } else {
         delete this.errorMessages['AddressTypeID'];
       }
-  
+
       // Additional validation logic can go here for other fields as needed
-  
+
       // Step 2: Handle Validation Errors
       if (this.hasValidationErrors) {
         this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
         return; // Prevent further action if validation fails
       }
-  
+
       // Step 3: Process Firm Addresses
       this.firmAddresses.forEach(address => {
         if (address.isRemoved) {
@@ -452,28 +476,20 @@ export class ViewFirmPageComponent implements OnInit {
           address.addressState = 2; // Set addressState to 2 for new addresses
         }
       });
-  
+
       this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
-  
-      // Step 4: Toggle Edit Mode
-      if (this.allowEditFirmDetails) {
-        this.allowEditFirmDetails = !this.allowEditFirmDetails;
-      } else {
-        this.allowEditFirmDetails = !this.allowEditFirmDetails; // Toggle to edit mode
-  
-        // Step 5: Set Additional Firm Details
-        this.setAdditionalFirmDetails();
-  
-        // Step 6: Prepare Firm Object
-        const firmObj = this.prepareFirmObject(userId);
-  
-        // Step 7: Save Firm Details
-        this.saveFirmDetails(firmObj, userId);
-        this.showFirmDetailsSaveSuccessAlert(constants.Firm_CoreDetails_Messages.FIRMDETAILS_SAVED_SUCCESSFULLY);
-      }
+
+      // Step 4: Save Firm Details
+      const firmObj = this.prepareFirmObject(userId);
+      this.saveFirmDetails(firmObj, userId);
+      this.showFirmDetailsSaveSuccessAlert(constants.Firm_CoreDetails_Messages.FIRMDETAILS_SAVED_SUCCESSFULLY);
+
+      // Toggle Edit Mode
+      this.allowEditFirmDetails = false;
     });
   }
-  
+
+
 
   onSameAsTypeChange(selectedTypeID: number) {
     const numericTypeID = Number(selectedTypeID);
@@ -641,7 +657,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   cancelEditFirm() {
-    this.allowEditFirmDetails = true;
+    this.allowEditFirmDetails = false;
     this.errorMessages = {};
     this.selectedFile = null;
     this.resetCollapsibleSections();
@@ -666,45 +682,116 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
 
-  editLicenseScope(): void {
-    this.allowEditLicScopeDetails = !this.allowEditLicScopeDetails;
-    const updatedLicenseScope = {
-      objFirmScope: this.ActivityLicensed.map(activityLic => ({
-        firmScopeID: activityLic.FirmScopeID,
-        scopeRevNum: activityLic.ScopeRevNum,
-        firmID: activityLic.FirmID,
-        objectID: 524,
-        createdBy: 10044,
-        docReferenceID: activityLic.docReferenceID,
-        firmApplTypeID: 1,
-        docIDs: activityLic.DocID,
-        generalConditions: activityLic.GeneralConditions,
-        effectiveDate: this.convertDateToYYYYMMDD(activityLic.ScopeEffectiveDate),
-        scopeCertificateLink: activityLic.ScopeCertificateLink,
-        applicationDate: this.convertDateToYYYYMMDD(activityLic.ApplicationDate),
-        licensedOrAuthorisedDate: this.convertDateToYYYYMMDD(activityLic.LicensedOrAuthorisedDate), //wrong
-      }))[0],
+  editLicenseScope() {
+    const userId = 10044; // Replace with dynamic userId as needed
+    const now = new Date();
+    const currentDateString = this.convertDateToYYYYMMDD(now);
 
-      lstFirmActivities: this.ActivityLicensed.map(activityLic => ({
-        createdBy: 10044,
+    // Check if the current date is greater than the ScopeLicensedDate
+    if (this.ActivityLicensed[0].ScopeLicensedDate !== null && this.ActivityLicensed[0].ScopeLicensedDate !== '') {
+      if (currentDateString > this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate)) {
+        this.disableApplicationDate = false;  // Enable the field
+      } else {
+        this.disableApplicationDate = true;  // Disable the field
+      }
+    } else {
+      this.disableApplicationDate = true;  // Enable if no licensed date is present
+    }
+
+    // If the form is not in edit mode, toggle to edit mode
+    if (!this.allowEditLicScopeDetails) {
+      this.allowEditLicScopeDetails = true;
+      return; // Exit the function to prevent running validations
+    }
+
+    // If the form is in edit mode, proceed with validations and saving
+
+    this.hasValidationErrors = false;
+
+    // APPLICATION DATE VALIDATION
+    if (this.ActivityLicensed[0].ScopeAppliedDate == null || this.ActivityLicensed[0].ScopeAppliedDate == '') {
+      this.getErrorMessages('ScopeAppliedDate', constants.FirmActivitiesEnum.ENTER_VALID_APPLICATIONDATE);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['ScopeAppliedDate'];
+    }
+
+    if (this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate) < this.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate)) {
+      this.getErrorMessages('ScopeAppliedDateLessThanFirmLicApplDate', constants.FirmActivitiesEnum.APPLICATIONDATE_LATER_COREDETAIL, this.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate));
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['ScopeAppliedDateLessThanFirmLicApplDate'];
+    }
+
+    // EFFECTIVE DATE VALIDATION
+    if (this.ActivityLicensed[0].ScopeEffectiveDate == null || this.ActivityLicensed[0].ScopeEffectiveDate == '') {
+      this.getErrorMessages('ScopeEffectiveDate', constants.FirmActivitiesEnum.ENTER_VALID_SCOPEEFFECTIVEDATE);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['ScopeEffectiveDate'];
+    }
+
+    if (this.ActivityLicensed[0].ScopeEffectiveDate[0] < this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate)) {
+      this.getErrorMessages('ScopeEffectiveDateLessThanApplicationDate', constants.FirmActivitiesEnum.ENTER_EFFECTIVEDATE_LATER_APPLICATIONDATE);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['ScopeEffectiveDateLessThanApplicationDate'];
+    }
+
+    // Step 2: Handle Validation Errors
+    if (this.hasValidationErrors) {
+      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      return; // Prevent further action if validation fails
+    }
+
+    this.existingActivities = this.ActivityLicensed;
+
+    // Step 3: Save License Scope Details
+    const updatedLicenseScope = this.prepareLicenseScopeObject(userId);
+    this.saveLicenseScopeDetails(updatedLicenseScope, userId);
+    this.showFirmScopeSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
+  }
+
+  prepareLicenseScopeObject(userId: number) {
+    return {
+      objFirmScope: {
+        firmScopeID: this.ActivityLicensed[0].FirmScopeID,
+        scopeRevNum: this.ActivityLicensed[0].ScopeRevNum,
+        firmID: this.ActivityLicensed[0].FirmID,
+        objectID: 524,
+        createdBy: userId,
+        docReferenceID: this.ActivityLicensed[0].docReferenceID,
+        firmApplTypeID: 2, // licensed
+        docIDs: this.ActivityLicensed[0].DocID,
+        generalConditions: this.ActivityLicensed[0].GeneralConditions,
+        effectiveDate: this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeEffectiveDate),
+        scopeCertificateLink: this.ActivityLicensed[0].ScopeCertificateLink,
+        applicationDate: this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate),
+        licensedOrAuthorisedDate: this.convertDateToYYYYMMDD(this.ActivityLicensed[0].LicensedOrAuthorisedDate),
+      },
+      lstFirmActivities: this.existingActivities.map(activityLic => ({
+        createdBy: userId,
         firmScopeTypeID: activityLic.FirmScopeTypeID,
-        activityTypeID: activityLic.ActivityTypeID,
-        effectiveDate: this.convertDateToYYYYMMDD(activityLic.EffectiveDate),
-        firmActivityConditions: activityLic.FirmActivityConditions || "None",
-        productTypeID: activityLic.ProductTypeID || null,
-        appliedDate: this.convertDateToYYYYMMDD(activityLic.AppliedDate),
+        activityTypeID: Number(activityLic.ActivityTypeID),
+        effectiveDate: this.convertDateToYYYYMMDD(activityLic.ScopeEffectiveDate),
+        firmActivityConditions: activityLic.Column1,
+        productTypeID: null,
+        appliedDate: this.convertDateToYYYYMMDD(activityLic.ScopeAppliedDate),
         withDrawnDate: this.convertDateToYYYYMMDD(activityLic.WithdrawnDate),
         objectProductActivity: null,
         activityDetails: activityLic.FirmActivityDetails
       }))
     };
+  }
 
-
+  saveLicenseScopeDetails(updatedLicenseScope: any, userId: number) {
     console.log('Updated License Scope:', updatedLicenseScope);
-    debugger
-    this.firmService.editLicenseScope(10044, updatedLicenseScope).subscribe(
+
+    this.firmService.editLicenseScope(userId, updatedLicenseScope).subscribe(
       response => {
         console.log('License scope updated successfully:', response);
+        this.loadActivitiesLicensed(); // Reload license scope details
+        this.allowEditLicScopeDetails = false; // Toggle edit mode off
       },
       error => {
         console.error('Error updating license scope:', error);
@@ -715,15 +802,16 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   cancelEditLicScope() {
-    this.allowEditLicScopeDetails = true;
+    this.allowEditLicScopeDetails = false;
+    this.disableApplicationDate = true;
+    this.errorMessages = {};
+    this.loadActivitiesLicensed(); // Reload license scope details to reset the form
   }
+
 
   editAuthScope() {
     this.allowEditAuthScopeDetails = !this.allowEditAuthScopeDetails;
     if (this.allowEditAuthScopeDetails) {
-
-
-
     }
   }
 
@@ -845,7 +933,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   validateQFCNum(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (this.allowEditFirmDetails) {
+      if (!this.allowEditFirmDetails) {
         // If not, toggle to edit mode and resolve the promise
         this.allowEditFirmDetails = true;
         resolve();
@@ -877,14 +965,14 @@ export class ViewFirmPageComponent implements OnInit {
       }
     });
   }
-  
-  
+
+
   isQFCNumExist(qfcNum: string, firmId: number): Promise<boolean> {
     return this.firmService.isQFCNumExist(qfcNum, firmId).toPromise().then(response => {
       return response.response.Column1 === 1;
     });
   }
-  
+
 
   // Method to load firm details
   loadFirmDetails(firmId: number) {
@@ -1265,14 +1353,14 @@ export class ViewFirmPageComponent implements OnInit {
     this.newActivity = {
       ActivityTypeID: 0,
       ActivityTypeDesc: '',
-      FirmScopeTypeID: 0,
-      FirmScopeTypeDesc: 1,
+      FirmScopeTypeID: 1,
+      FirmScopeTypeDesc: 'Add',
       FirmActivityID: 0,
       FirmActivityDetails: '',
       Column1: '',
 
     };
-    this.ActivityLicensed.unshift(this.newActivity);
+    this.ActivityLicensed.push(this.newActivity);
   }
 
   removeLicActivity(index: number) {
@@ -2152,7 +2240,7 @@ export class ViewFirmPageComponent implements OnInit {
         let errorMessage = response.response;
         // If a placeholder value is provided, replace the placeholder with the actual value
         if (placeholderValue) {
-          errorMessage = errorMessage.replace("#Date#", placeholderValue).replace("##DateFieldLabel##", placeholderValue);
+          errorMessage = errorMessage.replace("#Date#", placeholderValue).replace("##DateFieldLabel##", placeholderValue).replace("#ApplicationDate#", placeholderValue);
         }
         this.errorMessages[fieldName] = errorMessage;
       },
