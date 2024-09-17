@@ -7,7 +7,10 @@ import { map, switchMap } from 'rxjs/operators';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
 
-
+enum EntityType {
+  UBO_Corporate = 8,
+  UBO_Individual = 9,
+}
 
 @Component({
   selector: 'app-view-firm-page',
@@ -119,6 +122,7 @@ export class ViewFirmPageComponent implements OnInit {
   FIRMAuditors: any[] = [];
   FIRMContacts: any[] = [];
   FIRMControllers: any[] = [];
+  FIRMControllersIndividual: any[] = [];
   RegisteredFund: any[] = [];
   FIRMRA: any[] = [];
   FirmAdminFees: any[] = [];
@@ -186,6 +190,10 @@ export class ViewFirmPageComponent implements OnInit {
   hasValidationErrors: boolean = false;
   invalidAddress: boolean;
 
+  //Contact Popup 
+  isPopupVisible: boolean = false;
+  isEditable: boolean = false; // Controls the readonly state of the input fields
+  selectedContact: any = null;
 
   constructor(
     private router: Router,
@@ -315,6 +323,9 @@ export class ViewFirmPageComponent implements OnInit {
     }
     if (tabId == 'Controllers' && this.FIRMControllers.length === 0) {
       this.loadControllers();
+    }
+    if (tabId == 'Controllers' && this.FIRMControllersIndividual.length === 0) {
+      this.loadControllersIndividual();
     }
     if (tabId == 'SPRegFunds' && this.RegisteredFund.length === 0) {
       this.loadRegisteredFund();
@@ -1024,17 +1035,83 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadControllers() {
+ onRowClick(contact: any) {
+    this.selectedContact = contact;
+    this.isPopupVisible = true;
+    this.isEditable = false; // Initially, make inputs read-only
+  }
+
+  closeContactPopup() {
+    this.isPopupVisible = false;
+  }
+
+  saveContactPopupChanges() {
+    this.closeContactPopup();
+  }
+
+  enableEditing() {
+    this.isEditable = true; 
+  }
+
+  UpdateContactPopupChange() {
+    
+    this.closeContactPopup();
+  }
+  // loadControllers() {
+  //   this.firmService.getFIRMControllers(this.firmId).subscribe(
+  //     data => {
+  //       this.FIRMControllers = data.response;
+  //       console.log('Firm FIRM Controllers details:', this.FIRMControllers);
+  //     },
+  //     error => {
+  //       console.error('Error fetching firm controllers', error);
+  //     }
+  //   );
+  // }
+  loadControllers(): void {
     this.firmService.getFIRMControllers(this.firmId).subscribe(
       data => {
-        this.FIRMControllers = data.response;
-        console.log('Firm FIRM Controllers details:', this.FIRMControllers);
+        if (data && Array.isArray(data.response)) {
+          this.FIRMControllers = data.response.filter(controller =>
+            [
+              2, 
+              6, 
+              10, 
+              11 
+            ].includes(controller.EntityTypeID)
+          );
+          console.log('Filtered Firm FIRM Controllers details:', this.FIRMControllers);
+        } else {
+          console.error('Invalid data structure:', data);
+          this.FIRMControllers = []; 
+        }
       },
       error => {
         console.error('Error fetching firm controllers', error);
       }
     );
   }
+
+  loadControllersIndividual(): void {
+    this.firmService.getFIRMControllers(this.firmId).subscribe(
+      (data) => {
+        console.log('Raw API Data:', data); 
+        if (Array.isArray(data.response)) {
+          this.FIRMControllersIndividual = data.response.filter(controller =>
+            [8, 9].includes(controller.EntityTypeID)
+          );
+        } else {
+          console.error('Data is not an array:', data);
+          this.FIRMControllersIndividual = []; 
+        }
+        console.log('Filtered Controllers:', this.FIRMControllersIndividual);
+      },
+      (error) => {
+        console.error('Error fetching firm controllers', error);
+      }
+    );
+  }
+  
   loadAssiRA() {
     this.firmService.getFIRMUsersRAFunctions(this.firmId, this.ASSILevel).subscribe(
       data => {

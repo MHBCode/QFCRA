@@ -1,11 +1,10 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirmService } from 'src/app/ngServices/firm.service';
-
 @Component({
   selector: 'app-firms-page',
   templateUrl: './firms-page.component.html',
-  styleUrls: ['./firms-page.component.scss']
+  styleUrls: ['./firms-page.component.scss'],
 })
 export class FirmsPageComponent implements OnInit {
 
@@ -76,7 +75,6 @@ export class FirmsPageComponent implements OnInit {
   toggleSearch() {
     this.showSearchSection = !this.showSearchSection;
   }
-
   // Load initial firms
   loadFirms(): void {
     this.firmService.getAssignedFirms(10044).subscribe(

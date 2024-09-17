@@ -29,6 +29,7 @@
     height: 350px;
     width: 65%;
     margin-top: 0.4rem;
+    
 }
 .stastics-grid{
     display: flex;
@@ -55,6 +56,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    
 }
 app-ai-by-function{
     display: flex;
@@ -99,13 +101,14 @@ app-task-list{
     }
     .firmsList{
         width: 100%;
+        margin-bottom: 20;
     }
     .reoprtsSubmittions{
         width: 60%;
     }
     .taskList{
         width: 100%;
-        margin-bottom: 20px;
+        // margin-bottom: 20px;
     }
 }
 // @media  (max-width: 1280px) {
@@ -120,3 +123,5 @@ app-task-list{
 //         gap: 1rem;
 //     }
 // }
+
+
