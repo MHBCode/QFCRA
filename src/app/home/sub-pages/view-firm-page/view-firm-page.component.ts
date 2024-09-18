@@ -1035,7 +1035,45 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-
+  confirmDelete() {
+    console.log("confirmDelete called: ",this.selectedContact)
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this contact?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteContact(true); // Just pass output here, no need for ": boolean"
+      }
+    });
+  }
+  deleteContact(output: boolean) {
+    console.log(this.selectedContact.ContactID , this.selectedContact.ContactAssnID , "contactID , contactAssnID")
+    this.firmService.deleteContactDetails(this.selectedContact.ContactID, this.selectedContact.ContactAssnID, output).subscribe(
+      (response) => {
+        console.log('Contact deleted successfully', response);
+        Swal.fire(
+          'Deleted!',
+          'The contact has been deleted.',
+          'success'
+        );
+        this.closeContactPopup();
+        this.loadContacts();  // Reload contacts after deletion
+      },
+      (error) => {
+        console.error('Error deleting contact', error);
+        Swal.fire(
+          'Error!',
+          'There was an issue deleting the contact.',
+          'error'
+        );
+      }
+    );
+  }
   onRowClick(contact: any): void {
     this.isPopupVisible = true;
     
@@ -1043,6 +1081,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.firmService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
       data => {
         this.selectedContact = data.response; // Set the selected contact details
+        console.log("this the contact details: ",data)
         // Show the popup
       },
       error => {
@@ -1054,13 +1093,53 @@ export class ViewFirmPageComponent implements OnInit {
   closeContactPopup() {
     this.isPopupVisible = false;
   }
-
   saveContactPopupChanges(): void {
-    // Implement your save logic here (API call to save updated contact details)
-    console.log('Saving contact changes:', this.selectedContact);
-    // After saving, you might want to close the popup and refresh the data
-    this.closeContactPopup();
+    // Prepare the selectedContact object (which is bound to the form) to be saved
+    const contactDetails = {
+      firmId: this.firmId, // Ensure firmId is correctly passed
+      contactID: this.selectedContact?.contactID,
+      title: this.selectedContact?.title,
+      firstName: this.selectedContact?.firstName,
+      secondName: this.selectedContact?.secondName,
+      thirdName: this.selectedContact?.thirdName,
+      familyName: this.selectedContact?.familyName,
+      countryOfResidence: this.selectedContact?.countryOfResidence,
+      createdBy: this.selectedContact?.createdBy,
+      dateOfBirth: this.selectedContact?.dateOfBirth,
+      fullName: this.selectedContact?.fullName,
+      lastModifiedBy: this.selectedContact?.lastModifiedBy,
+      nationalID: this.selectedContact?.nationalID,
+      nationality: this.selectedContact?.nationality,
+      passportNum: this.selectedContact?.passportNum,
+      placeOfBirth: this.selectedContact?.placeOfBirth,
+      previousName: this.selectedContact?.previousName,
+      isExists: this.selectedContact?.isExists,
+      nameInPassport: this.selectedContact?.nameInPassport,
+      contactAddnlInfoTypeID: this.selectedContact?.contactAddnlInfoTypeID,
+      isFromContact: this.selectedContact?.isFromContact,
+      countryofBirth: this.selectedContact?.countryofBirth,
+      juridictionID: this.selectedContact?.juridictionID,
+      objectID: this.selectedContact?.objectID,
+      isPeP: this.selectedContact?.isPeP,
+    };
+  
+    console.log("Data to be saved:", contactDetails);
+  
+    this.firmService.saveContactDetails(contactDetails).subscribe(
+      (response) => {
+        console.log('Contact saved successfully:', response);
+        Swal.fire('Saved!', 'The contact details have been saved.', 'success');
+        this.closeContactPopup();
+        this.loadContacts(); // Reload the contacts list after saving
+      },
+      (error) => {
+        console.error('Error saving contact details:', error);
+        Swal.fire('Error!', 'There was an issue saving the contact.', 'error');
+      }
+    );
   }
+  
+  
 
   enableEditing() {
     this.isEditable = true; 
