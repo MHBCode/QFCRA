@@ -4479,7 +4479,7 @@ export class ContactClient {
             return this.processDetails(_response);
         });
     }
-
+    
     protected processDetails(response: Response): Promise<StringObjectDictionaryListBaseResponse> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
@@ -4531,7 +4531,34 @@ export class ContactClient {
             return this.processDetails(_response);
         });
     }
+    details(firmId: number | undefined,contactId: number | undefined, contactAssId: number | undefined): Promise<any> {
+        let url_ = this.baseUrl + "/api/Contact/get_contact_details_by_contactId?";
+        if (firmId === null)
+            throw new Error("The parameter 'firmId' cannot be null.");
+        else if (firmId !== undefined)
+            url_ += "firmId=" + encodeURIComponent("" + firmId) + "&";
+        if (contactId === null)
+            throw new Error("The parameter 'contactId' cannot be null.");
+        else if (contactId !== undefined)
+            url_ += "contactId=" + encodeURIComponent("" + contactId) + "&";
+        if (contactAssId === null)
+            throw new Error("The parameter 'contactAssId' cannot be null.");
+        else if (contactAssId !== undefined)
+            url_ += "contactAssId=" + encodeURIComponent("" + contactAssId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
 
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "text/plain"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processContactId(_response);
+        });
+    }
+      
     protected processDetails(response: Response): Promise<StringObjectDictionaryBaseResponse> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
@@ -4554,7 +4581,7 @@ export class ContactClient {
      * @param body (optional) 
      * @return OK
      */
-    details(body: ContactDetailsObj | undefined): Promise<StringObjectDictionaryBaseResponse> {
+    details(body: ContactDetailsObj | undefined , contactAssId: number | undefined): Promise<StringObjectDictionaryBaseResponse> {
         let url_ = this.baseUrl + "/api/Contact/save_contact_details";
         url_ = url_.replace(/[?&]$/, "");
 

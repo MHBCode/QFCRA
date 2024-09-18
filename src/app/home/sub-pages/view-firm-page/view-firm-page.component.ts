@@ -1035,17 +1035,30 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
- onRowClick(contact: any) {
-    this.selectedContact = contact;
+
+  onRowClick(contact: any): void {
     this.isPopupVisible = true;
-    this.isEditable = false; // Initially, make inputs read-only
-  }
+    
+    // Pass all required arguments to the getContactDetails method
+    this.firmService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
+      data => {
+        this.selectedContact = data.response; // Set the selected contact details
+        // Show the popup
+      },
+      error => {
+        console.error('Error fetching contact details', error);
+      }
+    );
+}
 
   closeContactPopup() {
     this.isPopupVisible = false;
   }
 
-  saveContactPopupChanges() {
+  saveContactPopupChanges(): void {
+    // Implement your save logic here (API call to save updated contact details)
+    console.log('Saving contact changes:', this.selectedContact);
+    // After saving, you might want to close the popup and refresh the data
     this.closeContactPopup();
   }
 
