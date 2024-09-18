@@ -218,7 +218,16 @@ export class FirmService {
   getContactDetails(firmId: number, contactId: number, contactAssId: number): Observable<any> {
     const url = `${this.baseUrlContact}get_contact_details_by_contactId?firmId=${firmId}&contactId=${contactId}&contactAssId=${contactAssId}`;
     return this.http.get<any>(url);
-}
+  }
+  ///////////////////
+  deleteContactDetails(contactID: number, contactAssnID: number, output: boolean): Observable<any> {
+    const url = `${this.baseUrlContact}delete_contact_details?contactId=${contactID}&contactAssId=${contactAssnID}&output=${output}`;
+    return this.http.delete<any>(url);
+  }
+  saveContactDetails(contactDetails: any): Observable<any> {
+    const url = `${this.baseUrlContact}save_contact_details`;
+    return this.http.post<any>(url, contactDetails);
+  }
   getFIRMUsersRAFunctions(firmId: number, assiLevel: number): Observable<any> {
     const url = `${this.baseUrl}get_firm_user?firmId=${firmId}`;
     return this.http.get<any>(url);
