@@ -544,7 +544,7 @@ tr:nth-child(even) {
   height: 15vh !important;
   left: 30vw !important;
   width: 40vw !important;
-  overflow-y: visible;
+  overflow-y: auto;
   overflow-x: visible;
   top: 35vh;
 }

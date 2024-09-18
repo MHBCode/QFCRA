@@ -15,45 +15,8 @@ import Swal from 'sweetalert2';
   styleUrls: ['./view-firm-page.component.scss']
 })
 export class ViewFirmPageComponent implements OnInit {
-  showErrorAlert(messageKey: number) {
-    this.firmService.errorMessages(messageKey).subscribe(
-      (response) => {
-        Swal.fire({
-          title: 'Alert!',
-          text: response.response,
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      },
-    );
-  }
 
-  showFirmDetailsSaveSuccessAlert(messageKey: number) {
-    this.firmService.errorMessages(messageKey).subscribe(
-      (response) => {
-        Swal.fire({
-          title: 'Success!',
-          text: response.response,
-          icon: 'success',
-          confirmButtonText: 'OK'
-        });
-      },
-    );
-  }
-
-  showFirmScopeSaveSuccessAlert(messageKey: number) {
-    this.firmService.errorMessages(messageKey).subscribe(
-      (response) => {
-        Swal.fire({
-          title: 'Success!',
-          text: response.response,
-          icon: 'success',
-          confirmButtonText: 'OK'
-        });
-      },
-    );
-  }
-
+  userId = 10044; // Replace with dynamic userId as needed
   errorMessages: { [key: string]: string } = {};
   /* for Auditors */
   IsViewAuditorVisible: boolean = false;
@@ -104,7 +67,7 @@ export class ViewFirmPageComponent implements OnInit {
   originalFirmAddresses: any = [];
   firmAddressesTypeHistory: any = [];
   ActivityLicensed: any = [{}];
-  ActivityAuth: any = [];
+  ActivityAuth: any = [{}];
   AuthTableDocument: any = [];
   islamicFinance: any = {};
   activityCategories: any[] = [];
@@ -131,12 +94,12 @@ export class ViewFirmPageComponent implements OnInit {
   allowEditFirmDetails: string | boolean = false;
   /* for scope */
   allowEditLicScopeDetails: string | boolean = false;
-  allowEditAuthScopeDetails: string | boolean = true;
+  allowEditAuthScopeDetails: string | boolean = false;
   showPermittedActivitiesTable: string | boolean = false;
   isIslamicFinanceChecked: boolean = true;
   disableApplicationDate: boolean = true;
   scopeRevNum: number;
-  selectedCategory: string;
+  selectedCategory: number;
   selectedActivity: string;
   documentDetails: any = {};
   LicPrevRevNumbers: any = [];
@@ -185,7 +148,11 @@ export class ViewFirmPageComponent implements OnInit {
   // flags validations
   hasValidationErrors: boolean = false;
   invalidAddress: boolean;
+  invalidActivity: boolean;
 
+  /* current date */
+  now = new Date();
+  isoString = this.now.toISOString();
 
   constructor(
     private router: Router,
@@ -332,19 +299,89 @@ export class ViewFirmPageComponent implements OnInit {
 
 
 
-  editFirm() {
-    const userId = 10044; // Replace with dynamic userId as needed
+  async editFirm() {
+    this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
 
     if (!this.allowEditFirmDetails) {
-      // If the form is not in edit mode, toggle to edit mode
+      // Toggle to edit mode if the form is not in edit mode
       this.allowEditFirmDetails = true;
-      return; // Exit the function to prevent running validations
+      return;
     }
 
-    // If the form is in edit mode, proceed with validations and saving
-
+    // Start validations
     this.hasValidationErrors = false;
 
+    // Synchronous firm-level validation checks
+    this.validateFirmDetails(); // This function performs the existing validation logic synchronously
+
+    if (this.hasValidationErrors) {
+      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      return;
+    }
+
+    // Perform async validations (like QFC number)
+    try {
+      // Await for QFC validation
+      await this.validateQFCNum();
+
+      // Check for application date duplicates and other async validation
+      await this.ApplicationDateValidationCheckDuplicates();
+
+      if (this.hasValidationErrors) {
+        throw new Error('Validation errors exist');
+      }
+
+      // After all validations have passed, proceed with saving the firm details
+      this.setAdditionalFirmDetails();
+
+      if (this.hasValidationErrors) {
+        this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+        return;
+      }
+
+      // Save Firm Details
+      const firmObj = this.prepareFirmObject(this.userId);
+      this.saveFirmDetails(firmObj, this.userId);
+
+      // Toggle off edit mode after saving
+      this.allowEditFirmDetails = false;
+    } catch (error) {
+      if (error.message !== 'Cancelled by user') {
+        console.error('Validation or Save Process failed:', error);
+        this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      }
+    }
+  }
+
+
+  async ApplicationDateValidationCheckDuplicates(): Promise<void> {
+    if (this.firmId) {
+      let LicenceOrAuthorisation = 2; // 2 for Licensing
+      let enteredLicenseStatusID = this.firmDetails.LicenseStatusTypeID;
+      let enteredLicenseStatusName = this.firmDetails.LicenseStatusTypeDesc;
+      let enteredLicenseDate = this.firmDetails.LicensedDate;
+
+      // Perform License Validation and await the result
+      const licenseValid = await this.performApplnStatusValidation(LicenceOrAuthorisation, enteredLicenseStatusID, enteredLicenseStatusName, enteredLicenseDate);
+      if (!licenseValid) {
+        throw new Error('License validation failed');
+      }
+
+      // Perform Authorization Validation
+      LicenceOrAuthorisation = 3; // 3 for Authorization
+      let enteredAuthorisationStatusID = this.firmDetails.AuthorisationStatusTypeID;
+      let enteredAuthorisationStatusName = this.firmDetails.AuthorisationStatusTypeDesc;
+      let enteredAuthorisationDate = this.firmDetails.AuthorisationDate;
+
+      const authorisationValid = await this.performApplnStatusValidation(LicenceOrAuthorisation, enteredAuthorisationStatusID, enteredAuthorisationStatusName, enteredAuthorisationDate);
+      if (!authorisationValid) {
+        throw new Error('Authorization validation failed');
+      }
+    }
+  }
+
+
+  validateFirmDetails() {
     // FIRM NAME VALIDATION
     this.firmDetails.FirmName = this.firmDetails.FirmName.trim();
     if (!this.firmDetails.FirmName) {
@@ -354,146 +391,170 @@ export class ViewFirmPageComponent implements OnInit {
       delete this.errorMessages['FirmName'];
     }
 
-    // QFC VALIDATION
+    // QFC VALIDATION SPECIAL CASES
     if (this.firmDetails.QFCNum) {
       this.firmDetails.QFCNum = this.padNumber(this.firmDetails.QFCNum);
     }
 
     if (this.selectedFirmTypeID === 2 && this.firmDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Licensed) {
-      if (this.firmDetails.QFCNum == null || this.firmDetails.QFCNum === '') {
+      if (!this.firmDetails.QFCNum) {
         this.getErrorMessages('QFCNum', constants.Firm_CoreDetails_Messages.ENTER_QFCNUMBER);
         this.hasValidationErrors = true;
       }
     }
 
     if (this.selectedFirmTypeID === 3 && this.firmDetails.AuthorisationStatusTypeID === constants.FirmAuthorizationApplStatusType.Authorised) {
-      if (this.firmDetails.QFCNum == null || this.firmDetails.QFCNum === '') {
+      if (!this.firmDetails.QFCNum) {
         this.getErrorMessages('QFCNum', constants.Firm_CoreDetails_Messages.ENTER_QFCNUMBER);
         this.hasValidationErrors = true;
       }
     }
 
-    // Validate QFC Number
-    this.validateQFCNum().then(() => {
-      // Continue with the rest of the validations only after QFC validation is complete
+    // LEGAL STATUS VALIDATION
+    if (this.firmDetails.LegalStatusTypeID == 0) {
+      this.getErrorMessages('LegalStatusTypeID', constants.Firm_CoreDetails_Messages.ENTER_LEGAL_STATUS);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['LegalStatusTypeID'];
+    }
 
-      // LEGAL STATUS VALIDATION
-      if (this.firmDetails.LegalStatusTypeID == 0) {
-        this.getErrorMessages('LegalStatusTypeID', constants.Firm_CoreDetails_Messages.ENTER_LEGAL_STATUS);
-        this.hasValidationErrors = true;
-      } else {
-        delete this.errorMessages['LegalStatusTypeID'];
-      }
+    // DATE OF INCORPORATION VALIDATION
+    if (this.firmDetails.DifferentIncorporationDate && !this.firmDetails.DateOfIncorporation) {
+      this.getErrorMessages('DateOfIncorporation', constants.FirmActivitiesEnum.DATEOFINCORPORATION_ERROR); // Adjust the message key as needed
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['DateOfIncorporation'];
+    }
 
-      // DATE OF INCORPORATION VALIDATION
-      if (this.firmDetails.DifferentIncorporationDate && !this.firmDetails.DateOfIncorporation) {
-        this.getErrorMessages('DateOfIncorporation', constants.FirmActivitiesEnum.DATEOFINCORPORATION_ERROR); // Adjust the message key as needed
-        this.hasValidationErrors = true;
-      } else {
-        this.firmDetails.DateOfIncorporation = this.firmDetails.DateOfIncorporation;
-        delete this.errorMessages['DateOfIncorporation'];
-      }
+    // FINANCIAL YEAR END EFFECTIVE FROM VALIDATION
+    if (!this.firmDetails.FirmFinYearEndEffectiveFrom && this.firmDetails.FinYearEndTypeID > 0) {
+      this.getErrorMessages('FYearEndDate', constants.InvoicesMessages.INVALID_DATA, "Financial Year End Effective From");
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['FYearEndDate'];
+    }
 
-      // FINANCIAL YEAR END EFFECTIVE FROM VALIDATION
-      if (this.firmDetails.FirmFinYearEndEffectiveFrom == null || this.firmDetails.FirmFinYearEndEffectiveFrom == '') {
-        if (this.firmDetails.FinYearEndTypeID > 0) {
-          this.getErrorMessages('FYearEndDate', constants.InvoicesMessages.INVALID_DATA, "Financial Year End Effective From");
-          this.hasValidationErrors = true;
-        }
-      } else {
-        delete this.errorMessages['FYearEndDate'];
-      }
+    // ACCOUNTING STANDARDS EFFECTIVE FROM VALIDATION
+    if (!this.firmDetails.FinAccStdTypeEffectiveFrom && this.firmDetails.FinAccStdTypeID > 0) {
+      this.getErrorMessages('AccStandDate', constants.InvoicesMessages.INVALID_DATA, "Accounting Standards Effective From");
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['AccStandDate'];
+    }
 
-      // ACCOUNTING STANDARDS EFFECTIVE FROM VALIDATION
-      if (this.firmDetails.FinAccStdTypeEffectiveFrom == null || this.firmDetails.FinAccStdTypeEffectiveFrom === '') {
-        if (this.firmDetails.FinAccStdTypeID > 0) {
-          this.getErrorMessages('AccStandDate', constants.InvoicesMessages.INVALID_DATA, "Accounting Standards Effective From");
-          this.hasValidationErrors = true;
-        }
-      } else {
-        delete this.errorMessages['AccStandDate'];
-      }
+    // PREV. FIRM NAME EFFECTIVE TO VALIDATION
+    if (this.firmNamesHistory[0]?.FirmNameHistoryID && (!this.firmNamesHistory[0].DateEffectiveTo)) {
+      this.getErrorMessages('PrevFirmNameEffectiveTo', constants.InvoicesMessages.INVALID_DATA, "Prev Firm Name Effective To");
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['PrevFirmNameEffectiveTo'];
+    }
 
-      // PREV. FIRM NAME EFFECTIVE TO VALIDATION
-      if (this.firmNamesHistory[0]?.FirmNameHistoryID) {
-        if (this.firmNamesHistory[0].DateEffectiveTo == null || this.firmNamesHistory[0].DateEffectiveTo === '') {
-          this.getErrorMessages('PrevFirmNameEffectiveTo', constants.InvoicesMessages.INVALID_DATA, "Prev Firm Name Effective To");
-          this.hasValidationErrors = true;
-        } else {
-          delete this.errorMessages['PrevFirmNameEffectiveTo'];
-        }
-      }
+    // APPLICATION DETAILS SECTION VALIDATION
+    if (!this.dateOfApplication) {
+      this.getErrorMessages('DateOfApplication', constants.Firm_CoreDetails_Messages.ENTER_DATE_OF_APPLICATION);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['DateOfApplication'];
+    }
 
-      // APPLICATION DETAILS SECTION VALIDATION
-      // DATE OF APPLICATION VALIDATION
-      if (!this.dateOfApplication) {
-        this.getErrorMessages('DateOfApplication', constants.Firm_CoreDetails_Messages.ENTER_DATE_OF_APPLICATION);
-        this.hasValidationErrors = true;
-      } else {
-        delete this.errorMessages['DateOfApplication'];
-      }
+    if (!this.firmDetails.LicensedDate) {
+      this.getErrorMessages('LicensedDate', constants.FirmActivitiesEnum.ENTER_VALID_DATE, "QFC License Status date");
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['LicensedDate'];
+    }
 
-      // QFC LICENSED DATE VALIDATION
-      if (!this.firmDetails.LicensedDate) {
-        this.getErrorMessages('LicensedDate', constants.FirmActivitiesEnum.ENTER_VALID_DATE, "QFC License Status date");
-        this.hasValidationErrors = true;
-      } else {
-        delete this.errorMessages['LicensedDate'];
-      }
+    if (!this.firmDetails.AuthorisationDate) {
+      this.getErrorMessages('AuthorisationDate', constants.FirmActivitiesEnum.ENTER_VALID_DATE, "Authorisation Status date");
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['AuthorisationDate'];
+    }
 
-      // AUTHORIZATION DATE VALIDATION
-      if (!this.firmDetails.AuthorisationDate) {
-        this.getErrorMessages('AuthorisationDate', constants.FirmActivitiesEnum.ENTER_VALID_DATE, "Authorisation Status date");
-        this.hasValidationErrors = true;
-      } else {
-        delete this.errorMessages['AuthorisationDate'];
-      }
+    // ADDRESS TYPE VALIDATION
+    this.invalidAddress = this.firmAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
+    if (this.invalidAddress) {
+      this.getErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['AddressTypeID'];
+    }
+  }
 
-      // ADDRESS TYPE VALIDATION
-      this.invalidAddress = this.firmAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
-      if (this.invalidAddress) {
-        this.getErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
-        this.hasValidationErrors = true;
-      } else {
-        delete this.errorMessages['AddressTypeID'];
-      }
-
-      // Additional validation logic can go here for other fields as needed
-
-      // Step 2: Handle Validation Errors
-      if (this.hasValidationErrors) {
-        this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
-        return; // Prevent further action if validation fails
-      }
-
-      // Step 3: Process Firm Addresses
-      this.firmAddresses.forEach(address => {
-        if (address.isRemoved) {
-          address.addressState = 4; // Set addressState to 4 if the address is marked as removed
-        } else if (address.AddressID) {
-          address.addressState = 6; // Set addressState to 6 for existing addresses
-        } else {
-          address.addressState = 2; // Set addressState to 2 for new addresses
-        }
-      });
-
-      this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
-
-      // Step 4: Save Firm Details
-      const firmObj = this.prepareFirmObject(userId);
-      this.saveFirmDetails(firmObj, userId);
-      this.showFirmDetailsSaveSuccessAlert(constants.Firm_CoreDetails_Messages.FIRMDETAILS_SAVED_SUCCESSFULLY);
-
-      // Toggle Edit Mode
-      this.allowEditFirmDetails = false;
+  performApplnStatusValidation(LicenceOrAuthorisation: number, enteredApplnStatusID: number, enteredApplnStatusName: string, enteredApplnStatusDate: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.firmService.getFirmStatusValidation(this.firmId, enteredApplnStatusID, enteredApplnStatusDate, LicenceOrAuthorisation)
+        .subscribe((response) => {
+          if (response.isSuccess && response.response) {
+            const { OldFirmApplStatusTypeDesc, OldFirmApplStatusDate, DuplicatePresentType } = response.response;
+  
+            if (DuplicatePresentType === 0) {
+              resolve(true); // Validation Pass
+            } else {
+              let msgKey: number;
+              let placeholderValue: string = '';
+  
+              if (DuplicatePresentType === 1) {
+                msgKey = (LicenceOrAuthorisation === 3)
+                  ? constants.Firm_CoreDetails_Messages.SAME_AUTHORISATION_STATUS_ON_TWO_DATES
+                  : constants.Firm_CoreDetails_Messages.SAME_LICENSED_STATUS_ON_TWO_DATES;
+                placeholderValue = this.formatDateToCustomFormat(OldFirmApplStatusDate);
+              } else if (DuplicatePresentType === 2) {
+                msgKey = (LicenceOrAuthorisation === 3)
+                  ? constants.Firm_CoreDetails_Messages.TWO_AUTHORISATION_STATUS_ON_SAME_DATE
+                  : constants.Firm_CoreDetails_Messages.TWO_LICENSED_STATUS_ON_SAME_DATE;
+                placeholderValue = `${OldFirmApplStatusTypeDesc} and ${enteredApplnStatusName}`;
+              } else if (DuplicatePresentType === 3) {
+                msgKey = 3917;
+              }
+  
+              // Show the validation popup and run additional validation or save logic when "Ok" is clicked
+              this.showApplnStatusValidationPopup(msgKey, placeholderValue ,() => {
+                if (LicenceOrAuthorisation === 2) {
+                  // Perform additional validation for Authorization
+                  LicenceOrAuthorisation = 3; // 3 for Authorization
+                  const authStatusID = this.firmDetails.AuthorisationStatusTypeID;
+                  const authStatusName = this.firmDetails.AuthorisationStatusTypeDesc;
+                  const authDate = this.firmDetails.AuthorisationDate;
+  
+                  this.performApplnStatusValidation(LicenceOrAuthorisation, authStatusID, authStatusName, authDate)
+                    .then((authorisationValid) => {
+                      if (authorisationValid) {
+                        this.completeSave(); // Save if everything is valid
+                      }
+                    });
+                } else {
+                  // If no further validation is needed, directly save
+                  this.completeSave();
+                }
+              })
+                .then(() => {
+                  resolve(false); // Validation failed but user confirmed
+                })
+                .catch(() => {
+                  reject(); // Cancel clicked, stop the process
+                });
+            }
+          } else {
+            resolve(false); // Validation failed (if response is invalid)
+          }
+        }, (error) => {
+          console.error('Validation error:', error);
+          resolve(false); // Resolve as false if there's an error
+        });
     });
   }
+  
+
+
+
 
 
 
   onSameAsTypeChange(selectedTypeID: number) {
     const numericTypeID = Number(selectedTypeID);
-    if (selectedTypeID && selectedTypeID !== 0) {
+    if (selectedTypeID && selectedTypeID != 0) {
       // flag to disable address fields after you select exisiting address type from same on as type field
       this.disableAddressFields = true;
       const selectedAddress = this.existingAddresses.find(address => address.AddressTypeID === numericTypeID);
@@ -525,11 +586,11 @@ export class ViewFirmPageComponent implements OnInit {
   setAdditionalFirmDetails() {
     if (this.firmDetails?.AuthorisationStatusTypeID > 0) {
       this.firmDetails.firmApplDate = this.firmDetails.FirmAuthApplDate
-        ? this.convertDateToYYYYMMDD(this.firmDetails.FirmAuthApplDate)
+        ? this.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate)
         : null;
     } else {
       this.firmDetails.firmApplDate = this.firmDetails.FirmLicApplDate
-        ? this.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate)
+        ? this.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate)
         : null;
     }
 
@@ -577,7 +638,7 @@ export class ViewFirmPageComponent implements OnInit {
         placeOfIncorporation: this.firmDetails.PlaceOfIncorporation,
         countyOfIncorporation: this.firmDetails.CountyOfIncorporation,
         webSiteAddress: this.firmDetails.WebSiteAddress,
-        firmApplDate: this.firmDetails.firmApplDate,
+        firmApplDate: this.convertDateToYYYYMMDD(this.firmDetails.firmApplDate),
         firmApplTypeID: this.selectedFirmTypeID,
         licenseStatusTypeID: this.firmDetails.LicenseStatusTypeID,
         licensedDate: this.convertDateToYYYYMMDD(this.firmDetails.LicensedDate),
@@ -618,7 +679,7 @@ export class ViewFirmPageComponent implements OnInit {
           phoneNumber: address.PhoneNum || '',
           phoneExt: address.PhoneExt || '',
           faxNumber: address.FaxNum || '',
-          lastModifiedDate: address.LastModifiedDate || new Date().toISOString(), // Default to current date
+          lastModifiedDate: address.LastModifiedDate || this.isoString, // Default to current date
           addressState: address.addressState, // New address state is 2, existing is 6
           fromDate: address.FromDate || null,
           toDate: address.ToDate || null,
@@ -635,6 +696,13 @@ export class ViewFirmPageComponent implements OnInit {
     };
   }
 
+  completeSave() {
+    const firmObj = this.prepareFirmObject(this.userId);
+  
+    // Save Firm Details using the editFirm service
+    this.saveFirmDetails(firmObj, this.userId);
+  }
+
   // Function to save firm details
   saveFirmDetails(firmObj: any, userId: number) {
     console.log("Final firm object to be sent:", firmObj);
@@ -648,6 +716,9 @@ export class ViewFirmPageComponent implements OnInit {
         this.loadFirmAdresses();
         this.resetCollapsibleSections();
         this.cdr.detectChanges();
+
+        this.showFirmDetailsSaveSuccessAlert(constants.Firm_CoreDetails_Messages.FIRMDETAILS_SAVED_SUCCESSFULLY);
+        this.allowEditFirmDetails = false;
       },
       error => {
         console.error('Error editing row:', error);
@@ -657,14 +728,26 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   cancelEditFirm() {
-    this.allowEditFirmDetails = false;
-    this.errorMessages = {};
-    this.selectedFile = null;
-    this.resetCollapsibleSections();
-    this.loadPrevFirmAndDate();
-    this.loadFirmDetails(this.firmId);
-    this.loadCurrentAppDetails();
-    this.loadFirmAdresses();
+    Swal.fire({
+      title: 'Alert',
+      text: 'Are you sure you want to cancel your changes ?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.allowEditFirmDetails = false;
+        this.errorMessages = {};
+        this.selectedFile = null;
+        this.resetCollapsibleSections();
+        this.loadPrevFirmAndDate();
+        this.loadFirmDetails(this.firmId);
+        this.loadCurrentAppDetails();
+        this.loadFirmAdresses();
+      }
+    });
   }
 
   // Function to reset the collapsible sections
@@ -724,25 +807,44 @@ export class ViewFirmPageComponent implements OnInit {
     }
 
     // EFFECTIVE DATE VALIDATION
-    if (this.ActivityLicensed[0].ScopeEffectiveDate == null || this.ActivityLicensed[0].ScopeEffectiveDate == '') {
-      this.getErrorMessages('ScopeEffectiveDate', constants.FirmActivitiesEnum.ENTER_VALID_SCOPEEFFECTIVEDATE);
-      this.hasValidationErrors = true;
-    } else {
-      delete this.errorMessages['ScopeEffectiveDate'];
+    if (this.ActivityLicensed[0].ScopeEffectiveDate) {
+      if (this.ActivityLicensed[0].ScopeEffectiveDate == null || this.ActivityLicensed[0].ScopeEffectiveDate == '') {
+        this.getErrorMessages('ScopeEffectiveDate', constants.FirmActivitiesEnum.ENTER_VALID_SCOPEEFFECTIVEDATE);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['ScopeEffectiveDate'];
+      }
     }
-
-    if (this.ActivityLicensed[0].ScopeEffectiveDate[0] < this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate)) {
+    if (this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeEffectiveDate) < this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate)) {
       this.getErrorMessages('ScopeEffectiveDateLessThanApplicationDate', constants.FirmActivitiesEnum.ENTER_EFFECTIVEDATE_LATER_APPLICATIONDATE);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['ScopeEffectiveDateLessThanApplicationDate'];
     }
 
+    // ACTIVITY TYPE VALIDATION
+    this.invalidActivity = this.ActivityLicensed.find(activity => activity.ActivityTypeID == 0);
+    if (this.invalidActivity) {
+      this.getErrorMessages('ActivityTypeIDCORRECTION', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
+      this.getErrorMessages('ActivityTypeID', constants.FirmActivitiesEnum.SELECT_ACTIVITIES);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['ActivityTypeID'];
+      delete this.errorMessages['ActivityTypeIDCORRECTION'];
+    }
+
     // Step 2: Handle Validation Errors
     if (this.hasValidationErrors) {
-      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.showErrorAlert(constants.FirmActivitiesEnum.ENTER_ALL_REQUIREDFIELDS);
       return; // Prevent further action if validation fails
     }
+
+    this.ActivityLicensed.forEach(activityLic => {
+      const selectedActivity = this.licensedActivities.find(activity => activity.ActivityTypeID === +activityLic.ActivityTypeID);
+      if (selectedActivity) {
+        activityLic.ActivityTypeDesc = selectedActivity.ActivityTypeDesc;
+      }
+    });
 
     this.existingActivities = this.ActivityLicensed;
 
@@ -760,14 +862,14 @@ export class ViewFirmPageComponent implements OnInit {
         firmID: this.ActivityLicensed[0].FirmID,
         objectID: 524,
         createdBy: userId,
-        docReferenceID: this.ActivityLicensed[0].docReferenceID,
+        docReferenceID: this.ActivityLicensed[0].docReferenceID ?? null,
         firmApplTypeID: 2, // licensed
         docIDs: this.ActivityLicensed[0].DocID,
         generalConditions: this.ActivityLicensed[0].GeneralConditions,
         effectiveDate: this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityLicensed[0].ScopeCertificateLink,
         applicationDate: this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate),
-        licensedOrAuthorisedDate: this.convertDateToYYYYMMDD(this.ActivityLicensed[0].LicensedOrAuthorisedDate),
+        licensedOrAuthorisedDate: this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate),
       },
       lstFirmActivities: this.existingActivities.map(activityLic => ({
         createdBy: userId,
@@ -792,6 +894,7 @@ export class ViewFirmPageComponent implements OnInit {
         console.log('License scope updated successfully:', response);
         this.loadActivitiesLicensed(); // Reload license scope details
         this.allowEditLicScopeDetails = false; // Toggle edit mode off
+        this.disableApplicationDate = true;
       },
       error => {
         console.error('Error updating license scope:', error);
@@ -799,7 +902,21 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
 
-
+  varyLicenseScope() {
+    Swal.fire({
+      title: 'Alert',
+      text: 'Are you sure you want to vary the scope?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Your code to vary the license scope goes here
+      }
+    }); // Closing parenthesis for the 'then' method
+  }
 
   cancelEditLicScope() {
     this.allowEditLicScopeDetails = false;
@@ -810,10 +927,15 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   editAuthScope() {
-    this.allowEditAuthScopeDetails = !this.allowEditAuthScopeDetails;
-    if (this.allowEditAuthScopeDetails) {
+
+
+    // If the form is not in edit mode, toggle to edit mode
+    if (!this.allowEditAuthScopeDetails) {
+      this.allowEditAuthScopeDetails = true;
+      return; // Exit the function to prevent running validations
     }
   }
+
 
   updateFirmScope() {
     if (!this.ActivityAuth || !this.ActivityAuth.FirmScopeID) {
@@ -912,7 +1034,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   cancelEditAuthScope() {
-    this.allowEditAuthScopeDetails = true;
+    this.allowEditAuthScopeDetails = false;
   }
 
 
@@ -966,6 +1088,35 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
+  validateFirmName(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (!this.allowEditFirmDetails) {
+        // If not, toggle to edit mode and resolve the promise
+        this.allowEditFirmDetails = true;
+        resolve();
+        return;
+      }
+      if (this.firmDetails.FirmName) {
+        this.isFirmNameExist(this.firmDetails.FirmName).then(isExist => {
+          if (isExist) {
+            this.getErrorMessages('FirmName', constants.Firm_CoreDetails_Messages.FIRMEXIST);
+            this.hasValidationErrors = true;
+          } else {
+            delete this.errorMessages['FirmName'];
+          }
+          resolve(); // Proceed with validation
+        }).catch(error => {
+          console.error('Error checking Firm name existence', error);
+          this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+          this.hasValidationErrors = true;
+          resolve(); // Proceed with validation, but hasValidationErrors is true
+        });
+      } else {
+        resolve(); // If no Firm Name, proceed with validation
+      }
+    });
+  }
+
 
   isQFCNumExist(qfcNum: string, firmId: number): Promise<boolean> {
     return this.firmService.isQFCNumExist(qfcNum, firmId).toPromise().then(response => {
@@ -973,6 +1124,11 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
+  isFirmNameExist(firmName: string): Promise<boolean> {
+    return this.firmService.isFirmNameExist(firmName, this.firmId).toPromise().then(response => {
+      return response.response.Column1 === 1;
+    });
+  }
 
   // Method to load firm details
   loadFirmDetails(firmId: number) {
@@ -981,7 +1137,8 @@ export class ViewFirmPageComponent implements OnInit {
         this.firmDetails = data.response;
         this.selectedFirmTypeID = this.firmDetails.AuthorisationStatusTypeID != 0 ? 3 : 2;
         this.dateOfApplication = this.firmDetails.AuthorisationStatusTypeID > 0 ? this.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate) : this.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate);
-        this.firmDetails.AuthorisationDate = this.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate);
+        // this.firmDetails.AuthorisationDate = this.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate);
+        // this.firmDetails.LicensedDate = this.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate);
         this.getFirmTypes();
         this.loadPrevFirmAndDate();
         console.log('Firm details:', this.firmDetails);
@@ -1203,16 +1360,23 @@ export class ViewFirmPageComponent implements OnInit {
             });
           }
 
-          // Set selected category if not already set
-          if (!activity.selectedCategory) {
-            activity.selectedCategory = this.activityCategories.find(
-              category => category.ActivityCategoryDesc === activity.ActivityCategoryDesc
-            );
+          // Initialize selectedCategory
+          activity.selectedCategory = this.activityCategories.find(
+            category => category.ActivityCategoryDesc === activity.ActivityCategoryDesc
+          );
 
-            // Load activities for the selected category if allowEditScopeDetailsAuth is false
-            if (!this.allowEditAuthScopeDetails && activity.selectedCategory) {
-              this.onCategoryChange(activity); // Load activities for the selected category
-            }
+          // If selectedCategory is found, load activities for that category
+          if (activity.selectedCategory) {
+            this.firmService.getAuthActivityTypes(activity.selectedCategory.ActivityCategoryID).subscribe(
+              data => {
+                activity.activities = data.response;
+
+                // Initialize selectedActivity based on ActivityTypeID
+                activity.selectedActivity = activity.activities.find(
+                  act => act.ActivityTypeID === activity.ActivityTypeID
+                );
+              }
+            );
           }
         });
       },
@@ -1221,6 +1385,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
+
 
 
 
@@ -1352,32 +1517,60 @@ export class ViewFirmPageComponent implements OnInit {
   addNewActivity() {
     this.newActivity = {
       ActivityTypeID: 0,
+      ActivityDisplayOrder: 0,
+      ActivityCategoryID: 1,
       ActivityTypeDesc: '',
       FirmScopeTypeID: 1,
       FirmScopeTypeDesc: 'Add',
       FirmActivityID: 0,
       FirmActivityDetails: '',
       Column1: '',
-
     };
     this.ActivityLicensed.push(this.newActivity);
   }
 
   removeLicActivity(index: number) {
     Swal.fire({
-      title: 'Are you sure?',
+      title: 'Alert',
       text: 'Are you sure you want to delete this activity?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Ok',
       cancelButtonText: 'Cancel',
-      reverseButtons: true
+      reverseButtons: false
     }).then((result) => {
       if (result.isConfirmed) {
         this.errorMessages = {};
-        if (index > -1 && index < this.ActivityLicensed.length) {
-          const activity = this.ActivityLicensed[index];
-          if (!activity.FirmActivityID) { // means newly added activity
+        const activity = this.ActivityLicensed[index];
+
+        // Check for existing activity (with FirmActivityID)
+        if (activity.FirmActivityID) {
+          if (this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate) < this.isoString) {
+            this.showErrorAlert(constants.FirmActivitiesEnum.LICENSEDDATEPASSED_CANNOTREMOVE);
+          } else if (this.ActivityLicensed.length > 1) {
+            this.ActivityLicensed.splice(index, 1);
+          } else {
+            Swal.fire({
+              title: 'Alert!',
+              text: 'There has to be at least one permitted activity!',
+              icon: 'error',
+              timer: 3000,
+              timerProgressBar: true,
+              showConfirmButton: false
+            });
+          }
+        } else {
+          // Check for new activity at index 0
+          if (index === 0 && this.ActivityLicensed.length === 1) {
+            Swal.fire({
+              title: 'Alert!',
+              text: 'There has to be at least one permitted activity!',
+              icon: 'error',
+              timer: 3000,
+              timerProgressBar: true,
+              showConfirmButton: false
+            });
+          } else {
             this.ActivityLicensed.splice(index, 1);
           }
         }
@@ -1385,9 +1578,8 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
+
   addNewAddress() {
-    const now = new Date();
-    const isoString = now.toISOString();
 
     // Define the total number of address types
     const totalAddressTypes = this.allAddressTypes.length;
@@ -1418,7 +1610,7 @@ export class ViewFirmPageComponent implements OnInit {
       PhoneNum: '',
       FaxNum: '',
       LastModifiedBy: 0, //todo _userId;
-      LastModifiedDate: isoString,
+      LastModifiedDate: this.isoString,
       addressState: 0,
       FromDate: null,
       ToDate: null,
@@ -1442,13 +1634,13 @@ export class ViewFirmPageComponent implements OnInit {
 
   removeAddress(index: number) {
     Swal.fire({
-      title: 'Are you sure?',
+      title: 'Alert',
       text: 'Are you sure you want to delete this record?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Ok',
       cancelButtonText: 'Cancel',
-      reverseButtons: true
+      reverseButtons: false
     }).then((result) => {
       if (result.isConfirmed) {
         this.errorMessages = {};
@@ -1481,6 +1673,8 @@ export class ViewFirmPageComponent implements OnInit {
 
     if (selectedAddressTypeId === 0) {
       // Do nothing if the "Select" option is chosen
+      address.AddressTypeID = 0;
+      address.AddressTypeDesc = '';
       return;
     }
 
@@ -2097,9 +2291,18 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   onDateOfApplicationChange(newDate: string) {
+    if (newDate && this.firmDetails.LicenseStatusTypeID == constants.FirmLicenseApplStatusType.Application) {
+      this.dateOfApplication = newDate;
+      this.firmDetails.LicensedDate = newDate;
+      // if date of application is null
+    } else if (!newDate && this.firmDetails.LicenseStatusTypeID == constants.FirmLicenseApplStatusType.Application) {
+      this.dateOfApplication = newDate;
+      this.firmDetails.LicensedDate = newDate;
+    }
     if (newDate && this.firmDetails.AuthorisationStatusTypeID == constants.FirmAuthorizationApplStatusType.Application) {
       this.dateOfApplication = newDate;
       this.firmDetails.AuthorisationDate = newDate;
+      // if date of application is null
     } else if (!newDate && this.firmDetails.AuthorisationStatusTypeID == constants.FirmAuthorizationApplStatusType.Application) {
       this.dateOfApplication = newDate;
       this.firmDetails.AuthorisationDate = newDate;
@@ -2115,12 +2318,10 @@ export class ViewFirmPageComponent implements OnInit {
       return;
     }
 
-    const currentDate = new Date().toISOString(); // Current date in ISO format
-
-    this.firmService.getFirmStatusValidation(this.firmId, numericValue, currentDate, 2)
+    this.firmService.getFirmStatusValidation(this.firmId, numericValue, this.isoString, 2)
       .subscribe(response => {
         if (response.isSuccess && response.response) {
-          const { OldFirmApplStatusTypeDesc, OldFirmApplStatusDate } = response.response;
+          const { OldFirmApplStatusTypeDesc, OldFirmApplStatusDate, IsFirmApplStatusGroupChanged } = response.response;
 
           // Fallback to selected option's description if no status description is returned
           const selectedOption = this.allQFCLicenseStatus.find(option => option.FirmApplStatusTypeID === numericValue);
@@ -2136,6 +2337,32 @@ export class ViewFirmPageComponent implements OnInit {
 
           // Save the current status and date
           this.licenseStatusDates[numericValue] = this.firmDetails.LicensedDate;
+
+          let messagePromises: Promise<string>[] = [];
+          if (this.firmDetails.FirmTypeID !== 2) {
+            if (this.firmDetails.LicensedDate) {
+              messagePromises.push(this.getNotePopupMessage(3917));
+            }
+          } else {
+
+            if (this.firmId !== null) {
+              if (IsFirmApplStatusGroupChanged > 0) {
+                if (IsFirmApplStatusGroupChanged == 1) {
+                  messagePromises.push(this.getNotePopupMessage(3913));
+                } else if (IsFirmApplStatusGroupChanged == 2) {
+                  messagePromises.push(this.getNotePopupMessage(3914));
+                }
+              }
+              if (this.firmDetails.AuthorisationDate) {
+                messagePromises.push(this.getNotePopupMessage(3917));
+              }
+            }
+          }
+          Promise.all(messagePromises).then((messages: string[]) => {
+            if (messages.length > 0) {
+              this.showCombinedPopup(messages);
+            }
+          });
         } else {
           // Handle error or default case
           const selectedOption = this.allQFCLicenseStatus.find(option => option.FirmApplStatusTypeID === numericValue);
@@ -2169,12 +2396,10 @@ export class ViewFirmPageComponent implements OnInit {
       }
     }
 
-    const currentDate = new Date().toISOString(); // Current date in ISO format
-
-    this.firmService.getFirmStatusValidation(this.firmId, numericValue, currentDate, 3)
+    this.firmService.getFirmStatusValidation(this.firmId, numericValue, this.isoString, 3)
       .subscribe(response => {
         if (response.isSuccess && response.response) {
-          const { OldFirmApplStatusTypeDesc, OldFirmApplStatusDate } = response.response;
+          const { OldFirmApplStatusTypeDesc, OldFirmApplStatusDate, IsFirmApplStatusGroupChanged } = response.response;
 
           // Fallback to selected option's description if no status description is returned
           const selectedOption = this.allAuthorisationStatus.find(option => option.FirmApplStatusTypeID === numericValue);
@@ -2192,6 +2417,25 @@ export class ViewFirmPageComponent implements OnInit {
 
           // Save the current status and date
           this.authorisationStatusDates[numericValue] = this.firmDetails.AuthorisationDate;
+          let messagePromises: Promise<string>[] = [];
+          if (this.firmId !== null) {
+            if (IsFirmApplStatusGroupChanged > 0) {
+              if (IsFirmApplStatusGroupChanged == 1) {
+                messagePromises.push(this.getNotePopupMessage(3913));
+              } else if (IsFirmApplStatusGroupChanged == 2) {
+                messagePromises.push(this.getNotePopupMessage(3914));
+              }
+            }
+            if (this.firmDetails.AuthorisationDate) {
+              messagePromises.push(this.getNotePopupMessage(3917));
+            }
+          }
+          // Once all the messages are retrieved, show them in a combined popup
+          Promise.all(messagePromises).then((messages: string[]) => {
+            if (messages.length > 0) {
+              this.showCombinedPopup(messages);
+            }
+          });
         } else {
           // Handle error or default case
           const selectedOption = this.allAuthorisationStatus.find(option => option.FirmApplStatusTypeID === numericValue);
@@ -2250,4 +2494,106 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
 
+  showErrorAlert(messageKey: number) {
+    this.firmService.errorMessages(messageKey).subscribe(
+      (response) => {
+        Swal.fire({
+          title: 'Alert!',
+          text: response.response,
+          icon: 'error',
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false
+        });
+      },
+    );
+  }
+
+  showFirmDetailsSaveSuccessAlert(messageKey: number) {
+    this.firmService.errorMessages(messageKey).subscribe(
+      (response) => {
+        Swal.fire({
+          title: 'Success!',
+          text: response.response,
+          icon: 'success',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false
+        });
+      },
+    );
+  }
+
+  showFirmScopeSaveSuccessAlert(messageKey: number) {
+    this.firmService.errorMessages(messageKey).subscribe(
+      (response) => {
+        const replacedText = response.response.replace('#Tab#', 'Licensed');
+        Swal.fire({
+          title: 'Success!',
+          text: replacedText,
+          icon: 'success',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      },
+    );
+  }
+
+  // Function to return a promise for the note popup message for Authorisation type change
+  getNotePopupMessage(messageKey: number): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.firmService.errorMessages(messageKey).subscribe(
+        (response) => resolve(response.response), // Resolve with the message
+        (error) => reject(error) // Reject in case of error
+      );
+    });
+  }
+
+  // Method to show a SweetAlert with combined messages for Authorisation type change
+  showCombinedPopup(messages: string[]) {
+    Swal.fire({
+      // title: 'Alert!',
+      html: messages.join('<br>'), // Combine the messages with a line break
+    });
+  }
+
+  // Method to show a SweetAlert for QFC Licensed type change
+  showPopupLicenseTypeChange(messages: string[]) {
+    Swal.fire({
+      // title: 'Alert!',
+      html: messages.join('<br>'), // Combine the messages with a line break
+    });
+  }
+
+  // Popups when you click save
+  showApplnStatusValidationPopup(messageKey: number, placeholder: string, onConfirmed?: () => void): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.firmService.errorMessages(messageKey).subscribe(
+        (response) => {
+          const messageWithPlaceholder = response.response.replace("{0}", placeholder);
+          Swal.fire({
+            html: messageWithPlaceholder,
+            showCancelButton: true,
+            confirmButtonText: 'Ok',
+            cancelButtonText: 'Cancel',
+            reverseButtons: false
+          }).then((result) => {
+            if (result.isConfirmed) {
+              if (onConfirmed) {
+                onConfirmed(); // Run additional logic when "Ok" is clicked
+              }
+              resolve(); // Proceed with validation or next step
+            } else {
+              reject(new Error('Cancelled by user')); // Stop the process if "Cancel" is clicked
+            }
+          });
+        },
+        (error) => {
+          console.error('Error fetching error message:', error);
+          reject(error); // Handle error, prevent continuation if the message fails to load
+        }
+      );
+    });
+  }
 }

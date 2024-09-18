@@ -46,6 +46,18 @@ export class FirmService {
     const url = `${this.baseUrl}is_existing_qfc?qfcNum=${qfcNum}&firmId=${firmId}`;
     return this.http.get<any>(url);
   }
+  isFirmNameExist(firmName: string, firmId: number) {
+    const url = `${this.baseUrl}is_exist_firm_name?firmName=${firmName}firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
+  isFirmNameExistForNewFirm(firmName: string) {
+    const url = `${this.baseUrl}is_exist_firm_name?firmName=${firmName}`;
+    return this.http.get<any>(url);
+  }
+  isQFCNumExistForNewFirm(qfcNum:string): Observable<any> {
+    const url = `${this.baseUrl}is_existing_qfc?qfcNum=${qfcNum}`; // NO FIRM ID
+    return this.http.get<any>(url);
+  }
   getFirmAddresses(firmId: number): Observable<any> {
     const url = `${this.baseUrlAddress}get_address_list?objectId=521&objectInstanceId=${firmId}&objectInstanceRevNum=1&sourceObjectID=521&sourceObjectInstanceId=${firmId}&sourceObjectInstanceRevNum=1`
     return this.http.get<any>(url);
