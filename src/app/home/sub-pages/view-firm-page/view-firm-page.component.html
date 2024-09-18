@@ -834,6 +834,7 @@
             <p *ngIf="errorMessages['ScopeAppliedDate']">{{ errorMessages['ScopeAppliedDate'] }}</p>
             <p *ngIf="errorMessages['ScopeEffectiveDateLessThanApplicationDate']">{{ errorMessages['ScopeEffectiveDateLessThanApplicationDate'] }}</p>
             <p *ngIf="errorMessages['ScopeAppliedDateLessThanFirmLicApplDate']">{{ errorMessages['ScopeAppliedDateLessThanFirmLicApplDate'] }}</p>
+            <p *ngIf="errorMessages['ActivityTypeIDCORRECTION']">{{ errorMessages['ActivityTypeIDCORRECTION'] }}</p>
           </div>
           <div class="edit-firm-actions">
             <h2 class="edit-firm-header">
@@ -894,7 +895,7 @@
               <input disabled name="licenseDate" id="licenseDate" type="text"
                 value="{{ ActivityLicensed[0]?.ScopeLicensedDate }}" />
             </div>
-            <div class="input-field" [hidden]="!this.ActivityLicensed[0].ScopeEffectiveDate">
+            <div class="input-field" *ngIf="(ActivityLicensed[0].ScopeRevNum !== null || ActivityLicensed[0].ScopeRevNum !== '') && ActivityLicensed[0].ScopeRevNum > 1">
               <label for="effectiveDate"> Effective Date </label>
               <input [disabled]="!allowEditLicScopeDetails" disabled name="effectiveDate" id="effectiveDate" type="text"
                 #dateInputs [(ngModel)]="ActivityLicensed[0].ScopeEffectiveDate" [ngClass]="{ 'error-border': errorMessages['ScopeEffectiveDate'] || errorMessages['ScopeEffectiveDateLessThanApplicationDate'] }"
@@ -920,7 +921,7 @@
                 value="{{ ActivityLicensed[0]?.ScopeCreatedDate }}" />
             </div>
             <div [hidden]="!allowEditLicScopeDetails" class="vary-scope">
-              <button>Vary Scope</button>
+              <button (click)="varyLicenseScope()">Vary Scope</button>
             </div>
           </div>
           <div *ngIf="!allowEditLicScopeDetails" class="view-prev-version-container">
@@ -957,7 +958,7 @@
                 <td>
                   <div class="input-field">
                     <select name="activities" id="activities" [ngClass]="{
-                      'select-background-edited': allowEditLicScopeDetails
+                      'select-background-edited': allowEditLicScopeDetails,'error-border': activityLic.ActivityTypeID == 0 && errorMessages['ActivityTypeID']
                     }" [(ngModel)]="activityLic.ActivityTypeID">
                       <option value="0">Select</option>
                       <option [value]="licensedActivity.ActivityTypeID"
@@ -971,7 +972,7 @@
                   <div class="input-field">
                     <select disabled [ngClass]="{'select-background-edited': allowEditLicScopeDetails}" name="action"
                       id="action" [(ngModel)]="activityLic.FirmScopeTypeID">
-                      <option [value]="activityLic.FirmScopeTypeDesc"></option>               
+                      <option [value]="activityLic.FirmScopeTypeID">{{activityLic.FirmScopeTypeDesc}}</option>
                     </select>
                   </div>
                 </td>
@@ -979,6 +980,9 @@
                   <button class="rmvActivityLicBtn bi-trash" (click)="removeLicActivity(i)">
                   </button>
                 </td>
+              </tr>
+              <tr class="error-messages" style="color: red">
+                <p *ngIf="activityLic.ActivityTypeID == 0 && errorMessages['ActivityTypeID']">{{ errorMessages['ActivityTypeID'] }}</p>
               </tr>
             </table>
 
@@ -1006,7 +1010,7 @@
             <div class="permitted-activity-body">
               <div class="input-field conditions-textarea">
                 <textarea [disabled]="!allowEditLicScopeDetails"
-                  [(ngModel)]="ActivityLicensed.GeneralConditions">{{ActivityLicensed?.GeneralConditions}}</textarea>
+                  [(ngModel)]="ActivityLicensed[0].GeneralConditions">{{ActivityLicensed?.GeneralConditions}}</textarea>
               </div>
             </div>
           </div>
@@ -1031,13 +1035,13 @@
             <div *ngIf="currentAuthRevisionNumber === lastAuthRevisionNumber" style="display: flex; gap: 10px">
               <div class="btn">
                 <button class="edit-btn" (click)="editAuthScope()">
-                  <i [class]="allowEditAuthScopeDetails ? 'bi bi-pen' : ''"></i>
-                  {{ allowEditAuthScopeDetails ? "Edit" : "Save" }}
+                  <i [class]="!allowEditAuthScopeDetails ? 'bi bi-pen' : ''"></i>
+                  {{ !allowEditAuthScopeDetails ? "Edit" : "Save" }}
                 </button>
               </div>
 
               <div class="btn">
-                <button class="cancel-btn" *ngIf="!allowEditAuthScopeDetails" (click)="cancelEditAuthScope()">
+                <button class="cancel-btn" *ngIf="allowEditAuthScopeDetails" (click)="cancelEditAuthScope()">
                   Cancel
                 </button>
               </div>
@@ -1057,11 +1061,13 @@
               <input disabled name="" id="" type="text" value="{{ ActivityAuth[0]?.ScopeRevNum }}" />
             </div>
             <div class="input-field">
-              <label for="q13AppDate" *ngIf="ActivityAuth[0]?.ScopeRevNum > 1">
+              <!--label is changed based on scoperevnum-->
+              <label for="q13AppDate" *ngIf="ActivityAuth[0]?.ScopeRevNum > 1 && ActivityAuth[0]?.ScopeRevNum">
                 Q13 Application Date for revisions
               </label>
-              <label *ngIf="ActivityAuth[0]?.ScopeRevNum == 1">Date Application</label>
-              <input [disabled]="allowEditAuthScopeDetails" name="q13AppDate" id="q13AppDate" type="text"
+              <!--label is changed based on scoperevnum-->
+              <label *ngIf="ActivityAuth[0]?.ScopeRevNum == 1">Application Date</label>
+              <input [disabled]="!allowEditAuthScopeDetails" name="q13AppDate" id="q13AppDate" type="text" #dateInputs
                 value="{{ ActivityAuth[0]?.ScopeAppliedDate }}" />
             </div>
             <div class="input-field">
@@ -1074,9 +1080,9 @@
               <input disabled name="authorisedDate" id="authorisedDate" type="text"
                 value="{{ ActivityAuth[0]?.ScopeLicensedDate }}" />
             </div>
-            <div class="input-field">
+            <div class="input-field" *ngIf="(ActivityAuth[0].ScopeRevNum !== null || ActivityAuth[0].ScopeRevNum !== '') && ActivityAuth[0].ScopeRevNum > 1">
               <label for="effectiveDate"> Effective Date </label>
-              <input [disabled]="allowEditAuthScopeDetails" name="effectiveDate" id="effectiveDate" type="text"
+              <input [disabled]="!allowEditAuthScopeDetails" name="effectiveDate" id="effectiveDate" type="text" #dateInputs
                 value="{{ ActivityAuth[0]?.ScopeEffectiveDate }}" />
             </div>
             <div class="input-field">
@@ -1095,11 +1101,11 @@
               <label for=""> Creation Date </label>
               <input disabled name="" id="" type="text" value="{{ ActivityAuth[0]?.ScopeCreatedDate }}" />
             </div>
-            <div [hidden]="allowEditAuthScopeDetails" class="vary-scope">
+            <div [hidden]="!allowEditAuthScopeDetails" class="vary-scope">
               <button>Vary Scope</button>
             </div>
           </div>
-          <div *ngIf="allowEditAuthScopeDetails" class="view-prev-version-container">
+          <div *ngIf="!allowEditAuthScopeDetails" class="view-prev-version-container">
             <a class="view-prev-version" (click)="getAuthScopePreviousVersions(firmId,3)">View Previous
               Version</a>
           </div>
@@ -1145,7 +1151,7 @@
             </div>
             <div class="regulated-activities-container">
               <div *ngFor="let activity of categorizedData">
-                <div class="regulated-activities-header" *ngIf="allowEditAuthScopeDetails">
+                <div class="regulated-activities-header" *ngIf="!allowEditAuthScopeDetails">
                   <p>
                     Category :
                     <strong>{{ activity?.ActivityCategoryDesc }}</strong>
@@ -1155,7 +1161,7 @@
                   </p>
                 </div>
                 <!--on edit mode-->
-                <div class="regulated-activities-header" *ngIf="!allowEditAuthScopeDetails">
+                <div class="regulated-activities-header" *ngIf="allowEditAuthScopeDetails">
                   <div class="category-select">
                     <label for="category" style="display: flex; gap: 5px">
                       Category <span style="color: red">*</span>:
@@ -1183,7 +1189,7 @@
                 <!---->
 
                 <!-- Loop through Products under each Activity -->
-                <div *ngIf="allowEditAuthScopeDetails">
+                <div *ngIf="!allowEditAuthScopeDetails">
                   <div *ngFor="let product of activity.products">
                     <!-- Display Main Category (Product) -->
                     <h4>{{ product.mainCategory }}</h4>
@@ -1198,7 +1204,7 @@
                 </div>
 
                 <!--on Edit mode-->
-                <table class="regulated-activity-table" *ngIf="!allowEditAuthScopeDetails">
+                <table class="regulated-activity-table" *ngIf="allowEditAuthScopeDetails">
                   <thead>
                     <tr>
                       <th>Product(s)</th>
@@ -1271,7 +1277,7 @@
         <div class="inputs-field-set" *ngIf="
             (firmDetails?.AuthorisationStatusTypeID > 0 &&
               islamicFinance?.IFinTypeId) ||
-            !allowEditAuthScopeDetails
+            allowEditAuthScopeDetails
           " [ngClass]="{ collapsed: isCollapsed['islamicFinanceSection'] }">
           <div class="edit-firm-actions collapse-container">
             <h2 class="edit-firm-header">Islamic Finance</h2>
@@ -1280,13 +1286,13 @@
             </button>
           </div>
           <div class="edit-firms-inputs">
-            <div class="input-field" *ngIf="allowEditAuthScopeDetails">
+            <div class="input-field" *ngIf="!allowEditAuthScopeDetails">
               <label for="isIslamicFinanceExist"> Islamic Finance </label>
               <input disabled name="isIslamicFinanceExist" id="isIslamicFinanceExist" type="text"
                 [value]="islamicFinance?.IFinTypeId !== null ? 'Yes' : 'No'" />
             </div>
             <!-- or -->
-            <div class="input-field" *ngIf="!allowEditAuthScopeDetails">
+            <div class="input-field" *ngIf="allowEditAuthScopeDetails">
               <div style="display: flex; gap: 15px">
                 <label for="isIslamicFinanceExist"> Islamic Finance </label>
                 <input style="width: 15px" type="checkbox" name="isIslamicFinanceExist" id="isIslamicFinanceExist"
@@ -1296,9 +1302,9 @@
             <div class="input-field">
               <label for="islamicFinanceType"> Type </label>
               <select [disabled]="
-                  !isIslamicFinanceChecked || allowEditAuthScopeDetails
+                  !isIslamicFinanceChecked || !allowEditAuthScopeDetails
                 " name="islamicFinanceType" id="islamicFinanceType" [ngClass]="{
-                  'select-background-edited': !allowEditAuthScopeDetails
+                  'select-background-edited': allowEditAuthScopeDetails
                 }" [(ngModel)]="islamicFinance.IFinTypeId">
                 <option value="0">Select</option>
                 <option value="1">Islamic Institution</option>
@@ -1309,7 +1315,7 @@
             <div class="input-field endorsement">
               <label for="endorsement"> Endorsement </label>
               <textarea [disabled]="
-                  !isIslamicFinanceChecked || allowEditAuthScopeDetails
+                  !isIslamicFinanceChecked || !allowEditAuthScopeDetails
                 " name="islamicEndorsement" id="endorsement" [(ngModel)]="islamicFinance.Endorsement"></textarea>
             </div>
             <div class="input-field">
@@ -1336,9 +1342,9 @@
           <div class="edit-firms-inputs">
             <div class="input-field">
               <label for="prudentialCategory"> Prudential Category </label>
-              <select [disabled]="allowEditAuthScopeDetails" name="prudentialCategory" id="prudentialCategory"
+              <select [disabled]="!allowEditAuthScopeDetails" name="prudentialCategory" id="prudentialCategory"
                 [(ngModel)]="ActivityAuth[0].PrudentialCategoryTypeID" [ngClass]="{
-                  'select-background-edited': !allowEditAuthScopeDetails
+                  'select-background-edited': allowEditAuthScopeDetails
                 }">
                 <option *ngFor="let option of allPrudentialCategoryTypes" [value]="option.PrudentialCategoryTypeID">
                   {{ option?.PrudentialCategoryTypeDesc }}
@@ -1349,9 +1355,9 @@
               <label for="authorisationCategory">
                 Authorisation Category
               </label>
-              <select [disabled]="allowEditAuthScopeDetails" name="prudentialCategory" id="prudentialCategory"
+              <select [disabled]="!allowEditAuthScopeDetails" name="prudentialCategory" id="prudentialCategory"
                 [(ngModel)]="ActivityAuth[0].AuthorisationCategoryTypeID" [ngClass]="{
-                  'select-background-edited': !allowEditAuthScopeDetails
+                  'select-background-edited': allowEditAuthScopeDetails
                 }">
                 <option *ngFor="let option of allAuthorisationCategoryTypes"
                   [value]="option?.AuthorisationCategoryTypeID">
@@ -1360,9 +1366,9 @@
               </select>
             </div>
             <div class="input-field">
-              <label for="effectiveDate"> Effective Date </label>
-              <input [disabled]="allowEditAuthScopeDetails" name="effectiveDate" id="effectiveDate" type="text"
-                #dateInputs value="{{ ActivityAuth[0]?.PrudentialCategoryEffectiveDate }}" />
+              <label for="effectiveDate"> Effective Date <span *ngIf="allowEditAuthScopeDetails" style="color:red">*</span></label>
+              <input [disabled]="!allowEditAuthScopeDetails" name="effectiveDate" id="effectiveDate" type="text" #dateInputs
+                 value="{{ ActivityAuth[0]?.PrudentialCategoryEffectiveDate }}" />
             </div>
             <div class="input-field">
               <label for="lastModifiedBy"> Last Modified By </label>
@@ -1375,7 +1381,7 @@
                 value="{{ ActivityAuth[0]?.PrudentialCategoryLastModifiedDate }}" />
             </div>
 
-            <table class="prudentialTable" [hidden]="!allowEditAuthScopeDetails">
+            <table class="prudentialTable" [hidden]="allowEditAuthScopeDetails">
               <thead>
                 <tr>
                   <th>Prudential Category</th>
@@ -1413,10 +1419,10 @@
           </div>
           <div class="edit-firms-inputs">
             <div class="input-field">
-              <label for="prudentialReturnType"> Prudential Return Type </label>
-              <select [disabled]="allowEditAuthScopeDetails" [(ngModel)]="ActivityAuth[0].SectorTypeID"
+              <label for="prudentialReturnType"> Prudential Return Type <span *ngIf="allowEditAuthScopeDetails" style="color:red">*</span></label>
+              <select [disabled]="!allowEditAuthScopeDetails" [(ngModel)]="ActivityAuth[0].SectorTypeID"
                 name="prudentialReturnType" id="prudentialReturnType" [ngClass]="{
-                  'select-background-edited': !allowEditAuthScopeDetails
+                  'select-background-edited': allowEditAuthScopeDetails
                 }">
                 <option *ngFor="let PrudReturnTypes of prudReturnTypesDropdown" [value]="PrudReturnTypes.SectorTypeID">
                   {{ PrudReturnTypes?.SectorTypeDesc }}
@@ -1424,9 +1430,9 @@
               </select>
             </div>
             <div class="input-field">
-              <label for="effectiveDate"> Effective Date </label>
-              <input [disabled]="allowEditAuthScopeDetails" name="effectiveDate" id="effectiveDate" type="text"
-                #dateInputs value="{{ ActivityAuth[0]?.SectorEffectiveDate }}" />
+              <label for="effectiveDate"> Effective Date <span *ngIf="allowEditAuthScopeDetails" style="color:red">*</span></label>
+              <input [disabled]="!allowEditAuthScopeDetails" name="effectiveDate" id="effectiveDate" type="text" #dateInputs
+                 value="{{ ActivityAuth[0]?.SectorEffectiveDate }}" />
             </div>
             <div class="input-field">
               <label for="lastModifiedBy"> Last Modified By </label>
@@ -1439,7 +1445,7 @@
                 value="{{ ActivityAuth[0]?.SectorLastModifiedDate }}" />
             </div>
 
-            <table class="prudentialTable" [hidden]="!allowEditAuthScopeDetails">
+            <table class="prudentialTable" [hidden]="allowEditAuthScopeDetails">
               <thead>
                 <tr>
                   <th>Prudential Return Type</th>
