@@ -7,7 +7,10 @@ import { map, switchMap } from 'rxjs/operators';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
 
-
+enum EntityType {
+  UBO_Corporate = 8,
+  UBO_Individual = 9,
+}
 
 @Component({
   selector: 'app-view-firm-page',
@@ -82,6 +85,7 @@ export class ViewFirmPageComponent implements OnInit {
   FIRMAuditors: any[] = [];
   FIRMContacts: any[] = [];
   FIRMControllers: any[] = [];
+  FIRMControllersIndividual: any[] = [];
   RegisteredFund: any[] = [];
   FIRMRA: any[] = [];
   FirmAdminFees: any[] = [];
@@ -150,6 +154,10 @@ export class ViewFirmPageComponent implements OnInit {
   invalidAddress: boolean;
   invalidActivity: boolean;
 
+  //Contact Popup 
+  isPopupVisible: boolean = false;
+  isEditable: boolean = false; // Controls the readonly state of the input fields
+  selectedContact: any = null;
   /* current date */
   now = new Date();
   isoString = this.now.toISOString();
@@ -282,6 +290,9 @@ export class ViewFirmPageComponent implements OnInit {
     }
     if (tabId == 'Controllers' && this.FIRMControllers.length === 0) {
       this.loadControllers();
+    }
+    if (tabId == 'Controllers' && this.FIRMControllersIndividual.length === 0) {
+      this.loadControllersIndividual();
     }
     if (tabId == 'SPRegFunds' && this.RegisteredFund.length === 0) {
       this.loadRegisteredFund();
@@ -1181,17 +1192,96 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadControllers() {
+
+  onRowClick(contact: any): void {
+    this.isPopupVisible = true;
+    
+    // Pass all required arguments to the getContactDetails method
+    this.firmService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
+      data => {
+        this.selectedContact = data.response; // Set the selected contact details
+        // Show the popup
+      },
+      error => {
+        console.error('Error fetching contact details', error);
+      }
+    );
+}
+
+  closeContactPopup() {
+    this.isPopupVisible = false;
+  }
+
+  saveContactPopupChanges(): void {
+    // Implement your save logic here (API call to save updated contact details)
+    console.log('Saving contact changes:', this.selectedContact);
+    // After saving, you might want to close the popup and refresh the data
+    this.closeContactPopup();
+  }
+
+  enableEditing() {
+    this.isEditable = true; 
+  }
+
+  UpdateContactPopupChange() {
+    
+    this.closeContactPopup();
+  }
+  // loadControllers() {
+  //   this.firmService.getFIRMControllers(this.firmId).subscribe(
+  //     data => {
+  //       this.FIRMControllers = data.response;
+  //       console.log('Firm FIRM Controllers details:', this.FIRMControllers);
+  //     },
+  //     error => {
+  //       console.error('Error fetching firm controllers', error);
+  //     }
+  //   );
+  // }
+  loadControllers(): void {
     this.firmService.getFIRMControllers(this.firmId).subscribe(
       data => {
-        this.FIRMControllers = data.response;
-        console.log('Firm FIRM Controllers details:', this.FIRMControllers);
+        if (data && Array.isArray(data.response)) {
+          this.FIRMControllers = data.response.filter(controller =>
+            [
+              2, 
+              6, 
+              10, 
+              11 
+            ].includes(controller.EntityTypeID)
+          );
+          console.log('Filtered Firm FIRM Controllers details:', this.FIRMControllers);
+        } else {
+          console.error('Invalid data structure:', data);
+          this.FIRMControllers = []; 
+        }
       },
       error => {
         console.error('Error fetching firm controllers', error);
       }
     );
   }
+
+  loadControllersIndividual(): void {
+    this.firmService.getFIRMControllers(this.firmId).subscribe(
+      (data) => {
+        console.log('Raw API Data:', data); 
+        if (Array.isArray(data.response)) {
+          this.FIRMControllersIndividual = data.response.filter(controller =>
+            [8, 9].includes(controller.EntityTypeID)
+          );
+        } else {
+          console.error('Data is not an array:', data);
+          this.FIRMControllersIndividual = []; 
+        }
+        console.log('Filtered Controllers:', this.FIRMControllersIndividual);
+      },
+      (error) => {
+        console.error('Error fetching firm controllers', error);
+      }
+    );
+  }
+  
   loadAssiRA() {
     this.firmService.getFIRMUsersRAFunctions(this.firmId, this.ASSILevel).subscribe(
       data => {

@@ -215,6 +215,10 @@ export class FirmService {
     const url = `${this.baseUrlContact}get_all_contact_details?firmId=${firmId}`;  // Construct full URL https://localhost:7091/api/Contact/get_all_contact_details?firmId=66
     return this.http.get<any>(url);
   }
+  getContactDetails(firmId: number, contactId: number, contactAssId: number): Observable<any> {
+    const url = `${this.baseUrlContact}get_contact_details_by_contactId?firmId=${firmId}&contactId=${contactId}&contactAssId=${contactAssId}`;
+    return this.http.get<any>(url);
+}
   getFIRMUsersRAFunctions(firmId: number, assiLevel: number): Observable<any> {
     const url = `${this.baseUrl}get_firm_user?firmId=${firmId}`;
     return this.http.get<any>(url);

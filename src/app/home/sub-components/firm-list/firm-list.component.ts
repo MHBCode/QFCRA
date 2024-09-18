@@ -1,4 +1,3 @@
-// src/app/home/sub-components/firm-list/firm-list.component.ts
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirmService } from 'src/app/ngServices/firm.service';
@@ -10,13 +9,21 @@ import { FirmService } from 'src/app/ngServices/firm.service';
 })
 export class FirmListComponent implements OnInit {
 
-  @Input() listCount: number = 50;
-
+  @Input() listCount: number = 5;
   @Input() firms: any[] = [];
-
   @Input() customClass: string = '';
 
-  v: any[] = this.firms.slice(5);
+  isExpanded: { [key: string]: boolean } = {};
+  isLoading: boolean = true;
+  currentPage: number = 1;
+  pageSize: number = 5;
+  totalPages: number = 0;
+  totalRows: number = 0;
+  paginatedFirms: any[] = [];
+  startRow: number = 0;
+  endRow: number = 0;
+  showTitle: boolean = true;
+
   constructor(
     private router: Router,
     private firmService: FirmService
@@ -24,18 +31,45 @@ export class FirmListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFirms();
+    this.checkRoute();
   }
 
   loadFirms(): void {
     this.firmService.getAssignedFirms(10044).subscribe(
       data => {
         this.firms = data.response;
-        console.log(this.firms);
+        this.totalRows = this.firms.length;
+        this.totalPages = Math.ceil(this.totalRows / this.pageSize);
+        this.updatePagination();
+        this.isLoading = false;
       },
       error => {
         console.error('Error fetching firms', error);
+        this.isLoading = false;
       }
     );
+  }
+
+  updatePagination(): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = Math.min(startIndex + this.pageSize, this.totalRows);
+    this.paginatedFirms = this.firms.slice(startIndex, endIndex);
+    this.startRow = startIndex + 1;
+    this.endRow = endIndex;
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
   }
 
   viewFirm(firmId: number) {
@@ -50,4 +84,10 @@ export class FirmListComponent implements OnInit {
   goToAllFirms() {
     this.router.navigate(['home/firms-page']);
   }
+
+  checkRoute(): void {
+    const currentUrl = this.router.url;
+    this.showTitle = !currentUrl.includes('home/firms-page');
+  }
+
 }

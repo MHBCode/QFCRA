@@ -1,29 +1,30 @@
 .firmList-wrapper {
+  margin-top: 0px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
   width: 100%;
 }
+
 .table {
   display: flex;
   flex-direction: column;
   position: relative;
-  justify-content: flex-start;
-  align-items: flex-end;
-  padding: 1% 5px;
-  height: 95%;
+  padding: 5px;
   background: white;
-  border-radius: 15px;
-  width: 98%;
+  border-radius: 15px; /* Radius for the table container */
+  width: 100%;
   box-shadow: 8px 8px 43px rgba(8, 50, 79, 0.1);
+  overflow: hidden;
 }
+
 .tableTitle {
   display: flex;
-  align-items: center;
   width: 100%;
   justify-content: flex-start;
+  background-color: rgba(253, 216, 216, 0.24);
 }
+
 .tableTitle h3 {
   cursor: pointer;
   color: #222529;
@@ -31,62 +32,53 @@
   font-weight: 500;
   margin: 5px;
 }
+
 .tableTitle h3:hover {
   color: #a51e36;
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
+  border-radius: 7px; /* Apply border-radius to the table */
+  overflow: hidden; /* Ensure rounded corners are visible */
 }
 
 thead {
-  background-color: rgba(243.31, 243.31, 243.31, 0.24);
-}
-
-th,
-td {
-  padding: 8px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
+  background-color: rgba(253, 216, 216, 0.24);
+  border-bottom: 2px solid #a51e36; /* Border under the header */
 }
 
 th {
-  color: #333333;
+  color: #7e0000;
   font-size: 0.75em;
-  font-weight: 500;
-  line-height: 18.97px;
-  letter-spacing: 0.09px;
-  word-wrap: break-word;
-  max-width: 80px;
+  font-weight: bold;
+  padding: 10px; /* Add padding for better spacing */
+  text-align: left;
+  border-right: 1px solid #ddd; /* Border between columns */
 }
 
 td {
-  height: 40px;
   color: #333333;
   font-size: 0.75em;
-  font-weight: 400;
-  line-height: 18.97px;
-  letter-spacing: 0.09px;
-  word-wrap: break-word;
   text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 80px;
-  text-wrap: nowrap;
-}
-
-.custom-style-firm-page td { //dynamic style for the firm-page-component firms list table
-  max-width: unset;
-  text-wrap: wrap;
-}
-
-.taskDesc {
-  width: 40px;
-}
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-td {
+  max-width: 150px; /* Increased for better readability */
+  padding: 10px; /* Add padding for better spacing */
+  border-right: 1px solid #ddd; /* Border between columns */
   cursor: pointer;
+}
+
+tbody {
+  background-color: #ffecf0; /* Light background for rows */
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2; /* Alternating row color */
+}
+
+tr:hover {
+  background-color: #e0e0e0; /* Highlight row on hover */
 }
 
 .table-responsive {
@@ -97,5 +89,111 @@ td {
 
 .table-responsive table {
   width: 100%;
-  min-width: 900px;
+  min-width: 700px;
+}
+
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #333;
+
+  button {
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin: 0 5px;
+    font-size: 0.9em;
+
+    &:disabled {
+      background-color: #e9e9e9;
+      cursor: not-allowed;
+    }
+
+    span {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      font-size: 1.2em;
+      line-height: 1;
+      text-align: center;
+    }
+  }
+
+  span {
+    margin: 0 10px;
+  }
+}
+
+.bold-text {
+  font-weight: bold;
+}
+
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  // background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loader {
+  border: 8px solid #f3f3f3; /* Light grey */
+  border-top: 8px solid #a00202; /* Blue */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Style for the expandable cell */
+.expandable-text-container {
+  position: relative;
+  display: inline-block;
+  max-width: 125px; /* Adjust based on your layout */
+}
+
+.expandable-text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  max-width: 300px; /* Show only up to 30 characters initially */
+  cursor: pointer;
+}
+
+.expandable-text:hover {
+  max-width: none; /* Expand to full width on hover */
+  white-space: normal; /* Allow text to wrap */
+  text-overflow: clip; /* Remove ellipsis when expanded */
+}
+
+/* Adding an ellipsis before expanding */
+.expandable-text::after {
+  content: '. . .';
+  position: absolute;
+  right: 0;
+  padding-left: 5px;
+  // background: white;
+}
+
+.expandable-text:hover::after {
+  content: ''; /* Remove the ellipsis when the text is expanded */
 }
