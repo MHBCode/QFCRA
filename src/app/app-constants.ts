@@ -164,3 +164,17 @@ export enum InvoicesMessages
     INVOICES_MESSGE=10524,
     INVOICE_CONFIRM=10525,
 }
+
+export enum EntityType
+{
+    Firm = 1,
+    ParentEntity = 2,
+    AuditingFirm = 3,
+    HomeStateRegulator = 5,
+    CorporateController = 6,
+    SigShareholder = 7,
+    UBO_Corporate=8,
+    UBO_Individual=9,
+   	Head_Office=10,
+    IndividualController =11
+}

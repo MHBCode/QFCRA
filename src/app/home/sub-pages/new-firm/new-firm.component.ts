@@ -176,7 +176,7 @@ export class NewFirmComponent implements OnInit {
     if (this.FirmDetails.QFCNum) {
       this.FirmDetails.QFCNum = this.padNumber(this.FirmDetails.QFCNum);
     }
-
+0
     if (this.selectedFirmTypeID === 2 && this.applicationDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Licensed) {
       if (this.FirmDetails.QFCNum == null || this.FirmDetails.QFCNum === '') {
         this.getErrorMessages('QFCNum', constants.Firm_CoreDetails_Messages.ENTER_QFCNUMBER);
@@ -580,8 +580,6 @@ export class NewFirmComponent implements OnInit {
     }
   }
 
-
-
   checkCanAddNewAddress() {
     const totalAddressTypes = this.allAddressTypes.length;
 
@@ -629,8 +627,6 @@ export class NewFirmComponent implements OnInit {
     this.checkCanAddNewAddress();
   }
 
-
-
   removeAddress(index: number) {
     if (this.addedAddresses.length > 1) {
       Swal.fire({
@@ -671,7 +667,6 @@ export class NewFirmComponent implements OnInit {
       currentAddress.isFieldsDisabled = false;
     }
   }
-
 
   // Updated to accept the target address to populate fields for
   populateNewAddressFields(targetAddress: any, sourceAddress: any) {
@@ -756,7 +751,6 @@ export class NewFirmComponent implements OnInit {
     return regex.test(value);
   }
 
-
   isQFCNumExist(qfcNum: string): Promise<boolean> {
     return this.firmService.isQFCNumExistForNewFirm(qfcNum).toPromise().then(response => {
       return response.response.Column1 === 1;
@@ -768,7 +762,6 @@ export class NewFirmComponent implements OnInit {
       return response.response.Column1 === 1;
     });
   }
-
 
   formatDateToCustomFormat(dateString: string): string {
     const date = new Date(dateString);

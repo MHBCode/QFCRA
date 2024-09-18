@@ -2,15 +2,10 @@ import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, QueryList, Ren
 import { Router, ActivatedRoute } from '@angular/router';  // Import ActivatedRoute
 import { FirmService } from 'src/app/ngServices/firm.service';  // Import FirmService
 import flatpickr from 'flatpickr';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
-
-enum EntityType {
-  UBO_Corporate = 8,
-  UBO_Individual = 9,
-}
 
 @Component({
   selector: 'app-view-firm-page',
@@ -1141,6 +1136,8 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
+  
+
   // Method to load firm details
   loadFirmDetails(firmId: number) {
     this.firmService.getFirmDetails(firmId).subscribe(
@@ -1244,10 +1241,10 @@ export class ViewFirmPageComponent implements OnInit {
         if (data && Array.isArray(data.response)) {
           this.FIRMControllers = data.response.filter(controller =>
             [
-              2, 
-              6, 
-              10, 
-              11 
+              constants.EntityType.ParentEntity, 
+              constants.EntityType.CorporateController,
+              constants.EntityType.Head_Office, 
+              constants.EntityType.IndividualController, 
             ].includes(controller.EntityTypeID)
           );
           console.log('Filtered Firm FIRM Controllers details:', this.FIRMControllers);
@@ -1268,7 +1265,7 @@ export class ViewFirmPageComponent implements OnInit {
         console.log('Raw API Data:', data); 
         if (Array.isArray(data.response)) {
           this.FIRMControllersIndividual = data.response.filter(controller =>
-            [8, 9].includes(controller.EntityTypeID)
+            [constants.EntityType.UBO_Corporate, constants.EntityType.UBO_Individual].includes(controller.EntityTypeID)
           );
         } else {
           console.error('Data is not an array:', data);
