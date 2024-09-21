@@ -53,6 +53,7 @@ export class UserAccessComponent implements OnInit {
     });
   }
 
+
   loadUserData() {
     this.usersService.getAllUsersData().subscribe(data => {
       this.userData = data.response; // Store the user data

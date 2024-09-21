@@ -920,7 +920,7 @@
               <input disabled name="createdDate" id="createdDate" type="text"
                 value="{{ ActivityLicensed[0]?.ScopeCreatedDate }}" />
             </div>
-            <div [hidden]="!allowEditLicScopeDetails" class="vary-scope">
+            <div *ngIf="allowEditLicScopeDetails && showVaryBtn" class="vary-scope">
               <button (click)="varyLicenseScope()">Vary Scope</button>
             </div>
           </div>
@@ -970,7 +970,7 @@
                 </td>
                 <td>
                   <div class="input-field">
-                    <select disabled [ngClass]="{'select-background-edited': allowEditLicScopeDetails}" name="action"
+                    <select [disabled]="!((this.ActivityLicensed[0].ScopeRevNum > 1) && !(isNullOrEmpty(this.ActivityLicensed[0].ScopeRevNum)))" [ngClass]="{'select-background-edited': allowEditLicScopeDetails}" name="action"
                       id="action" [(ngModel)]="activityLic.FirmScopeTypeID">
                       <option [value]="activityLic.FirmScopeTypeID">{{activityLic.FirmScopeTypeDesc}}</option>
                     </select>
@@ -2612,7 +2612,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeFYearHistory()">
+    <button class="subbutton" (click)="closeFYearHistory()">
       Close
     </button>
   </div>
@@ -2647,7 +2647,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeInactiveUsers()">
+    <button class="subbutton" (click)="closeInactiveUsers()">
       Close
     </button>
   </div>
@@ -2685,7 +2685,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeAccountingStandard()">
+    <button class="subbutton" (click)="closeAccountingStandard()">
       Close
     </button>
   </div>
@@ -2718,7 +2718,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closePrevFirmName()">
+    <button class="subbutton" (click)="closePrevFirmName()">
       Close
     </button>
   </div>
@@ -2785,7 +2785,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeApplicationDetails()">
+    <button class="subbutton" (click)="closeApplicationDetails()">
       Close
     </button>
   </div>
@@ -2805,10 +2805,10 @@
     <small style="color: red" *ngIf="fileError">{{ fileError }}</small>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%; margin-right: 5px" class="subbutton" (click)="confirmUpload()">
+    <button style="margin-right: 5px" class="subbutton" (click)="confirmUpload()">
       Ok
     </button>
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeSelectDocument()">
+    <button class="subbutton" (click)="closeSelectDocument()">
       Close
     </button>
   </div>
@@ -2848,7 +2848,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeAddressTypeHistory()">
+    <button class="subbutton" (click)="closeAddressTypeHistory()">
       Close
     </button>
   </div>
