@@ -1,0 +1,23 @@
+<div class="container">
+  <div class="menu-container">
+    <ul class="nav">
+      <li><a routerLink='/home/view-individual-status-change/individual' routerLinkActive="active">Individual</a></li>
+      <li><a routerLink='/home/view-individual-status-change/recommendation' routerLinkActive="active">Recommendation</a></li>
+      <li><a routerLink='/home/view-individual-status-change/tracking' routerLinkActive="active">Tracking</a></li>
+      <li><a routerLink='/home/view-individual-status-change/docs' routerLinkActive="active">Docs</a></li>
+      <li><a routerLink='/home/view-individual-status-change/reports' routerLinkActive="active">Reports</a></li>
+    </ul>
+  </div>
+  <a class="history">Back To History</a>
+</div>
+
+<div class="btn" style="display: none;">
+  <button class="edit-btn">
+      <i class="bi bi-pen"></i> 
+      Edit
+  </button>
+</div>
+
+
+
+<router-outlet></router-outlet>
