@@ -1,0 +1,358 @@
+<div class="brid-crump">
+    <div class="text">
+        <span> Home ></span> New Firm
+    </div>
+    <div class="edit-btn">
+
+    </div>
+</div>
+<section class="edit-firm-section">
+    <!--Firm Details Section-->
+    <div class="inputs-field-set">
+        <!--Error messages for firm details-->
+        <div class="error-messages" style="color: red">
+            <p *ngIf="errorMessages['FirmName']">{{ errorMessages['FirmName'] }}</p>
+            <p *ngIf="errorMessages['QFCNum']">{{ errorMessages['QFCNum'] }}</p>
+            <p *ngIf="errorMessages['LegalStatusTypeID']">{{ errorMessages['LegalStatusTypeID'] }}</p>
+            <p *ngIf="errorMessages['LicensedDate']">{{ errorMessages['LicensedDate'] }}</p>
+            <p *ngIf="errorMessages['AuthorisationDate']">{{ errorMessages['AuthorisationDate'] }}</p>
+            <p *ngIf="errorMessages['DateOfApplication']">{{ errorMessages['DateOfApplication'] }}</p>
+        </div>
+        <div class="edit-firm-actions">
+            <h2 class="edit-firm-header">
+                FIRM Details
+            </h2>
+            <div class="edit-btn">
+                <button (click)="createFirm()" class="save-btn">Save</button>
+                <button (click)="cancelFirm()" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+        <div class="edit-firms-inputs">
+            <div class="input-field">
+                <label for="firmName">
+                    Firm Name <span style="color: red;">*</span>
+                </label>
+                <input name="firmName" id="firmName" type="text" [(ngModel)]="FirmDetails.FirmName"
+                    [ngClass]="{'error-border': errorMessages['FirmName']}">
+            </div>
+            <div class="input-field">
+                <label for="QFCNumber">
+                    QFC Number
+                </label>
+                <input name="QFCNumber" id="QFCNumber" type="text" [(ngModel)]="FirmDetails.QFCNum"
+                    [ngClass]="{'error-border': errorMessages['QFCNum']}">
+            </div>
+            <div class="input-field">
+                <label for="code">
+                    Code
+                </label>
+                <input name="code" id="code" type="text" [(ngModel)]="FirmDetails.Code">
+            </div>
+            <div class="input-field">
+                <label for="legalStatus">
+                    Legal Status <span style="color: red;">*</span>
+                </label>
+                <select name="legalStatus" id="legalStatus" [(ngModel)]="FirmDetails.LegalStatusTypeID"
+                    (ngModelChange)="onLegalStatusChange($event)"
+                    [ngClass]="{'error-border': errorMessages['LegalStatusTypeID']}">
+                    <option value="0">Select</option>
+                    <option *ngFor="let option of allLegalStatus" [value]="option.LegalStatusTypeID">
+                        {{ option.LegalStatusTypeDesc }}
+                    </option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label for="qfcTradingName">
+                    QFC Trading Name
+                </label>
+                <input name="qfcTradingName" id="qfcTradingName" type="text" [(ngModel)]="FirmDetails.QFCTradingName">
+            </div>
+            <div class="input-field">
+                <label for="preTradingName">
+                    Prev. Trading Name(s)
+                </label>
+                <input name="preTradingName" id="preTradingName" type="text" [(ngModel)]="FirmDetails.PrevTradingName">
+            </div>
+            <div class="input-field">
+                <label for="placeOfIncorporation">
+                    Place of Incorporation
+                </label>
+                <input name="placeOfIncorporation" id="placeOfIncorporation" type="text"
+                    [(ngModel)]="FirmDetails.PlaceOfIncorporation">
+            </div>
+            <div class="input-field">
+                <label for="homeCountry">
+                    Home Country
+                </label>
+                <select name="homeCountry" id="homeCountry" [(ngModel)]="FirmDetails.PlaceOfIncorporation">
+                    <option value="0">Select</option>
+                    <option *ngFor="let option of allCountries" [value]="option.CountryID">
+                        {{ option?.CountryName }}
+                    </option>
+                </select>
+            </div>
+            <div class="input-field" [hidden]="true">
+                <label for="isDateDifferent">
+                    Is Date of Incorporation different from Date of Licensing or
+                    Authorisation : <span style="color: red">*</span>
+                </label>
+                <div class="radio-wrapper">
+                    <input name="isIncorporationDateDifferent" id="yes" type="radio"
+                        [(ngModel)]="FirmDetails.DifferentIncorporationDate" [value]="true" />
+                    Yes
+                    <input name="isIncorporationDateDifferent" id="no" type="radio"
+                        [(ngModel)]="FirmDetails.DifferentIncorporationDate" [value]="false" />
+                    No
+                </div>
+            </div>
+
+            <ng-container *ngIf="FirmDetails.DifferentIncorporationDate">
+                <div class="input-field">
+                    <label for="incorporationDate"> Incorporation Date </label>
+                    <input name="incorporationDate" id="incorporationDate" type="text" #dateInputs
+                        [(ngModel)]="FirmDetails.IncorporationDate" />
+                </div>
+            </ng-container>
+            <div class="input-field">
+                <label for="financialYear">
+                    Financial Year End
+                </label>
+                <select name="financialYear" id="financialYear" [(ngModel)]="FirmDetails.FinYearEndID">
+                    <option value="0">Select</option>
+                    <option *ngFor="let option of allFinYearEnd" [value]="option.FirmFinYearEndTypeID">
+                        {{ option.FirmFinYearEndTypeDesc }}
+                    </option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label for="financialYearEndEffectiveForm">
+                    Financial Year End Effective Form
+                </label>
+                <input name="financialYearEndEffectiveForm" id="financialYearEndEffectiveForm" type="text" #dateInputs
+                    [(ngModel)]="FirmDetails.FinYearEndEffectiveDate">
+            </div>
+            <div class="input-field">
+                <label for="accountingStandards">
+                    Accounting Standards
+                </label>
+                <select name="accountingStandards" id="accountingStandards" [(ngModel)]="FirmDetails.AccStdID">
+                    <option value="0">Select</option>
+                    <option *ngFor="let option of allFinAccStd" [value]="option.FinAccStdTypeID">
+                        {{ option.FinAccStdTypeDesc }}
+                    </option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label for="accountingStandardsEffectiveForm">
+                    Accounting Standards Effective Form
+                </label>
+                <input name="accountingStandardsEffectiveForm" id="accountingStandardsEffectiveForm" type="text"
+                    #dateInputs [(ngModel)]="FirmDetails.AccStdEffectiveDate">
+            </div>
+            <div class="input-field">
+                <label for="websiteLink">
+                    Website Link
+                </label>
+                <input name="websiteLink" id="websiteLink" type="text" [(ngModel)]="FirmDetails.WebsiteLink">
+            </div>
+        </div>
+
+    </div>
+    <!--Application Details Section-->
+    <div class="inputs-field-set">
+        <div class="edit-firm-actions">
+            <h2 class="edit-firm-header">
+                Application Details
+            </h2>
+            <div class="edit-btn">
+            </div>
+        </div>
+        <div class="edit-firms-inputs">
+            <div class="input-field">
+                <label for="dateOfApplication">
+                    Date of Application
+                </label>
+                <input name="dateOfApplication" id="dateOfApplication" type="text" #dateInputs
+                    [(ngModel)]="applicationDetails.dateOfApplication"
+                    (ngModelChange)=" onDateOfApplicationChange($event)" [ngClass]="{'error-border': errorMessages['DateOfApplication']}">
+            </div>
+            <div class="input-field">
+                <label for="firmApplicationType">
+                    Firm Application Type
+                </label>
+                <select name="firmApplicationType" id="firmApplicationType" [(ngModel)]="selectedFirmTypeID"
+                    (ngModelChange)="onFirmAppTypeChange($event)">
+                    <option *ngFor="let firmType of allFirmTypes" [value]="firmType.FirmApplTypeID">
+                        {{firmType.FirmApplTypeDesc}}</option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label for="qfcLicenseStatus">
+                    QFC License Status
+                </label>
+                <select name="qfcLicenseStatus" id="qfcLicenseStatus"
+                    [(ngModel)]="applicationDetails.LicenseStatusTypeID"
+                    (ngModelChange)="onLicenseStatusChange($event)">
+                    <option *ngFor="let option of allQFCLicenseStatus" [value]="option.FirmApplStatusTypeID">{{
+                        option.FirmApplStatusTypeDesc }}
+                    </option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label for="dateApplication">
+                    {{QFCDateApplicationLabel}}
+                </label>
+                <input name="dateApplication" id="dateApplication" type="text" #dateInputs
+                    [(ngModel)]="applicationDetails.LicensedDate" [ngClass]="{'error-border': errorMessages['LicensedDate']}">
+            </div>
+            <div class="input-field" *ngIf="selectedFirmTypeID === 3">
+                <label for="authorisationStatus">
+                    Authorisation Status
+                </label>
+                <select name="authorisationStatus" id="authorisationStatus"
+                    [(ngModel)]="applicationDetails.AuthorisationStatusTypeID">
+                    <option *ngFor="let option of allAuthorisationStatus" [value]="option.FirmApplStatusTypeID">{{
+                        option.FirmApplStatusTypeDesc}}
+                    </option>
+                </select>
+            </div>
+            <div class="input-field" *ngIf="selectedFirmTypeID === 3">
+                <label for="dateApplication">
+                    Date Application
+                </label>
+                <input name="dateApplication" id="dateApplication" type="text" #dateInputs
+                    [(ngModel)]="applicationDetails.AuthorizationDate" [ngClass]="{'error-border': errorMessages['AuthorisationDate']}">
+            </div>
+        </div>
+    </div>
+    <!--Comments Section-->
+    <div class="inputs-field-set comments" [ngClass]="{ collapsed: isCollapsed['commentsSection'] }">
+        <div class="edit-firm-actions collapse-container">
+            <h2 class="edit-firm-header">Comments</h2>
+            <button class="collapse-button" (click)="toggleCollapse('commentsSection')">
+                {{ isCollapsed["commentsSection"] ? "▲" : "▼" }}
+            </button>
+        </div>
+        <div class="edit-firms-inputs">
+            <div class="input-field">
+                <label for="generalComments">
+                    <strong>General Comments:</strong>
+                </label>
+                <textarea name="generalComments" id="generalComments"
+                    [(ngModel)]="comments.FirmApplicationDataComments"></textarea>
+            </div>
+            <div class="input-field">
+                <label for="publicRegisterComments">
+                    <strong>Public Register Comments:</strong>
+                </label>
+                <textarea name="publicRegisterComments" id="publicRegisterComments"
+                    [(ngModel)]="comments.PublicRegisterComments"></textarea>
+            </div>
+        </div>
+    </div>
+    <!--Addresses Section-->
+    <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['addressesSection']}">
+        <!--Error messages for addresses-->
+        <div class="error-messages" style="color: red">
+            <p *ngIf="errorMessages['AddressTypeID']">{{ errorMessages['AddressTypeID'] }}</p>
+        </div>
+        <div class="edit-firm-actions collapse-container">
+            <h2 class="edit-firm-header">
+                Addresses
+            </h2>
+            <button class="collapse-button" (click)="toggleCollapse('addressesSection')">
+                {{ isCollapsed['addressesSection'] ? '▲' : '▼'}}
+            </button>
+        </div>
+        <div class="add-address-container">
+            <button [disabled]="!canAddNewAddress" *ngIf="!isAllAddressesAdded" (click)="addNewAddress()"
+                [hidden]="isCollapsed['addressesSection']" class="addAddressBtn">Add Address</button>
+        </div>
+        <ng-container *ngFor="let address of addedAddresses; let i = index">
+            <div class="edit-firms-inputs">
+                <div class="del-address-container">
+                    <button *ngIf="addedAddresses.length > 1" (click)="removeAddress(i)"
+                        class="RmvAddressBtn bi-trash"></button>
+                </div>
+                <div class="input-field">
+                    <label for="addressType">
+                        Address Type
+                    </label>
+                    <select [(ngModel)]="address.AddressTypeID" [ngClass]="{
+                  'error-border': errorMessages['AddressTypeID']}" [disabled]="address.isAddressTypeSelected"
+                        (change)="onAddressTypeChange($event,i)">
+                        <option value="0">Select</option>
+                        <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
+                            {{option.AddressTypeDesc}}</option>
+                    </select>
+                </div>
+                <div class="input-field" *ngIf="this.addedAddresses.length > 1">
+                    <label for="sameAsType">
+                        Same As Type
+                    </label>
+                    <select [(ngModel)]="address.SameAsTypeID" name="sameAsType" id="sameAsType"
+                        (ngModelChange)="onSameAsTypeChange($event,i)">
+                        <option value="0">Select</option>
+                        <option *ngFor="let type of getAvailableSameAsTypeOptions(i)" [value]="type.AddressTypeID">
+                            {{type.AddressTypeDesc}}</option>
+                    </select>
+                </div>
+                <div class="input-field">
+                    <label for="addressLine1"> Address Line 1 </label>
+                    <input type="text" name="addressLine1" id="addressLine1" [(ngModel)]="address.AddressLine1"
+                        [disabled]="address.isFieldsDisabled" />
+                </div>
+                <div class="input-field">
+                    <label for="addressLine2"> Address Line 2 </label>
+                    <input name="addressLine2" id="addressLine2" type="text" [(ngModel)]="address.AddressLine2"
+                        [disabled]="address.isFieldsDisabled" />
+                </div>
+                <div class="input-field">
+                    <label for="addressLine3"> Address Line 3 </label>
+                    <input name="addressLine3" id="addressLine3" type="text" [(ngModel)]="address.AddressLine3"
+                        [disabled]="address.isFieldsDisabled" />
+                </div>
+                <div class="input-field">
+                    <label for="addressLine4"> Address Line 4 </label>
+                    <input name="addressLine4" id="addressLine4" type="text" [(ngModel)]="address.AddressLine4"
+                        [disabled]="address.isFieldsDisabled" />
+                </div>
+                <div class="input-field">
+                    <label for="city"> City </label>
+                    <input name="city" id="city" type="text" [(ngModel)]="address.City"
+                        [disabled]="address.isFieldsDisabled" />
+                </div>
+                <div class="input-field">
+                    <label for="state"> state/province </label>
+                    <input name="state" id="state" type="text" [(ngModel)]="address.Province"
+                        [disabled]="address.isFieldsDisabled" />
+                </div>
+                <div class="input-field">
+                    <label for="country"> Country </label>
+                    <select [(ngModel)]="address.CountryID" [disabled]="address.isFieldsDisabled">
+                        <option value="0">Select</option>
+                        <option *ngFor="let option of allCountries" [value]="option.CountryID">
+                            {{ option?.CountryName }}
+                        </option>
+                    </select>
+                </div>
+                <div class="input-field">
+                    <label for="zip"> Zip/Postal Code </label>
+                    <input name="zip" id="zip" type="text" [(ngModel)]="address.PostalCode"
+                        [disabled]="address.isFieldsDisabled" />
+                </div>
+                <div class="input-field">
+                    <label for="phone"> Phone </label>
+                    <input name="phone" id="phone" type="text" [(ngModel)]="address.PhoneNum"
+                        [disabled]="address.isFieldsDisabled" />
+                </div>
+                <div class="input-field">
+                    <label for="fax"> Fax </label>
+                    <input name="fax" id="fax" type="text" [(ngModel)]="address.FaxNum"
+                        [disabled]="address.isFieldsDisabled" />
+                </div>
+            </div>
+            <hr *ngIf="i < addedAddresses.length - 1 && !isCollapsed['addressesSection']">
+        </ng-container>
+    </div>
+</section>

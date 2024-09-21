@@ -1,0 +1,21 @@
+<div class="chart">
+    <div class="chartTitle">
+      <h3>AI by Functions</h3>
+    </div>
+    <div class="numbers">
+      <img src="../../../../assets/images/number.png">
+    </div>
+    <div class="chart-bars">
+      <div *ngFor="let aiFunction of AIFunction.slice(0,8)" class="chart-1bar">
+        <div class="bar" [id]="formatId(aiFunction.Controlled_Function)">
+          <div class="countOfBar">
+            {{ aiFunction.Total_AI }}
+          </div>
+        </div>
+        <div class="barTitle">
+          {{ aiFunction.Controlled_Function }}
+        </div>
+      </div>
+    </div>
+  </div>
+  

@@ -1,0 +1,64 @@
+<div *ngIf="isLoading" class="loader-overlay">
+  <div class="loader"></div>
+</div>
+<div class="firmList-wrapper">
+  <div class="table">
+    <div *ngIf="showTitle" (click)="goToAllFirms()" class="tableTitle">
+      <h3>Firm List</h3>
+    </div>
+    <div class="table-responsive">
+      <table [ngClass]="customClass">
+        <thead>
+          <tr>
+            <th>QFC Number</th>
+            <th>Firm Name</th>
+            <th>Legal Status</th>
+            <th>License Status</th>
+            <th>Authorization Status</th>
+            <th>Sector</th>
+            <th>Authorization Category</th>
+            <th>Supervision Category</th>
+            <th>Prudential Category</th>
+            <th>Home Country</th>
+            <th>Supervisor - Supervision</th>
+            <th>Supervisor - AML</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of paginatedFirms" (click)="viewFirm(item.FirmID)">
+            <td class="bold-text">{{ item.QFCNum }}</td>
+            <td>{{ item.FirmName }}</td>
+            <td>{{ item.LegalStatusTypeDesc }}</td>
+            <td>{{ item.LicenseStatusTypeDesc }}</td>
+            <td>{{ item.AuthorisationStatusTypeDesc }}</td>
+            <td>{{ item.SectorTypeShortDesc }}</td>
+            <td>{{ item.AuthorisationCategoryTypeDesc }}</td>
+            <td>{{ item.SupervisionCategory }}</td>
+            <td>{{ item.PrudentialCategoryTypeDesc }}</td>
+            <td>{{ item.Country }}</td>
+            <td>
+              <div class="expandable-text-container">
+                <span class="expandable-text">{{ item.Supervisor }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="expandable-text-container">
+                <span class="expandable-text">{{ item.Supervisor_AML }}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <button (click)="previousPage()" [disabled]="currentPage === 1">
+        <span>&lt;</span>
+      </button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+        <span>&gt;</span>
+      </button>
+      <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,101 @@
+<!-- <div class="chart">
+    <div class="chartTitle">
+        <h3>Firm by sector </h3>
+    </div>
+    <div class="chart-bars">
+        <div class="numbers">
+            <img src="../../../../assets/images/numbers.PNG">
+        </div>
+        <div class="chart-1bar">
+            <div class="bar" id="bank">
+                <div class="countOfBar">
+                    10
+                </div> 
+            </div>
+            <div class="barTitle">
+                Bank
+            </div>
+        </div>
+        <div class="chart-1bar">
+            <div class="bar" id="BankIslamic">
+                <div class="countOfBar">
+                    70
+                </div>
+            </div>
+            <div class="barTitle">
+                Bank (Islamic) 
+            </div>
+        </div>
+        <div class="chart-1bar">
+            <div class="bar" id="InsuranceIntermediary">
+                <div class="countOfBar">
+                    80
+                </div>
+            </div>
+            <div class="barTitle">
+                Insurance Intermediary
+            </div>
+        </div>
+        <div class="chart-1bar">
+            <div class="bar" id="Insurer">
+                <div class="countOfBar">
+                    140
+                </div>
+            </div>
+            <div class="barTitle">
+                Insurer
+            </div>
+        </div>
+        <div class="chart-1bar">
+            <div class="bar" id="InsurerIslamic">
+                <div class="countOfBar">
+                   90
+                </div>
+            </div>
+            <div class="barTitle">
+                Insurer (Islamic)
+            </div>
+        </div>
+        <div class="chart-1bar">
+            <div class="bar" id="InvestmentManager">
+                <div class="countOfBar">
+                    170
+                </div>
+            </div>
+            <div class="barTitle">
+                Investment Manager
+            </div>
+        </div>
+        <div class="chart-1bar">
+            <div class="bar" id="RepOffice">
+                <div class="countOfBar">
+                    110
+                </div>
+            </div>
+            <div class="barTitle">
+                Rep Office
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<div class="chart">
+    <div class="chartTitle">
+      <h3>Firm by sector</h3>
+    </div>
+    <div class="numbers">
+      <img src="../../../../assets/images/number.png">
+    </div>
+    <div class="chart-bars">
+      <div *ngFor="let sectorfunction of sectorFunction" class="chart-1bar">
+        <div class="bar" [id]="formatId(sectorfunction.SectorType)">
+          <div class="countOfBar">
+            {{ sectorfunction.TotalFirms }}
+          </div>
+        </div>
+        <div class="barTitle">
+          {{ sectorfunction.SectorType }}
+        </div>
+      </div>
+    </div>
+  </div>

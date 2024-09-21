@@ -19,6 +19,8 @@
 }
 
 .tableTitle {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
   display: flex;
   width: 100%;
   justify-content: flex-start;
@@ -40,7 +42,6 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  border-radius: 7px; /* Apply border-radius to the table */
   overflow: hidden; /* Ensure rounded corners are visible */
 }
 
