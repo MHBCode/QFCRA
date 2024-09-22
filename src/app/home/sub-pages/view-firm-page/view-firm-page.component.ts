@@ -110,7 +110,7 @@ export class ViewFirmPageComponent implements OnInit {
   currentAuthRevisionNumber: number | null = null;
   lastAuthRevisionNumber: number | null = null;
 
-
+  displayInactiveContacts: boolean = false;
 
   selectedStatusId: number | null = null;
   selectedAuthStatusId: number | null = null;
@@ -1259,21 +1259,41 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
   onRowClick(contact: any): void {
-    this.isPopupVisible = true;
+    // Reset the selected contact and hide the popup until data is loaded
+    this.selectedContact = {};
+    this.isPopupVisible = false;
 
-    // Pass all required arguments to the getContactDetails method
+    // Fetch contact details based on selected row
     this.firmService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
       data => {
-        this.selectedContact = data.response; // Set the selected contact details
-        console.log("this the contact details: ", data)
-        // Show the popup
+        if (data && data.response) {
+          this.selectedContact = data.response; // Assign the received data to selectedContact
+          console.log("Selected contact: ", this.selectedContact); // Log to check data
+          this.isPopupVisible = true; // Show the popup after data is loaded
+          this.cdr.detectChanges(); // Trigger change detection to update the view
+        } else {
+          console.error('No contact data received:', data);
+          this.isPopupVisible = false; // Hide popup if no data is received
+        }
       },
       error => {
         console.error('Error fetching contact details', error);
+        this.isPopupVisible = false; // Hide popup if there's an error
       }
     );
   }
-
+  get filteredContacts() {
+    if (this.displayInactiveContacts) {
+      return this.FIRMContacts;
+    } else {
+      return this.FIRMContacts.filter(contact => contact.ContactTypeDesc !== 'Contact- No Longer');
+    }
+  }
+  
+  // Method to handle the checkbox change
+  onInactiveContactsToggle(event: any): void {
+    this.displayInactiveContacts = event.target.checked;
+  }
   closeContactPopup() {
     this.isPopupVisible = false;
   }
