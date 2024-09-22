@@ -965,20 +965,20 @@ export class ViewFirmPageComponent implements OnInit {
             console.log('FirmScopeID is missing for FirmID:', firmData.FirmID);
             return;
         }
-      
+        debugger
         const firmScopeData = {
             objFirmScope: {
                 firmScopeID: firmData.FirmScopeID,
                 scopeRevNum: firmData.ScopeRevNum,
                 firmID: firmData.FirmID,
                 // objectID: firmData.ObjectID,
-                createdBy: 30,
+                createdBy: 30, // this will be change cuse there is no user 
                 docReferenceID: firmData.DocID,
                 // firmApplTypeID: 3,
                 // docIDs: firmData.DocIDs,
                 generalConditions: firmData.GeneralConditions,
                 effectiveDate: this.currentDate, 
-                scopeCertificateLink: 'http://intranet/sites/RSG/Shared%20Documents/REGISTERS/Licensed%20Firms/00129_Con%20Scope%20of%20Licence.pdf',
+                scopeCertificateLink: firmData.ScopeCertificateLink,
                 // applicationDate: firmData.ApplicationDate,
                 // licensedOrAuthorisedDate: firmData.LicensedDate
             },
@@ -1010,22 +1010,22 @@ export class ViewFirmPageComponent implements OnInit {
                 prudentialCategoryTypeID: firmData.PrudentialCategoryTypeID,
                 firmScopeID: firmData.FirmScopeID,
                 scopeRevNum: firmData.ScopeRevNum,
-                lastModifiedByID: 30,
+                lastModifiedByID: 30, // this will be change cuse there is no user
                 effectiveDate: this.currentDate, // Ensure date is valid
                 // expirationDate: firmData.ExpirationDate,
                 lastModifiedDate: this.currentDate,
                 authorisationCategoryTypeID: firmData.AuthorisationCategoryTypeID
             },
             objSector: {
-                firmSectorID: "202",
-                sectorTypeID: 6,
-                lastModifiedByID: 30,
+                firmSectorID: firmData.FirmSectorID.toString()  , 
+                sectorTypeID: firmData.SectorTypeID,  // this will be change cuse there is no user
+                lastModifiedByID: 30, // this will be change cuse there is no user
                 effectiveDate: this.currentDate,
             },
             lstFirmScopeCondition: [
                 {
                     scopeConditionTypeId: 1,
-                    lastModifiedBy: 30,
+                    lastModifiedBy: 30, // this will be change cuse there is no user
                     restriction: 1
                 }
             ],
@@ -1035,11 +1035,11 @@ export class ViewFirmPageComponent implements OnInit {
                 iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
                 endorsement: this.islamicFinance.Endorsement,
                 savedIFinTypeID: 2,
-                scopeRevNum: 4,
-                lastModifiedBy: 30
+                scopeRevNum: firmData.ScopeRevNum,
+                lastModifiedBy: 30 // this will be change cuse there is no user
             },
             resetFirmSector: true,
-            firmSectorID: "202",
+            firmSectorID: firmData.FirmSectorID.toString(),
              obj: {} 
         };
 
