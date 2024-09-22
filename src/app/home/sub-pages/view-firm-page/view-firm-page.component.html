@@ -920,7 +920,7 @@
               <input disabled name="createdDate" id="createdDate" type="text"
                 value="{{ ActivityLicensed[0]?.ScopeCreatedDate }}" />
             </div>
-            <div [hidden]="!allowEditLicScopeDetails" class="vary-scope">
+            <div *ngIf="allowEditLicScopeDetails && showVaryBtn" class="vary-scope">
               <button (click)="varyLicenseScope()">Vary Scope</button>
             </div>
           </div>
@@ -970,7 +970,7 @@
                 </td>
                 <td>
                   <div class="input-field">
-                    <select disabled [ngClass]="{'select-background-edited': allowEditLicScopeDetails}" name="action"
+                    <select [disabled]="!((this.ActivityLicensed[0].ScopeRevNum > 1) && !(isNullOrEmpty(this.ActivityLicensed[0].ScopeRevNum)))" [ngClass]="{'select-background-edited': allowEditLicScopeDetails}" name="action"
                       id="action" [(ngModel)]="activityLic.FirmScopeTypeID">
                       <option [value]="activityLic.FirmScopeTypeID">{{activityLic.FirmScopeTypeDesc}}</option>
                     </select>
@@ -1054,7 +1054,6 @@
             </div>
             <div class="input-field">
               <label for=""> Link To Scope </label>
-              
               <input disabled name="" id="" type="text" value="{{ ActivityAuth[0]?.ScopeCertificateLink }}" />
             </div>
             <div class="input-field">
@@ -1142,7 +1141,7 @@
         </div>
 
         <!--Regulated Activities-->
-        <!-- <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['regulatedActivitiesSection'] }">
+        <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['regulatedActivitiesSection'] }">
           <div class="section">
             <div class="edit-firm-actions collapse-container">
               <h2>Regulated Activities</h2>
@@ -1155,13 +1154,13 @@
                 <div class="regulated-activities-header" *ngIf="!allowEditAuthScopeDetails">
                   <p>
                     Category :
-                    <strong>[(ngModel)]="activity?.ActivityCategoryDesc"</strong>
+                    <strong>{{ activity?.ActivityCategoryDesc }}</strong>
                   </p>
                   <p>
-                    Activity : <strong>{{ activity[0]?.ActivityTypeDesc }}</strong>
+                    Activity : <strong>{{ activity?.ActivityTypeDesc }}</strong>
                   </p>
                 </div>
-                
+                <!--on edit mode-->
                 <div class="regulated-activities-header" *ngIf="allowEditAuthScopeDetails">
                   <div class="category-select">
                     <label for="category" style="display: flex; gap: 5px">
@@ -1169,7 +1168,7 @@
                     </label>
                     <select [(ngModel)]="activity.selectedCategory" (ngModelChange)="onCategoryChange(activity)"
                       name="category" id="category">
-                      
+                      <!-- <option value="" disabled>Select</option> -->
                       <option *ngFor="let category of activityCategories" [ngValue]="category">
                         {{ category.ActivityCategoryDesc }}
                       </option>
@@ -1187,15 +1186,15 @@
                     </select>
                   </div>
                 </div>
-                
+                <!---->
 
-                
+                <!-- Loop through Products under each Activity -->
                 <div *ngIf="!allowEditAuthScopeDetails">
                   <div *ngFor="let product of activity.products">
-                   
+                    <!-- Display Main Category (Product) -->
                     <h4>{{ product.mainCategory }}</h4>
 
-                    
+                    <!-- Loop through Subcategories under each Product -->
                     <ul style="margin-left: 40px">
                       <li *ngFor="let subCategory of product.subCategories">
                         {{ subCategory.ProductCategoryTypeDesc }}
@@ -1204,7 +1203,7 @@
                   </div>
                 </div>
 
-               
+                <!--on Edit mode-->
                 <table class="regulated-activity-table" *ngIf="allowEditAuthScopeDetails">
                   <thead>
                     <tr>
@@ -1212,7 +1211,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                   
+                    <!--integration loop will be inside this tr for products-->
                     <tr *ngFor="let product of activity.products">
                       <td>
                         <label>
@@ -1242,7 +1241,7 @@
                     </tr>
                   </tbody>
                 </table>
-                
+                <!--specific conditions and restrictions-->
                 <div class="specific-conditions-and-restrictions">
                   <div class="specific-conditions-and-restrictions-header">
                     <p>Specific Conditions and Restrictions</p>
@@ -1253,7 +1252,7 @@
                   </p>
                 </div>
               </div>
-            
+              <!--Conditions and Restrictions-->
               <div class="conditions-and-restrictions-section">
                 <div class="conditions-and-restrictions-header">
                   <p>Conditions and Restrictions</p>
@@ -1272,133 +1271,8 @@
               </div>
             </div>
           </div>
-        </div> -->
-        <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['regulatedActivitiesSection'] }">
-          <div class="section">
-            <div class="edit-firm-actions collapse-container">
-              <h2>Regulated Activities</h2>
-              <button class="collapse-button" (click)="toggleCollapse('regulatedActivitiesSection')">
-                {{ isCollapsed['regulatedActivitiesSection'] ? '▲' : '▼' }}
-              </button>
-            </div>
-        
-            <div class="regulated-activities-container">
-              <div *ngFor="let activity of categorizedData">
-                <!-- Displaying in Read-only mode -->
-                <div class="regulated-activities-header" *ngIf="!allowEditAuthScopeDetails">
-                  <p>
-                    Category: <strong>{{ activity?.ActivityCategoryDesc }}</strong>
-                  </p>
-                  <p>
-                    Activity: <strong>{{ activity?.ActivityTypeDesc }}</strong>
-                  </p>
-                </div>
-        
-                <!-- Displaying in Edit mode -->
-                <div class="regulated-activities-header" *ngIf="allowEditAuthScopeDetails">
-                  <div class="category-select">
-                    <label for="category" style="display: flex; gap: 5px">
-                      Category <span style="color: red">*</span>:
-                    </label>
-                    <select [(ngModel)]="activity.selectedCategory" (ngModelChange)="onCategoryChange(activity)"
-                      name="category" id="category">
-                      <option *ngFor="let category of activityCategories" [ngValue]="category">
-                         {{ category.ActivityCategoryDesc }}
-                      </option>
-                    </select>
-                  </div>
-        
-                  <div class="activity-select">
-                    <label for="activity" style="display: flex; gap: 5px">
-                      Activity <span style="color: red">*</span>:
-                    </label>
-                    <select [(ngModel)]="activity.selectedActivity" name="activity" id="activity">
-                      <option *ngFor="let act of activity.activities" [ngValue]="act">
-                        {{ act.ActivityTypeDesc }}
-                      </option>
-                    </select>
-                  </div>
-                </div>
-        
-                <!-- Loop through Products under each Activity -->
-                <div *ngIf="!allowEditAuthScopeDetails">
-                  <div *ngFor="let product of activity.products">
-                    <h4>{{ product.mainCategory }}</h4>
-                    <ul style="margin-left: 40px">
-                      <li *ngFor="let subCategory of product.subCategories">
-                        {{ subCategory.ProductCategoryTypeDesc }}
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-        
-                <!-- Edit mode for Products -->
-                <table class="regulated-activity-table" *ngIf="allowEditAuthScopeDetails">
-                  <thead>
-                    <tr>
-                      <th>Product(s)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let product of activity.products">
-                      <td>
-                        <label>
-                          <input type="checkbox" /> {{ product.mainCategory }}
-                        </label>
-                        <table class="nested-table">
-                          <tbody>
-                            <tr *ngFor="let subCategory of product.subCategories">
-                              <td>
-                                <label>
-                                  <input type="checkbox" />
-                                  {{ subCategory.ProductCategoryTypeDesc }}
-                                </label>
-                              </td>
-                              <td>
-                                <select class="action-column" name="action">
-                                  <option value="1">Add</option>
-                                  <option value="2">Withdrawal</option>
-                                  <option value="3">Discontinue</option>
-                                </select>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-        
-                <!-- Specific Conditions and Restrictions -->
-                <div class="specific-conditions-and-restrictions">
-                  <div class="specific-conditions-and-restrictions-header">
-                    <p>Specific Conditions and Restrictions</p>
-                  </div>
-                  <p>&nbsp;&nbsp;&nbsp;&nbsp;{{ activity?.specificCondition }}</p>
-                </div>
-              </div>
-        
-              <!-- Conditions and Restrictions -->
-              <div class="conditions-and-restrictions-section">
-                <div class="conditions-and-restrictions-header">
-                  <p>Conditions and Restrictions</p>
-                </div>
-                <p>
-                  <strong>Retail Restriction</strong> &nbsp;&nbsp;
-                  <input disabled type="checkbox" />
-                </p>
-                <p>
-                  <strong>General Authorisation Conditions or Restrictions</strong>
-                </p>
-                <div class="input-field conditions-textarea">
-                  <textarea disabled [value]="ActivityAuth[0]?.GeneralConditions"></textarea>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-        
-        
+
         <!-- Islamic Finance-->
         <div class="inputs-field-set" *ngIf="
             (firmDetails?.AuthorisationStatusTypeID > 0 &&
@@ -1469,9 +1343,10 @@
             <div class="input-field">
               <label for="prudentialCategory"> Prudential Category </label>
               <select [disabled]="!allowEditAuthScopeDetails" name="prudentialCategory" id="prudentialCategory"
-                [(ngModel)]="ActivityAuth[0].PrudentialCategoryTypeID" [ngClass]="{
+                [(ngModel)]="ActivityAuth[0].PrudentialCategoryTypeID" (ngModelChange)="onPrudentialCategoryChange($event)" [ngClass]="{
                   'select-background-edited': allowEditAuthScopeDetails
                 }">
+                <option value="0">Select</option>
                 <option *ngFor="let option of allPrudentialCategoryTypes" [value]="option.PrudentialCategoryTypeID">
                   {{ option?.PrudentialCategoryTypeDesc }}
                 </option>
@@ -1550,6 +1425,7 @@
                 name="prudentialReturnType" id="prudentialReturnType" [ngClass]="{
                   'select-background-edited': allowEditAuthScopeDetails
                 }">
+                <option value="0">Select</option>
                 <option *ngFor="let PrudReturnTypes of prudReturnTypesDropdown" [value]="PrudReturnTypes.SectorTypeID">
                   {{ PrudReturnTypes?.SectorTypeDesc }}
                 </option>
@@ -2738,7 +2614,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeFYearHistory()">
+    <button class="subbutton" (click)="closeFYearHistory()">
       Close
     </button>
   </div>
@@ -2773,7 +2649,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeInactiveUsers()">
+    <button class="subbutton" (click)="closeInactiveUsers()">
       Close
     </button>
   </div>
@@ -2811,7 +2687,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeAccountingStandard()">
+    <button class="subbutton" (click)="closeAccountingStandard()">
       Close
     </button>
   </div>
@@ -2844,7 +2720,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closePrevFirmName()">
+    <button class="subbutton" (click)="closePrevFirmName()">
       Close
     </button>
   </div>
@@ -2911,7 +2787,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeApplicationDetails()">
+    <button class="subbutton" (click)="closeApplicationDetails()">
       Close
     </button>
   </div>
@@ -2931,10 +2807,10 @@
     <small style="color: red" *ngIf="fileError">{{ fileError }}</small>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%; margin-right: 5px" class="subbutton" (click)="confirmUpload()">
+    <button style="margin-right: 5px" class="subbutton" (click)="confirmUpload()">
       Ok
     </button>
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeSelectDocument()">
+    <button class="subbutton" (click)="closeSelectDocument()">
       Close
     </button>
   </div>
@@ -2974,7 +2850,7 @@
     </table>
   </div>
   <div class="popup-operations-place">
-    <button style="padding: 1rem; width: 30%" class="subbutton" (click)="closeAddressTypeHistory()">
+    <button class="subbutton" (click)="closeAddressTypeHistory()">
       Close
     </button>
   </div>
