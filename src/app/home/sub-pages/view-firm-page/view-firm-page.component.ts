@@ -1058,37 +1058,37 @@ export class ViewFirmPageComponent implements OnInit {
                 firmScopeID: firmData.FirmScopeID,
                 scopeRevNum: firmData.ScopeRevNum,
                 firmID: firmData.FirmID,
-                objectID: firmData.ObjectID,
-                createdBy: firmData.userId,
+                // objectID: firmData.ObjectID,
+                createdBy: 30,
                 docReferenceID: firmData.DocID,
-                firmApplTypeID: 3,
-                docIDs: firmData.DocIDs,
+                // firmApplTypeID: 3,
+                // docIDs: firmData.DocIDs,
                 generalConditions: firmData.GeneralConditions,
                 effectiveDate: this.isoString, 
                 scopeCertificateLink: 'http://intranet/sites/RSG/Shared%20Documents/REGISTERS/Licensed%20Firms/00129_Con%20Scope%20of%20Licence.pdf',
-                applicationDate: firmData.ApplicationDate,
-                licensedOrAuthorisedDate: firmData.LicensedDate
+                // applicationDate: firmData.ApplicationDate,
+                // licensedOrAuthorisedDate: firmData.LicensedDate
             },
             lstFirmActivities: [
                 {
-                    createdBy: firmData.CreatedBy,
-                    firmScopeTypeID: firmData.FirmScopeTypeID,
+                    // createdBy: firmData.CreatedBy,
+                    // firmScopeTypeID: firmData.FirmScopeTypeID,
                     activityTypeID: firmData.ActivityTypeID,
                     effectiveDate: this.isoString,
-                    firmActivityConditions: firmData.FirmActivityConditions,
-                    productTypeID: firmData.ProductTypeID,
-                    appliedDate: firmData.AppliedDate,
-                    withDrawnDate: firmData.WithDrawnDate,
+                    // firmActivityConditions: firmData.FirmActivityConditions,
+                    // productTypeID: firmData.ProductTypeID,
+                    // appliedDate: firmData.AppliedDate,
+                    // withDrawnDate: firmData.WithDrawnDate,
                     objectProductActivity: [
                         {
-                            productTypeID: firmData.ProductTypeID,
-                            appliedDate: firmData.AppliedDate,
-                            withDrawnDate: firmData.WithDrawnDate,
+                            // productTypeID: firmData.ProductTypeID,
+                            // appliedDate: firmData.AppliedDate,
+                            // withDrawnDate: firmData.WithDrawnDate,
                             effectiveDate: firmData.EffectiveDate,
-                            firmScopeTypeID: firmData.FirmScopeTypeID
+                            // firmScopeTypeID: firmData.FirmScopeTypeID
                         }
                     ],
-                    activityDetails: firmData.ActivityDetails
+                    // activityDetails: firmData.ActivityDetails
                 }
             ],
             objPrudentialCategory: {
@@ -1097,37 +1097,37 @@ export class ViewFirmPageComponent implements OnInit {
                 prudentialCategoryTypeID: firmData.PrudentialCategoryTypeID,
                 firmScopeID: firmData.FirmScopeID,
                 scopeRevNum: firmData.ScopeRevNum,
-                lastModifiedByID: firmData.LastModifiedByID,
+                lastModifiedByID: 30,
                 effectiveDate: this.isoString, // Ensure date is valid
-                expirationDate: firmData.ExpirationDate,
+                // expirationDate: firmData.ExpirationDate,
                 lastModifiedDate: this.isoString,
                 authorisationCategoryTypeID: firmData.AuthorisationCategoryTypeID
             },
             objSector: {
-                firmSectorID: firmData.FirmSectorID.toString(),
-                sectorTypeID: firmData.SectorTypeID,
-                lastModifiedByID: firmData.LastModifiedByID,
+                firmSectorID: "202",
+                sectorTypeID: 6,
+                lastModifiedByID: 30,
                 effectiveDate: this.isoString,
             },
             lstFirmScopeCondition: [
                 {
-                    scopeConditionTypeId: firmData.ScopeConditionTypeId,
-                    lastModifiedBy: firmData.userId,
-                    restriction: firmData.Restriction
+                    scopeConditionTypeId: 1,
+                    lastModifiedBy: 30,
+                    restriction: 1
                 }
             ],
             objFirmIslamicFinance: {
-                iFinFlag: this.islamicFinance.IFinFlag,
+                iFinFlag: true,
                 iFinTypeId: this.islamicFinance.IFinTypeId,
                 iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
                 endorsement: this.islamicFinance.Endorsement,
-                savedIFinTypeID: this.islamicFinance.SavedIFinTypeID,
-                scopeRevNum: this.islamicFinance.ScopeRevNum,
-                lastModifiedBy: this.islamicFinance.userId
+                savedIFinTypeID: 2,
+                scopeRevNum: 4,
+                lastModifiedBy: 30
             },
             resetFirmSector: true,
-            firmSectorID: firmData.FirmSectorID.toString(),
-            obj: {} 
+            firmSectorID: "202",
+             obj: {} 
         };
 
         console.log('FirmScopeData to be sent:', firmScopeData);
@@ -1135,10 +1135,20 @@ export class ViewFirmPageComponent implements OnInit {
         this.firmService.editAuthorizedScope(10044, firmScopeData).subscribe(
             response => {
                 console.log('Firm scope updated successfully for FirmID:', firmData.FirmID, response);
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Success!',
+                  text: `Firm scope saved successfully for FirmID: ${firmData.FirmID}`,
+              });
             },
             error => {
                 console.error('Error updating firm scope for FirmID:', firmData.FirmID, error);
                 console.log('Error details:', error.error);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error!',
+                  text: `Failed to save firm scope for FirmID: ${firmData.FirmID}.`,
+              });
             }
         );
     });
