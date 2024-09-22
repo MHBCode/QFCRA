@@ -42,6 +42,10 @@ export class FirmService {
     const url = `${this.baseUrl}get_firm?firmID=${firmId}`;
     return this.http.get<any>(url);
   }
+  getAllFirms(): Observable<any> {
+    const url = `${this.baseUrl}get_firms`;
+    return this.http.get<any>(url);
+  } 
   isQFCNumExist(qfcNum:string, firmId: number,): Observable<any> {
     const url = `${this.baseUrl}is_existing_qfc?qfcNum=${qfcNum}&firmId=${firmId}`;
     return this.http.get<any>(url);

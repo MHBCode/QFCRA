@@ -3,6 +3,7 @@ import flatpickr from 'flatpickr';
 import { FirmService } from 'src/app/ngServices/firm.service';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-firm',
@@ -116,7 +117,7 @@ export class NewFirmComponent implements OnInit {
   /* error messages */
   errorMessages: { [key: string]: string } = {};
 
-  constructor(private firmService: FirmService) { }
+  constructor(private firmService: FirmService, private router: Router) { }
 
 
   ngOnInit(): void {
@@ -176,7 +177,7 @@ export class NewFirmComponent implements OnInit {
     if (this.FirmDetails.QFCNum) {
       this.FirmDetails.QFCNum = this.padNumber(this.FirmDetails.QFCNum);
     }
-0
+    0
     if (this.selectedFirmTypeID === 2 && this.applicationDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Licensed) {
       if (this.FirmDetails.QFCNum == null || this.FirmDetails.QFCNum === '') {
         this.getErrorMessages('QFCNum', constants.Firm_CoreDetails_Messages.ENTER_QFCNUMBER);
@@ -268,11 +269,11 @@ export class NewFirmComponent implements OnInit {
   setAdditionalFirmDetails() {
     if (this.selectedFirmTypeID === 3) {
       this.applicationDetails.firmApplDate = this.formatDateToCustomFormat(this.FirmDetails.FirmAuthApplDate)
-       
+
     } else if (this.selectedFirmTypeID === 2) {
       this.applicationDetails.firmApplDate = this.formatDateToCustomFormat(this.FirmDetails.FirmLicApplDate)
       this.applicationDetails.AuthorisationStatusTypeID = 0;
-      this.applicationDetails.AuthorizationDate = null; 
+      this.applicationDetails.AuthorizationDate = null;
     }
     // if (this.selectedFirmTypeID === 3) { // Firm type is "Authorized"
     //   if (this.applicationDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Application) {
@@ -384,12 +385,28 @@ export class NewFirmComponent implements OnInit {
     this.firmService.editFirm(userId, firmObj).subscribe(
       response => {
         console.log('Row edited successfully:', response);
+        // Once the firm is successfully saved, fetch the last created firm
+        this.firmService.getAllFirms().subscribe(
+          response => {
+            console.log('Firms Response:', response);
+            let Allfirms = response.response; // Cast to the appropriate type
+            console.log(Allfirms);
+            // Sort firms by FirmID in descending order to get the latest firm
+            const lastCreatedFirm = Allfirms.sort((a, b) => b.FirmID - a.FirmID)[0];
+            // Navigate to the view-firm page with the last created firm's ID
+            this.router.navigate([`home/view-firm/${lastCreatedFirm.FirmID}`]);
+          },
+          error => {
+            console.error('Error fetching firms:', error);
+          }
+        );
       },
       error => {
         console.error('Error editing row:', error);
       }
     );
   }
+
 
   cancelFirm() {
     // this.FirmDetails = {};
@@ -421,6 +438,7 @@ export class NewFirmComponent implements OnInit {
     } else {
       if (selectedFirmTypeID == 3) {
         this.selectedFirmTypeID = 3;
+        this.applicationDetails.AuthorisationStatusTypeID = constants.FirmAuthorizationApplStatusType.Application
         this.applicationDetails.AuthorizationDate = this.applicationDetails.dateOfApplication;
       }
     }
