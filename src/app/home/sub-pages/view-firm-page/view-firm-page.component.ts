@@ -948,6 +948,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.allowEditAuthScopeDetails = true;
       return; // Exit the function to prevent running validations
     }
+    this.updateOrSaveFirmScope();
   }
 
 
