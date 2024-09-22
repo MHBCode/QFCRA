@@ -111,7 +111,7 @@ export class ViewFirmPageComponent implements OnInit {
   currentAuthRevisionNumber: number | null = null;
   lastAuthRevisionNumber: number | null = null;
 
-
+  displayInactiveContacts: boolean = false;
 
   selectedStatusId: number | null = null;
   selectedAuthStatusId: number | null = null;
@@ -1034,87 +1034,87 @@ export class ViewFirmPageComponent implements OnInit {
     }
 
     this.ActivityAuth.forEach(firmData => {
-      if (!firmData.FirmScopeID) {
-        console.log('FirmScopeID is missing for FirmID:', firmData.FirmID);
-        return;
-      }
-
-      const firmScopeData = {
-        objFirmScope: {
-          firmScopeID: firmData.FirmScopeID,
-          scopeRevNum: firmData.ScopeRevNum,
-          firmID: firmData.FirmID,
-          // objectID: firmData.ObjectID,
-          createdBy: 30,
-          docReferenceID: firmData.DocID,
-          // firmApplTypeID: 3,
-          // docIDs: firmData.DocIDs,
-          generalConditions: firmData.GeneralConditions,
-          effectiveDate: this.currentDate,
-          scopeCertificateLink: 'http://intranet/sites/RSG/Shared%20Documents/REGISTERS/Licensed%20Firms/00129_Con%20Scope%20of%20Licence.pdf',
-          // applicationDate: firmData.ApplicationDate,
-          // licensedOrAuthorisedDate: firmData.LicensedDate
-        },
-        lstFirmActivities: [
-          {
-            // createdBy: firmData.CreatedBy,
-            // firmScopeTypeID: firmData.FirmScopeTypeID,
-            activityTypeID: firmData.ActivityTypeID,
-            effectiveDate: this.currentDate,
-            // firmActivityConditions: firmData.FirmActivityConditions,
-            // productTypeID: firmData.ProductTypeID,
-            // appliedDate: firmData.AppliedDate,
-            // withDrawnDate: firmData.WithDrawnDate,
-            objectProductActivity: [
-              {
-                // productTypeID: firmData.ProductTypeID,
-                // appliedDate: firmData.AppliedDate,
-                // withDrawnDate: firmData.WithDrawnDate,
-                effectiveDate: firmData.EffectiveDate,
-                // firmScopeTypeID: firmData.FirmScopeTypeID
-              }
+        if (!firmData.FirmScopeID) {
+            console.log('FirmScopeID is missing for FirmID:', firmData.FirmID);
+            return;
+        }
+        debugger
+        const firmScopeData = {
+            objFirmScope: {
+                firmScopeID: firmData.FirmScopeID,
+                scopeRevNum: firmData.ScopeRevNum,
+                firmID: firmData.FirmID,
+                // objectID: firmData.ObjectID,
+                createdBy: 30, // this will be change cuse there is no user 
+                docReferenceID: firmData.DocID,
+                // firmApplTypeID: 3,
+                // docIDs: firmData.DocIDs,
+                generalConditions: firmData.GeneralConditions,
+                effectiveDate: this.currentDate, 
+                scopeCertificateLink: firmData.ScopeCertificateLink,
+                // applicationDate: firmData.ApplicationDate,
+                // licensedOrAuthorisedDate: firmData.LicensedDate
+            },
+            lstFirmActivities: [
+                {
+                    // createdBy: firmData.CreatedBy,
+                    // firmScopeTypeID: firmData.FirmScopeTypeID,
+                    activityTypeID: firmData.ActivityTypeID,
+                    effectiveDate: this.currentDate,
+                    // firmActivityConditions: firmData.FirmActivityConditions,
+                    // productTypeID: firmData.ProductTypeID,
+                    // appliedDate: firmData.AppliedDate,
+                    // withDrawnDate: firmData.WithDrawnDate,
+                    objectProductActivity: [
+                        {
+                            // productTypeID: firmData.ProductTypeID,
+                            // appliedDate: firmData.AppliedDate,
+                            // withDrawnDate: firmData.WithDrawnDate,
+                            effectiveDate: firmData.EffectiveDate,
+                            // firmScopeTypeID: firmData.FirmScopeTypeID
+                        }
+                    ],
+                    // activityDetails: firmData.ActivityDetails
+                }
             ],
-            // activityDetails: firmData.ActivityDetails
-          }
-        ],
-        objPrudentialCategory: {
-          firmPrudentialCategoryID: firmData.FirmPrudentialCategoryID,
-          firmID: firmData.FirmID,
-          prudentialCategoryTypeID: firmData.PrudentialCategoryTypeID,
-          firmScopeID: firmData.FirmScopeID,
-          scopeRevNum: firmData.ScopeRevNum,
-          lastModifiedByID: 30,
-          effectiveDate: this.currentDate, // Ensure date is valid
-          // expirationDate: firmData.ExpirationDate,
-          lastModifiedDate: this.currentDate,
-          authorisationCategoryTypeID: firmData.AuthorisationCategoryTypeID
-        },
-        objSector: {
-          firmSectorID: "202",
-          sectorTypeID: 6,
-          lastModifiedByID: 30,
-          effectiveDate: this.currentDate,
-        },
-        lstFirmScopeCondition: [
-          {
-            scopeConditionTypeId: 1,
-            lastModifiedBy: 30,
-            restriction: 1
-          }
-        ],
-        objFirmIslamicFinance: {
-          iFinFlag: true,
-          iFinTypeId: this.islamicFinance.IFinTypeId,
-          iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
-          endorsement: this.islamicFinance.Endorsement,
-          savedIFinTypeID: 2,
-          scopeRevNum: 4,
-          lastModifiedBy: 30
-        },
-        resetFirmSector: true,
-        firmSectorID: "202",
-        obj: {}
-      };
+            objPrudentialCategory: {
+                firmPrudentialCategoryID: firmData.FirmPrudentialCategoryID,
+                firmID: firmData.FirmID,
+                prudentialCategoryTypeID: firmData.PrudentialCategoryTypeID,
+                firmScopeID: firmData.FirmScopeID,
+                scopeRevNum: firmData.ScopeRevNum,
+                lastModifiedByID: 30, // this will be change cuse there is no user
+                effectiveDate: this.currentDate, // Ensure date is valid
+                // expirationDate: firmData.ExpirationDate,
+                lastModifiedDate: this.currentDate,
+                authorisationCategoryTypeID: firmData.AuthorisationCategoryTypeID
+            },
+            objSector: {
+                firmSectorID: firmData.FirmSectorID.toString()  , 
+                sectorTypeID: firmData.SectorTypeID,  // this will be change cuse there is no user
+                lastModifiedByID: 30, // this will be change cuse there is no user
+                effectiveDate: this.currentDate,
+            },
+            lstFirmScopeCondition: [
+                {
+                    scopeConditionTypeId: 1,
+                    lastModifiedBy: 30, // this will be change cuse there is no user
+                    restriction: 1
+                }
+            ],
+            objFirmIslamicFinance: {
+                iFinFlag: true,
+                iFinTypeId: this.islamicFinance.IFinTypeId,
+                iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
+                endorsement: this.islamicFinance.Endorsement,
+                savedIFinTypeID: 2,
+                scopeRevNum: firmData.ScopeRevNum,
+                lastModifiedBy: 30 // this will be change cuse there is no user
+            },
+            resetFirmSector: true,
+            firmSectorID: firmData.FirmSectorID.toString(),
+             obj: {} 
+        };
 
       console.log('FirmScopeData to be sent:', firmScopeData);
 
@@ -1332,21 +1332,41 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
   onRowClick(contact: any): void {
-    this.isPopupVisible = true;
+    // Reset the selected contact and hide the popup until data is loaded
+    this.selectedContact = {};
+    this.isPopupVisible = false;
 
-    // Pass all required arguments to the getContactDetails method
+    // Fetch contact details based on selected row
     this.firmService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
       data => {
-        this.selectedContact = data.response; // Set the selected contact details
-        console.log("this the contact details: ", data)
-        // Show the popup
+        if (data && data.response) {
+          this.selectedContact = data.response; // Assign the received data to selectedContact
+          console.log("Selected contact: ", this.selectedContact); // Log to check data
+          this.isPopupVisible = true; // Show the popup after data is loaded
+          this.cdr.detectChanges(); // Trigger change detection to update the view
+        } else {
+          console.error('No contact data received:', data);
+          this.isPopupVisible = false; // Hide popup if no data is received
+        }
       },
       error => {
         console.error('Error fetching contact details', error);
+        this.isPopupVisible = false; // Hide popup if there's an error
       }
     );
   }
-
+  get filteredContacts() {
+    if (this.displayInactiveContacts) {
+      return this.FIRMContacts;
+    } else {
+      return this.FIRMContacts.filter(contact => contact.ContactTypeDesc !== 'Contact- No Longer');
+    }
+  }
+  
+  // Method to handle the checkbox change
+  onInactiveContactsToggle(event: any): void {
+    this.displayInactiveContacts = event.target.checked;
+  }
   closeContactPopup() {
     this.isPopupVisible = false;
   }

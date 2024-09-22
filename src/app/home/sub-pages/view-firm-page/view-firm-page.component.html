@@ -1880,7 +1880,7 @@
         <div class="contacts-header">
           <h2>Contacts For {{ firmDetails?.FirmName }}</h2>
           <span class="enhanced-checkbox">
-            <input id="InactiveContacts" type="checkbox" />
+            <input id="InactiveContacts" type="checkbox" (change)="onInactiveContactsToggle($event)" />
             <label for="InactiveContacts">Display Inactive Contacts</label>
           </span>
         </div>
@@ -1894,7 +1894,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let contact of FIRMContacts" (click)="onRowClick(contact)">
+            <tr *ngFor="let contact of filteredContacts" (click)="onRowClick(contact)">
               <td>{{ contact.FullName }}</td>
               <td>{{ contact.ContactTypeDesc }}</td>
               <td>{{ contact?.ContactMethodTypeDesc }}</td>
@@ -1914,7 +1914,7 @@
     
     <!-- Title -->
     <h3 style="margin-top: 0; color: #a51e36; font-size: 1.3em; text-align: left; border-bottom: 2px solid #a51e36; padding-bottom: 5px;">
-      Contact Details For {{selectedContact.firstName}}-{{selectedContact.familyName}}
+      Contact Details For {{selectedContact.FirstName}}-{{selectedContact.FamilyName}}
     </h3>
 
     <!-- Form -->
@@ -1924,17 +1924,17 @@
       <div style="display: flex; gap: 20px; margin-bottom: 5px;">
         <div style="flex: 1;">
           <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #a51e36;">Contact From:</label>
-          <input [(ngModel)]="selectedContact.contactMethodTypeDesc" name="contactFrom" [readonly]="!isEditable"
+          <input [(ngModel)]="selectedContact.ContactMethodTypeDesc" name="contactFrom" [readonly]="!isEditable"
                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #a51e36; background-color: #fffafa;" />
         </div>
         <div style="flex: 1;">
           <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #a51e36;">Is contact an approved individual?</label>
-          <input [(ngModel)]="selectedContact.isIndividualRegulated" name="isApprovedIndividual" [readonly]="!isEditable"
+          <input [(ngModel)]="selectedContact.IsIndividualRegulated" name="isApprovedIndividual" [readonly]="!isEditable"
                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #a51e36; background-color: #fffafa;" />
         </div>
         <div style="flex: 1;">
           <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #a51e36;">Contact Type:</label>
-          <input [(ngModel)]="selectedContact.contactTypeDesc" name="contactType" [readonly]="!isEditable"
+          <input [(ngModel)]="selectedContact.ContactTypeDesc" name="contactType" [readonly]="!isEditable"
                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #a51e36; background-color: #fffafa;" />
         </div>
       </div>
@@ -1943,17 +1943,17 @@
       <div style="display: flex; gap: 20px; margin-bottom: 5px;">
         <div style="flex: 1;">
           <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #a51e36;">First Name:</label>
-          <input [(ngModel)]="selectedContact.firstName" name="firstName" [readonly]="!isEditable"
+          <input [(ngModel)]="selectedContact.FirstName" name="firstName" [readonly]="!isEditable"
                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #a51e36; background-color: #fffafa;" />
         </div>
         <div style="flex: 1;">
           <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #a51e36;">Second Name:</label>
-          <input [(ngModel)]="selectedContact.secondName" name="secondName" [readonly]="!isEditable"
+          <input [(ngModel)]="selectedContact.SecondName" name="secondName" [readonly]="!isEditable"
                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #a51e36; background-color: #fffafa;" />
         </div>
         <div style="flex: 1;">
           <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #a51e36;">Family Name:</label>
-          <input [(ngModel)]="selectedContact.familyName" name="familyName" [readonly]="!isEditable"
+          <input [(ngModel)]="selectedContact.FamilyName" name="familyName" [readonly]="!isEditable"
                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #a51e36; background-color: #fffafa;" />
         </div>
       </div>
@@ -1962,17 +1962,17 @@
       <div style="display: flex; gap: 20px; margin-bottom: 5px;">
         <div style="flex: 1;">
           <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #a51e36;">Mobile Phone:</label>
-          <input [(ngModel)]="selectedContact.mobileNum" name="mobilePhone" [readonly]="!isEditable"
+          <input [(ngModel)]="selectedContact.MobileNum" name="mobilePhone" [readonly]="!isEditable"
                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #a51e36; background-color: #fffafa;" />
         </div>
         <div style="flex: 1;">
           <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #a51e36;">Business Email:</label>
-          <input [(ngModel)]="selectedContact.busEmail" name="businessEmail" [readonly]="!isEditable"
+          <input [(ngModel)]="selectedContact.BusEmail" name="businessEmail" [readonly]="!isEditable"
                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #a51e36; background-color: #fffafa;" />
         </div>
         <div style="flex: 1;">
           <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #a51e36;">Business Phone:</label>
-          <input [(ngModel)]="selectedContact.busPhone" name="businessPhone" [readonly]="!isEditable"
+          <input [(ngModel)]="selectedContact.BusPhone" name="businessPhone" [readonly]="!isEditable"
                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #a51e36; background-color: #fffafa;" />
         </div>
       </div>
