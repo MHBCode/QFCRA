@@ -244,7 +244,7 @@
 
         <div style="display: flex; gap: 10px">
           <div class="btn">
-            <button (click)="editFirm()">
+            <button [hidden]="hideEditBtn" (click)="editFirm()">
               <i [class]="!allowEditFirmDetails ? 'bi bi-pen' : ''"></i>
               {{ !allowEditFirmDetails ? "Edit" : "Save" }}
             </button>

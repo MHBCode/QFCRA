@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
+import { UsersService } from 'src/app/ngServices/users.service';
 
 @Component({
   selector: 'app-view-firm-page',
@@ -14,7 +15,7 @@ import Swal from 'sweetalert2';
 })
 export class ViewFirmPageComponent implements OnInit {
 
-  userId = 10044; // Replace with dynamic userId as needed
+  userId = 30; // Replace with dynamic userId as needed
   errorMessages: { [key: string]: string } = {};
   /* for Auditors */
   IsViewAuditorVisible: boolean = false;
@@ -158,10 +159,15 @@ export class ViewFirmPageComponent implements OnInit {
   now = new Date();
   currentDate = this.now.toISOString();
 
+  /* user access and security */
+  assignedUserRoles: any = [];
+  hideEditBtn: boolean;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,  // Inject ActivatedRoute
     private firmService: FirmService,  // Inject FirmService
+    private userService: UsersService,
     private el: ElementRef,
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef
@@ -199,6 +205,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.populatePrudentialCategoryTypes();
       this.populateAuthorisationCategoryTypes();
       this.checkFirmLicense();
+      this.onPageLoad();
     });
   }
 
@@ -304,7 +311,73 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  onPageLoad() {
+    this.getUserRoles();
+    this.applySecurityOnPage();
+  }
 
+  applySecurityOnPage() {
+    let firmType = 1;
+    if (this.mockIsValidFirmSupervisor(this.firmId, this.userId)) {
+      // No need to hide the button for Firm supervisor
+      this.hideEditBtn = false;
+      return; 
+    } else if (this.mockIsValidRSGMember(this.userId)) {
+      // No need to hide the button for RSG Member
+      this.hideEditBtn = false;
+      return; 
+    } else if (this.mockIsValidFirmAMLSupervisor(this.firmId, this.userId) || this.mockIsValidAMLDirector(this.userId)) {
+      // Hide button if firm is authorised or deauthorised and user is AML Team
+      if (firmType === 1) {
+        this.hideEditBtn = false; // User does not have access, hide the button
+      }
+    } else if (this.mockIsValidAMLSupervisor(this.userId) && !this.mockIsAMLSupervisorAssignedToFirm(this.firmId)) {
+      // Hide button if firm is not authorised and no AML supervisor is assigned
+      if (firmType === 1) {
+        this.hideEditBtn = false; // User does not have access, hide the button
+      }
+    } else {
+      this.hideEditBtn = false; // Default: Hide the button
+    }
+  }
+
+  // Mock implementations of security checks
+  mockIsValidFirmSupervisor(firmId: number, userId: number): boolean {
+    return true; // Replace with actual logic or mock data
+  }
+
+  mockIsValidRSGMember(userId: number): boolean {
+    return true;
+  }
+
+  mockIsValidFirmAMLSupervisor(firmId: number, userId: number): boolean {
+    return true;
+  }
+
+  mockIsValidAMLDirector(userId: number): boolean {
+    return false;
+  }
+
+  mockIsValidAMLSupervisor(userId: number): boolean {
+    return false;
+  }
+
+  mockIsAMLSupervisorAssignedToFirm(firmId: number): boolean {
+    return false;
+  }
+
+  // hideActionButton() {
+  //   this.hideEditBtn = true;
+  // }
+
+  getUserRoles() {
+    this.userService.getUserRoles(this.userId).subscribe((roles) => {
+      this.assignedUserRoles = roles.response;
+    }, error => {
+      console.error('Error fetching assigned user roles: ', error);
+    }
+    )
+  }
 
   async editFirm() {
     this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
@@ -956,116 +1029,116 @@ export class ViewFirmPageComponent implements OnInit {
     console.log("Data To Update Or Save Firm Scope:", this.ActivityAuth);
 
     if (!this.ActivityAuth || this.ActivityAuth.length === 0) {
-        console.log('Firm activity scope not found');
-        return;
+      console.log('Firm activity scope not found');
+      return;
     }
 
     this.ActivityAuth.forEach(firmData => {
-        if (!firmData.FirmScopeID) {
-            console.log('FirmScopeID is missing for FirmID:', firmData.FirmID);
-            return;
+      if (!firmData.FirmScopeID) {
+        console.log('FirmScopeID is missing for FirmID:', firmData.FirmID);
+        return;
+      }
+
+      const firmScopeData = {
+        objFirmScope: {
+          firmScopeID: firmData.FirmScopeID,
+          scopeRevNum: firmData.ScopeRevNum,
+          firmID: firmData.FirmID,
+          // objectID: firmData.ObjectID,
+          createdBy: 30,
+          docReferenceID: firmData.DocID,
+          // firmApplTypeID: 3,
+          // docIDs: firmData.DocIDs,
+          generalConditions: firmData.GeneralConditions,
+          effectiveDate: this.currentDate,
+          scopeCertificateLink: 'http://intranet/sites/RSG/Shared%20Documents/REGISTERS/Licensed%20Firms/00129_Con%20Scope%20of%20Licence.pdf',
+          // applicationDate: firmData.ApplicationDate,
+          // licensedOrAuthorisedDate: firmData.LicensedDate
+        },
+        lstFirmActivities: [
+          {
+            // createdBy: firmData.CreatedBy,
+            // firmScopeTypeID: firmData.FirmScopeTypeID,
+            activityTypeID: firmData.ActivityTypeID,
+            effectiveDate: this.currentDate,
+            // firmActivityConditions: firmData.FirmActivityConditions,
+            // productTypeID: firmData.ProductTypeID,
+            // appliedDate: firmData.AppliedDate,
+            // withDrawnDate: firmData.WithDrawnDate,
+            objectProductActivity: [
+              {
+                // productTypeID: firmData.ProductTypeID,
+                // appliedDate: firmData.AppliedDate,
+                // withDrawnDate: firmData.WithDrawnDate,
+                effectiveDate: firmData.EffectiveDate,
+                // firmScopeTypeID: firmData.FirmScopeTypeID
+              }
+            ],
+            // activityDetails: firmData.ActivityDetails
+          }
+        ],
+        objPrudentialCategory: {
+          firmPrudentialCategoryID: firmData.FirmPrudentialCategoryID,
+          firmID: firmData.FirmID,
+          prudentialCategoryTypeID: firmData.PrudentialCategoryTypeID,
+          firmScopeID: firmData.FirmScopeID,
+          scopeRevNum: firmData.ScopeRevNum,
+          lastModifiedByID: 30,
+          effectiveDate: this.currentDate, // Ensure date is valid
+          // expirationDate: firmData.ExpirationDate,
+          lastModifiedDate: this.currentDate,
+          authorisationCategoryTypeID: firmData.AuthorisationCategoryTypeID
+        },
+        objSector: {
+          firmSectorID: "202",
+          sectorTypeID: 6,
+          lastModifiedByID: 30,
+          effectiveDate: this.currentDate,
+        },
+        lstFirmScopeCondition: [
+          {
+            scopeConditionTypeId: 1,
+            lastModifiedBy: 30,
+            restriction: 1
+          }
+        ],
+        objFirmIslamicFinance: {
+          iFinFlag: true,
+          iFinTypeId: this.islamicFinance.IFinTypeId,
+          iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
+          endorsement: this.islamicFinance.Endorsement,
+          savedIFinTypeID: 2,
+          scopeRevNum: 4,
+          lastModifiedBy: 30
+        },
+        resetFirmSector: true,
+        firmSectorID: "202",
+        obj: {}
+      };
+
+      console.log('FirmScopeData to be sent:', firmScopeData);
+
+      this.firmService.editAuthorizedScope(10044, firmScopeData).subscribe(
+        response => {
+          console.log('Firm scope updated successfully for FirmID:', firmData.FirmID, response);
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: `Firm scope saved successfully for FirmID: ${firmData.FirmID}`,
+          });
+        },
+        error => {
+          console.error('Error updating firm scope for FirmID:', firmData.FirmID, error);
+          console.log('Error details:', error.error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: `Failed to save firm scope for FirmID: ${firmData.FirmID}.`,
+          });
         }
-      
-        const firmScopeData = {
-            objFirmScope: {
-                firmScopeID: firmData.FirmScopeID,
-                scopeRevNum: firmData.ScopeRevNum,
-                firmID: firmData.FirmID,
-                // objectID: firmData.ObjectID,
-                createdBy: 30,
-                docReferenceID: firmData.DocID,
-                // firmApplTypeID: 3,
-                // docIDs: firmData.DocIDs,
-                generalConditions: firmData.GeneralConditions,
-                effectiveDate: this.currentDate, 
-                scopeCertificateLink: 'http://intranet/sites/RSG/Shared%20Documents/REGISTERS/Licensed%20Firms/00129_Con%20Scope%20of%20Licence.pdf',
-                // applicationDate: firmData.ApplicationDate,
-                // licensedOrAuthorisedDate: firmData.LicensedDate
-            },
-            lstFirmActivities: [
-                {
-                    // createdBy: firmData.CreatedBy,
-                    // firmScopeTypeID: firmData.FirmScopeTypeID,
-                    activityTypeID: firmData.ActivityTypeID,
-                    effectiveDate: this.currentDate,
-                    // firmActivityConditions: firmData.FirmActivityConditions,
-                    // productTypeID: firmData.ProductTypeID,
-                    // appliedDate: firmData.AppliedDate,
-                    // withDrawnDate: firmData.WithDrawnDate,
-                    objectProductActivity: [
-                        {
-                            // productTypeID: firmData.ProductTypeID,
-                            // appliedDate: firmData.AppliedDate,
-                            // withDrawnDate: firmData.WithDrawnDate,
-                            effectiveDate: firmData.EffectiveDate,
-                            // firmScopeTypeID: firmData.FirmScopeTypeID
-                        }
-                    ],
-                    // activityDetails: firmData.ActivityDetails
-                }
-            ],
-            objPrudentialCategory: {
-                firmPrudentialCategoryID: firmData.FirmPrudentialCategoryID,
-                firmID: firmData.FirmID,
-                prudentialCategoryTypeID: firmData.PrudentialCategoryTypeID,
-                firmScopeID: firmData.FirmScopeID,
-                scopeRevNum: firmData.ScopeRevNum,
-                lastModifiedByID: 30,
-                effectiveDate: this.currentDate, // Ensure date is valid
-                // expirationDate: firmData.ExpirationDate,
-                lastModifiedDate: this.currentDate,
-                authorisationCategoryTypeID: firmData.AuthorisationCategoryTypeID
-            },
-            objSector: {
-                firmSectorID: "202",
-                sectorTypeID: 6,
-                lastModifiedByID: 30,
-                effectiveDate: this.currentDate,
-            },
-            lstFirmScopeCondition: [
-                {
-                    scopeConditionTypeId: 1,
-                    lastModifiedBy: 30,
-                    restriction: 1
-                }
-            ],
-            objFirmIslamicFinance: {
-                iFinFlag: true,
-                iFinTypeId: this.islamicFinance.IFinTypeId,
-                iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
-                endorsement: this.islamicFinance.Endorsement,
-                savedIFinTypeID: 2,
-                scopeRevNum: 4,
-                lastModifiedBy: 30
-            },
-            resetFirmSector: true,
-            firmSectorID: "202",
-             obj: {} 
-        };
-
-        console.log('FirmScopeData to be sent:', firmScopeData);
-
-        this.firmService.editAuthorizedScope(10044, firmScopeData).subscribe(
-            response => {
-                console.log('Firm scope updated successfully for FirmID:', firmData.FirmID, response);
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Success!',
-                  text: `Firm scope saved successfully for FirmID: ${firmData.FirmID}`,
-              });
-            },
-            error => {
-                console.error('Error updating firm scope for FirmID:', firmData.FirmID, error);
-                console.log('Error details:', error.error);
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error!',
-                  text: `Failed to save firm scope for FirmID: ${firmData.FirmID}.`,
-              });
-            }
-        );
+      );
     });
-}
+  }
 
 
 
@@ -1485,7 +1558,7 @@ export class ViewFirmPageComponent implements OnInit {
     // Set SectorTypeID to 'Select' (value 0)
     this.ActivityAuth[0].SectorTypeID = 0;
   }
-  
+
 
   loadScopeOfAuth() {
     this.firmService.getFirmScopeIdAndRevNum(this.firmId).pipe(
