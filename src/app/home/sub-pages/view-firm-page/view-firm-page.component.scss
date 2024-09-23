@@ -143,7 +143,6 @@ table {
 th {
   background-color: rgba(253, 216, 216, 0.24); /* Light pink background for headers */
   border-bottom: 2px solid #a51e36; /* Darker border under headers */
-  color: #7e0000; /* Dark red text */
   font-size: 0.85em; /* Slightly smaller font size */
   font-weight: bold;
   padding: 10px; /* Padding for better spacing */
@@ -267,7 +266,7 @@ table-responsive {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1rem;
+  margin: 10px 10px;
   padding-bottom: 0;
 }
 

@@ -18,9 +18,7 @@ export class NewFirmComponent implements OnInit {
           title: 'Alert!',
           text: response.response,
           icon: 'error',
-          timer: 3000,
-          timerProgressBar: true,
-          showConfirmButton: false
+          confirmButtonText: 'Ok',
         });
       },
     );
@@ -33,9 +31,7 @@ export class NewFirmComponent implements OnInit {
           title: 'Success!',
           text: response.response,
           icon: 'success',
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false
+          confirmButtonText: 'Ok',
         });
       },
     );

@@ -329,15 +329,15 @@ export class ViewFirmPageComponent implements OnInit {
     } else if (this.mockIsValidFirmAMLSupervisor(this.firmId, this.userId) || this.mockIsValidAMLDirector(this.userId)) {
       // Hide button if firm is authorised or deauthorised and user is AML Team
       if (firmType === 1) {
-        this.hideEditBtn = false; // User does not have access, hide the button
+        this.hideEditBtn = true; // User does not have access, hide the button
       }
     } else if (this.mockIsValidAMLSupervisor(this.userId) && !this.mockIsAMLSupervisorAssignedToFirm(this.firmId)) {
       // Hide button if firm is not authorised and no AML supervisor is assigned
       if (firmType === 1) {
-        this.hideEditBtn = false; // User does not have access, hide the button
+        this.hideEditBtn = true; // User does not have access, hide the button
       }
     } else {
-      this.hideEditBtn = false; // Default: Hide the button
+      this.hideEditBtn = true; // Default: Hide the button
     }
   }
 
@@ -1877,9 +1877,7 @@ export class ViewFirmPageComponent implements OnInit {
               title: 'Alert!',
               text: 'There has to be at least one permitted activity!',
               icon: 'error',
-              timer: 3000,
-              timerProgressBar: true,
-              showConfirmButton: false
+              confirmButtonText: 'Ok',
             });
           }
         } else {
@@ -1889,9 +1887,7 @@ export class ViewFirmPageComponent implements OnInit {
               title: 'Alert!',
               text: 'There has to be at least one permitted activity!',
               icon: 'error',
-              timer: 3000,
-              timerProgressBar: true,
-              showConfirmButton: false
+              confirmButtonText: 'Ok',
             });
           } else {
             this.ActivityLicensed.splice(index, 1);
@@ -2824,9 +2820,7 @@ export class ViewFirmPageComponent implements OnInit {
           title: 'Alert!',
           text: response.response,
           icon: 'error',
-          timer: 3000,
-          timerProgressBar: true,
-          showConfirmButton: false
+          confirmButtonText: 'Ok',
         });
       },
     );
@@ -2839,9 +2833,7 @@ export class ViewFirmPageComponent implements OnInit {
           title: 'Success!',
           text: response.response,
           icon: 'success',
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false
+          confirmButtonText: 'Ok',
         });
       },
     );
@@ -2855,9 +2847,7 @@ export class ViewFirmPageComponent implements OnInit {
           title: 'Success!',
           text: replacedText,
           icon: 'success',
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false,
+          confirmButtonText: 'Ok',
         });
       },
     );
