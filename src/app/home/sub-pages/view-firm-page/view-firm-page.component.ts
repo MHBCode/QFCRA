@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
+import { UsersService } from 'src/app/ngServices/users.service';
 
 @Component({
   selector: 'app-view-firm-page',
@@ -14,7 +15,7 @@ import Swal from 'sweetalert2';
 })
 export class ViewFirmPageComponent implements OnInit {
 
-  userId = 10044; // Replace with dynamic userId as needed
+  userId = 30; // Replace with dynamic userId as needed
   errorMessages: { [key: string]: string } = {};
   /* for Auditors */
   IsViewAuditorVisible: boolean = false;
@@ -158,10 +159,15 @@ export class ViewFirmPageComponent implements OnInit {
   now = new Date();
   currentDate = this.now.toISOString();
 
+  /* user access and security */
+  assignedUserRoles: any = [];
+  hideEditBtn: boolean;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,  // Inject ActivatedRoute
     private firmService: FirmService,  // Inject FirmService
+    private userService: UsersService,
     private el: ElementRef,
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef
@@ -199,6 +205,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.populatePrudentialCategoryTypes();
       this.populateAuthorisationCategoryTypes();
       this.checkFirmLicense();
+      this.onPageLoad();
     });
   }
 
@@ -304,7 +311,73 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  onPageLoad() {
+    this.getUserRoles();
+    this.applySecurityOnPage();
+  }
 
+  applySecurityOnPage() {
+    let firmType = 1;
+    if (this.mockIsValidFirmSupervisor(this.firmId, this.userId)) {
+      // No need to hide the button for Firm supervisor
+      this.hideEditBtn = false;
+      return; 
+    } else if (this.mockIsValidRSGMember(this.userId)) {
+      // No need to hide the button for RSG Member
+      this.hideEditBtn = false;
+      return; 
+    } else if (this.mockIsValidFirmAMLSupervisor(this.firmId, this.userId) || this.mockIsValidAMLDirector(this.userId)) {
+      // Hide button if firm is authorised or deauthorised and user is AML Team
+      if (firmType === 1) {
+        this.hideEditBtn = true; // User does not have access, hide the button
+      }
+    } else if (this.mockIsValidAMLSupervisor(this.userId) && !this.mockIsAMLSupervisorAssignedToFirm(this.firmId)) {
+      // Hide button if firm is not authorised and no AML supervisor is assigned
+      if (firmType === 1) {
+        this.hideEditBtn = true; // User does not have access, hide the button
+      }
+    } else {
+      this.hideEditBtn = true; // Default: Hide the button
+    }
+  }
+
+  // Mock implementations of security checks
+  mockIsValidFirmSupervisor(firmId: number, userId: number): boolean {
+    return true; // Replace with actual logic or mock data
+  }
+
+  mockIsValidRSGMember(userId: number): boolean {
+    return true;
+  }
+
+  mockIsValidFirmAMLSupervisor(firmId: number, userId: number): boolean {
+    return true;
+  }
+
+  mockIsValidAMLDirector(userId: number): boolean {
+    return false;
+  }
+
+  mockIsValidAMLSupervisor(userId: number): boolean {
+    return false;
+  }
+
+  mockIsAMLSupervisorAssignedToFirm(firmId: number): boolean {
+    return false;
+  }
+
+  // hideActionButton() {
+  //   this.hideEditBtn = true;
+  // }
+
+  getUserRoles() {
+    this.userService.getUserRoles(this.userId).subscribe((roles) => {
+      this.assignedUserRoles = roles.response;
+    }, error => {
+      console.error('Error fetching assigned user roles: ', error);
+    }
+    )
+  }
 
   async editFirm() {
     this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
@@ -956,8 +1029,8 @@ export class ViewFirmPageComponent implements OnInit {
     console.log("Data To Update Or Save Firm Scope:", this.ActivityAuth);
 
     if (!this.ActivityAuth || this.ActivityAuth.length === 0) {
-        console.log('Firm activity scope not found');
-        return;
+      console.log('Firm activity scope not found');
+      return;
     }
 
     this.ActivityAuth.forEach(firmData => {
@@ -1043,29 +1116,29 @@ export class ViewFirmPageComponent implements OnInit {
              obj: {} 
         };
 
-        console.log('FirmScopeData to be sent:', firmScopeData);
+      console.log('FirmScopeData to be sent:', firmScopeData);
 
-        this.firmService.editAuthorizedScope(10044, firmScopeData).subscribe(
-            response => {
-                console.log('Firm scope updated successfully for FirmID:', firmData.FirmID, response);
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Success!',
-                  text: `Firm scope saved successfully for FirmID: ${firmData.FirmID}`,
-              });
-            },
-            error => {
-                console.error('Error updating firm scope for FirmID:', firmData.FirmID, error);
-                console.log('Error details:', error.error);
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error!',
-                  text: `Failed to save firm scope for FirmID: ${firmData.FirmID}.`,
-              });
-            }
-        );
+      this.firmService.editAuthorizedScope(10044, firmScopeData).subscribe(
+        response => {
+          console.log('Firm scope updated successfully for FirmID:', firmData.FirmID, response);
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: `Firm scope saved successfully for FirmID: ${firmData.FirmID}`,
+          });
+        },
+        error => {
+          console.error('Error updating firm scope for FirmID:', firmData.FirmID, error);
+          console.log('Error details:', error.error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: `Failed to save firm scope for FirmID: ${firmData.FirmID}.`,
+          });
+        }
+      );
     });
-}
+  }
 
 
 
@@ -1505,7 +1578,7 @@ export class ViewFirmPageComponent implements OnInit {
     // Set SectorTypeID to 'Select' (value 0)
     this.ActivityAuth[0].SectorTypeID = 0;
   }
-  
+
 
   loadScopeOfAuth() {
     this.firmService.getFirmScopeIdAndRevNum(this.firmId).pipe(
@@ -1804,9 +1877,7 @@ export class ViewFirmPageComponent implements OnInit {
               title: 'Alert!',
               text: 'There has to be at least one permitted activity!',
               icon: 'error',
-              timer: 3000,
-              timerProgressBar: true,
-              showConfirmButton: false
+              confirmButtonText: 'Ok',
             });
           }
         } else {
@@ -1816,9 +1887,7 @@ export class ViewFirmPageComponent implements OnInit {
               title: 'Alert!',
               text: 'There has to be at least one permitted activity!',
               icon: 'error',
-              timer: 3000,
-              timerProgressBar: true,
-              showConfirmButton: false
+              confirmButtonText: 'Ok',
             });
           } else {
             this.ActivityLicensed.splice(index, 1);
@@ -2751,9 +2820,7 @@ export class ViewFirmPageComponent implements OnInit {
           title: 'Alert!',
           text: response.response,
           icon: 'error',
-          timer: 3000,
-          timerProgressBar: true,
-          showConfirmButton: false
+          confirmButtonText: 'Ok',
         });
       },
     );
@@ -2766,9 +2833,7 @@ export class ViewFirmPageComponent implements OnInit {
           title: 'Success!',
           text: response.response,
           icon: 'success',
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false
+          confirmButtonText: 'Ok',
         });
       },
     );
@@ -2782,9 +2847,7 @@ export class ViewFirmPageComponent implements OnInit {
           title: 'Success!',
           text: replacedText,
           icon: 'success',
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false,
+          confirmButtonText: 'Ok',
         });
       },
     );
