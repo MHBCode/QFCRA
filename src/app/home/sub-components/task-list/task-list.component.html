@@ -51,7 +51,7 @@
             </th>
             <th>
               Days Over Due
-              <i class="dropdown-icon" (click)="toggleDaysOverDueDropdown()">&#x25BC;</i>
+              <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleDaysOverDueDropdown()">&#x25BC;</i>
               <div *ngIf="daysOverDueDropdownVisible" class="custom-dropdown">
                 <ul class="dropdown-list">
                   <li class="dropdown-item" (click)="filterByDaysOverDue('')">All</li>
