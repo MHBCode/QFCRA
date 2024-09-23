@@ -381,48 +381,55 @@ export class ViewFirmPageComponent implements OnInit {
 
   async editFirm() {
     this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
-
+  
+    // If form is not in edit mode, toggle it to edit mode
     if (!this.allowEditFirmDetails) {
-      // Toggle to edit mode if the form is not in edit mode
       this.allowEditFirmDetails = true;
       return;
     }
-
+  
     // Start validations
     this.hasValidationErrors = false;
-
+  
     // Synchronous firm-level validation checks
-    this.validateFirmDetails(); // This function performs the existing validation logic synchronously
-
+    this.validateFirmDetails(); // Perform existing validation logic synchronously
+  
+    // If validation errors exist, stop the process
     if (this.hasValidationErrors) {
       this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       return;
     }
-
-    // Perform async validations (like QFC number)
+  
     try {
-      // Await for QFC validation
+      // Perform asynchronous QFC number validation first
       await this.validateQFCNum();
-
-      // Check for application date duplicates and other async validation
-      await this.ApplicationDateValidationCheckDuplicates();
-
+  
+      // If there were errors in QFC validation, stop further execution
       if (this.hasValidationErrors) {
-        throw new Error('Validation errors exist');
+        throw new Error('QFC validation failed');
       }
-
-      // After all validations have passed, proceed with saving the firm details
+  
+      // Perform async application date validation only if QFC validation passes
+      await this.ApplicationDateValidationCheckDuplicates();
+  
+      // Check for validation errors after async validation
+      if (this.hasValidationErrors) {
+        throw new Error('Application date validation failed');
+      }
+  
+      // Set additional firm details if all validations passed
       this.setAdditionalFirmDetails();
-
+  
+      // Check if there are any new validation errors
       if (this.hasValidationErrors) {
         this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
         return;
       }
-
-      // Save Firm Details
+  
+      // Prepare firm object and save the firm details
       const firmObj = this.prepareFirmObject(this.userId);
       this.saveFirmDetails(firmObj, this.userId);
-
+  
       // Toggle off edit mode after saving
       this.allowEditFirmDetails = false;
     } catch (error) {
@@ -432,6 +439,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     }
   }
+  
 
 
   async ApplicationDateValidationCheckDuplicates(): Promise<void> {
@@ -568,13 +576,13 @@ export class ViewFirmPageComponent implements OnInit {
         .subscribe((response) => {
           if (response.isSuccess && response.response) {
             const { OldFirmApplStatusTypeDesc, OldFirmApplStatusDate, DuplicatePresentType } = response.response;
-
+  
             if (DuplicatePresentType === 0) {
-              resolve(true); // Validation Pass
+              resolve(true); // Validation passes
             } else {
               let msgKey: number;
               let placeholderValue: string = '';
-
+  
               if (DuplicatePresentType === 1) {
                 msgKey = (LicenceOrAuthorisation === 3)
                   ? constants.Firm_CoreDetails_Messages.SAME_AUTHORISATION_STATUS_ON_TWO_DATES
@@ -588,48 +596,45 @@ export class ViewFirmPageComponent implements OnInit {
               } else if (DuplicatePresentType === 3) {
                 msgKey = 3917;
               }
-
-              // Show the validation popup and run additional validation or save logic when "Ok" is clicked
-              this.showApplnStatusValidationPopup(msgKey, placeholderValue, () => {
-                if (LicenceOrAuthorisation === 2) {
-                  // Perform additional validation for Authorization
-                  LicenceOrAuthorisation = 3; // 3 for Authorization
-                  const authStatusID = this.firmDetails.AuthorisationStatusTypeID;
-                  const authStatusName = this.firmDetails.AuthorisationStatusTypeDesc;
-                  const authDate = this.firmDetails.AuthorisationDate;
-
-                  this.performApplnStatusValidation(LicenceOrAuthorisation, authStatusID, authStatusName, authDate)
-                    .then((authorisationValid) => {
-                      if (authorisationValid) {
-                        this.completeSave(); // Save if everything is valid
-                      }
-                    });
-                } else {
-                  // If no further validation is needed, directly save
-                  this.completeSave();
-                }
-              })
-                .then(() => {
-                  resolve(false); // Validation failed but user confirmed
+  
+              // Show the validation popup
+              this.showApplnStatusValidationPopup(msgKey, placeholderValue)
+                .then((confirmed) => {
+                  if (confirmed) {
+                    // User clicked "Ok", continue validation
+                    if (LicenceOrAuthorisation === 2) {
+                      LicenceOrAuthorisation = 3; // Switch to authorization validation
+                      const authStatusID = this.firmDetails.AuthorisationStatusTypeID;
+                      const authStatusName = this.firmDetails.AuthorisationStatusTypeDesc;
+                      const authDate = this.firmDetails.AuthorisationDate;
+  
+                      this.performApplnStatusValidation(LicenceOrAuthorisation, authStatusID, authStatusName, authDate)
+                        .then((authorisationValid) => {
+                          if (authorisationValid) {
+                            this.completeSave(); // Proceed with save if valid
+                          }
+                        });
+                    } else {
+                      this.completeSave(); // Proceed with save if no further validation is required
+                    }
+                  } else {
+                    resolve(false); // Validation failed but user confirmed (so stop)
+                  }
                 })
-                .catch(() => {
-                  reject(); // Cancel clicked, stop the process
+                .catch((error) => {
+                  reject(error); // Handle rejection
                 });
             }
           } else {
-            resolve(false); // Validation failed (if response is invalid)
+            resolve(false); // Resolve as false if validation fails
           }
         }, (error) => {
           console.error('Validation error:', error);
-          resolve(false); // Resolve as false if there's an error
+          resolve(false); // Resolve as false on error
         });
     });
   }
-
-
-
-
-
+  
 
 
   onSameAsTypeChange(selectedTypeID: number) {
@@ -2868,6 +2873,8 @@ export class ViewFirmPageComponent implements OnInit {
     Swal.fire({
       // title: 'Alert!',
       html: messages.join('<br>'), // Combine the messages with a line break
+      showCancelButton: false,
+      confirmButtonText: 'Ok',
     });
   }
 
@@ -2876,15 +2883,19 @@ export class ViewFirmPageComponent implements OnInit {
     Swal.fire({
       // title: 'Alert!',
       html: messages.join('<br>'), // Combine the messages with a line break
+      showCancelButton: false,
+      confirmButtonText: 'Ok',
     });
   }
 
   // Popups when you click save
-  showApplnStatusValidationPopup(messageKey: number, placeholder: string, onConfirmed?: () => void): Promise<void> {
+  showApplnStatusValidationPopup(messageKey: number, placeholder: string, onConfirmed?: () => void): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.firmService.errorMessages(messageKey).subscribe(
         (response) => {
           const messageWithPlaceholder = response.response.replace("{0}", placeholder);
+          
+          // Display the popup
           Swal.fire({
             html: messageWithPlaceholder,
             showCancelButton: true,
@@ -2894,21 +2905,22 @@ export class ViewFirmPageComponent implements OnInit {
           }).then((result) => {
             if (result.isConfirmed) {
               if (onConfirmed) {
-                onConfirmed(); // Run additional logic when "Ok" is clicked
+                onConfirmed(); // Execute additional logic when "Ok" is clicked
               }
-              resolve(); // Proceed with validation or next step
+              resolve(true); // Proceed, resolving with 'true' to indicate confirmation
             } else {
-              reject(new Error('Cancelled by user')); // Stop the process if "Cancel" is clicked
+              reject(new Error('Cancelled by user')); // Reject with an error if "Cancel" is clicked
             }
           });
         },
         (error) => {
           console.error('Error fetching error message:', error);
-          reject(error); // Handle error, prevent continuation if the message fails to load
+          reject(error); // Reject if there is an error fetching the message
         }
       );
     });
   }
+  
 
   isNullOrEmpty(value: any): boolean {
     return value === null || value === '';
