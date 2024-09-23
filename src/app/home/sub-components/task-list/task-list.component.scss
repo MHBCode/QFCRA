@@ -23,6 +23,8 @@
     width: 100%;
     justify-content: flex-start;
     background-color: rgba(253, 216, 216, 0.24);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
   }
   
   .tableTitle h3 {
@@ -31,6 +33,7 @@
     font-size: 1em;
     font-weight: 500;
     margin: 5px;
+    font-weight: bold;
   }
   
   .tableTitle h3:hover {

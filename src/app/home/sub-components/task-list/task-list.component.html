@@ -1,72 +1,52 @@
 <div *ngIf="isLoading" class="loader-overlay">
-    <div class="loader"></div>
+  <div class="loader"></div>
 </div>
 <div class="TaskList-wrapper">
-<div class="table">
+  <div class="table">
     <div *ngIf="showTitle" (click)="goToAllTasks()" class="tableTitle">
-        <h3>Task List</h3>
+      <h3>Task List</h3>
     </div>
     <div class="table-responsive">
-    <table [ngClass]="customClass">
+      <table [ngClass]="customClass">
         <thead>
-            <tr>
-                <th>Task Type</th>
-                <th>Link</th>
-                <th>Firm Name</th>
-                <th>Description</th>
-                <th>Due Date</th>
-                <th>object ID</th>
-                <th>object Instance ID</th>
-                <th>object Instance Num</th>
-                <th>task Initiated Date</th>
-                <th>task Initiated By</th>
-                <th>Is Common Task</th>
-                <th>Firm ID</th>
-                <th *ngIf = "isMainView">Days Over Due</th>
-                <th *ngIf = "isMainView">comments</th>
-            </tr>
+          <tr>
+            <th>Task Type</th>
+            <th>Link</th>
+            <th>Firm Name</th>
+            <th>Description</th>
+            <th>Due Date</th>
+            <th *ngIf="isMainView">Days Over Due</th>
+            <th *ngIf="isMainView">Notes</th>
+          </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let item of paginatedTasks">
-                <td>
-                    <div class="expandable-text-container">
-                      <span class="expandable-text">{{ item.TaskType }}</span>
-                    </div>
-                </td>
-                <td>
-                    <div class="expandable-text-container">
-                      <span class="expandable-text">{{ item.Link }}</span>
-                    </div>
-                </td>
-                <td>{{ item.FirmName }}</td>            
-                <td>
-                    <div class="expandable-text-container">
-                      <span class="expandable-text">{{ item.ShortDescription }}</span>
-                    </div>
-                </td>
-                <td>{{item.TaskDueDate}}</td>
-                <td>{{item.ObjectID}}</td>
-                <td>{{item.ObjectInstanceID}}</td>
-                <td>{{item.ObjectInstanceNum}}</td>
-                <td>{{item.TaskInitiatedDate}}</td>
-                <td>{{item.TaskInitiatedBy}}</td>
-                <td>{{item.IsCommonTask}}</td>
-                <td>{{item.FirmID}}</td>
-                <td *ngIf = "isMainView">{{item.DaysOverDue}}</td>
-                <td *ngIf = "isMainView">{{item.Comments}}</td>
-            </tr>
+          <tr *ngFor="let item of paginatedTasks">
+            <td>
+              <div class="expandable-text-container">
+                <span class="expandable-text">{{ item.TaskType }}</span>
+              </div>
+            </td>
+            <td style="text-align: center;">
+              <a [href]="item.Link">View</a>
+            </td>
+            <td>{{ item.FirmName }}</td>
+            <td>{{ item.ShortDescription }}</td>
+            <td>{{item.TaskDueDate}}</td>
+            <td *ngIf="isMainView">{{item.DaysOverDue}}</td>
+            <td *ngIf="isMainView">{{item.Comments}}</td>
+          </tr>
         </tbody>
-    </table>
-  </div>
+      </table>
+    </div>
     <div class="pagination">
-        <button (click)="previousPage()" [disabled]="currentPage === 1">
-          <span>&lt;</span>
-        </button>
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button (click)="nextPage()" [disabled]="currentPage === totalPages">
-          <span>&gt;</span>
-        </button>
-        <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
-      </div>
+      <button (click)="previousPage()" [disabled]="currentPage === 1">
+        <span>&lt;</span>
+      </button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+        <span>&gt;</span>
+      </button>
+      <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
+    </div>
   </div>
 </div>
