@@ -3,44 +3,44 @@
     <img src="../../../assets/images/logo.jpg" />
   </div>
   <div class="nav">
-    <div
-      class="my-invention"
-      (click)="openMenu(0)"
-      *ngIf="
-        firms == true || admin == true || individuals == true || reports == true
-      "
-    ></div>
     <ul class="navigation-ul">
       <li>
         <a (click)="goHome()"> Home </a>
-      </li>
-      <li>
-        <a (click)="openMenu(1)" [class.active]="activeMenuIndex === 1"> Firms </a>
-        <div class="menuOfTop" *ngIf="firms == true">
+        <div class="menuOfTop">
           <ul>
-            <li (click)="goto(1)">Open</li>
-            <li (click)="goto(0)">New</li>
-            <li (click)="goto(2)">CO/Supervisors</li>
-            <li (click)="goto(3)">Notices and Responses</li>
-            <li (click)="goto(4)">Enforcement & Disciplinary Actions</li>
+            <li (click)="goto(0)">Tasks</li>
+            <li (click)="goto(1)">New Document</li>
+            <li (click)="goto(2)">Search Document</li>
           </ul>
         </div>
       </li>
       <li>
-        <a (click)="openMenu(2)" [class.active]="activeMenuIndex === 2"> Individuals </a>
-        <div class="menuOfTop" *ngIf="individuals == true">
+        <a [class.active]="activeMenuIndex === 1"> Firms </a>
+        <div class="menuOfTop">
           <ul>
-            <li (click)="goto(6)">Open</li>
-            <li (click)="goto(7)">Change registration Status</li>
-            <li (click)="goto(8)">Pending Ai Application</li>
+            <li (click)="goto(3)">Open</li>
+            <li (click)="goto(4)">New</li>
+            <li (click)="goto(5)">CO/Supervisors</li>
+            <li (click)="goto(6)">Notices and Responses</li>
+            <li (click)="goto(7)">Enforcement & Disciplinary Actions</li>
           </ul>
         </div>
       </li>
       <li>
-        <a (click)="openMenu(3)" [class.active]="activeMenuIndex === 3"> Reports </a>
-        <div class="menuOfTop" *ngIf="reports == true">
+        <a [class.active]="activeMenuIndex === 2"> Individuals </a>
+        <div class="menuOfTop">
           <ul>
-            <li (click)="goto(9)">Firms Report</li>
+            <li (click)="goto(8)">Open</li>
+            <li (click)="goto(9)">Change registration Status</li>
+            <li (click)="goto(10)">Pending Ai Application</li>
+          </ul>
+        </div>
+      </li>
+      <li>
+        <a [class.active]="activeMenuIndex === 3"> Reports </a>
+        <div class="menuOfTop">
+          <ul>
+            <li (click)="goto(11)">Firms Report</li>
             <li>Contacts Report</li>
             <li>AI Application Reports</li>
             <li>Approved individuals Report</li>
@@ -57,11 +57,11 @@
         </div>
       </li>
       <li>
-        <a (click)="openMenu(4)" [class.active]="activeMenuIndex === 4"> Admin </a>
-        <div class="menuOfTop" *ngIf="admin == true">
+        <a [class.active]="activeMenuIndex === 4"> Admin </a>
+        <div class="menuOfTop">
           <ul>
-            <li (click)="goto(22)">User Access</li>
-            <li (click)="goto(23)">Re-assign Tasks</li>
+            <li (click)="goto(24)">User Access</li>
+            <li (click)="goto(25)">Re-assign Tasks</li>
           </ul>
         </div>
       </li>
@@ -69,15 +69,9 @@
   </div>
   <div class="profile-icon-submenu" id="profile-icon-submenu">
     <div class="change-font">
-      <button class="font-btn decrease-font-size" (click)="decreaseFontSize()">
-        A-
-      </button>
-      <button class="font-btn reset-font-btn" (click)="resetFontSize()">
-        A
-      </button>
-      <button class="font-btn increase-font-btn" (click)="increaseFontSize()">
-        A+
-      </button>
+      <button class="font-btn decrease-font-size" (click)="decreaseFontSize()">A-</button>
+      <button class="font-btn reset-font-btn" (click)="resetFontSize()">A</button>
+      <button class="font-btn increase-font-btn" (click)="increaseFontSize()">A+</button>
     </div>
   </div>
   <div class="profile-access">

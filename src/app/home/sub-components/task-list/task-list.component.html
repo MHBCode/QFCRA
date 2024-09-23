@@ -10,12 +10,58 @@
       <table>
         <thead>
           <tr>
-            <th>Task Type</th>
+            <th>
+              Task Type
+              <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleTaskDropdown()">&#x25BC;</i>
+              <div *ngIf="TaskDropdownVisible" class="custom-dropdown">
+                <ul class="dropdown-list">
+                  <li class="dropdown-item" (click)="filterByTaskType('')">
+                    All Task Types
+                  </li>
+                  <li class="dropdown-item" *ngFor="let taskType of taskTypes" (click)="filterByTaskType(taskType)">
+                    {{ taskType }}
+                  </li>
+                </ul>
+              </div>
+            </th>
             <th *ngIf="isMainView">Link</th>
-            <th>Firm Name</th>
+            <th>
+              Firm Name
+              <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleFirmDropdown()">&#x25BC;</i>
+              <div *ngIf="FirmsDropdownVisible" class="custom-dropdown">
+                <ul class="dropdown-list">
+                  <li class="dropdown-item" (click)="filterByFirmName('')">
+                    All Firms
+                  </li>
+                  <li class="dropdown-item" *ngFor="let firm of firmNames" (click)="filterByFirmName(firm)">
+                    {{ firm }}
+                  </li>
+                </ul>
+              </div>
+            </th>
             <th>Description</th>
-            <th>Due Date</th>
-            <th>Days Over Due</th>
+            <th>
+              Due Date
+              <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleDueDateInput()">&#x25BC;</i>
+              <div *ngIf="dueDateInputVisible" class="due-date-filter">
+                <label for="dueDate" class="date-label">Select Due Date:</label>
+                <input [value]="selectedDueDate" id="dueDate" type="date" (change)="filterByDueDate($event)"
+                  class="custom-date-input" />
+              </div>
+            </th>
+            <th>
+              Days Over Due
+              <i class="dropdown-icon" (click)="toggleDaysOverDueDropdown()">&#x25BC;</i>
+              <div *ngIf="daysOverDueDropdownVisible" class="custom-dropdown">
+                <ul class="dropdown-list">
+                  <li class="dropdown-item" (click)="filterByDaysOverDue('')">All</li>
+                  <li class="dropdown-item" (click)="filterByDaysOverDue('>10')">&gt; 10</li>
+                  <li class="dropdown-item" (click)="filterByDaysOverDue('>20')">&gt; 20</li>
+                  <li class="dropdown-item" (click)="filterByDaysOverDue('>30')">&gt; 30</li>
+                  <li class="dropdown-item" (click)="filterByDaysOverDue('>40')">&gt; 40</li>
+                </ul>
+              </div>
+            </th>
             <th *ngIf="isMainView">Notes</th>
           </tr>
         </thead>
@@ -23,7 +69,7 @@
           <tr *ngFor="let item of paginatedTasks">
             <td>{{ item.TaskType }}</td>
             <td *ngIf="isMainView" style="text-align: center;">
-              <a [href]="item.Link">View</a>
+              <a [href]="item.Link" target="_blank">View</a>
             </td>
             <td>{{ item.FirmName }}</td>
             <td>
@@ -34,7 +80,7 @@
                 <div>{{ item.ShortDescription }}</div>
               </ng-template>
             </td>
-            
+
             <td>{{item.TaskDueDate}}</td>
             <td>{{item.DaysOverDue}}</td>
             <td *ngIf="isMainView">{{item.Comments}}</td>

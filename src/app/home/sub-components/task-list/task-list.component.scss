@@ -9,7 +9,6 @@
 .table {
   display: flex;
   flex-direction: column;
-  position: relative;
   padding: 5px;
   background: white;
   border-radius: 15px;
@@ -207,3 +206,94 @@ tr:hover {
 .expandable-text:hover::after {
   content: '';
 }
+
+/* Container for the dropdown */
+.custom-dropdown {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  overflow-y: auto;  /* Add scroll if dropdown is too long */
+  z-index: 1000; /* Ensure dropdown is on top */
+}
+
+/* The list inside the dropdown */
+.dropdown-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Individual dropdown items */
+.dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 0.875em;
+  color: #333;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hover effect for dropdown items */
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+  color: #000;
+}
+
+
+.dropdown-icon {
+  font-size: 1em;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+/* The due date filter container */
+.due-date-filter {
+  padding: 10px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  position: absolute;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+/* Input styling for the date */
+.custom-date-input {
+  width: 100%;
+  max-width: 250px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease;
+  outline: none;
+}
+
+.custom-date-input:hover,
+.custom-date-input:focus {
+  border-color: #a51e36; /* Change color when focused */
+  background-color: #ffffff; /* Background becomes white on focus */
+  box-shadow: 0 0 8px rgba(165, 30, 54, 0.2); /* Add shadow on focus */
+}
+
+/* Styling for the label above the input */
+.date-label {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 5px;
+  display: block;
+  font-weight: bold;
+}
+
+/* Smooth transition for the dropdown */
+.due-date-filter {
+  transition: all 0.3s ease-in-out;
+}
+
+.due-date-filter.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+
