@@ -1,6 +1,6 @@
   <!-- Search Form -->
   
-  <div class="brid-crump">
+  <!-- <div class="brid-crump">
     <div class="btn-group">
       <div class="btns">
         <button (click)="toggleSearch()">
@@ -11,7 +11,7 @@
     </div>
   </div>
 
-  <!-- Search Section -->
+  <!-- Search Section 
   <section *ngIf="showSearchSection" class="search-firm-section">
     <div class="inputs-field-set">
       <div class="search-firm-actions">
@@ -19,7 +19,7 @@
       </div>
 
       <div class="search-firms-inputs">
-        <!-- Firm Name (Dropdown) -->
+        <!-- Firm Name (Dropdown) 
         <div class="input-field">
           <label for="firmName">Firm Name</label>
           <div class="select-wrapper">
@@ -32,13 +32,13 @@
           </div>
         </div>
 
-        <!-- QFC Number -->
+        <!-- QFC Number 
         <div class="input-field">
           <label for="qfcNumber">QFC Number</label>
           <input name="qfcNumber" id="qfcNumber" type="text" [(ngModel)]="qfcNumber" />
         </div>
 
-        <!-- Firm Type (Checkboxes) -->
+        <!-- Firm Type (Checkboxes) 
         <div class="input-field" style="width: 100%">
           <div class="checkbox-wrapper">
             <label for="firmType">Firm Type:</label>
@@ -55,7 +55,7 @@
           </div>
         </div>
 
-        <!-- Firm Status (Checkboxes) -->
+        <!-- Firm Status (Checkboxes) 
         <div class="input-field" style="width: 100%">
           <div class="checkbox-wrapper">
             <label for="firmStatus">Firm Status:</label>
@@ -78,7 +78,7 @@
           </div>
         </div>
 
-        <!-- License Status (Dropdown) -->
+        <!-- License Status (Dropdown) 
         <div class="input-field">
           <label for="licenseStatus">License Status</label>
           <div class="select-wrapper">
@@ -91,7 +91,7 @@
           </div>
         </div>
 
-        <!-- Authorisation Status (Dropdown) -->
+        <!-- Authorisation Status (Dropdown) -
         <div class="input-field">
           <label for="authorisationStatus">Authorisation Status</label>
           <div class="select-wrapper">
@@ -104,7 +104,7 @@
           </div>
         </div>
 
-        <!-- Prudential Category (Checkboxes) -->
+        <!-- Prudential Category (Checkboxes) 
         <div class="input-field" style="width: 100%">
           <div class="checkbox-wrapper">
             <label for="prudentialCategory">Prudential Category</label>
@@ -132,7 +132,7 @@
           </div>
         </div>
 
-        <!-- Sectors (Checkboxes) -->
+        <!-- Sectors (Checkboxes) 
         <div class="input-field" style="width: 100%">
           <div class="checkbox-wrapper">
             <label for="sectors">Sectors</label>
@@ -155,7 +155,7 @@
         </div>
       </div>
 
-      <!-- Buttons -->
+      <!-- Buttons 
       <div class="input-search-buttons">
         <button type="button" (click)="resetFilters()" class="reset">
           Reset
@@ -167,12 +167,181 @@
     </div>
   </section>
 
-  <!-- Alphabet Filter -->
+  <!-- Alphabet Filter 
   <div class="alphabet-filter">
     <span *ngFor="let letter of alphabet" (click)="filterFirmsByLetter(letter)">{{
       letter
       }}</span>
-  </div>
+  </div> -->
 
   <!-- Firm List Component -->
+   <!-- Trigger Button for Search Popup -->
+<!-- Trigger Button for Search Popup -->
+<!-- Trigger Button for Search Popup -->
+<div class="brid-crump">
+  <div class="btn-group">
+    <div class="btns">
+      <button type="button" (click)="openSearchModal()">
+        <i class="bi bi-search"></i>
+        Search
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Modal for Search -->
+<div class="custom-modal" *ngIf="showSearchModal">
+  <div class="modal-overlay" (click)="closeSearchModal()"></div> <!-- Click outside to close -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4>Search Firms</h4>
+      <button type="button" class="close" (click)="closeSearchModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <section class="search-firm-section">
+        <div class="inputs-field-set">
+          <!-- Search Inputs -->
+          <div class="search-firms-inputs">
+            <!-- Firm Name Dropdown -->
+            <div class="input-field">
+              <label for="firmName">Firm Name</label>
+              <div class="select-wrapper">
+                <select name="firmName" id="firmName" [(ngModel)]="firmName">
+                  <option value="all">All</option>
+                  <option *ngFor="let firm of firms" [value]="firm.FirmName">
+                    {{ firm.FirmName }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- QFC Number Input -->
+            <div class="input-field">
+              <label for="qfcNumber">QFC Number</label>
+              <input name="qfcNumber" id="qfcNumber" type="text" [(ngModel)]="qfcNumber" />
+            </div>
+
+            <!-- Firm Type Checkboxes -->
+            <div class="input-field" style="width: 100%">
+              <label for="firmType">Firm Type:</label>
+              <div class="checkbox-options">
+                <label><input type="checkbox" [(ngModel)]="checkboxes.authorized" />
+                  Authorized</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.dnfbp" />
+                  DNFBP</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.licensed" />
+                  Licensed</label>
+              </div>
+            </div>
+
+            <!-- Firm Status Checkboxes -->
+            <div class="input-field" style="width: 100%">
+              <label for="firmStatus">Firm Status:</label>
+              <div class="checkbox-options">
+                <label><input type="checkbox" [(ngModel)]="checkboxes.applicant" />
+                  Applicant</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.applicationWithdrawn" />
+                  Application Withdrawn</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.applicationRejected" />
+                  Application Rejected</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.active" />
+                  Active</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.inactive" />
+                  Inactive</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.withdrawn" />
+                  Withdrawn</label>
+              </div>
+            </div>
+
+            <!-- License Status Dropdown -->
+            <div class="input-field">
+              <label for="licenseStatus">License Status</label>
+              <div class="select-wrapper">
+                <select name="licenseStatus" id="licenseStatus" [(ngModel)]="licenseStatus">
+                  <option value="all">All</option>
+                  <option *ngFor="let status of licenseStatuses" [value]="status">
+                    {{ status }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Authorisation Status Dropdown -->
+            <div class="input-field">
+              <label for="authorisationStatus">Authorisation Status</label>
+              <div class="select-wrapper">
+                <select name="authorisationStatus" id="authorisationStatus" [(ngModel)]="authorisationStatuses">
+                  <option value="all">All</option>
+                  <option *ngFor="let status of authorisationStatuses" [value]="status">
+                    {{ status }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Prudential Category Checkboxes -->
+            <div class="input-field" style="width: 100%">
+              <label for="prudentialCategory">Prudential Category:</label>
+              <div class="checkbox-options">
+                <label><input type="checkbox" [(ngModel)]="checkboxes.piib1" /> PIIB
+                  1</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.piib2" /> PIIB
+                  2</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.piib3" /> PIIB
+                  3</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.piib4" /> PIIB
+                  4</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.piib5" /> PIIB
+                  5</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.directInsurer" />
+                  Direct Insurer</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.reinsurer" />
+                  Reinsurer</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.insuranceIntermediary" />
+                  Insurance Intermediary</label>
+              </div>
+            </div>
+
+            <!-- Sectors Checkboxes -->
+            <div class="input-field" style="width: 100%">
+              <label for="sectors">Sectors:</label>
+              <div class="checkbox-options">
+                <label><input type="checkbox" [(ngModel)]="checkboxes.investmentManager" />
+                  Investment Manager</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.insurer" />
+                  Insurer</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.insuranceIntermediary" />
+                  Insurance Intermediary</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.bank" /> Bank</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.advisor" />
+                  Advisor</label>
+                <label><input type="checkbox" [(ngModel)]="checkboxes.repOffice" /> Rep
+                  Office</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alphabet Filter Section -->
+          <div class="alphabet-filter">
+            <span *ngFor="let letter of alphabet" (click)="filterFirmsByLetter(letter)">
+              {{ letter }}
+            </span>
+          </div>
+
+          <!-- Search and Reset Buttons -->
+          <div class="input-search-buttons">
+            <button type="button" (click)="resetFilters()" class="reset">
+              Reset
+            </button>
+            <button type="button" (click)="searchFirms()" class="search">
+              Search
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+
   <app-firm-list [customClass]="'custom-style-firm-page'" [firms]="filteredFirms"></app-firm-list>

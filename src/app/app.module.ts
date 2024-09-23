@@ -15,7 +15,7 @@ import { FirmListComponent } from './home/sub-components/firm-list/firm-list.com
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,    
   ],
   providers: [],
   bootstrap: [AppComponent]
