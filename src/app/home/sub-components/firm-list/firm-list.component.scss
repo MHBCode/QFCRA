@@ -60,6 +60,10 @@ th {
   border-right: 1px solid #ddd; /* Border between columns */
 }
 
+.home-page th {
+  padding: 3px;
+}
+
 td {
   color: #333333;
   font-size: 0.75em;
@@ -85,16 +89,15 @@ tr:hover {
 
 .table-responsive {
   width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .table-responsive table {
   width: 100%;
-  min-width: 700px;
 }
-
-
 
 .pagination {
   display: flex;

@@ -7,7 +7,7 @@
       <h3>Firm List</h3>
     </div>
     <div class="table-responsive">
-      <table [ngClass]="customClass">
+      <table [ngClass]="isMainView ? 'home-page' : 'firm-page'">
         <thead>
           <tr>
             <th>QFC Number</th>

@@ -11,7 +11,7 @@ export class FirmListComponent implements OnInit {
 
   @Input() listCount: number = 5;
   @Input() firms: any[] = [];
-  @Input() customClass: string = '';
+  @Input() isMainView: boolean = false;
 
   isExpanded: { [key: string]: boolean } = {};
   isLoading: boolean = true;

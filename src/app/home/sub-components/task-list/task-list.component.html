@@ -7,32 +7,36 @@
       <h3>Task List</h3>
     </div>
     <div class="table-responsive">
-      <table [ngClass]="customClass">
+      <table>
         <thead>
           <tr>
             <th>Task Type</th>
-            <th>Link</th>
+            <th *ngIf="isMainView">Link</th>
             <th>Firm Name</th>
             <th>Description</th>
             <th>Due Date</th>
-            <th *ngIf="isMainView">Days Over Due</th>
+            <th>Days Over Due</th>
             <th *ngIf="isMainView">Notes</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of paginatedTasks">
-            <td>
-              <div class="expandable-text-container">
-                <span class="expandable-text">{{ item.TaskType }}</span>
-              </div>
-            </td>
-            <td style="text-align: center;">
+            <td>{{ item.TaskType }}</td>
+            <td *ngIf="isMainView" style="text-align: center;">
               <a [href]="item.Link">View</a>
             </td>
             <td>{{ item.FirmName }}</td>
-            <td>{{ item.ShortDescription }}</td>
+            <td>
+              <div *ngIf="!isMainView; else noExpand" class="expandable-text-container">
+                <span class="expandable-text">{{ item.ShortDescription }}</span>
+              </div>
+              <ng-template #noExpand>
+                <div>{{ item.ShortDescription }}</div>
+              </ng-template>
+            </td>
+            
             <td>{{item.TaskDueDate}}</td>
-            <td *ngIf="isMainView">{{item.DaysOverDue}}</td>
+            <td>{{item.DaysOverDue}}</td>
             <td *ngIf="isMainView">{{item.Comments}}</td>
           </tr>
         </tbody>
@@ -50,3 +54,9 @@
     </div>
   </div>
 </div>
+
+<!-- <td>
+      <div class="expandable-text-container">
+         <span class="expandable-text">{{ item.TaskType }}</span>
+      </div>
+     </td> don't delete-->

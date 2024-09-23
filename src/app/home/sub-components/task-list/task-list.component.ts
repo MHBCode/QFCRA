@@ -11,7 +11,6 @@ export class TaskListComponent implements OnInit {
 
   @Input() listCount: number = 50;
   @Input() isMainView: boolean = false;
-  @Input() customClass: string = '';
   Tasks: any[] = [];
   paginatedTasks: any[] = [];
   currentPage: number = 1;
