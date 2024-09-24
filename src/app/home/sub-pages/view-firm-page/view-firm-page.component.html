@@ -1557,31 +1557,31 @@
 
   <!--Auditors-->
   <section id="Auditors" class="edit-firm-section" [ngStyle]="{ width: dataWidth }" style="display: none">
-    <div class="btn">
-      <button (click)="createAuditor()">
-        <i class="bi bi-plus"></i>
-        Create
-      </button>
-      <button (click)="editAuditor()">
-        <i class="bi bi-pen"></i>
-        Edit
-      </button>
-      <!--popup message for edit-->
-
-      <button>
-        <i class="bi bi-trash"></i>
-        Delete
-      </button>
-    </div>
     <div class="inputs-field-set">
       <div class="section">
         <div class="auditor-header">
           <h2>Auditors For {{ firmDetails?.FirmName }}</h2>
-          <span>
-            <input id="InactiveAuditors" type="checkbox" />
-            <label>Display Inactive Auditors</label>
-          </span>
+          <div class="btn">
+            <button (click)="createAuditor()">
+              <i class="bi bi-plus"></i>
+              Create
+            </button>
+            <button (click)="editAuditor()">
+              <i class="bi bi-pen"></i>
+              Edit
+            </button>
+            <!--popup message for edit-->
+      
+            <button>
+              <i class="bi bi-trash"></i>
+              Delete
+            </button>
+          </div>
         </div>
+        <span>
+          <input id="InactiveAuditors" type="checkbox" />
+          <label>Display Inactive Auditors</label>
+        </span>
         <table>
           <thead>
             <tr>

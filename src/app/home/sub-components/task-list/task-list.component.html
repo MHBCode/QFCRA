@@ -71,16 +71,8 @@
             <td *ngIf="isMainView" style="text-align: center;">
               <a [href]="item.Link" target="_blank">View</a>
             </td>
-            <td>{{ item.FirmName }}</td>
-            <td>
-              <div *ngIf="!isMainView; else noExpand" class="expandable-text-container">
-                <span class="expandable-text">{{ item.ShortDescription }}</span>
-              </div>
-              <ng-template #noExpand>
-                <div>{{ item.ShortDescription }}</div>
-              </ng-template>
-            </td>
-
+            <td>{{item.FirmName}}</td>
+            <td>{{item.ShortDescription}}</td>
             <td>{{item.TaskDueDate}}</td>
             <td>{{item.DaysOverDue}}</td>
             <td *ngIf="isMainView">{{item.Comments}}</td>

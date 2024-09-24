@@ -14,8 +14,10 @@
   background: white;
   border-radius: 15px; /* Radius for the table container */
   width: 100%;
+  height: 100%;
   box-shadow: 8px 8px 43px rgba(8, 50, 79, 0.1);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .tableTitle {
@@ -44,6 +46,10 @@ table {
   width: 100%;
   border-collapse: collapse;
   overflow: hidden; /* Ensure rounded corners are visible */
+}
+
+.home-page {
+  table-layout: fixed;
 }
 
 thead {

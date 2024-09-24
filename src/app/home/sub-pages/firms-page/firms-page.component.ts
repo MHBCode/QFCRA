@@ -178,7 +178,6 @@ import { FirmService } from 'src/app/ngServices/firm.service';
   styleUrls: ['./firms-page.component.scss'],
 })
 export class FirmsPageComponent implements OnInit {
-  @Input() listCount: number = 50;
 
   firms: any[] = [];
   licenseStatuses: string[] = [];
