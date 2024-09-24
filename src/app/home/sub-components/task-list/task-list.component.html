@@ -7,33 +7,40 @@
       <h3>Task List</h3>
     </div>
     <div class="table-responsive">
-      <table>
+      <table [ngClass]="isMainView ? 'task-table' : 'home-task-table'">
         <thead>
           <tr>
             <th>
               Task Type
               <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleTaskDropdown()">&#x25BC;</i>
+              <i *ngIf="selectedTaskType !== ''" class="filter-active-icon">&#x2713;</i> <!-- Active filter icon -->
               <div *ngIf="TaskDropdownVisible" class="custom-dropdown">
                 <ul class="dropdown-list">
-                  <li class="dropdown-item" (click)="filterByTaskType('')">
+                  <li class="dropdown-item" 
+                      [class.active-filter]="selectedTaskType === ''" 
+                      (click)="filterByTaskType('')">
                     All Task Types
                   </li>
-                  <li class="dropdown-item" *ngFor="let taskType of taskTypes" (click)="filterByTaskType(taskType)">
+                  <li class="dropdown-item" 
+                      *ngFor="let taskType of taskTypes" 
+                      [class.active-filter]="selectedTaskType === taskType" 
+                      (click)="filterByTaskType(taskType)">
                     {{ taskType }}
                   </li>
                 </ul>
               </div>
-            </th>
+            </th>            
             <th *ngIf="isMainView">Link</th>
             <th>
               Firm Name
               <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleFirmDropdown()">&#x25BC;</i>
+              <i *ngIf="selectedFirmName !== ''" class="filter-active-icon">&#x2713;</i> <!-- Active filter icon -->
               <div *ngIf="FirmsDropdownVisible" class="custom-dropdown">
                 <ul class="dropdown-list">
-                  <li class="dropdown-item" (click)="filterByFirmName('')">
+                  <li class="dropdown-item" (click)="filterByFirmName('')" [class.active-filter]="selectedFirmName === ''" >
                     All Firms
                   </li>
-                  <li class="dropdown-item" *ngFor="let firm of firmNames" (click)="filterByFirmName(firm)">
+                  <li class="dropdown-item" *ngFor="let firm of firmNames" (click)="filterByFirmName(firm)" [class.active-filter]="selectedFirmName === firm">
                     {{ firm }}
                   </li>
                 </ul>
@@ -43,6 +50,7 @@
             <th>
               Due Date
               <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleDueDateInput()">&#x25BC;</i>
+              <i *ngIf="selectedDueDate !== ''" class="filter-active-icon">&#x2713;</i> <!-- Active filter icon -->
               <div *ngIf="dueDateInputVisible" class="due-date-filter">
                 <label for="dueDate" class="date-label">Select Due Date:</label>
                 <input [value]="selectedDueDate" id="dueDate" type="date" (change)="filterByDueDate($event)"
@@ -52,27 +60,60 @@
             <th>
               Days Over Due
               <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleDaysOverDueDropdown()">&#x25BC;</i>
+              <!-- Show active filter icon when Days Over Due filter is selected -->
+              <i *ngIf="selectedDaysOverDue !== ''" class="filter-active-icon">&#x2713;</i>
               <div *ngIf="daysOverDueDropdownVisible" class="custom-dropdown">
                 <ul class="dropdown-list">
-                  <li class="dropdown-item" (click)="filterByDaysOverDue('')">All</li>
-                  <li class="dropdown-item" (click)="filterByDaysOverDue('>10')">&gt; 10</li>
-                  <li class="dropdown-item" (click)="filterByDaysOverDue('>20')">&gt; 20</li>
-                  <li class="dropdown-item" (click)="filterByDaysOverDue('>30')">&gt; 30</li>
-                  <li class="dropdown-item" (click)="filterByDaysOverDue('>40')">&gt; 40</li>
+                  <li class="dropdown-item" 
+                      (click)="filterByDaysOverDue('')" 
+                      [class.active-filter]="selectedDaysOverDue === ''">
+                    All
+                  </li>
+                  <li class="dropdown-item" 
+                      (click)="filterByDaysOverDue('>10')" 
+                      [class.active-filter]="selectedDaysOverDue === '>10'">
+                    &gt; 10
+                  </li>
+                  <li class="dropdown-item" 
+                      (click)="filterByDaysOverDue('>20')" 
+                      [class.active-filter]="selectedDaysOverDue === '>20'">
+                    &gt; 20
+                  </li>
+                  <li class="dropdown-item" 
+                      (click)="filterByDaysOverDue('>30')" 
+                      [class.active-filter]="selectedDaysOverDue === '>30'">
+                    &gt; 30
+                  </li>
+                  <li class="dropdown-item" 
+                      (click)="filterByDaysOverDue('>40')" 
+                      [class.active-filter]="selectedDaysOverDue === '>40'">
+                    &gt; 40
+                  </li>
                 </ul>
               </div>
-            </th>
+            </th>            
             <th *ngIf="isMainView">Notes</th>
           </tr>
         </thead>
+        
         <tbody>
           <tr *ngFor="let item of paginatedTasks">
-            <td>{{ item.TaskType }}</td>
+            <td>
+              <div *ngIf="!isMainView else expandType" class="expandable-text-container">
+                <span class="expandable-text">{{ item.TaskType }}</span>
+             </div>
+             <ng-template #expandType>{{item.TaskType}}</ng-template>
+            </td>
             <td *ngIf="isMainView" style="text-align: center;">
               <a [href]="item.Link" target="_blank">View</a>
             </td>
             <td>{{item.FirmName}}</td>
-            <td>{{item.ShortDescription}}</td>
+            <td>
+              <div *ngIf="!isMainView else expandDesc" class="expandable-text-container">
+                <span class="expandable-text">{{item.ShortDescription}}</span>
+              </div>
+              <ng-template #expandDesc>{{item.ShortDescription}}</ng-template>
+            </td>
             <td>{{item.TaskDueDate}}</td>
             <td>{{item.DaysOverDue}}</td>
             <td *ngIf="isMainView">{{item.Comments}}</td>

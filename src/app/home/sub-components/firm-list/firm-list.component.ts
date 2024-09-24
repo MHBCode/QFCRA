@@ -9,14 +9,13 @@ import { FirmService } from 'src/app/ngServices/firm.service';
 })
 export class FirmListComponent implements OnInit {
 
-  @Input() listCount: number = 5;
+  @Input() pageSize: number = 5;
   @Input() firms: any[] = [];
   @Input() isMainView: boolean = false;
 
   isExpanded: { [key: string]: boolean } = {};
   isLoading: boolean = true;
   currentPage: number = 1;
-  pageSize: number = 5;
   totalPages: number = 0;
   totalRows: number = 0;
   paginatedFirms: any[] = [];

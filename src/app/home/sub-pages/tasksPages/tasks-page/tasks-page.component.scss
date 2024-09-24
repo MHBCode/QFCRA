@@ -8,7 +8,7 @@
 }
 
 .menu-container {
-    padding: 10px;
+    padding: 10px 0px;
 }
 
 .nav {
@@ -42,18 +42,18 @@
 
 .active {
     background-color: #A51E36;
-    color: white!important;
+    color: white !important;
 }
 
 .active:hover {
-    background: #A51E36!important;
+    background: #A51E36 !important;
 }
 
 .nav li:last-child a {
     border-right: none;
 }
 
-.btns button{
+.btns button {
     background: #A51E36;
     padding: 0.5rem 1rem;
     display: flex;
@@ -63,8 +63,15 @@
     border-radius: 10px;
     color: white;
     min-width: 6rem;
-    min-height: 40px;;
-  }
-  .btns button i{
+    min-height: 40px;
+    ;
+}
+
+.btns button i {
     margin: 0 2px;
-  }
+}
+
+.task-page {
+    width: 98%;
+    margin: auto;
+}

@@ -48,7 +48,7 @@ table {
   overflow: hidden; /* Ensure rounded corners are visible */
 }
 
-.home-page {
+.home-firm-table {
   table-layout: fixed;
 }
 
@@ -64,9 +64,10 @@ th {
   padding: 10px; /* Add padding for better spacing */
   text-align: left;
   border-right: 1px solid #ddd; /* Border between columns */
+  min-width: 100px;
 }
 
-.home-page th {
+.home-firm-table th {
   padding: 3px;
 }
 
@@ -79,6 +80,7 @@ td {
   padding: 10px; /* Add padding for better spacing */
   border-right: 1px solid #ddd; /* Border between columns */
   cursor: pointer;
+  min-width: 100px;
 }
 
 tbody {
@@ -95,10 +97,9 @@ tr:hover {
 
 .table-responsive {
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: auto; /* Allows table to shrink or expand within parent */
   -webkit-overflow-scrolling: touch;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  scrollbar-width: none; /* Optionally hide the scrollbar */
 }
 
 .table-responsive table {

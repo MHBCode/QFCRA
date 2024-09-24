@@ -76,6 +76,10 @@ td {
   cursor: pointer;
 }
 
+.task-table td {
+  font-size: 0.90rem;
+}
+
 tbody {
   background-color: #ffecf0;
 }
@@ -297,4 +301,9 @@ tr:hover {
   visibility: hidden;
 }
 
+
+.active-filter {
+  background-color: #a51e36;
+  color: white;
+}
 
