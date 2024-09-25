@@ -40,7 +40,10 @@
 }
 
 .reportsTable th, .reportsTable td {
-    padding: 8px 12px; /* Add padding for better spacing */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 8px 12px;
+    font-size: 0.9em;
 }
 
 .reportsTable tr{
@@ -52,8 +55,22 @@
 }
 
 @media (max-width: 768px) {
+    .table {
+        overflow-x: auto; /* Enable horizontal scrolling */
+    }
+    
     .reportsTable th, .reportsTable td {
-        padding: 6px 8px; /* Reduce padding for smaller screens */
-        font-size: 0.85em;
+        font-size: 0.8em;
+        padding: 6px 8px;
+    }
+    
+    .tableTitle h3 {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 1270px) {
+    .reportsTable th, .reportsTable td {
+        font-size: 0.7em;
     }
 }

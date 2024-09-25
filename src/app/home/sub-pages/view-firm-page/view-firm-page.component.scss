@@ -307,6 +307,12 @@ table-responsive {
   flex-wrap: wrap;
 }
 
+
+
+.edit-firms-inputs table th, .edit-firms-inputs table td {
+  text-align: center;
+}
+
 .input-field {
   display: flex;
   flex-direction: column;
@@ -1122,3 +1128,5 @@ hr {
   border-color: red !important;
   outline: 0;
 }
+
+/* */

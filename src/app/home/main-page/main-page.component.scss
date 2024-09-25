@@ -1,120 +1,163 @@
-
-.ai-byFunction{
-    grid-area: ai;
-    min-height: 350px;
-    max-height: 350px;
-    width: 34.5%;
-}
-.reoprtsSubmittions{
-    grid-area: rs;
-    min-height: 350px;
-    max-height: 350px;
-    width: 31%;
-}
-.firms-bySelector{
-    grid-area: fs;
-    min-height: 350px;
-    max-height: 350px;
-    width: 32.4%;
-}
-.taskList{
-    grid-area: tl;
-    height: 350px;
-    width: 34%;
-    margin-top: 0.4rem;
-}
-
-.firmsList{
-    grid-area: fl;
-    height: 350px;
-    width: 65%;
-    margin-top: 0.4rem;
-    
-}
-.stastics-grid{
+.stastics-grid {
+    padding: 0.5rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    gap: 1.2rem;
-    padding: 0.5rem;
-    max-width: 99vw;
-    flex-wrap: wrap;
+    gap: 1rem;
+    gap: 1.5rem;
 }
-.stastics-grid-upper{
-    display: inline-flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
+
+.stastics-grid-upper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
 }
-.stastics-grid-lower{
-    display: inline-flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    
+
+.stastics-grid-lower {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
 }
-app-ai-by-function{
+
+app-ai-by-function {
     display: flex;
     height: 350px;
 }
+
 app-reports-submissions {
     display: flex;
     height: 350px;
 }
+
 app-firms-by-selector {
     display: flex;
     height: 350px;
 }
+
 app-firm-list {
     display: flex;
     height: 370px;
 }
-app-task-list{
+
+app-task-list {
     display: flex;
     height: 370px;
 }
+
+@media screen and (max-width: 1024px) {
+    .stastics-grid-upper, .stastics-grid-lower {
+        grid-template-columns: 1fr; /* Single column layout */
+    }
+
+    .stastics-grid-lower {
+        gap: 0.5rem;
+    }
+
+    .ai-byFunction,.reoprtsSubmittions {
+        margin-bottom: 10px;
+    }
+
+    table {
+        width: 100%; /* Ensure tables take up the full width */
+    }
+}
+
+// .ai-byFunction{
+//     grid-area: ai;
+//     min-height: 350px;
+//     max-height: 350px;
+//     width: 34.5%;
+// }
+// .reoprtsSubmittions{
+//     grid-area: rs;
+//     min-height: 350px;
+//     max-height: 350px;
+//     width: 31%;
+// }
+// .firms-bySelector{
+//     grid-area: fs;
+//     min-height: 350px;
+//     max-height: 350px;
+//     width: 32.4%;
+// }
+// .taskList{
+//     grid-area: tl;
+//     height: 350px;
+//     width: 34%;
+//     margin-top: 0.4rem;
+// }
+
+// .firmsList{
+//     grid-area: fl;
+//     height: 350px;
+//     width: 65%;
+//     margin-top: 0.4rem;
+// }
+
+// .stastics-grid{
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: space-around;
+//     align-items: center;
+//     gap: 1.2rem;
+//     padding: 0.5rem;
+//     max-width: 99vw;
+//     flex-wrap: wrap;
+// }
+// .stastics-grid-upper{
+//     display: inline-flex;
+//     flex-direction: row;
+//     flex-wrap: wrap;
+//     justify-content: space-between;
+//     align-items: center;
+//     width: 100%;
+// }
+// .stastics-grid-lower{
+//     display: inline-flex;
+//     flex-direction: row;
+//     flex-wrap: wrap;
+//     justify-content: space-between;
+//     align-items: center;
+//     width: 100%;
+
+// }
+
 // .stastics-grid div{
 //     width: 33%;
 // }
-@media  (max-width: 1450px) {
-    // .stastics-grid{
-    //     display: grid;
-    
-    //     grid-template-areas:
-    //     'ai ai fs fs' 
-    //     'rs rs tl tl'
-    //     'fl fl fl fl';
+// @media  (max-width: 1450px) {
+// .stastics-grid{
+//     display: grid;
 
-    //     gap: 2rem;
-    // }
-    .ai-byFunction{
-        width: 100%;
-        margin-bottom: 40px;
-    }
-    .firms-bySelector{
-        width: 39%;
-    }
-    .firmsList{
-        width: 100%;
-        margin-top: 1.2rem;
-    }
-    .reoprtsSubmittions{
-        width: 60%;
-    }
-    .taskList{
-        width: 100%;
-        // margin-bottom: 20px;
-    }
-}
+//     grid-template-areas:
+//     'ai ai fs fs' 
+//     'rs rs tl tl'
+//     'fl fl fl fl';
+
+//     gap: 2rem;
+// }
+//     .ai-byFunction{
+//         width: 100%;
+//         margin-bottom: 40px;
+//     }
+//     .firms-bySelector{
+//         width: 39%;
+//     }
+//     .firmsList{
+//         width: 100%;
+//         margin-top: 1.2rem;
+//     }
+//     .reoprtsSubmittions{
+//         width: 60%;
+//     }
+//     .taskList{
+//         width: 100%;
+//         // margin-bottom: 20px;
+//     }
+// }
 // @media  (max-width: 1280px) {
 //     .stastics-grid{
 //         display: grid;
-    
+
 //         grid-template-areas:
 //         'ai ai fs fs' 
 //         'rs rs tl tl'
@@ -123,5 +166,3 @@ app-task-list{
 //         gap: 1rem;
 //     }
 // }
-
-

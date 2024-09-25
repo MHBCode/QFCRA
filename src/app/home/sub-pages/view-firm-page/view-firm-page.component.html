@@ -438,106 +438,60 @@
         </h2>
       </div>
       <div class="edit-firms-inputs" *ngIf="!allowEditFirmDetails">
-        <h3 class="subTitle-firmDetails">License Status</h3>
-        <div class="input-field">
-          <label for="appliedOn">
-            Applied On
-          </label>
-          <input disabled name="appliedOn" id="appliedOn" type="text"
-            value="{{firmAppDetailsCurrentLicensed?.AppliedOn | date: 'dd/MMM/y'}}">
-        </div>
-
-        <div class="input-field">
-          <label for="licensedOn">
-            Licensed On
-          </label>
-          <input type="text" disabled name="licensedOn" id="licensedOn"
-            value="{{firmAppDetailsCurrentLicensed?.GrantedOn | date: 'dd/MMM/y'}}">
-
-        </div>
-        <div class="input-field">
-          <label for="currentStatus">
-            Current Status
-          </label>
-          <input disabled name="currentStatus" id="currentStatus" type="text"
-            value="{{firmAppDetailsCurrentLicensed?.RecentStatus}}">
-        </div>
-
-        <div class="input-field">
-          <label for="currentStatusEffectiveDate">
-            Current Status Effective Date
-          </label>
-          <input disabled name="currentStatusEffectiveDate" id="currentStatusEffectiveDate" type="text"
-            value="{{firmAppDetailsCurrentLicensed?.RecentStatusDate | date: 'dd/MMM/y'}}">
-        </div>
-
-        <div class="input-field">
-          <label for="lastModifiedBy">
-            Last Modified By
-          </label>
-          <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
-            value="{{firmAppDetailsCurrentLicensed?.LastModifiedBy}}">
-        </div>
-
-        <div class="input-field">
-          <label for="lastModifiedDate">
-            Last Modified Date
-          </label>
-          <input disabled name="lastModifiedDate" id="lastModifiedDate" type="text"
-            value="{{firmAppDetailsCurrentLicensed?.LastModifiedDate}}">
-        </div>
-
-        <ng-container *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
-          <h3 class="subTitle-firmDetails">Authorisation Status</h3>
-          <div class="input-field">
-            <label for="appliedOnAuth">
-              Applied On
-            </label>
-            <input disabled name="appliedOnAuth" id="appliedOnAuth" type="text"
-              value="{{firmAppDetailsCurrentAuthorized?.AppliedOn | date: 'dd/MMM/y'}}">
-          </div>
-
-          <div class="input-field">
-            <label for="AuthorizedOnAuth">
-              Authorised On
-            </label>
-            <input type="text" disabled name="AuthorizedOnAuth" id="AuthorizedOnAuth"
-              value="{{firmAppDetailsCurrentAuthorized?.GrantedOn | date: 'dd/MMM/y'}}">
-
-          </div>
-          <div class="input-field">
-            <label for="currentStatusAuth">
-              Current Status
-            </label>
-            <input disabled name="currentStatusAuth" id="currentStatusAuth" type="text"
-              value="{{firmAppDetailsCurrentAuthorized?.RecentStatus}}">
-          </div>
-
-          <div class="input-field">
-            <label for="currentStatusEffectiveDateAuth">
-              Current Status Effective Date
-            </label>
-            <input disabled name="currentStatusEffectiveDateAuth" id="currentStatusEffectiveDateAuth" type="text"
-              value="{{firmAppDetailsCurrentAuthorized?.RecentStatusDate | date: 'dd/MMM/y'}}">
-          </div>
-
-          <div class="input-field">
-            <label for="lastModifiedByAuth">
-              Last Modified By
-            </label>
-            <input disabled name="lastModifiedByAuth" id="lastModifiedByAuth" type="text"
-              value="{{firmAppDetailsCurrentAuthorized?.LastModifiedBy}}">
-          </div>
-
-          <div class="input-field">
-            <label for="lastModifiedDateAuth">
-              Last Modified Date
-            </label>
-            <input disabled name="lastModifiedDateAuth" id="lastModifiedDateAuth" type="text"
-              value="{{firmAppDetailsCurrentAuthorized?.LastModifiedDate}}">
-          </div>
-
-        </ng-container>
+        <table>
+          <thead>
+            <tr>
+              <td style="background: #a51e36; color: white; cursor: default;text-align: left" colspan="6">
+                Licensed Status
+              </td>
+            </tr>
+            <tr>
+              <th>Applied On</th>
+              <th>Licensed On</th>
+              <th>Current Status</th>
+              <th>Current Status Effective Date</th>
+              <th>Last Modified By</th>
+              <th>Last Modified Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{firmAppDetailsCurrentLicensed?.AppliedOn | date: 'dd/MMM/y'}}</td>
+              <td>{{firmAppDetailsCurrentLicensed?.GrantedOn | date: 'dd/MMM/y'}}</td>
+              <td>{{firmAppDetailsCurrentLicensed?.RecentStatus}}</td>
+              <td>{{firmAppDetailsCurrentLicensed?.RecentStatusDate | date: 'dd/MMM/y'}}</td>
+              <td>{{firmAppDetailsCurrentLicensed?.LastModifiedBy}}</td>
+              <td>{{firmAppDetailsCurrentLicensed?.LastModifiedDate}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <table *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
+          <thead>
+            <tr>
+              <td style="background: #a51e36; color: white; cursor: default;text-align: left" colspan="6">
+                Authorisation Status
+              </td>
+            </tr>
+            <tr>
+              <th>Applied On</th>
+              <th>Authorised On</th>
+              <th>Current Status</th>
+              <th>Current Status Effective Date</th>
+              <th>Last Modified By</th>
+              <th>Last Modified Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{firmAppDetailsCurrentAuthorized?.AppliedOn | date: 'dd/MMM/y'}}</td>
+              <td>{{firmAppDetailsCurrentAuthorized?.GrantedOn | date: 'dd/MMM/y'}}</td>
+              <td>{{firmAppDetailsCurrentAuthorized?.RecentStatus}}</td>
+              <td>{{firmAppDetailsCurrentAuthorized?.RecentStatusDate | date: 'dd/MMM/y'}}</td>
+              <td>{{firmAppDetailsCurrentAuthorized?.LastModifiedBy}}</td>
+              <td>{{firmAppDetailsCurrentAuthorized?.LastModifiedDate}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <!--or (edit mode)-->
       <div class="edit-firms-inputs" *ngIf="allowEditFirmDetails">
@@ -1557,31 +1511,31 @@
 
   <!--Auditors-->
   <section id="Auditors" class="edit-firm-section" [ngStyle]="{ width: dataWidth }" style="display: none">
-    <div class="btn">
-      <button (click)="createAuditor()">
-        <i class="bi bi-plus"></i>
-        Create
-      </button>
-      <button (click)="editAuditor()">
-        <i class="bi bi-pen"></i>
-        Edit
-      </button>
-      <!--popup message for edit-->
-
-      <button>
-        <i class="bi bi-trash"></i>
-        Delete
-      </button>
-    </div>
     <div class="inputs-field-set">
       <div class="section">
         <div class="auditor-header">
           <h2>Auditors For {{ firmDetails?.FirmName }}</h2>
-          <span>
-            <input id="InactiveAuditors" type="checkbox" />
-            <label>Display Inactive Auditors</label>
-          </span>
+          <div class="btn">
+            <button (click)="createAuditor()">
+              <i class="bi bi-plus"></i>
+              Create
+            </button>
+            <button (click)="editAuditor()">
+              <i class="bi bi-pen"></i>
+              Edit
+            </button>
+            <!--popup message for edit-->
+      
+            <button>
+              <i class="bi bi-trash"></i>
+              Delete
+            </button>
+          </div>
         </div>
+        <span>
+          <input id="InactiveAuditors" type="checkbox" />
+          <label>Display Inactive Auditors</label>
+        </span>
         <table>
           <thead>
             <tr>

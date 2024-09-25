@@ -6,15 +6,15 @@
         <thead>
             <tr>
                 <th>Report Name</th>
-                <th>Submitted</th>
-                <th>Not Submitted</th>
+                <th *ngIf="hasSubmitted" class="numbers">Submitted</th>
+                <th *ngIf="hasNotSubmitted" style="text-align: center;" class="numbers">Not Submitted</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let reportSubmissions of ReportSubmissions.slice(0,listCount)">
                 <td>{{reportSubmissions.ReportName}}</td>
-                <td class="numbers">{{reportSubmissions.Submitted}}</td>
-                <td class="numbers">{{reportSubmissions.NotSubmitted}}</td>
+                <td *ngIf="hasSubmitted" class="numbers">{{reportSubmissions.Submitted}}</td>
+                <td *ngIf="hasNotSubmitted" class="numbers">{{reportSubmissions.NotSubmitted}}</td>
             </tr>
         </tbody>
     </table>

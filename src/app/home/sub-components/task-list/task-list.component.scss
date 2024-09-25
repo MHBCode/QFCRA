@@ -13,8 +13,10 @@
   background: white;
   border-radius: 15px;
   width: 100%;
+  height: 100%;
   box-shadow: 8px 8px 43px rgba(8, 50, 79, 0.1);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .tableTitle {
@@ -69,10 +71,13 @@ td {
   font-size: 0.75em;
   text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 100px;
-  padding: 10px;
+  padding: 5px;
   border-right: 1px solid #ddd;
   cursor: pointer;
+}
+
+.task-table td {
+  font-size: 0.90rem;
 }
 
 tbody {
@@ -296,4 +301,9 @@ tr:hover {
   visibility: hidden;
 }
 
+
+.active-filter {
+  background-color: #a51e36;
+  color: white;
+}
 

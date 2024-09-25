@@ -9,7 +9,7 @@ import { TaskServiceService } from 'src/app/ngServices/task-service.service';
 })
 export class TaskListComponent implements OnInit {
 
-  @Input() listCount: number = 50;
+  @Input() pageSize: number = 10;
   @Input() isMainView: boolean = false;
   Tasks: any[] = [];
   taskTypes: string[] = [];
@@ -17,7 +17,6 @@ export class TaskListComponent implements OnInit {
   filteredTasks: any[] = [];
   paginatedTasks: any[] = [];
   currentPage: number = 1;
-  pageSize: number = 10;
   totalTasks: number = 0;
   totalPages: number = 0;
   startRow: number = 0;
