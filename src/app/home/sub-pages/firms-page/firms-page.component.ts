@@ -168,7 +168,7 @@
 //     }
 //   }
 // }
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirmService } from 'src/app/ngServices/firm.service';
 
@@ -178,19 +178,18 @@ import { FirmService } from 'src/app/ngServices/firm.service';
   styleUrls: ['./firms-page.component.scss'],
 })
 export class FirmsPageComponent implements OnInit {
+
   @Input() listCount: number = 50;
 
   firms: any[] = [];
   licenseStatuses: string[] = [];
   supervisorSupervisions: string[] = [];
-  legalStatuses: string[] = [];
   authorisationStatuses: string[] = [];
   amlSupervisors: string[] = [];
+
   filteredFirms: any[] = [];
-
-  // Control for the search modal visibility
-  showSearchModal: boolean = false;
-
+  showPopup: boolean = false;
+  isSortDropdownOpen: boolean = false;
   // Form search fields with defaults
   firmName: string = 'all';
   qfcNumber: string = '';
@@ -201,7 +200,15 @@ export class FirmsPageComponent implements OnInit {
   prudentialCategory: boolean = true;
   sectors: boolean = true;
 
-  // Checkbox model properties for firm search filters
+  // Toggling Options for expanded views
+  toggleOptions = {
+    firmType: false,
+    firmStatus: false,
+    prudentialCategory: false,
+    sectors: false
+  };
+
+  // Checkbox model properties
   checkboxes = {
     authorized: false,
     dnfbp: false,
@@ -226,31 +233,21 @@ export class FirmsPageComponent implements OnInit {
     advisor: false,
     repOffice: false
   };
-   toggleOptions = {
-      firmType: false,    
-      firmStatus: false,
-      prudentialCategory: false,
-      sectors: false
-   };
+
   alphabet: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('');
 
-  constructor(private router: Router, private firmService: FirmService) {}
+  constructor(private router: Router, private firmService: FirmService) { }
 
   ngOnInit(): void {
     this.loadFirms();
   }
 
-  // Function to open the search modal
-  openSearchModal(): void {
-    this.showSearchModal = true;
+  // Toggle popup visibility
+  togglePopup(): void {
+    this.showPopup = !this.showPopup;
   }
 
-  // Function to close the search modal
-  closeSearchModal(): void {
-    this.showSearchModal = false;
-  }
-
-  // Load initial firms from the service
+  // Load initial firms data
   loadFirms(): void {
     this.firmService.getAssignedFirms(10044).subscribe(
       data => {
@@ -262,8 +259,6 @@ export class FirmsPageComponent implements OnInit {
           this.supervisorSupervisions = [...new Set(this.firms.map(firm => firm.Supervisor))];
           this.authorisationStatuses = [...new Set(this.firms.map(firm => firm.AuthorisationStatusTypeDesc))];
           this.amlSupervisors = [...new Set(this.firms.map(firm => firm.Supervisor_AML))];
-
-          console.log(this.firms);
         } else {
           console.warn('No firms data found.');
         }
@@ -279,35 +274,32 @@ export class FirmsPageComponent implements OnInit {
     this.toggleOptions[category] = !this.toggleOptions[category];
   }
 
-  // Generalize search functionality for firms
+  // Search functionality for firms
   searchFirms(): void {
-    const searchCriteria = {
-      firmName: this.firmName !== 'all' ? this.firmName : null,
-      qfcNumber: this.qfcNumber || null,
-      firmType: this.firmType,
-      firmStatus: this.firmStatus,
-      licenseStatus: this.licenseStatus !== 'all' ? this.licenseStatus : null,
-      supervisorSupervision: this.supervisorSupervision !== 'all' ? this.supervisorSupervision : null,
-      prudentialCategory: this.prudentialCategory,
-      sectors: this.sectors,
-      checkboxes: this.checkboxes // Pass checkbox filters as part of the search criteria
-    };
+    this.filteredFirms = this.firms.filter(firm => {
+      console.log("Filters: ", {
+        firmName: this.firmName,
+        qfcNumber: this.qfcNumber,
+        licenseStatus: this.licenseStatus,
+        supervisorSupervision: this.supervisorSupervision,
+        checkboxes: this.checkboxes
+      });
+      return (
+        (this.firmName === 'all' || firm.FirmName.includes(this.firmName)) &&
+        (this.qfcNumber === '' || firm.QFCNum.includes(this.qfcNumber)) &&
+        (this.licenseStatus === 'all' || firm.LicenseStatusTypeDesc === this.licenseStatus) &&
+        (this.supervisorSupervision === 'all' || firm.Supervisor === this.supervisorSupervision) &&
+        (this.checkboxes.authorized && firm.FirmType === 'Authorized' ||
+         this.checkboxes.dnfbp && firm.FirmType === 'DNFBP' ||
+         this.checkboxes.licensed && firm.FirmType === 'Licensed' ||
+         (!this.checkboxes.authorized && !this.checkboxes.dnfbp && !this.checkboxes.licensed)) &&
+        (this.checkboxes.active && firm.FirmStatus === 'Active' ||
+         this.checkboxes.inactive && firm.FirmStatus === 'Inactive' ||
+         (!this.checkboxes.active && !this.checkboxes.inactive))
+      );
+      
+    });
 
-    this.firmService.getFirmsList(searchCriteria).subscribe(
-      data => {
-        if (data && data.response) {
-          this.filteredFirms = data.response;
-          console.log(this.filteredFirms);
-        } else {
-          console.warn('No filtered firms found.');
-        }
-      },
-      error => {
-        console.error('Error fetching firms', error);
-      }
-    );
-
-    this.closeSearchModal(); // Close the modal after searching
   }
 
   // Filter firms by letter
@@ -335,17 +327,43 @@ export class FirmsPageComponent implements OnInit {
     this.supervisorSupervision = 'all';
     this.prudentialCategory = true;
     this.sectors = true;
-    for (let key in this.checkboxes) {
-      this.checkboxes[key] = false;
-    }
   }
 
   // Navigate to firm details
-  viewFirm(firmId: number) {
+  viewFirm(firmId: number): void {
     if (firmId) {
       this.router.navigate(['home/view-firm', firmId]);
     } else {
       console.error('Invalid firm ID:', firmId);
     }
   }
+  // Existing methods...
+
+  toggleSortDropdown(): void {
+    this.isSortDropdownOpen = !this.isSortDropdownOpen;
+  }
+
+  sortFirms(option: string): void {
+    switch (option) {
+      case 'AtoZ':
+        this.filteredFirms.sort((a, b) => a.FirmName.localeCompare(b.FirmName));
+        break;
+      case 'ZtoA':
+        this.filteredFirms.sort((a, b) => b.FirmName.localeCompare(a.FirmName));
+        break;
+      case 'newFirms':
+        // Assuming there's a date property to sort by creation date
+        this.filteredFirms.sort((a, b) => new Date(b.CreationDate).getTime() - new Date(a.CreatedDate).getTime());
+        break;
+      case 'oldFirms':
+        this.filteredFirms.sort((a, b) => new Date(a.CreationDate).getTime() - new Date(b.CreationDate).getTime());
+        break;
+    }
+    console.log("sortFirms",option)
+    this.isSortDropdownOpen = false; // Close dropdown after selecting
+  }
+
 }
+
+
+

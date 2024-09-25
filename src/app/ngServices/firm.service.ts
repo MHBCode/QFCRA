@@ -264,7 +264,7 @@ export class FirmService {
 
   getFirmsList(criteria: any): Observable<any> {
     let params = new HttpParams();
-
+     console.log("foim-service getFirmsList", )
     if (criteria.firmName && criteria.firmName !== 'all') {
       params = params.append('FirmName', criteria.firmName);
     }
@@ -277,12 +277,6 @@ export class FirmService {
     if (criteria.firmStatus !== undefined) {
       params = params.append('CSVFirmStatus', criteria.firmStatus.toString()); 
     }
-    if (criteria.licenseStatus && criteria.licenseStatus !== 'all') {
-      params = params.append('CSVLicenseStatus', criteria.licenseStatus); 
-    }
-    if (criteria.supervisorSupervision && criteria.supervisorSupervision !== 'all') {
-      params = params.append('SupervisionCaseOfficerId', criteria.supervisorSupervision); 
-    }
     if (criteria.legalStatus && criteria.legalStatus !== 'all') {
       params = params.append('CSVLegalStatus', criteria.legalStatus); 
     }
@@ -292,16 +286,10 @@ export class FirmService {
     if (criteria.sectors !== undefined) {
       params = params.append('CSVSectorTypes', criteria.sectors.toString()); 
     }
-    if (criteria.supervisionCategory !== undefined) {
-      params = params.append('CSVAuthorisationCategories', criteria.supervisionCategory.toString()); 
-    }
     if (criteria.authorisationStatus && criteria.authorisationStatus !== 'all') {
       params = params.append('CSVAuthorisationStatus', criteria.authorisationStatus); 
     }
-    if (criteria.relevantPerson !== undefined) {
-      params = params.append('RelevantPerson', criteria.relevantPerson.toString()); 
-    }
-
+    console.log("foim-service getFirmsList", params)
     return this.http.get<any>(`${this.baseUrl}get_firms_list`, { params });
   }
 
