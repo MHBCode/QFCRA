@@ -190,10 +190,10 @@
     </button>
     <div class="dropdown-menu" *ngIf="isSortDropdownOpen">
       <ul>
-        <li (click)="sortFirms('AtoZ')">A → Z</li>
-        <li (click)="sortFirms('ZtoA')">Z → A</li>
-        <li (click)="sortFirms('newFirms')">New Firms</li>
-        <li (click)="sortFirms('oldFirms')">Old Firms</li>
+        <li (click)="getSortFunction('AtoZ')">A → Z</li>
+        <li (click)="getSortFunction('ZtoA')">Z → A</li>
+        <li (click)="getSortFunction('newFirms')">New Firms</li>
+        <li (click)="getSortFunction('oldFirms')">Old Firms</li>
       </ul>
     </div>
   </div>

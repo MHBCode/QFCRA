@@ -184,10 +184,12 @@ export class FirmsPageComponent implements OnInit {
   supervisorSupervisions: string[] = [];
   authorisationStatuses: string[] = [];
   amlSupervisors: string[] = [];
-
+  
   filteredFirms: any[] = [];
   showPopup: boolean = false;
   isSortDropdownOpen: boolean = false;
+  selectedSortOption: string = 'AtoZ'; // Default sort option
+  
   // Form search fields with defaults
   firmName: string = 'all';
   qfcNumber: string = '';
@@ -257,6 +259,9 @@ export class FirmsPageComponent implements OnInit {
           this.supervisorSupervisions = [...new Set(this.firms.map(firm => firm.Supervisor))];
           this.authorisationStatuses = [...new Set(this.firms.map(firm => firm.AuthorisationStatusTypeDesc))];
           this.amlSupervisors = [...new Set(this.firms.map(firm => firm.Supervisor_AML))];
+          
+          // Apply default sorting after data load
+          this.sortFirms(this.selectedSortOption);
         } else {
           console.warn('No firms data found.');
         }
@@ -275,13 +280,6 @@ export class FirmsPageComponent implements OnInit {
   // Search functionality for firms
   searchFirms(): void {
     this.filteredFirms = this.firms.filter(firm => {
-      console.log("Filters: ", {
-        firmName: this.firmName,
-        qfcNumber: this.qfcNumber,
-        licenseStatus: this.licenseStatus,
-        supervisorSupervision: this.supervisorSupervision,
-        checkboxes: this.checkboxes
-      });
       return (
         (this.firmName === 'all' || firm.FirmName.includes(this.firmName)) &&
         (this.qfcNumber === '' || firm.QFCNum.includes(this.qfcNumber)) &&
@@ -295,9 +293,9 @@ export class FirmsPageComponent implements OnInit {
          this.checkboxes.inactive && firm.FirmStatus === 'Inactive' ||
          (!this.checkboxes.active && !this.checkboxes.inactive))
       );
-      
     });
-
+    // Apply sorting after search
+    this.sortFirms(this.selectedSortOption);
   }
 
   // Filter firms by letter
@@ -307,12 +305,16 @@ export class FirmsPageComponent implements OnInit {
     } else {
       this.filteredFirms = this.firms.filter(firm => firm.FirmName.startsWith(letter));
     }
+    // Apply sorting after filter
+    this.sortFirms(this.selectedSortOption);
   }
 
   // Reset all filters to default values
   resetFilters(): void {
     this.setDefaultFilters();
     this.filteredFirms = [...this.firms];
+    // Apply sorting after reset
+    this.sortFirms(this.selectedSortOption);
   }
 
   // Set default filter values
@@ -335,32 +337,45 @@ export class FirmsPageComponent implements OnInit {
       console.error('Invalid firm ID:', firmId);
     }
   }
-  // Existing methods...
 
+  // Toggle sorting dropdown visibility
   toggleSortDropdown(): void {
     this.isSortDropdownOpen = !this.isSortDropdownOpen;
   }
 
-  sortFirms(option: string): void {
-    switch (option) {
-      case 'AtoZ':
-        this.filteredFirms.sort((a, b) => a.FirmName.localeCompare(b.FirmName));
-        break;
-      case 'ZtoA':
-        this.filteredFirms.sort((a, b) => b.FirmName.localeCompare(a.FirmName));
-        break;
-      case 'newFirms':
-        // Assuming there's a date property to sort by creation date
-        this.filteredFirms.sort((a, b) => new Date(b.CreationDate).getTime() - new Date(a.CreatedDate).getTime());
-        break;
-      case 'oldFirms':
-        this.filteredFirms.sort((a, b) => new Date(a.CreationDate).getTime() - new Date(b.CreationDate).getTime());
-        break;
-    }
-    console.log("sortFirms",option)
-    this.isSortDropdownOpen = false; // Close dropdown after selecting
+  // Handle sorting option selection
+  onSortOptionSelected(option: string): void {
+    this.selectedSortOption = option;
+    this.sortFirms(option);
+    this.toggleSortDropdown(); // Close dropdown after selection
   }
 
+  // Sort firms based on the selected option
+  sortFirms(option: string): void {
+    this.filteredFirms.sort(this.getSortFunction(option));
+  }
+
+  // Get the appropriate sort function based on the selected option
+  getSortFunction(option: string): (a: any, b: any) => number {
+    return (a, b) => {
+      // Debug statements to log the FirmName values
+      console.log(`Sorting Option: ${option}`);
+      console.log(`Firm A: ${a.FirmName}, Firm B: ${b.FirmName}`);
+      
+      switch (option) {
+        case 'AtoZ':
+          return a.FirmName.localeCompare(b.FirmName);
+        case 'ZtoA':
+          return b.FirmName.localeCompare(a.FirmName);
+        case 'newFirms':
+          return new Date(b.CreationDate).getTime() - new Date(a.CreationDate).getTime();
+        case 'oldFirms':
+          return new Date(a.CreationDate).getTime() - new Date(b.CreationDate).getTime();
+        default:
+          return 0; // No sorting
+      }
+    };
+  }
 }
 
 
