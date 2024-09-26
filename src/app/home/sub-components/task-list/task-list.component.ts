@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { TaskServiceService } from 'src/app/ngServices/task-service.service';
 
@@ -28,15 +29,19 @@ export class TaskListComponent implements OnInit {
   FirmsDropdownVisible: boolean = false;
   dueDateInputVisible: boolean = false;
   daysOverDueDropdownVisible: boolean = false;
+  showAuditorPopup: boolean = false;
 
   selectedTaskType: string = '';
   selectedFirmName: string = '';
   selectedDueDate: string = '';
   selectedDaysOverDue: string = '';
+  selectedTask: any = null;
+  safeHtmlDescription: SafeHtml = ''; // for html tags
 
   constructor(
     private TaskService: TaskServiceService,
     private router: Router,
+    private sanitizer: DomSanitizer,
   ) { }
 
   ngOnInit(): void {
@@ -61,6 +66,19 @@ export class TaskListComponent implements OnInit {
         this.isLoading = false;
       }
     )
+  }
+
+  toggleAuditorPopup(selectedRow: any) {
+    this.selectedTask = selectedRow;
+    this.showAuditorPopup = !this.showAuditorPopup;
+    if (this.selectedTask?.LongDescription) {
+      const updatedDescription = this.selectedTask.LongDescription.replace(/<BR\s*\/?>\s*<BR\s*\/?>/, ''); // Removes first two <br> tags
+      this.safeHtmlDescription = this.sanitizer.bypassSecurityTrustHtml(updatedDescription); // Apply the html tags in the endpoint
+    }
+  }
+
+  closeAuditorPopup() {
+    this.showAuditorPopup = false;
   }
 
   // Get unique task types from the task list
@@ -101,19 +119,35 @@ export class TaskListComponent implements OnInit {
   filterTasks(): void {
     this.filteredTasks = this.Tasks.filter(task => {
       const dueDateFormatted = this.convertApiDateToStandard(task.TaskDueDate);
-      const daysDue = task.DaysOverDue
+      const daysDue = task.DaysOverDue;
+  
+      // Check for matching conditions
       const matchesTaskType = this.selectedTaskType === '' || task.TaskType === this.selectedTaskType;
       const matchesFirmName = this.selectedFirmName === '' || task.FirmName === this.selectedFirmName;
       const matchesDueDate = this.selectedDueDate === '' || dueDateFormatted === this.selectedDueDate;
-      const matchDaysOverDue = this.selectedDaysOverDue === '' || daysDue === this.selectedDaysOverDue;
-      return matchesTaskType && matchesFirmName && matchesDueDate && matchDaysOverDue;
+  
+      // Handle Days Over Due filtering
+      let matchesDaysOverDue = true; // Default to true for "All"
+      if (this.selectedDaysOverDue === '>10') {
+        matchesDaysOverDue = daysDue > 10;
+      } else if (this.selectedDaysOverDue === '>20') {
+        matchesDaysOverDue = daysDue > 20;
+      } else if (this.selectedDaysOverDue === '>30') {
+        matchesDaysOverDue = daysDue > 30;
+      } else if (this.selectedDaysOverDue === '>40') {
+        matchesDaysOverDue = daysDue > 40;
+      }
+  
+      return matchesTaskType && matchesFirmName && matchesDueDate && matchesDaysOverDue;
     });
-
+  
+    // Update pagination
     this.currentPage = 1;
     this.totalRows = this.filteredTasks.length;
     this.totalPages = Math.ceil(this.totalRows / this.pageSize);
     this.updatePagination();
   }
+  
 
 
   filterByTaskType(selectedType: string): void {
@@ -139,15 +173,8 @@ export class TaskListComponent implements OnInit {
 
   filterByDaysOverDue(selectedValue: string): void {
     this.selectedDaysOverDue = selectedValue;
-
     this.filteredTasks = this.Tasks.filter(task => {
-      const matchesTaskType = this.selectedTaskType === '' || task.TaskType === this.selectedTaskType;
-      const matchesFirmName = this.selectedFirmName === '' || task.FirmName === this.selectedFirmName;
-      const matchesDueDate = this.selectedDueDate === '' || this.convertApiDateToStandard(task.DueDate) === this.selectedDueDate;
-
-      // Apply Days Over Due filter
-      let matchesDaysOverDue = true;  // Default is true (for "All")
-
+      let matchesDaysOverDue = true; // Default to true for "All"
       if (this.selectedDaysOverDue === '>10') {
         matchesDaysOverDue = task.DaysOverDue > 10;
       } else if (this.selectedDaysOverDue === '>20') {
@@ -157,18 +184,13 @@ export class TaskListComponent implements OnInit {
       } else if (this.selectedDaysOverDue === '>40') {
         matchesDaysOverDue = task.DaysOverDue > 40;
       }
-
-      return matchesTaskType && matchesFirmName && matchesDueDate && matchesDaysOverDue;
+      return matchesDaysOverDue; // Ensure return for the filter
     });
-
-    this.currentPage = 1;
-    this.totalRows = this.filteredTasks.length;
-    this.totalPages = Math.ceil(this.totalRows / this.pageSize);
-    this.updatePagination();
-
     // Automatically close the dropdown after selecting an option
+    this.filterTasks(); // Further refine filters (if any)
     this.daysOverDueDropdownVisible = false;
   }
+  
 
   updatePagination(): void {
     const startIndex = (this.currentPage - 1) * this.pageSize;

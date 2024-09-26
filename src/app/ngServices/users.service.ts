@@ -10,7 +10,6 @@ export class UsersService {
 
   private baseUrl = environment.API_URL+'/api/Users/';  // Base URL'
   private baseUrlAppRoles = environment.API_URL+'/api/AppRoles/';  // Approles URL
-  private baseUrlSecurity = environment.API_URL+'/api/Security/'; // Security URL
   
   constructor(private http: HttpClient) { }
 
@@ -29,9 +28,5 @@ export class UsersService {
   saveUserAcess(rowData: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrlAppRoles}save_user_access`, rowData, { headers: headers });
-  }
-  getUserRoles(userId: number): Observable<any> {
-    const url = `${this.baseUrlSecurity}get_user_roles?${userId}` // add this to security service
-    return this.http.get<any>(url);
   }
 }

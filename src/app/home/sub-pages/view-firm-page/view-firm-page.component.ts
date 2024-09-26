@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
-import { UsersService } from 'src/app/ngServices/users.service';
+import { SecurityService } from 'src/app/ngServices/security.service';
 
 @Component({
   selector: 'app-view-firm-page',
@@ -129,6 +129,7 @@ export class ViewFirmPageComponent implements OnInit {
   allAddressTypes: any = [];
   allPrudentialCategoryTypes: any = [];
   allAuthorisationCategoryTypes: any = [];
+  allFirmScopeTypes: any = [];
   activeTab: string = '';
 
   isCollapsed: { [key: string]: boolean } = {};
@@ -161,13 +162,16 @@ export class ViewFirmPageComponent implements OnInit {
 
   /* user access and security */
   assignedUserRoles: any = [];
+  assignedLevelUsers: any = [];
   hideEditBtn: boolean;
+  isFirmAMLSupervisor: boolean = false;
+  isFirmSupervisor: boolean = false;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,  // Inject ActivatedRoute
     private firmService: FirmService,  // Inject FirmService
-    private userService: UsersService,
+    private securityService: SecurityService,
     private el: ElementRef,
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef
@@ -204,8 +208,12 @@ export class ViewFirmPageComponent implements OnInit {
       this.populateAddressTypes();
       this.populatePrudentialCategoryTypes();
       this.populateAuthorisationCategoryTypes();
+      this.populateFirmScopeTypes();
       this.checkFirmLicense();
-      this.onPageLoad();
+      this.loadAssignedUserRoles();
+      this.isValidFirmAMLSupervisor(this.firmId, this.userId);
+      this.isValidFirmSupervisor(this.firmId, this.userId);
+      this.getAssignedLevelUsers();
     });
   }
 
@@ -278,7 +286,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.renderer.setStyle(neededSection, 'display', 'flex');
 
     if (tabId == 'CD') {
-
+      this.applySecurityOnPage();
     }
 
     if (tabId == 'Scope') {
@@ -311,27 +319,24 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  onPageLoad() {
-    this.getUserRoles();
-    this.applySecurityOnPage();
-  }
-
   applySecurityOnPage() {
-    let firmType = 1;
-    if (this.mockIsValidFirmSupervisor(this.firmId, this.userId)) {
+
+    let firmType = this.firmDetails.FirmTypeID;
+    if (this.isFirmSupervisor) { //is Firm Supervisor
       // No need to hide the button for Firm supervisor
       this.hideEditBtn = false;
-      return; 
-    } else if (this.mockIsValidRSGMember(this.userId)) {
+      return;
+    }
+    if (this.IsValidRSGMember()) {
       // No need to hide the button for RSG Member
       this.hideEditBtn = false;
-      return; 
-    } else if (this.mockIsValidFirmAMLSupervisor(this.firmId, this.userId) || this.mockIsValidAMLDirector(this.userId)) {
+      return;
+    } else if (this.isFirmAMLSupervisor || this.IsValidAMLDirector()) {
       // Hide button if firm is authorised or deauthorised and user is AML Team
       if (firmType === 1) {
         this.hideEditBtn = true; // User does not have access, hide the button
       }
-    } else if (this.mockIsValidAMLSupervisor(this.userId) && !this.mockIsAMLSupervisorAssignedToFirm(this.firmId)) {
+    } else if (this.IsValidAMLSupervisor() && !this.IsAMLSupervisorAssignedToFirm()) {
       // Hide button if firm is not authorised and no AML supervisor is assigned
       if (firmType === 1) {
         this.hideEditBtn = true; // User does not have access, hide the button
@@ -339,97 +344,125 @@ export class ViewFirmPageComponent implements OnInit {
     } else {
       this.hideEditBtn = true; // Default: Hide the button
     }
+
   }
 
-  // Mock implementations of security checks
-  mockIsValidFirmSupervisor(firmId: number, userId: number): boolean {
-    return true; // Replace with actual logic or mock data
+  isValidFirmSupervisor(firmId: number, userId: number): void {
+    this.securityService.isValidFirmSupervisor(firmId, userId).subscribe((response) => {
+      this.isFirmSupervisor = response.response;
+      this.applySecurityOnPage(); // Call the function to apply security checks after receiving the result
+    });
   }
 
-  mockIsValidRSGMember(userId: number): boolean {
-    return true;
-  }
-
-  mockIsValidFirmAMLSupervisor(firmId: number, userId: number): boolean {
-    return true;
-  }
-
-  mockIsValidAMLDirector(userId: number): boolean {
+  IsValidRSGMember(): boolean {
+    if (this.assignedUserRoles) {
+      return this.assignedUserRoles.some(role => role.AppRoleId === 5001);
+    }
     return false;
   }
 
-  mockIsValidAMLSupervisor(userId: number): boolean {
+  isValidFirmAMLSupervisor(firmId: number, userId: number): void {
+    this.securityService.isValidFirmAMLSupervisor(firmId, userId).subscribe((response) => {
+      this.isFirmAMLSupervisor = response.response;
+      this.applySecurityOnPage(); // Call the function to apply security checks after receiving the result
+    });
+  }
+
+  IsValidAMLDirector(): boolean {
+    if (this.assignedUserRoles) {
+      return this.assignedUserRoles.some(role => role.AppRoleId === 2007);
+    }
     return false;
   }
 
-  mockIsAMLSupervisorAssignedToFirm(firmId: number): boolean {
+  IsValidAMLSupervisor(): boolean {
+    if (this.assignedUserRoles) {
+      return this.assignedUserRoles.some(role => role.AppRoleId === 3009);
+    }
     return false;
+  }
+
+  IsAMLSupervisorAssignedToFirm(): boolean {
+    if (this.assignedLevelUsers) {
+      if (this.FIRMRA.length > 0) {
+        return this.assignedLevelUsers.some(levelUser => levelUser.FirmUserAssnTypeID === 7 || levelUser.FirmUserAssnTypeID === 8 || levelUser.FirmUserAssnTypeID === 9)
+      }
+    }
+    return false;
+  }
+
+  getAssignedLevelUsers(): void {
+    this.firmService.getAssignLevelUsers().subscribe((response) => {
+      this.assignedLevelUsers = response.response;
+    }, error => {
+      console.error('error fetching assigned level users: ', error)
+    })
   }
 
   // hideActionButton() {
   //   this.hideEditBtn = true;
   // }
 
-  getUserRoles() {
-    this.userService.getUserRoles(this.userId).subscribe((roles) => {
-      this.assignedUserRoles = roles.response;
+  loadAssignedUserRoles() {
+    this.securityService.getUserRoles(this.userId).subscribe((assignedRoles) => {
+      this.assignedUserRoles = assignedRoles.response;
+      console.log(this.assignedUserRoles);
     }, error => {
-      console.error('Error fetching assigned user roles: ', error);
-    }
-    )
+      console.error('Error fetching assigned roles: ', error);
+    })
   }
 
   async editFirm() {
     this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
-  
+
     // If form is not in edit mode, toggle it to edit mode
     if (!this.allowEditFirmDetails) {
       this.allowEditFirmDetails = true;
       return;
     }
-  
+
     // Start validations
     this.hasValidationErrors = false;
-  
+
     // Synchronous firm-level validation checks
     this.validateFirmDetails(); // Perform existing validation logic synchronously
-  
+
     // If validation errors exist, stop the process
     if (this.hasValidationErrors) {
       this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       return;
     }
-  
+
     try {
       // Perform asynchronous QFC number validation first
       await this.validateQFCNum();
-  
+
       // If there were errors in QFC validation, stop further execution
       if (this.hasValidationErrors) {
         throw new Error('QFC validation failed');
       }
-  
+
       // Perform async application date validation only if QFC validation passes
       await this.ApplicationDateValidationCheckDuplicates();
-  
+
       // Check for validation errors after async validation
       if (this.hasValidationErrors) {
         throw new Error('Application date validation failed');
       }
-  
+
       // Set additional firm details if all validations passed
       this.setAdditionalFirmDetails();
-  
+
       // Check if there are any new validation errors
       if (this.hasValidationErrors) {
         this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
         return;
       }
-  
+
       // Prepare firm object and save the firm details
       const firmObj = this.prepareFirmObject(this.userId);
       this.saveFirmDetails(firmObj, this.userId);
-  
+
       // Toggle off edit mode after saving
       this.allowEditFirmDetails = false;
     } catch (error) {
@@ -439,7 +472,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     }
   }
-  
+
 
 
   async ApplicationDateValidationCheckDuplicates(): Promise<void> {
@@ -576,13 +609,13 @@ export class ViewFirmPageComponent implements OnInit {
         .subscribe((response) => {
           if (response.isSuccess && response.response) {
             const { OldFirmApplStatusTypeDesc, OldFirmApplStatusDate, DuplicatePresentType } = response.response;
-  
+
             if (DuplicatePresentType === 0) {
               resolve(true); // Validation passes
             } else {
               let msgKey: number;
               let placeholderValue: string = '';
-  
+
               if (DuplicatePresentType === 1) {
                 msgKey = (LicenceOrAuthorisation === 3)
                   ? constants.Firm_CoreDetails_Messages.SAME_AUTHORISATION_STATUS_ON_TWO_DATES
@@ -596,7 +629,7 @@ export class ViewFirmPageComponent implements OnInit {
               } else if (DuplicatePresentType === 3) {
                 msgKey = 3917;
               }
-  
+
               // Show the validation popup
               this.showApplnStatusValidationPopup(msgKey, placeholderValue)
                 .then((confirmed) => {
@@ -607,7 +640,7 @@ export class ViewFirmPageComponent implements OnInit {
                       const authStatusID = this.firmDetails.AuthorisationStatusTypeID;
                       const authStatusName = this.firmDetails.AuthorisationStatusTypeDesc;
                       const authDate = this.firmDetails.AuthorisationDate;
-  
+
                       this.performApplnStatusValidation(LicenceOrAuthorisation, authStatusID, authStatusName, authDate)
                         .then((authorisationValid) => {
                           if (authorisationValid) {
@@ -634,7 +667,7 @@ export class ViewFirmPageComponent implements OnInit {
         });
     });
   }
-  
+
 
 
   onSameAsTypeChange(selectedTypeID: number) {
@@ -959,7 +992,7 @@ export class ViewFirmPageComponent implements OnInit {
         firmActivityConditions: activityLic.Column1,
         productTypeID: null,
         appliedDate: this.convertDateToYYYYMMDD(activityLic.ScopeAppliedDate),
-        withDrawnDate: this.convertDateToYYYYMMDD(activityLic.WithdrawnDate),
+        withDrawnDate: this.convertDateToYYYYMMDD(activityLic.ScopeEffectiveDate),
         objectProductActivity: null,
         activityDetails: activityLic.FirmActivityDetails
       }))
@@ -1039,87 +1072,87 @@ export class ViewFirmPageComponent implements OnInit {
     }
 
     this.ActivityAuth.forEach(firmData => {
-        if (!firmData.FirmScopeID) {
-            console.log('FirmScopeID is missing for FirmID:', firmData.FirmID);
-            return;
-        }
-        debugger
-        const firmScopeData = {
-            objFirmScope: {
-                firmScopeID: firmData.FirmScopeID,
-                scopeRevNum: firmData.ScopeRevNum,
-                firmID: firmData.FirmID,
-                // objectID: firmData.ObjectID,
-                createdBy: 30, // this will be change cuse there is no user 
-                docReferenceID: firmData.DocID,
-                // firmApplTypeID: 3,
-                // docIDs: firmData.DocIDs,
-                generalConditions: firmData.GeneralConditions,
-                effectiveDate: this.currentDate, 
-                scopeCertificateLink: firmData.ScopeCertificateLink,
-                // applicationDate: firmData.ApplicationDate,
-                // licensedOrAuthorisedDate: firmData.LicensedDate
-            },
-            lstFirmActivities: [
-                {
-                    // createdBy: firmData.CreatedBy,
-                    // firmScopeTypeID: firmData.FirmScopeTypeID,
-                    activityTypeID: firmData.ActivityTypeID,
-                    effectiveDate: this.currentDate,
-                    // firmActivityConditions: firmData.FirmActivityConditions,
-                    // productTypeID: firmData.ProductTypeID,
-                    // appliedDate: firmData.AppliedDate,
-                    // withDrawnDate: firmData.WithDrawnDate,
-                    objectProductActivity: [
-                        {
-                            // productTypeID: firmData.ProductTypeID,
-                            // appliedDate: firmData.AppliedDate,
-                            // withDrawnDate: firmData.WithDrawnDate,
-                            effectiveDate: firmData.EffectiveDate,
-                            // firmScopeTypeID: firmData.FirmScopeTypeID
-                        }
-                    ],
-                    // activityDetails: firmData.ActivityDetails
-                }
+      if (!firmData.FirmScopeID) {
+        console.log('FirmScopeID is missing for FirmID:', firmData.FirmID);
+        return;
+      }
+      debugger
+      const firmScopeData = {
+        objFirmScope: {
+          firmScopeID: firmData.FirmScopeID,
+          scopeRevNum: firmData.ScopeRevNum,
+          firmID: firmData.FirmID,
+          // objectID: firmData.ObjectID,
+          createdBy: 30, // this will be change cuse there is no user 
+          docReferenceID: firmData.DocID,
+          // firmApplTypeID: 3,
+          // docIDs: firmData.DocIDs,
+          generalConditions: firmData.GeneralConditions,
+          effectiveDate: this.currentDate,
+          scopeCertificateLink: firmData.ScopeCertificateLink,
+          // applicationDate: firmData.ApplicationDate,
+          // licensedOrAuthorisedDate: firmData.LicensedDate
+        },
+        lstFirmActivities: [
+          {
+            // createdBy: firmData.CreatedBy,
+            // firmScopeTypeID: firmData.FirmScopeTypeID,
+            activityTypeID: firmData.ActivityTypeID,
+            effectiveDate: this.currentDate,
+            // firmActivityConditions: firmData.FirmActivityConditions,
+            // productTypeID: firmData.ProductTypeID,
+            // appliedDate: firmData.AppliedDate,
+            // withDrawnDate: firmData.WithDrawnDate,
+            objectProductActivity: [
+              {
+                // productTypeID: firmData.ProductTypeID,
+                // appliedDate: firmData.AppliedDate,
+                // withDrawnDate: firmData.WithDrawnDate,
+                effectiveDate: firmData.EffectiveDate,
+                // firmScopeTypeID: firmData.FirmScopeTypeID
+              }
             ],
-            objPrudentialCategory: {
-                firmPrudentialCategoryID: firmData.FirmPrudentialCategoryID,
-                firmID: firmData.FirmID,
-                prudentialCategoryTypeID: firmData.PrudentialCategoryTypeID,
-                firmScopeID: firmData.FirmScopeID,
-                scopeRevNum: firmData.ScopeRevNum,
-                lastModifiedByID: 30, // this will be change cuse there is no user
-                effectiveDate: this.currentDate, // Ensure date is valid
-                // expirationDate: firmData.ExpirationDate,
-                lastModifiedDate: this.currentDate,
-                authorisationCategoryTypeID: firmData.AuthorisationCategoryTypeID
-            },
-            objSector: {
-                firmSectorID: firmData.FirmSectorID.toString()  , 
-                sectorTypeID: firmData.SectorTypeID,  // this will be change cuse there is no user
-                lastModifiedByID: 30, // this will be change cuse there is no user
-                effectiveDate: this.currentDate,
-            },
-            lstFirmScopeCondition: [
-                {
-                    scopeConditionTypeId: 1,
-                    lastModifiedBy: 30, // this will be change cuse there is no user
-                    restriction: 1
-                }
-            ],
-            objFirmIslamicFinance: {
-                iFinFlag: true,
-                iFinTypeId: this.islamicFinance.IFinTypeId,
-                iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
-                endorsement: this.islamicFinance.Endorsement,
-                savedIFinTypeID: 2,
-                scopeRevNum: firmData.ScopeRevNum,
-                lastModifiedBy: 30 // this will be change cuse there is no user
-            },
-            resetFirmSector: true,
-            firmSectorID: firmData.FirmSectorID.toString(),
-             obj: {} 
-        };
+            // activityDetails: firmData.ActivityDetails
+          }
+        ],
+        objPrudentialCategory: {
+          firmPrudentialCategoryID: firmData.FirmPrudentialCategoryID,
+          firmID: firmData.FirmID,
+          prudentialCategoryTypeID: firmData.PrudentialCategoryTypeID,
+          firmScopeID: firmData.FirmScopeID,
+          scopeRevNum: firmData.ScopeRevNum,
+          lastModifiedByID: 30, // this will be change cuse there is no user
+          effectiveDate: this.currentDate, // Ensure date is valid
+          // expirationDate: firmData.ExpirationDate,
+          lastModifiedDate: this.currentDate,
+          authorisationCategoryTypeID: firmData.AuthorisationCategoryTypeID
+        },
+        objSector: {
+          firmSectorID: firmData.FirmSectorID.toString(),
+          sectorTypeID: firmData.SectorTypeID,  // this will be change cuse there is no user
+          lastModifiedByID: 30, // this will be change cuse there is no user
+          effectiveDate: this.currentDate,
+        },
+        lstFirmScopeCondition: [
+          {
+            scopeConditionTypeId: 1,
+            lastModifiedBy: 30, // this will be change cuse there is no user
+            restriction: 1
+          }
+        ],
+        objFirmIslamicFinance: {
+          iFinFlag: true,
+          iFinTypeId: this.islamicFinance.IFinTypeId,
+          iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
+          endorsement: this.islamicFinance.Endorsement,
+          savedIFinTypeID: 2,
+          scopeRevNum: firmData.ScopeRevNum,
+          lastModifiedBy: 30 // this will be change cuse there is no user
+        },
+        resetFirmSector: true,
+        firmSectorID: firmData.FirmSectorID.toString(),
+        obj: {}
+      };
 
       console.log('FirmScopeData to be sent:', firmScopeData);
 
@@ -1367,7 +1400,7 @@ export class ViewFirmPageComponent implements OnInit {
       return this.FIRMContacts.filter(contact => contact.ContactTypeDesc !== 'Contact- No Longer');
     }
   }
-  
+
   // Method to handle the checkbox change
   onInactiveContactsToggle(event: any): void {
     this.displayInactiveContacts = event.target.checked;
@@ -2118,6 +2151,14 @@ export class ViewFirmPageComponent implements OnInit {
     })
   }
 
+  populateFirmScopeTypes() {
+    this.firmService.getObjectTypeTable(constants.firmScopeTypes).subscribe(data => {
+      this.allFirmScopeTypes = data.response;
+    }, error => {
+      console.error('Error Fetching Firm Scope Types dropdown: ', error);
+    })
+  }
+
   onCategoryChange(activity: any) {
     const selectedCategory = activity.selectedCategory;
     if (selectedCategory) {
@@ -2528,6 +2569,17 @@ export class ViewFirmPageComponent implements OnInit {
     return cleanedNotes;
   }
 
+  getCleanedUrl(link: string): string {
+    console.log('Original link:', link);
+    // Replace all occurrences of &amp; regardless of how many times it's encoded
+    while (link.includes('&amp;')) {
+      link = link.replace(/&amp;/g, '&');
+    }
+    console.log('Cleaned link:', link);
+    return link;
+  }
+  
+
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
@@ -2894,7 +2946,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.firmService.errorMessages(messageKey).subscribe(
         (response) => {
           const messageWithPlaceholder = response.response.replace("{0}", placeholder);
-          
+
           // Display the popup
           Swal.fire({
             html: messageWithPlaceholder,
@@ -2920,7 +2972,7 @@ export class ViewFirmPageComponent implements OnInit {
       );
     });
   }
-  
+
 
   isNullOrEmpty(value: any): boolean {
     return value === null || value === '';
