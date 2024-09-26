@@ -229,7 +229,7 @@ export class FirmService {
     return this.http.delete<any>(url);
   }
   saveContactDetails(contactDetails: any): Observable<any> {
-    const url = `${this.baseUrlContact}save_contact_details`;
+    const url = `${this.baseUrlContact}save_update_contact_form`;
     return this.http.post<any>(url, contactDetails);
   }
   getFIRMUsersRAFunctions(firmId: number, assiLevel: number): Observable<any> {
