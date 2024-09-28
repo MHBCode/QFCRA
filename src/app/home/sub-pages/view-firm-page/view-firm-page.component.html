@@ -1455,7 +1455,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let controller of FIRMControllers" (click)="viewController()">
+            <tr *ngFor="let controller of FIRMControllers" (click)="openControllerPopup(controller)">
               <td>{{ controller.OtherEntityName }}</td>
               <td>{{ controller.EntityTypeDesc }}</td>
               <td>{{ controller.RegisteredNum }}</td>
@@ -1470,9 +1470,9 @@
         </table>
       </div>
     </div>
-
+  
     <div class="inputs-field-set">
-      <div class="section" >
+      <div class="section">
         <h2>Ultimate Beneficial Owners For {{ firmDetails?.FirmName }}</h2>
         <table>
           <thead>
@@ -1507,7 +1507,245 @@
         <p> ---- No records found.</p>
       </ng-template>
     </div>
+  
+    <!-- Popup Section -->
+<!-- Popup Section -->
+<div *ngIf="isPopupOpen" (click)="closeControllerPopup()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(253, 236, 236, 0.2); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+  <div (click)="$event.stopPropagation()" style="background-color: #ffffff; padding: 15px; border-radius: 10px; width: 70%; height: 60%; box-shadow:0 0 10px rgba(146, 146, 146, 0.1); position: relative; display: flex; flex-direction: column; justify-content: space-between;">
+    <!-- Title -->
+    <h3 style="margin-top: 0; color: #8b152b; font-size: 1.3em; text-align: left; border-bottom: 2px solid #a51e36; padding-bottom: 5px;">
+      Controller Details For {{ selectedController?.OtherEntityName }}
+    </h3>
+
+    <!-- Form -->
+    <form style="flex: 1; overflow-y: auto;">
+      <ng-container *ngIf="isEditable">
+        <div style="display: flex; gap: 20px; margin-bottom: 5px;">
+          <div style="flex: 1;">                  
+            <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Controller Type :</label>
+            <input [(ngModel)]="selectedController.EntityTypeDesc" name="ControllerType" [readonly]
+                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+        </div>
+      </div>
+     </ng-container>
+      <!-- Contact Details Row 1 -->
+      <div style="display: flex; gap: 20px; margin-bottom: 5px;">
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Full Name of Entity:</label>
+          <input [(ngModel)]="selectedController.OtherEntityName" name="fullName" [readonly]="!isEditable"
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Legal Status:</label>
+          <ng-container *ngIf="isEditable; else legalStatusInput">
+            <select [(ngModel)]="selectedController.LegalStatusTypeDesc" name="legalStatus" 
+                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+              <option *ngFor="let status of legalStatusOptionsEdit" [value]="status.LegalStatusTypeID">{{ status.LegalStatusTypeDesc }}</option>
+            </select>
+          </ng-container>
+          <ng-template #legalStatusInput>
+            <input [(ngModel)]="selectedController.LegalStatusTypeDesc" name="legalStatus" [readonly]="!isEditable"
+                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+          </ng-template>
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Registered Number:</label>
+          <input [(ngModel)]="selectedController.RegisteredNum" name="registeredNum" [readonly]="!isEditable"
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
+        </div>
+      </div>
+
+      <!-- Contact Details Row 2 -->
+      <div style="display: flex; gap: 20px; margin-bottom: 5px;">
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Place of Establishment:</label>
+          <ng-container *ngIf="isEditable; else placeOfEstablishmentInput">
+            <select [(ngModel)]="selectedController.PlaceOfEstablishment" name="placeOfEstablishment" 
+                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+              <option *ngFor="let place of countryOptionsEdit" [value]="place.CountryID">{{ place.CountryName }}</option>
+            </select>
+          </ng-container>
+          <ng-template #placeOfEstablishmentInput>
+            <input [(ngModel)]="selectedController.PlaceOfEstablishment" name="placeOfEstablishment" [readonly]="!isEditable"
+                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+          </ng-template>
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Type of Control:</label>
+          <ng-container *ngIf="isEditable; else controlTypeInput">
+            <select [(ngModel)]="selectedController.ControllerControlTypeDesc" name="typeOfControl" 
+                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+              <option *ngFor="let controlType of controlTypeOptionsEdit" [value]="controlType.ControllerControlTypeID">{{ controlType.ControllerControlTypeDesc }}</option>
+            </select>
+          </ng-container>
+          <ng-template #controlTypeInput>
+            <input [(ngModel)]="selectedController.ControllerControlTypeDesc" name="typeOfControl" [readonly]="!isEditable"
+                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+          </ng-template>
+        </div>
+        <ng-container *ngIf="selectedController.ControllerControlTypeDesc == 'Percentage' ">
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">% of Holding :</label>
+          <input [(ngModel)]="selectedController.PctOfShares" name="cessationDate" [readonly]="!isEditable"
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
+        </div>
+        </ng-container>
+      </div>
+      <!-- Contact Details Row 3 -->
+      <div style="display: flex; gap: 20px; margin-bottom: 5px;">
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Effective Date:</label>
+          <ng-container *ngIf="isEditable; else effectiveDateInput">
+            <input type="date" [(ngModel)]="selectedController.EffectiveDate" name="effectiveDate" 
+                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;" />
+          </ng-container>
+          <ng-template #effectiveDateInput>
+            <input [(ngModel)]="selectedController.EffectiveDate" name="effectiveDate" [readonly]="!isEditable"
+                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+          </ng-template>
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Is The Company Regulated:</label>
+          <ng-container *ngIf="isEditable; else regulatedValue">
+            <div style="display: flex; align-items: center;">
+              <input type="radio" id="regulatedYes" [(ngModel)]="selectedController.IsCompanyRegulated" name="isCompanyRegulated" [value]="true"
+                     style="margin-right: 10px; cursor: pointer;" />
+              <label for="regulatedYes" style="margin-left: 5px; color: #413b3c;">Yes</label>
+        
+              <input type="radio" id="regulatedNo" [(ngModel)]="selectedController.IsCompanyRegulated" name="isCompanyRegulated" [value]="false"
+                     style="margin-left: 20px; margin-right: 10px; cursor: pointer;" />
+              <label for="regulatedNo" style="margin-left: 5px; color: #413b3c;">No</label>
+            </div>
+          </ng-container>
+          <ng-template #regulatedValue>
+            <span style="margin-left: 10px; color: #413b3c;">
+              {{ selectedController.IsCompanyRegulated ? 'Yes' : 'No' }}
+            </span>
+          </ng-template>
+        </div>
+      <div style="flex: 1;">
+        <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Cessation Date:</label>
+        <ng-container *ngIf="isEditable; else cessationDateInput">
+          <input type="date" [(ngModel)]="selectedController.CessationDate" name="cessationDate" 
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;" />
+        </ng-container>
+        <ng-template #cessationDateInput>
+          <input [(ngModel)]="selectedController.CessationDate" name="cessationDate" [readonly]="!isEditable"
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+        </ng-template>
+      </div>
+      </div>
+      <!-- Addresses Section -->
+      <h3 style="margin-top: 20px; color: #8b152b; font-size: 1.3em; text-align: left; border-bottom: 2px solid #a51e36; padding-bottom: 5px;">
+        Addresses
+      </h3>
+
+      <!-- Address Details -->
+      <div style="display: flex; gap: 20px; margin-bottom: 5px;">
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Address Type:</label>
+          <ng-container *ngIf="isEditable; else addressTypeInput">
+            <select [(ngModel)]="selectedController.AddressType" name="addressType" 
+                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+              <option *ngFor="let type of addressTypeOptionsEdit" [value]="type.AddressTypeID">{{ type.AddressTypeDesc }}</option>
+            </select>
+          </ng-container>
+          <ng-template #addressTypeInput>
+            <input [(ngModel)]="selectedController.AddressType" name="addressType" [readonly]="!isEditable"
+                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+          </ng-template>
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Address - Line 1:</label>
+          <input name="addressLine1" [readonly]="!isEditable"
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Address - Line 2:</label>
+          <input name="addressLine2" [readonly]="!isEditable"
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 20px; margin-bottom: 5px;">
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">State/Province:</label>
+          <input name="stateProvince" [readonly]="!isEditable"
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Country:</label>
+          <ng-container *ngIf="isEditable; else countryInput">
+            <select [(ngModel)]="selectedController.Country" name="country" 
+                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+              <option *ngFor="let country of countryOptionsEdit" [value]="country.CountryID">{{ country.CountryName }}</option>
+            </select>
+          </ng-container>
+          <ng-template #countryInput>
+            <input [(ngModel)]="selectedController.Country" name="country" [readonly]="!isEditable"
+                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+          </ng-template>
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">City:</label>
+          <input name="city" [readonly]="!isEditable"
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 20px; margin-bottom: 5px;">
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Zip/Postal Code:</label>
+          <input name="zipPostalCode" [readonly]="!isEditable"
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
+        </div>
+      </div>
+     <ng-container *ngIf="!isEditable || (isEditable && selectedController.IsCompanyRegulated)">
+      <h3 style="margin-top: 20px; color: #8b152b; font-size: 1.3em; text-align: left; border-bottom: 2px solid #a51e36; padding-bottom: 5px;">
+        Home State Regulators
+      </h3>
+
+      <div style="display: flex; gap: 20px; margin-bottom: 10px;">
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Regulator:</label>
+          <input [(ngModel)]="homeRegulater.RegulatorName" name="regulator" [readonly]="!isEditable"
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
+        </div>
+        <div style="flex: 1;">
+          <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Regulator Contact:</label>
+          <input [(ngModel)]="selectedController.RegulatorContact" name="regulatorContact" [readonly]="!isEditable"
+                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
+        </div>
+      </div>
+    </ng-container>
+    </form>
+
+    <!-- Save and Cancel Buttons -->
+    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+      <button type="button" (click)="deleteController()" 
+              style="padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; background-color: #a51e36; color: white; font-size: 0.9em;">
+        Delete
+      </button>
+      <button type="button" (click)="editController()" 
+              style="padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; background-color: #a51e36; color: white; font-size: 0.9em;">
+        Edit
+      </button>
+      <ng-container *ngIf="isEditable">
+        <button type="button" (click)="saveControllerPopupChanges()" 
+              style="padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; background-color: #a51e36; color: white; font-size: 0.9em;">
+            Save
+         </button>
+        <button type="button" (click)="closeControllerPopup()" 
+              style="padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; background-color: #a51e36; color: white; font-size: 0.9em;">
+            Cancel
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
   </section>
+  
 
   <!--Auditors-->
   <section id="Auditors" class="edit-firm-section" [ngStyle]="{ width: dataWidth }" style="display: none">

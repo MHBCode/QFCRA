@@ -478,6 +478,170 @@ table-responsive {
   margin-left: 5px;
 }
 
+// controller popup 
+/* Popup overlay styling */
+/* Popup overlay styling */
+.controllerPopup {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%; // Slightly increased width for better spacing
+  height: auto; // Adjust height based on content
+  background-color: #ffffff; // Pure white background
+  border: 1px solid #ddd; // Light border color for subtle effect
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // Softer shadow
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+  border-radius: 10px; // Rounded corners
+  font-family: Arial, sans-serif; // Consistent font family
+}
+
+/* Popup header */
+.controllerPopup .popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #a00; // Red separator to match the theme
+  padding-bottom: 10px;
+}
+
+.controllerPopup .popup-header h2 {
+  font-size: 1.5rem;
+  color: #a00; // Dark red color for header text
+  margin: 0; // Remove margin for alignment
+}
+
+.controllerPopup .close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #a00; // Dark red color for close button
+  transition: color 0.3s;
+
+  &:hover {
+    color: #ff0000; // Brighter red on hover
+  }
+}
+
+/* Popup form styling */
+.controllerPopup form {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); // 3 columns layout for inputs
+  gap: 15px; // Spacing between inputs
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.controllerPopup label {
+  font-weight: bold;
+  color: #a00; // Dark red for labels
+  margin-bottom: 5px;
+  font-size: 0.9rem; // Smaller font size
+}
+
+.controllerPopup input {
+  padding: 10px;
+  border: 1px solid #ccc; // Light border color
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+
+  &:focus {
+    border-color: #a00; // Red border on focus
+    outline: none;
+    box-shadow: 0 0 5px rgba(160, 0, 0, 0.2); // Subtle red shadow on focus
+  }
+}
+
+/* Section heading styles */
+.controllerPopup .popup-content h3 {
+  color: #a00; // Dark red color for section headings
+  margin: 15px 0 10px; // Space around headings
+  font-size: 1.2rem; // Slightly larger font size
+  border-bottom: 1px solid #a00; // Red underline
+  padding-bottom: 5px;
+}
+
+/* Address specific styling */
+.controllerPopup .address-container {
+  grid-column: span 3; // Span all columns
+  background-color: #a00; // Dark red background to match the theme
+  padding: 10px;
+  border-radius: 4px; // Rounded corners for address container
+  color: #fff; // White text color
+}
+
+/* Footer buttons */
+.controllerPopup .popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.controllerPopup .btn {
+  background-color: #a00; // Dark red for buttons
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background-color 0.3s, transform 0.2s;
+
+  &:hover {
+    background-color: #cc0000; // Darker red on hover
+    transform: translateY(-2px); // Lift on hover
+  }
+}
+
+.controllerPopup .btn.edit {
+  background-color: #007bff; // Blue for edit button
+}
+
+.controllerPopup .btn.edit:hover {
+  background-color: #0056b3; // Darker blue on hover
+}
+
+.controllerPopup .btn.delete {
+  background-color: #dc3545; // Red for delete button
+}
+
+.controllerPopup .btn.delete:hover {
+  background-color: #c82333; // Darker red on hover
+}
+
+.controllerPopup .btn.cancel {
+  background-color: gray; // Gray for cancel button
+}
+
+.controllerPopup .btn.cancel:hover {
+  background-color: darkgray; // Darker gray on hover
+}
+
+/* Adjust grid structure for alignment */
+@media (max-width: 1024px) {
+  .controllerPopup form {
+    grid-template-columns: repeat(2, 1fr); // Adjust columns for smaller screens
+  }
+}
+
+@media (max-width: 768px) {
+  .controllerPopup form {
+    grid-template-columns: 1fr; // Single column layout for small screens
+  }
+}
+
+
+// end controller popup style 
+
 /*Popup styles*/
 
 .popup-wrapper,

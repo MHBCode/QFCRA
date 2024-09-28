@@ -21,6 +21,7 @@ export class FirmService {
   private baseUrlSecurity = environment.API_URL + '/api/Security/' // Security
   private baseUrlLogForm = environment.API_URL + '/api/LogForm/' // logform
   private baseUrlObjectWF = environment.API_URL + '/api/ObjectWF/' // Object WF
+  private baseUrlParentEntity = environment.API_URL + '/api/ParentEntity/'; //ParentEntity
 
   constructor(private http: HttpClient) { }
 
@@ -240,6 +241,24 @@ export class FirmService {
     const url = `${this.baseUrlControllers}get_corporate_controller_details_list?firmId=${firmId}`; //https://localhost:7091/api/OtherEntity/get_corporate_controller_details_list?firmId=66
     return this.http.get<any>(url);
   }
+  //////// Yazan 
+  insertupdateotherentitydetails(saveControllerPopupChangesObj: any): Observable<any> {
+    const url = `${this.baseUrlControllers}insert_update_other_entity_details`;
+    return this.http.post<any>(url, saveControllerPopupChangesObj); 
+  }
+  saveupdatecontactform(saveControllerPopupChangesIndividualObj: any): Observable<any> {
+    const url = `${this.baseUrlContact}save_update_contact_form`;
+    return this.http.post<any>(url, saveControllerPopupChangesIndividualObj); 
+  }
+  getobjecttypetableEdit(userId: number,objectTypeTable: string,objectOpTypeId: number): Observable<any> {
+    const url = `${this.baseUrlSecurity}get_object_type_table?firmId=${userId}&objectTypeTable=${objectTypeTable}&objectOpTypeId=${objectOpTypeId}`; 
+    return this.http.get<any>(url);
+  }
+  getRegulatorDetails(otherEntityID : number, entityTypeId: number): Observable<any> {
+    const url = `${this.baseUrlParentEntity}get_regulator_details?otherEntityID=${otherEntityID}&entityTypeId=${entityTypeId}`; 
+    return this.http.get<any>(url);
+  }
+  
   getFIRMRegisteredFund(firmId: number): Observable<any> {
     const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?firmId=${firmId}`; //https://localhost:7091/api/RegisteredFund/get_registered_fund_data?firmId=69
     return this.http.get<any>(url);

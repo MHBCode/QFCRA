@@ -135,6 +135,7 @@ export class FirmListComponent implements OnInit, OnChanges {
             this.totalPages = Math.ceil(this.totalRows / this.pageSize);
             this.updatePagination();
             this.isLoading = false;
+            console.log(this.firms)
           },
           error => {
             console.error('Error fetching firms', error);
