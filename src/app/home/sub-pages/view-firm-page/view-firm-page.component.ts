@@ -270,6 +270,12 @@ export class ViewFirmPageComponent implements OnInit {
       this.isValidFirmAMLSupervisor(this.firmId, this.userId);
       this.isValidFirmSupervisor(this.firmId, this.userId);
       this.getAssignedLevelUsers();
+      this.getControllerControlTypes();
+      this.getTitle();
+      this.getAddressTypesController();
+      this.getlegalStatusController();
+      this.getCorporateController();
+      this.getcountries();
     });
   }
 
@@ -1714,7 +1720,7 @@ export class ViewFirmPageComponent implements OnInit {
   //////////// Yazan
   objectOpTypeIdEdit = 41;
   getControllerControlTypes(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, "ControllerControlTypes", this.objectOpTypeIdEdit)
+    this.firmService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.controlTypeOptionsEdit = data.response; 
         console.log("getControllerControlTypes", data)
@@ -1724,7 +1730,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getCorporateController(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, "V_ControllerType", this.objectOpTypeIdEdit)
+    this.firmService.getobjecttypetableEdit(this.userId, constants.CorporateController, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.CorporateControllerEdit = data.response; 
         console.log("getCorporateController", data)
@@ -1734,7 +1740,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getlegalStatusController(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, "v_FirmLegalStatusTypesController", this.objectOpTypeIdEdit)
+    this.firmService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.legalStatusOptionsEdit = data.response; 
         console.log("getlegalStatusController", data)
@@ -1744,7 +1750,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getAddressTypesController(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, "AddressTypes", this.objectOpTypeIdEdit)
+    this.firmService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.addressTypeOptionsEdit = data.response; 
         console.log("getAddressTypesController", data)
@@ -1754,7 +1760,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getTitle(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, "TitleTypes", this.objectOpTypeIdEdit)
+    this.firmService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.TitleEdit = data.response; 
         console.log("Countries", data)
@@ -1764,7 +1770,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getcountries(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, "Countries", this.objectOpTypeIdEdit)
+    this.firmService.getobjecttypetableEdit(this.userId, constants.countries, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.countryOptionsEdit = data.response; 
         console.log("Countries", data)
