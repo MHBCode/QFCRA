@@ -15,4 +15,8 @@ export class TaskServiceService {
     const url = `${this.baseUrl}get_task-reminder_list?userId=${userId}`;  // Construct full URL
     return this.http.get<any>(url);
   }
+  saveReminderNote(note: any): Observable<any> {
+    const url = `${this.baseUrl}insert_reminder_note`;
+    return this.http.post<any>(url, note);
+  }
 }

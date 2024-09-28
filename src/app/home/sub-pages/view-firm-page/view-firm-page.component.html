@@ -278,6 +278,7 @@
         </h2>
 
         <div style="display: flex; gap: 10px">
+          <!-- loading flag for rendering buttons, hideSaveBtn..etc flag for supervisor access and other roles, getControlVisiblity function for role access endpoint -->
           <div class="btn" *ngIf="!loading && !hideEditBtn && getControlVisibility('imgBtnEdit')">
             <button [disabled]="!getControlEnablement('imgBtnEdit')"
               class="edit-btn" (click)="editFirm()">
@@ -497,20 +498,19 @@
         </h2>
       </div>
       <div class="edit-firms-inputs" *ngIf="!isEditModeCore">
-        <table>
+        <!-- Licensed Status Table -->
+        <table class="aligned-table">
           <thead>
             <tr>
-              <td style="background: #a51e36; color: white; cursor: default;text-align: left" colspan="6">
-                Licensed Status
-              </td>
+              <td class="app-details-table-header" colspan="6">Licensed Status</td>
             </tr>
             <tr>
-              <th>Applied On</th>
-              <th>Licensed On</th>
-              <th>Current Status</th>
-              <th>Current Status Effective Date</th>
-              <th>Last Modified By</th>
-              <th>Last Modified Date</th>
+              <th class="aligned-column">Applied On</th>
+              <th class="aligned-column">Licensed On</th>
+              <th class="aligned-column">Current Status</th>
+              <th class="aligned-column">Current Status Effective Date</th>
+              <th class="aligned-column">Last Modified By</th>
+              <th class="aligned-column">Last Modified Date</th>
             </tr>
           </thead>
           <tbody>
@@ -524,20 +524,20 @@
             </tr>
           </tbody>
         </table>
-        <table *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
+      
+        <!-- Authorisation Status Table -->
+        <table class="aligned-table" *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
           <thead>
             <tr>
-              <td style="background: #a51e36; color: white; cursor: default;text-align: left" colspan="6">
-                Authorisation Status
-              </td>
+              <td class="app-details-table-header" colspan="6">Authorisation Status</td>
             </tr>
             <tr>
-              <th>Applied On</th>
-              <th>Authorised On</th>
-              <th>Current Status</th>
-              <th>Current Status Effective Date</th>
-              <th>Last Modified By</th>
-              <th>Last Modified Date</th>
+              <th class="aligned-column">Applied On</th>
+              <th class="aligned-column">Authorised On</th>
+              <th class="aligned-column">Current Status</th>
+              <th class="aligned-column">Current Status Effective Date</th>
+              <th class="aligned-column">Last Modified By</th>
+              <th class="aligned-column">Last Modified Date</th>
             </tr>
           </thead>
           <tbody>
@@ -551,7 +551,7 @@
             </tr>
           </tbody>
         </table>
-      </div>
+      </div>      
       <!--or (edit mode)-->
       <div class="edit-firms-inputs" *ngIf="isEditModeCore">
         <div class="input-field">
@@ -884,7 +884,7 @@
                 </button>
               </div>
 
-              <div class="btn" *ngIf="!loading && !hideReviseBtn && getControlVisibility('imgBtnRevise')">
+              <div class="btn" *ngIf="!loading && !hideReviseBtn && getControlVisibility('imgBtnRevise') && showVaryBtn">
                 <button [disabled]="!getControlEnablement('imgBtnRevise')">
                   Revise
                 </button>
@@ -964,7 +964,7 @@
               <input disabled name="createdDate" id="createdDate" type="text"
                 value="{{ ActivityLicensed[0]?.ScopeCreatedDate }}" />
             </div>
-            <div *ngIf="isEditModeLicense && showVaryBtn" class="vary-scope">
+            <div *ngIf="isEditModeLicense && !hideReviseBtn && showVaryBtn" class="vary-scope">
               <button (click)="varyLicenseScope()">Vary Scope</button>
             </div>
           </div>

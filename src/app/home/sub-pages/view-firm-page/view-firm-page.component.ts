@@ -223,6 +223,7 @@ export class ViewFirmPageComponent implements OnInit {
     console.log('ngOnInit called');
     this.scrollToTop();
 
+
     this.route.params.subscribe(params => {
       this.firmId = +params['id']; // Retrieve the firm ID from the route parameters
       console.log(`Loaded firm with ID: ${this.firmId}`);
@@ -334,6 +335,7 @@ export class ViewFirmPageComponent implements OnInit {
       case FrimsObject.Scope:
         this.showSection(this.scopeSection);
         this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+        this.applyVaryScopeButtonLogicOnView();
         this.isCollapsed['LicensedSection'] = true;
         break;
       case FrimsObject.Auditor:
@@ -1025,21 +1027,38 @@ export class ViewFirmPageComponent implements OnInit {
     return regex.test(value);
   }
 
+  // This function applies only the Vary Button logic and leaves the application date input always disabled in view mode
+  applyVaryScopeButtonLogicOnView() {
+    // The application date input should always be disabled in view mode
+    this.disableApplicationDate = true; // Ensure the application date input is always disabled in view mode
+
+    // Logic for showing or hiding the "Vary Scope" button
+    if (!(this.isNullOrEmpty(this.ActivityLicensed[0].ScopeAppliedDate)) && !(this.isNullOrEmpty(this.ActivityLicensed[0].ScopeLicensedDate))) {
+      if (this.currentDate > this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate)) {
+        this.showVaryBtn = true; 
+      } else {
+        this.showVaryBtn = false;
+      }
+    } else {
+      this.showVaryBtn = false; 
+    }
+  }
+
+
   editLicenseScope() {
     if (this.ActivityLicensed[0].ScopeRevNum) {
+      // enable/disable application date input and vary scope/revise button visiblity
       // Check if the current date is greater than the ScopeLicensedDate
       if (!(this.isNullOrEmpty(this.ActivityLicensed[0].ScopeAppliedDate)) && !(this.isNullOrEmpty(this.ActivityLicensed[0].ScopeLicensedDate))) {
         if (this.currentDate > this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate)) {
           this.disableApplicationDate = false;  // Enable the field
+          this.showVaryBtn = true;
         } else {
           this.disableApplicationDate = true;  // Disable the field
+          this.showVaryBtn = false;
         }
       } else {
         this.disableApplicationDate = true;  // Enable if no licensed date is present
-      }
-
-      // Vary Scope Button Visibility
-      if (this.isNullOrEmpty(this.ActivityLicensed[0].ScopeLicensedDate) || this.currentDate < this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate)) {
         this.showVaryBtn = false;
       }
 
@@ -1185,6 +1204,10 @@ export class ViewFirmPageComponent implements OnInit {
         // todo, vary scope button function goes here
       }
     });
+  }
+
+  varyScopeConfirm() {
+
   }
 
   cancelEditLicScope() {
@@ -2806,7 +2829,7 @@ export class ViewFirmPageComponent implements OnInit {
     const applicationLicStatus = this.allQFCLicenseStatus.find(
       option => option.FirmApplStatusTypeID === constants.FirmLicenseApplStatusType.Application
     );
-  
+
     // Only apply this logic if the firm is not licensed
     if (!this.isLicensed) {
       // Set License Status to Application if not already set or it's currently set to Application
@@ -2815,7 +2838,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.formattedLicenseApplStatusDate = this.dateOfApplication;
         this.firmDetails.LicenseStatusTypeLabelDesc = `Date ${applicationLicStatus?.FirmApplStatusTypeDesc}`;
       }
-  
+
       // Set Authorisation Status to Application if not already set or it's currently set to Application
       if (applicationAuthStatus) {
         this.firmDetails.AuthorisationStatusTypeID = applicationAuthStatus?.FirmApplStatusTypeID;
@@ -2823,7 +2846,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.firmDetails.AuthorisationStatusTypeLabelDesc = `Date ${applicationAuthStatus?.FirmApplStatusTypeDesc}`;
       }
     }
-  
+
     // If the firm is already licensed, handle switching between License and Authorisation
     if (this.isLicensed) {
       if (selectedFirmTypeID == 2) { // Switching to License
@@ -2831,7 +2854,7 @@ export class ViewFirmPageComponent implements OnInit {
           this.formattedLicenseApplStatusDate = this.dateOfApplication;
         }
       }
-  
+
       if (selectedFirmTypeID == 3) { // Switching to Authorisation
         if (this.firmDetails.AuthorisationStatusTypeID === constants.FirmAuthorizationApplStatusType.Application || !this.firmDetails.AuthorisationStatusTypeID) {
           this.firmDetails.AuthorisationStatusTypeID = applicationAuthStatus?.FirmApplStatusTypeID;
@@ -2841,7 +2864,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     }
   }
-  
+
 
   onDateOfApplicationChange(newDate: string) {
     if (newDate && this.firmDetails.LicenseStatusTypeID == constants.FirmLicenseApplStatusType.Application) {
@@ -3034,7 +3057,7 @@ export class ViewFirmPageComponent implements OnInit {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   }
-  
+
 
   getErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
     this.firmService.errorMessages(msgKey).subscribe(

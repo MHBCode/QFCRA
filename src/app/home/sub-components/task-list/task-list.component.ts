@@ -10,6 +10,7 @@ import { TaskServiceService } from 'src/app/ngServices/task-service.service';
 })
 export class TaskListComponent implements OnInit {
 
+  userId = 30 // must be dynamic
   @Input() pageSize: number = 10;
   @Input() isMainView: boolean = false;
   Tasks: any[] = [];
@@ -29,7 +30,7 @@ export class TaskListComponent implements OnInit {
   FirmsDropdownVisible: boolean = false;
   dueDateInputVisible: boolean = false;
   daysOverDueDropdownVisible: boolean = false;
-  showAuditorPopup: boolean = false;
+  showTaskPopup: boolean = false;
 
   selectedTaskType: string = '';
   selectedFirmName: string = '';
@@ -37,6 +38,7 @@ export class TaskListComponent implements OnInit {
   selectedDaysOverDue: string = '';
   selectedTask: any = null;
   safeHtmlDescription: SafeHtml = ''; // for html tags
+  noteText: string = '';
 
   constructor(
     private TaskService: TaskServiceService,
@@ -45,11 +47,13 @@ export class TaskListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getTasksList();
+    this.loadTasksList();
     this.checkRoute();
   }
 
-  getTasksList(): void {
+  loadTasksList(): void {
+    console.log('Starting task list load at: ', new Date());
+    this.isLoading = true;
     this.TaskService.getAssignedTaskReminders(30).subscribe(
       data => {
         this.Tasks = data.response;
@@ -60,25 +64,29 @@ export class TaskListComponent implements OnInit {
         this.getFirmNames();
         this.updatePagination();  // Apply pagination after fetching tasks
         this.isLoading = false;
+        console.log('Task list loaded at: ', new Date());  // Log when data is loaded
       },
       error => {
         console.error('Error fetching Tasks', error);
         this.isLoading = false;
       }
-    )
+    );
   }
+  
 
-  toggleAuditorPopup(selectedRow: any) {
+  toggleTaskPopup(selectedRow: any) {
     this.selectedTask = selectedRow;
-    this.showAuditorPopup = !this.showAuditorPopup;
+    console.log(this.selectedTask);
+    this.showTaskPopup = !this.showTaskPopup;
     if (this.selectedTask?.LongDescription) {
       const updatedDescription = this.selectedTask.LongDescription.replace(/<BR\s*\/?>\s*<BR\s*\/?>/, ''); // Removes first two <br> tags
       this.safeHtmlDescription = this.sanitizer.bypassSecurityTrustHtml(updatedDescription); // Apply the html tags in the endpoint
     }
+    this.noteText = '';
   }
 
-  closeAuditorPopup() {
-    this.showAuditorPopup = false;
+  closeTaskPopup() {
+    this.showTaskPopup = false;
   }
 
   // Get unique task types from the task list
@@ -94,6 +102,47 @@ export class TaskListComponent implements OnInit {
     this.firmNames = Array.from(new Set(firms)).sort();
     console.log(this.firmNames);
   }
+
+  prepareNoteObject() {
+    return {
+        objectID: this.selectedTask.ObjectID,
+        objectInstanceID: parseInt(this.selectedTask.ObjectInstanceID, 10),
+        objectInstanceRevNum: this.selectedTask.ObjectInstanceRevNum,
+        notes: this.noteText,
+        createdBy: this.userId,
+    };
+  }
+
+
+  saveNote() {
+    this.isLoading = true;
+    const note = this.prepareNoteObject();
+  
+    // Start the note save and task reload in parallel
+    const saveNotePromise = this.TaskService.saveReminderNote(note).toPromise();
+    const loadTasksPromise = this.TaskService.getAssignedTaskReminders(30).toPromise();
+  
+    Promise.all([saveNotePromise, loadTasksPromise])
+      .then(([saveNoteResponse, loadTasksResponse]) => {
+        console.log('Note updated successfully:', saveNoteResponse);
+        
+        // Update the task list after saving the note
+        this.Tasks = loadTasksResponse.response;
+        this.filteredTasks = [...this.Tasks];
+        this.totalRows = this.Tasks.length;
+        this.totalPages = Math.ceil(this.totalRows / this.pageSize);
+        this.updatePagination();
+  
+        this.showTaskPopup = false;
+        this.isLoading = false;
+        console.log('Task list reloaded after note save:', new Date());
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        this.isLoading = false;
+      });
+  }
+  
 
   toggleTaskDropdown(): void {
     this.TaskDropdownVisible = !this.TaskDropdownVisible;
