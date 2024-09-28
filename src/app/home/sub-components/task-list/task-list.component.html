@@ -101,7 +101,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let item of paginatedTasks" (click)="toggleAuditorPopup(item)">
+          <tr *ngFor="let item of paginatedTasks" (click)="toggleTaskPopup(item)">
             <td>
               <div *ngIf="!isMainView else expandType" class="expandable-text-container">
                 <span class="expandable-text">{{ item.TaskType }}</span>
@@ -138,12 +138,12 @@
   </div>
 </div>
 
-<!-- view auditor popup -->
-<div class="popup-overlay" *ngIf="showAuditorPopup">
+<!-- view task popup -->
+<div class="popup-overlay" *ngIf="showTaskPopup">
   <div class="popup-container" (click)="$event.stopPropagation()">
     <div class="popup-header">
       <h3>Task / Reminder Details</h3>
-      <i class="bi bi-x-circle close-icon" (click)="closeAuditorPopup()"></i>
+      <i class="bi bi-x-circle close-icon" (click)="closeTaskPopup()"></i>
     </div>
 
     <div class="popup-content">
@@ -200,12 +200,12 @@
       </div>
 
       <div class="input-field note-textarea-container">
-      <textarea class="note-textarea" placeholder="Write your note here..."></textarea>
+      <textarea [(ngModel)]="noteText" class="note-textarea" placeholder="Write your note here..."></textarea>
       </div>
 
       <!-- Save Note Button -->
       <div class="save-note">
-        <button type="button">Save Note</button>
+        <button type="button" (click)="saveNote()">Save Note</button>
       </div>
     </div>
   </div>

@@ -149,6 +149,9 @@ export class FirmListComponent implements OnInit, OnChanges {
     }
     
 
+
+
+
   // Update pagination based on current page and page size
   updatePagination(): void {
     if (this.firms && this.firms.length > 0) {

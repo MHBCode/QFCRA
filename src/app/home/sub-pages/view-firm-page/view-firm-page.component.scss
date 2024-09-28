@@ -147,7 +147,6 @@ th {
   font-weight: bold;
   padding: 10px; /* Padding for better spacing */
   text-align: left;
-  text-transform: uppercase; /* Uppercase headers */
   border-right: 1px solid #ddd; /* Border between columns */
 }
 
@@ -1302,3 +1301,22 @@ hr {
 }
 
 /* */
+
+/* app details core style */
+.app-details-table-header {
+    background: #a51e36;
+    color: white;
+    text-align: left!important;
+    padding: 8px;
+}
+.aligned-table {
+  width: 100%; 
+  table-layout: fixed;
+  border-collapse: collapse; 
+}
+.aligned-table th, .aligned-table td {
+  padding: 8px;
+  border: 1px solid #ccc; 
+}
+
+
