@@ -111,6 +111,9 @@ export class ViewFirmPageComponent implements OnInit {
   FIRMContacts: any[] = [];
   FIRMControllers: any[] = [];
   FIRMControllersIndividual: any[] = [];
+  isPopupOpen = false;
+  selectedFirmName = '';
+
   RegisteredFund: any[] = [];
   FIRMRA: any[] = [];
   FirmAdminFees: any[] = [];
@@ -175,7 +178,26 @@ export class ViewFirmPageComponent implements OnInit {
   objFirmIslamicFinance: any = {};
   rstFirmSector: boolean;
   firmSectorID: any;
-
+  
+  assignedLevelUsers: any = [];
+  isFirmAMLSupervisor: boolean = false;
+  isFirmSupervisor: boolean = false;
+  controlsPermissions: any = [];
+  loading: boolean;
+  CorporateControllerEdit: any[] = [];
+  legalStatusOptionsEdit: any[] = []; 
+  establishmentOptionsEdit: any[] = []; 
+  controlTypeOptionsEdit: any[] = []; 
+  countryOptionsEdit: any[] = []; 
+  addressTypeOptionsEdit: any[] = []; 
+  TitleEdit: any[] = [];
+  /* buttons */
+  hideEditBtn: boolean = false;
+  hideSaveBtn: boolean = false;
+  hideCancelBtn: boolean = false;
+  hideCreateBtn: boolean = false;
+  hideReviseBtn: boolean = false;
+  hideDeleteBtn: boolean = false;
   // flags validations
   hasValidationErrors: boolean = false;
   invalidAddress: boolean;
@@ -195,19 +217,6 @@ export class ViewFirmPageComponent implements OnInit {
 
   /* user access and security */
   assignedUserRoles: any = [];
-  assignedLevelUsers: any = [];
-  isFirmAMLSupervisor: boolean = false;
-  isFirmSupervisor: boolean = false;
-  controlsPermissions: any = [];
-  loading: boolean;
-
-  /* buttons */
-  hideEditBtn: boolean = false;
-  hideSaveBtn: boolean = false;
-  hideCancelBtn: boolean = false;
-  hideCreateBtn: boolean = false;
-  hideReviseBtn: boolean = false;
-  hideDeleteBtn: boolean = false;
 
   constructor(
     private router: Router,
@@ -1658,6 +1667,324 @@ export class ViewFirmPageComponent implements OnInit {
   //     }
   //   );
   // }
+  controllerDetails = {
+    OtherEntityName: '',
+    RegisteredNum: '',
+    ControllerControlTypeDesc: '',
+    AssnDateFrom: '',
+    AssnDateTo: '',
+    IsCompanyRegulated: false,
+    LegalStatusTypeDesc: '',
+    CountryName: '',
+    PctOfShares: '',
+    AdditionalDetails: '',
+    LastModifiedByOfOtherEntities: '',
+    LastModifiedDate: '',
+    addressType: '',
+    addressLine1: '',
+    addressLine2: '',
+    addressLine3: '',
+    addressLine4: '',
+    city: '',
+    stateProvince: '',
+    country: '',
+    zipPostalCode: '',
+    regulator: '',
+    regulatorContact: ''
+  };
+  homeRegulater: any = [];
+  selectedController: any;
+  Address : any = {}
+  openControllerPopup(controller: any): void {
+    this.selectedController = controller; // Set the firm name
+    this.controllerDetails = { ...controller }; // Populate the controller details
+    this.isPopupOpen = true; // Open the popup
+    console.log('SSSSSSSSSSSSSSSSSSSSSSSdfgdfgdfhfgjfhjdhdj', this.selectedController.OtherEntityID, this.selectedController.EntityTypeID);
+    this.firmService.getRegulatorDetails(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID).subscribe(
+      data => {
+        if (data.response && data.response.length > 0) {
+          this.homeRegulater = data.response[0]; // Assuming it's an array and taking the first element
+        }
+      },
+    );
+    console.log("controllerDetails",this.controllerDetails)
+    console.log("selectedController",this.selectedController)
+    
+  }
+  //////////// Yazan
+  objectOpTypeIdEdit = 41;
+  getControllerControlTypes(): void {
+    this.firmService.getobjecttypetableEdit(this.userId, "ControllerControlTypes", this.objectOpTypeIdEdit)
+      .subscribe(data => {
+        this.controlTypeOptionsEdit = data.response; 
+        console.log("getControllerControlTypes", data)
+      }, error => {
+        console.error("Error fetching controller control types:", error);
+      });
+  }
+
+  getCorporateController(): void {
+    this.firmService.getobjecttypetableEdit(this.userId, "V_ControllerType", this.objectOpTypeIdEdit)
+      .subscribe(data => {
+        this.CorporateControllerEdit = data.response; 
+        console.log("getCorporateController", data)
+      }, error => {
+        console.error("Error fetching controller", error);
+      });
+  }
+
+  getlegalStatusController(): void {
+    this.firmService.getobjecttypetableEdit(this.userId, "v_FirmLegalStatusTypesController", this.objectOpTypeIdEdit)
+      .subscribe(data => {
+        this.legalStatusOptionsEdit = data.response; 
+        console.log("getlegalStatusController", data)
+      }, error => {
+        console.error("Error fetching legalStatus", error);
+      });
+  }
+
+  getAddressTypesController(): void {
+    this.firmService.getobjecttypetableEdit(this.userId, "AddressTypes", this.objectOpTypeIdEdit)
+      .subscribe(data => {
+        this.addressTypeOptionsEdit = data.response; 
+        console.log("getAddressTypesController", data)
+      }, error => {
+        console.error("Error fetching AddressTypes", error);
+      });
+  }
+
+  getTitle(): void {
+    this.firmService.getobjecttypetableEdit(this.userId, "TitleTypes", this.objectOpTypeIdEdit)
+      .subscribe(data => {
+        this.TitleEdit = data.response; 
+        console.log("Countries", data)
+      }, error => {
+        console.error("Error fetching TitleTypes", error);
+      });
+  }
+
+  getcountries(): void {
+    this.firmService.getobjecttypetableEdit(this.userId, "Countries", this.objectOpTypeIdEdit)
+      .subscribe(data => {
+        this.countryOptionsEdit = data.response; 
+        console.log("Countries", data)
+      }, error => {
+        console.error("Error fetching Countries", error);
+      });
+  }
+
+    
+  
+
+  closeControllerPopup(): void {
+    this.isPopupOpen = false;
+    this.isEditable = false; // Close the popup
+  }
+  saveControllerPopupChanges(): void {    
+    this.isEditable = false;
+    console.log("Selected Controller:", this.selectedController);
+    if (
+        ["ParentEntity", "CorporateController", "Head_Office", "UBO_Corporate"].includes(this.selectedController.EntityTypeDesc)
+    ) {
+        const saveControllerPopupChangesObj = {
+            otherEntityDetails: {
+                otherEntityID: this.selectedController.otherEntityID,
+                createdBy: this.selectedController.createdBy,
+                relatedEntityID: this.selectedController.relatedEntityID,
+                entitySubTypeID: this.selectedController.entitySubTypeID,
+                relatedEntityTypeID: this.selectedController.relatedEntityTypeID,
+                relatedEntityEntityID: this.selectedController.relatedEntityEntityID,
+                myState: this.selectedController.myState,
+                otherEntityName: this.selectedController.OtherEntityName,
+                dateOfIncorporation: this.selectedController.dateOfIncorporation, // Ensure this is a valid date string
+                legalStatusTypeID: this.selectedController.LegalStatusTypeID,
+                placeOfIncorporation: this.selectedController.placeOfIncorporation,
+                countryOfIncorporation: this.selectedController.countryOfIncorporation,
+                registeredNumber: this.selectedController.RegisteredNum,
+                zebSiteAddress: this.selectedController.zebSiteAddress,
+                lastModifiedBy: this.selectedController.lastModifiedBy,
+                isAuditor: this.selectedController.isAuditor,
+                isCompanyRegulated: this.selectedController.IsCompanyRegulated,
+                additionalDetails: this.selectedController.additionalDetails,
+                isParentController: this.selectedController.isParentController,
+                isPublicallyTraded: this.selectedController.isPublicallyTraded,
+                areAnyUBOs: this.selectedController.areAnyUBOs,
+                controllerInfo: this.selectedController.controllerInfo,
+                output: this.selectedController.output,
+                firmId: this.selectedController.firmId,
+                entityTypeID: this.selectedController.entityTypeID,
+                entityID: this.selectedController.entityID,
+                controllerControlTypeID: this.selectedController.controllerControlTypeID,
+                numOfShares: this.selectedController.numOfShares,
+                pctOfShares: this.selectedController.pctOfShares,
+                majorityStockHolder: this.selectedController.majorityStockHolder,
+                assnDateFrom: this.selectedController.assnDateFrom,
+                assnDateTo: this.selectedController.assnDateTo
+            },
+            addressList: this.selectedController.addressList.map(address => ({
+                firmID: address.firmID,
+                countryID: address.countryID,
+                addressTypeID: address.addressTypeID,
+                sameAsTypeID: address.sameAsTypeID,
+                lastModifiedBy: address.lastModifiedBy,
+                addressAssnID: address.addressAssnID,
+                entityTypeID: address.entityTypeID,
+                entityID: address.entityID,
+                contactAssnID: address.contactAssnID,
+                contactID: address.contactID,
+                addressID: address.addressID,
+                addressLine1: address.addressLine1,
+                addressLine2: address.addressLine2,
+                addressLine3: address.addressLine3,
+                addressLine4: address.addressLine4,
+                city: address.city,
+                province: address.province,
+                postalCode: address.postalCode,
+                phoneNumber: address.phoneNumber,
+                phoneExt: address.phoneExt,
+                faxNumber: address.faxNumber,
+                lastModifiedDate: address.lastModifiedDate,
+                addressState: address.addressState,
+                fromDate: address.fromDate,
+                toDate: address.toDate,
+                objectID: address.objectID,
+                objectInstanceID: address.objectInstanceID,
+                objectInstanceRevNumber: address.objectInstanceRevNumber,
+                sourceObjectID: address.sourceObjectID,
+                sourceObjectInstanceID: address.sourceObjectInstanceID,
+                sourceObjectInstanceRevNumber: address.sourceObjectInstanceRevNumber,
+                objAis: address.objAis // Ensure this object is correctly structured
+            })),
+            regulatorList: this.selectedController.regulatorList.map(regulator => ({
+                regulatorState: regulator.regulatorState,
+                regulatorID: regulator.regulatorID,
+                entityTypeID: regulator.entityTypeID,
+                entityID: regulator.entityID,
+                relatedEntityTypeID: regulator.relatedEntityTypeID,
+                relatedEntityID: regulator.relatedEntityID,
+                contactAssnID: regulator.contactAssnID
+            }))
+        };
+
+        // Call the insert/update endpoint
+        this.firmService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
+            response => {
+                console.log("Save successful:", response);
+            },
+            error => {
+                console.error("Error saving changes:", error);
+            }
+        );
+    } else if (
+        ["IndividualController", "UBO_Individual"].includes(this.selectedController.EntityTypeDesc)
+    ) {
+        const saveControllerPopupChangesIndividualObj = {
+            contactDetails: {
+                contactDetails: {
+                    firmID: 0,
+                    contactID: 0,
+                    contactAssnID: 0,
+                    title: this.selectedController.Title, // Map your inputs accordingly
+                    firstName: this.selectedController.FirstName,
+                    secondName: this.selectedController.SecondName,
+                    thirdName: this.selectedController.ThirdName,
+                    familyName: this.selectedController.FamilyName,
+                    countryOfResidence: this.selectedController.CountryOfResidence,
+                    createdBy: this.selectedController.CreatedBy,
+                    dateOfBirth: this.selectedController.DateOfBirth,
+                    fullName: this.selectedController.FullName,
+                    lastModifiedBy: this.selectedController.LastModifiedBy,
+                    nationalID: this.selectedController.NationalID,
+                    nationality: this.selectedController.Nationality,
+                    passportNum: this.selectedController.PassportNum,
+                    placeOfBirth: this.selectedController.PlaceOfBirth,
+                    previousName: this.selectedController.PreviousName,
+                    isExists: this.selectedController.IsExists,
+                    nameInPassport: this.selectedController.NameInPassport,
+                    contactAddnlInfoTypeID: this.selectedController.ContactAddnlInfoTypeID,
+                    isFromContact: this.selectedController.IsFromContact,
+                    countryofBirth: this.selectedController.CountryOfBirth,
+                    juridictionID: this.selectedController.JuridictionID,
+                    objectID: this.selectedController.ObjectID,
+                    isPeP: this.selectedController.IsPeP
+                },
+                lstContactFunctions: this.selectedController.LstContactFunctions.map(func => ({
+                    contactFunctionID: func.ContactFunctionID,
+                    contactFunctionTypeID: func.ContactFunctionTypeID,
+                    contactAssnID: func.ContactAssnID,
+                    contactID: func.ContactID,
+                    contactFunctionTypeDesc: func.ContactFunctionTypeDesc,
+                    effectiveDate: func.EffectiveDate,
+                    endDate: func.EndDate,
+                    createdDate: func.CreatedDate,
+                    createdBy: func.CreatedBy,
+                    lastModifiedBy: func.LastModifiedBy,
+                    lastModifiedDate: func.LastModifiedDate,
+                    reviewStatus: func.ReviewStatus,
+                    selected: func.Selected,
+                    isFunctionActive: func.IsFunctionActive,
+                    isRecordEditable: func.IsRecordEditable
+                }))
+            },
+            addresses: this.selectedController.Addresses.map(address => ({
+                firmID: address.FirmID,
+                countryID: address.CountryID,
+                addressTypeID: address.AddressTypeID,
+                sameAsTypeID: address.SameAsTypeID,
+                lastModifiedBy: address.LastModifiedBy,
+                addressAssnID: address.AddressAssnID,
+                entityTypeID: address.EntityTypeID,
+                entityID: address.EntityID,
+                contactAssnID: address.ContactAssnID,
+                contactID: address.ContactID,
+                addressID: address.AddressID,
+                addressLine1: address.AddressLine1,
+                addressLine2: address.AddressLine2,
+                addressLine3: address.AddressLine3,
+                addressLine4: address.AddressLine4,
+                city: address.City,
+                province: address.Province,
+                postalCode: address.PostalCode,
+                phoneNumber: address.PhoneNumber,
+                phoneExt: address.PhoneExt,
+                faxNumber: address.FaxNumber,
+                lastModifiedDate: address.LastModifiedDate,
+                addressState: address.AddressState,
+                fromDate: address.FromDate,
+                toDate: address.ToDate,
+                objectID: address.ObjectID,
+                objectInstanceID: address.ObjectInstanceID,
+                objectInstanceRevNumber: address.ObjectInstanceRevNumber,
+                sourceObjectID: address.SourceObjectID,
+                sourceObjectInstanceID: address.SourceObjectInstanceID,
+                sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber,
+                objAis: address.ObjAis // Ensure this object is correctly structured
+            }))
+        };
+
+        // Call the save/update contact form endpoint
+        this.firmService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
+            response => {
+                console.log("Contact save successful:", response);
+            },
+            error => {
+                console.error("Error saving contact:", error);
+            }
+        );
+    }
+}
+
+  editController(): void {
+    
+    this.isEditable = true;
+      
+    console.log('Editing:', this.controllerDetails);
+  }
+
+  deleteController(): void {
+    // Logic to delete the controller
+    console.log('Deleting:', this.controllerDetails);
+  }
   loadControllers(): void {
     this.firmService.getFIRMControllers(this.firmId).subscribe(
       data => {

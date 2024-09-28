@@ -262,6 +262,7 @@ export class FirmsPageComponent implements OnInit {
           
           // Apply default sorting after data load
           this.sortFirms(this.selectedSortOption);
+          console.log(this.firms)
         } else {
           console.warn('No firms data found.');
         }
@@ -352,6 +353,8 @@ export class FirmsPageComponent implements OnInit {
 
   // Sort firms based on the selected option
   sortFirms(option: string): void {
+    this.filteredFirms = [...this.firms];
+
     this.filteredFirms.sort(this.getSortFunction(option));
   }
 
@@ -368,9 +371,9 @@ export class FirmsPageComponent implements OnInit {
         case 'ZtoA':
           return b.FirmName.localeCompare(a.FirmName);
         case 'newFirms':
-          return new Date(b.CreationDate).getTime() - new Date(a.CreationDate).getTime();
+          return new Date(b.CreatedDate).getTime() - new Date(a.CreatedDate).getTime();
         case 'oldFirms':
-          return new Date(a.CreationDate).getTime() - new Date(b.CreationDate).getTime();
+          return new Date(a.CreatedDate).getTime() - new Date(b.CreatedDate).getTime();
         default:
           return 0; // No sorting
       }

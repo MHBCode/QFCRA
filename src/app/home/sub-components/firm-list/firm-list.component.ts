@@ -120,6 +120,7 @@ export class FirmListComponent implements OnInit, OnChanges {
     this.loadFirms();
     this.updatePagination(); // Initial pagination
     this.checkRoute(); // Check the current route to decide the title visibility
+    this.loadFirms();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -127,7 +128,10 @@ export class FirmListComponent implements OnInit, OnChanges {
       this.updatePagination(); // Update pagination whenever firms input changes
     }
   }
+<<<<<<< HEAD
+=======
 
+>>>>>>> 3b9eb393ea4429e03526faa3527ef286c82bfe89
   loadFirms(): void {
         this.firmService.getAssignedFirms(10044).subscribe(
           data => {
@@ -136,14 +140,24 @@ export class FirmListComponent implements OnInit, OnChanges {
             this.totalPages = Math.ceil(this.totalRows / this.pageSize);
             this.updatePagination();
             this.isLoading = false;
+<<<<<<< HEAD
+            console.log(this.firms)
+=======
+>>>>>>> 3b9eb393ea4429e03526faa3527ef286c82bfe89
           },
           error => {
             console.error('Error fetching firms', error);
             this.isLoading = false;
           }
+<<<<<<< HEAD
+      );
+    }
+    
+=======
         );
       }
 
+>>>>>>> 3b9eb393ea4429e03526faa3527ef286c82bfe89
   // Update pagination based on current page and page size
   updatePagination(): void {
     if (this.firms && this.firms.length > 0) {
