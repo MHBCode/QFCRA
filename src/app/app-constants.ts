@@ -16,7 +16,8 @@ export const addressTypes = "v_EntityAddressTypes";
 export const firmLevels = "UserRoleFirmTypes";
 export const prudentialCategoryTypes = "PrudentialCategoryTypes";
 export const authorisationCategoryTypes = "V_AuthorisationCategoryTypes";
-export const PLACE_OF_INCORPORATION_QFC = "QFC"; 
+export const PLACE_OF_INCORPORATION_QFC = "QFC";
+export const firmScopeTypes = "FirmScopeTypes";
 export enum FirmLicenseApplStatusType
 {
     Application = 4,
@@ -183,4 +184,98 @@ export enum EntityType
     UBO_Individual=9,
    	Head_Office=10,
     IndividualController =11
+}
+
+export enum FrimsObject
+{
+    MainMenu = 0,
+    OperationMenu = 40,
+    FrimsMenu = 80,
+    Breach = 400,
+    BreachHistory = 401,
+    BreachStatus = 402,
+    Waiver = 440,
+    WaiverHistory = 441,
+    WaiverStatus = 442,
+    FirmsReportLog = 480,
+    Firm = 520,
+    Scope = 524,
+    Tasks = 560,
+    LogForms = 600,
+    Ais = 700,
+    Invoices = 750,
+    CoreDetail = 521,
+    ParentEntity = 522,
+    Contatcs = 523,
+    Controller = 525,
+    RegisteredFunds = 526,
+    Auditor=527,
+    CRO = 900,
+    Supervision = 1000,
+    Planning = 1001,
+    RiskAssememnt = 1002,
+    ReportingSchedule = 1004,
+    ReturnsReview = 1005,
+    PrudAnanlysis = 1006,
+    AssignRoles = 1007,
+    RMP = 1015,
+    IndividualMenu = 90,
+    AIDocs = 701,
+    AIAssessment = 702,
+    AIRecommendation = 703,
+    AIMeetingNotes = 704,
+    IndApplications = 705,
+    IndPersonalInfo = 706,
+    IndCredential = 707,
+    IndFunctions = 708,
+    IndFP = 709,
+    IndOpenItems = 710,
+    IndForumAgenda = 711,
+    IndSLC = 712,
+    Individual = 713,
+    AppExtReferences = 1110,
+    AIReview = 714,
+    FSReporting = 1016,
+    ALL = 9999,
+
+    //Added By Suhail on 18-Mar-2011
+    ReportingScheduleItem = 1026,
+    LateAdminFee = 1027,
+    PriorPostition=715,
+    AINOC=717,
+    AINOCRecommendation=718,
+    AIStatusChange=719,
+    GenralSubmission =100,
+    AINOCInternalDocs=720,
+
+
+    RptSchItemXBRL = 601, // By IRIS Report Schedule
+    RptSchItemNonXBRL = 602, // By IRIS Report Schedule
+    SupervisionJournal=529,
+    Regulators =528,
+    Notices =800,
+    NoticesResponse=801,
+    FIRMS_LN_Integration = 2004,
+    Enforcement=530,
+    ReportValidation =1060
+
+
+}
+
+export enum ObjectOpType
+{
+    Create = 40,
+    Edit = 41,
+    Delete = 42,
+    List = 43,
+    View = 44,
+    Search = 45,
+    Save = 46,
+    Cancel = 47,
+    StartWF = 48,
+    Review = 49,
+    CancelWF = 50,
+    Revise = 51,
+    Print = 52,
+    ListView = 100
 }

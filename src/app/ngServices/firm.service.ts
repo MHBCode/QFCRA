@@ -119,6 +119,10 @@ export class FirmService {
     const url = `${this.baseUrlApplication}get_applications?firmId=${firmId}&applicationTypeId=${applicationTypeId}`;
     return this.http.get<any>(url);
   }
+  getAssignLevelUsers() {
+    const url = `${this.baseUrl}get_assign_level_users`;
+    return this.http.get<any>(url);
+  }
   getFirmActivityLicensed(firmId: number): Observable<any> {
     const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmApplicationTypeId=2`;  //'https://localhost:7091/api/Activity/get_firm_activities?firmId=66&firmApplicationTypeId=2' 2: Licensed
     return this.http.get<any>(url);
