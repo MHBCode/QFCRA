@@ -204,7 +204,7 @@
   <div class="popup-container" (click)="$event.stopPropagation()">
     <div class="popup-header">
       <h3>Firms Search</h3>
-      <button class="close-button" (click)="togglePopup()">X</button>
+      <button class="close-button" (click)="togglePopup()"><i class="bi bi-x-circle close-icon"></i></button>
     </div>
 
     <div class="popup-content">
@@ -334,7 +334,6 @@
       <!-- Buttons for Reset and Search -->
       <div class="input-search-buttons">
         <button type="button" (click)="resetFilters()" class="reset">Reset</button>
-        <!-- <button type="button" (click)="searchFirms()" class="search">Search</button> -->
       </div>
     </div>
   </div>

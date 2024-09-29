@@ -83,7 +83,21 @@
   color: #555;
   margin-bottom: 2px;
 }
-
+.close-icon {
+  position: absolute;
+  right: 1rem;
+  top: 2rem;
+  font-size: 26px;
+  cursor: pointer;
+  color: #a51e36;
+}
+ 
+.close-button:hover {
+  color: #a51e36;
+}
+.select-wrapper select{
+  width: 100%;
+}
 .select-wrapper select,
 .input-field input {
   padding: 8px 12px;

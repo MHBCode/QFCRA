@@ -101,7 +101,7 @@ import { FirmService } from 'src/app/ngServices/firm.service';
 })
 export class FirmListComponent implements OnInit, OnChanges {
 
-  @Input() pageSize: number = 5;
+  @Input() pageSize: number = 10;
   @Input() firms: any[] = [];
   @Input() isMainView: boolean = false;
 
@@ -117,7 +117,6 @@ export class FirmListComponent implements OnInit, OnChanges {
   constructor(private router: Router, private firmService: FirmService) {}
 
   ngOnInit(): void {
-    this.loadFirms();
     this.updatePagination(); // Initial pagination
     this.checkRoute(); // Check the current route to decide the title visibility
     this.loadFirms();
@@ -137,14 +136,22 @@ export class FirmListComponent implements OnInit, OnChanges {
             this.totalPages = Math.ceil(this.totalRows / this.pageSize);
             this.updatePagination();
             this.isLoading = false;
+
+            console.log(this.firms)
+
           },
           error => {
             console.error('Error fetching firms', error);
             this.isLoading = false;
           }
+
       );
     }
     
+
+
+
+
   // Update pagination based on current page and page size
   updatePagination(): void {
     if (this.firms && this.firms.length > 0) {
