@@ -18,30 +18,30 @@
             <th>Sector</th>
             <th>Authorization Category</th>
             <th>Supervision Category</th>
-            <th>Prudential Category</th>
-            <th>Home Country</th>
-            <th>Supervisor - Supervision</th>
-            <th>Supervisor - AML</th>
+            <th *ngIf="isMainView">Prudential Category</th>
+            <th *ngIf="isMainView">Home Country</th>
+            <th *ngIf="isMainView">Supervisor - Supervision</th>
+            <th *ngIf="isMainView">Supervisor - AML</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of paginatedFirms" (click)="viewFirm(item.FirmID)">
             <td class="bold-text">{{ item.QFCNum }}</td>
-            <td>{{ item.FirmName }}</td>
+            <td >{{ item.FirmName }}</td>
             <td>{{ item.LegalStatusTypeDesc }}</td>
             <td>{{ item.LicenseStatusTypeDesc }}</td>
             <td>{{ item.AuthorisationStatusTypeDesc }}</td>
             <td>{{ item.SectorTypeShortDesc }}</td>
             <td>{{ item.AuthorisationCategoryTypeDesc }}</td>
             <td>{{ item.SupervisionCategory }}</td>
-            <td>{{ item.PrudentialCategoryTypeDesc }}</td>
-            <td>{{ item.Country }}</td>
-            <td>
+            <td *ngIf="isMainView">{{ item.PrudentialCategoryTypeDesc }}</td>
+            <td *ngIf="isMainView">{{ item.Country }}</td>
+            <td *ngIf="isMainView">
               <div class="expandable-text-container">
                 <span class="expandable-text">{{ item.Supervisor }}</span>
               </div>
             </td>
-            <td>
+            <td *ngIf="isMainView">
               <div class="expandable-text-container">
                 <span class="expandable-text">{{ item.Supervisor_AML }}</span>
               </div>

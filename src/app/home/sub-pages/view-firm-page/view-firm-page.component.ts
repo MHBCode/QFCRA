@@ -1786,6 +1786,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.isPopupOpen = false;
     this.isEditable = false; // Close the popup
   }
+  
   saveControllerPopupChanges(): void {    
     this.isEditable = false;
     console.log("Selected Controller:", this.selectedController);

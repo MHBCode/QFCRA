@@ -277,7 +277,9 @@ export class FirmsPageComponent implements OnInit {
   toggleCategoryOptions(category: string): void {
     this.toggleOptions[category] = !this.toggleOptions[category];
   }
-
+  checkboxesfilter(): void {
+    
+  }
   // Search functionality for firms
   searchFirms(): void {
     this.filteredFirms = this.firms.filter(firm => {
@@ -357,7 +359,7 @@ export class FirmsPageComponent implements OnInit {
 
     this.filteredFirms.sort(this.getSortFunction(option));
   }
-
+  
   // Get the appropriate sort function based on the selected option
   getSortFunction(option: string): (a: any, b: any) => number {
     return (a, b) => {

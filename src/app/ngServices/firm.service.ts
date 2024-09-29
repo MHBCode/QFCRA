@@ -99,6 +99,11 @@ export class FirmService {
     const url = `${this.baseUrl}get_firms_name_history?firmId=${firmId}`
     return this.http.get<any>(url);
   }
+  /// Yazan 
+  getFirmsAlphabetically(filterDataObj: any): Observable<any> {
+    const url = `${this.baseUrl}get_firms_alphabetically`;
+    return this.http.post<any>(url, filterDataObj);
+  }
   getAccountingStandardsHistory(firmId: number): Observable<any> {
     const url = `${this.baseUrl}get_firms_end_year_history?firmId=${firmId}&flag=2`; // Construct full URL https://localhost:7091/api/Firms/get_firms_end_year_history?firmId=66&flag=2
     return this.http.get<any>(url);
