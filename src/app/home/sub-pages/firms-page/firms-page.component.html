@@ -263,7 +263,7 @@
           <div class="input-field">
             <label for="firmType">Firm Type</label>
             <div class="checkbox-wrapper">
-              <input type="checkbox" [(ngModel)]="firmType" (change)="toggleCategoryOptions('firmType')" /> All
+              <input type="checkbox" [(ngModel)]="firmType" (change)="toggleCategoryOptions('firmType')"/> All
             </div>
             <div *ngIf="toggleOptions.firmType" class="checkbox-options">
               <label><input type="checkbox" [(ngModel)]="checkboxes.authorized" /> Authorized</label>
@@ -279,12 +279,12 @@
               <input type="checkbox" [(ngModel)]="firmStatus" (change)="toggleCategoryOptions('firmStatus')" /> All
             </div>
             <div *ngIf="toggleOptions.firmStatus" class="checkbox-options">
-              <label><input type="checkbox" [(ngModel)]="checkboxes.applicant" /> Applicant</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.applicationWithdrawn" /> Application Withdrawn</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.applicationRejected" /> Application Rejected</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.active" /> Active</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.inactive" /> Inactive</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.withdrawn" /> Withdrawn</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.applicant" value="1"/> Applicant</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.applicationWithdrawn" value="2"/> Application Withdrawn</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.applicationRejected" value="3"/> Application Rejected</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.active" value="4"/> Active</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.inactive" value="5"/> Inactive</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.withdrawn" value="6"/> Withdrawn</label>
             </div>
           </div>
 

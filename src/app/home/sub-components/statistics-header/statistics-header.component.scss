@@ -25,6 +25,7 @@
     border-radius: 50%;
     background: #FFF1F1;
     color: #A51E36;
+    margin-inline-start: 10px;
 }
 .statistics-square-icon i{
     font-size: 25px;
@@ -34,6 +35,7 @@
 .statistics-square-details{
     flex-direction: column;
     align-items: flex-start;
+    padding-inline-start: 10px;
 }
 .ssd-title{
     color: #A3AED0;
