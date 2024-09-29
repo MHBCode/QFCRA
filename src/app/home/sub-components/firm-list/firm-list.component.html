@@ -37,14 +37,10 @@
             <td *ngIf="isMainView">{{ item.PrudentialCategoryTypeDesc }}</td>
             <td *ngIf="isMainView">{{ item.Country }}</td>
             <td *ngIf="isMainView">
-              <div class="expandable-text-container">
-                <span class="expandable-text">{{ item.Supervisor }}</span>
-              </div>
+              {{ item.Supervisor }}
             </td>
             <td *ngIf="isMainView">
-              <div class="expandable-text-container">
-                <span class="expandable-text">{{ item.Supervisor_AML }}</span>
-              </div>
+             {{ item.Supervisor_AML }}
             </td>
           </tr>
         </tbody>
@@ -62,3 +58,7 @@
     </div>
   </div>
 </div>
+
+<!-- <div class="expandable-text-container">
+  <span class="expandable-text"></span>
+</div> -->

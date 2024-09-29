@@ -101,7 +101,7 @@ import { FirmService } from 'src/app/ngServices/firm.service';
 })
 export class FirmListComponent implements OnInit, OnChanges {
 
-  @Input() pageSize: number = 5;
+  @Input() pageSize: number = 10;
   @Input() firms: any[] = [];
   @Input() isMainView: boolean = false;
 
