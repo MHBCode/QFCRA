@@ -83,7 +83,7 @@ export class FirmService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrlAddress}insert_update_address`, rowData, { headers: headers });
   }
-  editLicenseScope(userId: number, rowData: any): Observable<any> {
+  editLicenseScope(rowData: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrlActivity}save_update_licensed_scope`, rowData, { headers: headers });
   }
