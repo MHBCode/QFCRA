@@ -301,7 +301,7 @@ export class FirmsPageComponent implements OnInit {
       },
       (error) => {
         console.error('Error fetching firms:', error);
-        alert(`Error: ${error.message}`);
+       // alert(`Error: ${error.message}`);
       }
     );
   }

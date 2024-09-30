@@ -19,4 +19,8 @@ export class TaskServiceService {
     const url = `${this.baseUrl}insert_reminder_note`;
     return this.http.post<any>(url, note);
   }
+  getMyTaskByObjectDetails(objectId: number,objectInstanceId: number, objectInstanceRevNum: number): Observable<any> {
+    const url = `${this.baseUrl}get_my_task_by_object_details?ObjectID=${objectId}&ObjectInstanceID=${objectInstanceId}&ObjectInstanceRevNum=${objectInstanceRevNum}`;  // Construct full URL
+    return this.http.get<any>(url);
+  }
 }

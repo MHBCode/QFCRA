@@ -1131,8 +1131,7 @@
               </label>
               <!--label is changed based on scoperevnum-->
               <label *ngIf="ActivityAuth[0]?.ScopeRevNum == 1">Application Date</label>
-              <input [disabled]="!isEditModeAuth" name="q13AppDate" id="q13AppDate" type="text" #dateInputs
-                value="{{ ActivityAuth[0]?.ScopeApplicationDate }}" />
+              <input [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].ScopeApplicationDate" name="q13AppDate" id="q13AppDate" type="text" #dateInputs/>
             </div>
             <div class="input-field">
               <label for="incorporationDate"> Incorporation Date </label>
@@ -1214,6 +1213,7 @@
                 {{ isCollapsed["regulatedActivitiesSection"] ? "▲" : "▼" }}
               </button>
             </div>
+            <!--on view mode-->
             <div class="regulated-activities-container">
               <div *ngFor="let activity of ActivityAuth">
                 <div class="regulated-activities-header" *ngIf="!isEditModeAuth">
@@ -1224,36 +1224,41 @@
                     Activity : <strong>{{ activity?.ActivityTypeDescription }}</strong>
                   </p>
                 </div>
+                <div *ngIf="!isEditModeAuth" class="products-header">
+                  <p>Product(s)</p>
+                </div>
+                <!---->
                 <!--on edit mode-->
                 <div class="regulated-activities-header" *ngIf="isEditModeAuth">
                   <div class="category-select">
                     <label for="category" style="display: flex; gap: 5px">
                       Category <span style="color: red">*</span>:
                     </label>
-                    <select [(ngModel)]="activity.selectedCategory" (ngModelChange)="onCategoryChange(activity)"
+                    <select [(ngModel)]="activity.FirmScopeTypeID" (ngModelChange)="onCategoryChange(activity)"
                       name="category" id="category">
-                      <!-- <option value="" disabled>Select</option> -->
-                      <option *ngFor="let category of activityCategories" [ngValue]="category">
+                      <option *ngFor="let category of activityCategories" [value]="category.ActivityCategoryID">
                         {{ category.ActivityCategoryDesc }}
                       </option>
                     </select>
                   </div>
+                  
 
                   <div class="activity-select">
                     <label for="activity" style="display: flex; gap: 5px">
                       Activity <span style="color: red">*</span>:
                     </label>
-                    <select [(ngModel)]="activity.selectedActivity" name="activity" id="activity">
-                      <option *ngFor="let activity of activity.activities" [ngValue]="activity">
-                        {{ activity.ActivityTypeDesc }}
+                    <select [(ngModel)]="activity.ActivityTypeID" name="activity" id="activity">
+                      <option *ngFor="let act of activity.activities" [value]="act.ActivityTypeID">
+                        {{ act.ActivityTypeDesc }}
                       </option>
                     </select>
                   </div>
                 </div>
                 <!---->
 
+                <!--on view mode-->
                 <!-- Display categorized products -->
-                <div *ngIf="activity?.categorizedProducts?.length > 0">
+                <div *ngIf="activity?.categorizedProducts?.length > 0 && !isEditModeAuth">
                   <div *ngFor="let category of activity.categorizedProducts">
                     <!-- Display Main Category -->
                     <h4>{{ category.mainCategory }}</h4>
@@ -1312,12 +1317,12 @@
                   </div>
 
                   <p>
-                    &nbsp;&nbsp;&nbsp;&nbsp;{{ activity?.specificCondition }}
+                    &nbsp;&nbsp;&nbsp;&nbsp;{{ activity?.FirmActivityConditions }}
                   </p>
                 </div>
               </div>
               <!--Conditions and Restrictions-->
-              <div class="conditions-and-restrictions-section">
+              <div *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0" class="conditions-and-restrictions-section">
                 <div class="conditions-and-restrictions-header">
                   <p>Conditions and Restrictions</p>
                 </div>
@@ -3234,7 +3239,7 @@
     <h3>Revisions for License Scope</h3>
   </div>
 
-  <div style="width: 50%" class="popup-info-place">
+  <div style="width: 80%" class="popup-info-place">
     <ul class="revision-list">
       <li *ngFor="let rev of LicPrevRevNumbers">
         <button class="change-rev" (click)="fetchPreviousScopeVersions(firmId,2,rev.ScopeRevNum)">
@@ -3254,7 +3259,7 @@
     <h3>Revisions for Authorize Scope</h3>
   </div>
 
-  <div style="width: 50%" class="popup-info-place">
+  <div style="width: 80%" class="popup-info-place">
     <ul class="revision-list">
       <li *ngFor="let rev of AuthPrevRevNumbers">
         <button class="change-rev" (click)="fetchPreviousScopeVersions(firmId,3,rev.ScopeRevNum)">
