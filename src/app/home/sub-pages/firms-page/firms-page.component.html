@@ -180,6 +180,9 @@
 <!-- Trigger Button for Search Popup -->
 <!-- Search Button -->
 <!-- Search Button -->
+<div *ngIf="isLoading" class="loader-overlay">
+  <div class="loader"></div>
+</div>
 <div class="search-button-container">
   <button (click)="togglePopup()" class="filter-button">
     <i class="bi bi-filter"></i> Filter 
@@ -215,7 +218,7 @@
           <div class="input-field">
             <label for="firmName">Firm Name</label>
             <div class="select-wrapper">
-              <select name="firmName" id="firmName" [(ngModel)]="firmName" (change)="searchFirms()">
+              <select name="firmName" id="firmName" [(ngModel)]="firmName" >
                 <option value="all">All</option>
                 <option *ngFor="let firm of firms" [value]="firm.FirmName">
                   {{ firm.FirmName }}
@@ -227,17 +230,17 @@
           <!-- QFC Number -->
           <div class="input-field">
             <label for="qfcNumber">QFC Number</label>
-            <input name="qfcNumber" id="qfcNumber" type="text" [(ngModel)]="qfcNumber" (input)="searchFirms()" />
+            <input name="qfcNumber" id="qfcNumber" type="text" [(ngModel)]="qfcNumber" />
           </div>
 
           <!-- License Status (Dropdown) -->
           <div class="input-field">
             <label for="licenseStatus">License Status</label>
             <div class="select-wrapper">
-              <select name="licenseStatus" id="licenseStatus" [(ngModel)]="licenseStatus" (change)="searchFirms()">
+              <select name="licenseStatus" id="licenseStatus" [(ngModel)]="licenseStatus" >
                 <option value="all">All</option>
-                <option *ngFor="let status of licenseStatuses" [value]="status">
-                  {{ status }}
+                <option *ngFor="let licstatus of licenseStatuses" [value]="licstatus">
+                  {{ licstatus }}
                 </option>
               </select>
             </div>
@@ -247,10 +250,11 @@
           <div class="input-field">
             <label for="authorisationStatus">Authorisation Status</label>
             <div class="select-wrapper">
-              <select name="authorisationStatus" id="authorisationStatus" [(ngModel)]="authorisationStatuses">
+              <!-- Bind to a single selected value (authorisationStatus), not the entire array -->
+              <select name="authorisationStatus" id="authorisationStatus" [(ngModel)]="authorisationStatus">
                 <option value="all">All</option>
-                <option *ngFor="let status of authorisationStatuses" [value]="status">
-                  {{ status }}
+                <option *ngFor="let authstatus of authorisationStatuses" [value]="authstatus">
+                  {{ authstatus }}
                 </option>
               </select>
             </div>
@@ -263,12 +267,12 @@
           <div class="input-field">
             <label for="firmType">Firm Type</label>
             <div class="checkbox-wrapper">
-              <input type="checkbox" [(ngModel)]="firmType" (change)="toggleCategoryOptions('firmType')" /> All
+              <input type="checkbox" [(ngModel)]="firmType" (change)="toggleCategoryOptions('firmType')"/> All
             </div>
             <div *ngIf="toggleOptions.firmType" class="checkbox-options">
-              <label><input type="checkbox" [(ngModel)]="checkboxes.authorized" /> Authorized</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.dnfbp" /> DNFBP</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.licensed" /> Licensed</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.authorized" value="1" /> Authorized</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.dnfbp" value="2"/> DNFBP</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.licensed" value="3"/> Licensed</label>
             </div>
           </div>
 
@@ -276,33 +280,33 @@
           <div class="input-field">
             <label for="firmStatus">Firm Status</label>
             <div class="checkbox-wrapper">
-              <input type="checkbox" [(ngModel)]="firmStatus" (change)="toggleCategoryOptions('firmStatus')" /> All
+              <input type="checkbox" [(ngModel)]="firmStatus"  (change)="toggleCategoryOptions('firmStatus')"/> All
             </div>
             <div *ngIf="toggleOptions.firmStatus" class="checkbox-options">
-              <label><input type="checkbox" [(ngModel)]="checkboxes.applicant" /> Applicant</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.applicationWithdrawn" /> Application Withdrawn</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.applicationRejected" /> Application Rejected</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.active" /> Active</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.inactive" /> Inactive</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.withdrawn" /> Withdrawn</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.applicant" value="1"/> Applicant</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.applicationWithdrawn" value="2"/> Application Withdrawn</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.applicationRejected" value="3"/> Application Rejected</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.active" value="4"/> Active</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.inactive" value="5"/> Inactive</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.withdrawn" value="6"/> Withdrawn</label>
             </div>
           </div>
-
+          <!-- (change)="toggleCategoryOptions('firmStatus')" -->
           <!-- Prudential Category (Checkboxes) -->
           <div class="input-field">
             <label for="prudentialCategory">Prudential Category</label>
             <div class="checkbox-wrapper">
-              <input type="checkbox" [(ngModel)]="prudentialCategory" (change)="toggleCategoryOptions('prudentialCategory')" /> All
+              <input type="checkbox" [(ngModel)]="prudentialCategory"  (change)="toggleCategoryOptions('prudentialCategory')"/> All
             </div>
             <div *ngIf="toggleOptions.prudentialCategory" class="checkbox-options">
-              <label><input type="checkbox" [(ngModel)]="checkboxes.piib1" /> PIIB 1</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.piib2" /> PIIB 2</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.piib3" /> PIIB 3</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.piib4" /> PIIB 4</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.piib5" /> PIIB 5</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.directInsurer" /> Direct Insurer</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.reinsurer" /> Reinsurer</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.insuranceIntermediary" /> Insurance Intermediary</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.piib1" value="1"/> PIIB 1</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.piib2" value="2"/> PIIB 2</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.piib3" value="3"/> PIIB 3</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.piib4" value="4"/> PIIB 4</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.piib5" value="5"/> PIIB 5</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.directInsurer" value="6" /> Direct Insurer</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.reinsurer" value="7"/> Reinsurer</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.insuranceIntermediary" value="8"/> Insurance Intermediary</label>
             </div>
           </div>
 
@@ -310,15 +314,15 @@
           <div class="input-field">
             <label for="sectors">Sectors</label>
             <div class="checkbox-wrapper">
-              <input type="checkbox" [(ngModel)]="sectors" (change)="toggleCategoryOptions('sectors')" /> All
+              <input type="checkbox" [(ngModel)]="sectors" (change)="toggleCategoryOptions('sectors')"/> All
             </div>
             <div *ngIf="toggleOptions.sectors" class="checkbox-options">
-              <label><input type="checkbox" [(ngModel)]="checkboxes.investmentManager" /> Investment Manager</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.insurer" /> Insurer</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.insuranceIntermediary" /> Insurance Intermediary</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.bank" /> Bank</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.advisor" /> Advisor</label>
-              <label><input type="checkbox" [(ngModel)]="checkboxes.repOffice" /> Rep Office</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.investmentManager" value="1"/> Investment Manager</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.insurer" value="2"/> Insurer</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.insuranceIntermediary" value="3"/> Insurance Intermediary</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.bank" value="4"/> Bank</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.advisor" value="5"/> Advisor</label>
+              <label><input type="checkbox" [(ngModel)]="checkboxes.repOffice" value="6"/> Rep Office</label>
             </div>
           </div>
         </div>
@@ -334,6 +338,7 @@
       <!-- Buttons for Reset and Search -->
       <div class="input-search-buttons">
         <button type="button" (click)="resetFilters()" class="reset">Reset</button>
+        <button type="button" (click)="searchFirms()" class="search">Search</button>
       </div>
     </div>
   </div>

@@ -101,8 +101,26 @@ export class FirmService {
   }
   /// Yazan 
   getFirmsAlphabetically(filterDataObj: any): Observable<any> {
-    const url = `${this.baseUrl}get_firms_alphabetically`;
-    return this.http.post<any>(url, filterDataObj);
+    
+    let params = new HttpParams()
+      .set('firmId', filterDataObj.FirmID)
+      .set('OperationalStatusId', 0)
+      .set('AuthorisationCaseOfficerId', 0)
+      .set('SupervisionCaseOfficerId', 0)
+      .set('QFCNumber', filterDataObj.QFCNumber)
+      .set('userId', 0)
+      .set('RelevantPerson', 0)
+      .set('CSVAuthorisationStatus',filterDataObj.CSVAuthorisationStatus.toString())
+      .set('CSVLicenseStatus', filterDataObj.CSVLicenseStatus.toString())
+      .set('CSVLegalStatus', 0)
+      .set('CSVPrudentialCategory',filterDataObj.CSVPrudentialCategory.toString())
+      .set('CSVSectorTypes', filterDataObj.CSVSectorTypes.toString())
+      .set('LoginuserId', 30)
+      .set('CSVSupCategories', 0)
+      .set('CSVFirmTypes', filterDataObj.CSVFirmTypes.toString())
+      .set('CSVFirmStatus', filterDataObj.CSVFirmStatus.toString())
+
+    return this.http.get<any>(`${this.baseUrl}get_firms_alphabetically`, { params });
   }
   getAccountingStandardsHistory(firmId: number): Observable<any> {
     const url = `${this.baseUrl}get_firms_end_year_history?firmId=${firmId}&flag=2`; // Construct full URL https://localhost:7091/api/Firms/get_firms_end_year_history?firmId=66&flag=2

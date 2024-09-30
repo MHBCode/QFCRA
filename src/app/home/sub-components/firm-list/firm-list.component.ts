@@ -124,7 +124,9 @@ export class FirmListComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['firms'] && changes['firms'].currentValue) {
+      this.isLoading = true; // Set loading while updating
       this.updatePagination(); // Update pagination whenever firms input changes
+      this.isLoading = false; // Remove loading indicator once pagination is updated
     }
   }
 
@@ -159,13 +161,12 @@ export class FirmListComponent implements OnInit, OnChanges {
       this.totalPages = Math.ceil(this.totalRows / this.pageSize);
       const startIndex = (this.currentPage - 1) * this.pageSize;
       const endIndex = Math.min(startIndex + this.pageSize, this.totalRows);
-      this.paginatedFirms = this.firms.slice(startIndex, endIndex);
+      this.paginatedFirms = this.firms.slice(startIndex, endIndex); // Paginated data
       this.startRow = startIndex + 1;
       this.endRow = endIndex;
     } else {
       this.paginatedFirms = []; // Reset paginated firms if no data
     }
-    this.isLoading = false; // Turn off loading indicator
   }
 
   // Navigate to the previous page
