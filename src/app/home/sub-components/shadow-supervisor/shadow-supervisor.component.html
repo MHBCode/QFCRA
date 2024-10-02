@@ -1,3 +1,4 @@
+<!-- 
 <div *ngIf="isLoading" class="loader-overlay">
     <div class="loader"></div>
   </div>
@@ -16,7 +17,7 @@
                   <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleTaskDropdown()">&#x25BC;</i>
                 </div>
                 <i *ngIf="selectedTaskType !== ''" class="bi bi-funnel-fill"></i> <!-- Active filter icon -->
-                <div *ngIf="TaskDropdownVisible" class="custom-dropdown">
+                <!-- <div *ngIf="TaskDropdownVisible" class="custom-dropdown">
                   <ul class="dropdown-list">
                     <li class="dropdown-item" [class.active-filter]="selectedTaskType === ''"
                       (click)="filterByTaskType('')">
@@ -36,7 +37,7 @@
                   <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleFirmDropdown()">&#x25BC;</i>
                 </div>
                 <i *ngIf="selectedFirmName !== ''" class="bi bi-funnel-fill"></i> <!-- Active filter icon -->
-                <div *ngIf="FirmsDropdownVisible" class="custom-dropdown">
+                <!-- <div *ngIf="FirmsDropdownVisible" class="custom-dropdown">
                   <ul class="dropdown-list">
                     <li class="dropdown-item" (click)="filterByFirmName('')"
                       [class.active-filter]="selectedFirmName === ''">
@@ -47,8 +48,8 @@
                       {{ firm }}
                     </li>
                   </ul>
-                </div>
-              </th>
+                </div> -->
+              <!-- </th>
               <th>Description</th>
               <th>
                 <div style="display: flex; justify-content: space-between;">
@@ -57,7 +58,7 @@
                     <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleDueDateInput()">&#x25BC;</i>
                   </div>
                   <i *ngIf="selectedDueDate !== ''" class="bi bi-funnel-fill"></i> <!-- Active filter icon -->
-                </div>
+                <!-- </div>
                 <div *ngIf="dueDateInputVisible" class="due-date-filter">
                   <label for="dueDate" class="date-label">Select Due Date:</label>
                   <input [value]="selectedDueDate" id="dueDate" type="date" (change)="filterByDueDate($event)"
@@ -68,9 +69,9 @@
                 <div>
                   Days Over Due
                   <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleDaysOverDueDropdown()">&#x25BC;</i>
-                </div>
+                </div>  -->
                 <!-- Show active filter icon when Days Over Due filter is selected -->
-                <i *ngIf="selectedDaysOverDue !== ''" class="bi bi-funnel-fill"></i>
+                <!-- <i *ngIf="selectedDaysOverDue !== ''" class="bi bi-funnel-fill"></i>
                 <div *ngIf="daysOverDueDropdownVisible" class="custom-dropdown">
                   <ul class="dropdown-list">
                     <li class="dropdown-item" (click)="filterByDaysOverDue('')"
@@ -136,10 +137,10 @@
         <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
       </div>
     </div>
-  </div>
+  </div> -->
   
   <!-- view task popup -->
-  <div class="popup-overlay" *ngIf="showTaskPopup">
+  <!-- <div class="popup-overlay" *ngIf="showTaskPopup">
     <div class="popup-container" (click)="$event.stopPropagation()">
       <div class="popup-header">
         <h3>Task / Reminder Details</h3>
@@ -180,7 +181,7 @@
         </div>
   
         <!-- Display reminder notes -->
-        <div *ngIf="selectedTask[0]?.myReminderNotesList && selectedTask[0]?.myReminderNotesList.length > 0" class="notes-container">
+        <!-- <div *ngIf="selectedTask[0]?.myReminderNotesList && selectedTask[0]?.myReminderNotesList.length > 0" class="notes-container">
           <h4>Reminder Notes</h4>
           <table>
             <thead>
@@ -198,19 +199,19 @@
               </tr>
             </tbody>
           </table>
-        </div>
+        </div> -->
   
         <!-- Add New Note -->
-        <div class="input-field note-textarea-container">
+        <!-- <div class="input-field note-textarea-container">
           <textarea [(ngModel)]="noteText" class="note-textarea" placeholder="Write your note here..."></textarea>
-        </div>
+        </div> -->
   
         <!-- Save Note Button -->
-        <div class="save-note">
+        <!-- <div class="save-note">
           <button type="button" (click)="saveNote()">Save Note</button>
         </div>
-      </div>
-    </div>
+      </div> -->
+    <!-- </div> --> 
   
   
     <!-- <td>
