@@ -190,7 +190,7 @@ export class FirmsPageComponent implements OnInit {
   showPopup: boolean = false;
   isSortDropdownOpen: boolean = false;
   selectedSortOption: string = 'AtoZ'; // Default sort option
-  isLoading: boolean = true;
+ 
   // Form search fields with defaults
   firmName: string = 'all';
   qfcNumber: string = '';
@@ -254,6 +254,7 @@ export class FirmsPageComponent implements OnInit {
     this.firmService.getAssignedFirms(30).subscribe(
       data => {
         if (data && data.response) {
+          
           this.firms = data.response;
           this.filteredFirms = [...this.firms];
 
@@ -264,7 +265,7 @@ export class FirmsPageComponent implements OnInit {
           
           // Apply default sorting after data load
           this.sortFirms(this.selectedSortOption);
-          this.isLoading = false;
+          
           console.log(this.firms)
         } else {
           console.warn('No firms data found.');
@@ -272,7 +273,7 @@ export class FirmsPageComponent implements OnInit {
       },
       error => {
         console.error('Error fetching firms', error);
-        this.isLoading = false;
+        
       }
     );
   }
@@ -305,7 +306,7 @@ export class FirmsPageComponent implements OnInit {
       }
     );
   }
-
+  
   prepareFilterData() {
     const filterData = {
       FirmID: this.firmName !== 'all' ? this.firms.find(firm => firm.FirmName === this.firmName)?.FirmID || 0 : 0, 
@@ -328,16 +329,24 @@ export class FirmsPageComponent implements OnInit {
       CSVFirmTypes: this.getFirmTypesCSV(),
       CSVFirmStatus: this.getFirmStatusCSV(),
       CSVSupCategories:0, 
+      startChar: this.startCharLatter || 0,
     };
 
-    console.log('Filter Data:', filterData); // Log the filter data
+    console.log('Filter Data:', filterData); 
     return filterData;
   }
+  startCharLatter : string;
+  getstartChar(letter: string): string {
+
+    this.startCharLatter = letter === '#' ? '0' : letter; 
+    return this.startCharLatter; 
+  }
+ 
   getCSVSelection(type: string): string {
     const selected = Object.keys(this.checkboxes)
       .filter(key => this.checkboxes[key] && key.startsWith(type))
-      .map(key => this.getCheckboxValue(key)); // Use the refactored method here
-    return selected.join(','); // Join as CSV
+      .map(key => this.getCheckboxValue(key));
+    return selected.join(',');
   }
   getCheckboxValue(key: string): string {
     const valueMapping: { [key: string]: string } = {
@@ -430,15 +439,7 @@ export class FirmsPageComponent implements OnInit {
     return '3,5'; // Adjust based on your logic
   }
   // Filter firms by letter
-  filterFirmsByLetter(letter: string): void {
-    if (letter === '#') {
-      this.filteredFirms = this.firms;
-    } else {
-      this.filteredFirms = this.firms.filter(firm => firm.FirmName.startsWith(letter));
-    }
-    // Apply sorting after filter
-    this.sortFirms(this.selectedSortOption);
-  }
+
 
   // Reset all filters to default values
   resetFilters(): void {
@@ -454,6 +455,10 @@ export class FirmsPageComponent implements OnInit {
     this.qfcNumber = '';
     this.licenseStatus = 'all';
     this.supervisorSupervision = 'all';
+    this.firmType = true;
+    this.firmStatus = true;
+    this.prudentialCategory = true;
+    this.sectors = true;
     this.checkboxes = {
       authorized: false,
       dnfbp: false,

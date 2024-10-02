@@ -17,6 +17,10 @@ export const prudentialCategoryTypes = "PrudentialCategoryTypes";
 export const authorisationCategoryTypes = "V_AuthorisationCategoryTypes";
 export const PLACE_OF_INCORPORATION_QFC = "QFC";
 export const firmScopeTypes = "FirmScopeTypes";
+
+export const firmAuditorName = "V_Firm_AuditorName";
+export const firmAuditorType = "V_Firm_AuditorType";
+
 export enum FirmLicenseApplStatusType
 {
     Application = 4,
@@ -79,7 +83,25 @@ export enum AddressControlMessages
     ENTER_VALIDFAXNUMBER = 2293,
     ENTERDATE_LESSTHAN_TODAY = 2294
 }
+export enum ControllerMessages
+{
+   ENTER_ALL_REQUIREDFIELDS = 4000,
+   ENTER_VALID_EFFECTIVEDATE = 4001,
+   ENTER_OTHER_ENTITY_NAME = 4003,
+   ENTER_GREATER_CESSATION_DATE = 4004,
+   SELECT_RECORD = 4005,
+   RECORD_MODIFIED = 4006,
+   RECORD_DELETED = 4007,
+   RECORD_INSERTED = 4008,
+   NO_RECORD = 4009,
+   ENTER_VALID_BIRTHDATE = 4010,
+   ENTER_VALID_PERCENTAGE = 4011,
+   ENTER_PERCENTAGE_NOTEXCEED = 4012,
+   ENTER_FIRSTNAME = 4013,
+   ENTER_REGISTEREDNUMBERCORPORATE = 4014,
+   SELECT_TYPEOFCONTROL = 4015,
 
+}
 export enum FirmActivitiesEnum
 {
     ENTER_ALL_REQUIREDFIELDS = 3000,

@@ -1640,13 +1640,19 @@
         <p> ---- No records found.</p>
       </ng-template>
     </div>
-
-    <!-- Popup Section -->
     <!-- Popup Section -->
     <div *ngIf="isPopupOpen" (click)="closeControllerPopup()"
       style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(253, 236, 236, 0.2); display: flex; justify-content: center; align-items: center; z-index: 1000;">
       <div (click)="$event.stopPropagation()"
         style="background-color: #ffffff; padding: 15px; border-radius: 10px; width: 70%; height: 60%; box-shadow:0 0 10px rgba(146, 146, 146, 0.1); position: relative; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="error-messages" style="color: red">
+          <p *ngIf="errorMessages['OtherEntityName']">{{ errorMessages['OtherEntityName'] }}</p>
+          <p *ngIf="errorMessages['EffectiveDate']">{{ errorMessages['EffectiveDate'] }}</p>
+          <p *ngIf="errorMessages['CessationDate']">{{ errorMessages['CessationDate'] }}</p>
+          <p *ngIf="errorMessages['PlaceOfEstablishment']">{{ errorMessages['PlaceOfEstablishment'] }}</p>
+          <p *ngIf="errorMessages['ControllerControlTypeDesc']">{{ errorMessages['ControllerControlTypeDesc'] }}</p>
+          <p *ngIf="errorMessages['PctOfShares']">{{ errorMessages['PctOfShares'] }}</p>
+        </div>
         <!-- Title -->
         <h3
           style="margin-top: 0; color: #8b152b; font-size: 1.3em; text-align: left; border-bottom: 2px solid #a51e36; padding-bottom: 5px;">
@@ -1660,7 +1666,7 @@
               <div style="flex: 1;">
                 <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Controller Type
                   :</label>
-                <input [(ngModel)]="selectedController.EntityTypeDesc" name="ControllerType" readonly
+                <input required [(ngModel)]="selectedController.EntityTypeDesc" name="ControllerType" readonly] 
                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
               </div>
             </div>
@@ -1670,7 +1676,7 @@
             <div style="flex: 1;">
               <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Full Name of
                 Entity:</label>
-              <input [(ngModel)]="selectedController.OtherEntityName" name="fullName" [readonly]="!isEditable"
+              <input [(ngModel)]="selectedController.OtherEntityName" name="fullName" [readonly]="!isEditable" required
                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
             </div>
             <div style="flex: 1;">
@@ -1702,7 +1708,7 @@
               <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Place of
                 Establishment:</label>
               <ng-container *ngIf="isEditable; else placeOfEstablishmentInput">
-                <select [(ngModel)]="selectedController.PlaceOfEstablishment" name="placeOfEstablishment"
+                <select required [(ngModel)]="selectedController.PlaceOfEstablishment" name="placeOfEstablishment"
                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
                   <option *ngFor="let place of countryOptionsEdit" [value]="place.CountryID">{{ place.CountryName }}
                   </option>
@@ -1718,7 +1724,7 @@
               <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Type of
                 Control:</label>
               <ng-container *ngIf="isEditable; else controlTypeInput">
-                <select [(ngModel)]="selectedController.ControllerControlTypeDesc" name="typeOfControl"
+                <select required [(ngModel)]="selectedController.ControllerControlTypeDesc" name="typeOfControl"
                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
                   <option *ngFor="let controlType of controlTypeOptionsEdit"
                     [value]="controlType.ControllerControlTypeID">{{ controlType.ControllerControlTypeDesc }}</option>
@@ -1745,7 +1751,7 @@
               <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Effective
                 Date:</label>
               <ng-container *ngIf="isEditable; else effectiveDateInput">
-                <input type="date" [(ngModel)]="selectedController.EffectiveDate" name="effectiveDate"
+                <input type="text" #dateInputs [(ngModel)]="selectedController.EffectiveDate" name="effectiveDate"
                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;" />
               </ng-container>
               <ng-template #effectiveDateInput>
@@ -1778,7 +1784,7 @@
               <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Cessation
                 Date:</label>
               <ng-container *ngIf="isEditable; else cessationDateInput">
-                <input type="date" [(ngModel)]="selectedController.CessationDate" name="cessationDate"
+                <input type="text" #dateInputs [(ngModel)]="selectedController.CessationDate" name="cessationDate"
                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;" />
               </ng-container>
               <ng-template #cessationDateInput>
@@ -1885,7 +1891,7 @@
 
         <!-- Save and Cancel Buttons -->
         <div style="display: flex; justify-content: flex-end; gap: 10px;">
-          <button type="button" (click)="deleteController()"
+          <button type="button" (click)="confarmDeleteControllerDetials(selectedController.OtherEntityID)"
             style="padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; background-color: #a51e36; color: white; font-size: 0.9em;">
             Delete
           </button>
@@ -1922,16 +1928,7 @@
               <i class="bi bi-plus"></i>
               Create
             </button>
-            <button (click)="editAuditor()">
-              <i class="bi bi-pen"></i>
-              Edit
-            </button>
-            <!--popup message for edit-->
 
-            <button>
-              <i class="bi bi-trash"></i>
-              Delete
-            </button>
           </div>
         </div>
         <span class="inactive-auditors">
@@ -1941,7 +1938,7 @@
         <table>
           <thead>
             <tr>
-              <th></th>
+              
               <!--leave it empty-->
               <th>Auditor Name</th>
               <th>Auditor Type</th>
@@ -1952,13 +1949,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let auditor of FIRMAuditors">
-              <td class="radio-table">
-                <label class="radioBtn">
-                  <input type="radio" name="auditor" #auditorRadio />
-                  <span></span>
-                </label>
-              </td>
+            <tr *ngFor="let auditor of FIRMAuditors" (click)="viewAuditor(auditor)">
               <td (click)="viewAuditor(auditor)">
                 {{ auditor.OtherEntityName }}
               </td>
@@ -1978,7 +1969,63 @@
         </table>
       </div>
     </div>
-    <!--view auditor-->
+      <!-- Popup for viewing/editing auditor -->
+  <div *ngIf="IsViewAuditorVisible || IsEditAuditorVisible" 
+  style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 62%; background: #fff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); padding: 20px; z-index: 1000; text-align: left; overflow-y: auto;">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+ <h2 style="font-size: 24px; color: #333;">{{ IsEditAuditorVisible ? 'Edit Auditor Details' : 'Auditor Details' }}</h2>
+ <div class="btn" *ngIf="!IsEditAuditorVisible">
+   <button (click)="editAuditor()"><i class="bi bi-pen"></i> Edit</button>
+   <button (click)="deleteAuditor()"><i class="bi bi-trash"></i> Delete</button>
+   <button (click)="createAuditor()"><i class="bi bi-plus"></i>Create</button>
+   <button (click)="closeAuditorPopup()"><i class="bi bi-x"></i>Cancel</button>
+ </div>
+</div>
+
+<form>
+ <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+  <div style="width:400px">
+    <label for="auditorName" style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Auditor Name</label>
+    <ng-container *ngIf="IsEditAuditorVisible; else viewAuditorName">
+      <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
+        <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}</option>
+      </select>
+    </ng-container>
+    <ng-template #viewAuditorName>
+      <input name="auditorName" id="auditorName" type="text" [(ngModel)]="selectedAuditor.OtherEntityName" disabled style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
+    </ng-template>
+  </div>
+  <div style="width:400px">
+    <label for="auditorType" style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Auditor Type</label>
+    <ng-container *ngIf="IsEditAuditorVisible; else viewAuditorType">
+      <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
+        <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">{{ type.EntitySubTypeDesc }}</option>
+      </select>
+    </ng-container>
+    <ng-template #viewAuditorType>
+      <input name="auditorType" id="auditorType" type="text" [(ngModel)]="selectedAuditor.EntitySubTypeDesc" disabled style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
+    </ng-template>
+  </div>
+   <div style="width:378px">
+     <label for="effectiveFromDate" style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Effective From Date</label>
+     <input [disabled]="!IsEditAuditorVisible" #dateInputs  name="effectiveFromDate" id="effectiveFromDate" type="text"
+       [(ngModel)]="selectedAuditor.AssnDateFrom" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
+   </div>
+   <div style="width:378px">
+     <label for="effectiveToDate" style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Effective To Date</label>
+     <input [disabled]="!IsEditAuditorVisible" #dateInputs name="effectiveToDate" id="effectiveToDate" type="text"
+       [(ngModel)]="selectedAuditor.AssnDateTo" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
+   </div>
+ </div>
+
+ <!-- Save and Cancel buttons in edit mode -->
+ <div *ngIf="IsEditAuditorVisible" style="margin-top: 20px; display: flex; justify-content: space-between;">
+   <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="saveAuditor()"><i class="bi bi-save"></i> Save</button>
+   <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="cancelEdit()"><i class="bi bi-x"></i> Cancel</button>
+ </div>
+</form>
+</div>
+    <!--view auditor
     <div class="inputs-field-set" *ngIf="IsViewAuditorVisible">
       <div class="view-auditor-actions">
         <h2 class="view-auditor-header">Auditor Details</h2>
@@ -2005,14 +2052,15 @@
             value="{{ selectedAuditor.AssnDateTo }}" />
         </div>
       </div>
-    </div>
-    <!--create auditor-->
+    </div> -->
+    create auditor
     <div class="inputs-field-set" *ngIf="IsCreateAuditorVisible">
       <div class="view-auditor-actions">
         <h2 class="view-auditor-header">Auditor Details</h2>
+        
         <div class="btn">
-          <button class="save-btn">Save</button>
-        </div>
+          <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="closecreateAuditor()"><i class="bi bi-x"></i> Cancel</button>
+        </div> 
       </div>
       <form>
         <div class="view-auditor-inputs">
@@ -2020,9 +2068,8 @@
             <label for="auditorName">
               Auditor Name <span style="color: red">*</span>
             </label>
-            <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditorNameFromSelectBox">
-              <option value="select">Select</option>
-              <option value="other">Other</option>
+            <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID">
+              <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}</option>
             </select>
           </div>
           <div class="input-field" *ngIf="selectedAuditorNameFromSelectBox === 'other'">
@@ -2035,25 +2082,28 @@
             <label for="auditorType">
               Auditor Type <span style="color: red">*</span>
             </label>
-            <select name="auditorType" id="auditorType">
-              <option value="select">Select</option>
+            <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID" >
+              <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">{{ type.EntitySubTypeDesc }}</option>
             </select>
           </div>
           <div class="input-field">
             <label for="address2">
               Effective From Date <span style="color: red">*</span>
             </label>
-            <input name="effectiveFromDate" id="effectiveFromDate" type="date" />
+            <input name="effectiveFromDate" [(ngModel)]="selectedAuditor.AssnDateFrom" id="effectiveFromDate" type="text" #dateInputs/>
           </div>
           <div class="input-field">
             <label for="effectiveToDate"> Effective To Date </label>
-            <input name="effectiveToDate" id="effectiveToDate" type="date" />
+            <input name="effectiveToDate" [(ngModel)]="selectedAuditor.AssnDateTo" id="effectiveToDate" type="text" #dateInputs/>
           </div>
         </div>
+        <div class="btn" style="margin-left: 15px;margin-bottom:10px; display: flex;">
+          <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="saveAuditor()"><i class="bi bi-save"></i> Save</button>
+        </div>
       </form>
-    </div>
+    </div> 
 
-    <!--edit auditor-->
+    <!--edit auditor 
     <div class="inputs-field-set" *ngIf="IsEditAuditorVisible">
       <div class="view-auditor-actions">
         <h2 class="view-auditor-header">Auditor Details</h2>
@@ -2093,8 +2143,8 @@
           </div>
         </div>
       </form>
-    </div>
-  </section>
+    </div> -->
+  </section> 
 
   <!--Contacts-->
   <!-- <section id="Contacts" class="edit-firm-section" [ngStyle]="{ width: dataWidth }" style="display: none">

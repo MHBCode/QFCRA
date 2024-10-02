@@ -1,8 +1,8 @@
 <div *ngIf="isLoading" class="loader-overlay">
   <div class="loader"></div>
 </div>
-<div class="TaskList-wrapper">
-  <div class="table">
+<div class="TaskList-wrapper" [ngClass]="isMainView ? 'listing-table' : 'home-table'">
+  <div class="table customTable">
     <div *ngIf="showTitle" (click)="goToAllTasks()" class="tableTitle">
       <h3>Task List</h3>
     </div>

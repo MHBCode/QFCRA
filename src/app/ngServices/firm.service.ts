@@ -100,6 +100,7 @@ export class FirmService {
     return this.http.get<any>(url);
   }
   /// Yazan 
+
   getFirmsAlphabetically(filterDataObj: any): Observable<any> {
     
     let params = new HttpParams()
@@ -119,7 +120,7 @@ export class FirmService {
       .set('CSVSupCategories', 0)
       .set('CSVFirmTypes', filterDataObj.CSVFirmTypes.toString())
       .set('CSVFirmStatus', filterDataObj.CSVFirmStatus.toString())
-
+      .set('startChar', filterDataObj.startChar.toString())
     return this.http.get<any>(`${this.baseUrl}get_firms_alphabetically`, { params });
   }
   getAccountingStandardsHistory(firmId: number): Observable<any> {
@@ -268,7 +269,16 @@ export class FirmService {
     const url = `${this.baseUrlControllers}get_corporate_controller_details_list?firmId=${firmId}`; //https://localhost:7091/api/OtherEntity/get_corporate_controller_details_list?firmId=66
     return this.http.get<any>(url);
   }
-  //////// Yazan 
+  //////// Yazan Auditors  
+  savefirmauditors(firmAuditorsObj): Observable<any> {
+    const url = `${this.baseUrl}save_firm_auditors`;
+    return this.http.post<any>(url, firmAuditorsObj);
+  }  
+  //////// Yazan Controller
+  deleteotherentitydetails(OtherEntityID: number): Observable<any> {
+    const url = `${this.baseUrlControllers}delete_other_entity_details?otherEntityID=${OtherEntityID}`;
+    return this.http.delete<any>(url);
+  }
   insertupdateotherentitydetails(saveControllerPopupChangesObj: any): Observable<any> {
     const url = `${this.baseUrlControllers}insert_update_other_entity_details`;
     return this.http.post<any>(url, saveControllerPopupChangesObj); 
