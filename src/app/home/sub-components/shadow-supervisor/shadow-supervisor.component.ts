@@ -4,11 +4,11 @@ import { Router } from '@angular/router';
 import { TaskServiceService } from 'src/app/ngServices/task-service.service';
 
 @Component({
-  selector: 'app-task-list',
-  templateUrl: './task-list.component.html',
-  styleUrls: ['./task-list.component.scss']
+  selector: 'app-shadow-supervisor',
+  templateUrl: './shadow-supervisor.component.html',
+  styleUrls: ['./shadow-supervisor.component.scss']
 })
-export class TaskListComponent implements OnInit {
+export class ShadowSupervisorComponent implements OnInit {
 
   userId = 30 // must be dynamic
   @Input() pageSize: number = 10;
