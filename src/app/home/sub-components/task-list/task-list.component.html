@@ -1,8 +1,8 @@
 <div *ngIf="isLoading" class="loader-overlay">
   <div class="loader"></div>
 </div>
-<div class="TaskList-wrapper">
-  <div class="table">
+<div class="TaskList-wrapper" [ngClass]="isMainView ? 'listing-table' : 'home-table'">
+  <div class="table customTable">
     <div *ngIf="showTitle" (click)="goToAllTasks()" class="tableTitle">
       <h3>Task List</h3>
     </div>
@@ -150,27 +150,27 @@
       <div class="view-auditor-inputs">
         <div class="input-field">
           <label for="taskType">Task Type</label>
-          <input disabled type="text" [value]="selectedTask?.TaskType"/>
+          <input disabled type="text" [value]="selectedTask[0]?.TaskType"/>
         </div>
 
         <div class="input-field">
           <label for="dueDate">Due Date</label>
-          <input disabled type="text" [value]="selectedTask?.TaskDueDate"/>
+          <input disabled type="text" [value]="selectedTask[0]?.TaskDueDate"/>
         </div>
 
         <div class="input-field">
           <label for="firmName">Firm Name</label>
-          <input disabled type="text" [value]="selectedTask?.FirmName"/>
+          <input disabled type="text" [value]="selectedTask[0]?.FirmName"/>
         </div>
 
         <div class="input-field">
           <label for="daysOverDue">Number of days overdue</label>
-          <input disabled type="text" [value]="selectedTask?.DaysOverDue"/>
+          <input disabled type="text" [value]="selectedTask[0]?.DaysOverDue"/>
         </div>
 
         <div class="input-field short-description">
           <label for="shortDesc">Short Description</label>
-          <input disabled type="text" [value]="selectedTask?.ShortDescription"/>
+          <input disabled type="text" [value]="selectedTask[0]?.ShortDescription"/>
         </div>
 
         <div class="input-field app-description">
@@ -179,28 +179,30 @@
         </div>
       </div>
 
-      <div *ngIf='selectedTask.Comments !== ""' class="notes-container">
-        <p>Notes</p>
+      <!-- Display reminder notes -->
+      <div *ngIf="selectedTask[0]?.myReminderNotesList && selectedTask[0]?.myReminderNotesList.length > 0" class="notes-container">
+        <h4>Reminder Notes</h4>
         <table>
           <thead>
             <tr>
               <th>By</th>
               <th>On</th>
-              <th>Description</th>
+              <th>Note</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>test</td>
-              <td>test</td>
-              <td>{{selectedTask.Comments}}</td>
+            <tr *ngFor="let note of selectedTask[0]?.myReminderNotesList">
+              <td>{{ note.createdByName }}</td>
+              <td>{{ note.createdDate }}</td>
+              <td>{{ note.notes }}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
+      <!-- Add New Note -->
       <div class="input-field note-textarea-container">
-      <textarea [(ngModel)]="noteText" class="note-textarea" placeholder="Write your note here..."></textarea>
+        <textarea [(ngModel)]="noteText" class="note-textarea" placeholder="Write your note here..."></textarea>
       </div>
 
       <!-- Save Note Button -->
@@ -209,6 +211,7 @@
       </div>
     </div>
   </div>
+
 
   <!-- <td>
       <div class="expandable-text-container">

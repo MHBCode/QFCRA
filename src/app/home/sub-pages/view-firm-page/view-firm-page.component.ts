@@ -96,10 +96,11 @@ export class ViewFirmPageComponent implements OnInit {
   firmAddressesTypeHistory: any = [];
   ActivityLicensed: any = [{}];
   ActivityAuth: any = [{}];
-  
+
   AuthTableDocument: any = [];
   islamicFinance: any = {};
   activityCategories: any[] = [];
+  activityTypes: any[] = [];
   licensedActivities: any = [];
   AuthRegulatedActivities: any = [];
   AllProducts: any[] = [];
@@ -168,7 +169,6 @@ export class ViewFirmPageComponent implements OnInit {
   isCollapsed: { [key: string]: boolean } = {};
   selectedFile: File | null = null;
   fileError: string = '';
-  categoriesWithProducts: any[] = [];
 
   objFirmScope: any = {};
   lstFirmActivities: any = [];
@@ -251,7 +251,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadActivitiesLicensed();
       this.loadActivitiesAuthorized();
       this.loadScopeOfAuth();
-      this.loadRegulatedActivities();
+      // this.loadRegulatedActivities();
       this.loadIslamicFinance();
       this.loadActivityCategories();
       this.loadActivitiesTypesForLicensed();
@@ -1266,6 +1266,12 @@ export class ViewFirmPageComponent implements OnInit {
     const varyLicenseScope = this.prepareVaryScopeLicenseObject(this.userId);
     this.firmService.editLicenseScope(varyLicenseScope).subscribe((response) => {
       console.log('Vary Scope Successfully', response);
+      this.loadActivitiesLicensed();
+      this.isEditModeLicense = false;
+      this.disableApplicationDate = true;
+      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+      this.loadLicScopeRevisions(this.firmId, 2);
+      this.showFirmScopeSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
     }, error => {
       console.log('Vary Scope Failed', error);
     })
@@ -1293,15 +1299,19 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   editAuthScope() {
-
-
-    // If the form is not in edit mode, toggle to edit mode
     if (!this.isEditModeAuth) {
-      this.isEditModeAuth = true;
-      return; // Exit the function to prevent running validations
+      this.isEditModeAuth = true;  // Set the form to edit mode
+  
+      // Loop through each activity and load its activities based on FirmScopeTypeID
+      this.ActivityAuth.forEach(activity => {
+        if (activity.FirmScopeTypeID) {
+          this.loadActivityTypes(activity);  // Load activities for each category
+        }
+      });
     }
-    this.updateOrSaveFirmScope();
   }
+  
+  
 
 
   updateOrSaveFirmScope() {
@@ -1422,7 +1432,22 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   cancelEditAuthScope() {
-    this.isEditModeAuth = false;
+    Swal.fire({
+      title: 'Alert',
+      text: 'Are you sure you want to cancel your changes ?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isEditModeAuth= false;
+        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+        this.errorMessages = {};
+        this.loadActivitiesAuthorized();
+      }
+    });
   }
 
 
@@ -2370,98 +2395,95 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
 
-  loadRegulatedActivities() {
-    this.firmService.getFirmActivityAuthorized(this.firmId).subscribe(
-      data => {
-        this.AuthRegulatedActivities = data.response;
+  // loadRegulatedActivities() {
+  //   this.firmService.getFirmActivityAuthorized(this.firmId).subscribe(
+  //     data => {
+  //       this.AuthRegulatedActivities = data.response;
 
-        this.AuthRegulatedActivities.forEach(activity => {
-          console.log("Activity ID: " + activity.ActivityTypeID);  // Print activity ID
+  //       this.AuthRegulatedActivities.forEach(activity => {
+  //         console.log("Activity ID: " + activity.ActivityTypeID);  // Print activity ID
 
-          if (activity.ActivityTypeID) {
-            // Initialize categorizedData for each activity
-            this.categorizedData = [];
+  //         if (activity.ActivityTypeID) {
+  //           // Initialize categorizedData for each activity
+  //           this.categorizedData = [];
 
-            // Load all products for the given activity
-            this.loadAllProducts(activity.ActivityTypeID).subscribe(allProducts => {
-              let currentCategory = null;
+  //           // Load all products for the given activity
+  //           this.loadAllProducts(activity.ActivityTypeID).subscribe(allProducts => {
+  //             let currentCategory = null;
 
-              // Create a new object to represent the activity with its products
-              const activityData = {
-                activityId: activity.ActivityTypeID,
-                ActivityCategoryDesc: activity?.ActivityCategoryDesc,
-                ActivityTypeDesc: activity?.ActivityTypeDesc,
-                specificCondition: activity?.Column1,
-                products: []
-              };
+  //             // Create a new object to represent the activity with its products
+  //             const activityData = {
+  //               activityId: activity.ActivityTypeID,
+  //               ActivityCategoryDesc: activity?.ActivityCategoryDesc,
+  //               ActivityTypeDesc: activity?.ActivityTypeDesc,
+  //               specificCondition: activity?.Column1,
+  //               products: []
+  //             };
 
-              // Categorize products into main categories and subcategories
-              allProducts.forEach(item => {
-                if (!currentCategory || item.ProductCategoryTypeID !== currentCategory.ProductCategoryTypeID) {
-                  // Create a new main category
-                  currentCategory = {
-                    mainCategory: item.ProductCategoryTypeDesc1,
-                    ProductCategoryTypeID: item.ProductCategoryTypeID,
-                    subCategories: []
-                  };
-                  activityData.products.push(currentCategory);
-                }
+  //             // Categorize products into main categories and subcategories
+  //             allProducts.forEach(item => {
+  //               if (!currentCategory || item.ProductCategoryTypeID !== currentCategory.ProductCategoryTypeID) {
+  //                 // Create a new main category
+  //                 currentCategory = {
+  //                   mainCategory: item.ProductCategoryTypeDesc1,
+  //                   ProductCategoryTypeID: item.ProductCategoryTypeID,
+  //                   subCategories: []
+  //                 };
+  //                 activityData.products.push(currentCategory);
+  //               }
 
-                // Check if the item is not the main category itself
-                if (item.ID !== 0) {
-                  // Add the current item as a subcategory
-                  currentCategory.subCategories.push({
-                    ID: item.ID,
-                    ProductCategoryTypeDesc: item.ProductCategoryTypeDesc,
-                    TotalProduct: item.TotalProduct
-                  });
-                }
-              });
+  //               // Check if the item is not the main category itself
+  //               if (item.ID !== 0) {
+  //                 // Add the current item as a subcategory
+  //                 currentCategory.subCategories.push({
+  //                   ID: item.ID,
+  //                   ProductCategoryTypeDesc: item.ProductCategoryTypeDesc,
+  //                   TotalProduct: item.TotalProduct
+  //                 });
+  //               }
+  //             });
 
-              // Push the activity data into categorizedData
-              this.categorizedData.push(activityData);
+  //             // Push the activity data into categorizedData
+  //             this.categorizedData.push(activityData);
 
-              // Print the categorized data for debugging
-              console.log("Activity ID " + activity.ActivityTypeID);
+  //             // Print the categorized data for debugging
+  //             console.log("Activity ID " + activity.ActivityTypeID);
 
-              activityData.products.forEach(category => {
-                console.log("Product category " + category.ProductCategoryTypeID + ": " + category.mainCategory);
+  //             activityData.products.forEach(category => {
+  //               console.log("Product category " + category.ProductCategoryTypeID + ": " + category.mainCategory);
 
-                category.subCategories.forEach(subCategory => {
-                  console.log("Subcategories" + JSON.stringify(subCategory));
-                });
-              });
-            });
-          }
+  //               category.subCategories.forEach(subCategory => {
+  //                 console.log("Subcategories" + JSON.stringify(subCategory));
+  //               });
+  //             });
+  //           });
+  //         }
 
-          // Initialize selectedCategory
-          activity.selectedCategory = this.activityCategories.find(
-            category => category.ActivityCategoryDesc === activity.ActivityCategoryDesc
-          );
+  //         // Initialize selectedCategory
+  //         activity.selectedCategory = this.activityCategories.find(
+  //           category => category.ActivityCategoryDesc === activity.ActivityCategoryDesc
+  //         );
 
-          // If selectedCategory is found, load activities for that category
-          if (activity.selectedCategory) {
-            this.firmService.getAuthActivityTypes(activity.selectedCategory.ActivityCategoryID).subscribe(
-              data => {
-                activity.activities = data.response;
+  //         // If selectedCategory is found, load activities for that category
+  //         if (activity.selectedCategory) {
+  //           this.firmService.getAuthActivityTypes(activity.selectedCategory.ActivityCategoryID).subscribe(
+  //             data => {
+  //               activity.activities = data.response;
 
-                // Initialize selectedActivity based on ActivityTypeID
-                activity.selectedActivity = activity.activities.find(
-                  act => act.ActivityTypeID === activity.ActivityTypeID
-                );
-              }
-            );
-          }
-        });
-      },
-      error => {
-        console.error('Error fetching License scope', error);
-      }
-    );
-  }
-
-
-
+  //               // Initialize selectedActivity based on ActivityTypeID
+  //               activity.selectedActivity = activity.activities.find(
+  //                 act => act.ActivityTypeID === activity.ActivityTypeID
+  //               );
+  //             }
+  //           );
+  //         }
+  //       });
+  //     },
+  //     error => {
+  //       console.error('Error fetching License scope', error);
+  //     }
+  //   );
+  // }
 
   loadAllProducts(activityID: any): Observable<any> {
     return this.firmService.getAllProducts(activityID).pipe(
@@ -2578,6 +2600,40 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
+
+  loadActivityTypes(activity: any) {
+    const firmScopeTypeID = activity.FirmScopeTypeID;
+  
+    if (firmScopeTypeID) {
+      this.firmService.getAuthActivityTypes(firmScopeTypeID).subscribe(
+        data => {
+          activity.activities = data.response;  // Set activities for the specific activity object
+  
+          console.log(`Loaded activities for FirmScopeTypeID ${firmScopeTypeID}:`, activity.activities);
+  
+          // Ensure the correct ActivityTypeID is selected
+          if (activity.ActivityTypeID) {
+            const selectedActivity = activity.activities.find(
+              act => act.ActivityTypeID === activity.ActivityTypeID
+            );
+  
+            // Set the preselected ActivityTypeID if it exists
+            if (selectedActivity) {
+              activity.ActivityTypeID = selectedActivity.ActivityTypeID;
+            } else {
+              console.warn(`ActivityTypeID ${activity.ActivityTypeID} not found for FirmScopeTypeID ${firmScopeTypeID}`);
+            }
+          }
+        },
+        error => {
+          console.error('Error fetching activities for FirmScopeTypeID:', firmScopeTypeID, error);
+        }
+      );
+    }
+  }
+  
+
+
 
   loadActivitiesTypesForLicensed() {
     this.firmService.getLicActivityTypes().subscribe(data => {
@@ -2894,17 +2950,18 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   onCategoryChange(activity: any) {
-    const selectedCategory = activity.selectedCategory;
-    if (selectedCategory) {
-      console.log('Selected Category ID:', selectedCategory.ActivityCategoryID);
-
-      this.firmService.getAuthActivityTypes(selectedCategory.ActivityCategoryID).subscribe(
+    const selectedCategoryID = activity.FirmScopeTypeID; // This is the correct ID you want to use
+    if (selectedCategoryID) {
+      console.log('Selected Category ID:', selectedCategoryID);
+  
+      // Fetch activities based on the selected category (FirmScopeTypeID)
+      this.firmService.getAuthActivityTypes(selectedCategoryID).subscribe(
         data => {
-          console.log('Fetched Activities for Category:', selectedCategory.ActivityCategoryDesc, data.response);
-
+          console.log('Fetched Activities for Category:', data.response);
+  
           // Populate activities array
           activity.activities = data.response;
-
+  
           // Automatically select the first activity if there are activities available
           activity.selectedActivity = activity.activities.length > 0
             ? activity.activities[0]
@@ -2916,6 +2973,9 @@ export class ViewFirmPageComponent implements OnInit {
       );
     }
   }
+  
+
+
 
   getFYearHistory() {
     this.callFYear = true;
@@ -3201,20 +3261,18 @@ export class ViewFirmPageComponent implements OnInit {
 
   loadAuthScopeRevisions(firmId: number, firmApplicationTypeId: number) {
     if (firmApplicationTypeId === 3) {
-      this.firmService.getFirmActivityAuthorized(firmId).subscribe(data => {
-        this.ActivityAuth = data.response;
+      if (this.ActivityAuth) {
+        const scopeID = this.ActivityAuth[0].FirmScopeID;
 
-        if (this.ActivityAuth) {
-          const scopeID = this.ActivityAuth[0].FirmScopeID;
-
-          this.firmService.getRevision(scopeID).subscribe(revisions => {
-            console.log('Fetched revisions:', revisions);
-            this.AuthPrevRevNumbers = revisions.response;
-          });
-        } else {
-          console.error('No activities found or scopeID is missing');
-        }
-      });
+        this.firmService.getRevision(scopeID).subscribe(revisions => {
+          console.log('Fetched revisions:', revisions);
+          this.AuthPrevRevNumbers = revisions.response;
+          //this.loadActivitiesAuthorized();
+          this.groupActivitiesByCategory(this.ActivityAuth);
+        });
+      } else {
+        console.error('No activities found or scopeID is missing');
+      }
     }
   }
 
@@ -3242,11 +3300,34 @@ export class ViewFirmPageComponent implements OnInit {
         this.ActivityAuth = data.response;
         this.currentAuthRevisionNumber = scopeRevNum;
         console.log('Authorized Activities:', this.ActivityAuth);
+        this.groupActivitiesByCategory(this.ActivityAuth);
         this.updateAuthLastRevisionNumber(); // Update lastRevisionNumber based on the response
         this.closeAuthScopePreviousVersions();
       });
     }
   }
+
+  groupActivitiesByCategory(activityList: any[]) {
+    activityList.forEach(activity => {
+      activity.categorizedProducts = [];
+      let currentCategory = null;
+
+      activity.ObjectProductActivity.forEach(product => {
+        if (product.productTypeID === "0") {
+          // If it's a main category, start a new group
+          currentCategory = {
+            mainCategory: product.productTypeDescription,
+            subProducts: []
+          };
+          activity.categorizedProducts.push(currentCategory);
+        } else if (currentCategory) {
+          // If it's a sub-product, add it to the current main category
+          currentCategory.subProducts.push(product);
+        }
+      });
+    });
+  }
+
 
 
   updateLicLastRevisionNumber() {

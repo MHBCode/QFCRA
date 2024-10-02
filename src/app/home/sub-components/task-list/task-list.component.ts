@@ -75,15 +75,34 @@ export class TaskListComponent implements OnInit {
   
 
   toggleTaskPopup(selectedRow: any) {
-    this.selectedTask = selectedRow;
-    console.log(this.selectedTask);
-    this.showTaskPopup = !this.showTaskPopup;
-    if (this.selectedTask?.LongDescription) {
-      const updatedDescription = this.selectedTask.LongDescription.replace(/<BR\s*\/?>\s*<BR\s*\/?>/, ''); // Removes first two <br> tags
-      this.safeHtmlDescription = this.sanitizer.bypassSecurityTrustHtml(updatedDescription); // Apply the html tags in the endpoint
-    }
-    this.noteText = '';
+    this.selectedTask = selectedRow;  // Temporarily set the selected task to show a loading state, if needed
+    this.showTaskPopup = !this.showTaskPopup; // Toggle popup visibility
+  
+    // Fetch task details using the new endpoint
+    this.TaskService.getMyTaskByObjectDetails(
+      this.selectedTask.ObjectID, 
+      this.selectedTask.ObjectInstanceID, 
+      this.selectedTask.ObjectInstanceRevNum
+    ).subscribe(
+      (data: any) => {
+        this.selectedTask = data.response;  // Replace the selected task with detailed data from the new endpoint
+        console.log('Detailed task data:', this.selectedTask);
+  
+        // If LongDescription exists, sanitize it for display
+        if (this.selectedTask[0]?.LongDescription) {
+          const updatedDescription = this.selectedTask.LongDescription.replace(/<BR\s*\/?>\s*<BR\s*\/?>/, ''); 
+          this.safeHtmlDescription = this.sanitizer.bypassSecurityTrustHtml(updatedDescription);
+        }
+  
+        // Initialize the note text area for adding a new note
+        this.noteText = '';
+      },
+      (error: any) => {
+        console.error('Error fetching detailed task data', error);
+      }
+    );
   }
+  
 
   closeTaskPopup() {
     this.showTaskPopup = false;
@@ -105,9 +124,9 @@ export class TaskListComponent implements OnInit {
 
   prepareNoteObject() {
     return {
-        objectID: this.selectedTask.ObjectID,
-        objectInstanceID: parseInt(this.selectedTask.ObjectInstanceID, 10),
-        objectInstanceRevNum: this.selectedTask.ObjectInstanceRevNum,
+        objectID: this.selectedTask[0].ObjectID,
+        objectInstanceID: parseInt(this.selectedTask[0].ObjectInstanceID, 10),
+        objectInstanceRevNum: this.selectedTask[0].ObjectInstanceRevNum,
         notes: this.noteText,
         createdBy: this.userId,
     };
@@ -135,6 +154,7 @@ export class TaskListComponent implements OnInit {
   
         this.showTaskPopup = false;
         this.isLoading = false;
+        this.noteText = '';
         console.log('Task list reloaded after note save:', new Date());
       })
       .catch(error => {
