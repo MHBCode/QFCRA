@@ -1,4 +1,17 @@
 <div class="task-page">
+  <div class="breadcrumb-row">
+    <div class="brid-crump">
+      <div class="text">
+        <span> Home > </span>All Tasks
+      </div>
+    </div>
+    <div class="btns exportBtn">
+      <button>
+        <i class="bi bi-file-earmark-text"></i>
+        Export to Excel
+      </button>
+    </div>
+  </div>
 <div class="container">
     <div class="menu-container">
       <ul class="nav">
@@ -8,12 +21,6 @@
         <li><a routerLink='' routerLinkActive="active">empty for now</a></li>
         <li><a routerLink='/home/tasks-page/CreateReminder' routerLinkActive="active">Create Reminder</a></li>
       </ul>
-    </div>
-    <div class="btns">
-        <button>
-            <i class="bi bi-file-earmark-text"></i>
-            Export to Excel
-        </button>
     </div>
   </div>
 <app-task-list [isMainView] = "true"></app-task-list>
