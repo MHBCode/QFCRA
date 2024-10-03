@@ -7,11 +7,17 @@
     width: 49%;
     padding: 0.5rem 0;
 
-    input {
-        width: 96%;
+    input,
+    select {
+        width: 100%;
         padding: 0.5rem 2%;
         border-radius: 7.20px;
         border: 0.72px #B1B1B1 solid;
+        box-sizing: border-box;
+        &:disabled {
+            color: rgb(170, 170, 170);
+            background-color: transparent;
+        }
     }
 
     textarea {
@@ -37,7 +43,7 @@
 }
 
 .inputs-row {
-    padding:0rem 1rem 1rem 1rem;
+    padding: 0rem 1rem 1rem 1rem;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -57,7 +63,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 1rem 0.5rem 1rem;
+    padding: 0.5rem 1rem 0.5rem 1rem;
 }
 
 .page {
@@ -67,4 +73,32 @@
     justify-content: space-between;
     margin: 1rem 0rem;
     gap: 1%;
-  }
+}
+
+button.swal2-confirm.swal2-styled {
+    background-color: #a51e36;
+}
+
+.swal2-show div:where(.swal2-icon).swal2-warning {
+    border-color: #a51e36;
+    color: #a51e36;
+}
+div:where(.swal2-icon).swal2-success [class^=swal2-success-line]{
+    background-color: #a51e36 !important;
+}
+
+div:where(.swal2-icon).swal2-success .swal2-success-ring{
+    border: .25em solid rgb(165 30 54 / 30%) !important;
+}
+.display-flex {
+    display: flex;
+
+    &.space-between {
+        justify-content: space-between;
+    }
+
+    &.align-center {
+        align-items: center;
+    }
+}
+

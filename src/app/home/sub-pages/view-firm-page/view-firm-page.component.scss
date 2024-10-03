@@ -1,8 +1,20 @@
-.history-row{
+.history-row {
   display: flex;
   justify-content: space-between;
+  width: 100%;
 }
 
+.popup-operations-place {
+  width: 100%;
+  text-align: end;
+
+  .subbutton {
+    padding: 10px;
+  }
+}
+#websiteLink {
+  color: #a41e36;
+}
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -178,15 +190,8 @@ td {
   text-align: left;
   /* Left-align text */
   vertical-align: middle;
-  /* Vertically center the content */
-  cursor: pointer;
 }
 
-/* Table row hover effect */
-tr:hover {
-  background-color: #e0dbdb;
-  /* Light grey background on hover */
-}
 
 /* Alternating row colors */
 tr:nth-child(even) {
@@ -300,7 +305,8 @@ table-responsive {
   word-wrap: break-word;
 }
 
-.inputs-row table th, .inputs-row table td {
+.inputs-row table th,
+.inputs-row table td {
   text-align: center;
 }
 
@@ -309,18 +315,9 @@ table-responsive {
   font-size: 14px;
 }
 
-
-
-.input-field select {
-  background-color: transparent;
-}
-
 .select-background-edited {
   background-color: white !important;
 }
-
-
-
 
 .radio-wrapper {
   display: flex;
@@ -617,14 +614,14 @@ table-responsive {
 .ScopeLicPreviousVersionsPopup,
 .ScopeAuthPreviousVersionsPopup {
   position: fixed;
-  top: 25vh;
-  left: 20vw;
-  width: 60vw;
-  height: 50vh;
-  overflow-y: scroll;
+  top: 15vh;
+  left: 8vw;
+  width: 78vw;
+  max-height: 70vh;
+  overflow-y: auto;
   overflow-x: hidden;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-  padding: 2rem;
+  padding: 1rem;
   background: white;
   align-items: center;
   justify-content: start;
@@ -632,6 +629,16 @@ table-responsive {
   gap: 2rem;
   display: none;
   z-index: 100;
+
+  table {
+    tbody {
+      tr {
+        td {
+          cursor: default;
+        }
+      }
+    }
+  }
 }
 
 .popup-wrapper table,
@@ -669,7 +676,7 @@ table-responsive {
 }
 
 .popup-info-place {
-  width: 95%;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -682,10 +689,7 @@ table-responsive {
   color: #a51e36;
 }
 
-.popup-operations-place {
-  width: 50%;
-  text-align: center;
-}
+
 
 .subbutton {
   padding: 0.1rem 1rem;
@@ -716,10 +720,6 @@ table-responsive {
   align-items: center;
 }
 
-.addressHistoryPopup table tr td,
-.addressHistoryPopup table tr th {
-  cursor: default;
-}
 
 .addressHistoryPopup table tr td {
   text-align: left;
@@ -1120,7 +1120,7 @@ hr {
 .close-icon {
   position: absolute;
   right: 1rem;
-  top: 2rem;
+  top: 1rem;
   font-size: 26px;
   cursor: pointer;
   color: #a51e36;
@@ -1168,17 +1168,23 @@ hr {
 .btns-container {
   display: flex;
   gap: 1%;
+  width: 100%;
 }
 
 .btns-container button {
-  padding: 2px 0px;
+  padding: 7px 20px;
   background-color: #a51e36;
   color: white;
   border-radius: 10px;
   border: 0;
   font-size: 1em;
 }
-
+.upload-document-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
 #fileInput {
   display: none;
 }
@@ -1225,7 +1231,6 @@ hr {
   font-size: 15px;
   padding: 5px 10px;
   border-radius: 7px;
-  margin-right: 10px;
 }
 
 .add-address-container {
@@ -1274,7 +1279,7 @@ hr {
   border: 1px solid red;
 }
 
-.error-messages {
+.error-messages p{
   margin-left: 15px;
   margin-top: 10px;
 }

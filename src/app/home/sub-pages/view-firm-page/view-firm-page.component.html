@@ -410,10 +410,10 @@
         </ng-container>
 
         <div class="input-field">
-          <label for="financialYearEnd">
+          <label for="financialYearEnd" class="history-row">
             Financial Year End
             <button *ngIf="firmDetails?.FinYearEndTypeDesc" class="subbutton" (click)="getFYearHistory()">
-              History
+              <i class="bi bi-clock-history"></i> Open History
             </button>
           </label>
           <select [ngClass]="{ 'select-background-edited': isEditModeCore }" [disabled]="!isEditModeCore"
@@ -434,10 +434,10 @@
         </div>
 
         <div class="input-field">
-          <label for="accountingStandards">
+          <label for="accountingStandards" class="history-row">
             Accounting Standards
             <button *ngIf="firmDetails?.FinAccStdTypeDesc" class="subbutton" (click)="getAccountingStandardHistory()">
-              History
+              <i class="bi bi-clock-history"></i> Open History
             </button>
           </label>
           <select [ngClass]="{ 'select-background-edited': isEditModeCore }" [disabled]="!isEditModeCore"
@@ -470,8 +470,9 @@
           </a>
         </div>
         <div class="input-field" *ngIf="firmNamesHistory[0]?.FirmNameHistoryID">
-          <label for="prevFirmName">
-            Prev. Firm Name <button class="subbutton" (click)="getPrevFirmName()">History</button>
+          <label for="prevFirmName" class="history-row">
+            Prev. Firm Name <button class="subbutton" (click)="getPrevFirmName()"><i class="bi bi-clock-history"></i>
+              Open History</button>
           </label>
           <input [disabled]="!isEditModeCore" name="prevFirmName" id="prevFirmName" type="text"
             [(ngModel)]="firmNamesHistory[0].PrevFirmName">
@@ -490,14 +491,15 @@
     <!---->
     <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['appDetailsSection']}">
       <div class="form-section-title collapse-container">
-        <h2 class="edit-firm-header">
-          Application Details <button class="subbutton" (click)="getApplicationDetailsHistory()">Open
-            History</button>
-          <button [ngClass]="{'hidden-button': !isEditModeCore}" class="collapse-button"
-            (click)="toggleCollapse('appDetailsSection')">
-            {{ isCollapsed['appDetailsSection'] ? '▲' : '▼'}}
-          </button>
-        </h2>
+        <div class="history-row">
+          <h2 class="edit-firm-header">
+            Application Details
+            <button [ngClass]="{'hidden-button': !isEditModeCore}" class="collapse-button"
+              (click)="toggleCollapse('appDetailsSection')">
+              {{ isCollapsed['appDetailsSection'] ? '▲' : '▼'}}
+            </button>
+          </h2>
+        </div>
       </div>
       <div class="inputs-row" *ngIf="!isEditModeCore">
         <!-- Licensed Status Table -->
@@ -638,16 +640,18 @@
               <option value="263">Press Releases</option>
             </select>
           </div>
+          <div class="input-field">
 
-          <div id="uploaded-documents">Uploaded documents go here</div>
+            <label id="uploaded-documents">Uploaded documents go here</label>
 
-          <div class="btns-container">
-            <div class="upload-container">
-              <button class="choose-document-btn" (click)="selectDocument()">
-                Choose Document
-              </button>
+            <div class="btns-container">
+              <div class="upload-container">
+                <button class="choose-document-btn" (click)="selectDocument()">
+                  Choose Document
+                </button>
+              </div>
+              <button class="upload-document-btn" (click)="uploadDocument()">Upload the Document</button>
             </div>
-            <button class="upload-document-btn" (click)="uploadDocument()">Upload the Document</button>
           </div>
         </div>
         <div class="file-table-container">
@@ -683,14 +687,14 @@
       <div class="inputs-row">
         <div class="input-field">
           <label for="generalComments">
-            <strong>General Comments:</strong>
+            General Comments
           </label>
           <textarea [disabled]="!isEditModeCore" name="generalComments" id="generalComments"
             [(ngModel)]="firmDetails.FirmApplicationDataComments"></textarea>
         </div>
         <div class="input-field">
           <label for="publicRegisterComments">
-            <strong>Public Register Comments:</strong>
+            Public Register Comments
           </label>
           <textarea [disabled]="!isEditModeCore" name="publicRegisterComments" id="publicRegisterComments"
             [(ngModel)]="firmDetails.PublicRegisterComments"></textarea>
@@ -705,36 +709,41 @@
         <p *ngIf="errorMessages['AddressTypeID']">{{ errorMessages['AddressTypeID'] }}</p>
         <p *ngIf="errorMessages['DuplicatedAddressTypeID']">{{ errorMessages['DuplicatedAddressTypeID'] }}</p>
       </div>
-      <div class="form-section-title collapse-container">
-        <h2 class="edit-firm-header">
-          Addresses
-        </h2>
-        <button class="collapse-button" (click)="toggleCollapse('addressesSection')">
-          {{ isCollapsed['addressesSection'] ? '▲' : '▼'}}
-        </button>
-      </div>
-      <div class="add-address-container">
-        <button *ngIf="isEditModeCore && canAddNewAddress" (click)="addNewAddress()"
-          [hidden]="isCollapsed['addressesSection']" class="addAddressBtn">Add Address</button>
+      <div class="display-flex space-between align-center border-bottom">
+        <div class="form-section-title collapse-container">
+          <h2 class="edit-firm-header">
+            Addresses
+          </h2>
+          <button class="collapse-button" (click)="toggleCollapse('addressesSection')">
+            {{ isCollapsed['addressesSection'] ? '▲' : '▼'}}
+          </button>
+        </div>
+        <div class="add-address-container">
+          <button *ngIf="isEditModeCore && canAddNewAddress" (click)="addNewAddress()"
+            [hidden]="isCollapsed['addressesSection']" class="addAddressBtn">Add Address</button>
+        </div>
       </div>
       <div class="inputs-row">
         <ng-container *ngFor="let address of filteredFirmAddresses; let i = index">
           <ng-container *ngIf="address.Valid === true">
             <div class="input-field" *ngIf="!isEditModeCore">
-              <label for="addressType">
+              <label for="addressType" class="history-row">
                 Address Type <button *ngIf="address.PreviousRecords !== 0" class="subbutton"
-                  (click)="getAddressTypeHistory(address.AddressTypeID)">History</button>
+                  (click)="getAddressTypeHistory(address.AddressTypeID)"><i class="bi bi-clock-history"></i> Open
+                  History</button>
               </label>
               <input disabled name="addressType" id="addressType" type="text" value="{{address?.AddressTypeDesc}}">
             </div>
+            <hr/>
             <div *ngIf="isEditModeCore" class="del-address-container">
               <button (click)="removeAddress(i)" class="RmvAddressBtn bi-trash"></button>
             </div>
             <!-- address type on edit mode -->
             <div class="input-field" *ngIf="isEditModeCore">
-              <label for="addressType">
+              <label for="addressType" class="history-row">
                 Address Type <button *ngIf="address.PreviousRecords !== 0 && address.AddressID" class="subbutton"
-                  (click)="getAddressTypeHistory(address.AddressTypeID)">History</button>
+                  (click)="getAddressTypeHistory(address.AddressTypeID)"><i class="bi bi-clock-history"></i> Open
+                  History</button>
               </label>
               <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID"
                 (change)="onAddressTypeChange($event, address)"
@@ -819,7 +828,7 @@
               <input [disabled]="!isEditModeCore || (disableAddressFields && !address.AddressID)" name="fax" id="fax"
                 type="text" [(ngModel)]="address.FaxNum" />
             </div>
-            <hr *ngIf="i < filteredFirmAddresses.length - 1" />
+
           </ng-container>
         </ng-container>
       </div>
@@ -827,14 +836,15 @@
   </section>
 
   <!--Scope Section-->
-  <section #scopeSection class="form-section edit-scope-section"
+  <section #scopeSection class="form-section edit-scope-section "
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Scope ? 'flex' : 'none' }">
     <!--scope tabs-->
     <div class="scope-container">
       <div class="menu-container tab-container">
         <ul class="nav">
           <li><a (click)="switchSection('Licensed')" [class.active]="activeSection === 'Licensed'">Licensed</a></li>
-          <li *ngIf="firmDetails?.AuthorisationStatusTypeID > 0"><a (click)="switchSection('Authorized')" [class.active]="activeSection === 'Authorized'">Authorized</a></li>
+          <li *ngIf="firmDetails?.AuthorisationStatusTypeID > 0"><a (click)="switchSection('Authorized')"
+              [class.active]="activeSection === 'Authorized'">Authorized</a></li>
         </ul>
       </div>
     </div>
@@ -874,7 +884,8 @@
                 </button>
               </div>
 
-              <div class="btn" *ngIf="tabIndex === 0 && !loading && !hideCancelBtn && getControlVisibility('imgBtnCancel')">
+              <div class="btn"
+                *ngIf="tabIndex === 0 && !loading && !hideCancelBtn && getControlVisibility('imgBtnCancel')">
                 <button [disabled]="!getControlEnablement('imgBtnCancel')" class="cancel-btn"
                   (click)="cancelEditLicScope()">
                   Cancel
@@ -895,7 +906,8 @@
                 </button>
               </div>
 
-              <div class="btn" *ngIf="tabIndex === 0 && !loading && !hideDeleteBtn && getControlVisibility('imgBtnDelete')">
+              <div class="btn"
+                *ngIf="tabIndex === 0 && !loading && !hideDeleteBtn && getControlVisibility('imgBtnDelete')">
                 <button [disabled]="!getControlEnablement('imgBtnDelete')">
                   Delete
                 </button>
@@ -1106,7 +1118,8 @@
                 </button>
               </div>
 
-              <div class="btn" *ngIf="tabIndex === 1 && !loading && !hideCancelBtn && getControlVisibility('imgBtnCancel')">
+              <div class="btn"
+                *ngIf="tabIndex === 1 && !loading && !hideCancelBtn && getControlVisibility('imgBtnCancel')">
                 <button [disabled]="!getControlEnablement('imgBtnCancel')" class="cancel-btn"
                   (click)="cancelEditAuthScope()">
                   Cancel
@@ -1127,7 +1140,8 @@
                 </button>
               </div>
 
-              <div class="btn" *ngIf="tabIndex === 1 && !loading && !hideDeleteBtn && getControlVisibility('imgBtnDelete')">
+              <div class="btn"
+                *ngIf="tabIndex === 1 && !loading && !hideDeleteBtn && getControlVisibility('imgBtnDelete')">
                 <button [disabled]="!getControlEnablement('imgBtnDelete')">
                   Delete
                 </button>
@@ -3084,6 +3098,9 @@
 <!--Select Document PopUp-->
 <div *ngIf="callUploadDoc" class="overlay show"></div>
 <div *ngIf="callUploadDoc" class="selectDocumentPopUp">
+  <button type="button" (click)="closeSelectDocument()">
+    <i class="bi bi-x-circle close-icon"></i>
+  </button>
   <i class="bi bi-x-circle close-icon" (click)="closeSelectDocument()"></i>
   <div class="popup-info-place upload-container">
     <div class="popup-header">
