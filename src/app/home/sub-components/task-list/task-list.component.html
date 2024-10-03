@@ -29,7 +29,7 @@
                 </ul>
               </div>
             </th>
-            <th *ngIf="isMainView">Link</th>
+            <th *ngIf="isMainView">Action</th>
             <th class="firmName-column">
               <div>
                 Firm Name
@@ -64,7 +64,7 @@
                   class="custom-date-input" />
               </div>
             </th>
-            <th style="display: flex;justify-content: space-between;">
+            <th style="display: flex;justify-content: center;">
               <div>
                 Days Over Due
                 <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleDaysOverDueDropdown()">&#x25BC;</i>
