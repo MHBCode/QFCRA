@@ -168,7 +168,7 @@
 //     }
 //   }
 // }
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Renderer2 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirmService } from 'src/app/ngServices/firm.service';
 
@@ -190,6 +190,9 @@ export class FirmsPageComponent implements OnInit {
   showPopup: boolean = false;
   isSortDropdownOpen: boolean = false;
   selectedSortOption: string = 'AtoZ'; // Default sort option
+
+  private unlistenDocumentClick: () => void;
+
   isLoading: boolean = true;
   // Form search fields with defaults
   firmName: string = 'all';
@@ -238,7 +241,7 @@ export class FirmsPageComponent implements OnInit {
   
   alphabet: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('');
 
-  constructor(private router: Router, private firmService: FirmService) { }
+  constructor(private router: Router, private firmService: FirmService,private renderer: Renderer2) { }
 
   ngOnInit(): void {
     this.loadFirms();
@@ -247,6 +250,11 @@ export class FirmsPageComponent implements OnInit {
   // Toggle popup visibility
   togglePopup(): void {
     this.showPopup = !this.showPopup;
+  }
+
+  // Navigate to new firm page
+  navigateToNewfirm() {
+    this.router.navigate(['home/new-firm']);
   }
 
   // Load initial firms data
@@ -298,6 +306,7 @@ export class FirmsPageComponent implements OnInit {
         this.filteredFirms = this.filteredFirmsdata;
       
         console.log('Filtered Firms:', this.filteredFirms);
+        this.togglePopup();
       },
       (error) => {
         console.error('Error fetching firms:', error);
@@ -445,7 +454,7 @@ export class FirmsPageComponent implements OnInit {
     this.setDefaultFilters();
     this.filteredFirms = [...this.firms];
     // Apply sorting after reset
-    this.sortFirms(this.selectedSortOption);
+    this.sortFirms('AtoZ');
   }
 
   // Set default filter values
@@ -493,13 +502,36 @@ export class FirmsPageComponent implements OnInit {
   // Toggle sorting dropdown visibility
   toggleSortDropdown(): void {
     this.isSortDropdownOpen = !this.isSortDropdownOpen;
+
+    if (this.isSortDropdownOpen) {
+      this.unlistenDocumentClick = this.renderer.listen('document', 'click', this.onDocumentClick.bind(this));
+    } else if (this.unlistenDocumentClick) {
+      this.unlistenDocumentClick();
+    }
+
+  }
+
+
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const isClickInside = target.closest('.button-style') || target.closest('.dropdown-menu');
+
+    if (!isClickInside) {
+      this.isSortDropdownOpen = false;
+      if (this.unlistenDocumentClick) {
+        this.unlistenDocumentClick();
+      }
+    }
   }
 
   // Handle sorting option selection
   onSortOptionSelected(option: string): void {
     this.selectedSortOption = option;
     this.sortFirms(option);
-    this.toggleSortDropdown(); // Close dropdown after selection
+    this.isSortDropdownOpen = false;
+    if (this.unlistenDocumentClick) {
+      this.unlistenDocumentClick();
+    }
   }
 
   // Sort firms based on the selected option
@@ -529,6 +561,12 @@ export class FirmsPageComponent implements OnInit {
           return 0; // No sorting
       }
     };
+  }
+
+  ngOnDestroy(): void {
+    if (this.unlistenDocumentClick) {
+      this.unlistenDocumentClick();
+    }
   }
 }
 

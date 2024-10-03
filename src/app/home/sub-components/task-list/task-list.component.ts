@@ -40,6 +40,7 @@ export class TaskListComponent implements OnInit {
   safeHtmlDescription: SafeHtml = ''; // for html tags
   noteText: string = '';
 
+  
   constructor(
     private TaskService: TaskServiceService,
     private router: Router,
