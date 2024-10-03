@@ -12,8 +12,10 @@
 }
 
 .loader {
-  border: 8px solid #f3f3f3; /* Light grey */
-  border-top: 8px solid #a00202; /* Blue */
+  border: 8px solid #f3f3f3;
+  /* Light grey */
+  border-top: 8px solid #a00202;
+  /* Blue */
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -21,8 +23,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .page {
@@ -160,47 +167,66 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
-  background-color: white; /* Ensure the background is white */
-  border-radius: 15px; /* Rounded corners */
-  box-shadow: 8px 8px 43px rgba(8, 50, 79, 0.1); /* Soft shadow for the table */
-  overflow: hidden; /* Clip the corners of the table */
+  background-color: white;
+  /* Ensure the background is white */
+  border-radius: 15px;
+  /* Rounded corners */
+  box-shadow: 8px 8px 43px rgba(8, 50, 79, 0.1);
+  /* Soft shadow for the table */
+  overflow: hidden;
+  /* Clip the corners of the table */
 }
 
 /* Table header styling */
 th {
-  background-color: rgba(253, 216, 216, 0.24); /* Light pink background for headers */
-  border-bottom: 2px solid #a51e36; /* Darker border under headers */
-  font-size: 0.85em; /* Slightly smaller font size */
+  background-color: rgba(253, 216, 216, 0.24);
+  /* Light pink background for headers */
+  border-bottom: 2px solid #a51e36;
+  /* Darker border under headers */
+  font-size: 0.85em;
+  /* Slightly smaller font size */
   font-weight: bold;
-  padding: 10px; /* Padding for better spacing */
+  padding: 10px;
+  /* Padding for better spacing */
   text-align: left;
-  border-right: 1px solid #ddd; /* Border between columns */
+  border-right: 1px solid #ddd;
+  /* Border between columns */
 }
 
 /* Table body styling */
 td {
-  padding: 10px; /* Padding for cells */
-  color: #333333; /* Dark grey text */
-  font-size: 0.85em; /* Matching font size */
-  border-right: 1px solid #ddd; /* Border between columns */
-  text-align: left; /* Left-align text */
-  vertical-align: middle; /* Vertically center the content */
+  padding: 10px;
+  /* Padding for cells */
+  color: #333333;
+  /* Dark grey text */
+  font-size: 0.85em;
+  /* Matching font size */
+  border-right: 1px solid #ddd;
+  /* Border between columns */
+  text-align: left;
+  /* Left-align text */
+  vertical-align: middle;
+  /* Vertically center the content */
   cursor: pointer;
 }
 
 /* Table row hover effect */
 tr:hover {
-  background-color: #e0dbdb; /* Light grey background on hover */
+  background-color: #e0dbdb;
+  /* Light grey background on hover */
 }
 
 /* Alternating row colors */
 tr:nth-child(even) {
-  background-color: #f2f2f2; /* Light grey for even rows */
+  background-color: #f2f2f2;
+  /* Light grey for even rows */
 }
 
 /* Specific column alignment */
-th, td {
-  text-align: left; /* Ensure all text aligns left */
+th,
+td {
+  text-align: left;
+  /* Ensure all text aligns left */
 }
 
 /* Table responsiveness */
@@ -209,17 +235,20 @@ table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
 .enhanced-checkbox {
   display: flex;
   align-items: center;
-  gap: 8px; /* Add spacing between checkbox and label */
+  gap: 8px;
+  /* Add spacing between checkbox and label */
 }
 
 .enhanced-checkbox input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #6b0000; /* Customize the color of the checkbox */
+  accent-color: #6b0000;
+  /* Customize the color of the checkbox */
 }
 
 .enhanced-checkbox label {
@@ -230,7 +259,8 @@ table-responsive {
 }
 
 .enhanced-checkbox label:hover {
-  color: #6b0000; /* Change color on hover */
+  color: #6b0000;
+  /* Change color on hover */
 }
 
 ////////////////////////////////////
@@ -247,10 +277,12 @@ table-responsive {
   display: flex;
   gap: 1%;
 }
+
 .custom-swal-width {
   width: 600px !important;
-  text-align:left;
+  text-align: left;
 }
+
 .btn button {
   background: #a51e36;
   padding: 0.5rem 1rem;
@@ -342,7 +374,8 @@ table-responsive {
 
 
 
-.edit-firms-inputs table th, .edit-firms-inputs table td {
+.edit-firms-inputs table th,
+.edit-firms-inputs table td {
   text-align: center;
 }
 
@@ -1358,19 +1391,91 @@ hr {
 
 /* app details core style */
 .app-details-table-header {
-    background: #a51e36;
-    color: white;
-    text-align: left!important;
-    padding: 8px;
-}
-.aligned-table {
-  width: 100%; 
-  table-layout: fixed;
-  border-collapse: collapse; 
-}
-.aligned-table th, .aligned-table td {
+  background: #a51e36;
+  color: white;
+  text-align: left !important;
   padding: 8px;
-  border: 1px solid #ccc; 
+}
+
+.aligned-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.aligned-table th,
+.aligned-table td {
+  padding: 8px;
+  border: 1px solid #ccc;
 }
 
 
+/* scope */
+.edit-scope-section {
+  gap: 0 !important;
+}
+
+.scope-container {
+  width: 100%;
+  margin: 0;
+  padding: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menu-container {
+  display: flex;
+  justify-content: center;
+  background-color: #ffffff;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  /* margin-top: 20px; */
+  width: 100%;
+}
+
+.nav {
+  list-style-type: none;
+  display: flex;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.nav li {
+  margin: 0 10px;
+}
+
+.nav li a.active {
+  background-color: #a51e36;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(90, 103, 216, 0.2);
+  transition: all 0.3s ease;
+}
+
+.nav li a.active:hover {
+  background-color: #a51e36;
+  color: #fff;
+}
+
+.nav li a {
+  display: inline-block;
+  padding: 12px 20px;
+  font-size: 16px;
+  color: #555;
+  text-decoration: none;
+  background-color: #f1f5f9;
+  border-radius: 30px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+
+.nav li a:hover {
+  background-color: #e2e8f0;
+  color: #333;
+}

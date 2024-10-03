@@ -139,7 +139,7 @@
 </div>
 
 <!-- view task popup -->
-<div class="popup-overlay" *ngIf="showTaskPopup">
+<div class="popup-overlay" *ngIf="!isLoading && showTaskPopup">
   <div class="popup-container" (click)="$event.stopPropagation()">
     <div class="popup-header">
       <h3>Task / Reminder Details</h3>
