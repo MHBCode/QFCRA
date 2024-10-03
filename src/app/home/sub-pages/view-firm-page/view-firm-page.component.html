@@ -1961,9 +1961,9 @@
  <h2 style="font-size: 24px; color: #333;">{{ IsEditAuditorVisible ? 'Edit Auditor Details' : 'Auditor Details' }}</h2>
  <div class="btn" *ngIf="!IsEditAuditorVisible">
    <button (click)="editAuditor()"><i class="bi bi-pen"></i> Edit</button>
-   <button (click)="deleteAuditor()"><i class="bi bi-trash"></i> Delete</button>
+   <button (click)="confirmDeleteAuditor()"><i class="bi bi-trash"></i> Delete</button>
    <button (click)="createAuditor()"><i class="bi bi-plus"></i>Create</button>
-   <button (click)="closeAuditorPopup()"><i class="bi bi-x"></i>Cancel</button>
+   <button style="margin-left: 150px;" (click)="closeAuditorPopup()">Close<i class="bi bi-x"></i></button>
  </div>
 </div>
 
@@ -2005,7 +2005,7 @@
 
  <!-- Save and Cancel buttons in edit mode -->
  <div *ngIf="IsEditAuditorVisible" style="margin-top: 20px; display: flex; justify-content: space-between;">
-   <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="saveAuditor()"><i class="bi bi-save"></i> Save</button>
+   <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="saveEditAuditor()"><i class="bi bi-save"></i> Save</button>
    <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="cancelEdit()"><i class="bi bi-x"></i> Cancel</button>
  </div>
 </form>
@@ -2038,7 +2038,6 @@
         </div>
       </div>
     </div> -->
-    create auditor
     <div class="inputs-field-set" *ngIf="IsCreateAuditorVisible">
       <div class="view-auditor-actions">
         <h2 class="view-auditor-header">Auditor Details</h2>
@@ -2083,7 +2082,7 @@
           </div>
         </div>
         <div class="btn" style="margin-left: 15px;margin-bottom:10px; display: flex;">
-          <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="saveAuditor()"><i class="bi bi-save"></i> Save</button>
+          <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="saveCreateAuditor()"><i class="bi bi-save"></i> Save</button>
         </div>
       </form>
     </div> 

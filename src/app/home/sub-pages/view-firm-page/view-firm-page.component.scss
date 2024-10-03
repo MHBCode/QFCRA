@@ -220,7 +220,10 @@ table-responsive {
   display: flex;
   gap: 1%;
 }
-
+.custom-swal-width {
+  width: 600px !important;
+  text-align:left;
+}
 .btn button {
   background: #a51e36;
   padding: 0.5rem 1rem;

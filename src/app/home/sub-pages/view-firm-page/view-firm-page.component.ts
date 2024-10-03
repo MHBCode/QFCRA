@@ -1788,7 +1788,10 @@ export class ViewFirmPageComponent implements OnInit {
     console.log("selectedController", this.selectedController)
 
   }
-  //////////// Yazan
+  //////////// 44
+
+
+  
   objectOpTypeIdEdit = 41;
   getControllerControlTypes(): void {
     this.firmService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdEdit)
@@ -1849,9 +1852,6 @@ export class ViewFirmPageComponent implements OnInit {
         console.error("Error fetching Countries", error);
       });
   }
-
-
-
 
   closeControllerPopup(): void {
     this.isPopupOpen = false;
@@ -3394,7 +3394,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.getFirmAuditorType();
   }
   firmAuditorsObj : {};
-  saveAuditor() {
+  saveEditAuditor() {
     this.firmAuditorsObj = {
       otherEntityID: this.selectedAuditor.OtherEntityID,
       createdBy: 30,
@@ -3402,7 +3402,7 @@ export class ViewFirmPageComponent implements OnInit {
       entitySubTypeID: this.selectedAuditor.EntitySubTypeID,
       relatedEntityTypeID: 0,
       relatedEntityEntityID: 0,
-      myState: 0,
+      myState: 5,
       otherEntityName: this.selectedAuditor.OtherEntityName,
       dateOfIncorporation: "2024-10-02T11:58:32.911Z",
       legalStatusTypeID: 0,
@@ -3411,6 +3411,55 @@ export class ViewFirmPageComponent implements OnInit {
       registeredNumber: null,
       zebSiteAddress: null,
       lastModifiedBy: 0,
+      isAuditor: 0,
+      isCompanyRegulated: true,
+      additionalDetails: null,
+      isParentController: true,
+      isPublicallyTraded: true,
+      areAnyUBOs: true,
+      controllerInfo: null,
+      output: 0,
+      firmId: this.firmId,
+      entityTypeID: 0,
+      entityID: 0,
+      controllerControlTypeID: 0,
+      numOfShares: 0,
+      pctOfShares: 0,
+      majorityStockHolder: true,
+      assnDateFrom: "2024-10-02T11:58:32.911Z",
+      assnDateTo: "2024-10-02T11:58:32.911Z"
+    }
+    this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
+      (response) => {
+        console.log("Auditor saved successfully", response);
+        Swal.fire('Seaved!', 'Auditors details has been Seaved.', 'success');
+        this.IsEditAuditorVisible = false;
+        this.IsViewAuditorVisible = false;        
+        this.loadAuditors(); 
+      },
+      (error) => {
+        console.error("Error saving auditor", error);
+        Swal.fire('Error!', 'Error Saving Auditor', 'error');
+      }
+    );
+  }
+  saveCreateAuditor() {
+    this.firmAuditorsObj = {
+      otherEntityID: this.selectedAuditor.OtherEntityID,
+      createdBy: this.userId,
+      relatedEntityID: this.selectedAuditor.RelatedEntityID,
+      entitySubTypeID: this.selectedAuditor.EntitySubTypeID,
+      relatedEntityTypeID: 0,
+      relatedEntityEntityID: 0,
+      myState: 2,
+      otherEntityName: this.selectedAuditor.OtherEntityName,
+      dateOfIncorporation: "2024-10-02T11:58:32.911Z",
+      legalStatusTypeID: 0,
+      placeOfIncorporation: null,
+      countryOfIncorporation: 0,
+      registeredNumber: null,
+      zebSiteAddress: null,
+      lastModifiedBy: this.userId,
       isAuditor: 0,
       isCompanyRegulated: true,
       additionalDetails: null,
@@ -3456,14 +3505,78 @@ export class ViewFirmPageComponent implements OnInit {
     this.getFirmAuditorName();
     this.getFirmAuditorType();
   }
- confirmDeleteAuditor(){
-  
- }
+ 
+  confirmDeleteAuditor() {
+    Swal.fire({
+      html:'No history will be maintained for the record being deleted. If you wish to maintain history, please click "Cancel", specify a date for the "Effective To Date" field and save the data.',
+      showCancelButton: true,
+      confirmButtonColor: '#a51e36',
+      cancelButtonColor: '#a51e36',
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      customClass: {
+        popup: 'custom-swal-width', // Class for custom width
+      }
+    
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteAuditor(); // Call delete logic if OK is clicked
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        // Do something if Cancel is clicked, if needed
+        console.log('Cancelled deletion');
+      }
+    });
+  }
+ 
   // Delete auditor logic
   deleteAuditor() {
-    // Add your delete logic here
-    alert('Auditor deleted successfully.');
-    this.IsViewAuditorVisible = false;
+    this.firmAuditorsObj = {
+      otherEntityID: this.selectedAuditor.OtherEntityID,
+      createdBy: 30,
+      relatedEntityID: this.selectedAuditor.RelatedEntityID,
+      entitySubTypeID: this.selectedAuditor.EntitySubTypeID,
+      relatedEntityTypeID: 0,
+      relatedEntityEntityID: 0,
+      myState: 4,
+      otherEntityName: this.selectedAuditor.OtherEntityName,
+      dateOfIncorporation: "2024-10-02T11:58:32.911Z",
+      legalStatusTypeID: 0,
+      placeOfIncorporation: null,
+      countryOfIncorporation: 0,
+      registeredNumber: null,
+      zebSiteAddress: null,
+      lastModifiedBy: 0,
+      isAuditor: 0,
+      isCompanyRegulated: true,
+      additionalDetails: null,
+      isParentController: true,
+      isPublicallyTraded: true,
+      areAnyUBOs: true,
+      controllerInfo: null,
+      output: 0,
+      firmId: this.firmId,
+      entityTypeID: 0,
+      entityID: 0,
+      controllerControlTypeID: 0,
+      numOfShares: 0,
+      pctOfShares: 0,
+      majorityStockHolder: true,
+      assnDateFrom: "2024-10-02T11:58:32.911Z",
+      assnDateTo: "2024-10-02T11:58:32.911Z"
+    }
+    this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
+      (response) => {
+        console.log("Auditor Deleted successfully", response);
+        Swal.fire('Deleted!', 'Auditors details has been Deleted.', 'success');
+        this.IsEditAuditorVisible = false;
+        this.IsViewAuditorVisible = false;        
+        this.loadAuditors(); 
+      },
+      (error) => {
+        console.error("Error Deleteing auditor", error);
+        Swal.fire('Error!', 'Error Deleteing Auditor', 'error');
+      }
+    );
   }
 
 
