@@ -827,16 +827,19 @@
   </section>
 
   <!--Scope Section-->
-  <section #scopeSection class="form-section"
+  <section #scopeSection class="form-section edit-scope-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Scope ? 'flex' : 'none' }">
-    <div class="licensed-section">
-      <div class="licensed-header" (click)="toggleCollapse('LicensedSection')">
-        Licensed
-        <span class="arrow" [ngClass]="{
-            down: !isCollapsed['LicensedSection'],
-            up: isCollapsed['LicensedSection']
-          }">{{ isCollapsed["LicensedSection"] ? "▲" : "▼" }}</span>
+    <!--scope tabs-->
+    <div class="scope-container">
+      <div class="menu-container tab-container">
+        <ul class="nav">
+          <li><a (click)="switchSection('Licensed')" [class.active]="activeSection === 'Licensed'">Licensed</a></li>
+          <li *ngIf="firmDetails?.AuthorisationStatusTypeID > 0"><a (click)="switchSection('Authorized')" [class.active]="activeSection === 'Authorized'">Authorized</a></li>
+        </ul>
       </div>
+    </div>
+    <!--Licensed Section-->
+    <div *ngIf="tabIndex === 0" class="licensed-section">
       <div class="licensed-body" [ngClass]="{
           collapsed:
             isCollapsed['LicensedSection'] &&
@@ -859,19 +862,19 @@
             </h2>
             <div *ngIf="currentLicRevisionNumber === lastLicRevisionNumber" style="display: flex; gap: 10px">
               <div class="btn"
-                *ngIf="!hideEditBtn && getControlVisibility('imgBtnEdit') && ActivityLicensed[0].ScopeRevNum">
+                *ngIf="tabIndex === 0 && !hideEditBtn && getControlVisibility('imgBtnEdit') && ActivityLicensed[0].ScopeRevNum">
                 <button [disabled]="!getControlEnablement('imgBtnEdit')" class="edit-btn" (click)="editLicenseScope()">
                   <i class="bi bi-pen"></i>Edit
                 </button>
               </div>
 
-              <div class="btn" *ngIf="!loading && !hideSaveBtn && getControlVisibility('imgBtnSave')">
+              <div class="btn" *ngIf="tabIndex === 0 && !loading && !hideSaveBtn && getControlVisibility('imgBtnSave')">
                 <button [disabled]="!getControlEnablement('imgBtnSave')" class="save-btn" (click)="saveLicenseScope()">
                   Save
                 </button>
               </div>
 
-              <div class="btn" *ngIf="!loading && !hideCancelBtn && getControlVisibility('imgBtnCancel')">
+              <div class="btn" *ngIf="tabIndex === 0 && !loading && !hideCancelBtn && getControlVisibility('imgBtnCancel')">
                 <button [disabled]="!getControlEnablement('imgBtnCancel')" class="cancel-btn"
                   (click)="cancelEditLicScope()">
                   Cancel
@@ -879,20 +882,20 @@
               </div>
 
               <div class="btn"
-                *ngIf="!loading && !hideCreateBtn && getControlVisibility('imgBtnCreate') && !(ActivityLicensed[0].ScopeRevNum)">
+                *ngIf="tabIndex === 0 && !loading && !hideCreateBtn && getControlVisibility('imgBtnCreate') && !(ActivityLicensed[0].ScopeRevNum)">
                 <button [disabled]="!getControlEnablement('imgBtnCreate')">
                   Create
                 </button>
               </div>
 
               <div class="btn"
-                *ngIf="!loading && !hideReviseBtn && getControlVisibility('imgBtnRevise') && showVaryBtn">
+                *ngIf="tabIndex === 0 && !loading && !hideReviseBtn && getControlVisibility('imgBtnRevise') && showVaryBtn">
                 <button [disabled]="!getControlEnablement('imgBtnRevise')">
                   Revise
                 </button>
               </div>
 
-              <div class="btn" *ngIf="!loading && !hideDeleteBtn && getControlVisibility('imgBtnDelete')">
+              <div class="btn" *ngIf="tabIndex === 0 && !loading && !hideDeleteBtn && getControlVisibility('imgBtnDelete')">
                 <button [disabled]="!getControlEnablement('imgBtnDelete')">
                   Delete
                 </button>
@@ -969,7 +972,7 @@
               <button (click)="varyLicenseScope()">Vary Scope</button>
             </div>
           </div>
-          <div *ngIf="!isEditModeLicense && ActivityLicensed[0]?.ScopeRevNum" class="view-prev-version-container">
+          <div *ngIf="!isEditModeLicense && ActivityLicensed[0].ScopeRevNum > 1" class="view-prev-version-container">
             <a class="view-prev-version" (click)="getLicScopePreviousVersions(firmId,2)">View Previous
               Version</a>
           </div>
@@ -1081,15 +1084,8 @@
         </div>
       </div>
     </div>
-    <!---->
-    <div class="authorized-section" *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
-      <div class="authorised-header" (click)="toggleCollapse('authorizeSection')">
-        Authorised
-        <span class="arrow" [ngClass]="{
-            down: !isCollapsed['authorizeSection'],
-            up: isCollapsed['authorizeSection']
-          }">{{ isCollapsed["authorizeSection"] ? "▲" : "▼" }}</span>
-      </div>
+    <!--Authorized Section-->
+    <div class="authorized-section" *ngIf="firmDetails?.AuthorisationStatusTypeID > 0 && tabIndex === 1">
       <div class="authorized-body" [ngClass]="{ collapsed: isCollapsed['authorizeSection'] }">
         <div class="inputs-field-set scopeFor">
           <div class="form-section-title">
@@ -1097,16 +1093,43 @@
               <small>Scope for</small> {{ firmDetails?.FirmName }}
             </h2>
             <div *ngIf="currentAuthRevisionNumber === lastAuthRevisionNumber" style="display: flex; gap: 10px">
-              <div class="btn">
-                <button class="edit-btn" (click)="editAuthScope()">
-                  <i [class]="!isEditModeAuth ? 'bi bi-pen' : ''"></i>
-                  {{ !isEditModeAuth ? "Edit" : "Save" }}
+              <div class="btn"
+                *ngIf="tabIndex === 1 && !hideEditBtn && getControlVisibility('imgBtnEdit') && ActivityAuth[0].ScopeRevNum">
+                <button [disabled]="!getControlEnablement('imgBtnEdit')" class="edit-btn" (click)="editAuthScope()">
+                  <i class="bi bi-pen"></i>Edit
                 </button>
               </div>
 
-              <div class="btn">
-                <button class="cancel-btn" *ngIf="isEditModeAuth" (click)="cancelEditAuthScope()">
+              <div class="btn" *ngIf="tabIndex === 1 && !loading && !hideSaveBtn && getControlVisibility('imgBtnSave')">
+                <button [disabled]="!getControlEnablement('imgBtnSave')" class="save-btn" (click)="saveAuthScope()">
+                  Save
+                </button>
+              </div>
+
+              <div class="btn" *ngIf="tabIndex === 1 && !loading && !hideCancelBtn && getControlVisibility('imgBtnCancel')">
+                <button [disabled]="!getControlEnablement('imgBtnCancel')" class="cancel-btn"
+                  (click)="cancelEditAuthScope()">
                   Cancel
+                </button>
+              </div>
+
+              <div class="btn"
+                *ngIf="tabIndex === 1 && !loading && !hideCreateBtn && getControlVisibility('imgBtnCreate') && !(ActivityAuth[0].ScopeRevNum)">
+                <button [disabled]="!getControlEnablement('imgBtnCreate')">
+                  Create
+                </button>
+              </div>
+
+              <div class="btn"
+                *ngIf="tabIndex === 1 && !loading && !hideReviseBtn && getControlVisibility('imgBtnRevise') && showVaryBtn">
+                <button [disabled]="!getControlEnablement('imgBtnRevise')">
+                  Revise
+                </button>
+              </div>
+
+              <div class="btn" *ngIf="tabIndex === 1 && !loading && !hideDeleteBtn && getControlVisibility('imgBtnDelete')">
+                <button [disabled]="!getControlEnablement('imgBtnDelete')">
+                  Delete
                 </button>
               </div>
             </div>
@@ -1173,7 +1196,7 @@
               <button>Vary Scope</button>
             </div>
           </div>
-          <div *ngIf="!isEditModeAuth" class="view-prev-version-container">
+          <div *ngIf="!isEditModeAuth && ActivityAuth[0].ScopeRevNum > 1" class="view-prev-version-container">
             <a class="view-prev-version" (click)="getAuthScopePreviousVersions(firmId,3)">View Previous
               Version</a>
           </div>

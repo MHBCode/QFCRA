@@ -128,8 +128,10 @@ export class ViewFirmPageComponent implements OnInit {
   newActivity: any = {};
   isEditModeCore: boolean = false;
   /* for scope */
+  activeSection: string = 'Licensed';
+  tabIndex: number = 0; // 0 for Licensed, 1 for Authorized
   isEditModeLicense: boolean = false;
-  isEditModeAuth: string | boolean = false;
+  isEditModeAuth: boolean = false;
   showPermittedActivitiesTable: string | boolean = false;
   isIslamicFinanceChecked: boolean = true;
   disableApplicationDate: boolean = true;
@@ -357,10 +359,16 @@ export class ViewFirmPageComponent implements OnInit {
         this.applySecurityOnPage(FrimsObject.CoreDetail, this.isEditModeCore);
         break;
       case FrimsObject.Scope:
+        const section = this.activeSection;
         this.showSection(this.scopeSection);
-        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+        if (section === 'Licensed') {
+          this.tabIndex = 0;
+          this.applySecurityOnPage(FrimsObject.Scope,this.isEditModeLicense); 
+        } else if (section === 'Authorized') {
+          this.tabIndex = 1;
+          this.applySecurityOnPage(FrimsObject.Scope,this.isEditModeAuth); 
+        }
         this.applyVaryScopeButtonLogicOnView();
-        this.isCollapsed['LicensedSection'] = true;
         break;
       case FrimsObject.Auditor:
         this.showSection(this.auditorSection);
@@ -477,6 +485,7 @@ export class ViewFirmPageComponent implements OnInit {
     // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
     this.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
       let firmType = this.firmDetails.FirmTypeID;
+      
 
       if (this.assignedUserRoles) {
         const isMacroPrudentialGroup = this.assignedUserRoles.some(role => role.AppRoleId === 9013 || role.AppRoleId === 2005);
@@ -506,7 +515,6 @@ export class ViewFirmPageComponent implements OnInit {
       this.loading = false;
     });
   }
-
 
 
   isValidFirmSupervisor(firmId: number, userId: number): void {
@@ -1068,6 +1076,17 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  switchSection(section: string) {
+    this.activeSection = section;  // Update the active section
+    if (section === 'Licensed') {
+      this.tabIndex = 0;
+      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense); 
+    } else if (section === 'Authorized') {
+      this.tabIndex = 1;
+      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth); 
+    }
+  }
+  
 
   editLicenseScope() {
     if (this.ActivityLicensed[0].ScopeRevNum) {
@@ -1307,7 +1326,7 @@ export class ViewFirmPageComponent implements OnInit {
   editAuthScope() {
     if (!this.isEditModeAuth) {
       this.isEditModeAuth = true;  // Set the form to edit mode
-
+      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
       // Loop through each activity and load its activities based on FirmScopeTypeID
       this.ActivityAuth.forEach(activity => {
         if (activity.FirmScopeTypeID) {
@@ -1358,16 +1377,17 @@ export class ViewFirmPageComponent implements OnInit {
         productTypeID: null,
         appliedDate: this.convertDateToYYYYMMDD(activityAuth.ScopeAppliedDate),
         withDrawnDate: this.convertDateToYYYYMMDD(activityAuth.ScopeEffectiveDate),
-        objectProductActivity: {
-          productTypeID: "string",
-          appliedDate: "2024-10-02T11:14:20.627Z",
-          withDrawnDate: "2024-10-02T11:14:20.627Z",
-          effectiveDate: "2024-10-02T11:14:20.627Z",
-          firmScopeTypeID: 0
-        },
+        objectProductActivity: activityAuth.subProducts
+          .filter(subProd => subProd.isChecked) // Send only checked sub-products
+          .map(subProd => ({
+            productTypeID: subProd.productTypeID,
+            appliedDate: this.convertDateToYYYYMMDD(subProd.appliedDate),
+            withDrawnDate: this.convertDateToYYYYMMDD(subProd.withDrawnDate),
+            effectiveDate: this.convertDateToYYYYMMDD(subProd.effectiveDate),
+            firmScopeTypeID: subProd.firmScopeTypeID
+          })),
         activityDetails: null
-      }),
-      ),
+      })),
       objPrudentialCategory: {
         firmPrudentialCategoryID: this.ActivityAuth[0].FirmPrudentialCategoryID,
         firmId: this.firmId,
@@ -1439,121 +1459,6 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-
-  // updateOrSaveFirmScope() {
-  //   console.log("Data To Update Or Save Firm Scope:", this.ActivityAuth);
-
-  //   if (!this.ActivityAuth || this.ActivityAuth.length === 0) {
-  //     console.log('Firm activity scope not found');
-  //     return;
-  //   }
-
-  //   this.ActivityAuth.forEach(firmData => {
-  //     if (!firmData.FirmScopeID) {
-  //       console.log('FirmScopeID is missing for FirmID:', firmData.FirmID);
-  //       return;
-  //     }
-  //     debugger
-  //     const firmScopeData = {
-  //       objFirmScope: {
-  //         firmScopeID: firmData.FirmScopeID,
-  //         scopeRevNum: firmData.ScopeRevNum,
-  //         firmID: firmData.FirmID,
-  //         // objectID: firmData.ObjectID,
-  //         createdBy: 30, // this will be change cuse there is no user 
-  //         docReferenceID: firmData.DocID,
-  //         // firmApplTypeID: 3,
-  //         // docIDs: firmData.DocIDs,
-  //         generalConditions: firmData.GeneralConditions,
-  //         effectiveDate: this.currentDate,
-  //         scopeCertificateLink: firmData.ScopeCertificateLink,
-  //         // applicationDate: firmData.ApplicationDate,
-  //         // licensedOrAuthorisedDate: firmData.LicensedDate
-  //       },
-  //       lstFirmActivities: [
-  //         {
-  //           // createdBy: firmData.CreatedBy,
-  //           // firmScopeTypeID: firmData.FirmScopeTypeID,
-  //           activityTypeID: firmData.ActivityTypeID,
-  //           effectiveDate: this.currentDate,
-  //           // firmActivityConditions: firmData.FirmActivityConditions,
-  //           // productTypeID: firmData.ProductTypeID,
-  //           // appliedDate: firmData.AppliedDate,
-  //           // withDrawnDate: firmData.WithDrawnDate,
-  //           objectProductActivity: [
-  //             {
-  //               // productTypeID: firmData.ProductTypeID,
-  //               // appliedDate: firmData.AppliedDate,
-  //               // withDrawnDate: firmData.WithDrawnDate,
-  //               effectiveDate: firmData.EffectiveDate,
-  //               // firmScopeTypeID: firmData.FirmScopeTypeID
-  //             }
-  //           ],
-  //           // activityDetails: firmData.ActivityDetails
-  //         }
-  //       ],
-  //       objPrudentialCategory: {
-  //         firmPrudentialCategoryID: firmData.FirmPrudentialCategoryID,
-  //         firmID: firmData.FirmID,
-  //         prudentialCategoryTypeID: firmData.PrudentialCategoryTypeID,
-  //         firmScopeID: firmData.FirmScopeID,
-  //         scopeRevNum: firmData.ScopeRevNum,
-  //         lastModifiedByID: 30, // this will be change cuse there is no user
-  //         effectiveDate: this.currentDate, // Ensure date is valid
-  //         // expirationDate: firmData.ExpirationDate,
-  //         lastModifiedDate: this.currentDate,
-  //         authorisationCategoryTypeID: firmData.AuthorisationCategoryTypeID
-  //       },
-  //       objSector: {
-  //         firmSectorID: firmData.FirmSectorID.toString(),
-  //         sectorTypeID: firmData.SectorTypeID,  // this will be change cuse there is no user
-  //         lastModifiedByID: 30, // this will be change cuse there is no user
-  //         effectiveDate: this.currentDate,
-  //       },
-  //       lstFirmScopeCondition: [
-  //         {
-  //           scopeConditionTypeId: 1,
-  //           lastModifiedBy: 30, // this will be change cuse there is no user
-  //           restriction: 1
-  //         }
-  //       ],
-  //       objFirmIslamicFinance: {
-  //         iFinFlag: true,
-  //         iFinTypeId: this.islamicFinance.IFinTypeId,
-  //         iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
-  //         endorsement: this.islamicFinance.Endorsement,
-  //         savedIFinTypeID: 2,
-  //         scopeRevNum: firmData.ScopeRevNum,
-  //         lastModifiedBy: 30 // this will be change cuse there is no user
-  //       },
-  //       resetFirmSector: true,
-  //       firmSectorID: firmData.FirmSectorID.toString(),
-  //       obj: {}
-  //     };
-
-  //     console.log('FirmScopeData to be sent:', firmScopeData);
-
-  //     this.firmService.editAuthorizedScope(10044, firmScopeData).subscribe(
-  //       response => {
-  //         console.log('Firm scope updated successfully for FirmID:', firmData.FirmID, response);
-  //         Swal.fire({
-  //           icon: 'success',
-  //           title: 'Success!',
-  //           text: `Firm scope saved successfully for FirmID: ${firmData.FirmID}`,
-  //         });
-  //       },
-  //       error => {
-  //         console.error('Error updating firm scope for FirmID:', firmData.FirmID, error);
-  //         console.log('Error details:', error.error);
-  //         Swal.fire({
-  //           icon: 'error',
-  //           title: 'Error!',
-  //           text: `Failed to save firm scope for FirmID: ${firmData.FirmID}.`,
-  //         });
-  //       }
-  //     );
-  //   });
-  // }
 
 
 
@@ -2563,96 +2468,6 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-
-  // loadRegulatedActivities() {
-  //   this.firmService.getFirmActivityAuthorized(this.firmId).subscribe(
-  //     data => {
-  //       this.AuthRegulatedActivities = data.response;
-
-  //       this.AuthRegulatedActivities.forEach(activity => {
-  //         console.log("Activity ID: " + activity.ActivityTypeID);  // Print activity ID
-
-  //         if (activity.ActivityTypeID) {
-  //           // Initialize categorizedData for each activity
-  //           this.categorizedData = [];
-
-  //           // Load all products for the given activity
-  //           this.loadAllProducts(activity.ActivityTypeID).subscribe(allProducts => {
-  //             let currentCategory = null;
-
-  //             // Create a new object to represent the activity with its products
-  //             const activityData = {
-  //               activityId: activity.ActivityTypeID,
-  //               ActivityCategoryDesc: activity?.ActivityCategoryDesc,
-  //               ActivityTypeDesc: activity?.ActivityTypeDesc,
-  //               specificCondition: activity?.Column1,
-  //               products: []
-  //             };
-
-  //             // Categorize products into main categories and subcategories
-  //             allProducts.forEach(item => {
-  //               if (!currentCategory || item.ProductCategoryTypeID !== currentCategory.ProductCategoryTypeID) {
-  //                 // Create a new main category
-  //                 currentCategory = {
-  //                   mainCategory: item.ProductCategoryTypeDesc1,
-  //                   ProductCategoryTypeID: item.ProductCategoryTypeID,
-  //                   subCategories: []
-  //                 };
-  //                 activityData.products.push(currentCategory);
-  //               }
-
-  //               // Check if the item is not the main category itself
-  //               if (item.ID !== 0) {
-  //                 // Add the current item as a subcategory
-  //                 currentCategory.subCategories.push({
-  //                   ID: item.ID,
-  //                   ProductCategoryTypeDesc: item.ProductCategoryTypeDesc,
-  //                   TotalProduct: item.TotalProduct
-  //                 });
-  //               }
-  //             });
-
-  //             // Push the activity data into categorizedData
-  //             this.categorizedData.push(activityData);
-
-  //             // Print the categorized data for debugging
-  //             console.log("Activity ID " + activity.ActivityTypeID);
-
-  //             activityData.products.forEach(category => {
-  //               console.log("Product category " + category.ProductCategoryTypeID + ": " + category.mainCategory);
-
-  //               category.subCategories.forEach(subCategory => {
-  //                 console.log("Subcategories" + JSON.stringify(subCategory));
-  //               });
-  //             });
-  //           });
-  //         }
-
-  //         // Initialize selectedCategory
-  //         activity.selectedCategory = this.activityCategories.find(
-  //           category => category.ActivityCategoryDesc === activity.ActivityCategoryDesc
-  //         );
-
-  //         // If selectedCategory is found, load activities for that category
-  //         if (activity.selectedCategory) {
-  //           this.firmService.getAuthActivityTypes(activity.selectedCategory.ActivityCategoryID).subscribe(
-  //             data => {
-  //               activity.activities = data.response;
-
-  //               // Initialize selectedActivity based on ActivityTypeID
-  //               activity.selectedActivity = activity.activities.find(
-  //                 act => act.ActivityTypeID === activity.ActivityTypeID
-  //               );
-  //             }
-  //           );
-  //         }
-  //       });
-  //     },
-  //     error => {
-  //       console.error('Error fetching License scope', error);
-  //     }
-  //   );
-  // }
 
 
   loadIslamicFinance() {
