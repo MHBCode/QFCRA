@@ -1338,18 +1338,39 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   saveAuthScope() {
-
+    this.isLoading = true; // Start loading indicator
     this.hasValidationErrors = false;
 
-    this.validateLicenseScope();
+
+    // this.validateLicenseScope();
 
     this.existingProducts = this.ActivityAuth;
-
+    console.log(this.existingProducts);
 
     const updatedAuthorizeScope = this.prepareAuthoriseScopeObject(this.userId);
-    this.saveAuthoriseScopeDetails(updatedAuthorizeScope, this.userId);
-    this.showFirmScopeAuthSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
-  }
+
+    // Call the function to save the details and handle response inside the subscription
+    this.firmService.editAuthorizedScope(updatedAuthorizeScope).subscribe(
+      response => {
+        console.log('Authorise scope updated successfully:', response);
+
+        this.loadActivitiesAuthorized(); // Reload license scope details
+
+        this.isEditModeAuth = false; // Toggle edit mode off
+        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+
+        // Show success alert after data is successfully saved
+        this.showFirmScopeAuthSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
+
+        this.isLoading = false; // Stop loading indicator after success
+      },
+      error => {
+        console.error('Error updating Authorised Scope:', error);
+        this.isLoading = false; // Stop loading indicator on error
+      }
+    );
+}
+
 
   prepareAuthoriseScopeObject(userId: number) {
     return {
@@ -1362,7 +1383,7 @@ export class ViewFirmPageComponent implements OnInit {
         docReferenceID: this.ActivityAuth[0].docReferenceID ?? null,
         firmApplTypeID: 3, // Authorised
         docIDs: this.ActivityAuth[0].DocID,
-        generalConditions: this.ActivityAuth[0].GeneralConditions,
+        generalConditions: this.ActivityAuth[0].GeneralCondition,
         effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityAuth[0]?.ScopeCertificateLink,
         applicationDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeApplicationDate),
@@ -1377,15 +1398,18 @@ export class ViewFirmPageComponent implements OnInit {
         productTypeID: null,
         appliedDate: this.convertDateToYYYYMMDD(activityAuth.ScopeAppliedDate),
         withDrawnDate: this.convertDateToYYYYMMDD(activityAuth.ScopeEffectiveDate),
-        objectProductActivity: activityAuth.subProducts
-          .filter(subProd => subProd.isChecked) // Send only checked sub-products
-          .map(subProd => ({
-            productTypeID: subProd.productTypeID,
-            appliedDate: this.convertDateToYYYYMMDD(subProd.appliedDate),
-            withDrawnDate: this.convertDateToYYYYMMDD(subProd.withDrawnDate),
-            effectiveDate: this.convertDateToYYYYMMDD(subProd.effectiveDate),
-            firmScopeTypeID: subProd.firmScopeTypeID
-          })),
+        objectProductActivity: activityAuth.categorizedProducts
+          .flatMap(catProd => 
+            catProd.subProducts
+              .filter(subProd => subProd.isChecked)  // Only include checked sub-products
+              .map(subProd => ({
+                productTypeID: String(subProd.ID),
+                appliedDate: this.convertDateToYYYYMMDD(activityAuth.appliedDate),
+                withDrawnDate: this.convertDateToYYYYMMDD(activityAuth.withDrawnDate),
+                effectiveDate: this.convertDateToYYYYMMDD(activityAuth.effectiveDate),
+                firmScopeTypeID: subProd.firmScopeTypeID
+              }))
+          ),
         activityDetails: null
       })),
       objPrudentialCategory: {
@@ -1395,16 +1419,16 @@ export class ViewFirmPageComponent implements OnInit {
         firmScopeID: this.ActivityAuth[0].FirmScopeID,
         scopeRevNum: this.ActivityAuth[0].ScopeRevNum,
         lastModifiedByID: userId,
-        effectiveDate: this.ActivityAuth[0].PrudentialCategoryEffectiveDate,
+        effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].PrudentialCategoryEffectiveDate),
         expirationDate: null,
-        lastModifiedDate: this.ActivityAuth[0].PrudentialCategoryLastModifiedDate,
+        lastModifiedDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].PrudentialCategoryLastModifiedDate),
         authorisationCategoryTypeID: this.ActivityAuth[0].AuthorisationCategoryTypeID
       },
       objSector: {
         firmSectorID: this.ActivityAuth[0].FirmSectorID,
         sectorTypeID: this.ActivityAuth[0].SectorTypeID,
         lastModifiedByID: userId, //recheck
-        effectiveDate: this.ActivityAuth[0].SectorEffectiveDate
+        effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].SectorEffectiveDate)
       },
       lstFirmScopeCondition: this.isScopeConditionChecked
         ? [
@@ -1436,29 +1460,30 @@ export class ViewFirmPageComponent implements OnInit {
         endorsement: this.islamicFinance.Endorsement,
         savedIFinTypeID: this.islamicFinance.IFinTypeId,
         scopeRevNum: this.ActivityAuth[0].ScopeRevNum,
-        lastModifiedBy: this.islamicFinance.IFinLastModifiedByName
+        lastModifiedBy: userId // recheck
+        // lastModifiedBy: this.islamicFinance.IFinLastModifiedByName
       },
       resetFirmSector: true,
       firmSectorID: null
     }
   }
 
-  saveAuthoriseScopeDetails(updatedAuthoriseScope: any, userId: number) {
-    console.log('Updated Authorise Scope:', updatedAuthoriseScope);
+  // saveAuthoriseScopeDetails(updatedAuthoriseScope: any, userId: number) {
+  //   console.log('Updated Authorise Scope:', updatedAuthoriseScope);
 
-    this.firmService.editAuthorizedScope(updatedAuthoriseScope).subscribe(
-      response => {
-        console.log('Authorise scope updated successfully:', response);
-        this.loadActivitiesAuthorized(); // Reload license scope details
-        this.isEditModeAuth = false; // Toggle edit mode off
-        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
-        // this.disableApplicationDate = true;
-      },
-      error => {
-        console.error('Error updating Authorised Scope:', error);
-      }
-    );
-  }
+  //   this.firmService.editAuthorizedScope(updatedAuthoriseScope).subscribe(
+  //     response => {
+  //       console.log('Authorise scope updated successfully:', response);
+  //       this.loadActivitiesAuthorized(); // Reload license scope details
+  //       this.isEditModeAuth = false; // Toggle edit mode off
+  //       this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+  //       // this.disableApplicationDate = true;
+  //     },
+  //     error => {
+  //       console.error('Error updating Authorised Scope:', error);
+  //     }
+  //   );
+  // }
 
 
 
@@ -2352,17 +2377,20 @@ export class ViewFirmPageComponent implements OnInit {
 
   // On View Mode
   loadActivitiesAuthorized(): void {
+    this.isLoading = true; // Start loading indicator
+
+    // Fetch the current scope revision number
     this.firmService.getCurrentScopeRevNum(this.firmId, 3).subscribe(
       data => {
         this.scopeRevNum = data.response.Column1;
 
+        // Once scope revision is fetched, fetch firm activity authorized details
         this.firmService.getFirmActivityAuthorized(this.firmId).subscribe(
           data => {
             this.ActivityAuth = data.response;
 
-            // Loop through activities and group products into main categories and subcategories
+            // Process activities and group products into main categories and subcategories
             this.ActivityAuth.forEach(activity => {
-              // Create a new array to store categorized products
               activity.categorizedProducts = [];
               let currentCategory = null;
 
@@ -2382,20 +2410,26 @@ export class ViewFirmPageComponent implements OnInit {
               });
             });
 
-            // Load Prudential Return Types
+            // Load Prudential Return Types based on the first activity
             const prudentialCategoryTypeID = this.ActivityAuth[0].PrudentialCategoryTypeID;
             this.loadPrudReturnTypes(prudentialCategoryTypeID);
+
+            // Stop loading indicator once all data is fully loaded
+            this.isLoading = false;
           },
           error => {
             console.error('Error fetching License scope', error);
+            this.isLoading = false; // Stop loading on error
           }
         );
       },
       error => {
         console.error('Error fetching current scope revision number for authorized:', error);
+        this.isLoading = false; // Stop loading on error
       }
     );
-  }
+}
+
 
 
 
@@ -2608,6 +2642,9 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   loadAllProductsForEditMode(): void {
+    this.isLoading = true;
+    const activityCount = this.ActivityAuth.length;
+    let loadedCount = 0;
     // Assuming ActivityAuth contains all activities with their ActivityTypeID
     this.ActivityAuth.forEach(activity => {
       const activityTypeID = activity.ActivityTypeID;
@@ -2651,11 +2688,14 @@ export class ViewFirmPageComponent implements OnInit {
               currentCategory.subProducts.push(subProduct);
             }
           });
-
-          console.log(`Categorized Products with firmScopeTypeID for ActivityTypeID ${activityTypeID}:`, activity.categorizedProducts);
+          loadedCount++;
+          if (loadedCount === activityCount) {
+            this.isLoading = false; // Stop loader after all products are loaded
+          }
         },
         error => {
           console.error(`Error fetching products for ActivityTypeID ${activityTypeID}:`, error);
+          this.isLoading = false;
         }
       );
     });
