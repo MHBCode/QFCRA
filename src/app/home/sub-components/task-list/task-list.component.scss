@@ -223,7 +223,10 @@ tr:hover {
   overflow-y: auto;
   /* Add scroll if dropdown is too long */
   z-index: 1000;
-  /* Ensure dropdown is on top */
+  left: 0px;
+  margin-top: 25px;
+  white-space: break-spaces;
+  height: 300px;
 }
 
 /* The list inside the dropdown */
@@ -444,9 +447,9 @@ tr:hover {
 
 .notes-container p {
   margin-bottom: 10px;
-    color: #a51e36;
-    font-size: 1em;
-    font-weight: 600;
+  color: #a51e36;
+  font-size: 1em;
+  font-weight: 600;
 }
 
 .save-note {

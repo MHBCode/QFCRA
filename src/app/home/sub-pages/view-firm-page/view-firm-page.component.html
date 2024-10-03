@@ -1,3 +1,6 @@
+<div *ngIf="isLoading" class="loader-overlay">
+  <div class="loader"></div>
+</div>
 <div class="brid-crump">
   <div class="text"><span> Home ></span> Firm Details</div>
 </div>
@@ -1131,7 +1134,8 @@
               </label>
               <!--label is changed based on scoperevnum-->
               <label *ngIf="ActivityAuth[0]?.ScopeRevNum == 1">Application Date</label>
-              <input [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].ScopeApplicationDate" name="q13AppDate" id="q13AppDate" type="text" #dateInputs/>
+              <input [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].ScopeApplicationDate" name="q13AppDate"
+                id="q13AppDate" type="text" #dateInputs />
             </div>
             <div class="input-field">
               <label for="incorporationDate"> Incorporation Date </label>
@@ -1241,7 +1245,7 @@
                       </option>
                     </select>
                   </div>
-                  
+
 
                   <div class="activity-select">
                     <label for="activity" style="display: flex; gap: 5px">
@@ -1272,35 +1276,42 @@
                   </div>
                 </div>
 
-                <!--on Edit mode-->
+                <!-- On Edit Mode Table -->
                 <table class="regulated-activity-table" *ngIf="isEditModeAuth">
                   <thead>
                     <tr>
-                      <th>Product(s)</th>
+                      <th style="width: 60%">Product(s)</th>
+                      <th style="width: 60%">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <!--integration loop will be inside this tr for products-->
-                    <tr *ngFor="let product of activity.products">
-                      <td>
+                    <!-- Loop through the categorized products -->
+                    <tr *ngFor="let product of activity.categorizedProducts">
+                      <td colspan="2">
                         <label>
-                          <input type="checkbox" /> {{ product.mainCategory }}
+                          <input type="checkbox" [(ngModel)]="product.isChecked"
+                            (change)="toggleAllSubCategories(product, product.isChecked)" />
+                          {{ product.mainCategory }}
                         </label>
 
+                        <!-- Nested table for sub-products -->
                         <table class="nested-table">
                           <tbody>
-                            <tr *ngFor="let subCategory of product.subCategories">
-                              <td>
+                            <tr *ngFor="let subProduct of product.subProducts">
+                              <!-- Sub-product description below "Product(s)" header -->
+                              <td style="width: 60%">
                                 <label>
-                                  <input type="checkbox" />
-                                  {{ subCategory.ProductCategoryTypeDesc }}
+                                  <input type="checkbox" [(ngModel)]="subProduct.isChecked" />
+                                  {{ subProduct.ProductCategoryTypeDesc }}
                                 </label>
                               </td>
-                              <td>
-                                <select class="action-column" name="action">
-                                  <option value="1">Add</option>
-                                  <option value="2">Withdrawal</option>
-                                  <option value="3">Discontinue</option>
+                              <!-- Dropdown placed under "Action" header -->
+                              <td style="width: 40%">
+                                <select [disabled]="!((this.ActivityAuth[0].ScopeRevNum > 1) && !(isNullOrEmpty(this.ActivityAuth[0].ScopeRevNum)))" class="action-column" name="action" [(ngModel)]="subProduct.firmScopeTypeID">
+                                  <option *ngFor="let firmScopeType of allFirmScopeTypes"
+                                    [value]="firmScopeType.FirmScopeTypeID">
+                                    {{ firmScopeType.FirmScopeTypeDesc }}
+                                  </option>
                                 </select>
                               </td>
                             </tr>
@@ -1310,6 +1321,7 @@
                     </tr>
                   </tbody>
                 </table>
+
                 <!--specific conditions and restrictions-->
                 <div class="specific-conditions-and-restrictions">
                   <div class="specific-conditions-and-restrictions-header">
@@ -1322,20 +1334,23 @@
                 </div>
               </div>
               <!--Conditions and Restrictions-->
-              <div *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0" class="conditions-and-restrictions-section">
+              <div class="conditions-and-restrictions-section">
                 <div class="conditions-and-restrictions-header">
                   <p>Conditions and Restrictions</p>
                 </div>
-                <p>
-                  <strong>Retail Restriction</strong> &nbsp;&nbsp;
-                  <input disabled type="checkbox" />
-                </p>
-
+                
+                  <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0">
+                    <strong>{{ActivityAuth[0].ObjectFirmScopeCondition[0].scopeConditionTypeDesc}}: </strong> &nbsp;
+                    <span *ngIf="!isEditModeAuth">Yes</span>
+                    <input *ngIf="isEditModeAuth"
+                    [(ngModel)]="isScopeConditionChecked" type="checkbox" [value]="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0 ? true : false"/>
+                  </p>
+              
                 <p>
                   <strong>General Authorisation Conditions or Restrictions</strong>
                 </p>
                 <div class="input-field conditions-textarea">
-                  <textarea disabled value="{{ ActivityAuth[0]?.GeneralConditions }}"></textarea>
+                  <textarea [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].GeneralCondition">{{ActivityAuth[0]?.GeneralCondition}}</textarea>
                 </div>
               </div>
             </div>

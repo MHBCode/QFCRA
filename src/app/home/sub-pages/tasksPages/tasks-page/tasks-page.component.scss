@@ -11,52 +11,15 @@
     padding-top: 0.5rem;
 }
 
-.menu-container {
-    padding: 10px 0px;
-}
-
-.nav {
-    list-style-type: none;
-    padding: 0px;
-    margin: 0;
+.tab-container{
     display: flex;
-    border-radius: 5px;
-    overflow: hidden;
-    background: #fff;
+    justify-content: center;
+    background-color: #ffffff;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin-bottom: 20px;
 }
-
-.nav li {
-    flex: 1;
-}
-
-.nav li a {
-    display: block;
-    text-wrap: nowrap;
-    padding: 14px 10px;
-    text-align: center;
-    text-decoration: none;
-    color: #000;
-    border-right: 1px solid #ddd;
-    font-size: 0.9rem;
-}
-
-.nav li a:hover {
-    background-color: #ddd;
-}
-
-.active {
-    background-color: #A51E36;
-    color: white !important;
-}
-
-.active:hover {
-    background: #A51E36 !important;
-}
-
-.nav li:last-child a {
-    border-right: none;
-}
-
 .btns button {
     background: #A51E36;
     padding: 0.5rem 1rem;

@@ -12,7 +12,7 @@ export class TaskListComponent implements OnInit {
 
   userId = 30 // must be dynamic
   @Input() pageSize: number = 10;
-  @Input() isMainView: boolean = false;
+  @Input() isMainView: boolean = true;
   Tasks: any[] = [];
   taskTypes: string[] = [];
   firmNames: string[] = [];
@@ -40,6 +40,7 @@ export class TaskListComponent implements OnInit {
   safeHtmlDescription: SafeHtml = ''; // for html tags
   noteText: string = '';
 
+  
   constructor(
     private TaskService: TaskServiceService,
     private router: Router,

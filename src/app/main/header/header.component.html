@@ -5,7 +5,7 @@
   <div class="nav">
     <ul class="navigation-ul">
       <li>
-        <a (click)="goHome()"> Home </a>
+        <a (click)="goHome()"><i class="bi bi-house"></i> Home </a>
         <div class="menuOfTop">
           <ul>
             <li (click)="goto(0)">Tasks</li>
@@ -15,11 +15,10 @@
         </div>
       </li>
       <li>
-        <a [class.active]="activeMenuIndex === 1"> Firms </a>
+        <a [class.active]="activeMenuIndex === 1"> <i class="bi bi-people"></i> Firms </a>
         <div class="menuOfTop">
           <ul>
-            <li (click)="goto(3)">Open</li>
-            <li (click)="goto(4)">New</li>
+            <li (click)="goto(3)">All Firms</li>
             <li (click)="goto(5)">CO/Supervisors</li>
             <li (click)="goto(6)">Notices and Responses</li>
             <li (click)="goto(7)">Enforcement & Disciplinary Actions</li>
@@ -27,7 +26,7 @@
         </div>
       </li>
       <li>
-        <a [class.active]="activeMenuIndex === 2"> Individuals </a>
+        <a [class.active]="activeMenuIndex === 2"> <i class="bi bi-person"></i> Individuals </a>
         <div class="menuOfTop">
           <ul>
             <li (click)="goto(8)">Open</li>
@@ -37,7 +36,7 @@
         </div>
       </li>
       <li>
-        <a [class.active]="activeMenuIndex === 3"> Reports </a>
+        <a [class.active]="activeMenuIndex === 3"> <i class="bi bi-file-earmark-text"></i> Reports </a>
         <div class="menuOfTop">
           <ul>
             <li (click)="goto(11)">Firms Report</li>
@@ -57,7 +56,7 @@
         </div>
       </li>
       <li>
-        <a [class.active]="activeMenuIndex === 4"> Admin </a>
+        <a [class.active]="activeMenuIndex === 4"> <i class="bi bi-gear"></i> Admin </a>
         <div class="menuOfTop">
           <ul>
             <li (click)="goto(24)">User Access</li>
