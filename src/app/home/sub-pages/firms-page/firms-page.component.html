@@ -180,9 +180,7 @@
 <!-- Trigger Button for Search Popup -->
 <!-- Search Button -->
 <!-- Search Button -->
-<div *ngIf="isLoading" class="loader-overlay">
-  <div class="loader"></div>
-</div>
+
 <div class="search-button-container">
   <div class="brid-crump">
     <div class="text">
@@ -347,7 +345,7 @@
 
       <!-- Alphabet Filter -->
       <div class="alphabet-filter">
-        <span *ngFor="let letter of alphabet" (click)="filterFirmsByLetter(letter)">
+        <span *ngFor="let letter of alphabet" (click)="getstartChar(letter)">
           {{ letter }}
         </span>
       </div>

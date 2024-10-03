@@ -12,7 +12,7 @@ export class TaskListComponent implements OnInit {
 
   userId = 30 // must be dynamic
   @Input() pageSize: number = 10;
-  @Input() isMainView: boolean = false;
+  @Input() isMainView: boolean = true;
   Tasks: any[] = [];
   taskTypes: string[] = [];
   firmNames: string[] = [];

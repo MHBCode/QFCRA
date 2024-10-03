@@ -108,7 +108,7 @@ export class HeaderComponent implements OnInit {
   }
   goto(where:Number){
     if (where == 0) {
-      this.router.navigate(['home/tasks-page'])
+      this.router.navigate(['home/tasks-page/assigned-tasks'])
     }
     if(where == 3){
       this.router.navigate(['home/firms-page'])

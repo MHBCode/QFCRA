@@ -1,3 +1,23 @@
+<!-- <div class="task-page">
+  <div class="container">
+    <div class="menu-container">
+      <ul class="nav">
+        <li><a routerLink='/home/tasks-page/assigned-tasks' routerLinkActive="active">Assigned Task(s)</a></li>
+        <li><a routerLink='/home/tasks-page/shadow-supervisor' routerLinkActive="active">As Shadow Supervisor</a></li>
+        <li><a routerLink='/home/tasks-page/tasks-i-assigned' routerLinkActive="active">Tasks I've Assigned</a></li>
+        <li><a routerLink='/home/tasks-page/my-team-tasks' routerLinkActive="active">My Team's Tasks</a></li>
+        <li><a routerLink='/home/tasks-page/create-reminder' routerLinkActive="active">Create Reminder</a></li>
+      </ul>
+    </div>
+    <div class="btns">
+      <button>
+        <i class="bi bi-file-earmark-text"></i>
+        Export to Excel
+      </button>
+    </div>
+  </div>
+  <router-outlet></router-outlet>
+</div> -->
 <div class="task-page">
   <div class="breadcrumb-row">
     <div class="brid-crump">
@@ -15,13 +35,14 @@
 <div class="container">
     <div class="menu-container tab-container">
       <ul class="nav">
-        <li><a routerLink='/home/tasks-page/AssignedTasks' routerLinkActive="active">Assigned Task(s)</a></li>
-        <li><a routerLink='/home/tasks-page/ShadowSupervisor' routerLinkActive="active">As Shadow Supervisor</a></li>
-        <li><a routerLink='/home/tasks-page/TasksIAssigned' routerLinkActive="active">Tasks I've Assigned</a></li>
-        <li><a routerLink='' routerLinkActive="active">empty for now</a></li>
-        <li><a routerLink='/home/tasks-page/CreateReminder' routerLinkActive="active">Create Reminder</a></li>
+        <li><a routerLink='/home/tasks-page/assigned-tasks' routerLinkActive="active">Assigned Task(s)</a></li>
+        <li><a routerLink='/home/tasks-page/shadow-supervisor' routerLinkActive="active">As Shadow Supervisor</a></li>
+        <li><a routerLink='/home/tasks-page/tasks-i-assigned' routerLinkActive="active">Tasks I've Assigned</a></li>
+        <li><a routerLink='/home/tasks-page/my-team-tasks' routerLinkActive="active">My Team's Tasks</a></li>
+        <li><a routerLink='/home/tasks-page/create-reminder' routerLinkActive="active">Create Reminder</a></li>
       </ul>
     </div>
   </div>
-<app-task-list [isMainView] = "true"></app-task-list>
+  <router-outlet></router-outlet>
 </div>
+

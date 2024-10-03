@@ -28,6 +28,11 @@ import { ViewControllerComponent } from './sub-pages/view-controller/view-contro
 import { EditControllerComponent } from './sub-pages/edit-controller/edit-controller.component';
 import { CreateControllerComponent } from './sub-pages/create-controller/create-controller.component';
 import { EditScopeAuthorizedComponent } from './sub-pages/edit-scope-authorized/edit-scope-authorized.component';
+import { ShadowSupervisorComponent } from './sub-components/shadow-supervisor/shadow-supervisor.component';
+import { TasksIAssignedComponent } from './sub-components/tasks-i-assigned/tasks-i-assigned.component';
+import { MyTeamTasksComponent } from './sub-components/my-team-tasks/my-team-tasks.component';
+import { CreateReminderComponent } from './sub-components/create-reminder/create-reminder.component';
+import { TaskListComponent } from './sub-components/task-list/task-list.component';
 const routes: Routes = [
   { path: '', component: MainPageComponent},
   { path: 'firms-page', component: FirmsPageComponent},
@@ -54,6 +59,18 @@ const routes: Routes = [
       { path: 'view-individual-status-change/tracking', component: TrackingComponent },
       { path: 'view-individual-status-change/docs', component: DocsComponent },
       { path: 'view-individual-status-change/reports', component: ReportsComponent }
+    ]
+  },
+  {
+    path: 'home/tasks-page',
+    component: TasksPageComponent,
+    children: [
+      { path: '', redirectTo: 'assigned-tasks', pathMatch: 'full' },
+      { path: 'assigned-tasks', component: TaskListComponent },
+      { path: 'shadow-supervisor', component: ShadowSupervisorComponent },
+      { path: 'tasks-i-assigned', component: TasksIAssignedComponent },
+      { path: 'my-team-tasks', component: MyTeamTasksComponent },
+      { path: 'create-reminder', component: CreateReminderComponent },
     ]
   },
   { path: 'notices-and-responses', component: NoticesAndResponsesComponent},

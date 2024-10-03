@@ -104,7 +104,6 @@ export class FirmListComponent implements OnInit, OnChanges {
   @Input() pageSize: number = 10;
   @Input() firms: any[] = [];
   @Input() isMainView: boolean = false;
-
   isLoading: boolean = true;
   currentPage: number = 1;
   totalPages: number = 0;
@@ -123,24 +122,22 @@ export class FirmListComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['firms'] && changes['firms'].currentValue) {
-      this.isLoading = true; // Set loading while updating
+    if (changes['firms'] && changes['firms'].currentValue) {    
       this.updatePagination(); // Update pagination whenever firms input changes
-      this.isLoading = false; // Remove loading indicator once pagination is updated
     }
   }
 
   loadFirms(): void {
         this.firmService.getAssignedFirms(10044).subscribe(
           data => {
+            this.isLoading = true;
             this.firms = data.response;
             this.totalRows = this.firms.length;
             this.totalPages = Math.ceil(this.totalRows / this.pageSize);
             this.updatePagination();
             this.isLoading = false;
-
             console.log(this.firms)
-
+            
           },
           error => {
             console.error('Error fetching firms', error);
