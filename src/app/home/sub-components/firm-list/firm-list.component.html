@@ -1,6 +1,3 @@
-<div *ngIf="isLoading" class="loader-overlay">
-  <div class="loader"></div>
-</div>
 <div class="firmList-wrapper" [ngClass]="isMainView ? 'listing-table' : 'home-table'">
   <div class="table customTable">
     <div *ngIf="showTitle" (click)="goToAllFirms()" class="tableTitle">

@@ -111,24 +111,6 @@
     background: white;
 }
 
-.input-field input {
-    width: 96%;
-    padding: 0.5rem 2%;
-    border-radius: 7.20px;
-    border: 0.72px #B1B1B1 solid;
-}
-
-.input-field textarea {
-    width: 96%;
-    height: 100px;
-    padding: 0.5rem 2%;
-    border-radius: 7.2px;
-    border: 0.72px #b1b1b1 solid;
-    resize: vertical;
-    min-height: 20px;
-    max-height: 100px;
-}
-
 .radio-wrapper {
     display: flex;
     flex-direction: row;

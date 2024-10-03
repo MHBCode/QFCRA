@@ -2,7 +2,7 @@
   <div class="loader"></div>
 </div>
 <div class="brid-crump">
-  <div class="text"><span> Home ></span> Firm Details</div>
+  <div class="text"><span> Home > All Firms > </span> Firm Details</div>
 </div>
 <div class="page">
   <div class="menu" [ngStyle]="{ width: menuWidth }">
@@ -107,15 +107,15 @@
   </div>
 
   <!-- Firm Section -->
-  <section #firmSection class="edit-firm-section"
+  <section #firmSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Firm ? 'flex' : 'none' }">
     <div class="inputs-field-set">
-      <div class="edit-firm-actions">
+      <div class="form-section-title">
         <h2 class="edit-firm-header">
           FIRM Details > <span>{{ firmDetails?.FirmName }}</span>
         </h2>
       </div>
-      <div class="edit-firms-inputs">
+      <div class="inputs-row">
         <div class="input-field">
           <label for="QFCNumber"> QFC Number </label>
           <input disabled name="QFCNumber" id="QFCNumber" type="text" value="{{ firmDetails?.QFCNum }}" />
@@ -143,11 +143,11 @@
     </div>
     <!---->
     <div class="inputs-field-set">
-      <div class="edit-firm-actions">
+      <div class="form-section-title">
         <h2 class="edit-firm-header">Application Details</h2>
         <div class="edit-btn"></div>
       </div>
-      <div class="edit-firms-inputs">
+      <div class="inputs-row">
         <div class="input-field">
           <label for="dateOfApplication"> Date of Application </label>
           <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="{{
@@ -193,11 +193,11 @@
     </div>
     <!---->
     <div class="inputs-field-set">
-      <div class="edit-firm-actions">
+      <div class="form-section-title">
         <h2 class="edit-firm-header">Operational Information</h2>
         <div class="edit-btn"></div>
       </div>
-      <div class="edit-firms-inputs">
+      <div class="inputs-row">
         <div class="input-field">
           <label for="noOfStaffInQatar"> No. Of Staff In Qatar </label>
           <input disabled name="noOfStaffInQatar" id="noOfStaffInQatar" type="text"
@@ -210,7 +210,7 @@
         </div>
 
         <div class="input-field notes">
-          <label for="notes"> Notes : </label>
+          <label for="notes"> Notes </label>
           <textarea disabled name="notes" id="notes">{{
             getCleanedNotes(firmOPDetails?.Notes)
           }}</textarea>
@@ -220,10 +220,10 @@
     <!---->
     <div class="inputs-field-set">
       <div class="section">
-        <h2>
+        <h2 class="history-row">
           RA Personal Assigned
           <button [disabled]="FIRMRA.length === 0" class="subbutton" (click)="getInactiveUsers()">
-            Open History
+            <i class="bi bi-clock-history"></i> Open History
           </button>
         </h2>
         <table *ngIf="FIRMRA?.length > 0; else noSupervisors">
@@ -255,7 +255,7 @@
   <!--Start Firm details sub section-->
 
   <!--Core Details-->
-  <section #coreDetailSection class="edit-firm-section"
+  <section #coreDetailSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.CoreDetail ? 'flex' : 'none' }">
     <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['firmDetailsSection'] }">
       <!--Error messages for firm details-->
@@ -271,7 +271,7 @@
         <p *ngIf="errorMessages['AccStandDate']">{{ errorMessages['AccStandDate'] }}</p>
         <p *ngIf="errorMessages['PrevFirmNameEffectiveTo']">{{ errorMessages['PrevFirmNameEffectiveTo'] }}</p>
       </div>
-      <div class="edit-firm-actions">
+      <div class="form-section-title">
         <h2 class="edit-firm-header">
           FIRM Details
           <button [ngClass]="{ 'hidden-button': !isEditModeCore }" class="collapse-button"
@@ -321,7 +321,7 @@
         </div>
       </div>
 
-      <div class="edit-firms-inputs">
+      <div class="inputs-row">
         <div class="input-field">
           <label for="firmName"> Firm Name
             <span [hidden]="!isEditModeCore" style="color: red">*</span>
@@ -489,7 +489,7 @@
     </div>
     <!---->
     <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['appDetailsSection']}">
-      <div class="edit-firm-actions collapse-container">
+      <div class="form-section-title collapse-container">
         <h2 class="edit-firm-header">
           Application Details <button class="subbutton" (click)="getApplicationDetailsHistory()">Open
             History</button>
@@ -499,7 +499,7 @@
           </button>
         </h2>
       </div>
-      <div class="edit-firms-inputs" *ngIf="!isEditModeCore">
+      <div class="inputs-row" *ngIf="!isEditModeCore">
         <!-- Licensed Status Table -->
         <table class="aligned-table">
           <thead>
@@ -555,7 +555,7 @@
         </table>
       </div>
       <!--or (edit mode)-->
-      <div class="edit-firms-inputs" *ngIf="isEditModeCore">
+      <div class="inputs-row" *ngIf="isEditModeCore">
         <div class="input-field">
           <label for="dateOfApplication">
             Date of Application
@@ -620,14 +620,14 @@
       <div class="error-messages" style="color: red">
         <p *ngIf="errorMessages['uploadDocument']">{{ errorMessages['uploadDocument'] }}</p>
       </div>
-      <div class="edit-firm-actions collapse-container">
+      <div class="form-section-title collapse-container">
         <h2 class="edit-firm-header">Press Releases</h2>
         <button [ngClass]="{'hidden-button': !isEditModeCore}" class="collapse-button"
           (click)="toggleCollapse('pressReleaseSection')">
           {{ isCollapsed['pressReleaseSection'] ? '▲' : '▼'}}
         </button>
       </div>
-      <div class="edit-firms-inputs">
+      <div class="inputs-row">
         <div class="file-container">
           <div class="input-field">
             <label for="documentType">
@@ -673,14 +673,14 @@
 
     <!---->
     <div class="inputs-field-set comments" [ngClass]="{ collapsed: isCollapsed['commentsSection'] }">
-      <div class="edit-firm-actions collapse-container">
+      <div class="form-section-title collapse-container">
         <h2 class="edit-firm-header">Comments</h2>
         <button [ngClass]="{ 'hidden-button': !isEditModeCore }" class="collapse-button"
           (click)="toggleCollapse('commentsSection')">
           {{ isCollapsed["commentsSection"] ? "▲" : "▼" }}
         </button>
       </div>
-      <div class="edit-firms-inputs">
+      <div class="inputs-row">
         <div class="input-field">
           <label for="generalComments">
             <strong>General Comments:</strong>
@@ -705,7 +705,7 @@
         <p *ngIf="errorMessages['AddressTypeID']">{{ errorMessages['AddressTypeID'] }}</p>
         <p *ngIf="errorMessages['DuplicatedAddressTypeID']">{{ errorMessages['DuplicatedAddressTypeID'] }}</p>
       </div>
-      <div class="edit-firm-actions collapse-container">
+      <div class="form-section-title collapse-container">
         <h2 class="edit-firm-header">
           Addresses
         </h2>
@@ -717,7 +717,7 @@
         <button *ngIf="isEditModeCore && canAddNewAddress" (click)="addNewAddress()"
           [hidden]="isCollapsed['addressesSection']" class="addAddressBtn">Add Address</button>
       </div>
-      <div class="edit-firms-inputs">
+      <div class="inputs-row">
         <ng-container *ngFor="let address of filteredFirmAddresses; let i = index">
           <ng-container *ngIf="address.Valid === true">
             <div class="input-field" *ngIf="!isEditModeCore">
@@ -827,7 +827,7 @@
   </section>
 
   <!--Scope Section-->
-  <section #scopeSection class="edit-firm-section"
+  <section #scopeSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Scope ? 'flex' : 'none' }">
     <div class="licensed-section">
       <div class="licensed-header" (click)="toggleCollapse('LicensedSection')">
@@ -853,7 +853,7 @@
               errorMessages['ScopeAppliedDateLessThanFirmLicApplDate'] }}</p>
             <p *ngIf="errorMessages['ActivityTypeIDCORRECTION']">{{ errorMessages['ActivityTypeIDCORRECTION'] }}</p>
           </div>
-          <div class="edit-firm-actions">
+          <div class="form-section-title">
             <h2 class="edit-firm-header">
               <small>Scope for</small> {{ firmDetails?.FirmName }}
             </h2>
@@ -899,7 +899,7 @@
               </div>
             </div>
           </div>
-          <div class="edit-firms-inputs">
+          <div class="inputs-row">
             <div style="width: 100%" class="input-field">
               <label for="formReff"> Form Reference </label>
               <!-- <input [disabled]="isEditModeLicense" [ngModel]="documentDetails.FileName"
@@ -976,7 +976,7 @@
         </div>
         <!---->
         <div class="inputs-field-set">
-          <div class="edit-firm-actions">
+          <div class="form-section-title">
             <h2 class="edit-firm-header">Permitted Activities</h2>
           </div>
 
@@ -1092,7 +1092,7 @@
       </div>
       <div class="authorized-body" [ngClass]="{ collapsed: isCollapsed['authorizeSection'] }">
         <div class="inputs-field-set scopeFor">
-          <div class="edit-firm-actions">
+          <div class="form-section-title">
             <h2 class="edit-firm-header">
               <small>Scope for</small> {{ firmDetails?.FirmName }}
             </h2>
@@ -1111,7 +1111,7 @@
               </div>
             </div>
           </div>
-          <div class="edit-firms-inputs">
+          <div class="inputs-row">
             <div class="input-field">
               <label for="formReff"> Form Reference </label>
               <input disabled name="formReff" id="formReff" type="text" value="" />
@@ -1182,13 +1182,13 @@
         <!--Scope of Authorization-->
         <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['scopeOfAuthorization'] }">
           <div class="section">
-            <div class="edit-firm-actions collapse-container">
+            <div class="form-section-title collapse-container">
               <h2 class="edit-firm-header">Scope of Authorisation</h2>
               <button class="collapse-button" (click)="toggleCollapse('scopeOfAuthorization')">
                 {{ isCollapsed["scopeOfAuthorization"] ? "▲" : "▼" }}
               </button>
             </div>
-            <div class="edit-firms-inputs">
+            <div class="inputs-row">
               <table class="scope-of-auth">
                 <thead>
                   <tr>
@@ -1211,7 +1211,7 @@
         <!--Regulated Activities-->
         <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['regulatedActivitiesSection'] }">
           <div class="section">
-            <div class="edit-firm-actions collapse-container">
+            <div class="form-section-title collapse-container">
               <h2>Regulated Activities</h2>
               <button class="collapse-button" (click)="toggleCollapse('regulatedActivitiesSection')">
                 {{ isCollapsed["regulatedActivitiesSection"] ? "▲" : "▼" }}
@@ -1307,7 +1307,9 @@
                               </td>
                               <!-- Dropdown placed under "Action" header -->
                               <td style="width: 40%">
-                                <select [disabled]="!((this.ActivityAuth[0].ScopeRevNum > 1) && !(isNullOrEmpty(this.ActivityAuth[0].ScopeRevNum)))" class="action-column" name="action" [(ngModel)]="subProduct.firmScopeTypeID">
+                                <select
+                                  [disabled]="!((this.ActivityAuth[0].ScopeRevNum > 1) && !(isNullOrEmpty(this.ActivityAuth[0].ScopeRevNum)))"
+                                  class="action-column" name="action" [(ngModel)]="subProduct.firmScopeTypeID">
                                   <option *ngFor="let firmScopeType of allFirmScopeTypes"
                                     [value]="firmScopeType.FirmScopeTypeID">
                                     {{ firmScopeType.FirmScopeTypeDesc }}
@@ -1338,19 +1340,20 @@
                 <div class="conditions-and-restrictions-header">
                   <p>Conditions and Restrictions</p>
                 </div>
-                
-                  <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0">
-                    <strong>{{ActivityAuth[0].ObjectFirmScopeCondition[0].scopeConditionTypeDesc}}: </strong> &nbsp;
-                    <span *ngIf="!isEditModeAuth">Yes</span>
-                    <input *ngIf="isEditModeAuth"
-                    [(ngModel)]="isScopeConditionChecked" type="checkbox" [value]="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0 ? true : false"/>
-                  </p>
-              
+
+                <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0">
+                  <strong>{{ActivityAuth[0].ObjectFirmScopeCondition[0].scopeConditionTypeDesc}}: </strong> &nbsp;
+                  <span *ngIf="!isEditModeAuth">Yes</span>
+                  <input *ngIf="isEditModeAuth" [(ngModel)]="isScopeConditionChecked" type="checkbox"
+                    [value]="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0 ? true : false" />
+                </p>
+
                 <p>
                   <strong>General Authorisation Conditions or Restrictions</strong>
                 </p>
                 <div class="input-field conditions-textarea">
-                  <textarea [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].GeneralCondition">{{ActivityAuth[0]?.GeneralCondition}}</textarea>
+                  <textarea [disabled]="!isEditModeAuth"
+                    [(ngModel)]="ActivityAuth[0].GeneralCondition">{{ActivityAuth[0]?.GeneralCondition}}</textarea>
                 </div>
               </div>
             </div>
@@ -1363,13 +1366,13 @@
               islamicFinance?.IFinTypeId) ||
             isEditModeAuth
           " [ngClass]="{ collapsed: isCollapsed['islamicFinanceSection'] }">
-          <div class="edit-firm-actions collapse-container">
+          <div class="form-section-title collapse-container">
             <h2 class="edit-firm-header">Islamic Finance</h2>
             <button class="collapse-button" (click)="toggleCollapse('islamicFinanceSection')">
               {{ isCollapsed["islamicFinanceSection"] ? "▲" : "▼" }}
             </button>
           </div>
-          <div class="edit-firms-inputs">
+          <div class="inputs-row">
             <div class="input-field" *ngIf="!isEditModeAuth">
               <label for="isIslamicFinanceExist"> Islamic Finance </label>
               <input disabled name="isIslamicFinanceExist" id="isIslamicFinanceExist" type="text"
@@ -1417,13 +1420,13 @@
 
         <!--Prudential Category-->
         <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['prudentialCategorySection'] }">
-          <div class="edit-firm-actions collapse-container">
+          <div class="form-section-title collapse-container">
             <h2 class="edit-firm-header">Prudential Category</h2>
             <button class="collapse-button" (click)="toggleCollapse('prudentialCategorySection')">
               {{ isCollapsed["prudentialCategorySection"] ? "▲" : "▼" }}
             </button>
           </div>
-          <div class="edit-firms-inputs">
+          <div class="inputs-row">
             <div class="input-field">
               <label for="prudentialCategory"> Prudential Category </label>
               <select [disabled]="!isEditModeAuth" name="prudentialCategory" id="prudentialCategory"
@@ -1497,13 +1500,13 @@
 
         <!--Prudential Return Type / Sector-->
         <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['prudentialReturnTypeSection'] }">
-          <div class="edit-firm-actions collapse-container">
+          <div class="form-section-title collapse-container">
             <h2 class="edit-firm-header">Prudential Return Type</h2>
             <button class="collapse-button" (click)="toggleCollapse('prudentialReturnTypeSection')">
               {{ isCollapsed["prudentialReturnTypeSection"] ? "▲" : "▼" }}
             </button>
           </div>
-          <div class="edit-firms-inputs">
+          <div class="inputs-row">
             <div class="input-field">
               <label for="prudentialReturnType"> Prudential Return Type <span *ngIf="isEditModeAuth"
                   style="color:red">*</span></label>
@@ -1560,11 +1563,11 @@
   </section>
 
   <!--Controllers-->
-  <section #controllerSection class="edit-firm-section"
+  <section #controllerSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Controller ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
-        <div class="edit-firm-actions">
+        <div class="form-section-title">
           <h2>Controllers For {{ firmDetails?.FirmName }}</h2>
           <div class="btn">
             <button (click)="createController()">
@@ -1666,7 +1669,7 @@
               <div style="flex: 1;">
                 <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Controller Type
                   :</label>
-                <input required [(ngModel)]="selectedController.EntityTypeDesc" name="ControllerType" readonly] 
+                <input required [(ngModel)]="selectedController.EntityTypeDesc" name="ControllerType" readonly]
                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
               </div>
             </div>
@@ -1917,7 +1920,7 @@
 
 
   <!--Auditors-->
-  <section #auditorSection class="edit-firm-section"
+  <section #auditorSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Auditor ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
@@ -1938,7 +1941,7 @@
         <table>
           <thead>
             <tr>
-              
+
               <!--leave it empty-->
               <th>Auditor Name</th>
               <th>Auditor Type</th>
@@ -1969,96 +1972,90 @@
         </table>
       </div>
     </div>
-      <!-- Popup for viewing/editing auditor -->
-  <div *ngIf="IsViewAuditorVisible || IsEditAuditorVisible" 
-  style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 62%; background: #fff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); padding: 20px; z-index: 1000; text-align: left; overflow-y: auto;">
-<div style="border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
- <h2 style="font-size: 24px; color: #333;">{{ IsEditAuditorVisible ? 'Edit Auditor Details' : 'Auditor Details' }}</h2>
- <div class="btn" *ngIf="!IsEditAuditorVisible">
-   <button (click)="editAuditor()"><i class="bi bi-pen"></i> Edit</button>
-   <button (click)="confirmDeleteAuditor()"><i class="bi bi-trash"></i> Delete</button>
-   <button style="margin-left: 150px;" (click)="closeAuditorPopup()">Close<i class="bi bi-x"></i></button>
- </div>
-</div>
-
-<form>
- <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-  <div style="width:400px">
-    <label for="auditorName" style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Auditor Name</label>
-    <ng-container *ngIf="IsEditAuditorVisible; else viewAuditorName">
-      <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
-        <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}</option>
-      </select>
-    </ng-container>
-    <ng-template #viewAuditorName>
-      <input name="auditorName" id="auditorName" type="text" [(ngModel)]="selectedAuditor.OtherEntityName" disabled style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
-    </ng-template>
-  </div>
-  <div style="width:400px">
-    <label for="auditorType" style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Auditor Type</label>
-    <ng-container *ngIf="IsEditAuditorVisible; else viewAuditorType">
-      <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
-        <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">{{ type.EntitySubTypeDesc }}</option>
-      </select>
-    </ng-container>
-    <ng-template #viewAuditorType>
-      <input name="auditorType" id="auditorType" type="text" [(ngModel)]="selectedAuditor.EntitySubTypeDesc" disabled style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
-    </ng-template>
-  </div>
-   <div style="width:378px">
-     <label for="effectiveFromDate" style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Effective From Date</label>
-     <input [disabled]="!IsEditAuditorVisible" #dateInputs  name="effectiveFromDate" id="effectiveFromDate" type="text"
-       [(ngModel)]="selectedAuditor.AssnDateFrom" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
-   </div>
-   <div style="width:378px">
-     <label for="effectiveToDate" style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Effective To Date</label>
-     <input [disabled]="!IsEditAuditorVisible" #dateInputs name="effectiveToDate" id="effectiveToDate" type="text"
-       [(ngModel)]="selectedAuditor.AssnDateTo" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
-   </div>
- </div>
-
- <!-- Save and Cancel buttons in edit mode -->
- <div *ngIf="IsEditAuditorVisible" style="margin-top: 20px; display: flex; justify-content: space-between;">
-   <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="saveEditAuditor()"><i class="bi bi-save"></i> Save</button>
-   <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="cancelEdit()"><i class="bi bi-x"></i> Cancel</button>
- </div>
-</form>
-</div>
-    <!--view auditor
-    <div class="inputs-field-set" *ngIf="IsViewAuditorVisible">
-      <div class="view-auditor-actions">
-        <h2 class="view-auditor-header">Auditor Details</h2>
-      </div>
-      <div class="view-auditor-inputs">
-        <div class="input-field">
-          <label for="auditorName"> Auditor Name </label>
-          <input disabled name="auditorName" id="auditorName" type="text"
-            value="{{ selectedAuditor.OtherEntityName }}" />
-        </div>
-        <div class="input-field">
-          <label for="auditorType"> Auditor Type </label>
-          <input disabled name="auditorType" id="auditorType" type="text"
-            value="{{ selectedAuditor.EntitySubTypeDesc }}" />
-        </div>
-        <div class="input-field">
-          <label for="address2"> Effective From Date </label>
-          <input disabled name="effectiveFromDate" id="effectiveFromDate" type="text"
-            value="{{ selectedAuditor.AssnDateFrom }}" />
-        </div>
-        <div class="input-field">
-          <label for="effectiveToDate"> Effective To Date </label>
-          <input disabled name="effectiveToDate" id="effectiveToDate" type="text"
-            value="{{ selectedAuditor.AssnDateTo }}" />
+    <!-- Popup for viewing/editing auditor -->
+    <div *ngIf="IsViewAuditorVisible || IsEditAuditorVisible"
+      style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 62%; background: #fff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); padding: 20px; z-index: 1000; text-align: left; overflow-y: auto;">
+      <div
+        style="border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="font-size: 24px; color: #333;">{{ IsEditAuditorVisible ? 'Edit Auditor Details' : 'Auditor Details'
+          }}</h2>
+        <div class="btn" *ngIf="!IsEditAuditorVisible">
+          <button (click)="editAuditor()"><i class="bi bi-pen"></i> Edit</button>
+          <button (click)="confirmDeleteAuditor()"><i class="bi bi-trash"></i> Delete</button>
+          <button style="margin-left: 150px;" (click)="closeAuditorPopup()">Close<i class="bi bi-x"></i></button>
         </div>
       </div>
-    </div> -->
+
+      <form>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div style="width:400px">
+            <label for="auditorName" style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Auditor
+              Name</label>
+            <ng-container *ngIf="IsEditAuditorVisible; else viewAuditorName">
+              <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID"
+                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
+                <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}
+                </option>
+              </select>
+            </ng-container>
+            <ng-template #viewAuditorName>
+              <input name="auditorName" id="auditorName" type="text" [(ngModel)]="selectedAuditor.OtherEntityName"
+                disabled
+                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
+            </ng-template>
+          </div>
+          <div style="width:400px">
+            <label for="auditorType" style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Auditor
+              Type</label>
+            <ng-container *ngIf="IsEditAuditorVisible; else viewAuditorType">
+              <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID"
+                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
+                <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">{{ type.EntitySubTypeDesc }}
+                </option>
+              </select>
+            </ng-container>
+            <ng-template #viewAuditorType>
+              <input name="auditorType" id="auditorType" type="text" [(ngModel)]="selectedAuditor.EntitySubTypeDesc"
+                disabled
+                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
+            </ng-template>
+          </div>
+          <div style="width:378px">
+            <label for="effectiveFromDate"
+              style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Effective From Date</label>
+            <input [disabled]="!IsEditAuditorVisible" #dateInputs name="effectiveFromDate" id="effectiveFromDate"
+              type="text" [(ngModel)]="selectedAuditor.AssnDateFrom"
+              style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
+          </div>
+          <div style="width:378px">
+            <label for="effectiveToDate"
+              style="font-size: 14px; color: #333; margin-bottom: 5px; display: block;">Effective To Date</label>
+            <input [disabled]="!IsEditAuditorVisible" #dateInputs name="effectiveToDate" id="effectiveToDate"
+              type="text" [(ngModel)]="selectedAuditor.AssnDateTo"
+              style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;" />
+          </div>
+        </div>
+
+        <!-- Save and Cancel buttons in edit mode -->
+        <div *ngIf="IsEditAuditorVisible" style="margin-top: 20px; display: flex; justify-content: space-between;">
+          <button
+            style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;"
+            (click)="saveEditAuditor()"><i class="bi bi-save"></i> Save</button>
+          <button
+            style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;"
+            (click)="cancelEdit()"><i class="bi bi-x"></i> Cancel</button>
+        </div>
+      </form>
+    </div>
     <div class="inputs-field-set" *ngIf="IsCreateAuditorVisible">
       <div class="view-auditor-actions">
         <h2 class="view-auditor-header">Auditor Details</h2>
-        
+
         <div class="btn">
-          <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="closecreateAuditor()"><i class="bi bi-x"></i> Cancel</button>
-        </div> 
+          <button
+            style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;"
+            (click)="closecreateAuditor()"><i class="bi bi-x"></i> Cancel</button>
+        </div>
       </div>
       <form>
         <div class="view-auditor-inputs">
@@ -2067,7 +2064,8 @@
               Auditor Name <span style="color: red">*</span>
             </label>
             <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID">
-              <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}</option>
+              <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}
+              </option>
             </select>
           </div>
           <div class="input-field" *ngIf="selectedAuditorNameFromSelectBox === 'other'">
@@ -2080,205 +2078,36 @@
             <label for="auditorType">
               Auditor Type <span style="color: red">*</span>
             </label>
-            <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID" >
-              <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">{{ type.EntitySubTypeDesc }}</option>
+            <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID">
+              <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">{{ type.EntitySubTypeDesc }}
+              </option>
             </select>
           </div>
           <div class="input-field">
             <label for="address2">
               Effective From Date <span style="color: red">*</span>
             </label>
-            <input name="effectiveFromDate" [(ngModel)]="selectedAuditor.AssnDateFrom" id="effectiveFromDate" type="text" #dateInputs/>
+            <input name="effectiveFromDate" [(ngModel)]="selectedAuditor.AssnDateFrom" id="effectiveFromDate"
+              type="text" #dateInputs />
           </div>
           <div class="input-field">
             <label for="effectiveToDate"> Effective To Date </label>
-            <input name="effectiveToDate" [(ngModel)]="selectedAuditor.AssnDateTo" id="effectiveToDate" type="text" #dateInputs/>
+            <input name="effectiveToDate" [(ngModel)]="selectedAuditor.AssnDateTo" id="effectiveToDate" type="text"
+              #dateInputs />
           </div>
         </div>
         <div class="btn" style="margin-left: 15px;margin-bottom:10px; display: flex;">
-          <button style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;" (click)="saveCreateAuditor()"><i class="bi bi-save"></i> Save</button>
+          <button
+            style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;"
+            (click)="saveCreateAuditor()"><i class="bi bi-save"></i> Save</button>
         </div>
       </form>
-    </div> 
+    </div>
 
-    <!--edit auditor 
-    <div class="inputs-field-set" *ngIf="IsEditAuditorVisible">
-      <div class="view-auditor-actions">
-        <h2 class="view-auditor-header">Auditor Details</h2>
-        <div class="btn">
-          <button class="save-btn">Save</button>
-        </div>
-      </div>
-      <form>
-        <div class="view-auditor-inputs">
-          <div class="input-field">
-            <label for="auditorName">
-              Auditor Name <span style="color: red">*</span>
-            </label>
-            <select disabled name="auditorName" id="auditorName" [(ngModel)]="selectedAuditorNameFromSelectBox"
-              value="{{ selectedAuditor.OtherEntityName }}">
-              <option value="select">Select</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div class="input-field">
-            <label for="auditorType">
-              Auditor Type <span style="color: red">*</span>
-            </label>
-            <select name="auditorType" id="auditorType">
-              <option value="select">Select</option>
-            </select>
-          </div>
-          <div class="input-field">
-            <label for="address2">
-              Effective From Date <span style="color: red">*</span>
-            </label>
-            <input name="effectiveFromDate" id="effectiveFromDate" type="date" />
-          </div>
-          <div class="input-field">
-            <label for="effectiveToDate"> Effective To Date </label>
-            <input name="effectiveToDate" id="effectiveToDate" type="date" />
-          </div>
-        </div>
-      </form>
-    </div> -->
-  </section> 
+  </section>
 
-  <!--Contacts-->
-  <!-- <section id="Contacts" class="edit-firm-section" [ngStyle]="{ width: dataWidth }" style="display: none">
-    <div class="inputs-field-set">
-      <div class="section">
-        <div class="contacts-header">
-          <h2>Contacts For</h2>
-          <span>
-            <input id="InactiveContacts" type="checkbox" />
-            <label>Display Inactive Contacts</label>
-          </span>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <!--leave it empty
-              <th>Name</th>
-              <th>Contact Type</th>
-              <th>Contact Form</th>
-              <th>Position/Job Title</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let contact of FIRMContacts">
-              <td class="radio-table">
-                <label class="radioBtn">
-                  <input type="radio" name="contact" />
-                  <span></span>
-                </label>
-              </td>
-              <td>{{ contact.FullName }}</td>
-              <td>{{ contact.ContactTypeDesc }}</td>
-              <td>{{ contact?.ContactMethodTypeDesc }}</td>
-              <td>{{ contact.JobTitle }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section> -->
-  <!-- <section id="Contacts" class="edit-firm-section" [ngStyle]="{ width: dataWidth }" style="display: none">
-    <div class="inputs-field-set">
-      <div class="section">
-        <div class="contacts-header">
-          <h2>Contacts For {{ firmDetails?.FirmName }}</h2>
-          <span>
-            <input id="InactiveContacts" type="checkbox" />
-            <label>Display Inactive Contacts</label>
-          </span>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Name</th>
-              <th>Contact Type</th>
-              <th>Contact Form</th>
-              <th>Position/Job Title</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let contact of FIRMContacts" (click)="onRowClick(contact)">
-              <td class="radio-table">
-                <label class="radioBtn">
-                  <input type="radio" name="contact" />
-                  <span></span>
-                </label>
-              </td>
-              <td>{{ contact.FullName }}</td>
-              <td>{{ contact.ContactTypeDesc }}</td>
-              <td>{{ contact?.ContactMethodTypeDesc }}</td>
-              <td>{{ contact.JobTitle }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  
-    <!- Popup 
-    <div *ngIf="isPopupVisible" (click)="closeContactPopup()" 
-      style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 242, 242, 0.2); display: flex; justify-content: center; align-items: center; z-index: 1000;">
-      
-      <div (click)="$event.stopPropagation()" 
-        style="background-color: #ffffff; padding: 20px; border-radius: 15px; max-width: 700px; width: 90%; position: relative; border: 2px solid #6b0000;">
-        
-        <!- Edit Button 
-        <button type="button" (click)="enableEditing()" 
-          style="position: absolute; top: 10px; right: 10px; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; background-color: #cc0000; color: white; font-size: 0.9em;">
-          Edit
-        </button>
-  
-        <h3 style="margin-top: 0; color: #cc0000; text-align: center; font-size: 1.5em; border-bottom: 2px solid #cc0000; padding-bottom: 10px;">Contact Details</h3>
-        
-        <form style="margin-top: 10px;">
-          <div style="display: flex; gap: 20px; margin-bottom: 10px;">
-            <div style="flex: 1;">
-              <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #990000;">Name:</label>
-              <input [(ngModel)]="selectedContact.FullName" name="fullName" [readonly]="!isEditable"
-                style="width: 85%; padding: 10px; border-radius: 5px; border: 1px solid #cc0000; font-size: 1em; background-color: #ffe6e6; color: #990000;" />
-            </div>
-            <div style="flex: 1;">
-              <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #990000;">Contact Type:</label>
-              <input [(ngModel)]="selectedContact.ContactTypeDesc" name="contactType" [readonly]="!isEditable"
-                style="width: 85%; padding: 10px; border-radius: 5px; border: 1px solid #cc0000; font-size: 1em; background-color: #ffe6e6; color: #990000;" />
-            </div>
-          </div>
-          
-          <div style="display: flex; gap: 20px; margin-bottom: 20px;">
-            <div style="flex: 1;">
-              <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #990000;">Contact Form:</label>
-              <input [(ngModel)]="selectedContact.ContactMethodTypeDesc" name="contactForm" [readonly]="!isEditable"
-                style="width: 85%; padding: 10px; border-radius: 5px; border: 1px solid #cc0000; font-size: 1em; background-color: #ffe6e6; color: #990000;" />
-            </div>
-            <div style="flex: 1;">
-              <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #990000;">Position/Job Title:</label>
-              <input [(ngModel)]="selectedContact.JobTitle" name="jobTitle" [readonly]="!isEditable"
-                style="width: 85%; padding: 10px; border-radius: 5px; border: 1px solid #cc0000; font-size: 1em; background-color: #ffe6e6; color: #990000;" />
-            </div>
-          </div>
-          
-          <div style="margin-top: 30px; display: flex; justify-content: space-between;">
-            <button type="button" (click)="saveContactPopupChanges()" 
-              style="padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; background-color: #cc0000; color: white; font-size: 1em;">
-              Save
-            </button>
-            <button type="button" (click)="closeContactPopup()" 
-              style="padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; background-color: #cc0000; color: #fdfcfc; font-size: 1em;">
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section> -->
-  <section #contactsSection class="edit-firm-section"
+
+  <section #contactsSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Contatcs ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
@@ -2493,7 +2322,7 @@
   <!--Start Individuals sub sections-->
 
   <!--Individuals Details-->
-  <section #individualSection class="edit-firm-section"
+  <section #individualSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Individual ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
@@ -2595,12 +2424,12 @@
 
   <!--Section Supervision-->
   <!--add here the section-->
-  <section #supervisionSection class="edit-firm-section"
+  <section #supervisionSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Supervision ? 'flex' : 'none' }">
 
   </section>
   <!--Supervision Reporting Schedule-->
-  <section #reportingScheduleSection class="edit-firm-section"
+  <section #reportingScheduleSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.ReportingSchedule ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
@@ -2632,7 +2461,7 @@
   </section>
 
   <!--Supervision Review-->
-  <section #returnReviewSection class="edit-firm-section"
+  <section #returnReviewSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.ReturnsReview ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
@@ -2680,7 +2509,7 @@
   </section>
 
   <!--Supervision Notices-->
-  <section #noticesSection class="edit-firm-section"
+  <section #noticesSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Notices ? 'flex' : 'none' }">
     <div class="inputs-field-set" style="overflow-x: scroll">
       <div class="section">
@@ -2732,7 +2561,7 @@
   </section>
 
   <!--Supervision Admin Fee-->
-  <section #adminFeeSection class="edit-firm-section"
+  <section #adminFeeSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.LateAdminFee ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
@@ -2772,7 +2601,7 @@
   </section>
 
   <!--Supervision RMPs-->
-  <section #rmpsSection class="edit-firm-section"
+  <section #rmpsSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.RMP ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
@@ -2816,7 +2645,7 @@
   </section>
 
   <!--Supervision Breaches-->
-  <section #breachesSection class="edit-firm-section"
+  <section #breachesSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Breach ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
@@ -2862,7 +2691,7 @@
   </section>
 
   <!--Supervision Waivers-->
-  <section #waiversSection class="edit-firm-section"
+  <section #waiversSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Waiver ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
@@ -2908,7 +2737,7 @@
   </section>
 
   <!--Supervision ENF Actions-->
-  <section #enfActionSection class="edit-firm-section"
+  <section #enfActionSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Enforcement ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
@@ -2952,7 +2781,7 @@
   </section>
 
   <!--Supervision Reg. Funds-->
-  <section #regFundsSection class="edit-firm-section"
+  <section #regFundsSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.RegisteredFunds ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
@@ -2985,7 +2814,7 @@
   </section>
 
   <!--Supervision Journal-->
-  <section #journalSection class="edit-firm-section"
+  <section #journalSection class="form-section"
     [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.SupervisionJournal ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="section">
