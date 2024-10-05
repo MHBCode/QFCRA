@@ -172,3 +172,19 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
 .popup-content input:disabled,.popup-content select:disabled {
     background-color: #fffafa;
 }
+
+.task-section-title {
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin-bottom: 20px;
+    background: linear-gradient(to right, #a51e36, #e99fa9);
+  
+    .edit-firm-actions {
+      padding-top: 0px;
+      .edit-firm-header{
+        color: white;
+        font-size: 1em;
+      }
+    }
+  }

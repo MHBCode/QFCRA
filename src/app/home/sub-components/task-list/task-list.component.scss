@@ -390,9 +390,11 @@ tr:hover {
   justify-content: space-between;
   flex-wrap: wrap;
 }
+
 .appDesc {
   line-height: 30px;
 }
+
 .app-description {
   width: 100%;
 }
@@ -482,12 +484,13 @@ tr:hover {
 }
 
 
-.popup-header{
+.popup-header {
   margin-bottom: 15px;
   padding-bottom: 10px;
   border-bottom: 2px solid #a51e36;
   width: 100%;
-  h3{
+
+  h3 {
     color: #a51e36;
   }
 }
