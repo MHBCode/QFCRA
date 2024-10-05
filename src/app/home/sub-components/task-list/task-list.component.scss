@@ -354,16 +354,12 @@ tr:hover {
   /* Smooth transition for appearance */
 }
 
-.popup-container::-webkit-scrollbar {
-  display: none;
-}
 
 /* Popup Header */
 .popup-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 }
 
 .popup-header h3 {
@@ -388,13 +384,15 @@ tr:hover {
 
 /* Content Style */
 .view-task-inputs {
-  padding: 0.5rem;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   flex-wrap: wrap;
 }
-
+.appDesc {
+  line-height: 30px;
+}
 .app-description {
   width: 100%;
 }
@@ -409,7 +407,7 @@ tr:hover {
 
 /* notes table */
 .notes-container {
-  padding: 0.5rem;
+  margin-top: 20px;
 }
 
 .notes-container table tbody tr td {
@@ -426,8 +424,9 @@ tr:hover {
 
 .save-note {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin-top: 10px;
 }
 
 .save-note button {
@@ -479,5 +478,16 @@ tr:hover {
   .input-field label {
     font-size: 0.9em;
     /* Adjust label size for better readability on smaller screens */
+  }
+}
+
+
+.popup-header{
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #a51e36;
+  width: 100%;
+  h3{
+    color: #a51e36;
   }
 }

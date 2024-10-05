@@ -167,3 +167,8 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
     line-height: 24px;
     word-wrap: break-word
 }
+
+
+.popup-content input:disabled,.popup-content select:disabled {
+    background-color: #fffafa;
+}

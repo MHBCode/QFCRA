@@ -173,15 +173,20 @@
           <input disabled type="text" [value]="selectedTask[0]?.ShortDescription"/>
         </div>
 
-        <div class="input-field app-description">
-          <label for="appDesc">Description</label>
-          <div class="appDesc" [innerHTML]="safeHtmlDescription"></div>
+      </div>
+
+      <div class="app-description">
+        <div class="popup-header">
+          <h3> Description </h3>
         </div>
+        <div class="appDesc" [innerHTML]="safeHtmlDescription"></div>
       </div>
 
       <!-- Display reminder notes -->
       <div *ngIf="selectedTask[0]?.myReminderNotesList && selectedTask[0]?.myReminderNotesList.length > 0" class="notes-container">
-        <h4>Reminder Notes</h4>
+        <div class="popup-header">
+          <h3> Reminder Notes </h3>
+        </div>
         <table>
           <thead>
             <tr>
