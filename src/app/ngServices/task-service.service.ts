@@ -15,6 +15,14 @@ export class TaskServiceService {
     const url = `${this.baseUrl}get_task-reminder_list?userId=${userId}`;  // Construct full URL
     return this.http.get<any>(url);
   }
+  getMyTasksAsSecondaryCaseOfficer(userId: number): Observable<any> { // Shadow Supervisor
+    const url = `${this.baseUrl}get_my_tasks_secondary_officer?userId=${userId}`;  // Construct full URL
+    return this.http.get<any>(url);
+  }
+  getMyTasksAssignedByUser(userId: number): Observable<any> { 
+    const url = `${this.baseUrl}get_tasks_assigned_by_user?userId=${userId}`;  // Construct full URL
+    return this.http.get<any>(url);
+  }
   saveReminderNote(note: any): Observable<any> {
     const url = `${this.baseUrl}insert_reminder_note`;
     return this.http.post<any>(url, note);
