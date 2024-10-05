@@ -1445,13 +1445,11 @@
             </div>
             <div class="input-field">
               <label for="lastModifiedBy"> Last Modified By </label>
-              <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
-                value="{{ islamicFinance?.IFinLastModifiedByName }}" />
+              <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text" [(ngModel)]="islamicFinance.IFinLastModifiedByName"/>
             </div>
             <div class="input-field">
               <label for="lastModificationDate"> Last Modified Date </label>
-              <input disabled name="lastModificationDate" id="lastModificationDate" type="text"
-                value="{{ islamicFinance?.LastModifiedDate }}" />
+              <input disabled name="lastModificationDate" id="lastModificationDate" type="text" [(ngModel)]="islamicFinance.LastModifiedDate"/>
             </div>
           </div>
         </div>
@@ -1520,15 +1518,14 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{{ ActivityAuth[0]?.PrudentialCategoryTypeDesc }}</td>
-                  <td>{{ ActivityAuth[0]?.AuthorisationCategoryTypeDesc }}</td>
-                  <td>{{ ActivityAuth[0]?.PrudentialCategoryEffectiveDate }}</td>
-                  <td></td>
-                  <!--Expiration Date does exist -->
-                  <td>{{ ActivityAuth[0]?.PrudentialModifiedByName }}</td>
+                <tr *ngFor="let prudDetail of prudentialCategoryDetails">
+                  <td>{{ prudDetail.PrudentialCategoryTypeDesc }}</td>
+                  <td>{{ prudDetail.AuthorisationCategoryTypeDesc }}</td>
+                  <td>{{ prudDetail.EffectiveDate }}</td>
+                  <td>{{ prudDetail.ExpirationDate }}</td>
+                  <td>{{ prudDetail.LastModifiedBy }}</td>
                   <td>
-                    {{ ActivityAuth[0]?.PrudentialCategoryLastModifiedDate }}
+                    {{ prudDetail.LastModifiedDate }}
                   </td>
                 </tr>
               </tbody>
@@ -1585,12 +1582,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{{ ActivityAuth[0]?.SectorTypeDesc }}</td>
-                  <td>{{ ActivityAuth[0]?.SectorEffectiveDate }}</td>
-                  <td></td>
-                  <td>{{ ActivityAuth[0]?.SectorModifiedByName }}</td>
-                  <td>{{ ActivityAuth[0]?.SectorLastModifiedDate }}</td>
+                <tr *ngFor="let sectorDetail of sectorDetails">
+                  <td>{{ sectorDetail.SectorTypeDesc }}</td>
+                  <td>{{ sectorDetail.EffectiveDate }}</td>
+                  <td>{{ sectorDetail.ExpirationDate }}</td>
+                  <td>{{ sectorDetail.LastModifiedBy }}</td>
+                  <td>{{ sectorDetail.LastModifiedDate }}</td>
                 </tr>
               </tbody>
             </table>
