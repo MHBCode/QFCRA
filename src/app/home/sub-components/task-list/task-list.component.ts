@@ -53,9 +53,8 @@ export class TaskListComponent implements OnInit {
   }
 
   loadTasksList(): void {
-    console.log('Starting task list load at: ', new Date());
     this.isLoading = true;
-    this.TaskService.getAssignedTaskReminders(30).subscribe(
+    this.TaskService.getAssignedTaskReminders(this.userId).subscribe(
       data => {
         this.Tasks = data.response;
         this.filteredTasks = [...this.Tasks];  // Initialize with all tasks

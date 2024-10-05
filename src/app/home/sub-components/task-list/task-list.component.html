@@ -10,7 +10,7 @@
       <table [ngClass]="isMainView ? 'task-table' : 'home-task-table'">
         <thead>
           <tr>
-            <th style="display: flex;justify-content: space-between;">
+            <th class="task-table-column">
               <div>
                 Task Type
                 <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleTaskDropdown()">&#x25BC;</i>
@@ -30,7 +30,7 @@
               </div>
             </th>
             <th *ngIf="isMainView">Action</th>
-            <th class="firmName-column">
+            <th class="task-table-column">
               <div>
                 Firm Name
                 <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleFirmDropdown()">&#x25BC;</i>
@@ -51,7 +51,7 @@
             </th>
             <th>Description</th>
             <th>
-              <div style="display: flex; justify-content: space-between;">
+              <div class="task-table-column">
                 <div>
                   Due Date
                   <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleDueDateInput()">&#x25BC;</i>
@@ -64,7 +64,7 @@
                   class="custom-date-input" />
               </div>
             </th>
-            <th style="display: flex;justify-content: center;">
+            <th class="task-table-column">
               <div>
                 Days Over Due
                 <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleDaysOverDueDropdown()">&#x25BC;</i>
@@ -147,7 +147,7 @@
     </div>
 
     <div class="popup-content">
-      <div class="view-auditor-inputs">
+      <div class="view-task-inputs">
         <div class="input-field">
           <label for="taskType">Task Type</label>
           <input disabled type="text" [value]="selectedTask[0]?.TaskType"/>

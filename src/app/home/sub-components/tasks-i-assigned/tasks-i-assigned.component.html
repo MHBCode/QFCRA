@@ -1,1 +1,227 @@
-<p>tasks-i-assigned works!</p>
+<div *ngIf="isLoading" class="loader-overlay">
+    <div class="loader"></div>
+  </div>
+  <div class="TaskList-wrapper listing-table">
+    <div class="table customTable">
+      <div class="table-responsive">
+        <table class="task-table">
+          <thead>
+            <tr>
+              <th class="task-table-column">
+                <div>
+                  Task Type
+                  <i class="dropdown-icon" (click)="toggleTaskDropdown()">&#x25BC;</i>
+                </div>
+                <i *ngIf="selectedTaskType !== ''" class="bi bi-funnel-fill"></i> <!-- Active filter icon -->
+                <div *ngIf="TaskDropdownVisible" class="custom-dropdown">
+                  <ul class="dropdown-list">
+                    <li class="dropdown-item" [class.active-filter]="selectedTaskType === ''"
+                      (click)="filterByTaskType('')">
+                      All Task Types
+                    </li>
+                    <li class="dropdown-item" *ngFor="let taskType of taskTypes"
+                      [class.active-filter]="selectedTaskType === taskType" (click)="filterByTaskType(taskType)">
+                      {{ taskType }}
+                    </li>
+                  </ul>
+                </div>
+              </th>
+              <th>Action</th>
+              <th class="task-table-column">
+                <div>
+                  Firm Name
+                  <i class="dropdown-icon" (click)="toggleFirmDropdown()">&#x25BC;</i>
+                </div>
+                <i *ngIf="selectedFirmName !== ''" class="bi bi-funnel-fill"></i> <!-- Active filter icon -->
+                <div *ngIf="FirmsDropdownVisible" class="custom-dropdown">
+                  <ul class="dropdown-list">
+                    <li class="dropdown-item" (click)="filterByFirmName('')"
+                      [class.active-filter]="selectedFirmName === ''">
+                      All Firms
+                    </li>
+                    <li class="dropdown-item" *ngFor="let firm of firmNames" (click)="filterByFirmName(firm)"
+                      [class.active-filter]="selectedFirmName === firm">
+                      {{ firm }}
+                    </li>
+                  </ul>
+                </div>
+              </th>
+              <th>Description</th>
+              <th>
+                <div class="task-table-column">
+                  <div>
+                    Due Date
+                    <i class="dropdown-icon" (click)="toggleDueDateInput()">&#x25BC;</i>
+                  </div>
+                  <i *ngIf="selectedDueDate !== ''" class="bi bi-funnel-fill"></i> <!-- Active filter icon -->
+                </div>
+                <div *ngIf="dueDateInputVisible" class="due-date-filter">
+                  <label for="dueDate" class="date-label">Select Due Date:</label>
+                  <input [value]="selectedDueDate" id="dueDate" type="date" (change)="filterByDueDate($event)"
+                    class="custom-date-input" />
+                </div>
+              </th>
+              <th class="task-table-column">
+                <div>
+                  Days Over Due
+                  <i class="dropdown-icon" (click)="toggleDaysOverDueDropdown()">&#x25BC;</i>
+                </div>
+                <!-- Show active filter icon when Days Over Due filter is selected -->
+                <i *ngIf="selectedDaysOverDue !== ''" class="bi bi-funnel-fill"></i>
+                <div *ngIf="daysOverDueDropdownVisible" class="custom-dropdown">
+                  <ul class="dropdown-list">
+                    <li class="dropdown-item" (click)="filterByDaysOverDue('')"
+                      [class.active-filter]="selectedDaysOverDue === ''">
+                      All
+                    </li>
+                    <li class="dropdown-item" (click)="filterByDaysOverDue('>10')"
+                      [class.active-filter]="selectedDaysOverDue === '>10'">
+                      &gt; 10
+                    </li>
+                    <li class="dropdown-item" (click)="filterByDaysOverDue('>20')"
+                      [class.active-filter]="selectedDaysOverDue === '>20'">
+                      &gt; 20
+                    </li>
+                    <li class="dropdown-item" (click)="filterByDaysOverDue('>30')"
+                      [class.active-filter]="selectedDaysOverDue === '>30'">
+                      &gt; 30
+                    </li>
+                    <li class="dropdown-item" (click)="filterByDaysOverDue('>40')"
+                      [class.active-filter]="selectedDaysOverDue === '>40'">
+                      &gt; 40
+                    </li>
+                  </ul>
+                </div>
+              </th>
+              <th>Notes</th>
+              <th class="task-table-column">
+                <div>
+                  Task Assigned To
+                  <i class="dropdown-icon" (click)="toggleUsersAssignedToDropdown()">&#x25BC;</i>
+                </div>
+                <i *ngIf="selectedUsersAssignedTo !== ''" class="bi bi-funnel-fill"></i> <!-- Active filter icon -->
+                <div *ngIf="UsersAssignedToDropdownVisible" class="custom-dropdown">
+                  <ul class="dropdown-list">
+                    <li class="dropdown-item" (click)="filterByTasksAssignedToUser('')"
+                      [class.active-filter]="selectedUsersAssignedTo === ''">
+                      All
+                    </li>
+                    <li class="dropdown-item" *ngFor="let user of usersAssignedTaskTo" (click)="filterByTasksAssignedToUser(user)"
+                      [class.active-filter]="selectedUsersAssignedTo === user">
+                      {{ user }}
+                    </li>
+                  </ul>
+                </div>
+              </th>
+            </tr>
+          </thead>
+  
+          <tbody>
+            <tr *ngFor="let item of paginatedTasks" (click)="toggleTaskPopup(item)">
+              <td>{{ item.TaskType }}</td>
+              <td style="text-align: center;">
+                <a [href]="item.Link" target="_blank" style="text-decoration: none;">View</a>
+              </td>
+              <td>{{item.FirmName}}</td>
+              <td>{{item.ShortDescription}}</td>
+              <td>{{item.TaskDueDate}}</td>
+              <td>{{ item.DaysOverDue > 0 ? item.DaysOverDue : '' }}</td>
+              <td>{{item.Comments}}</td>
+              <td>{{item.TaskAssignedToUserName}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button (click)="previousPage()" [disabled]="currentPage === 1">
+          <span>&lt;</span>
+        </button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+          <span>&gt;</span>
+        </button>
+        <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- view task popup -->
+  <div class="popup-overlay" *ngIf="!isLoading && showTaskPopup">
+    <div class="popup-container" (click)="$event.stopPropagation()">
+      <div class="popup-header">
+        <h3>Task / Reminder Details</h3>
+        <i class="bi bi-x-circle close-icon" (click)="closeTaskPopup()"></i>
+      </div>
+  
+      <div class="popup-content">
+        <div class="view-task-inputs">
+          <div class="input-field">
+            <label for="taskType">Task Type</label>
+            <input disabled type="text" [value]="selectedTask[0]?.TaskType"/>
+          </div>
+  
+          <div class="input-field">
+            <label for="dueDate">Due Date</label>
+            <input disabled type="text" [value]="selectedTask[0]?.TaskDueDate"/>
+          </div>
+  
+          <div class="input-field">
+            <label for="firmName">Firm Name</label>
+            <input disabled type="text" [value]="selectedTask[0]?.FirmName"/>
+          </div>
+  
+          <div class="input-field">
+            <label for="daysOverDue">Number of days overdue</label>
+            <input disabled type="text" [value]="selectedTask[0]?.DaysOverDue"/>
+          </div>
+  
+          <div class="input-field short-description">
+            <label for="shortDesc">Short Description</label>
+            <input disabled type="text" [value]="selectedTask[0]?.ShortDescription"/>
+          </div>
+  
+          <div class="input-field app-description">
+            <label for="appDesc">Description</label>
+            <div class="appDesc" [innerHTML]="safeHtmlDescription"></div>
+          </div>
+        </div>
+  
+        <!-- Display reminder notes -->
+        <div *ngIf="selectedTask[0]?.myReminderNotesList && selectedTask[0]?.myReminderNotesList.length > 0" class="notes-container">
+          <h4>Reminder Notes</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>By</th>
+                <th>On</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let note of selectedTask[0]?.myReminderNotesList">
+                <td>{{ note.createdByName }}</td>
+                <td>{{ note.createdDate }}</td>
+                <td>{{ note.notes }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+  
+        <!-- Add New Note -->
+        <div class="input-field note-textarea-container">
+          <textarea [(ngModel)]="noteText" class="note-textarea" placeholder="Write your note here..."></textarea>
+        </div>
+  
+        <!-- Save Note Button -->
+        <div class="save-note">
+          <button type="button" (click)="saveNote()">Save Note</button>
+        </div>
+      </div>
+    </div>
+  
+  
+    <!-- <td>
+        <div class="expandable-text-container">
+           <span class="expandable-text">{{ item.TaskType }}</span>
+        </div>
+       </td> don't delete-->

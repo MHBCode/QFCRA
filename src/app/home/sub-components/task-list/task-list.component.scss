@@ -76,7 +76,7 @@ td {
   cursor: pointer;
 }
 
-.task-table .firmName-column {
+.task-table .task-table-column {
   display: flex;
   justify-content: space-between;
 }
@@ -387,7 +387,7 @@ tr:hover {
 }
 
 /* Content Style */
-.view-auditor-inputs {
+.view-task-inputs {
   padding: 0.5rem;
   display: flex;
   flex-direction: row;
@@ -478,7 +478,7 @@ tr:hover {
     /* Ensure text fields and textareas take up full width */
   }
 
-  .view-auditor-inputs {
+  .view-task-inputs {
     flex-direction: column;
     /* Stack input fields vertically */
   }
