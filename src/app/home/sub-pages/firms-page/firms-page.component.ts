@@ -189,7 +189,7 @@ export class FirmsPageComponent implements OnInit {
   filteredFirmsdata: any = [];
   showPopup: boolean = false;
   isSortDropdownOpen: boolean = false;
-  selectedSortOption: string = 'AtoZ'; // Default sort option
+  selectedSortOption: string = 'newFirms'; // Default sort option
 
   private unlistenDocumentClick: () => void;
 
@@ -263,7 +263,7 @@ export class FirmsPageComponent implements OnInit {
     this.firmService.getAssignedFirms(30).subscribe(
       data => {
         if (data && data.response) {
-          
+          this.isLoading = true;
           this.firms = data.response;
           this.filteredFirms = [...this.firms];
 
@@ -456,7 +456,7 @@ export class FirmsPageComponent implements OnInit {
     this.setDefaultFilters();
     this.filteredFirms = [...this.firms];
     // Apply sorting after reset
-    this.sortFirms('AtoZ');
+    this.sortFirms('newFirms');
   }
 
   // Set default filter values

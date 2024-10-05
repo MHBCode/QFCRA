@@ -224,15 +224,7 @@ tr:nth-child(even) {
     justify-content: space-between;
     flex-wrap: wrap;
 }
-.input-field{
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    justify-content: center;
-    align-items: flex-start;
-    width: 49%;
-    padding: 0.5rem 0;
-}
+
 .input-field select{
     width: 100%;
     padding: 0.5rem 2%;
@@ -240,20 +232,8 @@ tr:nth-child(even) {
     border: 0.72px #B1B1B1 solid;
     background: white;
 }
-.input-field input{
-    width: 96%;
-    padding: 0.5rem 2%;
-    border-radius: 7.20px; 
-    border: 0.72px #B1B1B1 solid;
-}
-.input-field textarea{
-    width: 96%;
-    height: 150px;
-    padding: 0.5rem 2%;
-    border-radius: 7.20px; 
-    border: 0.72px #B1B1B1 solid;
-    resize: vertical;
-}
+
+
 .radio-wrapper{
     display: flex;
     flex-direction: row;

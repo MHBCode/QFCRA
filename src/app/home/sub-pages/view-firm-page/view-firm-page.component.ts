@@ -69,10 +69,10 @@ export class ViewFirmPageComponent implements OnInit {
   callLicScopePrev: boolean = false;
   callAuthScopePrev: boolean = false;
   menuId: Number = 0;
-  menuWidth: string = '2%';
+  menuWidth: string = '6%';
   dataWidth: string = '98%';
-  width1: string = '15%';
-  width2: string = '2%';
+  width1: string = '14%';
+  width2: string = '6%';
   widthData1: string = '98%';
   widthData2: string = '85%';
   firmId: number = 0;  // Add firmId property

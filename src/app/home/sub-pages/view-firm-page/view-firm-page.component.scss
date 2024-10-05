@@ -1,25 +1,20 @@
-.loader-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  // background: rgba(255, 255, 255, 0.8);
+.history-row {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+  justify-content: space-between;
+  width: 100%;
 }
 
-.loader {
-  border: 8px solid #f3f3f3;
-  /* Light grey */
-  border-top: 8px solid #a00202;
-  /* Blue */
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
+.popup-operations-place {
+  width: 100%;
+  text-align: end;
+
+  .subbutton {
+    padding: 10px;
+  }
+}
+
+#websiteLink {
+  color: #a41e36;
 }
 
 @keyframes spin {
@@ -32,19 +27,10 @@
   }
 }
 
-.page {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin: 1rem;
-  gap: 1%;
-}
-
 .menu {
   width: 20%;
   background: white;
-  padding: 20px;
+  padding: 20px 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 15px;
   display: flex;
@@ -52,6 +38,12 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
+}
+
+.menu[style="width: 6%;"],
+.menu[style="width: 6%;"] .menu-item {
+  justify-content: center !important;
+  align-items: center;
 }
 
 .menu-item {
@@ -91,8 +83,9 @@
   font-weight: 500;
   line-height: 27px;
   word-wrap: break-word;
-  width: 98%;
-  padding: 2%;
+  width: 100%;
+  padding: 2% 10px;
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -206,15 +199,8 @@ td {
   text-align: left;
   /* Left-align text */
   vertical-align: middle;
-  /* Vertically center the content */
-  cursor: pointer;
 }
 
-/* Table row hover effect */
-tr:hover {
-  background-color: #e0dbdb;
-  /* Light grey background on hover */
-}
 
 /* Alternating row colors */
 tr:nth-child(even) {
@@ -264,14 +250,6 @@ table-responsive {
 }
 
 ////////////////////////////////////
-.brid-crump {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  padding-bottom: 0;
-}
 
 .btn {
   display: flex;
@@ -289,7 +267,7 @@ table-responsive {
   border: none;
   border-radius: 10px;
   color: white;
-  min-width: 6rem;
+  min-width: 6.5rem;
   min-height: 40px;
 }
 
@@ -297,39 +275,11 @@ table-responsive {
   margin: 0 2px;
 }
 
-/*Added*/
-.edit-firm-section {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: flex-start;
-  gap: 2rem;
-  width: 80%;
-}
 
 .text span {
   color: rgb(153, 152, 152);
 }
 
-.inputs-field-set {
-  width: 100%;
-  background: #f1ebec;
-  border-radius: 15px;
-  min-height: 200px;
-  transition: max-height 0.5s ease-out;
-  overflow: hidden;
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-}
-
-.edit-firm-actions {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin: 10px 10px;
-  padding-bottom: 0;
-}
 
 .edit-btn button i {
   margin: 0 2px;
@@ -364,65 +314,18 @@ table-responsive {
   word-wrap: break-word;
 }
 
-.edit-firms-inputs {
-  padding: 1rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-
-
-.edit-firms-inputs table th,
-.edit-firms-inputs table td {
+.inputs-row table th,
+.inputs-row table td {
   text-align: center;
 }
 
-.input-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  justify-content: center;
-  align-items: flex-start;
-  width: 49%;
-  padding: 0.5rem 0;
-}
-
-.input-field input,
-.input-field select {
-  width: 100%;
-  padding: 0.5rem 2%;
-  border-radius: 7.2px;
-  border: 0.72px #b1b1b1 solid;
-}
 
 .input-field div a {
   font-size: 14px;
 }
 
-.input-field input {
-  width: 96%;
-}
-
-.input-field select {
-  background-color: transparent;
-}
-
 .select-background-edited {
   background-color: white !important;
-}
-
-
-.input-field textarea {
-  width: 96%;
-  height: 100px;
-  padding: 0.5rem 2%;
-  border-radius: 7.2px;
-  border: 0.72px #b1b1b1 solid;
-  resize: vertical;
-  min-height: 20px;
-  max-height: 100px;
 }
 
 .radio-wrapper {
@@ -720,14 +623,14 @@ table-responsive {
 .ScopeLicPreviousVersionsPopup,
 .ScopeAuthPreviousVersionsPopup {
   position: fixed;
-  top: 25vh;
-  left: 20vw;
-  width: 60vw;
-  height: 50vh;
-  overflow-y: scroll;
+  top: 15vh;
+  left: 8vw;
+  width: 78vw;
+  max-height: 70vh;
+  overflow-y: auto;
   overflow-x: hidden;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-  padding: 2rem;
+  padding: 1rem;
   background: white;
   align-items: center;
   justify-content: start;
@@ -735,6 +638,16 @@ table-responsive {
   gap: 2rem;
   display: none;
   z-index: 100;
+
+  table {
+    tbody {
+      tr {
+        td {
+          cursor: default;
+        }
+      }
+    }
+  }
 }
 
 .popup-wrapper table,
@@ -772,7 +685,7 @@ table-responsive {
 }
 
 .popup-info-place {
-  width: 95%;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -785,10 +698,7 @@ table-responsive {
   color: #a51e36;
 }
 
-.popup-operations-place {
-  width: 50%;
-  text-align: center;
-}
+
 
 .subbutton {
   padding: 0.1rem 1rem;
@@ -819,10 +729,6 @@ table-responsive {
   align-items: center;
 }
 
-.addressHistoryPopup table tr td,
-.addressHistoryPopup table tr th {
-  cursor: default;
-}
 
 .addressHistoryPopup table tr td {
   text-align: left;
@@ -1082,15 +988,15 @@ table .input-field {
 }
 
 /* Comments Section in Core */
-.comments .edit-firms-inputs {
+.comments .inputs-row {
   flex-direction: column;
 }
 
-.comments .edit-firms-inputs .input-field {
+.comments .inputs-row .input-field {
   width: 100%;
 }
 
-.comments .edit-firms-inputs .input-field .text-container {
+.comments .inputs-row .input-field .text-container {
   max-width: 400px;
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -1099,6 +1005,10 @@ table .input-field {
 
 .notes {
   width: 100% !important;
+}
+
+.menu-container.tab-container li a i {
+  margin-inline-end: 5px;
 }
 
 /* collapse section */
@@ -1122,7 +1032,7 @@ table .input-field {
   min-height: 50px;
 }
 
-.inputs-field-set.collapsed .edit-firms-inputs,
+.inputs-field-set.collapsed .inputs-row,
 .inputs-field-set.collapsed hr,
 .inputs-field-set.collapsed .regulated-activities-container,
 .inputs-field-set.collapsed .file-container,
@@ -1223,7 +1133,7 @@ hr {
 .close-icon {
   position: absolute;
   right: 1rem;
-  top: 2rem;
+  top: 1rem;
   font-size: 26px;
   cursor: pointer;
   color: #a51e36;
@@ -1271,15 +1181,23 @@ hr {
 .btns-container {
   display: flex;
   gap: 1%;
+  width: 100%;
 }
 
 .btns-container button {
-  padding: 2px 0px;
+  padding: 7px 20px;
   background-color: #a51e36;
   color: white;
   border-radius: 10px;
   border: 0;
   font-size: 1em;
+}
+
+.upload-document-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
 }
 
 #fileInput {
@@ -1328,7 +1246,6 @@ hr {
   font-size: 15px;
   padding: 5px 10px;
   border-radius: 7px;
-  margin-right: 10px;
 }
 
 .add-address-container {
@@ -1377,7 +1294,7 @@ hr {
   border: 1px solid red;
 }
 
-.error-messages {
+.error-messages p {
   margin-left: 15px;
   margin-top: 10px;
 }
@@ -1478,4 +1395,86 @@ hr {
 .nav li a:hover {
   background-color: #e2e8f0;
   color: #333;
+}
+
+
+//controllers popup 
+.contollerPopupOverlay {
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  padding-top: 5vh;
+}
+
+.contollerPopupContent {
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 10px;
+  width: 78vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 0 10px rgba(146, 146, 146, 0.1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+
+  .popup-header h3 {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #a51e36;
+    width: 95%;
+  }
+
+  .inputs-row {
+    padding: 0px;
+  }
+
+  .input-field {
+    width: 31%;
+
+    & input,
+    & select {
+
+      &:disabled,
+      &[readonly] {
+        color: rgb(170, 170, 170);
+        background-color: transparent;
+        width: 100%;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #c2c2c2;
+        background-color: #fffafa;
+      }
+    }
+  }
+
+  .addresses {
+    margin: 10px 0px;
+  }
+
+  .popup-title-btn-row {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #a51e36;
+    margin-bottom: 15px;
+
+
+    .popup-header {
+      width: 50%;
+    }
+
+    h3 {
+      border-bottom: 0px !important;
+    }
+  }
 }

@@ -33,21 +33,8 @@
     justify-content: space-between;
     flex-wrap: wrap;
 }
-.input-field{
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    justify-content: center;
-    align-items: flex-start;
-    width: 49%;
-    padding: 0.5rem 0;
-}
-.input-field input{
-    width: 96%;
-    padding: 0.5rem 2%;
-    border-radius: 7.20px; 
-    border: 0.72px #B1B1B1 solid;
-}
+
+
 
 .title {
     color: #A51E36;
