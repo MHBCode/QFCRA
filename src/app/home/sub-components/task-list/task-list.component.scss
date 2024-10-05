@@ -376,7 +376,7 @@ tr:hover {
 .close-icon {
   position: absolute;
   right: 1rem;
-  top: 2rem;
+  top: 1rem;
   font-size: 26px;
   cursor: pointer;
   color: #a51e36;
@@ -394,22 +394,6 @@ tr:hover {
   justify-content: space-between;
   flex-wrap: wrap;
 }
-
-.input-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  justify-content: center;
-  align-items: flex-start;
-  width: 49%;
-  padding: 0.5rem 0;
-}
-
-
-
-
-
-
 
 .app-description {
   width: 100%;
