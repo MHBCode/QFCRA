@@ -2,6 +2,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { TaskServiceService } from 'src/app/ngServices/task-service.service';
+import * as constants from 'src/app/app-constants';
+import { FirmService } from 'src/app/ngServices/firm.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-task-list',
@@ -40,9 +43,13 @@ export class TaskListComponent implements OnInit {
   safeHtmlDescription: SafeHtml = ''; // for html tags
   noteText: string = '';
 
+  hasValidationErrors: boolean = false;
+  /* error messages */
+  errorMessages: { [key: string]: string } = {};
   
   constructor(
     private TaskService: TaskServiceService,
+    private firmService: FirmService,
     private router: Router,
     private sanitizer: DomSanitizer,
   ) { }
@@ -109,6 +116,7 @@ export class TaskListComponent implements OnInit {
 
   closeTaskPopup() {
     this.showTaskPopup = false;
+    this.errorMessages = {};
   }
 
   // Get unique task types from the task list
@@ -139,6 +147,22 @@ export class TaskListComponent implements OnInit {
   saveNote() {
     this.isLoading = true;
     const note = this.prepareNoteObject();
+
+    this.hasValidationErrors = false;
+
+    if (this.noteText === null || this.noteText === '') {
+      this.getErrorMessages('note');
+      this.hasValidationErrors = true;
+      this.isLoading = false;
+    } else {
+      delete this.errorMessages['note'];
+    }
+
+    // Step 2: Handle Validation Errors
+    if (this.hasValidationErrors) {
+      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      return; // Prevent further action if validation fails
+    }
   
     // Start the note save and task reload in parallel
     const saveNotePromise = this.TaskService.saveReminderNote(note).toPromise();
@@ -302,5 +326,22 @@ export class TaskListComponent implements OnInit {
 
     // Return the date in 'YYYY-MM-DD' format
     return `${year}-${monthNumber}-${day.padStart(2, '0')}`;
+  }
+  getErrorMessages(fieldName: string) {
+        let errorMessage = 'Please Enter the Note';
+        this.errorMessages[fieldName] = errorMessage;
+  }
+
+  showErrorAlert(messageKey: number) {
+    this.firmService.errorMessages(messageKey).subscribe(
+      (response) => {
+        Swal.fire({
+          title: 'Alert!',
+          text: response.response,
+          icon: 'error',
+          confirmButtonText: 'Ok',
+        });
+      },
+    );
   }
 }

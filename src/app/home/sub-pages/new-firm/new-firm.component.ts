@@ -173,7 +173,7 @@ export class NewFirmComponent implements OnInit {
     if (this.FirmDetails.QFCNum) {
       this.FirmDetails.QFCNum = this.padNumber(this.FirmDetails.QFCNum);
     }
-    0
+    
     if (this.selectedFirmTypeID === 2 && this.applicationDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Licensed) {
       if (this.FirmDetails.QFCNum == null || this.FirmDetails.QFCNum === '') {
         this.getErrorMessages('QFCNum', constants.Firm_CoreDetails_Messages.ENTER_QFCNUMBER);

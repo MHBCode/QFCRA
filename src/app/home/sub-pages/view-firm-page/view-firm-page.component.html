@@ -985,7 +985,7 @@
               <button (click)="varyLicenseScope()">Vary Scope</button>
             </div>
           </div>
-          <div *ngIf="!isEditModeLicense && ActivityLicensed[0].ScopeRevNum > 1" class="view-prev-version-container">
+          <div *ngIf="!isEditModeLicense && ActivityLicensed[0].ScopeRevNum >= 1" class="view-prev-version-container">
             <a class="view-prev-version" (click)="getLicScopePreviousVersions(firmId,2)">View Previous
               Version</a>
           </div>
@@ -1211,7 +1211,7 @@
               <button>Vary Scope</button>
             </div>
           </div>
-          <div *ngIf="!isEditModeAuth && ActivityAuth[0].ScopeRevNum > 1" class="view-prev-version-container">
+          <div *ngIf="!isEditModeAuth && ActivityAuth[0].ScopeRevNum >= 1" class="view-prev-version-container">
             <a class="view-prev-version" (click)="getAuthScopePreviousVersions(firmId,3)">View Previous
               Version</a>
           </div>
@@ -1379,7 +1379,7 @@
                   <p>Conditions and Restrictions</p>
                 </div>
 
-                <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0">
+                <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0 || (isEditModeAuth)">
                   <strong>{{ActivityAuth[0].ObjectFirmScopeCondition[0].scopeConditionTypeDesc}}: </strong> &nbsp;
                   <span *ngIf="!isEditModeAuth">Yes</span>
                   <input *ngIf="isEditModeAuth" [(ngModel)]="isScopeConditionChecked" type="checkbox"
@@ -1399,11 +1399,7 @@
         </div>
 
         <!-- Islamic Finance-->
-        <div class="inputs-field-set" *ngIf="
-            (firmDetails?.AuthorisationStatusTypeID > 0 &&
-              islamicFinance?.IFinTypeId) ||
-            isEditModeAuth
-          " [ngClass]="{ collapsed: isCollapsed['islamicFinanceSection'] }">
+        <div class="inputs-field-set" *ngIf="(isEditModeAuth) || (!isEditModeAuth && islamicFinance?.IFinTypeId > 0 && !isIslamicFinanceDeleted)" [ngClass]="{ collapsed: isCollapsed['islamicFinanceSection'] }">
           <div class="form-section-title collapse-container">
             <h2 class="edit-firm-header">Islamic Finance</h2>
             <button class="collapse-button" (click)="toggleCollapse('islamicFinanceSection')">
@@ -1421,7 +1417,7 @@
               <div style="display: flex; gap: 15px">
                 <label for="isIslamicFinanceExist"> Islamic Finance </label>
                 <input style="width: 15px" type="checkbox" name="isIslamicFinanceExist" id="isIslamicFinanceExist"
-                  [checked]="islamicFinance?.IFinTypeId ? true : false" [(ngModel)]="isIslamicFinanceChecked" />
+                  [checked]="islamicFinance?.IFinTypeId > 0 ? true : false" [(ngModel)]="isIslamicFinanceChecked" />
               </div>
             </div>
             <div class="input-field">

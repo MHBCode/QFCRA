@@ -440,6 +440,17 @@ tr:hover {
   border-radius: 10px;
 }
 
+ /* errors */
+ .error-border {
+  border-color: red !important;
+  outline: 0;
+}
+
+.error-messages {
+  margin-left: 15px;
+  margin-top: 10px;
+}
+
 /* */
 
 @media (max-width: 768px) {
