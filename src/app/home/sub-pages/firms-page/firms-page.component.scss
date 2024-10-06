@@ -31,6 +31,8 @@
   flex-direction: column;
   transition: all 0.3s ease-in-out;
   /* Smooth transition for appearance */
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 /* Popup Header */
@@ -65,7 +67,7 @@
 .popup-content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.5rem;
 }
 
 /* Search Form Styling */
@@ -79,7 +81,6 @@
   flex: 1 1 45%;
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px;
 }
 
 .input-field label {
