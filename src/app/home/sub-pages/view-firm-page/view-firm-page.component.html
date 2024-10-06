@@ -1603,7 +1603,7 @@
     <div class="inputs-field-set">
       <div class="section">
         <div class="form-section-title">
-          <h2>Controllers For {{ firmDetails?.FirmName }}</h2>
+          <h2 class="edit-firm-header">Controllers > <span>{{ firmDetails?.FirmName }}</span></h2>
           <div class="btn">
             <button (click)="createController()">
               <i class="bi bi-pen"></i>
@@ -2302,7 +2302,7 @@
     <div class="inputs-field-set">
       <div class="section">
         <div class="auditor-header">
-          <h2>Auditors For {{ firmDetails?.FirmName }}</h2>
+          <h2 class="edit-firm-header">Auditors > <span>{{ firmDetails?.FirmName }}</span></h2>
           <div class="btn">
             <button (click)="createAuditor()">
               <i class="bi bi-plus"></i>
@@ -2476,7 +2476,7 @@
     <div class="inputs-field-set">
       <div class="section">
         <div class="contacts-header">
-          <h2>Contacts For {{ firmDetails?.FirmName }}</h2>
+          <h2 class="edit-firm-header">Contacts > <span>{{ firmDetails?.FirmName }}</span></h2>
           <div class="btn">
             <button (click)="createContact()">
               <i class="bi bi-pen"></i>

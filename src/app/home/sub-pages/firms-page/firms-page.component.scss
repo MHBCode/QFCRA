@@ -202,11 +202,14 @@
   display: flex;
   justify-content: space-between;
   padding: 15px 0px;
+  align-items: flex-start;
 }
 
 
 .buttons-section {
   display: inline-flex;
+  align-items: flex-start;
+  gap: 4px;
 }
 
 
@@ -218,17 +221,21 @@
   color: #ffffff;
   /* White text color */
   border: none;
-  padding: 12px 24px;
+  padding: 5px 7px;
   border-radius: 8px;
   font-size: 1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 5px;
   transition: background-color 0.3s ease;
-  margin: 5px;
 
-  .bi.bi-caret-down-fill {
+  i {
+    font-size: 13px;
+    margin-inline-end: 4px;
+  }
+
+  .bi.bi-caret-down-fill,
+  .bi.bi-funnel-fill {
     font-size: 10px;
   }
 }

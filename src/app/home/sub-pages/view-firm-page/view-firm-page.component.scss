@@ -156,71 +156,6 @@
   margin: 0 0 10px;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  background-color: white;
-  /* Ensure the background is white */
-  border-radius: 15px;
-  /* Rounded corners */
-  box-shadow: 8px 8px 43px rgba(8, 50, 79, 0.1);
-  /* Soft shadow for the table */
-  overflow: hidden;
-  /* Clip the corners of the table */
-}
-
-/* Table header styling */
-th {
-  background-color: rgba(253, 216, 216, 0.24);
-  /* Light pink background for headers */
-  border-bottom: 2px solid #a51e36;
-  /* Darker border under headers */
-  font-size: 0.85em;
-  /* Slightly smaller font size */
-  font-weight: bold;
-  padding: 10px;
-  /* Padding for better spacing */
-  text-align: left;
-  border-right: 1px solid #ddd;
-  /* Border between columns */
-}
-
-/* Table body styling */
-td {
-  padding: 10px;
-  /* Padding for cells */
-  color: #333333;
-  /* Dark grey text */
-  font-size: 0.85em;
-  /* Matching font size */
-  border-right: 1px solid #ddd;
-  /* Border between columns */
-  text-align: left;
-  /* Left-align text */
-  vertical-align: middle;
-}
-
-
-/* Alternating row colors */
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-  /* Light grey for even rows */
-}
-
-/* Specific column alignment */
-th,
-td {
-  text-align: left;
-  /* Ensure all text aligns left */
-}
-
-/* Table responsiveness */
-table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
 
 .enhanced-checkbox {
   display: flex;
@@ -365,11 +300,6 @@ table-responsive {
 .subTitle-firmDetails {
   width: 100%;
   color: red;
-}
-
-.inputs-field-set .section table tr th,
-.inputs-field-set .section table tr td {
-  text-align: left;
 }
 
 .auditor-header,

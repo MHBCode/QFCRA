@@ -6,19 +6,6 @@
   width: 100%;
 }
 
-.table {
-  display: flex;
-  flex-direction: column;
-  padding: 5px;
-  background: white;
-  border-radius: 15px;
-  width: 100%;
-  height: 100%;
-  box-shadow: 8px 8px 43px rgba(8, 50, 79, 0.1);
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
 .tableTitle {
   display: flex;
   width: 100%;
@@ -41,58 +28,6 @@
   color: #a51e36;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-radius: 7px;
-  overflow: hidden;
-}
-
-thead {
-  background-color: rgba(253, 216, 216, 0.24);
-  border-bottom: 2px solid #a51e36;
-}
-
-thead th {
-  white-space: nowrap;
-}
-
-th {
-  color: #7e0000;
-  font-size: 0.75em;
-  font-weight: bold;
-  padding: 10px;
-  text-align: left;
-  border-right: 1px solid #ddd;
-}
-
-td {
-  color: #333333;
-  font-size: 0.75em;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  padding: 5px;
-  border-right: 1px solid #ddd;
-  cursor: pointer;
-}
-
-.task-table .task-table-column {
-  display: flex;
-  justify-content: space-between;
-}
-
-tbody {
-  background-color: #ffecf0;
-}
-
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-tr:hover {
-  background-color: #e0e0e0;
-}
-
 .table-responsive {
   width: 100%;
   overflow-x: hidden;
@@ -100,12 +35,6 @@ tr:hover {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
-.table-responsive table {
-  width: 100%;
-}
-
-
 
 .pagination {
   display: flex;
@@ -364,11 +293,13 @@ tr:hover {
 
 .popup-header h3 {
   color: #a51e36;
-  font-size: 1.5em;
+  font-size: 1.2rem;
   margin: 0;
   font-weight: 600;
 }
-
+th.task-table-column {
+    position: relative;
+}
 .close-icon {
   position: absolute;
   right: 1rem;
