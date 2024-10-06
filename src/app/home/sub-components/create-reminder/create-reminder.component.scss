@@ -7,3 +7,14 @@
         padding: 0.5rem 1rem;
     }
 }
+
+/* errors */
+.error-border {
+    border-color: red !important;
+    outline: 0;
+}
+
+.error-messages {
+    margin-left: 15px;
+    margin-top: 10px;
+}
