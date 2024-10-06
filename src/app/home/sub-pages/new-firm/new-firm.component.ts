@@ -408,6 +408,7 @@ export class NewFirmComponent implements OnInit {
     // this.FirmDetails = {};
     this.errorMessages = {}
     this.resetCollapsibleSections();
+    this.router.navigate(['/home/firms-page']);
   }
 
   // Function to reset the collapsible sections
