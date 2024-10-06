@@ -1395,15 +1395,7 @@ hr {
   flex-wrap: wrap;
   position: relative;
 }
-.input-field{
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  justify-content: center;
-  align-items: flex-start;
-  width: 49%;
-  padding: 0.5rem 0;
-}
+
 .input-field select{
   width: 100%;
   outline: none;

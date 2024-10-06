@@ -70,7 +70,7 @@ export class ViewFirmPageComponent implements OnInit {
   callAuthScopePrev: boolean = false;
   menuId: Number = 0;
   menuWidth: string = '6%';
-  dataWidth: string = '98%';
+  dataWidth: string = '93%';
   width1: string = '14%';
   width2: string = '6%';
   widthData1: string = '98%';
