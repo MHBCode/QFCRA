@@ -126,16 +126,16 @@
 
         <tbody>
           <tr *ngFor="let item of paginatedTasks" (click)="toggleTaskPopup(item)">
-            <td>{{ item.TaskType }}</td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{ item.TaskType }}</td>
             <td style="text-align: center;">
               <a [href]="item.Link" target="_blank" style="text-decoration: none;">View</a>
             </td>
-            <td>{{item.FirmName}}</td>
-            <td>{{item.ShortDescription}}</td>
-            <td>{{item.TaskDueDate}}</td>
-            <td>{{ item.DaysOverDue > 0 ? item.DaysOverDue : '' }}</td>
-            <td>{{item.Comments}}</td>
-            <td>{{item.TaskAssignedToUserName}}</td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.FirmName}}</td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.ShortDescription}}</td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.TaskDueDate}}</td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{ item.DaysOverDue > 0 ? item.DaysOverDue : '' }}</td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.Comments}}</td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.TaskAssignedToUserName}}</td>
           </tr>
         </tbody>
       </table>
@@ -220,7 +220,7 @@
       <div class="error-messages" style="color: red">
         <p *ngIf="errorMessages['note']">{{ errorMessages['note'] }}</p>
       </div>
-      
+
       <!-- Add New Note -->
       <div class="input-field note-textarea-container">
         <textarea [(ngModel)]="noteText" [ngClass]="{
