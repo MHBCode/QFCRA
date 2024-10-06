@@ -339,7 +339,7 @@ export class FirmsPageComponent implements OnInit {
       CSVFirmTypes: this.getFirmTypesCSV(),
       CSVFirmStatus: this.getFirmStatusCSV(),
       CSVSupCategories:0, 
-      startChar: this.startCharLatter || 0,
+      startChar: this.startCharLatter || '',
     };
 
     console.log('Filter Data:', filterData); 
@@ -348,7 +348,7 @@ export class FirmsPageComponent implements OnInit {
   startCharLatter : string;
   getstartChar(letter: string): string {
 
-    this.startCharLatter = letter === '#' ? '0' : letter; 
+    this.startCharLatter = letter === '#' ? '' : letter; 
     return this.startCharLatter; 
   }
  
@@ -469,6 +469,7 @@ export class FirmsPageComponent implements OnInit {
     this.firmStatus = true;
     this.prudentialCategory = true;
     this.sectors = true;
+    this.getstartChar("#");
     this.checkboxes = {
       authorized: false,
       dnfbp: false,
@@ -492,6 +493,7 @@ export class FirmsPageComponent implements OnInit {
       bank: false,
       advisor: false,
       repOffice: false,
+
     };
   }
  //////////// End Filter Area
