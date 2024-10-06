@@ -297,7 +297,9 @@
   margin: 0;
   font-weight: 600;
 }
-
+th.task-table-column {
+    position: relative;
+}
 .close-icon {
   position: absolute;
   right: 1rem;
