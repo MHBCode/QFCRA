@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, QueryList, Ren
 import { Router, ActivatedRoute } from '@angular/router';  // Import ActivatedRoute
 import { FirmService } from 'src/app/ngServices/firm.service';  // Import FirmService
 import flatpickr from 'flatpickr';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
@@ -133,7 +133,8 @@ export class ViewFirmPageComponent implements OnInit {
   isEditModeLicense: boolean = false;
   isEditModeAuth: boolean = false;
   showPermittedActivitiesTable: string | boolean = false;
-  isIslamicFinanceChecked: boolean;
+  isIslamicFinanceChecked: boolean = true;
+  isIslamicFinanceDeleted: boolean = false;
   disableApplicationDate: boolean = true;
   showVaryBtn: boolean = true;
   resetFirmSector: boolean = false;
@@ -290,6 +291,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.getcountries();
       this.getFirmAuditorName();
       this.getFirmAuditorType();
+
     });
   }
 
@@ -1337,6 +1339,11 @@ export class ViewFirmPageComponent implements OnInit {
         }
       });
       this.loadAllProductsForEditMode();
+      if (this.islamicFinance?.IFinTypeId > 0 && this.islamicFinance) {
+        this.isIslamicFinanceChecked = true;  // Check the box
+      } else {
+        this.isIslamicFinanceChecked = false; // Uncheck the box
+      }
     }
   }
 
@@ -1357,7 +1364,7 @@ export class ViewFirmPageComponent implements OnInit {
       response => {
         console.log('Authorise scope updated successfully:', response);
 
-        this.loadActivitiesAuthorized(); // Reload license scope details
+        this.loadActivitiesAuthorized(); // Reload authorize scope details
         this.loadIslamicFinance();
         this.isEditModeAuth = false; // Toggle edit mode off
         this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
@@ -1480,24 +1487,6 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  // saveAuthoriseScopeDetails(updatedAuthoriseScope: any, userId: number) {
-  //   console.log('Updated Authorise Scope:', updatedAuthoriseScope);
-
-  //   this.firmService.editAuthorizedScope(updatedAuthoriseScope).subscribe(
-  //     response => {
-  //       console.log('Authorise scope updated successfully:', response);
-  //       this.loadActivitiesAuthorized(); // Reload license scope details
-  //       this.isEditModeAuth = false; // Toggle edit mode off
-  //       this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
-  //       // this.disableApplicationDate = true;
-  //     },
-  //     error => {
-  //       console.error('Error updating Authorised Scope:', error);
-  //     }
-  //   );
-  // }
-
-
 
   cancelEditAuthScope() {
     Swal.fire({
@@ -1514,6 +1503,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
         this.errorMessages = {};
         this.loadActivitiesAuthorized();
+        this.loadIslamicFinance();
       }
     });
   }
@@ -2386,58 +2376,53 @@ export class ViewFirmPageComponent implements OnInit {
       })
   }
 
-
   // On View Mode
   loadActivitiesAuthorized(): void {
     this.isLoading = true; // Start loading indicator
 
-    // Fetch the current scope revision number
-    this.firmService.getCurrentScopeRevNum(this.firmId, 3).subscribe(
-      data => {
-        this.scopeRevNum = data.response.Column1;
+    // Run both API calls in parallel
+    forkJoin({
+      scopeRevNum: this.firmService.getCurrentScopeRevNum(this.firmId, 3),
+      firmActivity: this.firmService.getFirmActivityAuthorized(this.firmId),
+    }).subscribe(
+      ({ scopeRevNum, firmActivity }) => {
+        // Process scope revision number
+        this.scopeRevNum = scopeRevNum.response.Column1;
 
-        // Once scope revision is fetched, fetch firm activity authorized details
-        this.firmService.getFirmActivityAuthorized(this.firmId).subscribe(
-          data => {
-            this.ActivityAuth = data.response;
-            this.loadPrudentialCategoryDetails();
-            this.loadSectorDetails();
-            // Process activities and group products into main categories and subcategories
-            this.ActivityAuth.forEach(activity => {
-              activity.categorizedProducts = [];
-              let currentCategory = null;
+        // Process firm activity authorized details
+        this.ActivityAuth = firmActivity.response;
 
-              activity.ObjectProductActivity.forEach(product => {
-                if (product.productTypeID === "0") {
-                  // Main category
-                  currentCategory = {
-                    mainCategory: product.productTypeDescription,
-                    subProducts: []
-                  };
-                  activity.categorizedProducts.push(currentCategory);
-                } else if (currentCategory) {
-                  // Sub-product
-                  product.firmScopeTypeID = product.firmScopeTypeID || ''; // Ensure firmScopeTypeID is set
-                  currentCategory.subProducts.push(product);
-                }
-              });
-            });
+        // Process activities and categorize products
+        this.ActivityAuth.forEach(activity => {
+          activity.categorizedProducts = [];
+          let currentCategory = null;
 
-            // Load Prudential Return Types based on the first activity
-            const prudentialCategoryTypeID = this.ActivityAuth[0].PrudentialCategoryTypeID;
-            this.loadPrudReturnTypes(prudentialCategoryTypeID);
+          activity.ObjectProductActivity.forEach(product => {
+            if (product.productTypeID === "0") {
+              // Main category
+              currentCategory = {
+                mainCategory: product.productTypeDescription,
+                subProducts: []
+              };
+              activity.categorizedProducts.push(currentCategory);
+            } else if (currentCategory) {
+              // Sub-product
+              product.firmScopeTypeID = product.firmScopeTypeID || ''; // Ensure firmScopeTypeID is set
+              currentCategory.subProducts.push(product);
+            }
+          });
+        });
 
-            // Stop loading indicator once all data is fully loaded
-            this.isLoading = false;
-          },
-          error => {
-            console.error('Error fetching License scope', error);
-            this.isLoading = false; // Stop loading on error
-          }
-        );
+        // Load Prudential Return Types based on the first activity
+        const prudentialCategoryTypeID = this.ActivityAuth[0].PrudentialCategoryTypeID;
+        this.loadPrudReturnTypes(prudentialCategoryTypeID);
+        this.loadPrudentialCategoryDetails();
+        this.loadSectorDetails();
+        // Stop loading indicator once all data is fully loaded
+        this.isLoading = false;
       },
       error => {
-        console.error('Error fetching current scope revision number for authorized:', error);
+        console.error('Error fetching data', error);
         this.isLoading = false; // Stop loading on error
       }
     );
@@ -2538,12 +2523,18 @@ export class ViewFirmPageComponent implements OnInit {
   loadIslamicFinance() {
     this.firmService.getIslamicFinance(this.firmId).subscribe(
       data => {
-        this.islamicFinance = data.response;
-        console.log('Firm Islamic Finance:', this.islamicFinance);
-      }, error => {
-        console.error('Error Fetching islamic finance', error);
-      })
+        this.islamicFinance = data.response || { IFinTypeId: null };
+        this.isIslamicFinanceDeleted = false; // Data exists, so reset the flag
+        this.isIslamicFinanceChecked = this.islamicFinance?.IFinTypeId > 0; // Set checkbox based on data
+      },
+      error => {
+        console.error('Error fetching Islamic Finance', error);
+        this.isIslamicFinanceDeleted = true; // Set flag to hide the section in view mode
+        this.islamicFinance = { IFinTypeId: null };
+      }
+    );
   }
+
 
   loadFirmAdresses() {
     this.firmService.getFirmAddresses(this.firmId).subscribe(

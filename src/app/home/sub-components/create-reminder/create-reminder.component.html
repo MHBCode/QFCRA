@@ -2,50 +2,55 @@
     <div class="task-section-title">
         <div class="edit-firm-actions">
             <h2 class="edit-firm-header">
-               Create Personal Reminder
+                Create Personal Reminder
             </h2>
         </div>
     </div>
     <div class="inputs-field-set">
+        <!--Error messages for firm details-->
+        <div class="error-messages" style="color: red">
+            <p *ngIf="errorMessages['Summary']">{{ errorMessages['Summary'] }}</p>
+            <p *ngIf="errorMessages['DueDate']">{{ errorMessages['DueDate'] }}</p>
+        </div>
         <div class="actions-btn">
             <div class="edit-btn">
-                <button class="save-btn">Save</button>
-                <button class="cancel-btn">Cancel</button>
+                <button (click)="insertReminder()" class="save-btn">Save</button>
+                <button (click)="cancelReminder()" class="cancel-btn">Cancel</button>
             </div>
         </div>
         <div class="inputs-row">
             <div class="input-field">
-                <label for="summary">Summary</label>
-                <input name="summary" type="text" />
+                <label for="summary">Summary <span style="color:red;">*</span></label>
+                <input [(ngModel)]="createReminder.summary" [ngClass]="{
+                  'error-border': errorMessages['Summary']}" name="summary" type="text" />
             </div>
             <div class="input-field">
                 <label for="firmName">Firm Name</label>
-                <select name="firmName">
-                    <!-- <option *ngFor="let option of firmName"
-                  [value]="option?.AuthorisationCategoryTypeID">
-                  {{ option?.AuthorisationCategoryTypeDesc }}
-                </option> -->
+                <select [(ngModel)]="createReminder.FirmID" name="firmName">
+                    <option value="0">Select</option>
+                    <option *ngFor="let option of allFirms" [value]="option?.FirmID">
+                        {{ option?.FirmName }}
+                    </option>
                 </select>
             </div>
         </div>
         <div class="inputs-row">
             <div class="input-field fullwidth">
                 <label for="notes">Notes</label>
-                <textarea name="notes"></textarea>
+                <textarea [(ngModel)]="createReminder.Notes" name="notes"></textarea>
             </div>
         </div>
         <div class="inputs-row">
             <div class="input-field">
-                <label for="duedate">Due Date</label>
-                <input name="duedate" id="dueDate" type="date">
+                <label for="duedate">Due Date <span style="color:red;">*</span></label>
+                <input [(ngModel)]="createReminder.dueDate" [ngClass]="{
+                  'error-border': errorMessages['DueDate']}" name="duedate" id="dueDate" type="text" #dateInputs>
             </div>
             <div class="input-field">
                 <label for="Status">Status</label>
-                <select name="Status">
-                    <!-- <option *ngFor="let option of firmName"
-                  [value]="option?.AuthorisationCategoryTypeID">
-                  {{ option?.AuthorisationCategoryTypeDesc }}
-                </option> -->
+                <select [(ngModel)]="createReminder.status" name="Status">
+                    <option value="1">Pending</option>
+                    <option value="2">Completed</option>
                 </select>
             </div>
         </div>

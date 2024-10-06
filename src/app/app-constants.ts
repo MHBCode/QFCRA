@@ -283,6 +283,16 @@ export enum FrimsObject
 
 }
 
+export enum CRORegisterReports
+{
+    ENTER_DATE = 3600,
+    INVALID_DATE = 3601,
+    SELECT_REPORT_TYPE = 3602,
+     SELECT_CRO_REPORT_TYPE = 3603,
+    REPORT_MAIN_HEADER=3604
+
+}
+
 export enum ObjectOpType
 {
     Create = 40,

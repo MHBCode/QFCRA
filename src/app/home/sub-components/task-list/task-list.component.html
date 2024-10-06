@@ -213,9 +213,15 @@
         </table>
       </div>
 
+      <!--Error messages for firm details-->
+      <div class="error-messages" style="color: red">
+        <p *ngIf="errorMessages['note']">{{ errorMessages['note'] }}</p>
+      </div>
+
       <!-- Add New Note -->
       <div class="input-field note-textarea-container">
-        <textarea [(ngModel)]="noteText" class="note-textarea" placeholder="Write your note here..."></textarea>
+        <textarea [(ngModel)]="noteText" [ngClass]="{
+                'error-border': errorMessages['note']}" class="note-textarea"  placeholder="Write your note here..."></textarea>
       </div>
 
       <!-- Save Note Button -->
