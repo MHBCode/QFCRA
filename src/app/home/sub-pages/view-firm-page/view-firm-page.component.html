@@ -1380,7 +1380,7 @@
                 </div>
 
                 <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0 || (isEditModeAuth)">
-                  <strong>{{ActivityAuth[0].ObjectFirmScopeCondition[0].scopeConditionTypeDesc}}: </strong> &nbsp;
+                  <strong>Retail Restriction: </strong> &nbsp;
                   <span *ngIf="!isEditModeAuth">Yes</span>
                   <input *ngIf="isEditModeAuth" [(ngModel)]="isScopeConditionChecked" type="checkbox"
                     [value]="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0 ? true : false" />
