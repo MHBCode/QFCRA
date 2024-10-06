@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-create-controller',
-  templateUrl: './create-controller.component.html',
-  styleUrls: ['./create-controller.component.scss']
+  selector: 'app-create-contact',
+  templateUrl: './create-contact.component.html',
+  styleUrls: ['./create-contact.component.scss']
 })
-export class CreateControllerComponent implements OnInit {
+export class CreateContactComponent {
+
   selectedType: string = '';
   showHoldingsPercentage: boolean = false;
   selectedControlType: string = 'select';
@@ -13,7 +14,7 @@ export class CreateControllerComponent implements OnInit {
   isCompanyTraded: boolean | null = null;
   isCompanyRegulated: boolean | null = null;
   more10UBOs: boolean | null = null;
-  selectedController: any;
+
   constructor() {}
 
   ngOnInit(): void {
@@ -36,5 +37,4 @@ export class CreateControllerComponent implements OnInit {
       this.hideForms = false;
     }
   }
-
 }

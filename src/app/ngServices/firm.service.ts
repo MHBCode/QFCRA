@@ -121,6 +121,7 @@ export class FirmService {
       .set('CSVFirmTypes', filterDataObj.CSVFirmTypes.toString())
       .set('CSVFirmStatus', filterDataObj.CSVFirmStatus.toString())
       .set('startChar', filterDataObj.startChar.toString())
+      console.log('HTTP Params:', params.toString());
     return this.http.get<any>(`${this.baseUrl}get_firms_alphabetically`, { params });
   }
   getAccountingStandardsHistory(firmId: number): Observable<any> {

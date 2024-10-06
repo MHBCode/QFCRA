@@ -1679,7 +1679,7 @@
               <input [(ngModel)]="selectedController.OtherEntityName" name="fullName" [readonly]="!isEditable" required
                 style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa;" />
             </div>
-            <div style="flex: 1;">
+            <!-- <div style="flex: 1;">
               <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Legal
                 Status:</label>
               <ng-container *ngIf="isEditable; else legalStatusInput">
@@ -1693,6 +1693,21 @@
                 <input [(ngModel)]="selectedController.LegalStatusTypeDesc" name="legalStatus" [readonly]="!isEditable"
                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
               </ng-template>
+            </div> -->
+            <div style="flex: 1;">
+              <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Legal Status:</label>
+              <ng-container *ngIf="isEditable; else legalStatusDisplay">
+                <select [(ngModel)]="selectedController.LegalStatusTypeID" name="legalStatus"
+                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                  <option *ngFor="let status of legalStatusOptionsEdit" [value]="status.LegalStatusTypeID">
+                    {{ status.LegalStatusTypeDesc }}
+                  </option>
+                </select>
+              </ng-container>
+              <ng-template #legalStatusDisplay>
+                <input [value]="getLegalStatusDescription()" name="legalStatus" readonly
+                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+              </ng-template>
             </div>
             <div style="flex: 1;">
               <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Registered
@@ -1704,7 +1719,7 @@
 
           <!-- Contact Details Row 2 -->
           <div style="display: flex; gap: 20px; margin-bottom: 5px;">
-            <div style="flex: 1;">
+            <!-- <div style="flex: 1;">
               <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Place of
                 Establishment:</label>
               <ng-container *ngIf="isEditable; else placeOfEstablishmentInput">
@@ -1733,6 +1748,35 @@
               <ng-template #controlTypeInput>
                 <input [(ngModel)]="selectedController.ControllerControlTypeDesc" name="typeOfControl"
                   [readonly]="!isEditable"
+                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+              </ng-template>
+            </div> -->
+            <div style="flex: 1;">
+              <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Place of Establishment:</label>
+              <ng-container *ngIf="isEditable; else placeOfEstablishmentDisplay">
+                <select required [(ngModel)]="selectedController.PlaceOfEstablishment" name="placeOfEstablishment"
+                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                  <option *ngFor="let place of countryOptionsEdit" [value]="place.CountryID">{{ place.CountryName }}</option>
+                </select>
+              </ng-container>
+              <ng-template #placeOfEstablishmentDisplay>
+                <input [value]="getPlaceOfEstablishmentName()" name="placeOfEstablishment" readonly
+                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+              </ng-template>
+            </div>
+            
+            <div style="flex: 1;">
+              <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Type of Control:</label>
+              <ng-container *ngIf="isEditable; else controlTypeDisplay">
+                <select required [(ngModel)]="selectedController.ControllerControlTypeID" name="typeOfControl"
+                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                  <option *ngFor="let controlType of controlTypeOptionsEdit" [value]="controlType.ControllerControlTypeID">
+                    {{ controlType.ControllerControlTypeDesc }}
+                  </option>
+                </select>
+              </ng-container>
+              <ng-template #controlTypeDisplay>
+                <input [value]="getControlTypeDescription()" name="typeOfControl" readonly
                   style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
               </ng-template>
             </div>
@@ -1912,7 +1956,358 @@
         </div>
       </div>
     </div>
+    <div class="create-controller-section" *ngIf="showCreateControllerSection">
+      <div class="inputs-field-set">
+        <div class="create-controller-actions">
+            <h2 class="create-controller-header">
+                Controller For {{ firmDetails?.FirmName }}
+            </h2>
+            <div class="btns">
+                <button class="save-btn" (click)="createControllerPopupChanges()">Save</button>
+                <button class="cancel-btn">Cancel</button>
+            </div>
+            
+        </div>
+        <div class="error-messages" style="color: red">
+          <p *ngIf="errorMessages['OtherEntityName']">{{ errorMessages['OtherEntityName'] }}</p>
+          <p *ngIf="errorMessages['EffectiveDate']">{{ errorMessages['EffectiveDate'] }}</p>
+          <p *ngIf="errorMessages['CessationDate']">{{ errorMessages['CessationDate'] }}</p>
+          <p *ngIf="errorMessages['PlaceOfEstablishment']">{{ errorMessages['PlaceOfEstablishment'] }}</p>
+          <p *ngIf="errorMessages['ControllerControlTypeDesc']">{{ errorMessages['ControllerControlTypeDesc'] }}</p>
+          <p *ngIf="errorMessages['PctOfShares']">{{ errorMessages['PctOfShares'] }}</p>
+        </div>
+        <div class="create-controller-inputs">
+            <div class="input-field controller-type-container">
+                <label for="controllerType">
+                    Controller Type <span style="color: red;">*</span>
+                </label>
+                <select name="controllerType" id="controllerType" [(ngModel)]="CreatecontrollerDetails.SelectedControlType"
+                    (change)="changeControlType()">
+                    <option value="select" selected>Select</option>
+                    <option value="parentEntity">Parent Entity</option>
+                    <option value="corporateController">Corporate Controller</option>
+                    <option value="uboCorporate">UBO - Corporate</option>
+                    <option value="uboIndividual">UBO - Individual</option>
+                    <option value="headOfficeBranch">Head Office of a Branch</option>
+                    <option value="individualController">Individual Controller</option>
+                </select>
+            </div>
+            <ng-container *ngIf="!hideForms">
+                <div class="input-field"
+                    *ngIf="CreatecontrollerDetails.SelectedControlType === 'parentEntity' || CreatecontrollerDetails.SelectedControlType === 'corporateController' || CreatecontrollerDetails.SelectedControlType === 'uboCorporate' || CreatecontrollerDetails.SelectedControlType === 'headOfficeBranch'">
+                    <label for="entityName">
+                        Full Name of Entity <span style="color: red;">*</span>
+                    </label>
+                    <input name="entityName" id="entityName" [(ngModel)]="CreatecontrollerDetails.OtherEntityName" type="text">
+                </div>
+                <!---->
+                <div class="input-field"
+                    *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+                    <label for="individualTitle">
+                        Title
+                    </label>
+                    <select [(ngModel)]="CreatecontrollerDetails.Title" name="legalStatus">
+                      <option *ngFor="let title of TitleEdit" [value]="title.TitleTypeId">
+                        {{ title.TitleDesc }}
+                      </option>
+                    </select>
+                </div>
+                <!---->
+                <div class="input-field"
+                    *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+                    <label for="firstName">
+                        First Name <span style="color: red;">*</span>
+                    </label>
+                    <input [(ngModel)]="CreatecontrollerDetails.FirstName"  name="firstName" id="firstName" type="text">
+                </div>
+                <!---->
+                <div class="input-field"
+                    *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+                    <label for="secondName">
+                        Second Name <span style="color: red;">*</span>
+                    </label>
+                    <input [(ngModel)]="CreatecontrollerDetails.SecondName" name="secondName" id="secondName" type="text">
+                </div>
+                <!---->
+                <div class="input-field"
+                    *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+                    <label for="familyName">
+                        Family Name <span style="color: red;">*</span>
+                    </label>
+                    <input [(ngModel)]="CreatecontrollerDetails.FamilyName" name="familyName" id="familyName" type="text">
+                </div>
+                <!---->
+                <div class="input-field"
+                    *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+                    <label for="placeOfBirth">
+                        Place of birth
+                    </label>
+                    <input name="placeOfBirth" id="placeOfBirth" type="text">
+                    <select required [(ngModel)]="CreatecontrollerDetails.PlaceOfBirth" name="placeOfBirth"
+                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                    <option *ngFor="let place of countryOptionsEdit" [value]="place.CountryID">{{ place.CountryName }}</option>
+                  </select>
+                </div>
+                <!---->
+                <div class="input-field"
+                    *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+                    <label for="dateOfBirth">
+                        Date of birth <span style="color: red;">*</span>
+                    </label>
+                    <input [(ngModel)]="CreatecontrollerDetails.DateOfBirth" #dateInputs  name="dateOfBirth" id="dateOfBirth" type="input">
+                </div>
+                <!---->
+                <div class="input-field"
+                    *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+                    <label for="passportNum">
+                        Passport Number
+                    </label>
+                    <input [(ngModel)]="CreatecontrollerDetails.PassportNum" name="passportNum" id="passportNum" type="text">
+                </div>
+                <!---->
+                <div class="input-field"
+                    *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+                    <label for="jurisdictionIssue">
+                        Jurisdiction of Issue
+                    </label>
+                    <select name="jurisdictionIssue" id="jurisdictionIssue">
+                        <option value="select">Select</option>
+                    </select>
+                </div>
+                <!---->
+                <div class="input-field" style="width: 100%;"
+                    *ngIf="selectedControlType === 'uboIndividual' || selectedControlType === 'individualController'">
+                    <label for="isPEP">
+                        Is Politically Exposed Person (PEP)? <span style="color: red;">*</span>
+                    </label>
+                    <div class="radio-wrapper">
+                        <input name="isPEP" id="yes" type="radio" [value]="true" [(ngModel)]="CreatecontrollerDetails.IsPEP"> Yes
+                        <input name="isPEP" id="no" type="radio" [value]="false" [(ngModel)]="CreatecontrollerDetails.IsPEP"> No
+                    </div>
+                </div>
+                <!---->
+                <div class="input-field"
+                    *ngIf="CreatecontrollerDetails.SelectedControlType === 'parentEntity' || CreatecontrollerDetails.SelectedControlType === 'corporateController' || CreatecontrollerDetails.SelectedControlType === 'uboCorporate' || CreatecontrollerDetails.SelectedControlType === 'headOfficeBranch'">
+                    <label for="legalStatus">
+                        Legal Status
+                    </label>
+                    <select [(ngModel)]="CreatecontrollerDetails.LegalStatusTypeID" name="legalStatus">
+                      <option *ngFor="let status of legalStatusOptionsEdit" [value]="status.LegalStatusTypeID">
+                        {{ status.LegalStatusTypeDesc }}
+                      </option>
+                    </select>
+                </div>
+                <!---->
+                <div class="input-field"
+                    *ngIf="CreatecontrollerDetails.SelectedControlType === 'parentEntity' || CreatecontrollerDetails.SelectedControlType === 'corporateController' || CreatecontrollerDetails.SelectedControlType === 'uboCorporate' || CreatecontrollerDetails.SelectedControlType === 'headOfficeBranch'">
+                    <label for="registeredNumber">
+                        Registered Number
+                    </label>
+                    <input [(ngModel)]="CreatecontrollerDetails.RegisteredNum" name="registeredNumber" id="registeredNumber" type="text">
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="CreatecontrollerDetails.SelectedControlType === 'parentEntity' || CreatecontrollerDetails.SelectedControlType === 'corporateController' || CreatecontrollerDetails.SelectedControlType === 'uboCorporate' || CreatecontrollerDetails.SelectedControlType === 'headOfficeBranch'">
+                    <label for="establishmentPlace">
+                        Place of Establishment <span style="color: red;">*</span>
+                    </label>
+                    <select required [(ngModel)]="CreatecontrollerDetails.PlaceOfEstablishment" name="placeOfEstablishment"
+                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                    <option *ngFor="let place of countryOptionsCreate" [value]="place.CountryID">{{ place.CountryName }}</option>
+                  </select>
+                </div>
+                <!---->
+                <div class="input-field">
+                    <label for="controlType">
+                        Type of Control <span style="color: red;">*</span>
+                    </label>
+                    <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeID" name="typeOfControl"
+                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                    <option *ngFor="let controlType of controlTypeOptionsCreate" [value]="controlType.ControllerControlTypeID">
+                      {{ controlType.ControllerControlTypeDesc }}
+                    </option>
+                  </select>
+                </div>
+                <!---->
+                <div class="input-field" [ngStyle]="{'visibility': showHoldingsPercentage ? 'visible' : 'hidden'}">
+                    <label for="holdingsPercentage">
+                        % of Holding
+                    </label>
+                    <input [(ngModel)]="CreatecontrollerDetails.HoldingsPercentage" name="holdingsPercentage" id="holdingsPercentage" type="text">
+                </div>
+                <!---->
+                <div class="input-field">
+                    <label for="effectiveDate">
+                        Effective Date
+                    </label>
+                    <input [(ngModel)]="CreatecontrollerDetails.EffectiveDate" name="effectiveDate" id="effectiveDate" #dateInputs type="text">
+                </div>
+                <!---->
+                <div class="input-field">
+                    <label for="cessationDate">
+                        Cessation Date
+                    </label>
+                    <input [(ngModel)]="CreatecontrollerDetails.CessationDate" name="cessationDate" id="cessationDate" #dateInputs type="text">
+                </div>
+                <!---->
+                <div class="input-field"
+                    *ngIf="selectedControlType === 'parentEntity' || selectedControlType === 'corporateController' || selectedControlType === 'uboCorporate' || selectedControlType === 'headOfficeBranch'">
+                    <label for="isRegulated">
+                        Is the company regulated :
+                    </label>
+                    <div class="radio-wrapper">
+                        <input name="isRegulated" id="yes" type="radio" [(ngModel)]="CreatecontrollerDetails.IsCompanyRegulated" [value]="true">
+                        Yes
+                        <input name="isRegulated" id="no" type="radio" [(ngModel)]="CreatecontrollerDetails.IsCompanyRegulated" [value]="false">
+                        No
+                    </div>
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboCorporate'">
+                    <label for="isParent">
+                        Is it also Parent / Corporate Controller? :
+                    </label>
+                    <div class="radio-wrapper">
+                        <input name="isParent" id="yes" type="radio" [(ngModel)]="CreatecontrollerDetails.IsParentController"> Yes
+                        <input name="isParent" id="no" type="radio" [(ngModel)]="CreatecontrollerDetails.IsParentController"> No
+                    </div>
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboCorporate'">
+                    <label for="isCompanyTraded">
+                        Is the company publicly traded :
+                    </label>
+                    <div class="radio-wrapper">
+                        <input name="isCompanyTraded" id="yes" type="radio" [(ngModel)]="CreatecontrollerDetails.IsPublicallyTraded"
+                            [value]="true"> Yes
+                        <input name="isCompanyTraded" id="no" type="radio" [(ngModel)]="CreatecontrollerDetails.IsPublicallyTraded"
+                            [value]="false"> No
+                    </div>
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="CreatecontrollerDetails.IsPublicallyTraded === false && CreatecontrollerDetails.SelectedControlType === 'uboCorporate'">
+                    <label for="more10UBOs">
+                        Are there any UBOs that own more than 10% of this entity? :
+                    </label>
+                    <div class="radio-wrapper">
+                        <input name="more10UBOs" id="yes" type="radio" [(ngModel)]="CreatecontrollerDetails.More10UBOs" [value]="true"> Yes
+                        <input name="more10UBOs" id="no" type="radio" [(ngModel)]="CreatecontrollerDetails.More10UBOs" [value]="false"> No
+                    </div>
+                </div>
+                
+                <div class="input-field additional-details">
+                    <label for="additionalDetails">
+                        Additional Details
+                    </label>
+                    <textarea [(ngModel)]="CreatecontrollerDetails.AdditionalDetails" name="additionalDetails" id="additionalDetails"></textarea>
+                </div>
+                <!---->
+            </ng-container>
+        </div>
+    </div>
+    <div *ngIf="!hideForms" class="inputs-field-set">
+        <div class="create-controller-actions">
+            <h2 class="create-controller-header">
+                Addresses 
+            </h2>
+        </div>
+        <div class="create-controller-inputs">
+            <div class="input-field">
+                <label for="addressType">
+                    Address Type
+                </label>
+                <select  [(ngModel)]="Address.AddressType"
+                (change)="onAddressTypeChange($event, Address)"
+                [ngClass]="{
+                'error-border': !Address.AddressID && errorMessages['AddressTypeID'] ,'select-background-edited': isEditModeCore}">
+                <option value="0">Select</option>
+                <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
+                  {{option.AddressTypeDesc}}</option>
+              </select>
+            </div>
+            <div class="input-field">
+                <label for="address1">
+                    Address - Line 1
+                </label>
+                <input [(ngModel)]="CreatecontrollerDetails.addressLine1" name="address1" id="address1" type="text" value="">
+            </div>
+            <div class="input-field">
+                <label for="address2">
+                    Address - Line 2
+                </label>
+                <input [(ngModel)]="CreatecontrollerDetails.addressLine2" name="address2" id="address2" type="text" value="">
+            </div>
+            <div class="input-field">
+                <label for="address3">
+                    Address - Line 3
+                </label>
+                <input [(ngModel)]="CreatecontrollerDetails.addressLine3" name="address3" id="address3" type="text" value="">
+            </div>
+            <div class="input-field">
+                <label for="address4">
+                    Address - Line 4
+                </label>
+                <input [(ngModel)]="CreatecontrollerDetails.addressLine4" name="address4" id="address4" type="text" value="">
+            </div>
+            <div class="input-field">
+                <label for="city">
+                    City
+                </label>
+                <input [(ngModel)]="CreatecontrollerDetails.city" name="city" id="city" type="text" value="">
+            </div>
+            <div class="input-field">
+                <label for="state">
+                    State/Province
+                </label>
+                <input [(ngModel)]="CreatecontrollerDetails.stateProvince" name="state" id="state" type="text" value="">
+            </div>
+            <div class="input-field">
+                <label for="country">
+                    Country
+                </label>
+                <select required [(ngModel)]="CreatecontrollerDetails.country" name="placeOfEstablishment"
+                style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                <option *ngFor="let place of countryOptionsCreate" [value]="place.CountryID">{{ place.CountryName }}</option>
+              </select>
+            </div>
+            <div class="input-field">
+                <label for="zipCode">
+                    Zip/Postal Code
+                </label>
+                <input [(ngModel)]="CreatecontrollerDetails.zipPostalCode" name="zipCode" id="zipCode" type="text" value="">
+            </div>
+        </div>
+    </div>
 
+    <div class="inputs-field-set" *ngIf="CreatecontrollerDetails.IsCompanyRegulated === true">
+        <div class="create-controller-actions">
+            <h2 class="create-controller-header">
+                Home State Regulators
+            </h2>
+        </div>
+        <div class="create-controller-inputs">
+            <div class="button-wrapper">
+                <button class="add-regulator-btn">+</button>
+            </div>
+            <div class="input-field home-state-regulators-container">
+                <div class="regulator-select-container">
+                    <label for="regulators">
+                        Regulator <span style="color: red;">*</span>
+                    </label>
+                    <input type="text" [(ngModel)]="CreatecontrollerDetails.regulator"  name="regulators" id="regulators">
+               </div>
+                <div class="del-regulator-btn">
+                    <button>x</button>
+                </div>
+            </div>
+            <div class="input-field regulator-contact-container">
+                <label for="regulatorContact">
+                    Regulator Contact
+                </label>
+                <input disabled type="text">
+            </div>
+        </div>
+    </div>
+  </div>
   </section>
 
 
@@ -2284,6 +2679,12 @@
       <div class="section">
         <div class="contacts-header">
           <h2>Contacts For {{ firmDetails?.FirmName }}</h2>
+          <div class="btn">
+            <button (click)="createContact()">
+              <i class="bi bi-pen"></i>
+              Create
+            </button>
+          </div>
           <span class="enhanced-checkbox">
             <input id="InactiveContacts" type="checkbox" (change)="onInactiveContactsToggle($event)" />
             <label for="InactiveContacts">Display Inactive Contacts</label>
