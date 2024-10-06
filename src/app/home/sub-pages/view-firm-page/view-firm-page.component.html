@@ -1399,7 +1399,9 @@
         </div>
 
         <!-- Islamic Finance-->
-        <div class="inputs-field-set" *ngIf="(isEditModeAuth) || (!isEditModeAuth && islamicFinance?.IFinTypeId > 0 && !isIslamicFinanceDeleted)" [ngClass]="{ collapsed: isCollapsed['islamicFinanceSection'] }">
+        <div class="inputs-field-set"
+          *ngIf="(isEditModeAuth) || (!isEditModeAuth && islamicFinance?.IFinTypeId > 0 && !isIslamicFinanceDeleted)"
+          [ngClass]="{ collapsed: isCollapsed['islamicFinanceSection'] }">
           <div class="form-section-title collapse-container">
             <h2 class="edit-firm-header">Islamic Finance</h2>
             <button class="collapse-button" (click)="toggleCollapse('islamicFinanceSection')">
@@ -1441,11 +1443,13 @@
             </div>
             <div class="input-field">
               <label for="lastModifiedBy"> Last Modified By </label>
-              <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text" [(ngModel)]="islamicFinance.IFinLastModifiedByName"/>
+              <input disabled name="lastModifiedBy" id="lastModifiedBy" type="text"
+                [(ngModel)]="islamicFinance.IFinLastModifiedByName" />
             </div>
             <div class="input-field">
               <label for="lastModificationDate"> Last Modified Date </label>
-              <input disabled name="lastModificationDate" id="lastModificationDate" type="text" [(ngModel)]="islamicFinance.LastModifiedDate"/>
+              <input disabled name="lastModificationDate" id="lastModificationDate" type="text"
+                [(ngModel)]="islamicFinance.LastModifiedDate" />
             </div>
           </div>
         </div>
@@ -1726,15 +1730,14 @@
               <label>Legal
                 Status</label>
               <ng-container *ngIf="isEditable; else legalStatusInput">
-                <select [(ngModel)]="selectedController.LegalStatusTypeDesc" name="legalStatus"
-                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                <select [(ngModel)]="selectedController.LegalStatusTypeDesc" name="legalStatus">
                   <option *ngFor="let status of legalStatusOptionsEdit" [value]="status.LegalStatusTypeID">{{
                     status.LegalStatusTypeDesc }}</option>
                 </select>
               </ng-container>
               <ng-template #legalStatusInput>
-                <input [(ngModel)]="selectedController.LegalStatusTypeDesc" name="legalStatus" [readonly]="!isEditable"
-                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+                <input [(ngModel)]="selectedController.LegalStatusTypeDesc" name="legalStatus"
+                  [readonly]="!isEditable" />
               </ng-template>
             </div>
             <div class="input-field">
@@ -1841,15 +1844,13 @@
                 <label>Address
                   Type</label>
                 <ng-container *ngIf="isEditable; else addressTypeInput">
-                  <select [(ngModel)]="selectedController.AddressType" name="addressType"
-                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                  <select [(ngModel)]="selectedController.AddressType" name="addressType">
                     <option *ngFor="let type of addressTypeOptionsEdit" [value]="type.AddressTypeID">{{
                       type.AddressTypeDesc }}</option>
                   </select>
                 </ng-container>
                 <ng-template #addressTypeInput>
-                  <input [(ngModel)]="selectedController.AddressType" name="addressType" [readonly]="!isEditable"
-                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+                  <input [(ngModel)]="selectedController.AddressType" name="addressType" [readonly]="!isEditable" />
                 </ng-template>
               </div>
               <div class="input-field">
@@ -1872,16 +1873,14 @@
               <div class="input-field">
                 <label>Country</label>
                 <ng-container *ngIf="isEditable; else countryInput">
-                  <select [(ngModel)]="selectedController.Country" name="country"
-                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                  <select [(ngModel)]="selectedController.Country" name="country">
                     <option *ngFor="let country of countryOptionsEdit" [value]="country.CountryID">{{
                       country.CountryName
                       }}</option>
                   </select>
                 </ng-container>
                 <ng-template #countryInput>
-                  <input [(ngModel)]="selectedController.Country" name="country" [readonly]="!isEditable"
-                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+                  <input [(ngModel)]="selectedController.Country" name="country" [readonly]="!isEditable" />
                 </ng-template>
               </div>
               <div class="input-field">
@@ -2213,8 +2212,7 @@
           </div>
 
           <!-- Addresses Section -->
-          <h3
-            style="margin-top: 20px; color: #a51e36; font-size: 1.3em; text-align: left; border-bottom: 2px solid #a51e36; padding-bottom: 5px;">
+          <h3>
             Addresses
           </h3>
 
@@ -2230,22 +2228,20 @@
                 1</label>
               <input [(ngModel)]="selectedContact.addressLine1" name="addressLine1" [readonly]="!isEditable" />
             </div>
-          </div>
-
-          <div class="inputs-row">
             <div class="input-field">
               <label>Address - Line
                 2</label>
               <input [(ngModel)]="selectedContact.addressLine2" name="addressLine2" [readonly]="!isEditable" />
             </div>
+          </div>
+
+          <div class="inputs-row">
             <div class="input-field">
               <label>Address - Line
                 3</label>
               <input [(ngModel)]="selectedContact.addressLine3" name="addressLine3" [readonly]="!isEditable" />
             </div>
-          </div>
 
-          <div class="inputs-row">
             <div class="input-field">
               <label>City</label>
               <input [(ngModel)]="selectedContact.city" name="city" [readonly]="!isEditable" />
@@ -2254,20 +2250,19 @@
               <label>State/Province</label>
               <input [(ngModel)]="selectedContact.stateProvince" name="stateProvince" [readonly]="!isEditable" />
             </div>
+          </div>
+          <div class="input-row">
             <div class="input-field">
               <label>Country</label>
               <input [(ngModel)]="selectedContact.country" name="country" [readonly]="!isEditable" />
             </div>
-          </div>
 
-          <div style="display: flex; gap: 20px; margin-bottom: 10px;">
             <div class="input-field">
               <label>Zip/Postal
                 Code</label>
               <input [(ngModel)]="selectedContact.zipPostalCode" name="zipPostalCode" [readonly]="!isEditable" />
             </div>
           </div>
-
         </form>
       </div>
     </div>
