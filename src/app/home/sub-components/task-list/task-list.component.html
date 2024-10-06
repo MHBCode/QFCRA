@@ -109,7 +109,7 @@
 
         <tbody>
           <tr *ngFor="let item of paginatedTasks" (click)="toggleTaskPopup(item)">
-            <td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">
               <div *ngIf="!isMainView else expandType" class="expandable-text-container">
                 <span class="expandable-text">{{ item.TaskType }}</span>
               </div>
@@ -118,16 +118,16 @@
             <td *ngIf="isMainView" style="text-align: center;">
               <a [href]="item.Link" target="_blank" style="text-decoration: none;">View</a>
             </td>
-            <td>{{item.FirmName}}</td>
-            <td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.FirmName}}</td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">
               <div *ngIf="!isMainView else expandDesc" class="expandable-text-container">
                 <span class="expandable-text">{{item.ShortDescription}}</span>
               </div>
               <ng-template #expandDesc>{{item.ShortDescription}}</ng-template>
             </td>
-            <td>{{item.TaskDueDate}}</td>
-            <td>{{item.DaysOverDue}}</td>
-            <td *ngIf="isMainView">{{item.Comments}}</td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.TaskDueDate}}</td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.DaysOverDue}}</td>
+            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}" *ngIf="isMainView">{{item.Comments}}</td>
           </tr>
         </tbody>
       </table>
