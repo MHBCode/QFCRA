@@ -2099,8 +2099,7 @@
                     <label for="establishmentPlace">
                         Place of Establishment <span style="color: red;">*</span>
                     </label>
-                    <select required [(ngModel)]="CreatecontrollerDetails.PlaceOfEstablishment" name="placeOfEstablishment"
-                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                    <select required [(ngModel)]="CreatecontrollerDetails.PlaceOfEstablishment" name="placeOfEstablishment">
                     <option *ngFor="let place of countryOptionsCreate" [value]="place.CountryID">{{ place.CountryName }}</option>
                   </select>
                 </div>
@@ -2109,8 +2108,7 @@
                     <label for="controlType">
                         Type of Control <span style="color: red;">*</span>
                     </label>
-                    <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeID" name="typeOfControl"
-                    style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                    <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeID" name="typeOfControl">
                     <option *ngFor="let controlType of controlTypeOptionsCreate" [value]="controlType.ControllerControlTypeID">
                       {{ controlType.ControllerControlTypeDesc }}
                     </option>
@@ -2253,8 +2251,7 @@
                 <label for="country">
                     Country
                 </label>
-                <select required [(ngModel)]="CreatecontrollerDetails.country" name="placeOfEstablishment"
-                style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c; cursor: pointer;">
+                <select required [(ngModel)]="CreatecontrollerDetails.country" name="placeOfEstablishment">
                 <option *ngFor="let place of countryOptionsCreate" [value]="place.CountryID">{{ place.CountryName }}</option>
               </select>
             </div>

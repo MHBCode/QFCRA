@@ -1,6 +1,6 @@
 .history-row {
   display: flex;
-  justify-content: space-between;
+  gap:10px;
   width: 100%;
 }
 
@@ -1396,37 +1396,13 @@ hr {
   position: relative;
 }
 
-.input-field select{
-  width: 100%;
-  outline: none;
-  padding: 0.5rem 0.1rem;
-  border-radius: 7.2px;
-  border: 0.72px #B1B1B1 solid;
-  background: white;
-}
-.input-field input{
-  width: 96%;
-  padding: 0.5rem 2%;
-  border-radius: 7.20px; 
-  border: 0.72px #B1B1B1 solid;
-}
-.input-field textarea{
-  width: 96%;
-  height: 150px;
-  padding: 0.5rem 2%;
-  border-radius: 7.20px; 
-  border: 0.72px #B1B1B1 solid;
-  resize: vertical;
-  max-height: 100px;
-  min-height: 20px;
-}
 
 .controller-type-container {
   width: 96%!important;
 }
 
 #controllerType {
-  width: 35%;
+  width: 51%;
 }
 
 .radio-wrapper {
