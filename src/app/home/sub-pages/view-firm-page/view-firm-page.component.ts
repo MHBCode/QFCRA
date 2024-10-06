@@ -69,10 +69,10 @@ export class ViewFirmPageComponent implements OnInit {
   callLicScopePrev: boolean = false;
   callAuthScopePrev: boolean = false;
   menuId: Number = 0;
-  menuWidth: string = '2%';
+  menuWidth: string = '6%';
   dataWidth: string = '98%';
-  width1: string = '15%';
-  width2: string = '2%';
+  width1: string = '14%';
+  width2: string = '6%';
   widthData1: string = '98%';
   widthData2: string = '85%';
   firmId: number = 0;  // Add firmId property
@@ -127,12 +127,15 @@ export class ViewFirmPageComponent implements OnInit {
   newActivity: any = {};
   isEditModeCore: boolean = false;
   /* for scope */
+  activeSection: string = 'Licensed';
+  tabIndex: number = 0; // 0 for Licensed, 1 for Authorized
   isEditModeLicense: boolean = false;
-  isEditModeAuth: string | boolean = false;
+  isEditModeAuth: boolean = false;
   showPermittedActivitiesTable: string | boolean = false;
-  isIslamicFinanceChecked: boolean = true;
+  isIslamicFinanceChecked: boolean;
   disableApplicationDate: boolean = true;
   showVaryBtn: boolean = true;
+  resetFirmSector: boolean = false;
   scopeRevNum: number;
   selectedCategory: number;
   selectedActivity: string;
@@ -141,6 +144,8 @@ export class ViewFirmPageComponent implements OnInit {
   AuthPrevRevNumbers: any = [];
   existingActivities: any = [];
   existingProducts: any = [];
+  sectorDetails: any = [];
+  prudentialCategoryDetails: any = [];
   currentLicRevisionNumber: number | null = null;
   lastLicRevisionNumber: number | null = null;
   currentAuthRevisionNumber: number | null = null;
@@ -368,10 +373,16 @@ export class ViewFirmPageComponent implements OnInit {
         this.applySecurityOnPage(FrimsObject.CoreDetail, this.isEditModeCore);
         break;
       case FrimsObject.Scope:
+        const section = this.activeSection;
         this.showSection(this.scopeSection);
-        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+        if (section === 'Licensed') {
+          this.tabIndex = 0;
+          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+        } else if (section === 'Authorized') {
+          this.tabIndex = 1;
+          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+        }
         this.applyVaryScopeButtonLogicOnView();
-        this.isCollapsed['LicensedSection'] = true;
         break;
       case FrimsObject.Auditor:
         this.showSection(this.auditorSection);
@@ -489,6 +500,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
       let firmType = this.firmDetails.FirmTypeID;
 
+
       if (this.assignedUserRoles) {
         const isMacroPrudentialGroup = this.assignedUserRoles.some(role => role.AppRoleId === 9013 || role.AppRoleId === 2005);
         if (isMacroPrudentialGroup) {
@@ -517,7 +529,6 @@ export class ViewFirmPageComponent implements OnInit {
       this.loading = false;
     });
   }
-
 
 
   isValidFirmSupervisor(firmId: number, userId: number): void {
@@ -1079,6 +1090,17 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  switchSection(section: string) {
+    this.activeSection = section;  // Update the active section
+    if (section === 'Licensed') {
+      this.tabIndex = 0;
+      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+    } else if (section === 'Authorized') {
+      this.tabIndex = 1;
+      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+    }
+  }
+
 
   editLicenseScope() {
     if (this.ActivityLicensed[0].ScopeRevNum) {
@@ -1318,7 +1340,7 @@ export class ViewFirmPageComponent implements OnInit {
   editAuthScope() {
     if (!this.isEditModeAuth) {
       this.isEditModeAuth = true;  // Set the form to edit mode
-
+      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
       // Loop through each activity and load its activities based on FirmScopeTypeID
       this.ActivityAuth.forEach(activity => {
         if (activity.FirmScopeTypeID) {
@@ -1330,18 +1352,39 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   saveAuthScope() {
-
+    this.isLoading = true; // Start loading indicator
     this.hasValidationErrors = false;
 
-    this.validateLicenseScope();
+
+    // this.validateLicenseScope();
 
     this.existingProducts = this.ActivityAuth;
-
+    console.log(this.existingProducts);
 
     const updatedAuthorizeScope = this.prepareAuthoriseScopeObject(this.userId);
-    this.saveAuthoriseScopeDetails(updatedAuthorizeScope, this.userId);
-    this.showFirmScopeAuthSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
+
+    // Call the function to save the details and handle response inside the subscription
+    this.firmService.editAuthorizedScope(updatedAuthorizeScope).subscribe(
+      response => {
+        console.log('Authorise scope updated successfully:', response);
+
+        this.loadActivitiesAuthorized(); // Reload license scope details
+        this.loadIslamicFinance();
+        this.isEditModeAuth = false; // Toggle edit mode off
+        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+
+        // Show success alert after data is successfully saved
+        this.showFirmScopeAuthSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
+
+        this.isLoading = false; // Stop loading indicator after success
+      },
+      error => {
+        console.error('Error updating Authorised Scope:', error);
+        this.isLoading = false; // Stop loading indicator on error
+      }
+    );
   }
+
 
   prepareAuthoriseScopeObject(userId: number) {
     return {
@@ -1354,7 +1397,7 @@ export class ViewFirmPageComponent implements OnInit {
         docReferenceID: this.ActivityAuth[0].docReferenceID ?? null,
         firmApplTypeID: 3, // Authorised
         docIDs: this.ActivityAuth[0].DocID,
-        generalConditions: this.ActivityAuth[0].GeneralConditions,
+        generalConditions: this.ActivityAuth[0].GeneralCondition,
         effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityAuth[0]?.ScopeCertificateLink,
         applicationDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeApplicationDate),
@@ -1369,16 +1412,20 @@ export class ViewFirmPageComponent implements OnInit {
         productTypeID: null,
         appliedDate: this.convertDateToYYYYMMDD(activityAuth.ScopeAppliedDate),
         withDrawnDate: this.convertDateToYYYYMMDD(activityAuth.ScopeEffectiveDate),
-        objectProductActivity: {
-          productTypeID: "string",
-          appliedDate: "2024-10-02T11:14:20.627Z",
-          withDrawnDate: "2024-10-02T11:14:20.627Z",
-          effectiveDate: "2024-10-02T11:14:20.627Z",
-          firmScopeTypeID: 0
-        },
+        objectProductActivity: activityAuth.categorizedProducts
+          .flatMap(catProd =>
+            catProd.subProducts
+              .filter(subProd => subProd.isChecked)  // Only include checked sub-products
+              .map(subProd => ({
+                productTypeID: String(subProd.ID),
+                appliedDate: this.convertDateToYYYYMMDD(activityAuth.appliedDate),
+                withDrawnDate: this.convertDateToYYYYMMDD(activityAuth.withDrawnDate),
+                effectiveDate: this.convertDateToYYYYMMDD(activityAuth.effectiveDate),
+                firmScopeTypeID: subProd.firmScopeTypeID
+              }))
+          ),
         activityDetails: null
-      }),
-      ),
+      })),
       objPrudentialCategory: {
         firmPrudentialCategoryID: this.ActivityAuth[0].FirmPrudentialCategoryID,
         firmId: this.firmId,
@@ -1386,16 +1433,16 @@ export class ViewFirmPageComponent implements OnInit {
         firmScopeID: this.ActivityAuth[0].FirmScopeID,
         scopeRevNum: this.ActivityAuth[0].ScopeRevNum,
         lastModifiedByID: userId,
-        effectiveDate: this.ActivityAuth[0].PrudentialCategoryEffectiveDate,
+        effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].PrudentialCategoryEffectiveDate),
         expirationDate: null,
-        lastModifiedDate: this.ActivityAuth[0].PrudentialCategoryLastModifiedDate,
+        lastModifiedDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].PrudentialCategoryLastModifiedDate),
         authorisationCategoryTypeID: this.ActivityAuth[0].AuthorisationCategoryTypeID
       },
       objSector: {
-        firmSectorID: this.ActivityAuth[0].FirmSectorID,
-        sectorTypeID: this.ActivityAuth[0].SectorTypeID,
+        firmSectorID: null,
+        sectorTypeID: parseInt(this.ActivityAuth[0].SectorTypeID),
         lastModifiedByID: userId, //recheck
-        effectiveDate: this.ActivityAuth[0].SectorEffectiveDate
+        effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].SectorEffectiveDate)
       },
       lstFirmScopeCondition: this.isScopeConditionChecked
         ? [
@@ -1420,150 +1467,45 @@ export class ViewFirmPageComponent implements OnInit {
           }
         ]
         : [], // Send an empty array if the checkbox is not checked
-      objFirmIslamicFinance: {
-        iFinFlag: this.isIslamicFinanceChecked,
-        iFinTypeId: this.islamicFinance.IFinTypeId,
-        iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
-        endorsement: this.islamicFinance.Endorsement,
-        savedIFinTypeID: this.islamicFinance.IFinTypeId,
-        scopeRevNum: this.ActivityAuth[0].ScopeRevNum,
-        lastModifiedBy: this.islamicFinance.IFinLastModifiedByName
-      },
-      resetFirmSector: true,
+      objFirmIslamicFinance: this.isIslamicFinanceChecked
+        ? {  // When checked, send the actual values
+          iFinFlag: this.isIslamicFinanceChecked,
+          iFinTypeId: this.islamicFinance.IFinTypeId,
+          iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
+          endorsement: this.islamicFinance.Endorsement,
+          savedIFinTypeID: this.islamicFinance.IFinTypeId,
+          scopeRevNum: this.ActivityAuth[0].ScopeRevNum,
+          lastModifiedBy: userId
+        }
+        : {  // When unchecked, send iFinFlag as false and everything else as null
+          iFinFlag: false,
+          iFinTypeId: null,
+          iFinTypeDesc: null,
+          endorsement: null,
+          savedIFinTypeID: null,
+          scopeRevNum: null,
+          lastModifiedBy: null
+        },
+      resetFirmSector: this.resetFirmSector,
       firmSectorID: null
     }
   }
 
-  saveAuthoriseScopeDetails(updatedAuthoriseScope: any, userId: number) {
-    console.log('Updated Authorise Scope:', updatedAuthoriseScope);
+  // saveAuthoriseScopeDetails(updatedAuthoriseScope: any, userId: number) {
+  //   console.log('Updated Authorise Scope:', updatedAuthoriseScope);
 
-    this.firmService.editAuthorizedScope(updatedAuthoriseScope).subscribe(
-      response => {
-        console.log('Authorise scope updated successfully:', response);
-        this.loadActivitiesAuthorized(); // Reload license scope details
-        this.isEditModeAuth = false; // Toggle edit mode off
-        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
-        // this.disableApplicationDate = true;
-      },
-      error => {
-        console.error('Error updating Authorised Scope:', error);
-      }
-    );
-  }
-
-  // updateOrSaveFirmScope() {
-  //   console.log("Data To Update Or Save Firm Scope:", this.ActivityAuth);
-
-  //   if (!this.ActivityAuth || this.ActivityAuth.length === 0) {
-  //     console.log('Firm activity scope not found');
-  //     return;
-  //   }
-
-  //   this.ActivityAuth.forEach(firmData => {
-  //     if (!firmData.FirmScopeID) {
-  //       console.log('FirmScopeID is missing for FirmID:', firmData.FirmID);
-  //       return;
+  //   this.firmService.editAuthorizedScope(updatedAuthoriseScope).subscribe(
+  //     response => {
+  //       console.log('Authorise scope updated successfully:', response);
+  //       this.loadActivitiesAuthorized(); // Reload license scope details
+  //       this.isEditModeAuth = false; // Toggle edit mode off
+  //       this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+  //       // this.disableApplicationDate = true;
+  //     },
+  //     error => {
+  //       console.error('Error updating Authorised Scope:', error);
   //     }
-  //     debugger
-  //     const firmScopeData = {
-  //       objFirmScope: {
-  //         firmScopeID: firmData.FirmScopeID,
-  //         scopeRevNum: firmData.ScopeRevNum,
-  //         firmID: firmData.FirmID,
-  //         // objectID: firmData.ObjectID,
-  //         createdBy: 30, // this will be change cuse there is no user 
-  //         docReferenceID: firmData.DocID,
-  //         // firmApplTypeID: 3,
-  //         // docIDs: firmData.DocIDs,
-  //         generalConditions: firmData.GeneralConditions,
-  //         effectiveDate: this.currentDate,
-  //         scopeCertificateLink: firmData.ScopeCertificateLink,
-  //         // applicationDate: firmData.ApplicationDate,
-  //         // licensedOrAuthorisedDate: firmData.LicensedDate
-  //       },
-  //       lstFirmActivities: [
-  //         {
-  //           // createdBy: firmData.CreatedBy,
-  //           // firmScopeTypeID: firmData.FirmScopeTypeID,
-  //           activityTypeID: firmData.ActivityTypeID,
-  //           effectiveDate: this.currentDate,
-  //           // firmActivityConditions: firmData.FirmActivityConditions,
-  //           // productTypeID: firmData.ProductTypeID,
-  //           // appliedDate: firmData.AppliedDate,
-  //           // withDrawnDate: firmData.WithDrawnDate,
-  //           objectProductActivity: [
-  //             {
-  //               // productTypeID: firmData.ProductTypeID,
-  //               // appliedDate: firmData.AppliedDate,
-  //               // withDrawnDate: firmData.WithDrawnDate,
-  //               effectiveDate: firmData.EffectiveDate,
-  //               // firmScopeTypeID: firmData.FirmScopeTypeID
-  //             }
-  //           ],
-  //           // activityDetails: firmData.ActivityDetails
-  //         }
-  //       ],
-  //       objPrudentialCategory: {
-  //         firmPrudentialCategoryID: firmData.FirmPrudentialCategoryID,
-  //         firmID: firmData.FirmID,
-  //         prudentialCategoryTypeID: firmData.PrudentialCategoryTypeID,
-  //         firmScopeID: firmData.FirmScopeID,
-  //         scopeRevNum: firmData.ScopeRevNum,
-  //         lastModifiedByID: 30, // this will be change cuse there is no user
-  //         effectiveDate: this.currentDate, // Ensure date is valid
-  //         // expirationDate: firmData.ExpirationDate,
-  //         lastModifiedDate: this.currentDate,
-  //         authorisationCategoryTypeID: firmData.AuthorisationCategoryTypeID
-  //       },
-  //       objSector: {
-  //         firmSectorID: firmData.FirmSectorID.toString(),
-  //         sectorTypeID: firmData.SectorTypeID,  // this will be change cuse there is no user
-  //         lastModifiedByID: 30, // this will be change cuse there is no user
-  //         effectiveDate: this.currentDate,
-  //       },
-  //       lstFirmScopeCondition: [
-  //         {
-  //           scopeConditionTypeId: 1,
-  //           lastModifiedBy: 30, // this will be change cuse there is no user
-  //           restriction: 1
-  //         }
-  //       ],
-  //       objFirmIslamicFinance: {
-  //         iFinFlag: true,
-  //         iFinTypeId: this.islamicFinance.IFinTypeId,
-  //         iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
-  //         endorsement: this.islamicFinance.Endorsement,
-  //         savedIFinTypeID: 2,
-  //         scopeRevNum: firmData.ScopeRevNum,
-  //         lastModifiedBy: 30 // this will be change cuse there is no user
-  //       },
-  //       resetFirmSector: true,
-  //       firmSectorID: firmData.FirmSectorID.toString(),
-  //       obj: {}
-  //     };
-
-  //     console.log('FirmScopeData to be sent:', firmScopeData);
-
-  //     this.firmService.editAuthorizedScope(10044, firmScopeData).subscribe(
-  //       response => {
-  //         console.log('Firm scope updated successfully for FirmID:', firmData.FirmID, response);
-  //         Swal.fire({
-  //           icon: 'success',
-  //           title: 'Success!',
-  //           text: `Firm scope saved successfully for FirmID: ${firmData.FirmID}`,
-  //         });
-  //       },
-  //       error => {
-  //         console.error('Error updating firm scope for FirmID:', firmData.FirmID, error);
-  //         console.log('Error details:', error.error);
-  //         Swal.fire({
-  //           icon: 'error',
-  //           title: 'Error!',
-  //           text: `Failed to save firm scope for FirmID: ${firmData.FirmID}.`,
-  //         });
-  //       }
-  //     );
-  //   });
+  //   );
   // }
 
 
@@ -1929,7 +1871,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
   //////////// 44
 
-  
+
   
   objectOpTypeIdEdit = 41;
   objectOpTypeIdCreate = 40;
@@ -2320,7 +2262,6 @@ export class ViewFirmPageComponent implements OnInit {
       this.firmService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
         response => {
           console.log("Save successful:", response);
-          this.isEditable = false;
         },
         error => {
           console.error("Error saving changes:", error);
@@ -2415,20 +2356,20 @@ export class ViewFirmPageComponent implements OnInit {
         }))
       };
 
-      // Call the save/update contact form endpoint
-      this.firmService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
-        response => {
-          console.log("Contact save successful:", response);
-        },
-        error => {
-          console.error("Error saving contact:", error);
-        }
-      );
-    }
-    else {
-      console.log('Validation errors found:', this.errorMessages);
-    }
-  });
+        // Call the save/update contact form endpoint
+        this.firmService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
+          response => {
+            console.log("Contact save successful:", response);
+          },
+          error => {
+            console.error("Error saving contact:", error);
+          }
+        );
+      }
+      else {
+        console.log('Validation errors found:', this.errorMessages);
+      }
+    });
   }
   CreateControllerValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -2898,17 +2839,21 @@ export class ViewFirmPageComponent implements OnInit {
 
   // On View Mode
   loadActivitiesAuthorized(): void {
+    this.isLoading = true; // Start loading indicator
+
+    // Fetch the current scope revision number
     this.firmService.getCurrentScopeRevNum(this.firmId, 3).subscribe(
       data => {
         this.scopeRevNum = data.response.Column1;
 
+        // Once scope revision is fetched, fetch firm activity authorized details
         this.firmService.getFirmActivityAuthorized(this.firmId).subscribe(
           data => {
             this.ActivityAuth = data.response;
-
-            // Loop through activities and group products into main categories and subcategories
+            this.loadPrudentialCategoryDetails();
+            this.loadSectorDetails();
+            // Process activities and group products into main categories and subcategories
             this.ActivityAuth.forEach(activity => {
-              // Create a new array to store categorized products
               activity.categorizedProducts = [];
               let currentCategory = null;
 
@@ -2928,50 +2873,74 @@ export class ViewFirmPageComponent implements OnInit {
               });
             });
 
-            // Load Prudential Return Types
+            // Load Prudential Return Types based on the first activity
             const prudentialCategoryTypeID = this.ActivityAuth[0].PrudentialCategoryTypeID;
             this.loadPrudReturnTypes(prudentialCategoryTypeID);
+
+            // Stop loading indicator once all data is fully loaded
+            this.isLoading = false;
           },
           error => {
             console.error('Error fetching License scope', error);
+            this.isLoading = false; // Stop loading on error
           }
         );
       },
       error => {
         console.error('Error fetching current scope revision number for authorized:', error);
+        this.isLoading = false; // Stop loading on error
       }
     );
   }
 
+  loadPrudentialCategoryDetails() {
+    this.ActivityAuth.forEach((activity => {
+      this.firmService.getPrudentialCategoryDetails(this.firmId, activity.FirmScopeID, activity.ScopeRevNum).subscribe((data) => {
+        this.prudentialCategoryDetails = data.response
+      }, error => {
+        console.error('Error Fetching Prudential Category Details: ', error)
+      })
+    }))
+  }
 
-
+  loadSectorDetails() {
+    this.ActivityAuth.forEach((activity => {
+      this.firmService.getSectorDetails(this.firmId, activity.FirmScopeID, activity.ScopeRevNum).subscribe((data) => {
+        this.sectorDetails = data.response;
+      }, error => {
+        console.error('Error Fetching Prudential Category Details: ', error)
+      })
+    }))
+  }
 
   onPrudentialCategoryChange(prudCategID: number) {
-    
+
     this.previousPrudentialCategoryID = parseInt(this.ActivityAuth[0].PrudentialCategoryTypeID);
 
     if (this.ActivityAuth[0].SectorTypeID > 0 && this.ActivityAuth[0].PrudentialCategoryTypeID) {
-      this.showConfirmationAndUpdate(prudCategID,constants.FirmActivitiesEnum.CHANGINGPRUDCAT_RESET_PRUDRETTYPE);
+      this.showConfirmationAndUpdate(prudCategID, constants.FirmActivitiesEnum.CHANGINGPRUDCAT_RESET_PRUDRETTYPE);
     } else {
       // No confirmation needed, just load return types normally
       this.updateSectorAndLoadReturnTypes(prudCategID);
     }
   }
 
-  showConfirmationAndUpdate(prudCategID: number,msgKey: number) {
+  showConfirmationAndUpdate(prudCategID: number, msgKey: number) {
     this.firmService.errorMessages(msgKey).subscribe((response) => {
       Swal.fire({
         title: 'Alert',
-        text: response.response, 
+        text: response.response,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Yes',
         cancelButtonText: 'No',
       }).then((result) => {
         if (result.isConfirmed) {
+          this.resetFirmSector = true;
           // User clicked 'Yes', reset SectorTypeID and load new return types
           this.updateSectorAndLoadReturnTypes(prudCategID, true); // true indicates reset SectorTypeID
         } else if (result.isDismissed) {
+          this.resetFirmSector = false;
           // User clicked 'No', reset the prudential category to the previous value
           this.ActivityAuth[0].PrudentialCategoryTypeID = this.previousPrudentialCategoryID;
           this.loadPrudReturnTypes(this.ActivityAuth[0].PrudentialCategoryTypeID);
@@ -3014,96 +2983,6 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-
-  // loadRegulatedActivities() {
-  //   this.firmService.getFirmActivityAuthorized(this.firmId).subscribe(
-  //     data => {
-  //       this.AuthRegulatedActivities = data.response;
-
-  //       this.AuthRegulatedActivities.forEach(activity => {
-  //         console.log("Activity ID: " + activity.ActivityTypeID);  // Print activity ID
-
-  //         if (activity.ActivityTypeID) {
-  //           // Initialize categorizedData for each activity
-  //           this.categorizedData = [];
-
-  //           // Load all products for the given activity
-  //           this.loadAllProducts(activity.ActivityTypeID).subscribe(allProducts => {
-  //             let currentCategory = null;
-
-  //             // Create a new object to represent the activity with its products
-  //             const activityData = {
-  //               activityId: activity.ActivityTypeID,
-  //               ActivityCategoryDesc: activity?.ActivityCategoryDesc,
-  //               ActivityTypeDesc: activity?.ActivityTypeDesc,
-  //               specificCondition: activity?.Column1,
-  //               products: []
-  //             };
-
-  //             // Categorize products into main categories and subcategories
-  //             allProducts.forEach(item => {
-  //               if (!currentCategory || item.ProductCategoryTypeID !== currentCategory.ProductCategoryTypeID) {
-  //                 // Create a new main category
-  //                 currentCategory = {
-  //                   mainCategory: item.ProductCategoryTypeDesc1,
-  //                   ProductCategoryTypeID: item.ProductCategoryTypeID,
-  //                   subCategories: []
-  //                 };
-  //                 activityData.products.push(currentCategory);
-  //               }
-
-  //               // Check if the item is not the main category itself
-  //               if (item.ID !== 0) {
-  //                 // Add the current item as a subcategory
-  //                 currentCategory.subCategories.push({
-  //                   ID: item.ID,
-  //                   ProductCategoryTypeDesc: item.ProductCategoryTypeDesc,
-  //                   TotalProduct: item.TotalProduct
-  //                 });
-  //               }
-  //             });
-
-  //             // Push the activity data into categorizedData
-  //             this.categorizedData.push(activityData);
-
-  //             // Print the categorized data for debugging
-  //             console.log("Activity ID " + activity.ActivityTypeID);
-
-  //             activityData.products.forEach(category => {
-  //               console.log("Product category " + category.ProductCategoryTypeID + ": " + category.mainCategory);
-
-  //               category.subCategories.forEach(subCategory => {
-  //                 console.log("Subcategories" + JSON.stringify(subCategory));
-  //               });
-  //             });
-  //           });
-  //         }
-
-  //         // Initialize selectedCategory
-  //         activity.selectedCategory = this.activityCategories.find(
-  //           category => category.ActivityCategoryDesc === activity.ActivityCategoryDesc
-  //         );
-
-  //         // If selectedCategory is found, load activities for that category
-  //         if (activity.selectedCategory) {
-  //           this.firmService.getAuthActivityTypes(activity.selectedCategory.ActivityCategoryID).subscribe(
-  //             data => {
-  //               activity.activities = data.response;
-
-  //               // Initialize selectedActivity based on ActivityTypeID
-  //               activity.selectedActivity = activity.activities.find(
-  //                 act => act.ActivityTypeID === activity.ActivityTypeID
-  //               );
-  //             }
-  //           );
-  //         }
-  //       });
-  //     },
-  //     error => {
-  //       console.error('Error fetching License scope', error);
-  //     }
-  //   );
-  // }
 
 
   loadIslamicFinance() {
@@ -3244,6 +3123,9 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   loadAllProductsForEditMode(): void {
+    this.isLoading = true;
+    const activityCount = this.ActivityAuth.length;
+    let loadedCount = 0;
     // Assuming ActivityAuth contains all activities with their ActivityTypeID
     this.ActivityAuth.forEach(activity => {
       const activityTypeID = activity.ActivityTypeID;
@@ -3287,11 +3169,14 @@ export class ViewFirmPageComponent implements OnInit {
               currentCategory.subProducts.push(subProduct);
             }
           });
-
-          console.log(`Categorized Products with firmScopeTypeID for ActivityTypeID ${activityTypeID}:`, activity.categorizedProducts);
+          loadedCount++;
+          if (loadedCount === activityCount) {
+            this.isLoading = false; // Stop loader after all products are loaded
+          }
         },
         error => {
           console.error(`Error fetching products for ActivityTypeID ${activityTypeID}:`, error);
+          this.isLoading = false;
         }
       );
     });
@@ -4061,31 +3946,31 @@ export class ViewFirmPageComponent implements OnInit {
   }
   viewAuditor(auditor: any) {
     this.selectedAuditor = auditor; // Set the selected auditor
-  this.IsViewAuditorVisible = true; // Show view section
-  this.IsEditAuditorVisible = false; // Hide edit section
-  this.IsCreateAuditorVisible = false; // Hide create section
+    this.IsViewAuditorVisible = true; // Show view section
+    this.IsEditAuditorVisible = false; // Hide edit section
+    this.IsCreateAuditorVisible = false; // Hide create section
   }
-  closeAuditorPopup(){
+  closeAuditorPopup() {
     this.selectedAuditor = {}; // Reset the selected auditor object
     this.IsEditAuditorVisible = false; // Hide edit section
     this.IsViewAuditorVisible = false; // Hide view section
     this.IsCreateAuditorVisible = false; // Hide create section
   }
-  closecreateAuditor(){
-    this.selectedAuditor = {}; 
-    this.IsCreateAuditorVisible = false; 
-    this.IsViewAuditorVisible = false; 
+  closecreateAuditor() {
+    this.selectedAuditor = {};
+    this.IsCreateAuditorVisible = false;
+    this.IsViewAuditorVisible = false;
   }
   editAuditor() {
     this.IsEditAuditorVisible = true; // Show the edit section
     this.IsCreateAuditorVisible = false; // Hide the create section
     this.IsViewAuditorVisible = false; // Hide the view section
-  
+
     // Fetch dropdown values when entering edit mode
     this.getFirmAuditorName();
     this.getFirmAuditorType();
   }
-  firmAuditorsObj : {};
+  firmAuditorsObj: {};
   saveEditAuditor() {
     this.firmAuditorsObj = {
       otherEntityID: this.selectedAuditor.OtherEntityID,
@@ -4128,8 +4013,8 @@ export class ViewFirmPageComponent implements OnInit {
         console.log("Auditor saved successfully", response);
         Swal.fire('Saved!', 'Auditors details has been Saved.', 'success');
         this.IsEditAuditorVisible = false;
-        this.IsViewAuditorVisible = false;        
-        this.loadAuditors(); 
+        this.IsViewAuditorVisible = false;
+        this.loadAuditors();
       },
       (error) => {
         console.error("Error saving auditor", error);
@@ -4177,8 +4062,8 @@ export class ViewFirmPageComponent implements OnInit {
         console.log("Auditor saved successfully", response);
         Swal.fire('Seaved!', 'Auditors details has been Seaved.', 'success');
         this.IsEditAuditorVisible = false;
-        this.IsViewAuditorVisible = false;        
-        this.loadAuditors(); 
+        this.IsViewAuditorVisible = false;
+        this.loadAuditors();
       },
       (error) => {
         console.error("Error saving auditor", error);
@@ -4192,37 +4077,36 @@ export class ViewFirmPageComponent implements OnInit {
     this.IsViewAuditorVisible = true;
   }
   createAuditor() {
-    this.selectedAuditor = {}; 
-    this.IsCreateAuditorVisible = true; 
-    this.IsEditAuditorVisible = false; 
+    this.selectedAuditor = {};
+    this.IsCreateAuditorVisible = true;
+    this.IsEditAuditorVisible = false;
     this.IsViewAuditorVisible = false;
     this.getFirmAuditorName();
     this.getFirmAuditorType();
   }
 
   confirmDeleteAuditor() {
-    this.firmService.errorMessages(3915).subscribe(
-      (response) => {
-        Swal.fire({
-          html: response.response,
-          showCancelButton: true,
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.deleteAuditor(); // Call delete logic if OK is clicked
-          } else if (result.dismiss === Swal.DismissReason.cancel) {
-            console.log('Cancelled deletion');
-          }
-        });
-      },
-      (error) => {
-        console.error('Error fetching message:', error);
-        // Handle error if needed
+    Swal.fire({
+      html:'No history will be maintained for the record being deleted. If you wish to maintain history, please click "Cancel", specify a date for the "Effective To Date" field and save the data.',
+      showCancelButton: true,
+      confirmButtonColor: '#a51e36',
+      cancelButtonColor: '#a51e36',
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      customClass: {
+        popup: 'custom-swal-width', // Class for custom width
       }
-    );
+    
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteAuditor(); // Call delete logic if OK is clicked
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        // Do something if Cancel is clicked, if needed
+        console.log('Cancelled deletion');
+      }
+    });
   }
- 
+
   // Delete auditor logic
   deleteAuditor() {
     this.firmAuditorsObj = {
@@ -4264,8 +4148,8 @@ export class ViewFirmPageComponent implements OnInit {
         console.log("Auditor Deleted successfully", response);
         Swal.fire('Deleted!', 'Auditors details has been Deleted.', 'success');
         this.IsEditAuditorVisible = false;
-        this.IsViewAuditorVisible = false;        
-        this.loadAuditors(); 
+        this.IsViewAuditorVisible = false;
+        this.loadAuditors();
       },
       (error) => {
         console.error("Error Deleteing auditor", error);

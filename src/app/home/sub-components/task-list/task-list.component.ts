@@ -53,9 +53,8 @@ export class TaskListComponent implements OnInit {
   }
 
   loadTasksList(): void {
-    console.log('Starting task list load at: ', new Date());
     this.isLoading = true;
-    this.TaskService.getAssignedTaskReminders(30).subscribe(
+    this.TaskService.getAssignedTaskReminders(this.userId).subscribe(
       data => {
         this.Tasks = data.response;
         this.filteredTasks = [...this.Tasks];  // Initialize with all tasks
@@ -76,33 +75,36 @@ export class TaskListComponent implements OnInit {
   
 
   toggleTaskPopup(selectedRow: any) {
-    this.selectedTask = selectedRow;  // Temporarily set the selected task to show a loading state, if needed
-    this.showTaskPopup = !this.showTaskPopup; // Toggle popup visibility
-  
+    this.isLoading = true;  // Set loader active before making the request
+    this.showTaskPopup = !this.showTaskPopup;  // Toggle popup visibility
+
     // Fetch task details using the new endpoint
     this.TaskService.getMyTaskByObjectDetails(
-      this.selectedTask.ObjectID, 
-      this.selectedTask.ObjectInstanceID, 
-      this.selectedTask.ObjectInstanceRevNum
+      selectedRow.ObjectID, 
+      selectedRow.ObjectInstanceID, 
+      selectedRow.ObjectInstanceRevNum
     ).subscribe(
       (data: any) => {
         this.selectedTask = data.response;  // Replace the selected task with detailed data from the new endpoint
         console.log('Detailed task data:', this.selectedTask);
-  
+
         // If LongDescription exists, sanitize it for display
         if (this.selectedTask[0]?.LongDescription) {
-          const updatedDescription = this.selectedTask.LongDescription.replace(/<BR\s*\/?>\s*<BR\s*\/?>/, ''); 
+          const updatedDescription = this.selectedTask[0].LongDescription.replace(/<BR\s*\/?>\s*<BR\s*\/?>/, ''); 
           this.safeHtmlDescription = this.sanitizer.bypassSecurityTrustHtml(updatedDescription);
         }
-  
+
         // Initialize the note text area for adding a new note
         this.noteText = '';
+        this.isLoading = false;  // Stop loader after data is loaded
       },
       (error: any) => {
         console.error('Error fetching detailed task data', error);
+        this.isLoading = false;  // Stop loader on error as well
       }
     );
-  }
+}
+
   
 
   closeTaskPopup() {

@@ -226,6 +226,16 @@ export class FirmService {
     return this.http.get<any>(url);
   }
 
+  getPrudentialCategoryDetails(firmId: number, firmScopeID: number,firmScopeRevNo: number): Observable<any> {
+    const url = `${this.baseUrlActivity}get_prudential_category?firmId=${firmId}&firmScopeID=${firmScopeID}&firmScopeRevNo=${firmScopeRevNo}`;
+    return this.http.get<any>(url);
+  }
+
+  getSectorDetails(firmId: number, firmScopeID: number,firmScopeRevNo: number): Observable<any> {
+    const url = `${this.baseUrlActivity}get_sector_details?firmId=${firmId}&firmScopeID=${firmScopeID}&firmScopeRevNo=${firmScopeRevNo}`;
+    return this.http.get<any>(url);
+  }
+
   getAllProducts(activityId: number): Observable<any> {
     const url = `${this.baseUrlActivity}get_available_products?activityTypeID=${activityId}`;
     return this.http.get<any>(url);

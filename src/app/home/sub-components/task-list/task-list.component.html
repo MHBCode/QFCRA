@@ -1,6 +1,13 @@
 <div *ngIf="isLoading" class="loader-overlay">
   <div class="loader"></div>
 </div>
+<div class="task-section-title" *ngIf="isMainView">
+  <div class="edit-firm-actions">
+    <h2 class="edit-firm-header">
+      Tasks & Reminders
+    </h2>
+  </div>
+</div>
 <div class="TaskList-wrapper" [ngClass]="isMainView ? 'listing-table' : 'home-table'">
   <div class="table customTable">
     <div *ngIf="showTitle" (click)="goToAllTasks()" class="tableTitle">
@@ -10,7 +17,7 @@
       <table [ngClass]="isMainView ? 'task-table' : 'home-task-table'">
         <thead>
           <tr>
-            <th style="display: flex;justify-content: space-between;">
+            <th class="task-table-column">
               <div>
                 Task Type
                 <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleTaskDropdown()">&#x25BC;</i>
@@ -30,7 +37,7 @@
               </div>
             </th>
             <th *ngIf="isMainView">Action</th>
-            <th class="firmName-column">
+            <th class="task-table-column">
               <div>
                 Firm Name
                 <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleFirmDropdown()">&#x25BC;</i>
@@ -51,7 +58,7 @@
             </th>
             <th>Description</th>
             <th>
-              <div style="display: flex; justify-content: space-between;">
+              <div class="task-table-column">
                 <div>
                   Due Date
                   <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleDueDateInput()">&#x25BC;</i>
@@ -64,7 +71,7 @@
                   class="custom-date-input" />
               </div>
             </th>
-            <th style="display: flex;justify-content: center;">
+            <th class="task-table-column">
               <div>
                 Days Over Due
                 <i *ngIf="isMainView" class="dropdown-icon" (click)="toggleDaysOverDueDropdown()">&#x25BC;</i>
@@ -139,7 +146,7 @@
 </div>
 
 <!-- view task popup -->
-<div class="popup-overlay" *ngIf="showTaskPopup">
+<div class="popup-overlay" *ngIf="!isLoading && showTaskPopup">
   <div class="popup-container" (click)="$event.stopPropagation()">
     <div class="popup-header">
       <h3>Task / Reminder Details</h3>
@@ -147,41 +154,47 @@
     </div>
 
     <div class="popup-content">
-      <div class="view-auditor-inputs">
+      <div class="view-task-inputs">
         <div class="input-field">
           <label for="taskType">Task Type</label>
-          <input disabled type="text" [value]="selectedTask[0]?.TaskType"/>
+          <input disabled type="text" [value]="selectedTask[0]?.TaskType" />
         </div>
 
         <div class="input-field">
           <label for="dueDate">Due Date</label>
-          <input disabled type="text" [value]="selectedTask[0]?.TaskDueDate"/>
+          <input disabled type="text" [value]="selectedTask[0]?.TaskDueDate" />
         </div>
 
         <div class="input-field">
           <label for="firmName">Firm Name</label>
-          <input disabled type="text" [value]="selectedTask[0]?.FirmName"/>
+          <input disabled type="text" [value]="selectedTask[0]?.FirmName" />
         </div>
 
         <div class="input-field">
           <label for="daysOverDue">Number of days overdue</label>
-          <input disabled type="text" [value]="selectedTask[0]?.DaysOverDue"/>
+          <input disabled type="text" [value]="selectedTask[0]?.DaysOverDue" />
         </div>
 
         <div class="input-field short-description">
           <label for="shortDesc">Short Description</label>
-          <input disabled type="text" [value]="selectedTask[0]?.ShortDescription"/>
+          <input disabled type="text" [value]="selectedTask[0]?.ShortDescription" />
         </div>
 
-        <div class="input-field app-description">
-          <label for="appDesc">Description</label>
-          <div class="appDesc" [innerHTML]="safeHtmlDescription"></div>
+      </div>
+
+      <div class="app-description">
+        <div class="popup-header">
+          <h3> Description </h3>
         </div>
+        <div class="appDesc" [innerHTML]="safeHtmlDescription"></div>
       </div>
 
       <!-- Display reminder notes -->
-      <div *ngIf="selectedTask[0]?.myReminderNotesList && selectedTask[0]?.myReminderNotesList.length > 0" class="notes-container">
-        <h4>Reminder Notes</h4>
+      <div *ngIf="selectedTask[0]?.myReminderNotesList && selectedTask[0]?.myReminderNotesList.length > 0"
+        class="notes-container">
+        <div class="popup-header">
+          <h3> Reminder Notes </h3>
+        </div>
         <table>
           <thead>
             <tr>
