@@ -1,6 +1,6 @@
 .history-row {
   display: flex;
-  gap:10px;
+  gap: 10px;
   width: 100%;
 }
 
@@ -790,10 +790,28 @@ table .input-field {
 /* regulated-activities */
 .regulated-activities-header {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
+  /* Space out elements */
+  align-items: center;
+  /* Center items vertically */
   background-color: #f2b6c0;
-  padding: 5px 0px;
+  padding: 5px 10px;
 }
+
+.regulated-activity-view {
+  justify-content: space-evenly;
+}
+
+.select-container {
+  display: flex;
+  gap: 20px;
+  /* Adjust gap as needed */
+  justify-content: center;
+  /* Center selects */
+  flex-grow: 1;
+  /* Allow the selects container to grow and take up space */
+}
+
 
 .regulated-activities-header p {
   margin: 0;
@@ -885,6 +903,29 @@ table .input-field {
   outline: 0;
 }
 
+.removeRegulatedActivity {
+  background: red;
+  color: white;
+  border: none;
+  font-size: 15px;
+  padding: 5px 10px;
+  border-radius: 7px;
+}
+
+.add-btn-container {
+  margin-left: auto;
+}
+
+.add-permitted-btn {
+  border: none;
+  font-size: 15px;
+  padding: 5px;
+  border-radius: 7px;
+  background: #A51E36;
+  margin-right: 10px;
+  color: white;
+}
+
 /**/
 
 /* Auditors */
@@ -965,6 +1006,7 @@ table .input-field {
 .inputs-field-set.collapsed .inputs-row,
 .inputs-field-set.collapsed hr,
 .inputs-field-set.collapsed .regulated-activities-container,
+.input-field-set.collapsed .add-btn-container,
 .inputs-field-set.collapsed .file-container,
 .inputs-field-set.collapsed .file-table-container,
 .authorized-body.collapsed,
@@ -1113,9 +1155,10 @@ hr {
   gap: 1%;
   width: 100%;
 }
-.create-controller-btns {
 
-}
+// .create-controller-btns {
+
+// }
 .btns-container button {
   padding: 7px 20px;
   background-color: #a51e36;
@@ -1273,24 +1316,42 @@ hr {
 //   width: 100%;
 // }
 .create-controller-section {
-  position: fixed; /* Fixes the popup on the screen */
-  top: 50%; /* Centers vertically */
-  left: 50%; /* Centers horizontally */
-  transform: translate(-50%, -50%); /* Adjusts for actual centering */
-  margin: 0; /* Remove margin */
-  z-index: 1000; /* High z-index to appear above other content */
-  background-color: #ffffff; /* White background for the popup */
-  display: flex; /* Flex layout for content */
-  flex-direction: column; /* Vertical layout */
-  align-items: center; /* Center content horizontally */
-  justify-content: flex-start; /* Align content to the top */
-  gap: 2rem; /* Gap between child elements */
-  width: 70%; /* Set the width to 70% of the screen */
-  height: 70%; /* Set the height to 70% of the screen */
-  padding: 2rem; /* Add padding inside the popup */
-  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.25); /* Adds shadow */
-  border-radius: 8px; /* Rounded corners */
-  max-width: none; /* Remove max-width constraint */
+  position: fixed;
+  /* Fixes the popup on the screen */
+  top: 50%;
+  /* Centers vertically */
+  left: 50%;
+  /* Centers horizontally */
+  transform: translate(-50%, -50%);
+  /* Adjusts for actual centering */
+  margin: 0;
+  /* Remove margin */
+  z-index: 1000;
+  /* High z-index to appear above other content */
+  background-color: #ffffff;
+  /* White background for the popup */
+  display: flex;
+  /* Flex layout for content */
+  flex-direction: column;
+  /* Vertical layout */
+  align-items: center;
+  /* Center content horizontally */
+  justify-content: flex-start;
+  /* Align content to the top */
+  gap: 2rem;
+  /* Gap between child elements */
+  width: 70%;
+  /* Set the width to 70% of the screen */
+  height: 70%;
+  /* Set the height to 70% of the screen */
+  padding: 2rem;
+  /* Add padding inside the popup */
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.25);
+  /* Adds shadow */
+  border-radius: 8px;
+  /* Rounded corners */
+  max-width: none;
+  /* Remove max-width constraint */
   overflow-y: scroll;
 }
 
@@ -1308,20 +1369,22 @@ hr {
   padding-top: 5vh;
 }
 
-.create-inputs-field-set{
+.create-inputs-field-set {
   width: 100%;
   background: #ffffff;
   min-height: 200px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
-.inputs-field-set{
+
+.inputs-field-set {
   width: 100%;
   background: #F1EBEC;
   border-radius: 15px;
   min-height: 200px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
-.create-controller-actions{
+
+.create-controller-actions {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -1329,13 +1392,15 @@ hr {
   padding: 0.5rem 1rem;
   padding-bottom: 0;
 }
+
 .btns {
   display: inline-flex;
   gap: 0.5rem;
   justify-content: center;
   align-items: center;
 }
-.btns button{
+
+.btns button {
   background: #A51E36;
   padding: 0.5rem 1rem;
   display: flex;
@@ -1347,10 +1412,12 @@ hr {
   min-width: 6rem;
   min-height: 40px;
 }
-.btns button i{
+
+.btns button i {
   margin: 0 2px;
 }
-.cancel-btn{
+
+.cancel-btn {
   background: transparent !important;
   color: #A51E36 !important;
   border: 1px solid #A51E36 !important;
@@ -1364,7 +1431,8 @@ hr {
   word-wrap: break-word;
   display: flex;
 }
-.create-controller-inputs{
+
+.create-controller-inputs {
   padding: 1rem;
   display: flex;
   flex-direction: row;
@@ -1375,7 +1443,7 @@ hr {
 
 
 .controller-type-container {
-  width: 96%!important;
+  width: 96% !important;
 }
 
 #controllerType {
@@ -1396,8 +1464,8 @@ hr {
 
 .button-wrapper {
   position: absolute;
-  top: 10px; 
-  right: 10px; 
+  top: 10px;
+  right: 10px;
 }
 
 .add-regulator-btn {
@@ -1422,8 +1490,8 @@ hr {
 }
 
 .home-state-regulators-container {
-  flex-direction: row!important;
-  align-items: center!important;
+  flex-direction: row !important;
+  align-items: center !important;
   width: 100%;
 }
 
@@ -1432,8 +1500,10 @@ hr {
 }
 
 .regulator-contact-container {
-  width: 100%!important;
-}/* scope */
+  width: 100% !important;
+}
+
+/* scope */
 .edit-scope-section {
   gap: 0 !important;
 }
@@ -1622,7 +1692,8 @@ hr {
   gap: 10px;
 }
 
-.create-save-btn, .create-cancel-btn {
+.create-save-btn,
+.create-cancel-btn {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;

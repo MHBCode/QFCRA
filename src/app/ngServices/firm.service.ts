@@ -180,21 +180,22 @@ export class FirmService {
     const url = `${this.baseUrlActivity}get_activity_types?activityCategoryId=1`
     return this.http.get<any>(url);
   }
-  getFirmScopeIdAndRevNum(firmId: number): Observable<{ scopeId: number; scopeRevNum: number }> {
-    const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmApplicationTypeId=3`;
-    return this.http.get<any>(url).pipe(
-      map(response => {
-        const firstItem = response.response?.[0];
-        if (firstItem) {
-          return {
-            scopeId: firstItem.FirmScopeID,
-            scopeRevNum: firstItem.ScopeRevNum
-          };
-        }
-        throw new Error('No data found');
-      })
-    );
-  }
+
+  // getFirmScopeIdAndRevNum(firmId: number): Observable<{ scopeId: number; scopeRevNum: number }> {
+  //   const url = `${this.baseUrlActivity}get_firm_activities?firmId=${firmId}&firmApplicationTypeId=3`;
+  //   return this.http.get<any>(url).pipe(
+  //     map(response => {
+  //       const firstItem = response.response?.[0];
+  //       if (firstItem) {
+  //         return {
+  //           scopeId: firstItem.FirmScopeID,
+  //           scopeRevNum: firstItem.ScopeRevNum
+  //         };
+  //       }
+  //       throw new Error('No data found');
+  //     })
+  //   );
+  // }
 
   getRevision(scopeID: number): Observable<any> {
     const url = `${this.baseUrlObjectWF}get_revision?objectId=524&objectInstanceId=${scopeID}`
@@ -207,13 +208,18 @@ export class FirmService {
     return this.http.get<any>(url);
   }
 
-  getIslamicFinance(firmId: number): Observable<any> {
-    return this.getFirmScopeIdAndRevNum(firmId).pipe(
-      switchMap(({ scopeId, scopeRevNum }) => {  // Destructure the object
-        const url = `${this.baseUrlActivity}get_islamic_finance?firmId=${firmId}&firmScopeID=${scopeId}&scopeRevNo=${scopeRevNum}`;
-        return this.http.get<any>(url);
-      })
-    );
+  // getIslamicFinance(firmId: number): Observable<any> {
+  //   return this.getFirmScopeIdAndRevNum(firmId).pipe(
+  //     switchMap(({ scopeId, scopeRevNum }) => {  // Destructure the object
+  //       const url = `${this.baseUrlActivity}get_islamic_finance?firmId=${firmId}&firmScopeID=${scopeId}&scopeRevNo=${scopeRevNum}`;
+  //       return this.http.get<any>(url);
+  //     })
+  //   );
+  // }
+
+  getIslamicFinance(firmId: number,scopeId:number,scopeRevNum:number): Observable<any> {
+    const url = `${this.baseUrlActivity}get_islamic_finance?firmId=${firmId}&firmScopeID=${scopeId}&scopeRevNo=${scopeRevNum}`
+    return this.http.get<any>(url);
   }
 
   getObjectTypeTable(dropdown: string): Observable<any> {

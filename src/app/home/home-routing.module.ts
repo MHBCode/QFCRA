@@ -28,7 +28,6 @@ import { ViewControllerComponent } from './sub-pages/view-controller/view-contro
 import { EditControllerComponent } from './sub-pages/edit-controller/edit-controller.component';
 import { CreateControllerComponent } from './sub-pages/create-controller/create-controller.component';
 import { CreateContactComponent } from './sub-pages/create-contact/create-contact.component';
-import { EditScopeAuthorizedComponent } from './sub-pages/edit-scope-authorized/edit-scope-authorized.component';
 import { ShadowSupervisorComponent } from './sub-components/shadow-supervisor/shadow-supervisor.component';
 import { TasksIAssignedComponent } from './sub-components/tasks-i-assigned/tasks-i-assigned.component';
 import { MyTeamTasksComponent } from './sub-components/my-team-tasks/my-team-tasks.component';
@@ -82,7 +81,6 @@ const routes: Routes = [
   { path: 'edit-controller', component: EditControllerComponent},
   { path: 'create-controller', component: CreateControllerComponent},
   { path: 'create-contact', component: CreateContactComponent },
-  { path: 'edit-scope-authorized/:id', component: EditScopeAuthorizedComponent}
 ];
 
 @NgModule({

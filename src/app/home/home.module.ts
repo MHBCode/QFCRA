@@ -36,7 +36,6 @@ import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages
 import { ViewControllerComponent } from './sub-pages/view-controller/view-controller.component';
 import { EditControllerComponent } from './sub-pages/edit-controller/edit-controller.component';
 import { CreateControllerComponent } from './sub-pages/create-controller/create-controller.component';
-import { EditScopeAuthorizedComponent } from './sub-pages/edit-scope-authorized/edit-scope-authorized.component';
 import { ShadowSupervisorComponent } from './sub-components/shadow-supervisor/shadow-supervisor.component';
 import { TasksIAssignedComponent } from './sub-components/tasks-i-assigned/tasks-i-assigned.component';
 import { MyTeamTasksComponent } from './sub-components/my-team-tasks/my-team-tasks.component';
@@ -74,7 +73,6 @@ import { CreateReminderComponent } from './sub-components/create-reminder/create
     ViewControllerComponent,
     EditControllerComponent,
     CreateControllerComponent,
-    EditScopeAuthorizedComponent,
     ShadowSupervisorComponent,
     TasksIAssignedComponent,
     MyTeamTasksComponent,

@@ -1241,9 +1241,10 @@
                 <tbody>
                   <tr>
                     <td style="text-align:left">{{AuthTableDocument?.DocSubTypeDesc}}</td>
-                    <td style="text-align:left"><a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{AuthTableDocument?.FileLoc}}"
+                    <td style="text-align:left"><a
+                        href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{AuthTableDocument?.FileLoc}}"
                         target="_blank">{{AuthTableDocument?.FileName}}</a></td>
-                        <td style="text-align:center"><button>Delete</button></td>
+                    <td style="text-align:center"><button>Delete</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -1260,10 +1261,13 @@
                 {{ isCollapsed["regulatedActivitiesSection"] ? "▲" : "▼" }}
               </button>
             </div>
+            <div [hidden]="isCollapsed['regulatedActivitiesSection']" class="add-btn-container" *ngIf="isEditModeAuth">
+              <button class="add-permitted-btn" (click)="addNewPermittedActivity()">Add</button>
+            </div>
             <!--on view mode-->
             <div class="regulated-activities-container">
-              <div *ngFor="let activity of ActivityAuth">
-                <div class="regulated-activities-header" *ngIf="!isEditModeAuth">
+              <div *ngFor="let activity of ActivityAuth; let i = index">
+                <div class="regulated-activities-header regulated-activity-view" *ngIf="!isEditModeAuth">
                   <p>
                     Category : <strong>{{ activity?.CategoryDescription }}</strong>
                   </p>
@@ -1277,32 +1281,36 @@
                 <!---->
                 <!--on edit mode-->
                 <div class="regulated-activities-header" *ngIf="isEditModeAuth">
-                  <div class="category-select">
-                    <label for="category" style="display: flex; gap: 5px">
-                      Category <span style="color: red">*</span>:
-                    </label>
-                    <select [(ngModel)]="activity.FirmScopeTypeID" (ngModelChange)="onCategoryChange(activity)"
-                      name="category" id="category">
-                      <option *ngFor="let category of activityCategories" [value]="category.ActivityCategoryID">
-                        {{ category.ActivityCategoryDesc }}
-                      </option>
-                    </select>
+                  <div class="select-container">
+                    <div class="category-select">
+                      <label for="category" style="display: flex; gap: 5px">
+                        Category <span style="color: red">*</span>:
+                      </label>
+                      <select [(ngModel)]="activity.FirmScopeTypeID" (ngModelChange)="onCategoryChange(activity)"
+                        name="category" id="category">
+                        <option *ngFor="let category of activityCategories" [value]="category.ActivityCategoryID">
+                          {{ category.ActivityCategoryDesc }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="activity-select">
+                      <label for="activity" style="display: flex; gap: 5px">
+                        Activity <span style="color: red">*</span>:
+                      </label>
+                      <select [(ngModel)]="activity.ActivityTypeID" (ngModelChange)="onActivityChange(activity)"
+                        name="activity" id="activity">
+                        <option value="0">Select</option>
+                        <option *ngFor="let act of activity.activities" [value]="act.ActivityTypeID">
+                          {{ act.ActivityTypeDesc }}
+                        </option>
+                      </select>
+                    </div>
                   </div>
 
-
-                  <div class="activity-select">
-                    <label for="activity" style="display: flex; gap: 5px">
-                      Activity <span style="color: red">*</span>:
-                    </label>
-                    <select [(ngModel)]="activity.ActivityTypeID" (ngModelChange)="onActivityChange(activity)"
-                      name="activity" id="activity">
-                      <option value="0">Select</option>
-                      <option *ngFor="let act of activity.activities" [value]="act.ActivityTypeID">
-                        {{ act.ActivityTypeDesc }}
-                      </option>
-                    </select>
-                  </div>
+                  <button class="removeRegulatedActivity bi bi-trash" style="margin-left: auto;" (click)="removePermittedActivity(i)"></button>
                 </div>
+
                 <!---->
 
                 <!--on view mode-->
@@ -1313,13 +1321,13 @@
                     <h4>{{ category.mainCategory }}</h4>
 
                     <!-- Display Sub Products -->
-                 
-                      <ul style="margin-left: 40px">
-                        <li *ngFor="let subProduct of category.subProducts">
-                          {{ subProduct.productTypeDescription }}
-                        </li>
-                      </ul>
-                
+
+                    <ul style="margin-left: 40px">
+                      <li *ngFor="let subProduct of category.subProducts">
+                        {{ subProduct.productTypeDescription }}
+                      </li>
+                    </ul>
+
                   </div>
                 </div>
 
@@ -1348,8 +1356,8 @@
                               <!-- Sub-product description below "Product(s)" header -->
                               <td style="width: 60%">
                                 <label>
-                                  <input type="checkbox" [(ngModel)]="subProduct.isChecked" 
-                                  (change)="updateMainCategoryState(product)" />
+                                  <input type="checkbox" [(ngModel)]="subProduct.isChecked"
+                                    (change)="updateMainCategoryState(product)" />
                                   {{ subProduct.ProductCategoryTypeDesc }}
                                 </label>
                               </td>
@@ -1381,7 +1389,7 @@
                     {{ activity.errorMessages['Products'] }}
                   </p>
                 </div>
-                
+
 
                 <!-- on view mode -->
                 <!--specific conditions and restrictions-->
@@ -1414,11 +1422,10 @@
                   <p>Conditions and Restrictions</p>
                 </div>
 
-                <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0 || (isEditModeAuth)">
+                <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition[0]?.length > 0 || (isEditModeAuth)">
                   <strong>Retail Restriction: </strong> &nbsp;
                   <span *ngIf="!isEditModeAuth">Yes</span>
-                  <input *ngIf="isEditModeAuth" [(ngModel)]="isScopeConditionChecked" type="checkbox"
-                    [value]="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0 ? true : false" />
+                  <input *ngIf="isEditModeAuth" [(ngModel)]="isScopeConditionChecked" type="checkbox"/>
                 </p>
 
                 <p>
@@ -1453,8 +1460,7 @@
             <div class="input-field" *ngIf="isEditModeAuth">
               <div style="display: flex; gap: 15px">
                 <label for="isIslamicFinanceExist"> Islamic Finance </label>
-                <input style="width: 15px" type="checkbox" name="isIslamicFinanceExist" id="isIslamicFinanceExist"
-                  [checked]="islamicFinance?.IFinTypeId > 0 ? true : false" [(ngModel)]="isIslamicFinanceChecked" />
+                <input style="width: 15px" type="checkbox" name="isIslamicFinanceExist" id="isIslamicFinanceExist" [(ngModel)]="isIslamicFinanceChecked" />
               </div>
             </div>
             <div class="input-field">
@@ -1745,12 +1751,12 @@
         <!-- Form -->
         <form>
 
-            <div class="inputs-row">
-              <div class="input-field">
-                <label>Controller Type</label>
-                <input [(ngModel)]="selectedController.EntityTypeDesc" name="ControllerType" disabled/>
-              </div>
+          <div class="inputs-row">
+            <div class="input-field">
+              <label>Controller Type</label>
+              <input [(ngModel)]="selectedController.EntityTypeDesc" name="ControllerType" disabled />
             </div>
+          </div>
 
           <!-- Contact Details Row 1 -->
           <div class="inputs-row">
@@ -1782,7 +1788,7 @@
 
           <!-- Contact Details Row 2 -->
           <div class="inputs-row">
-           
+
             <div class="input-field">
               <label>Place of Establishment:</label>
               <ng-container *ngIf="isEditable; else placeOfEstablishmentDisplay">
@@ -1799,24 +1805,20 @@
             <div class="input-field">
               <ng-container>
                 <label>Type of Control</label>
-                <select required [(ngModel)]="selectedController.ControllerControlTypeID" 
-                (ngModelChange)="updateControlTypeDesc($event)"
-                        name="typeOfControl" 
-                        [disabled]="!isEditable">
+                <select required [(ngModel)]="selectedController.ControllerControlTypeID"
+                  (ngModelChange)="updateControlTypeDesc($event)" name="typeOfControl" [disabled]="!isEditable">
                   <option value="1">Percentage</option>
                   <option value="2">Exercise Control</option>
                 </select>
               </ng-container>
             </div>
-            
+
             <!-- Display the % of Holding field only if the control type is "Percentage" -->
             <ng-container *ngIf="selectedController.ControllerControlTypeID == 1">
               <div class="input-field">
                 <label>% of Holding</label>
-                <input [(ngModel)]="selectedController.PctOfShares" 
-                       name="percentOfHolding" 
-                       type="text" 
-                       [readonly]="!isEditable" />
+                <input [(ngModel)]="selectedController.PctOfShares" name="percentOfHolding" type="text"
+                  [readonly]="!isEditable" />
               </div>
             </ng-container>
           </div>
@@ -1954,14 +1956,14 @@
     <div class="create-controller-section" *ngIf="showCreateControllerSection">
       <div class="create--inputs-field-set">
         <div class="create-controller-actions">
-            <h2 class="create-controller-header">
-                Controller For {{ firmDetails?.FirmName }}
-            </h2>
-            <div class="btns">
-                <button class="save-btn" (click)="createControllerPopupChanges()">Save</button>
-                <button class="cancel-btn" (click)="closeCreateControllerPopup()">Cancel</button>
-            </div>
-            
+          <h2 class="create-controller-header">
+            Controller For {{ firmDetails?.FirmName }}
+          </h2>
+          <div class="btns">
+            <button class="save-btn" (click)="createControllerPopupChanges()">Save</button>
+            <button class="cancel-btn" (click)="closeCreateControllerPopup()">Cancel</button>
+          </div>
+
         </div>
         <div class="error-messages" style="color: red">
           <p *ngIf="errorMessages['OtherEntityName']">{{ errorMessages['OtherEntityName'] }}</p>
@@ -2214,8 +2216,8 @@
             <!---->
           </ng-container>
         </div>
-    </div>
-    <div *ngIf="!hideForms" class="create--inputs-field-set">
+      </div>
+      <div *ngIf="!hideForms" class="create--inputs-field-set">
         <div class="create-controller-actions">
           <h2 class="create-controller-header">
             Addresses
@@ -2292,7 +2294,7 @@
         </div>
       </div>
 
-    <div class="create-inputs-field-set" *ngIf="CreatecontrollerDetails.IsCompanyRegulated === true">
+      <div class="create-inputs-field-set" *ngIf="CreatecontrollerDetails.IsCompanyRegulated === true">
         <div class="create-controller-actions">
           <h2 class="create-controller-header">
             Home State Regulators
@@ -2442,61 +2444,61 @@
     <!-- create Auditor popup -->
     <div class="contollerPopupOverlay" *ngIf="IsCreateAuditorVisible">
       <div class="contollerPopupContent">
-      <div class="view-auditor-actions">
-        <h2 class="view-auditor-header">Auditor Details</h2>
+        <div class="view-auditor-actions">
+          <h2 class="view-auditor-header">Auditor Details</h2>
 
-        <div class="btn">
-          <button
-            style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;"
-            (click)="closecreateAuditor()"><i class="bi bi-x"></i> Cancel</button>
+          <div class="btn">
+            <button
+              style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;"
+              (click)="closecreateAuditor()"><i class="bi bi-x"></i> Cancel</button>
+          </div>
         </div>
+        <form>
+          <div class="view-auditor-inputs">
+            <div class="input-field">
+              <label for="auditorName">
+                Auditor Name <span style="color: red">*</span>
+              </label>
+              <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID">
+                <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}
+                </option>
+              </select>
+            </div>
+            <div class="input-field" *ngIf="selectedAuditorNameFromSelectBox === 'other'">
+              <label for="auditorName">
+                Auditor Name <span style="color: red">*</span>
+              </label>
+              <input type="text" />
+            </div>
+            <div class="input-field">
+              <label for="auditorType">
+                Auditor Type <span style="color: red">*</span>
+              </label>
+              <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID">
+                <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">{{ type.EntitySubTypeDesc }}
+                </option>
+              </select>
+            </div>
+            <div class="input-field">
+              <label for="address2">
+                Effective From Date <span style="color: red">*</span>
+              </label>
+              <input name="effectiveFromDate" [(ngModel)]="selectedAuditor.AssnDateFrom" id="effectiveFromDate"
+                type="text" #dateInputs />
+            </div>
+            <div class="input-field">
+              <label for="effectiveToDate"> Effective To Date </label>
+              <input name="effectiveToDate" [(ngModel)]="selectedAuditor.AssnDateTo" id="effectiveToDate" type="text"
+                #dateInputs />
+            </div>
+          </div>
+          <div class="btn" style="margin-left: 15px;margin-bottom:10px; display: flex;">
+            <button
+              style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;"
+              (click)="saveCreateAuditor()"><i class="bi bi-save"></i> Save</button>
+          </div>
+        </form>
       </div>
-      <form>
-        <div class="view-auditor-inputs">
-          <div class="input-field">
-            <label for="auditorName">
-              Auditor Name <span style="color: red">*</span>
-            </label>
-            <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID">
-              <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}
-              </option>
-            </select>
-          </div>
-          <div class="input-field" *ngIf="selectedAuditorNameFromSelectBox === 'other'">
-            <label for="auditorName">
-              Auditor Name <span style="color: red">*</span>
-            </label>
-            <input type="text" />
-          </div>
-          <div class="input-field">
-            <label for="auditorType">
-              Auditor Type <span style="color: red">*</span>
-            </label>
-            <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID">
-              <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">{{ type.EntitySubTypeDesc }}
-              </option>
-            </select>
-          </div>
-          <div class="input-field">
-            <label for="address2">
-              Effective From Date <span style="color: red">*</span>
-            </label>
-            <input name="effectiveFromDate" [(ngModel)]="selectedAuditor.AssnDateFrom" id="effectiveFromDate"
-              type="text" #dateInputs />
-          </div>
-          <div class="input-field">
-            <label for="effectiveToDate"> Effective To Date </label>
-            <input name="effectiveToDate" [(ngModel)]="selectedAuditor.AssnDateTo" id="effectiveToDate" type="text"
-              #dateInputs />
-          </div>
-        </div>
-        <div class="btn" style="margin-left: 15px;margin-bottom:10px; display: flex;">
-          <button
-            style="background: #a51e36;padding: 0.5rem 1rem;border: none;border-radius: 10px;color: white;min-width: 6rem;min-height: 40px;"
-            (click)="saveCreateAuditor()"><i class="bi bi-save"></i> Save</button>
-        </div>
-      </form>
-    </div>
     </div>
 
   </section>
@@ -2674,7 +2676,7 @@
           </div>
         </form>
       </div>
-      
+
     </div>
   </section>
 
@@ -2820,7 +2822,7 @@
           </tbody>
         </table>
       </div>
-      
+
     </div>
   </section>
 
