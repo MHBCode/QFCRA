@@ -184,13 +184,13 @@ export class FirmsPageComponent implements OnInit {
   supervisorSupervisions: string[] = [];
   authorisationStatuses: string[] = [];
   amlSupervisors: string[] = [];
-  
+  legalStatuses: string[] = [];
   filteredFirms: any[] = [];
   filteredFirmsdata: any = [];
   showPopup: boolean = false;
   isSortDropdownOpen: boolean = false;
   selectedSortOption: string = 'newFirms'; // Default sort option
-
+  relevantPerson: boolean = false;
   private unlistenDocumentClick: () => void;
 
   isLoading: boolean = true;
@@ -201,17 +201,22 @@ export class FirmsPageComponent implements OnInit {
   firmType: boolean = true;
   firmStatus: boolean = true;
   licenseStatus: string = 'all';
+  legalStatus: string = 'all';
+  amlSup: string = 'all';
   authorisationStatus: string = 'all'
   supervisorSupervision: string = 'all';
   prudentialCategory: boolean = true;
   sectors: boolean = true;
-
+  supervisionCategory: boolean = true;
+  authorisationCategory : boolean = true;
   // Toggling Options for expanded views
   toggleOptions = {
     firmType: false,
     firmStatus: false,
     prudentialCategory: false,
-    sectors: false
+    sectors: false,
+    supervisionCategory: false,
+    authorisationCategory: false,
   };
   
   // Checkbox model properties
@@ -237,7 +242,31 @@ export class FirmsPageComponent implements OnInit {
     insurer: false,
     bank: false,
     advisor: false,
-    repOffice: false
+    repOffice: false,
+    corporateBank:false,
+    investmentManagerSupCat:false,
+    auditAndAccountingServices:false,
+    trustServices:false,
+    singleFamilyOffice:false,
+    insuranceIntermediarySupCat:false,
+    captiveInsurer:false,
+    captiveManager:false,
+    investmentBank:false,
+    advisorSupCat:false,
+    legalServices:false,
+    professionalServices:false,
+    directInsurerSupCat:false,
+    repOfficeSupCat:false,
+    reinsurerSupCat:false,
+    wealthManager:false,    
+    iBANK:false,
+    iNMA:false,
+    cAPI:false,
+    iMEB: false,
+    pINS:false,
+    rEPO:false,
+    dMEX:false,
+    relevantPerson: false,
   };
   
   alphabet: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('');
@@ -271,7 +300,7 @@ export class FirmsPageComponent implements OnInit {
           this.supervisorSupervisions = [...new Set(this.firms.map(firm => firm.Supervisor))];
           this.authorisationStatuses = [...new Set(this.firms.map(firm => firm.AuthorisationStatusTypeDesc))];
           this.amlSupervisors = [...new Set(this.firms.map(firm => firm.Supervisor_AML))];
-          
+          this.legalStatuses = [...new Set(this.firms.map(firm => firm.LegalStatusTypeDesc))];
           // Apply default sorting after data load
           this.sortFirms(this.selectedSortOption);
           
@@ -324,21 +353,24 @@ export class FirmsPageComponent implements OnInit {
       AuthorisationStatusId: this.authorisationStatus !== 'all' ? this.authorisationStatus : 0,  
       OperationalStatusId: 0, // Adjust based on your logic
       QFCNumber: this.qfcNumber || 0,
-      LegalStatusId: 0, 
+      LegalStatusId: this.legalStatus !== 'all' ? this.firms.find(firm => firm.LegalStatusTypeDesc === this.legalStatus)?.LegalStatusId || 0 : 0, 
+      AmlSupervisorsId: this.amlSup !=='all' ? this.firms.find(firm => firm.Supervisor_AML === this.amlSupervisors)?.AmlSupervisorsId || 0 : 0,
+      SupervisorSupervisionId: this.supervisorSupervision !=='all' ? this.firms.find(firm => firm.Supervisor === this.supervisorSupervision)?.SupervisorSupervisionId || 0 : 0,
       AuthorisationCaseOfficerId: 0, // Example value
       SupervisionCaseOfficerId: 0, // Example value
       PrudentialCategotyId: 0, // Adjust based on your logic
       UserID:0, // Adjust based on your logic
-      RelevantPerson: 0, 
+      RelevantPerson: this.relevantPerson ? 1 : 0, 
       CSVAuthorisationStatus: this.authorisationStatus !== 'all' ? this.authorisationStatus : 0,
       CSVLicenseStatus: 0,
       CSVLegalStatus: 0, 
+      CSVauthorisationCategory: this.getAuthorisationCategoriesCSV(),
       CSVPrudentialCategory:this.getPrudentialCategoriesCSV(), 
       CSVSectorTypes:this.getSectorsCSV(), 
       LoginUserID: 30, 
       CSVFirmTypes: this.getFirmTypesCSV(),
       CSVFirmStatus: this.getFirmStatusCSV(),
-      CSVSupCategories:0, 
+      CSVSupCategories:this.getSupCategoriesCSV(), 
       startChar: this.startCharLatter || '',
     };
 
@@ -381,14 +413,31 @@ export class FirmsPageComponent implements OnInit {
       insurer: '2',
       bank: '4',
       advisor: '5',
-      repOffice: '6'
+      repOffice: '6',
+    corporateBank:'1',
+    auditAndAccountingServices:'3',
+    trustServices:'4',
+    singleFamilyOffice:'5',
+    captiveInsurer:'7',
+    captiveManager:'8',
+    investmentBank:'9',
+    legalServices:'11',
+    professionalServices:'12',
+    wealthManager:'16',   
+    iBANK:'2',
+    iNMA:'3',
+    cAPI:'4',
+    iMEB: '5',
+    pINS:'6',
+    rEPO:'7',
+    dMEX:'8' 
     };
     return valueMapping[key] || '0'; // Default value if no match found
   }
   getPrudentialCategoriesCSV(): string {
     return Object.keys(this.checkboxes)
       .filter(key => this.checkboxes[key] && key.startsWith('piib'))
-      .map((key, index) => (index + 1).toString()) // Assuming PIIBs are numbered 1-5
+      .map((key, index) => (index + 1)) // Assuming PIIBs are numbered 1-5
       .join(',');
   }
   getSectorsCSV(): string {
@@ -402,7 +451,7 @@ export class FirmsPageComponent implements OnInit {
           case 'bank': return '4';
           case 'advisor': return '5';
           case 'repOffice': return '6';
-          default: return '0';
+          default: return "";
         }
       })
       .join(',');
@@ -415,7 +464,7 @@ export class FirmsPageComponent implements OnInit {
           case 'authorized': return '1';
           case 'dnfbp': return '2';
           case 'licensed': return '3';
-          default: return '0';
+          default: return "";
         }
       })
       .join(',');
@@ -431,7 +480,7 @@ export class FirmsPageComponent implements OnInit {
           case 'active': return '4';
           case 'inactive': return '5';
           case 'withdrawn': return '6';
-          default: return '0';
+          default: return "";
           
         }
       })
@@ -440,14 +489,54 @@ export class FirmsPageComponent implements OnInit {
   }
 
   getSupCategoriesCSV(): string {
-    // Logic to collect supervision categories as CSV
-    return '5,7'; // Adjust based on your logic
-  }
+    return Object.keys(this.checkboxes)
+        .filter(key => this.checkboxes[key])  // Check if the checkbox is checked
+        .map(key => {
+            // Return the corresponding value based on the key
+            switch (key) {
+                case 'corporateBank': return '1';
+                case 'investmentManager': return '2';
+                case 'auditAndAccountingServices': return '3';
+                case 'trustServices': return '4';
+                case 'singleFamilyOffice': return '5';
+                case 'insuranceIntermediary': return '6';
+                case 'captiveInsurer': return '7';
+                case 'captiveManager': return '8';
+                case 'investmentBank': return '9';
+                case 'advisorSupCat': return '10';
+                case 'legalServices': return '11';
+                case 'professionalServices': return '12';
+                case 'directInsurer': return '13';
+                case 'repOffice': return '14';
+                case 'reinsurer': return '15';
+                case 'wealthManager': return '16';
+                default: return "";  // Return an empty string for unknown keys
+            }
+        })
+        .filter(value => value !== "")  // Filter out empty strings
+        .join(',');  // Join the values into a comma-separated string
+}
 
-  getAuthorisationCategoriesCSV(): string {
-    // Logic to collect authorisation categories as CSV
-    return '3,5'; // Adjust based on your logic
-  }
+getAuthorisationCategoriesCSV(): string {
+  return Object.keys(this.checkboxes)
+      .filter(key => this.checkboxes[key])  // Check if the checkbox is checked
+      .map(key => {
+          // Return the corresponding value based on the key
+          switch (key) {
+              case 'bank': return '1';
+              case 'iBANK': return '2';
+              case 'iNMA': return '3';
+              case 'cAPI': return '4';
+              case 'iMEB': return '5';
+              case 'pINS': return '6';
+              case 'rEPO': return '7';
+              case 'dMEX': return '8';
+              default: return "";  // Return an empty string for unknown keys
+          }
+      })
+      .filter(value => value !== "")  // Filter out empty strings
+      .join(',');  // Join the values into a comma-separated string
+}
   // Filter firms by letter
 
 
@@ -465,10 +554,15 @@ export class FirmsPageComponent implements OnInit {
     this.qfcNumber = '';
     this.licenseStatus = 'all';
     this.supervisorSupervision = 'all';
+    this.authorisationStatus = 'all' ;
+    this.legalStatus = 'all';
+    this.amlSup = 'all';
     this.firmType = true;
     this.firmStatus = true;
     this.prudentialCategory = true;
     this.sectors = true;
+    this.supervisionCategory = true;
+    this.authorisationCategory = true;
     this.getstartChar("#");
     this.checkboxes = {
       authorized: false,
@@ -493,8 +587,31 @@ export class FirmsPageComponent implements OnInit {
       bank: false,
       advisor: false,
       repOffice: false,
-
-    };
+      corporateBank: false,
+      investmentManagerSupCat: false,  // Ensure this property is included
+      auditAndAccountingServices: false,
+      trustServices: false,
+      singleFamilyOffice: false,
+      insuranceIntermediarySupCat: false,  // Ensure this property is included
+      captiveInsurer: false,
+      captiveManager: false,
+      investmentBank: false,
+      advisorSupCat: false,  // Ensure this property is included
+      legalServices: false,
+      professionalServices: false,
+      directInsurerSupCat: false,  // Ensure this property is included
+      repOfficeSupCat: false,
+      reinsurerSupCat: false,
+      wealthManager: false,
+      iBANK: false,
+      iNMA: false,
+      cAPI: false,
+      iMEB: false,
+      pINS: false,
+      rEPO: false,
+      dMEX: false,
+      relevantPerson: false
+  };  
   }
  //////////// End Filter Area
 

@@ -102,9 +102,8 @@
               </select>
             </div>
           </div>
-
-          <!-- Prudential Category (Checkboxes) -->
-          <div class="input-field">
+           <!-- Prudential Category (Checkboxes) -->
+           <div class="input-field">
             <label for="prudentialCategory">Prudential Category</label>
             <div class="checkbox-wrapper">
               <input type="checkbox" [(ngModel)]="prudentialCategory"
@@ -122,24 +121,20 @@
                 Intermediary</label>
             </div>
           </div>
-
-          <!-- Authorisation Status (Dropdown) -->
+          <!-- Supervisor - Supervision (Dropdown) -->
           <div class="input-field">
-            <label for="authorisationStatus">Authorisation Status</label>
+            <label for="Supervisor">Supervisor - Supervision</label>
             <div class="select-wrapper">
-              <!-- Bind to a single selected value (authorisationStatus), not the entire array -->
-              <select name="authorisationStatus" id="authorisationStatus" [(ngModel)]="authorisationStatus">
+              <select name="Supervisor" id="Supervisor" [(ngModel)]="supervisorSupervision">
                 <option value="all">All</option>
-                <option *ngFor="let authstatus of authorisationStatuses" [value]="authstatus">
-                  {{ authstatus }}
+                <option *ngFor="let supervisorSup of supervisorSupervisions" [value]="supervisorSup">
+                  {{ supervisorSup }}
                 </option>
               </select>
             </div>
           </div>
-
-
-          <!-- Sectors (Checkboxes) -->
-          <div class="input-field">
+           <!-- Sectors (Checkboxes) -->
+           <div class="input-field">
             <label for="sectors">Sectors</label>
             <div class="checkbox-wrapper">
               <input type="checkbox" [(ngModel)]="sectors" (change)="toggleCategoryOptions('sectors')" /> All
@@ -155,7 +150,94 @@
               <label><input type="checkbox" [(ngModel)]="checkboxes.repOffice" value="6" /> Rep Office</label>
             </div>
           </div>
+          <!-- Supervisor -  AML (Dropdown) -->
+          <div class="input-field">
+            <label for="amlSup">Supervisor - AML</label>
+            <div class="select-wrapper">
+              <select name="amlSup" id="amlSup" [(ngModel)]="amlSup">
+                <option value="all">All</option>
+                <option *ngFor="let amlSup of amlSupervisors" [value]="amlSup">
+                  {{ amlSup }}
+                </option>
+              </select>
+            </div>
+          </div>
+           <!-- Supervision Category (Checkboxes) -->
+           <div class="input-field">
+            <label for="supervisionCategory">Supervision Category</label>
+             <div class="checkbox-wrapper">
+               <input type="checkbox" [(ngModel)]="supervisionCategory" (change)="toggleCategoryOptions('supervisionCategory')" /> All
+              </div>
+            <div *ngIf="toggleOptions.supervisionCategory" class="checkbox-options">
+            <label><input type="checkbox" [(ngModel)]="checkboxes.corporateBank" value="1" /> Corporate Bank</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.investmentManagerSupCat" value="2" /> Investment Manager</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.auditAndAccountingServices" value="3" /> Audit and Accounting Services</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.trustServices" value="4" /> Trust Services</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.singleFamilyOffice" value="5" /> Single Family Office</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.insuranceIntermediarySupCat" value="6" /> Insurance Intermediary</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.captiveInsurer" value="7" /> Captive Insurer</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.captiveManager" value="8" /> Captive Manager</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.investmentBank" value="9" /> Investment Bank</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.advisorSupCat" value="10"/> Advisor</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.legalServices" value="11"/> Legal Services</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.professionalServices" value="12"/> Professional Services</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.directInsurerSupCat" value="13"/> Direct Insurer</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.repOfficeSupCat" value="14"/> Rep Office</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.reinsurerSupCat" value="15"/> Reinsurer</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.wealthManager" value="16"/> Wealth Manager</label>
+          </div>
+        </div>
+          <!-- Legal Status (Dropdown) -->
+          <div class="input-field">
+            <label for="amlSup">Legal Status</label>
+            <div class="select-wrapper">
+              <select name="amlSup" id="amlSup" [(ngModel)]="legalStatus">
+                <option value="all">All</option>
+                <option *ngFor="let legalStatus of legalStatuses" [value]="legalStatus">
+                  {{ legalStatus }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <!-- Authorisation Category (Checkboxes) -->
+          <div class="input-field">
+            <label for="authorisationCategory">Authorisation Category</label>
+             <div class="checkbox-wrapper">
+               <input type="checkbox" [(ngModel)]="authorisationCategory" (change)="toggleCategoryOptions('authorisationCategory')" /> All
+              </div>
+            <div *ngIf="toggleOptions.authorisationCategory" class="checkbox-options">
+            <label><input type="checkbox" [(ngModel)]="checkboxes.bank" value="1" />Bank</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.iBANK" value="2" /> IBANK</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.iNMA" value="3" />INMA</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.cAPI" value="4" />CAPI</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.iMEB" value="5" />IMEB</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.pINS" value="6" /> PINS</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.rEPO" value="7" />REPO</label>
+            <label><input type="checkbox" [(ngModel)]="checkboxes.dMEX" value="8" />DMEX</label>
+          </div>
+        </div>           
 
+          <!-- Authorisation Status (Dropdown) -->
+          <div class="input-field">
+            <label for="authorisationStatus">Authorisation Status</label>
+            <div class="select-wrapper">
+              <!-- Bind to a single selected value (authorisationStatus), not the entire array -->
+              <select name="authorisationStatus" id="authorisationStatus" [(ngModel)]="authorisationStatus">
+                <option value="all">All</option>
+                <option *ngFor="let authstatus of authorisationStatuses" [value]="authstatus">
+                  {{ authstatus }}
+                </option>
+              </select>
+            </div>
+          </div>
+         <!--Relevant Person (Checkbox)-->
+          <div class="input-field">
+            <label for="relevantPerson">Relevant Person</label>
+            <div class="checkbox-options">
+              <input type="checkbox" [(ngModel)]="relevantPerson" value="1" /> 
+             </div>
+          </div>
+         
         </div>
 
       </div>

@@ -2064,6 +2064,10 @@ export class ViewFirmPageComponent implements OnInit {
     this.isPopupOpen = false;
     this.isEditable = false; // Close the popup
   }
+  closeCreateControllerPopup(): void {
+    this.isEditable = false;
+    this.showCreateControllerSection = false; // Close the popup
+  }
   EditControllerValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.errorMessages = {}; // Clear previous error messages
@@ -2156,7 +2160,7 @@ export class ViewFirmPageComponent implements OnInit {
     return controlType ? controlType.ControllerControlTypeDesc : '';
   }
   changeType() {
-    if (this.selectedType === 'percentage') {
+    if (this.selectedType === 'Percentage') {
       this.showHoldingsPercentage = true;
     } else {
       this.showHoldingsPercentage = false;
@@ -2496,12 +2500,23 @@ export class ViewFirmPageComponent implements OnInit {
       }
     });
   }
+  // updateControlType() {
+  //   const selectedType = this.controlTypeOptionsEdit.find(
+  //     controlType => controlType.ControllerControlTypeID === this.CreatecontrollerDetails.ControllerControlTypeID
+  //   );
+  
+  //   if (selectedType) {
+  //     this.CreatecontrollerDetails.ControllerControlTypeDesc = selectedType.ControllerControlTypeDesc;
+  //   }
+  // }
   CreatecontrollerDetails = {
     SelectedControlType:'',
+    TypeOfControl:'',
     EntityTypeDesc: '',
     OtherEntityID: 0,
     OtherEntityName:'',
     LegalStatusTypeID: 0,
+    PctOfShares:null,
     PlaceOfEstablishment:'',
     Title: '',
     FirstName: '',
@@ -2525,7 +2540,6 @@ export class ViewFirmPageComponent implements OnInit {
     IsCompanyRegulated: false ,
     LegalStatusTypeDesc: '',
     CountryName: '',
-    PctOfShares: null,
     AdditionalDetails: '',
     LastModifiedByOfOtherEntities: '',
     LastModifiedDate: '',
@@ -2545,7 +2559,7 @@ export class ViewFirmPageComponent implements OnInit {
     EntitySubTypeID:null,
     EntityTypeID:1,
     RelatedEntityEntityID:0,
-    MyState:2,
+    MyState:3,
     PlaceOfIncorporation:'',
     CountryOfIncorporation:0,
     zebSiteAddress:'',
@@ -2573,6 +2587,19 @@ export class ViewFirmPageComponent implements OnInit {
     RegulatorID:0,
     PreferredMethodType:'',
   };
+  updateControlTypeDesc(selectedValue: any) {
+    switch (selectedValue) {
+      case '1':
+        this.selectedController.ControllerControlTypeDesc = 'Percentage';
+        break;
+      case '2':
+        this.selectedController.ControllerControlTypeDesc = 'Exercise Control';
+        break;
+      default:
+        this.selectedController.ControllerControlTypeDesc = '';
+        break;
+    }
+  }
 
   createControllerPopupChanges(): void {    
     console.log("CreatecontrollerDetails",this.CreatecontrollerDetails)
@@ -2586,6 +2613,7 @@ export class ViewFirmPageComponent implements OnInit {
         otherEntityDetails: {
           UserID: 30,
           UserName: null,
+          EntityTypeDesc:this.CreatecontrollerDetails.EntityTypeDesc,
           OtherEntityName:this.CreatecontrollerDetails.EntityTypeDesc,          
           otherEntityID: this.CreatecontrollerDetails.OtherEntityID,
           DateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
@@ -2593,7 +2621,8 @@ export class ViewFirmPageComponent implements OnInit {
           CessationDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CessationDate),
           EffectiveDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.EffectiveDate),
           CreatedDate: null,
-          SelectedControlType: this.CreatecontrollerDetails.SelectedControlType,
+          ControllerControlTypeID:this.CreatecontrollerDetails.ControllerControlTypeID,
+          SelectedControlType: this.CreatecontrollerDetails.ControllerControlTypeID,
           relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
           entitySubTypeID: this.CreatecontrollerDetails.EntitySubTypeID,
           relatedEntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
@@ -2603,10 +2632,11 @@ export class ViewFirmPageComponent implements OnInit {
           LegalStatusTypeDesc: this.CreatecontrollerDetails.LegalStatusTypeDesc,
           placeOfIncorporation: this.CreatecontrollerDetails.PlaceOfIncorporation,
           countryOfIncorporation: 2,
+          PctOfShares: null,
+          addressState:2,
           registeredNumber: this.CreatecontrollerDetails.RegisteredNum,
           zebSiteAddress: this.CreatecontrollerDetails.zebSiteAddress,
           lastModifiedBy: 30,
-          ControllerControlTypeDesc: null,
           //LastModifiedDate : "2024-10-01T13:55:58.178Z",
           isAuditor: this.CreatecontrollerDetails.IsAuditor,
           isCompanyRegulated: this.CreatecontrollerDetails.IsCompanyRegulated,
@@ -2620,8 +2650,8 @@ export class ViewFirmPageComponent implements OnInit {
           EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
           EntityID: this.CreatecontrollerDetails.FirmID,
           controllerControlTypeID: this.CreatecontrollerDetails.ControllerControlTypeID,
+          ControllerControlTypeDesc: this.CreatecontrollerDetails.ControllerControlTypeDesc,
           numOfShares: this.CreatecontrollerDetails.NumOfShares,
-          pctOfShares: this.CreatecontrollerDetails.PctOfShares,
           MajorityStockHolder: false,
           assnDateFrom: null,
           assnDateTo: null,
@@ -2636,13 +2666,14 @@ export class ViewFirmPageComponent implements OnInit {
           entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
           entityID: this.CreatecontrollerDetails.EntityID,
           contactID: this.CreatecontrollerDetails.ContactID,
-          addressID: this.CreatecontrollerDetails.AddressID,
+          addressID: null,
           addressLine1: this.CreatecontrollerDetails.addressLine1,
           addressLine2: this.CreatecontrollerDetails.addressLine2,
           addressLine3: this.CreatecontrollerDetails.addressLine3,
           addressLine4: this.CreatecontrollerDetails.addressLine4,
           city: this.CreatecontrollerDetails.city,
           createdBy: 0,
+          addressAssnID:null,
           CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
           LastModifiedDate: this.currentDate,
           addressState: this.CreatecontrollerDetails.AddressState,
@@ -2660,7 +2691,7 @@ export class ViewFirmPageComponent implements OnInit {
         dateOfBirth: this.CreatecontrollerDetails.DateOfBirth,
         placeOfBirth: this.CreatecontrollerDetails.PlaceOfBirth,
         passportNumber: this.CreatecontrollerDetails.PassportNum,
-        
+        addressAssnID:null,
         statusDate: this.CreatecontrollerDetails.StatusDate,
         createdDate: this.CreatecontrollerDetails.CreatedDate,
         mobilePhone: this.CreatecontrollerDetails.MobilePhone,
