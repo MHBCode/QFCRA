@@ -1709,15 +1709,14 @@
 
         <!-- Form -->
         <form>
-          <ng-container *ngIf="isEditable">
+
             <div class="inputs-row">
               <div class="input-field">
                 <label>Controller Type</label>
-                <input required [(ngModel)]="selectedController.EntityTypeDesc" name="ControllerType" readonly]
-                  style="width: 85%; padding: 8px; border-radius: 5px; border: 1px solid #c2c2c2; background-color: #fffafa; color: #413b3c;" />
+                <input [(ngModel)]="selectedController.EntityTypeDesc" name="ControllerType" disabled/>
               </div>
             </div>
-          </ng-container>
+
           <!-- Contact Details Row 1 -->
           <div class="inputs-row">
             <div class="input-field">
@@ -1748,34 +1747,7 @@
 
           <!-- Contact Details Row 2 -->
           <div class="inputs-row">
-            <!-- <div style="flex: 1;">
-              <label style="display: block; margin-bottom: 3px; font-weight: bold; color: #413b3c;">Place of
-                Establishment:</label>
-              <ng-container *ngIf="isEditable; else placeOfEstablishmentInput">
-                <select required [(ngModel)]="selectedController.PlaceOfEstablishment" name="placeOfEstablishment">
-                  <option *ngFor="let place of countryOptionsEdit" [value]="place.CountryID">{{ place.CountryName }}
-                  </option>
-                </select>
-              </ng-container>
-              <ng-template #placeOfEstablishmentInput>
-                <input [(ngModel)]="selectedController.PlaceOfEstablishment" name="placeOfEstablishment"
-                  [readonly]="!isEditable" />
-              </ng-template>
-            </div>
-            <div class="input-field">
-              <label>Type of
-                Control</label>
-              <ng-container *ngIf="isEditable; else controlTypeInput">
-                <select required [(ngModel)]="selectedController.ControllerControlTypeDesc" name="typeOfControl">
-                  <option *ngFor="let controlType of controlTypeOptionsEdit"
-                    [value]="controlType.ControllerControlTypeID">{{ controlType.ControllerControlTypeDesc }}</option>
-                </select>
-              </ng-container>
-              <ng-template #controlTypeInput>
-                <input [(ngModel)]="selectedController.ControllerControlTypeDesc" name="typeOfControl"
-                  [readonly]="!isEditable" />
-              </ng-template>
-            </div> -->
+           
             <div class="input-field">
               <label>Place of Establishment:</label>
               <ng-container *ngIf="isEditable; else placeOfEstablishmentDisplay">
@@ -1789,23 +1761,26 @@
             </div>
             
             <div class="input-field">
-              <label>Type of Control</label>
-              <ng-container *ngIf="isEditable; else controlTypeDisplay">
-                <select required [(ngModel)]="selectedController.ControllerControlTypeID" name="typeOfControl">
-                  <option *ngFor="let controlType of controlTypeOptionsEdit" [value]="controlType.ControllerControlTypeID">
-                    {{ controlType.ControllerControlTypeDesc }}
-                  </option>
+              <ng-container>
+                <label>Type of Control</label>
+                <select required [(ngModel)]="selectedController.ControllerControlTypeID" 
+                (ngModelChange)="updateControlTypeDesc($event)"
+                        name="typeOfControl" 
+                        [disabled]="!isEditable">
+                  <option value="1">Percentage</option>
+                  <option value="2">Exercise Control</option>
                 </select>
               </ng-container>
-              <ng-template #controlTypeDisplay>
-                <input [value]="getControlTypeDescription()" name="typeOfControl" readonly />
-              </ng-template>
             </div>
-            <ng-container *ngIf="selectedController.ControllerControlTypeDesc == 'Percentage' ">
+            
+            <!-- Display the % of Holding field only if the control type is "Percentage" -->
+            <ng-container *ngIf="selectedController.ControllerControlTypeID == 1">
               <div class="input-field">
-                <label>% of Holding
-                </label>
-                <input [(ngModel)]="selectedController.PctOfShares" name="cessationDate" [readonly]="!isEditable" />
+                <label>% of Holding</label>
+                <input [(ngModel)]="selectedController.PctOfShares" 
+                       name="percentOfHolding" 
+                       type="text" 
+                       [readonly]="!isEditable" />
               </div>
             </ng-container>
           </div>
@@ -1865,17 +1840,12 @@
             <!-- Address Details -->
             <div class="inputs-row">
               <div class="input-field">
-                <label>Address
-                  Type</label>
-                <ng-container *ngIf="isEditable; else addressTypeInput">
-                  <select [(ngModel)]="selectedController.AddressType" name="addressType">
-                    <option *ngFor="let type of addressTypeOptionsEdit" [value]="type.AddressTypeID">{{
-                      type.AddressTypeDesc }}</option>
-                  </select>
-                </ng-container>
-                <ng-template #addressTypeInput>
-                  <input [(ngModel)]="selectedController.AddressType" name="addressType" [readonly]="!isEditable" />
-                </ng-template>
+                <label>Address Type</label>
+                <select [(ngModel)]="selectedController.AddressType" name="addressType" disabled>
+                  <option *ngFor="let type of addressTypeOptionsEdit" [value]="type.AddressTypeID">
+                    {{ type.AddressTypeDesc }}
+                  </option>
+                </select>
               </div>
               <div class="input-field">
                 <label>Address - Line
@@ -1946,14 +1916,14 @@
       </div>
     </div>
     <div class="create-controller-section" *ngIf="showCreateControllerSection">
-      <div class="inputs-field-set">
+      <div class="create--inputs-field-set">
         <div class="create-controller-actions">
             <h2 class="create-controller-header">
                 Controller For {{ firmDetails?.FirmName }}
             </h2>
             <div class="btns">
                 <button class="save-btn" (click)="createControllerPopupChanges()">Save</button>
-                <button class="cancel-btn">Cancel</button>
+                <button class="cancel-btn" (click)="closeCreateControllerPopup()">Cancel</button>
             </div>
             
         </div>
@@ -2191,7 +2161,7 @@
             </ng-container>
         </div>
     </div>
-    <div *ngIf="!hideForms" class="inputs-field-set">
+    <div *ngIf="!hideForms" class="create--inputs-field-set">
         <div class="create-controller-actions">
             <h2 class="create-controller-header">
                 Addresses 
@@ -2264,7 +2234,7 @@
         </div>
     </div>
 
-    <div class="inputs-field-set" *ngIf="CreatecontrollerDetails.IsCompanyRegulated === true">
+    <div class="create-inputs-field-set" *ngIf="CreatecontrollerDetails.IsCompanyRegulated === true">
         <div class="create-controller-actions">
             <h2 class="create-controller-header">
                 Home State Regulators
@@ -2411,7 +2381,9 @@
         </form>
       </div>
     </div>
-    <div class="inputs-field-set" *ngIf="IsCreateAuditorVisible">
+    <!-- create Auditor popup -->
+    <div class="contollerPopupOverlay" *ngIf="IsCreateAuditorVisible">
+      <div class="contollerPopupContent">
       <div class="view-auditor-actions">
         <h2 class="view-auditor-header">Auditor Details</h2>
 
@@ -2466,6 +2438,7 @@
             (click)="saveCreateAuditor()"><i class="bi bi-save"></i> Save</button>
         </div>
       </form>
+    </div>
     </div>
 
   </section>
@@ -2643,6 +2616,7 @@
           </div>
         </form>
       </div>
+      
     </div>
   </section>
 
@@ -2788,6 +2762,7 @@
           </tbody>
         </table>
       </div>
+      
     </div>
   </section>
 
