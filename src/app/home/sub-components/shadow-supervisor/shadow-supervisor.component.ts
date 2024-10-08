@@ -5,6 +5,7 @@ import { FirmService } from 'src/app/ngServices/firm.service';
 import { TaskServiceService } from 'src/app/ngServices/task-service.service';
 import Swal from 'sweetalert2';
 import * as constants from 'src/app/app-constants';
+import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 
 
 @Component({
@@ -52,7 +53,9 @@ export class ShadowSupervisorComponent implements OnInit {
     private TaskService: TaskServiceService,
     private firmService: FirmService,
     private router: Router,
-    private sanitizer: DomSanitizer) { }
+    private sanitizer: DomSanitizer,
+    private dateUtilService: DateUtilService
+  ) { }
 
   ngOnInit(): void {
     this.loadTasksShadowSupervisor();
@@ -94,16 +97,18 @@ export class ShadowSupervisorComponent implements OnInit {
     console.log(this.firmNames);
   }
 
-  // Get unique firm names from the task list
   getPrimarySupervisors() {
-    const supervisors = this.ShadowSupervisorTasks.map(task => task.PrimarySupervisionCaseOfficer);
+    const supervisors = this.ShadowSupervisorTasks
+      .map(task => task.PrimarySupervisionCaseOfficer)
+      .filter(supervisor => supervisor); // Filter out null, undefined, or empty values
+
     this.primarySupervisors = Array.from(new Set(supervisors)).sort();
     console.log(this.primarySupervisors);
   }
 
   filterTasks(): void {
     this.filteredTasks = this.ShadowSupervisorTasks.filter(task => {
-      const dueDateFormatted = this.convertApiDateToStandard(task.TaskDueDate);
+      const dueDateFormatted = this.dateUtilService.convertApiDateToStandard(task.TaskDueDate);
       const daysDue = task.DaysOverDue;
 
       // Check for matching conditions
@@ -222,11 +227,11 @@ export class ShadowSupervisorComponent implements OnInit {
 
   prepareNoteObject() {
     return {
-        objectID: this.selectedTask[0].ObjectID,
-        objectInstanceID: parseInt(this.selectedTask[0].ObjectInstanceID, 10),
-        objectInstanceRevNum: this.selectedTask[0].ObjectInstanceRevNum,
-        notes: this.noteText,
-        createdBy: this.userId,
+      objectID: this.selectedTask[0].ObjectID,
+      objectInstanceID: parseInt(this.selectedTask[0].ObjectInstanceID, 10),
+      objectInstanceRevNum: this.selectedTask[0].ObjectInstanceRevNum,
+      notes: this.noteText,
+      createdBy: this.userId,
     };
   }
 
@@ -249,22 +254,22 @@ export class ShadowSupervisorComponent implements OnInit {
       this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       return; // Prevent further action if validation fails
     }
-  
+
     // Start the note save and task reload in parallel
     const saveNotePromise = this.TaskService.saveReminderNote(note).toPromise();
     const loadTasksPromise = this.TaskService.getMyTasksAsSecondaryCaseOfficer(this.userId).toPromise();
-  
+
     Promise.all([saveNotePromise, loadTasksPromise])
       .then(([saveNoteResponse, loadTasksResponse]) => {
         console.log('Note updated successfully:', saveNoteResponse);
-        
+
         // Update the task list after saving the note
         this.ShadowSupervisorTasks = loadTasksResponse.response;
         this.filteredTasks = [...this.ShadowSupervisorTasks];
         this.totalRows = this.ShadowSupervisorTasks.length;
         this.totalPages = Math.ceil(this.totalRows / this.pageSize);
         this.updatePagination();
-  
+
         this.showTaskPopup = false;
         this.isLoading = false;
         this.noteText = '';
@@ -318,58 +323,14 @@ export class ShadowSupervisorComponent implements OnInit {
     }
   }
 
-  isOverdue(dueDate: string): boolean {
-    const today = new Date();
-    const taskDueDate = this.convertStringToDate(dueDate);
-  
-    if (!taskDueDate) {
-      return false; // If date is invalid, assume it's not overdue
-    }
-  
-    return taskDueDate < today; // Compare the two Date objects
-  }
-
-
-  convertStringToDate(dateStr: string): Date | null {
-    const months = {
-      Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
-      Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
-    };
-  
-    // Split the date string: "09/Nov/2022"
-    const parts = dateStr.split('/');
-    if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = months[parts[1]]; // Convert "Nov" to "11"
-      const year = parseInt(parts[2], 10);
-  
-      // Create a new Date object from the parsed parts
-      const formattedDate = `${year}-${month}-${String(day).padStart(2, '0')}`;
-      const date = new Date(formattedDate); // This creates a valid Date object in "YYYY-MM-DD" format
-      return date;
-    } else {
-      console.error('Invalid date format:', dateStr);
-      return null;
-    }
-  }
-
-  convertApiDateToStandard(dateStr: string): string {
-    const months = {
-      Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
-      Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
-    };
-
-    const [day, month, year] = dateStr.split('/');
-    const monthNumber = months[month];
-
-    // Return the date in 'YYYY-MM-DD' format
-    return `${year}-${monthNumber}-${day.padStart(2, '0')}`;
+  isTaskOverdue(dueDate: string): boolean {
+    return this.dateUtilService.isOverdue(dueDate);
   }
 
   getErrorMessages(fieldName: string) {
     let errorMessage = 'Please Enter the Note';
     this.errorMessages[fieldName] = errorMessage;
-}
+  }
 
   showErrorAlert(messageKey: number) {
     this.firmService.errorMessages(messageKey).subscribe(

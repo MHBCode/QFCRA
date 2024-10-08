@@ -153,9 +153,6 @@
   /* Add scroll if dropdown is too long */
   z-index: 1000;
   left: 0px;
-  margin-top: 25px;
-  white-space: break-spaces;
-  height: 300px;
 }
 
 /* The list inside the dropdown */
@@ -245,6 +242,11 @@
   color: white;
 }
 
+.active-filter:hover {
+  background-color: #a51e36;
+  color: white;
+}
+
 /* Auditor Popup style */
 .popup-overlay {
   position: fixed;
@@ -297,9 +299,25 @@
   margin: 0;
   font-weight: 600;
 }
+
 th.task-table-column {
-    position: relative;
+  position: relative;
 }
+
+.task-table-column-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-table-column-content > div {
+  text-wrap: nowrap;
+}
+
+.task-table-column-content .bi-funnel-fill {
+  color: #a51e36;
+}
+
 .close-icon {
   position: absolute;
   right: 1rem;

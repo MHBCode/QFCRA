@@ -5,6 +5,7 @@ import { TaskServiceService } from 'src/app/ngServices/task-service.service';
 import * as constants from 'src/app/app-constants';
 import { FirmService } from 'src/app/ngServices/firm.service';
 import Swal from 'sweetalert2';
+import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 
 @Component({
   selector: 'app-task-list',
@@ -52,6 +53,7 @@ export class TaskListComponent implements OnInit {
     private firmService: FirmService,
     private router: Router,
     private sanitizer: DomSanitizer,
+    private dateUtilService: DateUtilService
   ) { }
 
   ngOnInit(): void {
@@ -214,7 +216,7 @@ export class TaskListComponent implements OnInit {
 
   filterTasks(): void {
     this.filteredTasks = this.Tasks.filter(task => {
-      const dueDateFormatted = this.convertApiDateToStandard(task.TaskDueDate);
+      const dueDateFormatted = this.dateUtilService.convertApiDateToStandard(task.TaskDueDate);
       const daysDue = task.DaysOverDue;
   
       // Check for matching conditions
@@ -315,57 +317,11 @@ export class TaskListComponent implements OnInit {
     this.showTitle = !currentUrl.includes('home/tasks-page');
   }
 
-  isOverdue(dueDate: string): boolean {
-    const today = new Date();
-    const taskDueDate = this.convertStringToDate(dueDate);
-  
-    if (!taskDueDate) {
-      return false; // If date is invalid, assume it's not overdue
-    }
-  
-    return taskDueDate < today; // Compare the two Date objects
+  isTaskOverdue(dueDate: string): boolean {
+    return this.dateUtilService.isOverdue(dueDate);
   }
-  
-  
 
-  convertStringToDate(dateStr: string): Date | null {
-    const months = {
-      Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
-      Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
-    };
   
-    // Split the date string: "09/Nov/2022"
-    const parts = dateStr.split('/');
-    if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = months[parts[1]]; // Convert "Nov" to "11"
-      const year = parseInt(parts[2], 10);
-  
-      // Create a new Date object from the parsed parts
-      const formattedDate = `${year}-${month}-${String(day).padStart(2, '0')}`;
-      const date = new Date(formattedDate); // This creates a valid Date object in "YYYY-MM-DD" format
-      return date;
-    } else {
-      console.error('Invalid date format:', dateStr);
-      return null;
-    }
-  }
-  
-  
-  
-
-  convertApiDateToStandard(dateStr: string): string {
-    const months = {
-      Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
-      Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
-    };
-
-    const [day, month, year] = dateStr.split('/');
-    const monthNumber = months[month];
-
-    // Return the date in 'YYYY-MM-DD' format
-    return `${year}-${monthNumber}-${day.padStart(2, '0')}`;
-  }
   getErrorMessages(fieldName: string) {
         let errorMessage = 'Please Enter the Note';
         this.errorMessages[fieldName] = errorMessage;

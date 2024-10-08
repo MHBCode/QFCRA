@@ -1363,7 +1363,14 @@ export class ViewFirmPageComponent implements OnInit {
     this.hasValidationErrors = false;
 
 
-    // this.validateLicenseScope();
+    this.validateAuthScope();
+
+    // Step 2: Handle Validation Errors
+    if (this.hasValidationErrors) {
+      this.showErrorAlert(constants.FirmActivitiesEnum.ENTER_ALL_REQUIREDFIELDS);
+      this.isLoading = false;
+      return; // Prevent further action if validation fails
+    }
 
     this.existingProducts = this.ActivityAuth;
     console.log(this.existingProducts);
@@ -1412,10 +1419,10 @@ export class ViewFirmPageComponent implements OnInit {
       },
       lstFirmActivities: this.existingProducts.map(activityAuth => ({
         createdBy: userId, //recheck
-        firmScopeTypeID: activityAuth.FirmScopeTypeID,
-        activityTypeID: Number(activityAuth.ActivityTypeID),
+        firmScopeTypeID: parseInt(activityAuth.FirmScopeTypeID),
+        activityTypeID: parseInt(activityAuth.ActivityTypeID),
         effectiveDate: this.convertDateToYYYYMMDD(activityAuth.ScopeEffectiveDate),
-        firmActivityConditions: activityAuth.Column1,
+        firmActivityConditions: activityAuth.FirmActivityConditions,
         productTypeID: null,
         appliedDate: this.convertDateToYYYYMMDD(activityAuth.ScopeAppliedDate),
         withDrawnDate: this.convertDateToYYYYMMDD(activityAuth.ScopeEffectiveDate),
@@ -1497,6 +1504,85 @@ export class ViewFirmPageComponent implements OnInit {
       firmSectorID: null
     }
   }
+
+  validateAuthScope() {
+    this.hasValidationErrors = false;
+  
+    // Validation for Activities
+    this.ActivityAuth.forEach(activity => {
+      // Reset error messages for each activity
+      activity.errorMessages = {};
+  
+      // Check if the selected activity is valid (not "Select")
+      if (activity.ActivityTypeID == 0) {
+        this.getErrorMessages('ActivityTypeID', constants.FirmActivitiesEnum.SELECT_ACTIVITIES, activity);
+        this.getErrorMessages('correctPermittedActivities', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
+        this.hasValidationErrors = true;
+      } else {
+        delete activity.errorMessages['ActivityTypeID'];
+        delete this.errorMessages['correctPermittedActivities'];
+      }
+  
+      // Check if categorizedProducts exists and is empty
+      const hasNoProducts = activity.categorizedProducts == null || activity.categorizedProducts.length == 0;
+  
+      // Check if any product is selected (isChecked = true) in the current activity
+      const hasCheckedProducts = activity.categorizedProducts?.some(catProd =>
+        catProd.subProducts.some(subProd => subProd.isChecked)
+      );
+  
+      // If the activity has no products or has products but none are selected, display an error
+      if (hasNoProducts || (!hasNoProducts && !hasCheckedProducts)) {
+        this.getErrorMessages('Products', constants.FirmActivitiesEnum.SELECT_ATLEASTONE_PRODUCTS, activity);
+        this.getErrorMessages('correctPermittedActivities', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
+        this.hasValidationErrors = true;
+      } else {
+        delete activity.errorMessages['Products'];
+        delete this.errorMessages['correctPermittedActivities'];
+      }
+    });
+  }
+  
+  
+  
+
+  // validateAuthScope() {
+    
+  //   this.hasValidationErrors = false;
+  //   let hasSelectedProducts = false;
+    
+  //   // Validation for Activities
+  //   this.ActivityAuth.forEach(activity => {
+  //     if (!activity.ActivityTypeID || activity.ActivityTypeID === 0) {
+  //       this.getErrorMessages('ActivityTypeID', constants.FirmActivitiesEnum.SELECT_ACTIVITIES);
+  //       this.hasValidationErrors = true;
+  //     } else {
+  //       delete this.errorMessages['ActivityTypeID'];
+  //     }
+      
+
+  //   // Validation for Products
+  //     // Check if any product is selected (isChecked = true)
+  //     const hasCheckedProducts = activity.categorizedProducts?.some(catProd =>
+  //       catProd.subProducts.some(subProd => subProd.isChecked)
+  //     );
+  
+  //     // If any product is selected, set hasSelectedProducts to true
+  //     if (hasCheckedProducts) {
+  //       hasSelectedProducts = true;
+  //     }
+  //   });
+    
+  //   // If no product is selected in any activity, set validation error
+  //   if (!hasSelectedProducts) {
+  //     this.getErrorMessages('Products', constants.FirmActivitiesEnum.SELECT_ATLEASTONE_PRODUCTS);
+  //     this.hasValidationErrors = true;
+  //   } else {
+  //     delete this.errorMessages['Products'];
+  //   }
+  // }
+  
+  
 
 
   cancelEditAuthScope() {
@@ -3183,6 +3269,10 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
+  updateMainCategoryState(product: any): void {
+    // If any sub-product is not checked, the main category should be unchecked
+    product.isChecked = product.subProducts.every(subProduct => subProduct.isChecked);
+  }
 
   loadActivitiesTypesForLicensed() {
     this.firmService.getLicActivityTypes().subscribe(data => {
@@ -3499,22 +3589,23 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   onCategoryChange(activity: any) {
-    const selectedCategoryID = activity.FirmScopeTypeID; // This is the correct ID you want to use
+    const selectedCategoryID = activity.FirmScopeTypeID; // The selected category ID
     if (selectedCategoryID) {
       console.log('Selected Category ID:', selectedCategoryID);
-
-      // Fetch activities based on the selected category (FirmScopeTypeID)
+  
+      // Reset the categorized products for the activity when the category changes
+      activity.categorizedProducts = [];
+  
+      // Fetch activities based on the selected category
       this.firmService.getAuthActivityTypes(selectedCategoryID).subscribe(
         data => {
           console.log('Fetched Activities for Category:', data.response);
-
+  
           // Populate activities array
           activity.activities = data.response;
-
-          // Automatically select the first activity if there are activities available
-          activity.selectedActivity = activity.activities.length > 0
-            ? activity.activities[0]
-            : null;
+  
+          // Reset the selected ActivityTypeID to '0' to select the "Select" option
+          activity.ActivityTypeID = 0; // Ensure the default "Select" option is chosen
         },
         error => {
           console.error('Error fetching activities', error);
@@ -3522,8 +3613,66 @@ export class ViewFirmPageComponent implements OnInit {
       );
     }
   }
+  
 
-
+  onActivityChange(activity: any) {
+    const activityTypeID = activity.ActivityTypeID; // The selected activity ID
+  
+    if (activityTypeID) {
+      console.log('Selected Activity ID:', activityTypeID);
+  
+      // Fetch products for the selected activity
+      this.firmService.getAllProducts(activityTypeID).subscribe(
+        data => {
+          const products = data.response;
+  
+          // If no products are returned, set categorizedProducts to null
+          if (!products || products.length === 0) {
+            activity.categorizedProducts = null;
+            console.log('No products found for the selected activity.');
+            return;
+          }
+  
+          // Reset categorizedProducts to load new products
+          activity.categorizedProducts = [];
+          let currentCategory = null;
+  
+          // Iterate through the products and categorize them
+          products.forEach(product => {
+            if (product.ID === 0) {
+              // If it's a main category, start a new group
+              currentCategory = {
+                mainCategory: product.ProductCategoryTypeDesc,
+                subProducts: []
+              };
+              activity.categorizedProducts.push(currentCategory);
+            } else if (currentCategory) {
+              const subProduct = { ...product }; // Copy product details
+  
+              // Uncheck the product by default when loading
+              subProduct.isChecked = false;
+              subProduct.firmScopeTypeID = 1; // Default firmScopeTypeID
+  
+              // Add the subProduct to the current category
+              currentCategory.subProducts.push(subProduct);
+            }
+          });
+  
+          console.log('Loaded Products for Activity:', activity.categorizedProducts);
+        },
+        error => {
+          // If an error occurs, set categorizedProducts to null
+          console.error('Error fetching products for ActivityTypeID', error);
+          activity.categorizedProducts = null;
+        }
+      );
+    } else {
+      // If no activity is selected, clear the products
+      activity.categorizedProducts = null;
+    }
+  }
+  
+  
 
 
   getFYearHistory() {
@@ -4468,7 +4617,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
 
-  getErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+  getErrorMessages(fieldName: string, msgKey: number, activity?: any,placeholderValue?: string) {
     this.firmService.errorMessages(msgKey).subscribe(
       (response) => {
         let errorMessage = response.response;
@@ -4477,6 +4626,7 @@ export class ViewFirmPageComponent implements OnInit {
           errorMessage = errorMessage.replace("#Date#", placeholderValue).replace("##DateFieldLabel##", placeholderValue).replace("#ApplicationDate#", placeholderValue);
         }
         this.errorMessages[fieldName] = errorMessage;
+        activity.errorMessages[fieldName] = errorMessage;
       },
       (error) => {
         console.error(`Failed to load error message for ${fieldName}.`, error);

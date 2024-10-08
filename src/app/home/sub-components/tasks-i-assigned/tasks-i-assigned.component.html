@@ -15,11 +15,13 @@
         <thead>
           <tr>
             <th class="task-table-column">
-              <div>
-                Task Type
-                <i class="dropdown-icon" (click)="toggleTaskDropdown()">&#x25BC;</i>
+              <div class="task-table-column-content">
+                <div>
+                  Task Type
+                  <i class="dropdown-icon bi bi-filter" (click)="toggleTaskDropdown()"></i>
+                </div>
+                <i *ngIf="selectedTaskType !== ''" class="bi bi-funnel-fill" title="filtered task types"></i> <!-- Active filter icon -->
               </div>
-              <i *ngIf="selectedTaskType !== ''" class="bi bi-funnel-fill"></i> <!-- Active filter icon -->
               <div *ngIf="TaskDropdownVisible" class="custom-dropdown">
                 <ul class="dropdown-list">
                   <li class="dropdown-item" [class.active-filter]="selectedTaskType === ''"
@@ -35,11 +37,13 @@
             </th>
             <th>Action</th>
             <th class="task-table-column">
-              <div>
-                Firm Name
-                <i class="dropdown-icon" (click)="toggleFirmDropdown()">&#x25BC;</i>
+              <div class="task-table-column-content">
+                <div>
+                  Firm Name
+                  <i class="dropdown-icon bi bi-filter" (click)="toggleFirmDropdown()"></i>
+                </div>
+                <i *ngIf="selectedFirmName !== ''" class="bi bi-funnel-fill" title="filtered firm names"></i> <!-- Active filter icon -->
               </div>
-              <i *ngIf="selectedFirmName !== ''" class="bi bi-funnel-fill"></i> <!-- Active filter icon -->
               <div *ngIf="FirmsDropdownVisible" class="custom-dropdown">
                 <ul class="dropdown-list">
                   <li class="dropdown-item" (click)="filterByFirmName('')"
@@ -56,11 +60,13 @@
             <th>Description</th>
             <th>
               <div class="task-table-column">
-                <div>
-                  Due Date
-                  <i class="dropdown-icon" (click)="toggleDueDateInput()">&#x25BC;</i>
+                <div class="task-table-column-content">
+                  <div>
+                    Due Date
+                    <i class="dropdown-icon bi bi-filter" (click)="toggleDueDateInput()"></i>
+                  </div>
+                  <i *ngIf="selectedDueDate !== ''" class="bi bi-funnel-fill" title="filtered due date"></i> <!-- Active filter icon -->
                 </div>
-                <i *ngIf="selectedDueDate !== ''" class="bi bi-funnel-fill"></i> <!-- Active filter icon -->
               </div>
               <div *ngIf="dueDateInputVisible" class="due-date-filter">
                 <label for="dueDate" class="date-label">Select Due Date:</label>
@@ -69,12 +75,14 @@
               </div>
             </th>
             <th class="task-table-column">
-              <div>
-                Days Over Due
-                <i class="dropdown-icon" (click)="toggleDaysOverDueDropdown()">&#x25BC;</i>
+              <div class="task-table-column-content">
+                <div>
+                  Days Over Due
+                  <i class="dropdown-icon bi bi-filter" (click)="toggleDaysOverDueDropdown()"></i>
+                </div>
+                <!-- Show active filter icon when Days Over Due filter is selected -->
+                <i *ngIf="selectedDaysOverDue !== ''" class="bi bi-funnel-fill" title="filtered days over due"></i>
               </div>
-              <!-- Show active filter icon when Days Over Due filter is selected -->
-              <i *ngIf="selectedDaysOverDue !== ''" class="bi bi-funnel-fill"></i>
               <div *ngIf="daysOverDueDropdownVisible" class="custom-dropdown">
                 <ul class="dropdown-list">
                   <li class="dropdown-item" (click)="filterByDaysOverDue('')"
@@ -102,11 +110,13 @@
             </th>
             <th>Notes</th>
             <th class="task-table-column">
-              <div>
-                Task Assigned To
-                <i class="dropdown-icon" (click)="toggleUsersAssignedToDropdown()">&#x25BC;</i>
+              <div class="task-table-column-content">
+                <div>
+                  Task Assigned To
+                  <i class="dropdown-icon bi bi-filter" (click)="toggleUsersAssignedToDropdown()"></i>
+                </div>
+                <i *ngIf="selectedUsersAssignedTo !== ''" class="bi bi-funnel-fill" title="filtered users"></i> <!-- Active filter icon -->
               </div>
-              <i *ngIf="selectedUsersAssignedTo !== ''" class="bi bi-funnel-fill"></i> <!-- Active filter icon -->
               <div *ngIf="UsersAssignedToDropdownVisible" class="custom-dropdown">
                 <ul class="dropdown-list">
                   <li class="dropdown-item" (click)="filterByTasksAssignedToUser('')"
@@ -126,16 +136,17 @@
 
         <tbody>
           <tr *ngFor="let item of paginatedTasks" (click)="toggleTaskPopup(item)">
-            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{ item.TaskType }}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{ item.TaskType }}</td>
             <td style="text-align: center;">
               <a [href]="item.Link" target="_blank" style="text-decoration: none;">View</a>
             </td>
-            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.FirmName}}</td>
-            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.ShortDescription}}</td>
-            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.TaskDueDate}}</td>
-            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{ item.DaysOverDue > 0 ? item.DaysOverDue : '' }}</td>
-            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.Comments}}</td>
-            <td [ngClass]="{'overdue': isOverdue(item.TaskDueDate)}">{{item.TaskAssignedToUserName}}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.FirmName}}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.ShortDescription}}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.TaskDueDate}}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{ item.DaysOverDue > 0 ? item.DaysOverDue : ''
+              }}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.Comments}}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.TaskAssignedToUserName}}</td>
           </tr>
         </tbody>
       </table>
