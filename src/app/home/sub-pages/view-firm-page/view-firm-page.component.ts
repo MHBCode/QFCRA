@@ -401,6 +401,7 @@ export class ViewFirmPageComponent implements OnInit {
         }
         break;
       case FrimsObject.Supervision:
+        
         this.showSection(this.supervisionSection);
         break;
       case FrimsObject.ReturnsReview:
