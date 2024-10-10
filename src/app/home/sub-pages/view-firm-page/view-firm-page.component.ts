@@ -8,6 +8,8 @@ import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
 
 @Component({
   selector: 'app-view-firm-page',
@@ -138,6 +140,8 @@ export class ViewFirmPageComponent implements OnInit {
   disableApplicationDate: boolean = true;
   showVaryBtn: boolean = true;
   resetFirmSector: boolean = false;
+  resetFirmPrudentialCategoryID: boolean = false;
+  // resetSectorTypeID: boolean = false;
   scopeRevNum: number;
   selectedCategory: number;
   selectedActivity: string;
@@ -154,6 +158,7 @@ export class ViewFirmPageComponent implements OnInit {
   lastAuthRevisionNumber: number | null = null;
   isScopeConditionChecked: boolean = false;
   previousPrudentialCategoryID: number;
+  previousSectorTypeID: number;
   /* */
   displayInactiveContacts: boolean = false;
 
@@ -249,7 +254,8 @@ export class ViewFirmPageComponent implements OnInit {
     private securityService: SecurityService,
     private el: ElementRef,
     private renderer: Renderer2,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -276,7 +282,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.populatePrudentialCategoryTypes();
       this.populateAuthorisationCategoryTypes();
       this.populateFirmScopeTypes();
-      
+
       this.loadAssignedUserRoles();
       this.isValidFirmAMLSupervisor(this.firmId, this.userId);
       this.isValidFirmSupervisor(this.firmId, this.userId);
@@ -358,6 +364,11 @@ export class ViewFirmPageComponent implements OnInit {
     // Hide all sections
     this.hideAllSections();
 
+    this.isEditModeLicense = false;
+    this.isEditModeAuth = false;
+    this.isEditModeCore = false;
+     // Add other edit mode variables if needed...
+
     // Show the selected section based on the objectId
     switch (objectId) {
       case FrimsObject.CoreDetail:
@@ -368,8 +379,11 @@ export class ViewFirmPageComponent implements OnInit {
         this.loadFirmAdresses();
         break;
       case FrimsObject.Scope:
-        const section = this.activeSection;
+        const section = 'Licensed';
         this.showSection(this.scopeSection);
+
+        this.activeSection = 'Licensed';
+
         if (section === 'Licensed') {
           this.tabIndex = 0;
           this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
@@ -1096,14 +1110,17 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  switchSection(section: string) {
+  switchScopeTab(section: string) {
     this.activeSection = section;  // Update the active section
     if (section === 'Licensed') {
       this.tabIndex = 0;
+      this.isEditModeLicense = false;
+      this.disableApplicationDate = true;
       this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
       this.loadActivitiesLicensed();
     } else if (section === 'Authorized') {
       this.tabIndex = 1;
+      this.isEditModeAuth = false;
       this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
       this.loadActivitiesAuthorized();
     }
@@ -1243,6 +1260,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   saveLicenseScopeDetails(updatedLicenseScope: any, userId: number) {
+    this.isLoading = true;
     console.log('Updated License Scope:', updatedLicenseScope);
 
     this.firmService.editLicenseScope(updatedLicenseScope).subscribe(
@@ -1252,9 +1270,11 @@ export class ViewFirmPageComponent implements OnInit {
         this.isEditModeLicense = false; // Toggle edit mode off
         this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
         this.disableApplicationDate = true;
+        this.isLoading = false;
       },
       error => {
         console.error('Error updating license scope:', error);
+        this.isLoading = false;
       }
     );
   }
@@ -1363,7 +1383,7 @@ export class ViewFirmPageComponent implements OnInit {
       } else {
         this.isIslamicFinanceChecked = false; // Uncheck the box
       }
-      if (this.ActivityAuth[0]?.ObjectFirmScopeCondition[0]?.scopeConditionTypeId > 0) {
+      if (this.ActivityAuth[0]?.ObjectFirmScopeCondition[0]?.restriction === 0) {
         this.isScopeConditionChecked = true;
       } else {
         this.isScopeConditionChecked = false;
@@ -1454,7 +1474,7 @@ export class ViewFirmPageComponent implements OnInit {
         activityDetails: null
       })),
       objPrudentialCategory: {
-        firmPrudentialCategoryID: this.ActivityAuth[0].FirmPrudentialCategoryID,
+        firmPrudentialCategoryID: this.resetFirmPrudentialCategoryID ? null : this.prudentialCategoryDetails[0].FirmPrudentialCategoryID,
         firmId: this.firmId,
         prudentialCategoryTypeID: this.ActivityAuth[0].PrudentialCategoryTypeID,
         firmScopeID: this.ActivityAuth[0].FirmScopeID,
@@ -1462,7 +1482,7 @@ export class ViewFirmPageComponent implements OnInit {
         lastModifiedByID: userId,
         effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].PrudentialCategoryEffectiveDate),
         expirationDate: null,
-        lastModifiedDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].PrudentialCategoryLastModifiedDate),
+        lastModifiedDate: null,
         authorisationCategoryTypeID: this.ActivityAuth[0].AuthorisationCategoryTypeID
       },
       objSector: {
@@ -1474,7 +1494,7 @@ export class ViewFirmPageComponent implements OnInit {
       lstFirmScopeCondition: this.isScopeConditionChecked
         ? [
           {
-            firmScopeID: null,
+            firmScopeID: this.ActivityAuth[0].FirmScopeID,
             firmID: null,
             objectID: null,
             createdBy: null,
@@ -1494,7 +1514,22 @@ export class ViewFirmPageComponent implements OnInit {
         ]
         : [
           {
+            firmScopeID: this.ActivityAuth[0].FirmScopeID,
+            firmID: null,
+            objectID: null,
+            createdBy: null,
+            docReferenceID: null,
+            firmApplTypeID: null,
+            docIDs: null,
+            generalConditions: null,
+            effectiveDate: null,
+            scopeCertificateLink: null,
+            applicationDate: null,
+            licensedOrAuthorisedDate: null,
+            scopeConditionTypeId: 1,
+            lastModifiedBy: userId,
             restriction: 0,
+            scopeConditionTypeDesc: "Retail Restriction"
           }
         ], // Send an empty array if the checkbox is not checked
       objFirmIslamicFinance: this.isIslamicFinanceChecked
@@ -2987,7 +3022,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   // On View Mode
   loadActivitiesAuthorized(): void {
-    this.isLoading = true; // Start loading indicator
+    this.isLoading = true; // Start loading indicator 
 
     // Run both API calls in parallel
     forkJoin({
@@ -3000,7 +3035,7 @@ export class ViewFirmPageComponent implements OnInit {
 
         // Process firm activity authorized details
         this.ActivityAuth = firmActivity.response;
-
+        this.previousPrudentialCategoryID = parseInt(this.ActivityAuth[0].PrudentialCategoryTypeID)
         // Process activities and categorize products
         this.ActivityAuth.forEach(activity => {
           activity.categorizedProducts = [];
@@ -3062,20 +3097,30 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  // storePreviousPrudentialCategory() {
+  //   this.previousPrudentialCategoryID = parseInt(this.ActivityAuth[0].PrudentialCategoryTypeID);
+  // }
 
-  onPrudentialCategoryChange(prudCategID: number) {
 
-    this.previousPrudentialCategoryID = parseInt(this.ActivityAuth[0].PrudentialCategoryTypeID);
-
-    if (this.ActivityAuth[0].SectorTypeID > 0 && this.ActivityAuth[0].PrudentialCategoryTypeID) {
-      this.showConfirmationAndUpdate(prudCategID, constants.FirmActivitiesEnum.CHANGINGPRUDCAT_RESET_PRUDRETTYPE);
+  onPrudentialCategoryChange(prudCategID: string) {
+    // Check if the new selection is the same as the previous one
+    if (parseInt(prudCategID) === this.previousPrudentialCategoryID) {
+      this.resetFirmPrudentialCategoryID = false;
     } else {
-      // No confirmation needed, just load return types normally
-      this.updateSectorAndLoadReturnTypes(prudCategID);
+      // Determine if the FirmPrudentialCategoryID should be reset for a different selection
+      if (this.ActivityAuth[0].SectorTypeID > 0 && this.ActivityAuth[0].PrudentialCategoryTypeID) {
+        this.resetFirmPrudentialCategoryID = true;
+        this.showConfirmationAndUpdate(prudCategID, constants.FirmActivitiesEnum.CHANGINGPRUDCAT_RESET_PRUDRETTYPE);
+      } else {
+        this.resetFirmPrudentialCategoryID = false;
+        this.updateSectorAndLoadReturnTypes(prudCategID);
+      }
     }
   }
+  
+  
 
-  showConfirmationAndUpdate(prudCategID: number, msgKey: number) {
+  showConfirmationAndUpdate(prudCategID: string, msgKey: number) {
     this.firmService.errorMessages(msgKey).subscribe((response) => {
       Swal.fire({
         title: 'Alert',
@@ -3100,14 +3145,14 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
-  updateSectorAndLoadReturnTypes(prudCategID: number, resetSectorTypeID: boolean = false) {
+  updateSectorAndLoadReturnTypes(prudCategID: string, resetSectorTypeID: boolean = false) {
     // If instructed to reset SectorTypeID, set it to 0 ('Select')
     if (resetSectorTypeID) {
       this.ActivityAuth[0].SectorTypeID = 0;
     }
 
     // Load the return types for the new Prudential Category or clear if 'Select' is chosen
-    if (prudCategID != 0) {
+    if (parseInt(prudCategID) !== 0) {
       this.loadPrudReturnTypes(prudCategID);
     } else {
       this.prudReturnTypesDropdown = []; // Clear the dropdown
@@ -3674,7 +3719,7 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  loadPrudReturnTypes(prudCategID: number) {
+  loadPrudReturnTypes(prudCategID: string) {
     this.firmService.getPrudReturnTypes(prudCategID).subscribe(data => {
       this.prudReturnTypesDropdown = data.response;
       console.log('Firm Scope Prud Return Types: ', this.prudReturnTypesDropdown);
@@ -4482,27 +4527,12 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
 
-  getCleanedNotes(notes: string): string {
+  getSanitizedNotes(notes: string): SafeHtml {
     if (typeof notes !== 'string') return '';
-
-    // Remove <p> tags and replace <br> with newline
-    let cleanedNotes = notes
-      .replace(/<p\s*\/?>/gi, '\n') // <p> or <p />
-      .replace(/<\/p>/gi, '\n') // </p>
-      .replace(/<br\s*\/?>/gi, '\n'); // <br> or <br />
-    return cleanedNotes;
+  
+    // Use the sanitizer to bypass security and render the notes as HTML
+    return this.sanitizer.bypassSecurityTrustHtml(notes);
   }
-
-  // getCleanedUrl(link: string | null | undefined): string {
-  //   if (!link) {
-  //     return ''; // Return an empty string or handle undefined/null value as needed
-  //   }
-  //   // Replace all occurrences of &amp; regardless of how many times it's encoded
-  //   while (link.includes('&amp;')) {
-  //     link = link.replace(/&amp;/g, '&');
-  //   }
-  //   return link;
-  // }
 
 
   onFileSelected(event: Event) {
@@ -4844,6 +4874,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   showFirmScopeLicSaveSuccessAlert(messageKey: number) {
+    this.isLoading = true;
     this.firmService.errorMessages(messageKey).subscribe(
       (response) => {
         const replacedText = response.response.replace('#Tab#', 'Licensed');
@@ -4855,6 +4886,7 @@ export class ViewFirmPageComponent implements OnInit {
         });
       },
     );
+    this.isLoading = false;
   }
 
   showFirmScopeAuthSaveSuccessAlert(messageKey: number) {

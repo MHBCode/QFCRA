@@ -227,7 +227,7 @@ export class FirmService {
     return this.http.get<any>(url);
   }
 
-  getPrudReturnTypes(prudCategoryID: number): Observable<any> {
+  getPrudReturnTypes(prudCategoryID: string): Observable<any> {
     const url = `${this.baseUrlActivity}get_prud_ret_type?prudCatId=${prudCategoryID}`;
     return this.http.get<any>(url);
   }

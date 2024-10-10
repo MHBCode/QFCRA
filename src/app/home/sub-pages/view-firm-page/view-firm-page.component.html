@@ -212,7 +212,7 @@
         <div class="input-field notes">
           <label for="notes"> Notes </label>
           <textarea disabled name="notes" id="notes">{{
-            getCleanedNotes(firmOPDetails?.Notes)
+            getSanitizedNotes(firmOPDetails?.Notes)
           }}</textarea>
         </div>
       </div>
@@ -842,9 +842,9 @@
     <div class="scope-container">
       <div class="menu-container tab-container">
         <ul class="nav">
-          <li><a (click)="switchSection('Licensed')" [class.active]="activeSection === 'Licensed'"><i
+          <li><a (click)="switchScopeTab('Licensed')" [class.active]="activeSection === 'Licensed'"><i
                 class="bi bi-award"></i>Licensed</a></li>
-          <li *ngIf="firmDetails?.AuthorisationStatusTypeID > 0"><a (click)="switchSection('Authorized')"
+          <li *ngIf="firmDetails?.AuthorisationStatusTypeID > 0"><a (click)="switchScopeTab('Authorized')"
               [class.active]="activeSection === 'Authorized'"><i class="bi bi-shield-check"></i>Authorized</a></li>
         </ul>
       </div>
@@ -1059,8 +1059,7 @@
                     </div>
                   </td>
                   <td>
-                    <button class="rmvActivityLicBtn bi-trash" (click)="removeLicActivity(i)">
-                    </button>
+                    <button class="rmvActivityLicBtn bi bi-trash" (click)="removeLicActivity(i)"></button>
                   </td>
                 </tr>
                 <tr class="error-messages" style="color: red">
@@ -1422,7 +1421,7 @@
                   <p>Conditions and Restrictions</p>
                 </div>
 
-                <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition[0]?.length > 0 || (isEditModeAuth)">
+                <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition[0]?.restriction === 0 || (isEditModeAuth)">
                   <strong>Retail Restriction: </strong> &nbsp;
                   <span *ngIf="!isEditModeAuth">Yes</span>
                   <input *ngIf="isEditModeAuth" [(ngModel)]="isScopeConditionChecked" type="checkbox"/>
