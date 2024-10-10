@@ -317,6 +317,7 @@ export class TaskListComponent implements OnInit {
     this.showTitle = !currentUrl.includes('home/tasks-page');
   }
 
+  
   isTaskOverdue(dueDate: string): boolean {
     return this.dateUtilService.isOverdue(dueDate);
   }

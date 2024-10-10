@@ -80,6 +80,7 @@
             <th class="task-table-column">
               <div class="task-table-column-content">
                 <div>
+
                   Days Over Due
                   <i *ngIf="isMainView" class="dropdown-icon bi bi-filter" (click)="toggleDaysOverDueDropdown()"></i>
                 </div>
@@ -115,27 +116,63 @@
           </tr>
         </thead>
 
-        <tbody>
-          <tr *ngFor="let item of paginatedTasks" (click)="toggleTaskPopup(item)">
-            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">
+        <tbody>         
+         <!--  <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">
               <div *ngIf="!isMainView else expandType" class="expandable-text-container">
                 <span class="expandable-text">{{ item.TaskType }}</span>
               </div>
               <ng-template #expandType>{{item.TaskType}}</ng-template>
+            </td> -->
+          <tr *ngFor="let item of paginatedTasks" (click)="toggleTaskPopup(item)">
+            <!-- <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">
+              <span class="d-flex align-items-center">
+                <ng-container *ngIf="isTaskOverdue(item.TaskDueDate); else okFlag">
+                  <i style="color: red;" class="bi bi-flag-fill text-danger me-1"></i> 
+                </ng-container>
+                <ng-template #okFlag>
+                  <i style="color: green;" class="bi bi-flag-fill text-success me-1"></i> 
+                </ng-template>
+          
+                
+                <span class="expandable-text-container" *ngIf="!isMainView">
+                  <span class="expandable-text">{{ item.TaskType }}</span>
+                </span>
+                <span *ngIf="isMainView">{{ item.TaskType }}</span> 
+              </span>
+            </td> -->
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">
+              <span class="d-flex align-items-center" style="display: flex; align-items: center;"> <!-- Flexbox to align them horizontally -->
+                <ng-container *ngIf="isTaskOverdue(item.TaskDueDate); else okFlag">
+                  <i style="color: red; font-size: 1rem; margin-right: 5px;" class="bi bi-flag-fill"></i> <!-- Red flag for overdue -->
+                </ng-container>
+                <ng-template #okFlag>
+                  <i style="color: green; font-size: 1rem; margin-right: 5px;" class="bi bi-flag-fill"></i> <!-- Green flag for not overdue -->
+                </ng-template>
+            
+                <!-- Task Type -->
+                <span class="expandable-text-container" *ngIf="!isMainView">
+                  <span class="expandable-text">{{ item.TaskType }}</span>
+                </span>
+                <span *ngIf="isMainView">{{ item.TaskType }}</span> <!-- Task Type displayed normally in main view -->
+              </span>
             </td>
             <td *ngIf="isMainView" style="text-align: center;">
               <a [href]="item.Link" target="_blank" style="text-decoration: none;">View</a>
             </td>
-            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.FirmName}}</td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">
               <div *ngIf="!isMainView else expandDesc" class="expandable-text-container">
-                <span class="expandable-text">{{item.ShortDescription}}</span>
+                <span class="expandable-text">{{ item.FirmName }}</span>
               </div>
-              <ng-template #expandDesc>{{item.ShortDescription}}</ng-template>
             </td>
-            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.TaskDueDate}}</td>
-            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.DaysOverDue}}</td>
-            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}" *ngIf="isMainView">{{item.Comments}}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">
+              <div *ngIf="!isMainView else expandDesc" class="expandable-text-container">
+                <span class="expandable-text">{{ item.ShortDescription }}</span>
+              </div>
+              <ng-template #expandDesc>{{ item.ShortDescription }}</ng-template>
+            </td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{ item.TaskDueDate }}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{ item.DaysOverDue }}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}" *ngIf="isMainView">{{ item.Comments }}</td>
           </tr>
         </tbody>
       </table>

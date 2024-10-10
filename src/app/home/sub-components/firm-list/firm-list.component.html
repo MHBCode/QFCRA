@@ -9,13 +9,13 @@
           <tr>
             <th>QFC Number</th>
             <th>Firm Name</th>
-            <th>Legal Status</th>
-            <th>License Status</th>
+            <th *ngIf="isMainView">Legal Status</th>
+            <th *ngIf="isMainView">License Status</th>
             <th>Authorization Status</th>
-            <th>Sector</th>
+            <th *ngIf="isMainView">Sector</th>
             <th>Authorization Category</th>
             <th *ngIf="isMainView">Supervision Category</th>
-            <th *ngIf="isMainView">Prudential Category</th>
+            <th >Prudential Category</th>
             <th *ngIf="isMainView">Home Country</th>
             <th *ngIf="isMainView">Supervisor - Supervision</th>
             <th *ngIf="isMainView">Supervisor - AML</th>
@@ -24,14 +24,18 @@
         <tbody>
           <tr *ngFor="let item of paginatedFirms" (click)="viewFirm(item.FirmID)">
             <td class="bold-text">{{ item.QFCNum }}</td>
-            <td >{{ item.FirmName }}</td>
-            <td>{{ item.LegalStatusTypeDesc }}</td>
-            <td>{{ item.LicenseStatusTypeDesc }}</td>
+            <td>
+                <div class="expandable-text-container">
+                  <span class="expandable-text">{{ item.FirmName }}</span> <!-- Expandable in main view -->
+                </div>
+            </td>
+            <td *ngIf="isMainView">{{ item.LegalStatusTypeDesc }}</td>
+            <td *ngIf="isMainView">{{ item.LicenseStatusTypeDesc }}</td>
             <td>{{ item.AuthorisationStatusTypeDesc }}</td>
-            <td>{{ item.SectorTypeShortDesc }}</td>
+            <td *ngIf="isMainView">{{ item.SectorTypeShortDesc }}</td>
             <td>{{ item.AuthorisationCategoryTypeDesc }}</td>
             <td *ngIf="isMainView">{{ item.SupervisionCategory }}</td>
-            <td *ngIf="isMainView">{{ item.PrudentialCategoryTypeDesc }}</td>
+            <td >{{ item.PrudentialCategoryTypeDesc }}</td>
             <td *ngIf="isMainView">{{ item.Country }}</td>
             <td *ngIf="isMainView">
               {{ item.Supervisor }}
@@ -40,6 +44,7 @@
              {{ item.Supervisor_AML }}
             </td>
           </tr>
+                
         </tbody>
       </table>
     </div>
@@ -52,6 +57,6 @@
         <span>&gt;</span>
       </button>
       <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
-    </div>
+    </div>        
   </div>
 </div>

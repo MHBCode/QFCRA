@@ -629,6 +629,37 @@
 }
 
 
+.subbutton-open-history {
+  padding: 0.1rem;
+  color: white;
+  background: #a51e36;
+  border: none;
+  border-radius: 5px;
+  position: relative;
+  width: 40px; /* Small default width */
+  transition: width 0.3s ease, height 0.3s ease; /* Smooth transition for width */
+  display: flex; /* Flexbox to center icon */
+  align-items: center; /* Center vertically */
+  overflow: hidden; /* Hide text when not hovered */
+  padding-left: 13px;
+}
+
+.subbutton-open-history span {
+  visibility: hidden;
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.subbutton-open-history:hover {
+  width: 130px; /* Expand the width on hover */
+}
+
+.subbutton-open-history:hover span {
+  visibility: visible;
+  opacity: 1;
+  padding-left: 6px;
+}
 
 .subbutton {
   padding: 0.1rem 1rem;
@@ -1379,7 +1410,7 @@ hr {
 
 .inputs-field-set {
   width: 100%;
-  background: #F1EBEC;
+  background: #ffffff;
   border-radius: 15px;
   min-height: 200px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;

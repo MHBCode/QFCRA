@@ -83,6 +83,8 @@ export class ViewFirmPageComponent implements OnInit {
   dateOfApplication: any;
   formattedLicenseApplStatusDate: any;
   formattedAuthApplStatusDate: any;
+  AuthorisationStatusTypeLabelDescFormatted : any ;
+  LicenseStatusTypeLabelDescFormatted : any ;
   existingAddresses: any = [];
   firmApp: any = {};
   firmOPDetails: any;
@@ -117,7 +119,7 @@ export class ViewFirmPageComponent implements OnInit {
   FIRMControllersIndividual: any[] = [];
   isPopupOpen = false;
   selectedFirmName = '';
-
+  
   RegisteredFund: any[] = [];
   FIRMRA: any[] = [];
   FirmAdminFees: any[] = [];
@@ -415,6 +417,7 @@ export class ViewFirmPageComponent implements OnInit {
         }
         break;
       case FrimsObject.Supervision:
+        
         this.showSection(this.supervisionSection);
         break;
       case FrimsObject.ReturnsReview:
@@ -1759,16 +1762,22 @@ export class ViewFirmPageComponent implements OnInit {
         this.dateOfApplication = this.firmDetails.AuthorisationStatusTypeID > 0 ? this.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate) : this.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate);
         this.formattedLicenseApplStatusDate = this.formatDateToCustomFormat(this.firmDetails.LicenseApplStatusDate);
         this.formattedAuthApplStatusDate = this.formatDateToCustomFormat(this.firmDetails.AuthApplStatusDate);
-
+        this.AuthorisationStatusTypeLabelDescFormatted = this.firmDetails.AuthorisationStatusTypeLabelDesc.replace(/:/g, '');
+        this.LicenseStatusTypeLabelDescFormatted = this.firmDetails.LicenseStatusTypeLabelDesc.replace(/:/g, '');
         // this.firmDetails.AuthorisationDate = this.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate);
         // this.firmDetails.LicensedDate = this.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate);
         this.getFirmTypes();
         console.log('Firm details:', this.firmDetails);
+        console.log("AuthorisationStatusTypeLabelDescFormatted",this.AuthorisationStatusTypeLabelDescFormatted)
       },
       error => {
         console.error('Error fetching firm details', error);
       }
     );
+  }
+  formatText() {
+    this.AuthorisationStatusTypeLabelDescFormatted = this.firmDetails.AuthorisationStatusTypeLabelDesc.replace(/:/g, '');
+    
   }
   loadFirmOPDetails(firmId: number) {
     this.firmService.getFIRMOPData(firmId).subscribe(
@@ -2582,7 +2591,7 @@ export class ViewFirmPageComponent implements OnInit {
     PassportNum: '',
     IsPEP: 0,
     IsPublicallyTraded: false,
-    ControllerControlTypeID: 0,
+    ControllerControlTypeID: 2,
     RegisteredNum: '',
     ControllerControlTypeDesc: '',
     HoldingsPercentage: '',
@@ -2614,7 +2623,7 @@ export class ViewFirmPageComponent implements OnInit {
     EntitySubTypeID: null,
     EntityTypeID: 1,
     RelatedEntityEntityID: 0,
-    MyState: 3,
+    MyState:0,
     PlaceOfIncorporation: '',
     CountryOfIncorporation: 0,
     zebSiteAddress: '',
@@ -2660,24 +2669,24 @@ export class ViewFirmPageComponent implements OnInit {
     console.log("CreatecontrollerDetails", this.CreatecontrollerDetails)
     this.CreateControllerValidateForm().then(() => {
       if (!this.hasValidationErrors) {
-        console.log("Selected Controller:", this.CreatecontrollerDetails.SelectedControlType);
+        console.log("Selected Controller:", this.CreatecontrollerDetails.EntityTypeDesc);
         if (
-          ["parentEntity", "corporateController", "headOfficeBranch", "uboCorporate"].includes(this.CreatecontrollerDetails.SelectedControlType)
+          ["parentEntity", "corporateController", "headOfficeBranch", "uboCorporate"].includes(this.CreatecontrollerDetails.EntityTypeDesc)
         ) {
           const saveControllerPopupChangesObj = {
             otherEntityDetails: {
               UserID: 30,
               UserName: null,
+              OtherEntityName: this.CreatecontrollerDetails.OtherEntityName,
+              OtherEntityID: null,
+              ControllerControlTypeDesc: this.CreatecontrollerDetails.ControllerControlTypeDesc,
               EntityTypeDesc: this.CreatecontrollerDetails.EntityTypeDesc,
-              OtherEntityName: this.CreatecontrollerDetails.EntityTypeDesc,
-              otherEntityID: this.CreatecontrollerDetails.OtherEntityID,
               DateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
               createdBy: this.CreatecontrollerDetails.CreatedBy,
               CessationDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CessationDate),
               EffectiveDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.EffectiveDate),
               CreatedDate: null,
               ControllerControlTypeID: this.CreatecontrollerDetails.ControllerControlTypeID,
-              SelectedControlType: this.CreatecontrollerDetails.ControllerControlTypeID,
               relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
               entitySubTypeID: this.CreatecontrollerDetails.EntitySubTypeID,
               relatedEntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
@@ -2704,8 +2713,7 @@ export class ViewFirmPageComponent implements OnInit {
               FirmID: this.firmId,
               EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               EntityID: this.CreatecontrollerDetails.FirmID,
-              controllerControlTypeID: this.CreatecontrollerDetails.ControllerControlTypeID,
-              ControllerControlTypeDesc: this.CreatecontrollerDetails.ControllerControlTypeDesc,
+             
               numOfShares: this.CreatecontrollerDetails.NumOfShares,
               MajorityStockHolder: false,
               assnDateFrom: null,
@@ -2782,7 +2790,7 @@ export class ViewFirmPageComponent implements OnInit {
         }
       }
       else if (
-        ["individualController", "uboIndividual"].includes(this.selectedController.EntityTypeDesc)
+        ["individualController", "uboIndividual"].includes(this.CreatecontrollerDetails.EntityTypeDesc)
       ) {
         const saveControllerPopupChangesIndividualObj = {
           contactDetails: {
@@ -4340,25 +4348,29 @@ export class ViewFirmPageComponent implements OnInit {
   }
   firmAuditorsObj: {};
   saveEditAuditor() {
+    console.log("selectedAuditor",this.selectedAuditor)
     this.firmAuditorsObj = {
-      otherEntityID: this.selectedAuditor.OtherEntityID,
-      createdBy: 30,
-      relatedEntityID: this.selectedAuditor.RelatedEntityID,
-      entitySubTypeID: this.selectedAuditor.EntitySubTypeID,
+      OtherEntityID: this.selectedAuditor.OtherEntityID,
+      CreatedBy: 30,
+      RelatedEntityID: this.selectedAuditor.RelatedEntityID,
+      EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
+      EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeDesc,
       // erorr
-      relatedEntityTypeID: this.selectedAuditor.relatedEntityTypeID,
-      relatedEntityEntityID: this.selectedAuditor.OtherEntityID,
-      myState: 3,
+      RelatedEntityTypeID: this.selectedAuditor.RelatedEntityTypeID,
+      RelatedEntityEntityID: this.selectedAuditor.OtherEntityID,
+      MyState: 2,
       LastModifiedByOfOtherEntity: 30,
-      otherEntityName: this.selectedAuditor.OtherEntityName,
-      dateOfIncorporation: "2024-10-02T11:58:32.911Z",
-      legalStatusTypeID: 0,
-      placeOfIncorporation: null,
-      countryOfIncorporation: 0,
-      registeredNumber: null,
-      zebSiteAddress: null,
-      lastModifiedBy: 0,
+      OtherEntityName: this.selectedAuditor.OtherEntityName,
+      DateOfIncorporation: "2024-10-02T11:58:32.911Z",
+      LegalStatusTypeID: 0,
+      PlaceOfIncorporation: null,
+      CountryOfIncorporation: 0,
+      RegisteredNumber: null,
+      ZebSiteAddress: null,
+      LastModifiedDate: this.currentDate,
+      lastModifiedBy: 30,
       isAuditor: 0,
+
       isCompanyRegulated: true,
       additionalDetails: null,
       isParentController: true,
@@ -4368,13 +4380,13 @@ export class ViewFirmPageComponent implements OnInit {
       output: 0,
       firmId: this.firmId,
       entityTypeID: 0,
-      entityID: this.selectedController.EntityID,
+      entityID: this.firmId,
       controllerControlTypeID: 0,
       numOfShares: 0,
       pctOfShares: 0,
       majorityStockHolder: true,
-      assnDateFrom: null,
-      assnDateTo: null
+      assnDateFrom: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom),
+      assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)
     }
     this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
       (response) => {
@@ -4398,7 +4410,7 @@ export class ViewFirmPageComponent implements OnInit {
       entitySubTypeID: this.selectedAuditor.EntitySubTypeID,
       relatedEntityTypeID: 0,
       relatedEntityEntityID: 0,
-      myState: 5,
+      myState: 2,
       otherEntityName: this.selectedAuditor.OtherEntityName,
       dateOfIncorporation: "2024-10-02T11:58:32.911Z",
       legalStatusTypeID: 0,
@@ -4657,41 +4669,101 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
 
+  // onLicenseStatusChange(selectedValue: any) {
+  //   const numericValue = Number(selectedValue);
+
+  //   if (isNaN(numericValue) || !this.firmId) {
+  //     console.error('Invalid value or firm ID');
+  //     return;
+  //   }
+
+  //   this.firmService.getFirmStatusValidation(this.firmId, numericValue, this.currentDate, 2)
+  //     .subscribe(response => {
+  //       if (response.isSuccess && response.response) {
+  //         const { OldFirmApplStatusTypeDesc, OldFirmApplStatusDate, IsFirmApplStatusGroupChanged } = response.response;
+
+  //         // Fallback to selected option's description if no status description is returned
+  //         const selectedOption = this.allQFCLicenseStatus.find(option => option.FirmApplStatusTypeID === numericValue);
+  //         const statusDescription = OldFirmApplStatusTypeDesc || selectedOption?.FirmApplStatusTypeDesc || '';
+
+  //         // Update license status label
+  //         this.firmDetails.LicenseStatusTypeLabelDesc = `Date ${statusDescription}`;
+
+  //         // Set the date if available, otherwise make it null
+  //         this.formattedLicenseApplStatusDate = OldFirmApplStatusDate !== '1900-01-01T00:00:00'
+  //           ? this.formatDateToCustomFormat(OldFirmApplStatusDate)
+  //           : null;
+
+  //         // Save the current status and date
+  //         this.licenseStatusDates[numericValue] = this.formattedLicenseApplStatusDate;
+
+  //         let messagePromises: Promise<string>[] = [];
+  //         if (this.firmDetails.FirmTypeID !== 2) {
+  //           if (this.formattedLicenseApplStatusDate) {
+  //             messagePromises.push(this.getNotePopupMessage(3917));
+  //           }
+  //         } else {
+
+  //           if (this.firmId !== null) {
+  //             if (IsFirmApplStatusGroupChanged > 0) {
+  //               if (IsFirmApplStatusGroupChanged == 1) {
+  //                 messagePromises.push(this.getNotePopupMessage(3913));
+  //               } else if (IsFirmApplStatusGroupChanged == 2) {
+  //                 messagePromises.push(this.getNotePopupMessage(3914));
+  //               }
+  //             }
+  //             if (this.formattedAuthApplStatusDate) {
+  //               messagePromises.push(this.getNotePopupMessage(3917));
+  //             }
+  //           }
+  //         }
+  //         Promise.all(messagePromises).then((messages: string[]) => {
+  //           if (messages.length > 0) {
+  //             this.showCombinedPopup(messages);
+  //           }
+  //         });
+  //       } else {
+  //         // Handle error or default case
+  //         const selectedOption = this.allQFCLicenseStatus.find(option => option.FirmApplStatusTypeID === numericValue);
+  //         this.firmDetails.LicenseStatusTypeLabelDesc = `Date ${selectedOption?.FirmApplStatusTypeDesc || ''}`;
+  //         this.formattedLicenseApplStatusDate = null;
+  //       }
+  //     });
+  // }
   onLicenseStatusChange(selectedValue: any) {
     const numericValue = Number(selectedValue);
-
+  
     if (isNaN(numericValue) || !this.firmId) {
       console.error('Invalid value or firm ID');
       return;
     }
-
+  
     this.firmService.getFirmStatusValidation(this.firmId, numericValue, this.currentDate, 2)
       .subscribe(response => {
         if (response.isSuccess && response.response) {
           const { OldFirmApplStatusTypeDesc, OldFirmApplStatusDate, IsFirmApplStatusGroupChanged } = response.response;
-
-          // Fallback to selected option's description if no status description is returned
+  
           const selectedOption = this.allQFCLicenseStatus.find(option => option.FirmApplStatusTypeID === numericValue);
-          const statusDescription = OldFirmApplStatusTypeDesc || selectedOption?.FirmApplStatusTypeDesc || '';
-
+          let statusDescription = OldFirmApplStatusTypeDesc || selectedOption?.FirmApplStatusTypeDesc || '';
+  
+          // Remove any trailing colon
+          statusDescription = statusDescription.trim().replace(/:$/, '');
+  
           // Update license status label
           this.firmDetails.LicenseStatusTypeLabelDesc = `Date ${statusDescription}`;
-
-          // Set the date if available, otherwise make it null
+  
           this.formattedLicenseApplStatusDate = OldFirmApplStatusDate !== '1900-01-01T00:00:00'
             ? this.formatDateToCustomFormat(OldFirmApplStatusDate)
             : null;
-
-          // Save the current status and date
+  
           this.licenseStatusDates[numericValue] = this.formattedLicenseApplStatusDate;
-
+  
           let messagePromises: Promise<string>[] = [];
           if (this.firmDetails.FirmTypeID !== 2) {
             if (this.formattedLicenseApplStatusDate) {
               messagePromises.push(this.getNotePopupMessage(3917));
             }
           } else {
-
             if (this.firmId !== null) {
               if (IsFirmApplStatusGroupChanged > 0) {
                 if (IsFirmApplStatusGroupChanged == 1) {
@@ -4713,12 +4785,17 @@ export class ViewFirmPageComponent implements OnInit {
         } else {
           // Handle error or default case
           const selectedOption = this.allQFCLicenseStatus.find(option => option.FirmApplStatusTypeID === numericValue);
-          this.firmDetails.LicenseStatusTypeLabelDesc = `Date ${selectedOption?.FirmApplStatusTypeDesc || ''}`;
+          let statusDescription = selectedOption?.FirmApplStatusTypeDesc || '';
+  
+          // Remove any trailing colon
+          statusDescription = statusDescription.trim().replace(/:$/, '');
+  
+          this.firmDetails.LicenseStatusTypeLabelDesc = `Date ${statusDescription}`;
           this.formattedLicenseApplStatusDate = null;
         }
       });
   }
-
+  
   onAuthorizedStatusChange(selectedValue: any) {
     const numericValue = Number(selectedValue);
 

@@ -7,27 +7,70 @@
     justify-content: space-between;
 }
 
+
+// .exportBtn {
+//     padding-top: 0.5rem;
+// }
+
+// .btns button {
+//     background: #A51E36;
+//     padding: 0.5rem 1rem;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     border: none;
+//     border-radius: 10px;
+//     color: white;
+//     min-width: 6rem;
+//     min-height: 40px;
+//     ;
+// }
+
+// .btns button i {
+//     margin: 0 2px;
+// }
 .exportBtn {
     padding-top: 0.5rem;
 }
 
 .btns button {
     background: #A51E36;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     border: none;
     border-radius: 10px;
     color: white;
-    min-width: 6rem;
+    min-width: 3rem; /* Adjusted to fit the icon */
     min-height: 40px;
-    ;
+    position: relative;
+    width: auto; /* Button width adjusts automatically */
 }
 
 .btns button i {
+    font-size: 1.5rem; /* Increase icon size */
     margin: 0 2px;
+    transition: opacity 0.3s ease, font-size 0.3s ease;
 }
+
+.btns button .export-text {
+    display: none;
+    transition: opacity 0.3s ease;
+}
+
+.btns button:hover {
+    padding: 0.5rem 1rem; /* Button size on hover to fit text */
+}
+
+.btns button:hover i {
+    display: none;
+}
+
+.btns button:hover .export-text {
+    display: inline;
+}
+
 
 .task-page {
     width: 98%;

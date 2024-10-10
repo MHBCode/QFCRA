@@ -215,35 +215,83 @@
 
 
 /* Common Styles for Both Buttons */
+// .button-style {
+//   background-color: #a51e36;
+//   /* Same background color as Filter button */
+//   color: #ffffff;
+//   /* White text color */
+//   border: none;
+//   padding: 5px 7px;
+//   border-radius: 8px;
+//   font-size: 1rem;
+//   cursor: pointer;
+//   display: flex;
+//   align-items: center;
+//   transition: background-color 0.3s ease;
+
+//   i {
+//     font-size: 13px;
+//     margin-inline-end: 4px;
+//   }
+
+//   .bi.bi-caret-down-fill,
+//   .bi.bi-funnel-fill {
+//     font-size: 10px;
+//   }
+// }
+
+// .button-style:hover {
+//   background-color: #8e172e;
+//   /* Darker shade on hover */
+// }
 .button-style {
   background-color: #a51e36;
-  /* Same background color as Filter button */
   color: #ffffff;
-  /* White text color */
   border: none;
-  padding: 5px 7px;
+  padding: 5px;
   border-radius: 8px;
   font-size: 1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: background-color 0.3s ease;
+  justify-content: center;
+  transition: background-color 0.3s ease, padding 0.3s ease, min-width 0.3s ease;
+  
+  min-width: 2.5rem; /* Smaller width for just the icon */
+  position: relative;
+}
 
-  i {
-    font-size: 13px;
-    margin-inline-end: 4px;
-  }
+.button-style i {
+  font-size: 1.3rem;
+  margin-inline-end: 4px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
 
-  .bi.bi-caret-down-fill,
-  .bi.bi-funnel-fill {
-    font-size: 10px;
-  }
+.button-style .button-text {
+  display: none;
+  transition: opacity 0.3s ease;
 }
 
 .button-style:hover {
+  padding: 5px 15px; /* Expand to fit text */
   background-color: #8e172e;
-  /* Darker shade on hover */
 }
+
+.button-style:hover .button-text {
+  display: inline; /* Show text on hover */
+  margin-left: 5px; /* Add space between icon and text */
+}
+
+.button-style:hover i {
+  transform: scale(1); /* Keep the icon visible on hover */
+}
+
+.button-style .bi.bi-caret-down-fill,
+.button-style .bi.bi-funnel-fill {
+  font-size: 10px;
+}
+
+
 
 /* Dropdown Styles */
 .sort-dropdown {
