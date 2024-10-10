@@ -12,9 +12,11 @@
   display: flex;
   width: 100%;
   justify-content: flex-start;
-  background-color: rgba(253, 216, 216, 0.24);
+  background-color: rgba(230, 230, 230, 0.24);
 }
-
+tr .pagination{
+  width: 100%;
+}
 .tableTitle h3 {
   cursor: pointer;
   color: #222529;

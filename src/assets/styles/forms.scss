@@ -32,7 +32,6 @@
         border: 0.72px #b1b1b1 solid;
         resize: vertical;
         min-height: 20px;
-        max-height: 100px;
     }
 }
 
@@ -157,9 +156,9 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
 }
 
 .edit-firm-header {
-    color: #a51e36;
+    color: #A51E36;
     font-size: 1.25em;
-    font-weight: 500;
+    font-weight: bold;
     line-height: 36px;
     word-wrap: break-word;
 }
@@ -182,13 +181,13 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
     border-radius: 15px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     margin-bottom: 20px;
-    background: linear-gradient(to right, #a51e36, #e99fa9);
   
     .edit-firm-actions {
       padding-top: 0px;
       .edit-firm-header{
-        color: white;
+        color: #080808;
         font-size: 1em;
+        font-weight: bold;
       }
     }
   }

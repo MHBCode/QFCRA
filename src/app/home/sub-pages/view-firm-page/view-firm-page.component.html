@@ -112,7 +112,7 @@
     <div class="inputs-field-set">
       <div class="form-section-title">
         <h2 class="edit-firm-header">
-          FIRM Details > <span>{{ firmDetails?.FirmName }}</span>
+           <span>{{ firmDetails?.FirmName }}</span>
         </h2>
       </div>
       <div class="inputs-row">
@@ -171,7 +171,7 @@
 
         <div class="input-field">
           <label for="DateLicensed">
-            {{ firmDetails?.LicenseStatusTypeLabelDesc }}
+            {{ LicenseStatusTypeLabelDescFormatted }}
           </label>
           <input disabled name="DateLicensed" id="DateLicensed" type="text"
             value="{{ firmDetails?.LicenseApplStatusDate | date : 'dd/MMM/y' }}" />
@@ -184,7 +184,7 @@
         </div>
         <div class="input-field" *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
           <label for="dateApplication">
-            {{ firmDetails?.AuthorisationStatusTypeLabelDesc }}
+            {{ AuthorisationStatusTypeLabelDescFormatted }}
           </label>
           <input disabled name="dateApplication" id="dateApplication" type="text"
             value="{{ firmDetails?.AuthApplStatusDate | date : 'dd/MMM/y' }}" />
@@ -222,8 +222,9 @@
       <div class="section">
         <h2 class="history-row">
           RA Personal Assigned
-          <button [disabled]="FIRMRA.length === 0" class="subbutton" (click)="getInactiveUsers()">
-            <i class="bi bi-clock-history"></i> Open History
+          <button [disabled]="FIRMRA.length === 0" class="subbutton-open-history" (click)="getInactiveUsers()">
+            <i class="bi bi-clock-history"></i> 
+            <span> Open History</span>
           </button>
         </h2>
         <table *ngIf="FIRMRA?.length > 0; else noSupervisors">
@@ -1978,7 +1979,7 @@
             <label for="controllerType">
               Controller Type <span style="color: red;">*</span>
             </label>
-            <select name="controllerType" id="controllerType" [(ngModel)]="CreatecontrollerDetails.SelectedControlType"
+            <select name="controllerType" id="controllerType" [(ngModel)]="CreatecontrollerDetails.EntityTypeDesc"
               (change)="changeControlType()">
               <option value="select" selected>Select</option>
               <option value="parentEntity">Parent Entity</option>
@@ -1991,7 +1992,7 @@
           </div>
           <ng-container *ngIf="!hideForms">
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'parentEntity' || CreatecontrollerDetails.SelectedControlType === 'corporateController' || CreatecontrollerDetails.SelectedControlType === 'uboCorporate' || CreatecontrollerDetails.SelectedControlType === 'headOfficeBranch'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'parentEntity' || CreatecontrollerDetails.EntityTypeDesc === 'corporateController' || CreatecontrollerDetails.EntityTypeDesc === 'uboCorporate' || CreatecontrollerDetails.EntityTypeDesc === 'headOfficeBranch'">
               <label for="entityName">
                 Full Name of Entity <span style="color: red;">*</span>
               </label>
@@ -2000,7 +2001,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'uboIndividual' || CreatecontrollerDetails.EntityTypeDesc === 'individualController'">
               <label for="individualTitle">
                 Title
               </label>
@@ -2012,7 +2013,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'uboIndividual' || CreatecontrollerDetails.EntityTypeDesc === 'individualController'">
               <label for="firstName">
                 First Name <span style="color: red;">*</span>
               </label>
@@ -2020,7 +2021,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'uboIndividual' || CreatecontrollerDetails.EntityTypeDesc === 'individualController'">
               <label for="secondName">
                 Second Name <span style="color: red;">*</span>
               </label>
@@ -2028,7 +2029,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'uboIndividual' || CreatecontrollerDetails.EntityTypeDesc === 'individualController'">
               <label for="familyName">
                 Family Name <span style="color: red;">*</span>
               </label>
@@ -2036,7 +2037,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'uboIndividual' || CreatecontrollerDetails.EntityTypeDesc === 'individualController'">
               <label for="placeOfBirth">
                 Place of birth
               </label>
@@ -2049,7 +2050,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'uboIndividual' || CreatecontrollerDetails.EntityTypeDesc === 'individualController'">
               <label for="dateOfBirth">
                 Date of birth <span style="color: red;">*</span>
               </label>
@@ -2058,7 +2059,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'uboIndividual' || CreatecontrollerDetails.EntityTypeDesc === 'individualController'">
               <label for="passportNum">
                 Passport Number
               </label>
@@ -2066,7 +2067,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboIndividual' || CreatecontrollerDetails.SelectedControlType === 'individualController'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'uboIndividual' || CreatecontrollerDetails.EntityTypeDesc === 'individualController'">
               <label for="jurisdictionIssue">
                 Jurisdiction of Issue
               </label>
@@ -2076,7 +2077,7 @@
             </div>
             <!---->
             <div class="input-field" style="width: 100%;"
-              *ngIf="selectedControlType === 'uboIndividual' || selectedControlType === 'individualController'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'uboIndividual' || CreatecontrollerDetails.EntityTypeDesc === 'individualController'">
               <label for="isPEP">
                 Is Politically Exposed Person (PEP)? <span style="color: red;">*</span>
               </label>
@@ -2088,7 +2089,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'parentEntity' || CreatecontrollerDetails.SelectedControlType === 'corporateController' || CreatecontrollerDetails.SelectedControlType === 'uboCorporate' || CreatecontrollerDetails.SelectedControlType === 'headOfficeBranch'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'parentEntity' || CreatecontrollerDetails.EntityTypeDesc === 'corporateController' || CreatecontrollerDetails.EntityTypeDesc === 'uboCorporate' || CreatecontrollerDetails.EntityTypeDesc === 'headOfficeBranch'">
               <label for="legalStatus">
                 Legal Status
               </label>
@@ -2100,7 +2101,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'parentEntity' || CreatecontrollerDetails.SelectedControlType === 'corporateController' || CreatecontrollerDetails.SelectedControlType === 'uboCorporate' || CreatecontrollerDetails.SelectedControlType === 'headOfficeBranch'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'parentEntity' || CreatecontrollerDetails.EntityTypeDesc === 'corporateController' || CreatecontrollerDetails.EntityTypeDesc === 'uboCorporate' || CreatecontrollerDetails.EntityTypeDesc === 'headOfficeBranch'">
               <label for="registeredNumber">
                 Registered Number
               </label>
@@ -2109,7 +2110,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.SelectedControlType === 'parentEntity' || CreatecontrollerDetails.SelectedControlType === 'corporateController' || CreatecontrollerDetails.SelectedControlType === 'uboCorporate' || CreatecontrollerDetails.SelectedControlType === 'headOfficeBranch'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'parentEntity' || CreatecontrollerDetails.EntityTypeDesc === 'corporateController' || CreatecontrollerDetails.EntityTypeDesc === 'uboCorporate' || CreatecontrollerDetails.EntityTypeDesc === 'headOfficeBranch'">
               <label for="establishmentPlace">
                 Place of Establishment <span style="color: red;">*</span>
               </label>
@@ -2123,7 +2124,7 @@
               <label for="controlType">
                 Type of Control <span style="color: red;">*</span>
               </label>
-              <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeID" name="typeOfControl">
+              <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeDesc" name="typeOfControl">
                 <option *ngFor="let controlType of controlTypeOptionsCreate"
                   [value]="controlType.ControllerControlTypeID">
                   {{ controlType.ControllerControlTypeDesc }}
@@ -2156,7 +2157,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="selectedControlType === 'parentEntity' || selectedControlType === 'corporateController' || selectedControlType === 'uboCorporate' || selectedControlType === 'headOfficeBranch'">
+              *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'parentEntity' || CreatecontrollerDetails.EntityTypeDesc === 'corporateController' || CreatecontrollerDetails.EntityTypeDesc === 'uboCorporate' || CreatecontrollerDetails.EntityTypeDesc === 'headOfficeBranch'">
               <label for="isRegulated">
                 Is the company regulated :
               </label>
@@ -2170,7 +2171,7 @@
               </div>
             </div>
             <!---->
-            <div class="input-field" *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboCorporate'">
+            <div class="input-field" *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'uboCorporate'">
               <label for="isParent">
                 Is it also Parent / Corporate Controller? :
               </label>
@@ -2181,7 +2182,7 @@
               </div>
             </div>
             <!---->
-            <div class="input-field" *ngIf="CreatecontrollerDetails.SelectedControlType === 'uboCorporate'">
+            <div class="input-field" *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'uboCorporate'">
               <label for="isCompanyTraded">
                 Is the company publicly traded :
               </label>
@@ -2194,7 +2195,7 @@
             </div>
             <!---->
             <div class="input-field"
-              *ngIf="CreatecontrollerDetails.IsPublicallyTraded === false && CreatecontrollerDetails.SelectedControlType === 'uboCorporate'">
+              *ngIf="CreatecontrollerDetails.IsPublicallyTraded === false && CreatecontrollerDetails.EntityTypeDesc === 'uboCorporate'">
               <label for="more10UBOs">
                 Are there any UBOs that own more than 10% of this entity? :
               </label>
