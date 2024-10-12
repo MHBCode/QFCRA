@@ -171,7 +171,7 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
 }
 
 .edit-firm-header {
-    color: #A51E36;
+   
     font-size: 1.25em;
     font-weight: bold;
     line-height: 36px;
@@ -179,7 +179,7 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
 }
 
 .edit-firm-header span {
-    color: #A51E36;
+    
     font-size: 1em;
     font-weight: 500;
     line-height: 24px;
@@ -265,4 +265,7 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
     border-width: 0 3px 3px 0;
     transform: rotate(45deg);
 }
-  
+
+.date-center {
+    text-align: center;
+}

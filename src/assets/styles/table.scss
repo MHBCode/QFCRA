@@ -11,12 +11,13 @@ table {
 
 /* Table header styling */
 th {
-    background-color: rgba(219, 219, 219, 0.24);
+    background-color: rgb(224 224 224);
     font-size: 0.85em;
     font-weight: bold;
     padding: 10px;
     text-align: left;
-    border-right: 1px solid #ddd;
+    border-right: 1px solid #fefefe;
+    color: black;
 }
 
 td {
@@ -84,4 +85,11 @@ tr:nth-child(even) {
             margin: 0 10px;
         }
     }
+}
+
+.popup-info-place table thead th:first-child {
+    border-top-left-radius: 15px;
+}
+.popup-info-place table thead th:last-child{
+    border-top-right-radius: 15px;
 }

@@ -145,7 +145,6 @@
 }
 
 .section h2 {
-  color: #a51e36;
   font-size: 1.25em;
   font-weight: 500;
   line-height: 30px;
@@ -231,7 +230,6 @@
 }
 
 .edit-firm-header {
-  color: #a51e36;
   font-size: 1.25em;
   font-weight: 500;
   line-height: 30px;
@@ -569,6 +567,7 @@
   display: none;
   z-index: 100;
   border-radius: 10px;
+
   table {
     tbody {
       tr {
@@ -591,10 +590,12 @@
     background-color: #f2f2f2;
   }
 }
-.popup-header h3{
+
+.popup-header h3 {
   color: #000;
-  
+
 }
+
 /* Overlay */
 .overlay {
   position: fixed;
@@ -627,11 +628,6 @@
   flex-wrap: wrap;
 }
 
-.popup-header h3 {
-  color: #a51e36;
-}
-
-
 .subbutton-open-history {
   padding: 0.1rem;
   color: white;
@@ -639,11 +635,16 @@
   border: none;
   border-radius: 5px;
   position: relative;
-  width: 40px; /* Small default width */
-  transition: width 0.3s ease, height 0.3s ease; /* Smooth transition for width */
-  display: flex; /* Flexbox to center icon */
-  align-items: center; /* Center vertically */
-  overflow: hidden; /* Hide text when not hovered */
+  width: 40px;
+  /* Small default width */
+  transition: width 0.3s ease, height 0.3s ease;
+  /* Smooth transition for width */
+  display: flex;
+  /* Flexbox to center icon */
+  align-items: center;
+  /* Center vertically */
+  overflow: hidden;
+  /* Hide text when not hovered */
   padding-left: 13px;
 }
 
@@ -655,7 +656,8 @@
 }
 
 .subbutton-open-history:hover {
-  width: 130px; /* Expand the width on hover */
+  width: 130px;
+  /* Expand the width on hover */
 }
 
 .subbutton-open-history:hover span {
@@ -680,8 +682,24 @@
   color: black;
 }
 
+.ApplicationDetailsPopUp .popup-info-place {
+  gap: 0;
+}
+
 .ApplicationDetailsPopUp .popup-header {
   width: 100%;
+  margin-bottom: 15px;
+}
+
+.app-detail-history-header {
+  background: #a51e36;
+  color: white;
+  cursor: default;
+  padding: 10px;
+  width: 100%;
+  font-size: 0.85em;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
 }
 
 .addressHistoryPopup .popup-info-place {
@@ -1324,15 +1342,15 @@ hr {
 
 .access-denied-container {
   display: flex;
-  justify-content: center; 
-  align-items: center;      
-  height: 80vh;            
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
   text-align: center;
 }
 
 .access-denied-message {
   font-size: 1rem;
-  color: red; 
+  color: red;
 }
 
 /* */
@@ -1770,6 +1788,7 @@ hr {
   padding: 0;
   font-size: 14px;
 }
+
 .close-button {
   background: transparent;
   border: none;
@@ -1782,8 +1801,17 @@ hr {
 .close-button:hover {
   color: #a51e36;
 }
+
 .close-icon {
   font-size: 26px;
   cursor: pointer;
   color: #a51e36;
+}
+
+.ApplicationDetailsPopUp .popup-info-place table thead th:first-child {
+  border-top-left-radius: 0;
+}
+
+.ApplicationDetailsPopUp .popup-info-place table thead th:last-child {
+  border-top-right-radius: 0;
 }

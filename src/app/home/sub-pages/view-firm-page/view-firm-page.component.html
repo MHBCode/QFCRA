@@ -235,16 +235,16 @@
               <tr>
                 <th>Function / Role</th>
                 <th>Name</th>
-                <th>Date From</th>
-                <th>Date To</th>
+                <th class="date-center">Date From</th>
+                <th class="date-center">Date To</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let RA of FIRMRA">
                 <td style="text-align: left">{{ RA.firmUserAssnTypeDesc }}</td>
                 <td style="text-align: left">{{ RA.name }}</td>
-                <td>{{ RA.firmUserAssnDateFrom | date : "dd/MMM/yyyy" }}</td>
-                <td>{{ RA.firmUserAssnDateTo | date : "dd/MMM/yyyy" }}</td>
+                <td class="date-center">{{ RA.firmUserAssnDateFrom | date : "dd/MMM/yyyy" }}</td>
+                <td class="date-center">{{ RA.firmUserAssnDateTo | date : "dd/MMM/yyyy" }}</td>
               </tr>
             </tbody>
           </table>
@@ -501,6 +501,9 @@
               <button [ngClass]="{'hidden-button': !isEditModeCore}" class="collapse-button"
                 (click)="toggleCollapse('appDetailsSection')">
                 {{ isCollapsed['appDetailsSection'] ? '▲' : '▼'}}
+              </button>
+              <button class="subbutton" (click)="getApplicationDetailsHistory()">
+                <i class="bi bi-clock-history"></i> Open History
               </button>
             </h2>
           </div>
@@ -3290,20 +3293,20 @@
         <tr>
           <th>Firm</th>
           <th>Financial Year End</th>
-          <th>Financial Year Effective From</th>
-          <th>Financial Year Effective To</th>
+          <th class="date-center">Financial Year Effective From</th>
+          <th class="date-center">Financial Year Effective To</th>
           <th>Modified By</th>
-          <th>Modified Date</th>
+          <th class="date-center">Modified Date</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let FR of firmFYearHistory">
           <td style="text-align: left">{{ FR?.FirmName }}</td>
           <td style="text-align: left">{{ FR?.FirmFinYearEndTypeDesc }}</td>
-          <td>{{ FR?.FirmFinYearEndEffectiveFrom }}</td>
-          <td>{{ firmDetails?.FirmFinYearEndEffectiveTo }}</td>
+          <td class="date-center">{{ FR?.FirmFinYearEndEffectiveFrom }}</td>
+          <td class="date-center">{{ firmDetails?.FirmFinYearEndEffectiveTo }}</td>
           <td style="text-align: left">{{ FR?.UserName }}</td>
-          <td>{{ FR?.Column1 }}</td>
+          <td class="date-center">{{ FR?.Column1 }}</td>
         </tr>
       </tbody>
     </table>
@@ -3327,8 +3330,8 @@
         <tr>
           <th>Function / Role</th>
           <th>Name</th>
-          <th>Date From</th>
-          <th>Date To</th>
+          <th class="date-center">Date From</th>
+          <th class="date-center">Date To</th>
           <th>Reason For Change</th>
         </tr>
       </thead>
@@ -3336,8 +3339,8 @@
         <tr *ngFor="let FYE of firmInactiveUsers">
           <td style="text-align: left">{{ FYE.FirmUserAssnTypeDesc }}</td>
           <td style="text-align: left">{{ FYE.Name }}</td>
-          <td>{{ FYE.FirmUserAssnDateFrom | date : "dd/MMM/yyyy" }}</td>
-          <td>{{ FYE.FirmUserAssnDateTo | date : "dd/MMM/yyyy" }}</td>
+          <td class="date-center">{{ FYE.FirmUserAssnDateFrom | date : "dd/MMM/yyyy" }}</td>
+          <td class="date-center">{{ FYE.FirmUserAssnDateTo | date : "dd/MMM/yyyy" }}</td>
           <td>{{ FYE.FirmUserAssnReasonTypeDesc }}</td>
         </tr>
       </tbody>
@@ -3363,20 +3366,20 @@
         <tr>
           <th>Firm</th>
           <th>Financial Standard</th>
-          <th>Financial Standard Effective From</th>
-          <th>Financial Standard Effective To</th>
+          <th class="date-center">Financial Standard Effective From</th>
+          <th class="date-center">Financial Standard Effective To</th>
           <th>Modified By</th>
-          <th>Modified Date</th>
+          <th class="date-center">Modified Date</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let AS of firmAccountingStandardHistory">
           <td style="text-align: left">{{ AS?.FirmName }}</td>
           <td style="text-align: left">{{ AS?.FinAccStdTypeDesc }}</td>
-          <td>{{ AS?.FirmFinYearEndEffectiveFrom }}</td>
-          <td>{{ firmDetails?.FirmFinYearEndEffectiveTo }}</td>
+          <td class="date-center">{{ AS?.FirmFinYearEndEffectiveFrom }}</td>
+          <td class="date-center">{{ firmDetails?.FirmFinYearEndEffectiveTo }}</td>
           <td style="text-align: left">{{ AS?.UserName }}</td>
-          <td>{{ AS?.Column1 }}</td>
+          <td class="date-center">{{ AS?.Column1 }}</td>
         </tr>
       </tbody>
     </table>
@@ -3428,18 +3431,16 @@
     <div class="popup-header">
       <h3>Application Details History</h3>
     </div>
+    <div class="app-detail-history-header">
+      Licensed Status
+    </div>
     <table>
       <thead>
         <tr>
-          <td style="background: #a51e36; color: white; cursor: default" colspan="4">
-            Licensed Status
-          </td>
-        </tr>
-        <tr>
           <th>Status</th>
-          <th>Status Date</th>
+          <th class="date-center">Status Date</th>
           <th>Last Modified By</th>
-          <th>Last Modified Date</th>
+          <th class="date-center">Last Modified Date</th>
         </tr>
       </thead>
       <tbody>
@@ -3447,25 +3448,23 @@
           <td style="text-align: left">
             {{ LicenseDetailsHistory.FirmApplStatusTypeDesc }}
           </td>
-          <td>{{ LicenseDetailsHistory.FirmApplStatusDate }}</td>
+          <td class="date-center">{{ LicenseDetailsHistory.FirmApplStatusDate }}</td>
           <td>{{ LicenseDetailsHistory.LastModifiedByUser }}</td>
-          <td>{{ LicenseDetailsHistory.LastModifiedDate }}</td>
+          <td class="date-center">{{ LicenseDetailsHistory.LastModifiedDate }}</td>
         </tr>
       </tbody>
     </table>
+    <div style="margin-top: 15px;" class="app-detail-history-header">
+      Authorisation Status
+    </div>
     <table *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
       <thead>
         <tr>
-          <td style="background: #a51e36; color: white; cursor: default" colspan="5">
-            Authorisation Status
-          </td>
-        </tr>
-        <tr>
           <th>Status</th>
-          <th>Status Date</th>
+          <th class="date-center">Status Date</th>
           <th>Press Release</th>
           <th>Last Modified By</th>
-          <th>Last Modified Date</th>
+          <th class="date-center">Last Modified Date</th>
         </tr>
       </thead>
       <tbody>
@@ -3473,10 +3472,10 @@
           <td style="text-align: left">
             {{ AuthDetailsHistory.FirmApplStatusTypeDesc }}
           </td>
-          <td>{{ AuthDetailsHistory.FirmApplStatusDate }}</td>
+          <td class="date-center">{{ AuthDetailsHistory.FirmApplStatusDate }}</td>
           <td>{{ firmDetails?.PressReleaseLink }}</td>
           <td>{{ AuthDetailsHistory.LastModifiedByUser }}</td>
-          <td>{{ AuthDetailsHistory.LastModifiedDate }}</td>
+          <td class="date-center">{{ AuthDetailsHistory.LastModifiedDate }}</td>
         </tr>
       </tbody>
     </table>
