@@ -3411,6 +3411,9 @@ export class ViewFirmPageComponent implements OnInit {
     this.securityService.isUserAllowedToAccessFirm(this.userId,this.firmId).subscribe(data => {
       this.isUserAllowed = data.response;
       this.isLoading = false;
+      if (!this.isUserAllowed) {
+        this.router.navigate(['error/FirmAccessDenied'])
+      } 
     }, error => {
       console.error('Error loading is user allowed to access firm: ', error);
       this.isLoading = false;

@@ -4,8 +4,8 @@
 <div *ngIf="isUserAllowed" class="brid-crump">
   <div class="text"><span> Home > All Firms > </span> {{titleSection}}</div>
 </div>
-<div *ngIf="!isLoading">
-  <div *ngIf="isUserAllowed; else accessDenied" class="page">
+
+  <div *ngIf="isUserAllowed" class="page">
     <div class="menu" [ngStyle]="{ width: menuWidth }">
       <!-- <button (click)="toggleFulMenu()" class="menu-item menu-item-btn-ce"> -->
       <i (click)="toggleFulMenu()" *ngIf="menuWidth.match(width1)" class="menu-icons bi bi-arrow-left-square-fill"></i>
@@ -3271,13 +3271,7 @@
 
     <!--End Supervision sub sections-->
   </div>
-</div>
 
-  <ng-template #accessDenied>
-    <div class="access-denied-container">
-      <p class="access-denied-message">You are not authorized to view the details of this firm.</p>
-    </div>
-  </ng-template>
 
 <!--Popups-->
 <!--Financial Year End History-->
@@ -3454,7 +3448,7 @@
         </tr>
       </tbody>
     </table>
-    <div style="margin-top: 15px;" class="app-detail-history-header">
+    <div *ngIf="firmDetails?.AuthorisationStatusTypeID > 0" style="margin-top: 15px;" class="app-detail-history-header">
       Authorisation Status
     </div>
     <table *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">

@@ -86,9 +86,9 @@ tr:nth-child(even) {
     }
 }
 
-.popup-info-place table thead th:first-child {
+.popup-info-place table thead th:first-child, .section table thead th:first-child {
     border-top-left-radius: 15px;
 }
-.popup-info-place table thead th:last-child{
+.popup-info-place table thead th:last-child, .section table thead th:last-child {
     border-top-right-radius: 15px;
 }

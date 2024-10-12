@@ -7,11 +7,16 @@ import { HomeModule } from './home/home.module';
 const routes: Routes = [
   {
     path: 'home',
-    loadChildren: () => import('./home/home.module').then((mod) => mod.HomeModule)
+    loadChildren: () => import('./home/home.module').then(mod => mod.HomeModule)
   },
   {
     path: '',
-    loadChildren: () => import('./home/home.module').then((mod) => mod.HomeModule)
+    redirectTo: 'home',
+    pathMatch: 'full'
+  },
+  {
+    path: 'error',
+    loadChildren: () => import('./error/error.module').then(mod => mod.ErrorModule)
   }
 ];
 

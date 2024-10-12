@@ -1,0 +1,12 @@
+.access-denied-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    text-align: center;
+  }
+  
+  .access-denied-message {
+    font-size: 1rem;
+    color: red;
+  }
