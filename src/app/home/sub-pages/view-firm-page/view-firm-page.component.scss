@@ -1146,6 +1146,10 @@ hr {
   color: #a51e36;
 }
 
+.close-icon-prev-revisions {
+  top: 2rem;
+}
+
 .input-field[hidden] {
   display: none !important;
 }
@@ -1298,6 +1302,10 @@ hr {
   background-color: #f2b6c0;
 }
 
+.document-container {
+  padding: 0rem 1rem 1rem 1rem;
+}
+
 
 /* validations styling */
 .invalid {
@@ -1314,6 +1322,18 @@ hr {
   outline: 0;
 }
 
+.access-denied-container {
+  display: flex;
+  justify-content: center; 
+  align-items: center;      
+  height: 80vh;            
+  text-align: center;
+}
+
+.access-denied-message {
+  font-size: 1rem;
+  color: red; 
+}
 
 /* */
 

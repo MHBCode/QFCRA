@@ -12,7 +12,8 @@
     }
 
     input,
-    select {
+    select,
+    textarea {
         width: 100%;
         padding: 0.5rem 2%;
         border-radius: 7.20px;
@@ -24,7 +25,8 @@
         }
     }
 
-    textarea {
+    textarea,
+    .resizable-textarea {
         width: 100%;
         height: 100px;
         padding: 0.5rem 2%;
@@ -33,6 +35,19 @@
         resize: vertical;
         min-height: 20px;
     }
+}
+
+.resizable-textarea {
+    background-color: #47424224;
+    font-size: 0.875rem;
+    border: 1px solid #ccc;
+    color: #767676;
+    padding: 8px;
+    min-height: 100px;
+    resize: both;
+    overflow: auto;
+    white-space: pre-wrap;
+    /* Preserve whitespace similar to textarea */
 }
 
 .inputs-field-set {
@@ -172,7 +187,8 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
 }
 
 
-.popup-content input:disabled,.popup-content select:disabled {
+.popup-content input:disabled,
+.popup-content select:disabled {
     background-color: #fffafa;
 }
 
@@ -181,14 +197,15 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
     border-radius: 15px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     margin-bottom: 20px;
-  
+
     .edit-firm-actions {
-      padding-top: 0px;
-      .edit-firm-header{
-        color: #080808;
-        font-size: 1em;
-        font-weight: bold;
-      }
+        padding-top: 0px;
+
+        .edit-firm-header {
+            color: #080808;
+            font-size: 1em;
+            font-weight: bold;
+        }
     }
   }
 
