@@ -1686,7 +1686,7 @@
 
     <div class="inputs-field-set">
       <div class="section">
-        <h2>Ultimate Beneficial Owners For {{ firmDetails?.FirmName }}</h2>
+        <h2 class="edit-firm-header">Ultimate Beneficial Owners For <span>{{ firmDetails?.FirmName }}</span></h2>
         <table>
           <thead>
             <tr>
@@ -1739,13 +1739,7 @@
             </h3>
           </div>
           <!-- Save and Cancel Buttons -->
-          <div class="btn">
-            <button *ngIf="!isEditable" (click)="editController()"><i class="bi bi-pen"></i> Edit</button>
-            <button *ngIf="isEditable" (click)="saveControllerPopupChanges()"><i class="bi bi-save"></i> Save</button>
-            <button (click)="confarmDeleteControllerDetials(selectedController.OtherEntityID)"><i
-                class="bi bi-trash"></i>
-              Delete</button>         
-          </div>
+
           <button class="close-button" (click)="closeControllerPopup()"><i class="bi bi-x-circle close-icon"></i></button>
         </div>
 
@@ -1949,6 +1943,13 @@
                   [readonly]="!isEditable" />
               </div>
             </div>
+            <div class="btn">
+              <button *ngIf="!isEditable" (click)="editController()"><i class="bi bi-pen"></i> Edit</button>
+              <button *ngIf="isEditable" (click)="saveControllerPopupChanges()"><i class="bi bi-save"></i> Save</button>
+              <button (click)="confarmDeleteControllerDetials(selectedController.OtherEntityID)"><i
+                  class="bi bi-trash"></i>
+                Delete</button>         
+            </div>
           </ng-container>
         </form>
 
@@ -1960,10 +1961,10 @@
           <h2 class="create-controller-header">
             Controller For {{ firmDetails?.FirmName }}
           </h2>
-          <div class="btns">
-            <button class="save-btn" (click)="createControllerPopupChanges()">Save</button>
-            <button class="cancel-btn" (click)="closeCreateControllerPopup()">Cancel</button>
-          </div>
+          
+            
+            <button class="close-button" (click)="closeCreateControllerPopup()"><i class="bi bi-x-circle close-icon"></i></button>
+          
 
         </div>
         <div class="error-messages" style="color: red">
@@ -2324,6 +2325,10 @@
           </div>
         </div>
       </div>
+      <div class="btn">
+        <button class="save-btn" (click)="createControllerPopupChanges()">Save</button>
+      </div>
+      
     </div>
   </section>
 
