@@ -26,4 +26,8 @@ export class SecurityService {
     const url = `${this.baseUrlSecurity}get_app_role_access?userId=${userId}&objectId=${objectId}&objectOpTypeId=${OpType}`;
     return this.http.get<any>(url);
   }
+  isUserAllowedToAccessFirm(userId: number,firmId: number) {
+    const url = `${this.baseUrlSecurity}is_user_allowed_to_browse_firm_detail?userID=${userId}&FirmID=${firmId}&objectID=523`
+    return this.http.get<any>(url);
+  }
 }
