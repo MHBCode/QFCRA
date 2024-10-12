@@ -39,7 +39,7 @@ const routes: Routes = [
   { path: 'view-firm/:id', component: ViewFirmPageComponent},
   { path: 'edit-firm/:id', component: EditFirmComponent},
   { path: 'new-firm', component: NewFirmComponent},
-  { path: 'tasks-page', component: TasksPageComponent},
+  //{ path: 'tasks-page', component: TasksPageComponent},
   { path: 'individual-page', component: IndividualPageComponent},
   { path: 'individual-registration-status', component: IndividualRegistrationStatusComponent},
   { path: 'individual-pending-ai-apps', component: IndividualPendingAiAppsComponent},

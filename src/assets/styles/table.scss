@@ -92,3 +92,19 @@ tr:nth-child(even) {
 .popup-info-place table thead th:last-child, .section table thead th:last-child {
     border-top-right-radius: 15px;
 }
+
+.listing-table table {
+    width: 100%;
+}
+
+.task-table th:first-child {
+    border-top-left-radius: 15px;
+}
+
+.task-table th:last-child {
+    border-top-right-radius: 15px;
+}
+
+tfoot tr td {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}

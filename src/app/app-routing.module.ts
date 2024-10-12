@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HeaderComponent } from './main/header/header.component';
 import { MainModule } from './main/main.module';
-import { HomeModule } from './home/home.module';
 
 const routes: Routes = [
   {
@@ -11,8 +9,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
+    loadChildren: () => import('./home/home.module').then((mod) => mod.HomeModule)
   },
   {
     path: 'error',
