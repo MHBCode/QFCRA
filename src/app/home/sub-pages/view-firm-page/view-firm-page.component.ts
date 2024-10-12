@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, Output, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';  // Import ActivatedRoute
 import { FirmService } from 'src/app/ngServices/firm.service';  // Import FirmService
 import flatpickr from 'flatpickr';
@@ -2724,7 +2724,7 @@ export class ViewFirmPageComponent implements OnInit {
     CreatedBy: 30,
     RelatedEntityID: 0,
     EntitySubTypeID: null,
-    EntityTypeID: 1,
+    EntityTypeID: 6,
     RelatedEntityEntityID: 0,
     MyState: 0,
     PlaceOfIncorporation: '',
@@ -2742,7 +2742,7 @@ export class ViewFirmPageComponent implements OnInit {
     ContactID: 0,
     AddressID: '',
     AddressState: 0,
-    RelatedEntityTypeID: 0,
+    RelatedEntityTypeID: 6,
     ObjectID: 0,
     PrefferdMethod: '',
     ContactId: 0,
@@ -2753,6 +2753,7 @@ export class ViewFirmPageComponent implements OnInit {
     OtherEmail: '',
     RegulatorID: 0,
     PreferredMethodType: '',
+    RegulatorName:'',
   };
   updateControlTypeDesc(selectedValue: any) {
     switch (selectedValue) {
@@ -2815,8 +2816,7 @@ export class ViewFirmPageComponent implements OnInit {
               output: this.CreatecontrollerDetails.Output,
               FirmID: this.firmId,
               EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-              EntityID: this.CreatecontrollerDetails.FirmID,
-
+              EntityID: this.firmId,
               numOfShares: this.CreatecontrollerDetails.NumOfShares,
               MajorityStockHolder: false,
               assnDateFrom: null,
@@ -2825,7 +2825,7 @@ export class ViewFirmPageComponent implements OnInit {
             },
             addressList: [
               {
-                firmID: this.CreatecontrollerDetails.FirmID,
+                firmID: this.firmId,
                 countryID: this.CreatecontrollerDetails.CountryID,
                 addressTypeID: this.CreatecontrollerDetails.AddressTypeID,
                 LastModifiedBy: 30,
@@ -2842,14 +2842,15 @@ export class ViewFirmPageComponent implements OnInit {
                 addressAssnID: null,
                 CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
                 LastModifiedDate: this.currentDate,
-                addressState: this.CreatecontrollerDetails.AddressState,
+                addressState: 2,
                 fromDate: null,
                 toDate: null,
+                output:0,
                 objectID: this.CreatecontrollerDetails.ObjectID,
                 objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
                 objAis: { // Ensure this object is correctly structured
                   contactId: this.CreatecontrollerDetails.ContactId,
-                  FirmId: this.CreatecontrollerDetails.FirmID,
+                  FirmId: this.firmId,
                   title: this.CreatecontrollerDetails.Title,
                   firstName: this.CreatecontrollerDetails.FirstName,
                   secondName: this.CreatecontrollerDetails.SecondName,
@@ -2858,6 +2859,7 @@ export class ViewFirmPageComponent implements OnInit {
                   placeOfBirth: this.CreatecontrollerDetails.PlaceOfBirth,
                   passportNumber: this.CreatecontrollerDetails.PassportNum,
                   addressAssnID: null,
+                  AddressTypeID:this.CreatecontrollerDetails.AddressTypeID,
                   statusDate: this.CreatecontrollerDetails.StatusDate,
                   createdDate: this.CreatecontrollerDetails.CreatedDate,
                   mobilePhone: this.CreatecontrollerDetails.MobilePhone,
@@ -2865,17 +2867,21 @@ export class ViewFirmPageComponent implements OnInit {
                   otherEmail: this.CreatecontrollerDetails.OtherEmail,
                   preferredMethodType: this.CreatecontrollerDetails.PreferredMethodType,
                   showReadOnly: true,
-                  showEnabled: true
+                  showEnabled: true,
+                  output:0,
                 }
               }
             ],
             regulatorList: [
               {
-                regulatorID: this.CreatecontrollerDetails.RegulatorID,
-                entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-                entityID: this.CreatecontrollerDetails.EntityID,
-                relatedEntityTypeID: this.CreatecontrollerDetails.RelatedEntityTypeID,
+                RegulatorID: this.CreatecontrollerDetails.RegulatorID,
+                EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+                entityID: this.firmId,
+                RelatedEntityTypeID: this.CreatecontrollerDetails.RelatedEntityTypeID,
                 relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
+                regulatorState: 2,
+                RegulatorName:this.CreatecontrollerDetails.RegulatorName,
+                output:0,
               }
             ]
           }
@@ -4481,15 +4487,15 @@ export class ViewFirmPageComponent implements OnInit {
       EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
       EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeDesc,
       // erorr
-      RelatedEntityTypeID: this.selectedAuditor.RelatedEntityTypeID,
+      RelatedEntityTypeID: this.selectedAuditor.RelatedEntityID,
       RelatedEntityEntityID: this.selectedAuditor.OtherEntityID,
-      MyState: 2,
+      MyState: 3,
       LastModifiedByOfOtherEntity: 30,
       OtherEntityName: this.selectedAuditor.OtherEntityName,
-      DateOfIncorporation: "2024-10-02T11:58:32.911Z",
-      LegalStatusTypeID: 0,
+      DateOfIncorporation: null,
+      LegalStatusTypeID: null,
       PlaceOfIncorporation: null,
-      CountryOfIncorporation: 0,
+      CountryOfIncorporation: null,
       RegisteredNumber: null,
       ZebSiteAddress: null,
       LastModifiedDate: this.currentDate,
@@ -4506,12 +4512,16 @@ export class ViewFirmPageComponent implements OnInit {
       firmId: this.firmId,
       entityTypeID: 0,
       entityID: this.firmId,
-      controllerControlTypeID: 0,
+      controllerControlTypeID: null,
       numOfShares: 0,
       pctOfShares: 0,
       majorityStockHolder: true,
       assnDateFrom: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom),
-      assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)
+      assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo),
+      ShowEnabled: false,
+      ShowReadOnly:false,
+      MajorityStockHolder:false,
+
     }
     this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
       (response) => {

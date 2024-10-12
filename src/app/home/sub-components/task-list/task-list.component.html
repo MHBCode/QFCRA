@@ -175,17 +175,23 @@
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}" *ngIf="isMainView">{{ item.Comments }}</td>
           </tr>
         </tbody>
+        <tfoot>
+          <tr>
+            <td [attr.colspan]="!isMainView ? 5 : 12">
+              <div class="pagination">
+                <button (click)="previousPage()" [disabled]="currentPage === 1">
+                  <span>&lt;</span>
+                </button>
+                <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+                  <span>&gt;</span>
+                </button>
+                <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
       </table>
-    </div>
-    <div class="pagination">
-      <button (click)="previousPage()" [disabled]="currentPage === 1">
-        <span>&lt;</span>
-      </button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button (click)="nextPage()" [disabled]="currentPage === totalPages">
-        <span>&gt;</span>
-      </button>
-      <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
     </div>
   </div>
 </div>

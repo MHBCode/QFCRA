@@ -10,7 +10,7 @@
   display: flex;
   width: 100%;
   justify-content: flex-start;
-  background-color: rgba(230, 230, 230, 0.24);
+  background-color: rgb(255, 255, 255);
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
 }
@@ -122,7 +122,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   transition: all 0.3s ease;
-  max-width: 300px;
+  max-width: 115px;
   cursor: pointer;
 }
 
@@ -310,7 +310,12 @@ th.task-table-column {
   justify-content: space-between;
   align-items: center;
 }
-
+.home-task-table{
+  table-layout: fixed;
+}
+.task-table{
+  table-layout: auto !important;
+}
 .task-table-column-content > div {
   text-wrap: nowrap;
 }

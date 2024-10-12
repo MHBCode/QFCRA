@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-}
+};
 
 .tableTitle {
   border-top-left-radius: 15px;
@@ -12,7 +12,7 @@
   display: flex;
   width: 100%;
   justify-content: flex-start;
-  background-color: rgba(230, 230, 230, 0.24);
+  background-color: rgb(255 255 255);
 }
 tr .pagination{
   width: 100%;
@@ -33,7 +33,10 @@ tr .pagination{
 .home-firm-table {
   table-layout: fixed;
 }
-
+.firm-table{
+  table-layout: auto !important;
+  border-radius: 15px;
+}
 
 .home-firm-table th {
   padding: 3px;

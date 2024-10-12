@@ -24,10 +24,15 @@
         <tbody>
           <tr *ngFor="let item of paginatedFirms" (click)="viewFirm(item.FirmID)">
             <td class="bold-text">{{ item.QFCNum }}</td>
-            <td>
+            <!-- <td>
                 <div class="expandable-text-container">
-                  <span class="expandable-text">{{ item.FirmName }}</span> <!-- Expandable in main view -->
+                  <span class="expandable-text">{{ item.FirmName }}</span> 
                 </div>
+            </td> -->
+            <td>
+              <div [ngClass]="{'expandable-text-container': !isMainView}">
+                <span [ngClass]="{'expandable-text': !isMainView}">{{ item.FirmName }}</span>
+              </div>
             </td>
             <td *ngIf="isMainView">{{ item.LegalStatusTypeDesc }}</td>
             <td *ngIf="isMainView">{{ item.LicenseStatusTypeDesc }}</td>
@@ -43,20 +48,26 @@
             <td *ngIf="isMainView">
              {{ item.Supervisor_AML }}
             </td>
-          </tr>
-                
+          </tr>      
         </tbody>
+        <tfoot>
+          <tr>
+            <td  [attr.colspan]="!isMainView ? 5 : 12">
+              <div class="pagination">
+                <button (click)="previousPage()" [disabled]="currentPage === 1">
+                  <span>&lt;</span>
+                </button>
+                <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+                  <span>&gt;</span>
+                </button>
+                <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
+              </div>        
+            </td>          
+          </tr>
+        </tfoot>
       </table>
     </div>
-    <div class="pagination">
-      <button (click)="previousPage()" [disabled]="currentPage === 1">
-        <span>&lt;</span>
-      </button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button (click)="nextPage()" [disabled]="currentPage === totalPages">
-        <span>&gt;</span>
-      </button>
-      <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
-    </div>        
+   
   </div>
 </div>

@@ -107,51 +107,52 @@
       </div>
     </div>
 
-    <!-- Firm Section -->
-    <section #firmSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Firm ? 'flex' : 'none' }">
-      <div class="inputs-field-set">
-        <div class="form-section-title">
-          <h2 class="edit-firm-header">
-            <span>{{ firmDetails?.FirmName }}</span>
-          </h2>
+  <!-- Firm Section -->
+  <section #firmSection class="form-section"
+    [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Firm ? 'flex' : 'none' }">
+    <div class="inputs-field-set">
+      <div class="form-section-title">
+        <h2 class="edit-firm-header">
+           <span>{{ firmDetails?.FirmName }}</span>
+        </h2>
+      </div>
+      <div class="inputs-row">
+        <div class="input-field">
+          <label for="QFCNumber"> QFC Number </label>
+          <input disabled name="QFCNumber" id="QFCNumber" type="text" value="{{ firmDetails?.QFCNum }}" />
         </div>
-        <div class="inputs-row">
-          <div class="input-field">
-            <label for="QFCNumber"> QFC Number </label>
-            <input disabled name="QFCNumber" id="QFCNumber" type="text" value="{{ firmDetails?.QFCNum }}" />
-          </div>
-          <div class="input-field">
-            <label for="code"> Code </label>
-            <input disabled name="code" id="code" type="text" value="{{ firmDetails?.FirmCode }}" />
-          </div>
-          <div class="input-field">
-            <label for="lagalStatus"> Legal Status </label>
-            <input disabled name="lagalStatus" id="lagalStatus" type="text"
-              value="{{ firmDetails?.LegalStatusTypeDesc }}" />
-          </div>
-          <div class="input-field">
-            <label for="PrudentialCategory"> Prudential Category </label>
-            <input disabled name="PrudentialCategory" id="PrudentialCategory" type="text"
-              value="{{ firmDetails?.PrudentialCategoryTypeDesc }}" />
-          </div>
-          <div class="input-field">
-            <label for="FinancialYearEnd"> Financial Year End </label>
-            <input disabled name="financialYearEnd" id="financialYearEnd" type="text"
-              value="{{ firmDetails?.FinYearEndTypeDesc }}" />
-          </div>
+        <div class="input-field">
+          <label for="code"> Code </label>
+          <input disabled name="code" id="code" type="text" value="{{ firmDetails?.FirmCode }}" />
+        </div>
+        <div class="input-field">
+          <label for="lagalStatus"> Legal Status </label>
+          <input disabled name="lagalStatus" id="lagalStatus" type="text"
+            value="{{ firmDetails?.LegalStatusTypeDesc }}" />
+        </div>
+        <div class="input-field">
+          <label for="PrudentialCategory"> Prudential Category </label>
+          <input disabled name="PrudentialCategory" id="PrudentialCategory" type="text"
+            value="{{ firmDetails?.PrudentialCategoryTypeDesc }}" />
+        </div>
+        <div class="input-field">
+          <label for="FinancialYearEnd"> Financial Year End </label>
+          <input disabled name="financialYearEnd" id="financialYearEnd" type="text"
+            value="{{ firmDetails?.FinYearEndTypeDesc }}" />
         </div>
       </div>
-      <!---->
-      <div class="inputs-field-set">
-        <div class="form-section-title">
-          <h2 class="edit-firm-header">Application Details</h2>
-          <div class="edit-btn"></div>
-        </div>
-        <div class="inputs-row">
-          <div class="input-field">
-            <label for="dateOfApplication"> Date of Application </label>
-            <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="{{
+    </div>
+
+    <!---->
+    <div class="inputs-field-set">
+      <div class="form-section-title">
+        <h2 class="edit-firm-header">Application Details</h2>
+        <div class="edit-btn"></div>
+      </div>
+      <div class="inputs-row">
+        <div class="input-field">
+          <label for="dateOfApplication"> Date of Application </label>
+          <input disabled name="dateOfApplication" id="dateOfApplication" type="text" value="{{
               firmDetails?.AuthorisationStatusTypeID == 0
                 ? (firmDetails?.FirmLicApplDate | date : 'dd/MMM/y')
                 : (firmDetails?.FirmAuthApplDate | date : 'dd/MMM/y')
@@ -1726,70 +1727,70 @@
         </div>
       </div>
 
-      <div class="inputs-field-set">
-        <div class="section">
-          <h2>Ultimate Beneficial Owners For {{ firmDetails?.FirmName }}</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Controller Type</th>
-                <th>Registered Number</th>
-                <th>Control Type</th>
-                <th>% of Holding</th>
-                <th>Effective Date</th>
-                <th>Cessation Date</th>
-                <th>Last Modified By</th>
-                <th>Last Modified Date</th>
-              </tr>
-            </thead>
-            <tbody *ngIf="FIRMControllersIndividual?.length > 0; else noRecords">
-              <tr *ngFor="let controller of FIRMControllersIndividual" (click)="viewController()">
-                <td>{{ controller.OtherEntityName }}</td>
-                <td>{{ controller.EntityTypeDesc }}</td>
-                <td>{{ controller.RegisteredNum }}</td>
-                <td>{{ controller.ControllerControlTypeDesc }}</td>
-                <td>{{ controller.PctOfShares }}</td>
-                <td>{{ controller.AssnDateFrom }}</td>
-                <td>{{ controller.AssnDateTo }}</td>
-                <td>{{ controller.LastModifiedByOfOtherEntities }}</td>
-                <td>{{ controller.LastModifiedDate }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <ng-template #noRecords>
-          <p class="norecords"> ---- No records found.</p>
-        </ng-template>
+    <div class="inputs-field-set">
+      <div class="section">
+        <h2>Ultimate Beneficial Owners For {{ firmDetails?.FirmName }}</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Controller Type</th>
+              <th>Registered Number</th>
+              <th>Control Type</th>
+              <th>% of Holding</th>
+              <th>Effective Date</th>
+              <th>Cessation Date</th>
+              <th>Last Modified By</th>
+              <th>Last Modified Date</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="FIRMControllersIndividual?.length > 0; else noRecords">
+            <tr *ngFor="let controller of FIRMControllersIndividual" (click)="openControllerPopup(controller)">
+              <td>{{ controller.OtherEntityName }}</td>
+              <td>{{ controller.EntityTypeDesc }}</td>
+              <td>{{ controller.RegisteredNum }}</td>
+              <td>{{ controller.ControllerControlTypeDesc }}</td>
+              <td>{{ controller.PctOfShares }}</td>
+              <td>{{ controller.AssnDateFrom }}</td>
+              <td>{{ controller.AssnDateTo }}</td>
+              <td>{{ controller.LastModifiedByOfOtherEntities }}</td>
+              <td>{{ controller.LastModifiedDate }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <!-- Popup Section -->
-      <div *ngIf="isPopupOpen" (click)="closeControllerPopup()" class="contollerPopupOverlay">
-        <div (click)="$event.stopPropagation()" class="contollerPopupContent">
-          <div class="error-messages" style="color: red">
-            <p *ngIf="errorMessages['OtherEntityName']">{{ errorMessages['OtherEntityName'] }}</p>
-            <p *ngIf="errorMessages['EffectiveDate']">{{ errorMessages['EffectiveDate'] }}</p>
-            <p *ngIf="errorMessages['CessationDate']">{{ errorMessages['CessationDate'] }}</p>
-            <p *ngIf="errorMessages['PlaceOfEstablishment']">{{ errorMessages['PlaceOfEstablishment'] }}</p>
-            <p *ngIf="errorMessages['ControllerControlTypeDesc']">{{ errorMessages['ControllerControlTypeDesc'] }}</p>
-            <p *ngIf="errorMessages['PctOfShares']">{{ errorMessages['PctOfShares'] }}</p>
+      <ng-template #noRecords>
+        <p class="norecords"> ---- No records found.</p>
+      </ng-template>
+    </div>
+    <!-- Popup Section -->
+    <div *ngIf="isPopupOpen" (click)="closeControllerPopup()" class="contollerPopupOverlay">
+      <div (click)="$event.stopPropagation()" class="contollerPopupContent">
+        <div class="error-messages" style="color: red">
+          <p *ngIf="errorMessages['OtherEntityName']">{{ errorMessages['OtherEntityName'] }}</p>
+          <p *ngIf="errorMessages['EffectiveDate']">{{ errorMessages['EffectiveDate'] }}</p>
+          <p *ngIf="errorMessages['CessationDate']">{{ errorMessages['CessationDate'] }}</p>
+          <p *ngIf="errorMessages['PlaceOfEstablishment']">{{ errorMessages['PlaceOfEstablishment'] }}</p>
+          <p *ngIf="errorMessages['ControllerControlTypeDesc']">{{ errorMessages['ControllerControlTypeDesc'] }}</p>
+          <p *ngIf="errorMessages['PctOfShares']">{{ errorMessages['PctOfShares'] }}</p>
+        </div>
+        <!-- Title -->
+        <div class="popup-title-btn-row">
+          <div class="popup-header">
+            <h3>
+              Controller Details For {{ selectedController?.OtherEntityName }}
+            </h3>
           </div>
-          <!-- Title -->
-          <div class="popup-title-btn-row">
-            <div class="popup-header">
-              <h3>
-                Controller Details For {{ selectedController?.OtherEntityName }}
-              </h3>
-            </div>
-            <!-- Save and Cancel Buttons -->
-            <div class="btn">
-              <button *ngIf="!isEditable" (click)="editController()"><i class="bi bi-pen"></i> Edit</button>
-              <button *ngIf="isEditable" (click)="saveControllerPopupChanges()"><i class="bi bi-save"></i> Save</button>
-              <button (click)="confarmDeleteControllerDetials(selectedController.OtherEntityID)"><i
-                  class="bi bi-trash"></i>
-                Delete</button>
-              <button style="margin-left: 150px;" (click)="closeControllerPopup()">Close<i class="bi bi-x"></i></button>
-            </div>
+          <!-- Save and Cancel Buttons -->
+          <div class="btn">
+            <button *ngIf="!isEditable" (click)="editController()"><i class="bi bi-pen"></i> Edit</button>
+            <button *ngIf="isEditable" (click)="saveControllerPopupChanges()"><i class="bi bi-save"></i> Save</button>
+            <button (click)="confarmDeleteControllerDetials(selectedController.OtherEntityID)"><i
+                class="bi bi-trash"></i>
+              Delete</button>         
           </div>
+          <button class="close-button" (click)="closeControllerPopup()"><i class="bi bi-x-circle close-icon"></i></button>
+        </div>
 
           <!-- Form -->
           <form>
@@ -2252,94 +2253,93 @@
                 </div>
               </div>
 
-              <div class="input-field additional-details">
-                <label for="additionalDetails">
-                  Additional Details
-                </label>
-                <textarea [(ngModel)]="CreatecontrollerDetails.AdditionalDetails" name="additionalDetails"
-                  id="additionalDetails"></textarea>
-              </div>
-              <!---->
-            </ng-container>
-          </div>
-        </div>
-        <div *ngIf="!hideForms" class="create--inputs-field-set">
-          <div class="create-controller-actions">
-            <h2 class="create-controller-header">
-              Addresses
-            </h2>
-          </div>
-          <div class="create-controller-inputs">
-            <div class="input-field">
-              <label for="addressType">
-                Address Type
+            <div class="input-field additional-details">
+              <label for="additionalDetails">
+                Additional Details
               </label>
-              <select [(ngModel)]="Address.AddressType" (change)="onAddressTypeChange($event, Address)"
-                [ngClass]="{
+              <textarea [(ngModel)]="CreatecontrollerDetails.AdditionalDetails" name="additionalDetails"
+                id="additionalDetails"></textarea>
+            </div>
+            <!---->
+          </ng-container>
+        </div>
+      </div>
+      <div *ngIf="!hideForms" class="create--inputs-field-set">
+        <div class="create-controller-actions">
+          <h2 class="create-controller-header">
+            Addresses
+          </h2>
+        </div>
+        <div class="create-controller-inputs">
+          <div class="input-field">
+            <label for="addressType">
+              Address Type
+            </label>
+            <select [(ngModel)]="CreatecontrollerDetails.AddressTypeID" (change)="onAddressTypeChange($event, Address)"
+              [ngClass]="{
                 'error-border': !Address.AddressID && errorMessages['AddressTypeID'] ,'select-background-edited': isEditModeCore}">
-                <option value="0">Select</option>
-                <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
-                  {{option.AddressTypeDesc}}</option>
-              </select>
-            </div>
-            <div class="input-field">
-              <label for="address1">
-                Address - Line 1
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.addressLine1" name="address1" id="address1" type="text"
-                value="">
-            </div>
-            <div class="input-field">
-              <label for="address2">
-                Address - Line 2
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.addressLine2" name="address2" id="address2" type="text"
-                value="">
-            </div>
-            <div class="input-field">
-              <label for="address3">
-                Address - Line 3
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.addressLine3" name="address3" id="address3" type="text"
-                value="">
-            </div>
-            <div class="input-field">
-              <label for="address4">
-                Address - Line 4
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.addressLine4" name="address4" id="address4" type="text"
-                value="">
-            </div>
-            <div class="input-field">
-              <label for="city">
-                City
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.city" name="city" id="city" type="text" value="">
-            </div>
-            <div class="input-field">
-              <label for="state">
-                State/Province
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.stateProvince" name="state" id="state" type="text" value="">
-            </div>
-            <div class="input-field">
-              <label for="country">
-                Country
-              </label>
-              <select required [(ngModel)]="CreatecontrollerDetails.country" name="placeOfEstablishment">
-                <option *ngFor="let place of countryOptionsCreate" [value]="place.CountryID">{{ place.CountryName }}
-                </option>
-              </select>
-            </div>
-            <div class="input-field">
-              <label for="zipCode">
-                Zip/Postal Code
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.zipPostalCode" name="zipCode" id="zipCode" type="text"
-                value="">
-            </div>
+              <option value="0">Select</option>
+              <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
+                {{option.AddressTypeDesc}}</option>
+            </select>
+          </div>
+          <div class="input-field">
+            <label for="address1">
+              Address - Line 1
+            </label>
+            <input [(ngModel)]="CreatecontrollerDetails.addressLine1" name="address1" id="address1" type="text"
+              value="">
+          </div>
+          <div class="input-field">
+            <label for="address2">
+              Address - Line 2
+            </label>
+            <input [(ngModel)]="CreatecontrollerDetails.addressLine2" name="address2" id="address2" type="text"
+              value="">
+          </div>
+          <div class="input-field">
+            <label for="address3">
+              Address - Line 3
+            </label>
+            <input [(ngModel)]="CreatecontrollerDetails.addressLine3" name="address3" id="address3" type="text"
+              value="">
+          </div>
+          <div class="input-field">
+            <label for="address4">
+              Address - Line 4
+            </label>
+            <input [(ngModel)]="CreatecontrollerDetails.addressLine4" name="address4" id="address4" type="text"
+              value="">
+          </div>
+          <div class="input-field">
+            <label for="city">
+              City
+            </label>
+            <input [(ngModel)]="CreatecontrollerDetails.city" name="city" id="city" type="text" value="">
+          </div>
+          <div class="input-field">
+            <label for="state">
+              State/Province
+            </label>
+            <input [(ngModel)]="CreatecontrollerDetails.stateProvince" name="state" id="state" type="text" value="">
+          </div>
+          <div class="input-field">
+            <label for="country">
+              Country
+            </label>
+            <select required [(ngModel)]="CreatecontrollerDetails.CountryID" name="placeOfEstablishment">
+              <option *ngFor="let place of countryOptionsCreate" [value]="place.CountryID">{{ place.CountryName }}
+              </option>
+            </select>
+          </div>
+          <div class="input-field">
+            <label for="zipCode">
+              Zip/Postal Code
+            </label>
+            <input [(ngModel)]="CreatecontrollerDetails.zipPostalCode" name="zipCode" id="zipCode" type="text" value="">
           </div>
         </div>
+      </div>
 
         <div class="create-inputs-field-set" *ngIf="CreatecontrollerDetails.IsCompanyRegulated === true">
           <div class="create-controller-actions">
