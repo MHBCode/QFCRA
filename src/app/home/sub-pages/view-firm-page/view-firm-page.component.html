@@ -141,6 +141,7 @@
         </div>
       </div>
     </div>
+
     <!---->
     <div class="inputs-field-set">
       <div class="form-section-title">
@@ -1701,7 +1702,7 @@
             </tr>
           </thead>
           <tbody *ngIf="FIRMControllersIndividual?.length > 0; else noRecords">
-            <tr *ngFor="let controller of FIRMControllersIndividual" (click)="viewController()">
+            <tr *ngFor="let controller of FIRMControllersIndividual" (click)="openControllerPopup(controller)">
               <td>{{ controller.OtherEntityName }}</td>
               <td>{{ controller.EntityTypeDesc }}</td>
               <td>{{ controller.RegisteredNum }}</td>
@@ -1743,9 +1744,9 @@
             <button *ngIf="isEditable" (click)="saveControllerPopupChanges()"><i class="bi bi-save"></i> Save</button>
             <button (click)="confarmDeleteControllerDetials(selectedController.OtherEntityID)"><i
                 class="bi bi-trash"></i>
-              Delete</button>
-            <button style="margin-left: 150px;" (click)="closeControllerPopup()">Close<i class="bi bi-x"></i></button>
+              Delete</button>         
           </div>
+          <button class="close-button" (click)="closeControllerPopup()"><i class="bi bi-x-circle close-icon"></i></button>
         </div>
 
         <!-- Form -->
@@ -2228,7 +2229,7 @@
             <label for="addressType">
               Address Type
             </label>
-            <select [(ngModel)]="Address.AddressType" (change)="onAddressTypeChange($event, Address)"
+            <select [(ngModel)]="CreatecontrollerDetails.AddressTypeID" (change)="onAddressTypeChange($event, Address)"
               [ngClass]="{
                 'error-border': !Address.AddressID && errorMessages['AddressTypeID'] ,'select-background-edited': isEditModeCore}">
               <option value="0">Select</option>
@@ -2280,7 +2281,7 @@
             <label for="country">
               Country
             </label>
-            <select required [(ngModel)]="CreatecontrollerDetails.country" name="placeOfEstablishment">
+            <select required [(ngModel)]="CreatecontrollerDetails.CountryID" name="placeOfEstablishment">
               <option *ngFor="let place of countryOptionsCreate" [value]="place.CountryID">{{ place.CountryName }}
               </option>
             </select>

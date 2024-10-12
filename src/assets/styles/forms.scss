@@ -192,4 +192,60 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
     }
   }
 
+  .custom-checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  /* Create a custom checkbox style */
+  .custom-checkbox {
+    display: inline-block;
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    user-select: none;
+  }
+  
+  /* Style the custom checkmark */
+  .custom-checkbox .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    background-color: #eee;
+    border: 1px solid rgb(75, 75, 75);
+    border-radius: 4px;
+  }
+  
+  /* Change the background when the checkbox is checked */
+  .custom-checkbox input:checked + .checkmark {
+    background-color: #8e172e;
+  }
+  
+  /* Create the checkmark/indicator */
+  .custom-checkbox .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the checkmark when checked */
+  .custom-checkbox input:checked + .checkmark:after {
+    display: block;
+  }
+  
+  /* Style the checkmark (the tick) */
+  .custom-checkbox .checkmark:after {
+    left: 4px;
+    top: 3px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
   

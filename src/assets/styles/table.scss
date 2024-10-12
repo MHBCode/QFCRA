@@ -2,7 +2,8 @@ table {
     width: 100%;
     border-collapse: collapse;
     background-color: white;
-    border-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
     box-shadow: 8px 8px 43px rgba(8, 50, 79, 0.1);
     overflow: hidden;
     table-layout: fixed;
@@ -31,10 +32,9 @@ tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-table-responsive {
+.table-responsive {
     width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    border-radius: 15px;
 }
 
 
@@ -42,7 +42,8 @@ table-responsive {
     display: flex;
     flex-direction: column;
     position: relative;
-
+    border-radius: 15px;
+    box-shadow: 8px 8px 43px rgba(8, 50, 79, 0.1);
     .pagination {
         display: flex;
         justify-content: center;
