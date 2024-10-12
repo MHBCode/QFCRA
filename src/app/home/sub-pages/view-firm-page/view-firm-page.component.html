@@ -416,8 +416,8 @@
           <div class="input-field">
             <label for="financialYearEnd" class="history-row">
               Financial Year End
-              <button *ngIf="firmDetails?.FinYearEndTypeDesc" class="subbutton" (click)="getFYearHistory()">
-                <i class="bi bi-clock-history"></i> Open History
+              <button *ngIf="firmDetails?.FinYearEndTypeDesc" class="subbutton-open-history" (click)="getFYearHistory()">
+                <i class="bi bi-clock-history"></i> <span> Open History</span>
               </button>
             </label>
             <select [ngClass]="{ 'select-background-edited': isEditModeCore }" [disabled]="!isEditModeCore"
@@ -440,8 +440,8 @@
           <div class="input-field">
             <label for="accountingStandards" class="history-row">
               Accounting Standards
-              <button *ngIf="firmDetails?.FinAccStdTypeDesc" class="subbutton" (click)="getAccountingStandardHistory()">
-                <i class="bi bi-clock-history"></i> Open History
+              <button *ngIf="firmDetails?.FinAccStdTypeDesc" class="subbutton-open-history" (click)="getAccountingStandardHistory()">
+                <i class="bi bi-clock-history"></i><span> Open History</span>
               </button>
             </label>
             <select [ngClass]="{ 'select-background-edited': isEditModeCore }" [disabled]="!isEditModeCore"
@@ -595,7 +595,7 @@
           </div>
           <div class="input-field">
             <label for="DateLicensed">
-              {{firmDetails?.LicenseStatusTypeLabelDesc}}
+              {{LicenseStatusTypeLabelDescFormatted}}
             </label>
             <input name="DateLicensed" id="DateLicensed" type="text" #dateInputs
               [(ngModel)]="formattedLicenseApplStatusDate" [ngClass]="{'error-border': errorMessages['LicensedDate']}">
@@ -613,7 +613,7 @@
           </div>
           <div class="input-field" *ngIf="selectedFirmTypeID == 3">
             <label for="dateAuthorized">
-              {{firmDetails?.AuthorisationStatusTypeLabelDesc}}
+              {{AuthorisationStatusTypeLabelDescFormatted}}
             </label>
             <input name="dateAuthorized" id="dateAuthorized" type="text" #dateInputs
               [(ngModel)]="formattedAuthApplStatusDate"
@@ -736,9 +736,10 @@
             <ng-container *ngIf="address.Valid === true">
               <div class="input-field" *ngIf="!isEditModeCore">
                 <label for="addressType" class="history-row">
-                  Address Type <button *ngIf="address.PreviousRecords !== 0" class="subbutton"
-                    (click)="getAddressTypeHistory(address.AddressTypeID)"><i class="bi bi-clock-history"></i> Open
-                    History</button>
+                  Address Type 
+                  <button *ngIf="address.PreviousRecords !== 0" class="subbutton-open-history"
+                    (click)="getAddressTypeHistory(address.AddressTypeID)"><i class="bi bi-clock-history"></i><span> Open History</span>
+                  </button>
                 </label>
                 <input disabled name="addressType" id="addressType" type="text" value="{{address?.AddressTypeDesc}}">
               </div>
