@@ -4279,6 +4279,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   loadLicScopeRevisions(firmId: number, firmApplicationTypeId: number) {
+    this.isLoading = true;
     if (firmApplicationTypeId === 2) {
       this.firmService.getFirmActivityLicensed(firmId).subscribe(data => {
         this.ActivityLicensed = data.response;
@@ -4289,9 +4290,11 @@ export class ViewFirmPageComponent implements OnInit {
           this.firmService.getRevision(scopeID).subscribe(revisions => {
             console.log('Fetched revisions:', revisions);
             this.LicPrevRevNumbers = revisions.response;
+            this.isLoading = false;
           });
         } else {
           console.error('No activities found or scopeID is missing');
+          this.isLoading = false;
         }
       });
     }
@@ -4326,6 +4329,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   loadAuthScopeRevisions(firmId: number, firmApplicationTypeId: number) {
+    this.isLoading = true;
     if (firmApplicationTypeId === 3) {
       if (this.ActivityAuth) {
         const scopeID = this.ActivityAuth[0].FirmScopeID;
@@ -4334,9 +4338,11 @@ export class ViewFirmPageComponent implements OnInit {
           console.log('Fetched revisions:', revisions);
           this.AuthPrevRevNumbers = revisions.response;
           this.groupActivitiesByCategory(this.ActivityAuth);
+          this.isLoading = false;
         });
       } else {
         console.error('No activities found or scopeID is missing');
+        this.isLoading = false;
       }
     }
   }

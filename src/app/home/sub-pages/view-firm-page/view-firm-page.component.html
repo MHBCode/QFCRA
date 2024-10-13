@@ -475,8 +475,9 @@
           </div>
           <div class="input-field" *ngIf="firmNamesHistory[0]?.FirmNameHistoryID">
             <label for="prevFirmName" class="history-row">
-              Prev. Firm Name <button class="subbutton" (click)="getPrevFirmName()"><i class="bi bi-clock-history"></i>
-                Open History</button>
+              Prev. Firm Name <button class="subbutton-open-history" (click)="getPrevFirmName()">
+                <i class="bi bi-clock-history"></i> <span> Open History</span>
+              </button>
             </label>
             <input [disabled]="!isEditModeCore" name="prevFirmName" id="prevFirmName" type="text"
               [(ngModel)]="firmNamesHistory[0].PrevFirmName">
@@ -1463,7 +1464,7 @@
                     <p>Conditions and Restrictions</p>
                   </div>
 
-                  <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition.length === 0 || (isEditModeAuth)">
+                  <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition.length !== 0 || (isEditModeAuth)">
                     <strong>Retail Restriction: </strong> &nbsp;
                     <span *ngIf="!isEditModeAuth">Yes</span>
                     <input *ngIf="isEditModeAuth" [(ngModel)]="isScopeConditionChecked" type="checkbox" />
@@ -3448,7 +3449,7 @@
         </tr>
       </tbody>
     </table>
-    <div *ngIf="firmDetails?.AuthorisationStatusTypeID > 0" style="margin-top: 15px;" class="app-detail-history-header">
+    <div *ngIf="firmDetails?.AuthorisationStatusTypeID > 0" style="margin-top: 25px;" class="app-detail-history-header">
       Authorisation Status
     </div>
     <table *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
@@ -3525,8 +3526,8 @@
       <thead>
         <tr>
           <th>Address</th>
-          <th>Created Date</th>
-          <th>Modified Date</th>
+          <th class="date-center">Created Date</th>
+          <th class="date-center">Modified Date</th>
         </tr>
       </thead>
       <tbody>

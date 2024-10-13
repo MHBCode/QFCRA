@@ -239,8 +239,8 @@
   align-items: center;
 }
 
-.edit-firm-header span {
-  color: black;
+.edit-firm-header > span {
+  color: #a51e36;
   font-size: 1em;
   font-weight: 500;
   line-height: 24px;
@@ -709,11 +709,7 @@
 .addressHistoryPopup .address-type-info {
   display: flex;
   align-items: center;
-}
-
-
-.addressHistoryPopup table tr td {
-  text-align: left;
+  margin-bottom: 10px;
 }
 
 .ScopeLicPreviousVersionsPopup,
