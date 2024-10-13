@@ -171,6 +171,7 @@
 import { Component, Input, OnInit, Renderer2 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirmService } from 'src/app/ngServices/firm.service';
+import * as constants from 'src/app/app-constants';
 
 @Component({
   selector: 'app-firms-page',
@@ -192,7 +193,7 @@ export class FirmsPageComponent implements OnInit {
   selectedSortOption: string = 'newFirms'; // Default sort option
   relevantPerson: boolean = false;
   private unlistenDocumentClick: () => void;
-
+  allQFCLicenseStatus: any = [];
   isLoading: boolean = true;
   allfirms :any = [] ;
   // Form search fields with defaults
@@ -209,6 +210,9 @@ export class FirmsPageComponent implements OnInit {
   sectors: boolean = true;
   supervisionCategory: boolean = true;
   authorisationCategory : boolean = true;
+  legalStatusOptions: any[] = [];
+  authorisationStatusOptions : any[] = [];
+  
   // Toggling Options for expanded views
   toggleOptions = {
     firmType: false,
@@ -276,6 +280,9 @@ export class FirmsPageComponent implements OnInit {
   ngOnInit(): void {
     this.loadFirms();
     this.LoadAllFirms();
+    this.populateQFCLicenseStatus();
+    this.getlegalStatus();
+    this.getauthorisationStatus();
   }
 
   // Toggle popup visibility
@@ -287,7 +294,33 @@ export class FirmsPageComponent implements OnInit {
   navigateToNewfirm() {
     this.router.navigate(['home/new-firm']);
   }
-
+  populateQFCLicenseStatus() {
+    this.firmService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
+      this.allQFCLicenseStatus = data.response;
+      console.log("allQFCLicenseStatus",this.allQFCLicenseStatus)
+    }, error => {
+      console.error('Error Fetching QFC License Status dropdown: ', error);
+    })
+    console.log("allQFCLicenseStatus",this.allQFCLicenseStatus)
+  }
+getlegalStatus(): void {
+    this.firmService.getobjecttypetableEdit(30, constants.legalStatus, 41)
+      .subscribe(data => {
+        this.legalStatusOptions = data.response;
+        console.log("getlegalStatusController", data)
+      }, error => {
+        console.error("Error fetching legalStatus", error);
+      });
+}
+getauthorisationStatus(): void {
+  this.firmService.getobjecttypetableEdit(30, constants.authorisationStatus, 41)
+    .subscribe(data => {
+      this.authorisationStatusOptions = data.response;
+      console.log("getlegalStatusController", data)
+    }, error => {
+      console.error("Error fetching legalStatus", error);
+    });
+}
   // Load initial firms data
   loadFirms(): void {
     this.firmService.getAssignedFirms(30).subscribe(
@@ -361,21 +394,17 @@ export class FirmsPageComponent implements OnInit {
   prepareFilterData() {
     const filterData = {
       FirmID: this.firmName !== 'all' ? this.allfirms.find(firm => firm.FirmName === this.firmName)?.FirmID || 0 : 0, 
-      LicenseStatusId: this.licenseStatus !== 'all' ? this.firms.find(firm => firm.LicenseStatusTypeDesc === this.licenseStatus)?.LicenseStatusId || 0 : 0, 
-      AuthorisationStatusId: this.authorisationStatus !== 'all' ? this.authorisationStatus : 0,  
+      CSVLicenseStatus: this.licenseStatus !== 'all' ? this.allQFCLicenseStatus.find(firm => firm.FirmApplStatusTypeDesc === this.licenseStatus)?.FirmApplStatusTypeID || 0 : 0,
+      CSVAuthorisationStatus: this.authorisationStatus !== 'all' ? this.authorisationStatusOptions.find(firm => firm.AuthorisationStatusTypeDesc === this.authorisationStatus)?.FirmApplStatusTypeID || 0 : 0,  
       OperationalStatusId: 0, // Adjust based on your logic
       QFCNumber: this.qfcNumber || 0,
-      LegalStatusId: this.legalStatus !== 'all' ? this.firms.find(firm => firm.LegalStatusTypeDesc === this.legalStatus)?.LegalStatusId || 0 : 0, 
+      CSVLegalStatus: this.legalStatus !== 'all' ? this.legalStatusOptions.find(firm => firm.LegalStatusTypeDesc === this.legalStatus)?.LegalStatusTypeID || 0 : 0, 
       AmlSupervisorsId: this.amlSup !=='all' ? this.firms.find(firm => firm.Supervisor_AML === this.amlSupervisors)?.AmlSupervisorsId || 0 : 0,
-      SupervisorSupervisionId: this.supervisorSupervision !=='all' ? this.firms.find(firm => firm.Supervisor === this.supervisorSupervision)?.SupervisorSupervisionId || 0 : 0,
+      SupervisionCaseOfficerId: this.supervisorSupervision !=='all' ? this.firms.find(firm => firm.Supervisor === this.supervisorSupervision)?.SupervisionCaseOfficerId || 0 : 0,
       AuthorisationCaseOfficerId: 0, // Example value
-      SupervisionCaseOfficerId: 0, // Example value
       PrudentialCategotyId: 0, // Adjust based on your logic
-      UserID:0, // Adjust based on your logic
+      UserID:30, // Adjust based on your logic
       RelevantPerson: this.relevantPerson ? 1 : 0, 
-      CSVAuthorisationStatus: this.authorisationStatus !== 'all' ? this.authorisationStatus : 0,
-      CSVLicenseStatus: 0,
-      CSVLegalStatus: 0, 
       CSVauthorisationCategory: this.getAuthorisationCategoriesCSV(),
       CSVPrudentialCategory:this.getPrudentialCategoriesCSV(), 
       CSVSectorTypes:this.getSectorsCSV(), 
