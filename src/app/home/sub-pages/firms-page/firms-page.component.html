@@ -128,10 +128,12 @@
             <div class="select-wrapper">
               <select name="licenseStatus" id="licenseStatus" [(ngModel)]="licenseStatus">
                 <option value="all">All</option>
-                <option *ngFor="let licstatus of licenseStatuses" [value]="licstatus">
-                  {{ licstatus }}
+                <option *ngFor="let licstatus of allQFCLicenseStatus" [value]="licstatus.FirmApplStatusTypeDesc">
+                  {{ licstatus.FirmApplStatusTypeDesc }}
                 </option>
               </select>
+
+              
             </div>
           </div>
            <!-- Prudential Category (Checkboxes) -->
@@ -335,8 +337,8 @@
             <div class="select-wrapper">
               <select name="amlSup" id="amlSup" [(ngModel)]="legalStatus">
                 <option value="all">All</option>
-                <option *ngFor="let legalStatus of legalStatuses" [value]="legalStatus">
-                  {{ legalStatus }}
+                <option *ngFor="let legalStatus of legalStatusOptions" [value]="legalStatus.LegalStatusTypeDesc">
+                  {{ legalStatus.LegalStatusTypeDesc }}
                 </option>
               </select>
             </div>
@@ -393,8 +395,8 @@
               <!-- Bind to a single selected value (authorisationStatus), not the entire array -->
               <select name="authorisationStatus" id="authorisationStatus" [(ngModel)]="authorisationStatus">
                 <option value="all">All</option>
-                <option *ngFor="let authstatus of authorisationStatuses" [value]="authstatus">
-                  {{ authstatus }}
+                <option *ngFor="let authstatus of authorisationStatusOptions" [value]="authstatus.FirmApplStatusTypeDesc">
+                  {{ authstatus.FirmApplStatusTypeDesc }}
                 </option>
               </select>
             </div>

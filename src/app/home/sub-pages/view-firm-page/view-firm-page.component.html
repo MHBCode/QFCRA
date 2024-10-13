@@ -1991,14 +1991,14 @@
                   [readonly]="!isEditable" />
               </div>
             </div>
-            <div class="btn">
-              <button *ngIf="!isEditable" (click)="editController()"><i class="bi bi-pen"></i> Edit</button>
-              <button *ngIf="isEditable" (click)="saveControllerPopupChanges()"><i class="bi bi-save"></i> Save</button>
-              <button (click)="confarmDeleteControllerDetials(selectedController.OtherEntityID)"><i
-                  class="bi bi-trash"></i>
-                Delete</button>         
-            </div>
           </ng-container>
+          <div class="btn">
+            <button *ngIf="!isEditable" (click)="editController()"><i class="bi bi-pen"></i> Edit</button>
+            <button *ngIf="isEditable" (click)="saveControllerPopupChanges()"><i class="bi bi-save"></i> Save</button>
+            <button (click)="confarmDeleteControllerDetials(selectedController.OtherEntityID)"><i
+                class="bi bi-trash"></i>
+              Delete</button>         
+          </div>
         </form>
 
       </div>
