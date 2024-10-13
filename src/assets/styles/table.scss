@@ -37,7 +37,12 @@ tr:nth-child(even) {
     width: 100%;
 }
 
-
+table thead tr th {
+    cursor: pointer;
+  }
+  table tbody tr td {
+    cursor: pointer;
+  }
 .table {
     display: flex;
     flex-direction: column;

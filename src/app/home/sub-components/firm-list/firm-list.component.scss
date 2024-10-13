@@ -83,3 +83,9 @@ tr .pagination{
 .expandable-text:hover::after {
   content: ''; /* Remove the ellipsis when the text is expanded */
 }
+table thead tr th {
+  cursor: pointer;
+}
+table tbody tr td {
+  cursor: pointer;
+}

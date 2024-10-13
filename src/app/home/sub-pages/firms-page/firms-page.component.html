@@ -65,7 +65,7 @@
             <div class="select-wrapper">
               <select name="firmName" id="firmName" [(ngModel)]="firmName">
                 <option value="all">All</option>
-                <option *ngFor="let firm of firms" [value]="firm.FirmName">
+                <option *ngFor="let firm of allfirms" [value]="firm.FirmName">
                   {{ firm.FirmName }}
                 </option>
               </select>

@@ -277,7 +277,7 @@
         </div>
         <div class="form-section-title">
           <h2 class="edit-firm-header">
-            Core Details > <span>{{ firmDetails?.FirmName }}</span>
+             <span>{{ firmDetails?.FirmName }}</span>
             <button [ngClass]="{ 'hidden-button': !isEditModeCore }" class="collapse-button"
               (click)="toggleCollapse('firmDetailsSection')">
               {{ isCollapsed["firmDetailsSection"] ? "▲" : "▼" }}
@@ -502,8 +502,8 @@
                 (click)="toggleCollapse('appDetailsSection')">
                 {{ isCollapsed['appDetailsSection'] ? '▲' : '▼'}}
               </button>
-              <button class="subbutton" (click)="getApplicationDetailsHistory()">
-                <i class="bi bi-clock-history"></i> Open History
+              <button class="subbutton-open-history" (click)="getApplicationDetailsHistory()">
+                <i class="bi bi-clock-history"></i> <span> Open History</span>
               </button>
             </h2>
           </div>
@@ -880,7 +880,7 @@
             </div>
             <div class="form-section-title">
               <h2 class="edit-firm-header">
-                Scope > <span>{{ firmDetails?.FirmName }}</span>
+                 <span>{{ firmDetails?.FirmName }}</span>
               </h2>
               <div *ngIf="currentLicRevisionNumber === lastLicRevisionNumber" style="display: flex; gap: 10px">
                 <div class="btn"
@@ -1692,7 +1692,7 @@
       <div class="inputs-field-set">
         <div class="section">
           <div class="form-section-title">
-            <h2 class="edit-firm-header">Controllers > <span>{{ firmDetails?.FirmName }}</span></h2>
+            <h2 class="edit-firm-header"> <span>{{ firmDetails?.FirmName }}</span></h2>
             <div class="btn">
               <button (click)="createController()">
                 <i class="bi bi-pen"></i>

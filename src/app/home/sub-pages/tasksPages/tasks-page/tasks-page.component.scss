@@ -35,7 +35,6 @@
 
 .btns button {
     background: #A51E36;
-    padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -59,16 +58,17 @@
     transition: opacity 0.3s ease;
 }
 
-.btns button:hover {
-    padding: 0.5rem 1rem; /* Button size on hover to fit text */
-}
+// .btns button:hover {
+//      padding: 1rem; /* Button size on hover to fit text */
+// }
 
-.btns button:hover i {
-    display: none;
-}
+// .btns button:hover i {
+//     display: none;
+// }
 
 .btns button:hover .export-text {
     display: inline;
+    padding-right: 5px;
 }
 
 

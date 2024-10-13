@@ -194,7 +194,7 @@ export class FirmsPageComponent implements OnInit {
   private unlistenDocumentClick: () => void;
 
   isLoading: boolean = true;
- 
+  allfirms :any = [] ;
   // Form search fields with defaults
   firmName: string = 'all';
   qfcNumber: string = '';
@@ -275,6 +275,7 @@ export class FirmsPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFirms();
+    this.LoadAllFirms();
   }
 
   // Toggle popup visibility
@@ -294,7 +295,7 @@ export class FirmsPageComponent implements OnInit {
         if (data && data.response) {
           this.isLoading = true;
           this.firms = data.response;
-          this.filteredFirms = [...this.firms];
+          this.filteredFirms = [...this.allfirms];
 
           this.licenseStatuses = [...new Set(this.firms.map(firm => firm.LicenseStatusTypeDesc))];
           this.supervisorSupervisions = [...new Set(this.firms.map(firm => firm.Supervisor))];
@@ -346,9 +347,20 @@ export class FirmsPageComponent implements OnInit {
     );
   }
   
+  LoadAllFirms(): void {
+    this.firmService.getAllFirms().subscribe(
+      (data) => {
+        this.allfirms = data.response ;
+
+      },
+      (error) => {
+        console.error('Error fetching firms:', error);
+      }
+    )
+  }
   prepareFilterData() {
     const filterData = {
-      FirmID: this.firmName !== 'all' ? this.firms.find(firm => firm.FirmName === this.firmName)?.FirmID || 0 : 0, 
+      FirmID: this.firmName !== 'all' ? this.allfirms.find(firm => firm.FirmName === this.firmName)?.FirmID || 0 : 0, 
       LicenseStatusId: this.licenseStatus !== 'all' ? this.firms.find(firm => firm.LicenseStatusTypeDesc === this.licenseStatus)?.LicenseStatusId || 0 : 0, 
       AuthorisationStatusId: this.authorisationStatus !== 'all' ? this.authorisationStatus : 0,  
       OperationalStatusId: 0, // Adjust based on your logic
