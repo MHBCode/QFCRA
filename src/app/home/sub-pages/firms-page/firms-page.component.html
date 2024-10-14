@@ -195,8 +195,8 @@
             <div class="select-wrapper">
               <select name="Supervisor" id="Supervisor" [(ngModel)]="supervisorSupervision">
                 <option value="all">All</option>
-                <option *ngFor="let supervisorSup of supervisorSupervisions" [value]="supervisorSup">
-                  {{ supervisorSup }}
+                <option *ngFor="let supervisorSup of allSupervisionCaseOfficer" [value]="supervisorSup.FullName">
+                  {{ supervisorSup.FullName }}
                 </option>
               </select>
             </div>
@@ -249,8 +249,8 @@
             <div class="select-wrapper">
               <select name="amlSup" id="amlSup" [(ngModel)]="amlSup">
                 <option value="all">All</option>
-                <option *ngFor="let amlSup of amlSupervisors" [value]="amlSup">
-                  {{ amlSup }}
+                <option *ngFor="let amlSupo of allAuthorisationCaseOfficer" [value]="amlSupo.FullName">
+                  {{ amlSupo.FullName }}
                 </option>
               </select>
             </div>
@@ -333,12 +333,12 @@
         </div>
           <!-- Legal Status (Dropdown) -->
           <div class="input-field">
-            <label for="amlSup">Legal Status</label>
+            <label for="legalStatus">Legal Status</label>
             <div class="select-wrapper">
-              <select name="amlSup" id="amlSup" [(ngModel)]="legalStatus">
+              <select name="legalStatus" id="legalStatus" [(ngModel)]="legalStatus">
                 <option value="all">All</option>
-                <option *ngFor="let legalStatus of legalStatusOptions" [value]="legalStatus.LegalStatusTypeDesc">
-                  {{ legalStatus.LegalStatusTypeDesc }}
+                <option *ngFor="let status  of legalStatusOptions" [value]="status.LegalStatusTypeDesc">
+                  {{ status.LegalStatusTypeDesc }}
                 </option>
               </select>
             </div>

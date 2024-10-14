@@ -8,6 +8,9 @@ export const countries = "Countries";
 export const qfcLicenseStatus = "v_LicenseStatus";
 export const authorisationStatus = "v_AuthorizationStatus";
 export const legalStatus = "v_FirmLegalStatusTypes";
+export const legalStatusfilter = "LegalStatusTypes";
+export const SupervisionCaseOfficer = "V_SupervisionSupervisor" ;
+export const AuthorisationCaseOfficer = "V_AMLSupervisors";
 export const FinYearEnd = "FirmFinYearEndTypes";
 export const FinAccStd = "FinAccStdTypes";
 export const firmAppTypes = "v_FirmApplicationType";
@@ -39,7 +42,12 @@ export enum FirmAuthorizationApplStatusType
     AuthorisedWithdrawnVoluntary = 14,
     AuthorisedWithdrawnInvoluntary = 15
 }
-
+export enum AuditorsMessages{
+    Select_Auditor_Name = 3901,
+    Selected_Auditor_Name_already_Exsists = 3903,
+    Select_Auditor_Type = 3904,
+    Select_Valid_Data = 3906
+}
 export enum Firm_CoreDetails_Messages
 {
     Authorisation = 8500,

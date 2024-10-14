@@ -194,6 +194,7 @@ export class FirmsPageComponent implements OnInit {
   relevantPerson: boolean = false;
   private unlistenDocumentClick: () => void;
   allQFCLicenseStatus: any = [];
+  allSupervisionCaseOfficer: any = [];
   isLoading: boolean = true;
   allfirms :any = [] ;
   // Form search fields with defaults
@@ -210,9 +211,9 @@ export class FirmsPageComponent implements OnInit {
   sectors: boolean = true;
   supervisionCategory: boolean = true;
   authorisationCategory : boolean = true;
-  legalStatusOptions: any[] = [];
-  authorisationStatusOptions : any[] = [];
-  
+  legalStatusOptions: any = [];
+  authorisationStatusOptions : any = [];
+  allAuthorisationCaseOfficer : any = [];
   // Toggling Options for expanded views
   toggleOptions = {
     firmType: false,
@@ -283,6 +284,8 @@ export class FirmsPageComponent implements OnInit {
     this.populateQFCLicenseStatus();
     this.getlegalStatus();
     this.getauthorisationStatus();
+    this.getSupervisionCaseOfficer();
+    this.getAuthorisationCaseOfficer();
   }
 
   // Toggle popup visibility
@@ -303,17 +306,40 @@ export class FirmsPageComponent implements OnInit {
     })
     console.log("allQFCLicenseStatus",this.allQFCLicenseStatus)
   }
-getlegalStatus(): void {
-    this.firmService.getobjecttypetableEdit(30, constants.legalStatus, 41)
-      .subscribe(data => {
-        this.legalStatusOptions = data.response;
-        console.log("getlegalStatusController", data)
-      }, error => {
-        console.error("Error fetching legalStatus", error);
-      });
+  getSupervisionCaseOfficer() {
+    this.firmService.getObjectTypeTable(constants.SupervisionCaseOfficer).subscribe(data => {
+      this.allSupervisionCaseOfficer = data.response;
+      console.log("allQFCLicenseStatus",this.allQFCLicenseStatus)
+    }, error => {
+      console.error('Error Fetching QFC License Status dropdown: ', error);
+    })
+    console.log("allQFCLicenseStatus",this.allQFCLicenseStatus)
+  }
+  getAuthorisationCaseOfficer() {
+    this.firmService.getObjectTypeTable(constants.AuthorisationCaseOfficer).subscribe(data => {
+      this.allAuthorisationCaseOfficer = data.response;
+      console.log("allQFCLicenseStatus",this.allAuthorisationCaseOfficer)
+    }, error => {
+      console.error('Error Fetching QFC License Status dropdown: ', error);
+    })
+    console.log("allQFCLicenseStatus",this.allAuthorisationCaseOfficer)
+  }
+  getlegalStatus(): void {
+    this.firmService.getObjectTypeTable(constants.legalStatusfilter)
+        .subscribe(data => {
+            this.legalStatusOptions = data.response;
+            console.log("Fetched Legal Status Options:", this.legalStatusOptions);
+
+            // Log each LegalStatusTypeDesc
+            this.legalStatusOptions.forEach(status => {
+                console.log("LegalStatusTypeDesc:", status.LegalStatusTypeDesc);
+            });
+        }, error => {
+            console.error("Error fetching legalStatus", error);
+        });
 }
 getauthorisationStatus(): void {
-  this.firmService.getobjecttypetableEdit(30, constants.authorisationStatus, 41)
+  this.firmService.getObjectTypeTable(constants.authorisationStatus)
     .subscribe(data => {
       this.authorisationStatusOptions = data.response;
       console.log("getlegalStatusController", data)
@@ -337,7 +363,6 @@ getauthorisationStatus(): void {
           this.legalStatuses = [...new Set(this.firms.map(firm => firm.LegalStatusTypeDesc))];
           // Apply default sorting after data load
           this.sortFirms(this.selectedSortOption);
-          
           console.log(this.firms)
         } else {
           console.warn('No firms data found.');
@@ -394,19 +419,17 @@ getauthorisationStatus(): void {
   prepareFilterData() {
     const filterData = {
       FirmID: this.firmName !== 'all' ? this.allfirms.find(firm => firm.FirmName === this.firmName)?.FirmID || 0 : 0, 
-      CSVLicenseStatus: this.licenseStatus !== 'all' ? this.allQFCLicenseStatus.find(firm => firm.FirmApplStatusTypeDesc === this.licenseStatus)?.FirmApplStatusTypeID || 0 : 0,
-      CSVAuthorisationStatus: this.authorisationStatus !== 'all' ? this.authorisationStatusOptions.find(firm => firm.AuthorisationStatusTypeDesc === this.authorisationStatus)?.FirmApplStatusTypeID || 0 : 0,  
+      CSVLicenseStatus: this.licenseStatus !== 'all' ? this.allQFCLicenseStatus.find(firm => firm.FirmApplStatusTypeDesc === this.licenseStatus)?.FirmApplStatusTypeID || 0 : 0,   
+      CSVLegalStatus: this.legalStatus !== 'all' ? this.legalStatusOptions.find(firm => firm.LegalStatusTypeDesc === this.legalStatus)?.LegalStatusTypeID || 0 : 0, 
       OperationalStatusId: 0, // Adjust based on your logic
       QFCNumber: this.qfcNumber || 0,
-      CSVLegalStatus: this.legalStatus !== 'all' ? this.legalStatusOptions.find(firm => firm.LegalStatusTypeDesc === this.legalStatus)?.LegalStatusTypeID || 0 : 0, 
-      AmlSupervisorsId: this.amlSup !=='all' ? this.firms.find(firm => firm.Supervisor_AML === this.amlSupervisors)?.AmlSupervisorsId || 0 : 0,
-      SupervisionCaseOfficerId: this.supervisorSupervision !=='all' ? this.firms.find(firm => firm.Supervisor === this.supervisorSupervision)?.SupervisionCaseOfficerId || 0 : 0,
-      AuthorisationCaseOfficerId: 0, // Example value
+      SupervisionCaseOfficerId: this.supervisorSupervision !=='all' ? this.allSupervisionCaseOfficer.find(firm => firm.FullName === this.supervisorSupervision)?.UserID || 0 : 0,
+      AuthorisationCaseOfficerId: this.amlSup !== 'all' ? this.allAuthorisationCaseOfficer.find(firm => firm.FullName === this.amlSup)?.UserID || 0 : 0,
       PrudentialCategotyId: 0, // Adjust based on your logic
-      UserID:30, // Adjust based on your logic
+      CSVAuthorisationStatus: this.authorisationStatus !== 'all' ? this.authorisationStatusOptions.find(firm => firm.FirmApplStatusTypeDesc === this.authorisationStatus)?.FirmApplStatusTypeID || 0 : 0,
       RelevantPerson: this.relevantPerson ? 1 : 0, 
       CSVauthorisationCategory: this.getAuthorisationCategoriesCSV(),
-      CSVPrudentialCategory:this.getPrudentialCategoriesCSV(), 
+      CSVPrudentialCategory:this.getPrudentialCategoriesCSV() , 
       CSVSectorTypes:this.getSectorsCSV(), 
       LoginUserID: 30, 
       CSVFirmTypes: this.getFirmTypesCSV(),

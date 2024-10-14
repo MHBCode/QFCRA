@@ -165,7 +165,7 @@ export class ViewFirmPageComponent implements OnInit {
   previousSectorTypeID: number;
   /* */
   displayInactiveContacts: boolean = false;
-
+  displayInactiveAuditors: boolean = false;
   selectedStatusId: number | null = null;
   selectedAuthStatusId: number | null = null;
   licenseStatusDates: { [key: number]: string | null } = {};
@@ -1991,11 +1991,18 @@ export class ViewFirmPageComponent implements OnInit {
       return this.FIRMContacts.filter(contact => contact.ContactTypeDesc !== 'Contact- No Longer');
     }
   }
-
+  get filteredAuditors() {
+    if (this.displayInactiveAuditors) {
+      return this.FIRMAuditors;
+    } else {
+      return this.FIRMAuditors.filter(auditor => auditor.AssnDateTo >= this.currentDate);
+    }
+  }
   // Method to handle the checkbox change
   onInactiveContactsToggle(event: any): void {
     this.displayInactiveContacts = event.target.checked;
   }
+  
   closeContactPopup() {
     this.isPopupVisible = false;
   }
@@ -2724,9 +2731,9 @@ export class ViewFirmPageComponent implements OnInit {
     CreatedBy: 30,
     RelatedEntityID: 0,
     EntitySubTypeID: null,
-    EntityTypeID: 6,
+    EntityTypeID: 1,
     RelatedEntityEntityID: 0,
-    MyState: 0,
+    MyState: 2,
     PlaceOfIncorporation: '',
     CountryOfIncorporation: 0,
     zebSiteAddress: '',
@@ -2784,17 +2791,18 @@ export class ViewFirmPageComponent implements OnInit {
               OtherEntityName: this.CreatecontrollerDetails.OtherEntityName,
               OtherEntityID: null,
               ControllerControlTypeDesc: this.CreatecontrollerDetails.ControllerControlTypeDesc,
-              EntityTypeDesc: this.CreatecontrollerDetails.EntityTypeDesc,
+              EntityTypeDesc: null,
               DateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
               createdBy: this.CreatecontrollerDetails.CreatedBy,
               CessationDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CessationDate),
               EffectiveDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.EffectiveDate),
               CreatedDate: null,
               ControllerControlTypeID: this.CreatecontrollerDetails.ControllerControlTypeID,
-              relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
-              entitySubTypeID: this.CreatecontrollerDetails.EntitySubTypeID,
-              relatedEntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-              relatedEntityEntityID: this.CreatecontrollerDetails.RelatedEntityEntityID,
+              RelatedEntityID: null,
+              EntitySubTypeID: null,
+              EntityTypeID: 1,
+              RelatedEntityTypeID: 6,
+              relatedEntityEntityID: null,
               myState: this.CreatecontrollerDetails.MyState,
               LegalStatusTypeID: this.CreatecontrollerDetails.LegalStatusTypeID,
               LegalStatusTypeDesc: this.CreatecontrollerDetails.LegalStatusTypeDesc,
@@ -2815,7 +2823,6 @@ export class ViewFirmPageComponent implements OnInit {
               controllerInfo: this.CreatecontrollerDetails.ControllerInfo,
               Output:0,
               FirmID: this.firmId,
-              EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               EntityID: this.firmId,
               numOfShares: this.CreatecontrollerDetails.NumOfShares,
               MajorityStockHolder: false,
@@ -2915,11 +2922,13 @@ export class ViewFirmPageComponent implements OnInit {
             response => {
               console.log("Save successful:", response);
               this.isEditable = false;
+              this.loadControllers();
             },
             error => {
               console.error("Error saving changes:", error);
             }
           );
+          
         }
       }
       else if (
@@ -3030,7 +3039,7 @@ export class ViewFirmPageComponent implements OnInit {
 
     console.log('Editing:', this.controllerDetails);
   }
-
+  
   loadControllers(): void {
     this.isLoading = true;
     this.firmService.getFIRMControllers(this.firmId).subscribe(
@@ -4466,11 +4475,22 @@ export class ViewFirmPageComponent implements OnInit {
   ////////// Yazan Auditor
   firmAuditorName: { OtherEntityID: number, OtherEntityName: string }[] = [];
   firmAuditorType: { EntitySubTypeID: number, EntitySubTypeDesc: string }[] = [];
+  // getFirmAuditorName(): void {
+  //   this.firmService.getobjecttypetableEdit(this.userId, constants.firmAuditorName, this.objectOpTypeIdEdit)
+  //     .subscribe(data => {
+  //       this.firmAuditorName = data.response;
+  //       console.log("firmAuditorName", data)
+  //     }, error => {
+  //       console.error("Error fetching controller", error);
+  //     });
+  // }
   getFirmAuditorName(): void {
     this.firmService.getobjecttypetableEdit(this.userId, constants.firmAuditorName, this.objectOpTypeIdEdit)
       .subscribe(data => {
-        this.firmAuditorName = data.response;
-        console.log("firmAuditorName", data)
+        this.firmAuditorName = data.response.filter(item => {
+          return isNaN(item.OtherEntityName) && !/\d/.test(item.OtherEntityName);
+        });
+        console.log("Filtered firmAuditorName", this.firmAuditorName);
       }, error => {
         console.error("Error fetching controller", error);
       });
@@ -4500,6 +4520,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.selectedAuditor = {};
     this.IsCreateAuditorVisible = false;
     this.IsViewAuditorVisible = false;
+    this.firmAuditorsObj = {};
   }
   editAuditor() {
     this.IsEditAuditorVisible = true; // Show the edit section
@@ -4510,6 +4531,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.getFirmAuditorName();
     this.getFirmAuditorType();
   }
+
   firmAuditorsObj: {};
   saveEditAuditor() {
     console.log("selectedAuditor", this.selectedAuditor)
@@ -4520,12 +4542,12 @@ export class ViewFirmPageComponent implements OnInit {
       EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
       EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeDesc,
       // erorr
-      RelatedEntityTypeID: this.selectedAuditor.RelatedEntityID,
+      RelatedEntityTypeID: 3, // Yazan ??
       RelatedEntityEntityID: this.selectedAuditor.OtherEntityID,
-      MyState: 3,
+      MyState: 2,
       LastModifiedByOfOtherEntity: 30,
       OtherEntityName: this.selectedAuditor.OtherEntityName,
-      DateOfIncorporation: null,
+      DateOfIncorporation: "2024-10-02T11:58:32.911Z",
       LegalStatusTypeID: null,
       PlaceOfIncorporation: null,
       CountryOfIncorporation: null,
@@ -4533,8 +4555,7 @@ export class ViewFirmPageComponent implements OnInit {
       ZebSiteAddress: null,
       LastModifiedDate: this.currentDate,
       lastModifiedBy: 30,
-      isAuditor: 0,
-
+      isAuditor: null,
       isCompanyRegulated: true,
       additionalDetails: null,
       isParentController: true,
@@ -4543,7 +4564,7 @@ export class ViewFirmPageComponent implements OnInit {
       controllerInfo: null,
       output: 0,
       firmId: this.firmId,
-      entityTypeID: 0,
+      entityTypeID: 1,
       entityID: this.firmId,
       controllerControlTypeID: null,
       numOfShares: 0,
@@ -4556,6 +4577,7 @@ export class ViewFirmPageComponent implements OnInit {
       MajorityStockHolder:false,
 
     }
+    console.log("Auditor to be saved",this.firmAuditorsObj)
     this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
       (response) => {
         console.log("Auditor saved successfully", response);
@@ -4570,24 +4592,73 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  saveCreateAuditor() {
+  onAuditorChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+  
+    if (value === 'other') {
+      this.selectedAuditor.OtherEntityID = 'other';
+      this.selectedAuditor.OtherEntityName = ''; // Clear the name when "other" is selected
+    } else {
+      const numericValue = Number(value); // Convert string value to a number
+      this.selectedAuditor.OtherEntityID = numericValue;
+      
+      const selectedAuditor = this.firmAuditorName.find(auditor => auditor.OtherEntityID === numericValue);
+      this.selectedAuditor.OtherEntityName = selectedAuditor ? selectedAuditor.OtherEntityName : '';
+    }
+  }
+  CreateAuditorValidateForm(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.errorMessages = {}; 
+      this.hasValidationErrors = false;
+  
+      if (!this.selectedAuditor.OtherEntityName || this.selectedAuditor.OtherEntityName.trim() === "") {
+        this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name); // Use constant for message
+      } else if (this.firmAuditorName.some(auditor => auditor.OtherEntityName.toLowerCase() === this.selectedAuditor.OtherEntityName.toLowerCase())) {
+        this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
+      }
+        if (!this.selectedAuditor.EntitySubTypeID || typeof this.selectedAuditor.EntitySubTypeID !== 'number') {
+        this.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
+      }
+  
+      if (Object.keys(this.errorMessages).length > 0) {
+        this.hasValidationErrors = true;
+        resolve(); // Resolve with errors
+      } else {
+        resolve(); // Resolve with no errors
+      }
+    });
+  }
+  async saveCreateAuditor() {
+    // Wait for validation to complete
+    await this.CreateAuditorValidateForm(); 
+  
+    // Check if there are validation errors
+    if (this.hasValidationErrors) {
+      Swal.fire('Error!', 'Please fix the validation errors before submitting.', 'error');
+      return; // Stop further execution if there are validation errors
+    }
+  
+    // If no validation errors, proceed to save the auditor
     this.firmAuditorsObj = {
-      otherEntityID: this.selectedAuditor.OtherEntityID,
-      createdBy: this.userId,
-      relatedEntityID: this.selectedAuditor.RelatedEntityID,
-      entitySubTypeID: this.selectedAuditor.EntitySubTypeID,
-      relatedEntityTypeID: 0,
-      relatedEntityEntityID: 0,
-      myState: 2,
-      otherEntityName: this.selectedAuditor.OtherEntityName,
-      dateOfIncorporation: "2024-10-02T11:58:32.911Z",
-      legalStatusTypeID: 0,
-      placeOfIncorporation: null,
-      countryOfIncorporation: 0,
-      registeredNumber: null,
-      zebSiteAddress: null,
+      OtherEntityID: this.selectedAuditor.OtherEntityID,
+      CreatedBy: this.userId,
+      RelatedEntityID: null,
+      EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
+      EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeID,
+      RelatedEntityEntityID: 4,
+      MyState: 2,
+      LastModifiedByOfOtherEntity: 30,
+      OtherEntityName: this.selectedAuditor.OtherEntityName,
+      DateOfIncorporation: "2024-10-02T11:58:32.911Z",
+      LegalStatusTypeID: null,
+      PlaceOfIncorporation: null,
+      CountryOfIncorporation: null,
+      RegisteredNumber: null,
+      ZebSiteAddress: null,
+      LastModifiedDate: this.currentDate,
       lastModifiedBy: this.userId,
-      isAuditor: 0,
+      relatedEntityTypeID:  3,
+      isAuditor: 2,
       isCompanyRegulated: true,
       additionalDetails: null,
       isParentController: true,
@@ -4596,19 +4667,23 @@ export class ViewFirmPageComponent implements OnInit {
       controllerInfo: null,
       output: 0,
       firmId: this.firmId,
-      entityTypeID: 0,
-      entityID: 0,
-      controllerControlTypeID: 0,
+      entityTypeID: 1,
+      entityID: this.firmId,
+      controllerControlTypeID: null,
       numOfShares: 0,
       pctOfShares: 0,
       majorityStockHolder: true,
-      assnDateFrom: "2024-10-02T11:58:32.911Z",
-      assnDateTo: "2024-10-02T11:58:32.911Z"
-    }
+      assnDateFrom: "2020-03-01",
+      assnDateTo: "2021-03-31"
+    };
+  
+    console.log("Auditor to be created", this.firmAuditorsObj);
+  
+    // Call the save function
     this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
       (response) => {
         console.log("Auditor saved successfully", response);
-        Swal.fire('Seaved!', 'Auditors details has been Seaved.', 'success');
+        Swal.fire('Saved!', 'Auditors details have been saved.', 'success');
         this.IsEditAuditorVisible = false;
         this.IsViewAuditorVisible = false;
         this.loadAuditors();
@@ -4619,7 +4694,91 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
+  
+  // CreateAuditorValidateForm(): Promise<void> {
+  //   return new Promise<void>((resolve, reject) => {
+  //     this.errorMessages = {}; 
+  //     this.hasValidationErrors = false;
+  
+  //     if (!this.selectedAuditor.OtherEntityName) {
+  //       this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name); // Use the constant for message
+  //     } else if (this.firmAuditorName.some(auditor => auditor.OtherEntityName === this.selectedAuditor.OtherEntityName)) {
+  //       this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
+  //     }
+  //     if (!this.selectedAuditor.EntitySubTypeID) {
+  //       this.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type); // Use the constant for message
+  //     }
+  //     if (Object.keys(this.errorMessages).length > 0) {
+  //       this.hasValidationErrors = true;
+  //       resolve(); 
+  //     } else {
+  //       resolve(); 
+  //     }
+  //   });
+  // }
+  // saveCreateAuditor() {
+  //   this.CreateAuditorValidateForm(); 
+  //   if (this.hasValidationErrors) {
+  //     Swal.fire('Error!', 'Please fix the validation errors before submitting.', 'error');
+  //     return; 
+  //   }
+  //   this.firmAuditorsObj = {
+  //     OtherEntityID: this.selectedAuditor.OtherEntityID, // Yazan ??
+  //     CreatedBy: this.userId,
+  //     RelatedEntityID: null,
+  //     EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
+  //     EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeID,
+  //     RelatedEntityEntityID: 4, // Yazan ??
+  //     MyState: 2,
+  //     LastModifiedByOfOtherEntity: 30,
+  //     OtherEntityName: this.selectedAuditor.OtherEntityName,
+  //     DateOfIncorporation: "2024-10-02T11:58:32.911Z",
+  //     LegalStatusTypeID: null,
+  //     PlaceOfIncorporation: null,
+  //     CountryOfIncorporation: null,
+  //     RegisteredNumber: null,
+  //     ZebSiteAddress: null,
+  //     LastModifiedDate: this.currentDate,
+  //     lastModifiedBy: this.userId,
+  //     relatedEntityTypeID:  3, // Yazan ??
+  //     isAuditor: 2,
+  //     isCompanyRegulated: true,
+  //     additionalDetails: null,
+  //     isParentController: true,
+  //     isPublicallyTraded: true,
+  //     areAnyUBOs: true,
+  //     controllerInfo: null,
+  //     output: 0,
+  //     firmId: this.firmId,
+  //     entityTypeID: 1, // Yazan ??
+  //     entityID: this.firmId,
+  //     controllerControlTypeID: null,
+  //     numOfShares: 0,
+  //     pctOfShares: 0,
+  //     majorityStockHolder: true,
+  //     assnDateFrom: "2020-03-01",
+  //     assnDateTo: "2021-03-31"
+      
+  //   }
+  //   console.log("Auditor to be created",this.firmAuditorsObj)
+  //   this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
+  //     (response) => {
+  //       console.log("Auditor saved successfully", response);
+  //       Swal.fire('Seaved!', 'Auditors details has been Seaved.', 'success');
+  //       this.IsEditAuditorVisible = false;
+  //       this.IsViewAuditorVisible = false;
+  //       this.loadAuditors();
+  //     },
+  //     (error) => {
+  //       console.error("Error saving auditor", error);
+  //       Swal.fire('Error!', 'Error Saving Auditor', 'error');
+  //     }
+  //   );
+  // }
   // Method to cancel the edit action and switch back to view mode
+  onInactiveAuditorsToggle(event: any): void {
+    this.displayInactiveAuditors = event.target.checked;
+  }
   cancelEdit() {
     this.IsEditAuditorVisible = false;
     this.IsViewAuditorVisible = true;

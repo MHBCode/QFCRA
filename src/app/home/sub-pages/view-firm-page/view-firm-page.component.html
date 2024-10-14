@@ -2398,9 +2398,9 @@
 
             </div>
           </div>
-          <span class="inactive-auditors">
-            <input id="InactiveAuditors" type="checkbox" />
-            <label>Display Inactive Auditors</label>
+          <span class="enhanced-checkbox">
+            <input id="InactiveContacts" type="checkbox" (change)="onInactiveAuditorsToggle($event)" />
+            <label for="InactiveContacts">Display Inactive Auditors</label>
           </span>
           <table>
             <thead>
@@ -2439,6 +2439,7 @@
       <!-- Popup for viewing/editing auditor -->
       <div *ngIf="IsViewAuditorVisible || IsEditAuditorVisible" class="contollerPopupOverlay">
         <div class="contollerPopupContent">
+          
           <div class="popup-title-btn-row">
             <div class="popup-header">
               <h3>{{ IsEditAuditorVisible ? 'Edit Auditor Details' : 'Auditor Details'}}</h3>
@@ -2459,7 +2460,7 @@
                 <label for="auditorName">Auditor
                   Name</label>
                 <ng-container *ngIf="IsEditAuditorVisible; else viewAuditorName">
-                  <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID">
+                  <select disabled name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID">
                     <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}
                     </option>
                   </select>
@@ -2502,6 +2503,12 @@
       <!-- create Auditor popup -->
       <div class="contollerPopupOverlay" *ngIf="IsCreateAuditorVisible">
         <div class="contollerPopupContent">
+          <div class="error-messages" style="color: red">
+               <!-- Auditor Name Error -->
+             <p *ngIf="errorMessages['OtherEntityName']">{{ errorMessages['OtherEntityName'] }}</p>
+              <!-- Auditor Type Error -->
+             <p *ngIf="errorMessages['EntitySubTypeID']">{{ errorMessages['EntitySubTypeID'] }}</p>
+          </div>
           <div class="view-auditor-actions">
             <h2 class="view-auditor-header">Auditor Details</h2>
 
@@ -2517,16 +2524,16 @@
                 <label for="auditorName">
                   Auditor Name <span style="color: red">*</span>
                 </label>
-                <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID">
-                  <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}
-                  </option>
+                <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID" (change)="onAuditorChange($event)">
+                  <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}</option>
+                  <option [value]="'other'">Other</option>
                 </select>
               </div>
-              <div class="input-field" *ngIf="selectedAuditorNameFromSelectBox === 'other'">
-                <label for="auditorName">
-                  Auditor Name <span style="color: red">*</span>
+              <div class="input-field" *ngIf="selectedAuditor.OtherEntityID === 'other'">
+                <label for="customAuditorName">
+                  Custom Auditor Name <span style="color: red">*</span>
                 </label>
-                <input type="text" />
+                <input type="text" [(ngModel)]="selectedAuditor.OtherEntityName" placeholder="Enter Auditor Name" />
               </div>
               <div class="input-field">
                 <label for="auditorType">
