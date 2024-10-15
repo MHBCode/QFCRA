@@ -2171,25 +2171,29 @@
                 </select>
               </div>
               <!---->
+              <!-- Display the % of Holding field only if the control type is "Percentage" -->
+
               <div class="input-field">
                 <label for="controlType">
                   Type of Control <span style="color: red;">*</span>
                 </label>
-                <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeDesc" name="typeOfControl">
-                  <option *ngFor="let controlType of controlTypeOptionsCreate"
-                    [value]="controlType.ControllerControlTypeID">
-                    {{ controlType.ControllerControlTypeDesc }}
-                  </option>
+                <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeDesc" name="typeOfControl"
+                (ngModelChange)="CreateControlTypeDesc($event)" name="typeOfControl"  >
+                <option value="1">Percentage</option>
+                <option value="2">Exercise Control</option>
                 </select>
               </div>
               <!---->
-              <div class="input-field" [ngStyle]="{'visibility': showHoldingsPercentage ? 'visible' : 'hidden'}">
-                <label for="holdingsPercentage">
-                  % of Holding
-                </label>
-                <input [(ngModel)]="CreatecontrollerDetails.HoldingsPercentage" name="holdingsPercentage"
-                  id="holdingsPercentage" type="text">
-              </div>
+              <ng-container *ngIf="CreatecontrollerDetails.ControllerControlTypeID == 1">
+                <div class="input-field">
+                  <label for="holdingsPercentage">
+                    % of Holding
+                  </label>
+                  <input [(ngModel)]="CreatecontrollerDetails.PctOfShares" name="holdingsPercentage"
+                    id="holdingsPercentage" type="text" >
+                </div>
+              </ng-container>
+              
               <!---->
               <div class="input-field">
                 <label for="effectiveDate">

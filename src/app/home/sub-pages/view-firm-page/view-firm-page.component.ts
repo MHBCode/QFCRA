@@ -2775,7 +2775,19 @@ export class ViewFirmPageComponent implements OnInit {
         break;
     }
   }
-
+  CreateControlTypeDesc(selectedValue: any) {
+    switch (selectedValue) {
+      case '1':
+        this.CreatecontrollerDetails.ControllerControlTypeDesc = 'Percentage';
+        break;
+      case '2':
+        this.CreatecontrollerDetails.ControllerControlTypeDesc = 'Exercise Control';
+        break;
+      default:
+        this.CreatecontrollerDetails.ControllerControlTypeDesc = '';
+        break;
+    }
+  }
   createControllerPopupChanges(): void {
     console.log("CreatecontrollerDetails", this.CreatecontrollerDetails)
     this.CreateControllerValidateForm().then(() => {
