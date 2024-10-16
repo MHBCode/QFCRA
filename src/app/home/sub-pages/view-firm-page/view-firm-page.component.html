@@ -15,29 +15,29 @@
 
       <div class="menu-item">
         <h3 *ngIf="menuWidth.match(width1)" id="1-item" (click)="toggleMenu(1)" [ngClass]="{ active: menuId === 1 }"
-          (click)="switchTab(FrimsObject.Firm)">
+          (click)="switchTab(Page.Firm)">
           FIRM Details
         </h3>
         <i *ngIf="menuWidth.match(width2)" class="menu-icons bi bi-info-square"></i>
         <div class="sub-menu" *ngIf="menuId === 1 && menuWidth.match(width1)">
-          <a (click)="switchTab(FrimsObject.CoreDetail)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.CoreDetail }">
+          <a (click)="switchTab(Page.CoreDetail)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.CoreDetail }">
             Core Details
           </a>
-          <a (click)="switchTab(FrimsObject.Scope)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.Scope }">
+          <a (click)="switchTab(Page.Scope)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.Scope }">
             Scope
           </a>
-          <a (click)="switchTab(FrimsObject.Controller)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.Controller }">
+          <a (click)="switchTab(Page.Controller)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.Controller }">
             Controllers
           </a>
-          <a (click)="switchTab(FrimsObject.Auditor)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.Auditor }">
+          <a (click)="switchTab(Page.Auditor)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.Auditor }">
             Auditors
           </a>
-          <a (click)="switchTab(FrimsObject.Contatcs)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.Contatcs }">
+          <a (click)="switchTab(Page.Contatcs)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.Contatcs }">
             Contacts
           </a>
         </div>
@@ -50,8 +50,8 @@
         </h3>
         <i *ngIf="menuWidth.match(width2)" class="menu-icons bi bi-people"></i>
         <div class="sub-menu" *ngIf="menuId === 2 && menuWidth.match(width1)">
-          <a (click)="switchTab(FrimsObject.Individual)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.Individual }">
+          <a (click)="switchTab(Page.Individual)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.Individual }">
             Individual Details
           </a>
         </div>
@@ -63,44 +63,44 @@
         </h3>
         <i *ngIf="menuWidth.match(width2)" class="menu-icons bi bi-kanban"></i>
         <div class="sub-menu" *ngIf="menuId === 3 && menuWidth.match(width1)">
-          <a (click)="switchTab(FrimsObject.ReportingSchedule)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.ReportingSchedule }">
+          <a (click)="switchTab(Page.ReportingSchedule)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.ReportingSchedule }">
             Reporting Schedule
           </a>
-          <a (click)="switchTab(FrimsObject.ReturnsReview)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.ReturnsReview }">
+          <a (click)="switchTab(Page.ReturnsReview)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.ReturnsReview }">
             Return Review
           </a>
-          <a (click)="switchTab(FrimsObject.Notices)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.Notices }">
+          <a (click)="switchTab(Page.Notices)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.Notices }">
             Notices
           </a>
-          <a (click)="switchTab(FrimsObject.LateAdminFee)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.LateAdminFee }">
+          <a (click)="switchTab(Page.LateAdminFee)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.LateAdminFee }">
             Admin Fee
           </a>
-          <a (click)="switchTab(FrimsObject.RMP)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.RMP }">
+          <a (click)="switchTab(Page.RMP)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.RMP }">
             RMPs
           </a>
-          <a (click)="switchTab(FrimsObject.Breach)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.Breach }">
+          <a (click)="switchTab(Page.Breach)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.Breach }">
             Breaches
           </a>
-          <a (click)="switchTab(FrimsObject.Waiver)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.Waiver }">
+          <a (click)="switchTab(Page.Waiver)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.Waiver }">
             Waivers
           </a>
-          <a (click)="switchTab(FrimsObject.Enforcement)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.Enforcement }">
+          <a (click)="switchTab(Page.Enforcement)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.Enforcement }">
             Enf. Actions
           </a>
-          <a (click)="switchTab(FrimsObject.RegisteredFunds)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.RegisteredFunds }">
+          <a (click)="switchTab(Page.RegisteredFunds)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.RegisteredFunds }">
             Reg. Funds
           </a>
-          <a (click)="switchTab(FrimsObject.SupervisionJournal)" class="menu-sub-item"
-            [ngClass]="{ active: activeTab === FrimsObject.SupervisionJournal }">
+          <a (click)="switchTab(Page.SupervisionJournal)" class="menu-sub-item"
+            [ngClass]="{ active: activeTab === Page.SupervisionJournal }">
             Journal
           </a>
         </div>
@@ -109,7 +109,7 @@
 
   <!-- Firm Section -->
   <section #firmSection class="form-section"
-    [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Firm ? 'flex' : 'none' }">
+    [ngStyle]="{ width: dataWidth, display: activeTab === Page.Firm ? 'flex' : 'none' }">
     <div class="inputs-field-set">
       <div class="form-section-title">
         <h2 class="edit-firm-header">
@@ -264,7 +264,7 @@
 
     <!--Core Details-->
     <section #coreDetailSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.CoreDetail ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.CoreDetail ? 'flex' : 'none' }">
       <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['firmDetailsSection'] }">
         <!--Error messages for firm details-->
         <div class="error-messages" style="color: red">
@@ -853,7 +853,7 @@
 
     <!--Scope Section-->
     <section #scopeSection class="form-section edit-scope-section "
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Scope ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.Scope ? 'flex' : 'none' }">
       <!--scope tabs-->
       <div class="scope-container">
         <div class="menu-container tab-container">
@@ -1223,8 +1223,7 @@
               <div class="input-field"
                 *ngIf="(ActivityAuth[0].ScopeRevNum !== null || ActivityAuth[0].ScopeRevNum !== '') && ActivityAuth[0].ScopeRevNum > 1">
                 <label for="effectiveDate"> Effective Date </label>
-                <input [disabled]="!isEditModeAuth" name="effectiveDate" id="effectiveDate" type="text" #dateInputs
-                  value="{{ ActivityAuth[0]?.ScopeEffectiveDate }}" />
+                <input [(ngModel)]="ActivityAuth[0].ScopeEffectiveDate" [disabled]="!isEditModeAuth" name="effectiveDate" id="effectiveDate" type="text" #dateInputs/>
               </div>
               <div class="input-field">
                 <label for=""> Created By </label>
@@ -1708,7 +1707,7 @@
 
     <!--Controllers-->
     <section #controllerSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Controller ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.Controller ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <div class="form-section-title">
@@ -2411,7 +2410,7 @@
 
     <!--Auditors-->
     <section #auditorSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Auditor ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.Auditor ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <div class="auditor-header">
@@ -2598,7 +2597,7 @@
 
     <!-- contact section -->
     <section #contactsSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Contatcs ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.Contatcs ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <div class="contacts-header">
@@ -2782,7 +2781,7 @@
 
     <!--Individuals Details-->
     <section #individualSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Individual ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.Individual ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <h2>Applied For</h2>
@@ -2884,12 +2883,12 @@
     <!--Section Supervision-->
     <!--add here the section-->
     <section #supervisionSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Supervision ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.Supervision ? 'flex' : 'none' }">
 
     </section>
     <!--Supervision Reporting Schedule-->
     <section #reportingScheduleSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.ReportingSchedule ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.ReportingSchedule ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <h2>Reporting Schedule For</h2>
@@ -2922,7 +2921,7 @@
 
     <!--Supervision Review-->
     <section #returnReviewSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.ReturnsReview ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.ReturnsReview ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <div class="return-review-header">
@@ -2970,7 +2969,7 @@
 
     <!--Supervision Notices-->
     <section #noticesSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Notices ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.Notices ? 'flex' : 'none' }">
       <div class="inputs-field-set" style="overflow-x: scroll">
         <div class="section">
           <h2>Notices And Responses -</h2>
@@ -3022,7 +3021,7 @@
 
     <!--Supervision Admin Fee-->
     <section #adminFeeSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.LateAdminFee ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.LateAdminFee ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <h2>Admin Fees For</h2>
@@ -3062,7 +3061,7 @@
 
     <!--Supervision RMPs-->
     <section #rmpsSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.RMP ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.RMP ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <h2>RMPs For</h2>
@@ -3106,7 +3105,7 @@
 
     <!--Supervision Breaches-->
     <section #breachesSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Breach ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.Breach ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <h2>Breaches For</h2>
@@ -3152,7 +3151,7 @@
 
     <!--Supervision Waivers-->
     <section #waiversSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Waiver ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.Waiver ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <h2>Waiver And/Or Modification For</h2>
@@ -3198,7 +3197,7 @@
 
     <!--Supervision ENF Actions-->
     <section #enfActionSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.Enforcement ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.Enforcement ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <div class="ENFAction-header">
@@ -3242,7 +3241,7 @@
 
     <!--Supervision Reg. Funds-->
     <section #regFundsSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.RegisteredFunds ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.RegisteredFunds ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <h2>List Of Registered Funds For</h2>
@@ -3275,7 +3274,7 @@
 
     <!--Supervision Journal-->
     <section #journalSection class="form-section"
-      [ngStyle]="{ width: dataWidth, display: activeTab === FrimsObject.SupervisionJournal ? 'flex' : 'none' }">
+      [ngStyle]="{ width: dataWidth, display: activeTab === Page.SupervisionJournal ? 'flex' : 'none' }">
       <div class="inputs-field-set">
         <div class="section">
           <div class="Journal-header">

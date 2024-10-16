@@ -238,7 +238,7 @@ export class ViewFirmPageComponent implements OnInit {
   more10UBOs: boolean | null = null;
   /* */
   objectOpType = constants.ObjectOpType.View;
-  FrimsObject = FrimsObject;
+  Page = FrimsObject;
 
   //Contact Popup 
   isPopupVisible: boolean = false;
@@ -264,7 +264,9 @@ export class ViewFirmPageComponent implements OnInit {
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer
-  ) { }
+  ) { 
+    console.log('FrimsObject: ', this.Page);
+     }
 
   ngOnInit(): void {
     console.log('ngOnInit called');
@@ -394,7 +396,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.hideCreateBtn = false;
         this.hideDeleteBtn = false;
         this.hideReviseBtn = false;
-        this.applySecurityOnPage(FrimsObject.CoreDetail, this.isEditModeCore);
+        this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
         this.loadPrevFirmAndDate();
         this.loadCurrentAppDetails();
         this.loadFirmAdresses();
@@ -410,26 +412,26 @@ export class ViewFirmPageComponent implements OnInit {
           this.disableApplicationDate = true;
           this.loadActivitiesLicensed()
             .then(() => {
-              this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+              this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
             })
             .catch((error) => {
               console.error('Error loading activities:', error);
             })
             .finally(() => {
-              this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+              this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
             });
         } else if (section === 'Authorized') {
           this.tabIndex = 1;
           this.disableApplicationDate = true;
           this.loadActivitiesAuthorized()
             .then(() => {
-              this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+              this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
             })
             .catch((error) => {
               console.error('Error loading activities:', error);
             })
             .finally(() => {
-              this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+              this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
             });
         }
         break;
@@ -548,7 +550,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   // This one is used for Core Details and Scope Licensed/Authorized
   applySecurityOnPage(objectId: FrimsObject, isEditMode: boolean) {
-    if (this.activeTab === FrimsObject.Scope) {
+    if (this.activeTab === this.Page.Scope) {
       this.maskCommandActionsControlsScope();
     }
     this.loading = true;
@@ -711,7 +713,7 @@ export class ViewFirmPageComponent implements OnInit {
     if (!this.isEditModeCore) {
       this.objectOpType = constants.ObjectOpType.Edit; //Not used
       this.isEditModeCore = true;
-      this.applySecurityOnPage(FrimsObject.CoreDetail, this.isEditModeCore);
+      this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
       this.isLoading = false;
       return;
     }
@@ -765,7 +767,7 @@ export class ViewFirmPageComponent implements OnInit {
 
       // Toggle off edit mode after saving
       this.isEditModeCore = false;
-      this.applySecurityOnPage(FrimsObject.CoreDetail, this.isEditModeCore);
+      this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
       this.isLoading = false;
     } catch (error) {
       if (error.message !== 'Cancelled by user') {
@@ -1106,10 +1108,10 @@ export class ViewFirmPageComponent implements OnInit {
           addressState: addressState, // New address state is 2, existing modified or unchanged is 6, 4 is delete
           fromDate: address.FromDate || null,
           toDate: address.ToDate || null,
-          objectID: address.ObjectID || FrimsObject.CoreDetail,
+          objectID: address.ObjectID || this.Page.CoreDetail,
           objectInstanceID: address.ObjectInstanceID || this.firmId,
           objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
-          sourceObjectID: address.SourceObjectID || FrimsObject.CoreDetail,
+          sourceObjectID: address.SourceObjectID || this.Page.CoreDetail,
           sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
           sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
           objAis: null,
@@ -1125,7 +1127,7 @@ export class ViewFirmPageComponent implements OnInit {
     // Save Firm Details using the editFirm service
     this.saveFirmDetails(firmObj, this.userId);
     this.isEditModeCore = false;
-    this.applySecurityOnPage(FrimsObject.CoreDetail, this.isEditModeCore);
+    this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
   }
 
   // Function to save firm details
@@ -1168,7 +1170,7 @@ export class ViewFirmPageComponent implements OnInit {
       if (result.isConfirmed) {
         this.objectOpType = constants.ObjectOpType.View; // Not used
         this.isEditModeCore = false;
-        this.applySecurityOnPage(FrimsObject.CoreDetail, this.isEditModeCore);
+        this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
         this.errorMessages = {};
         this.selectedFile = null;
         this.resetCollapsibleSections();
@@ -1235,26 +1237,26 @@ export class ViewFirmPageComponent implements OnInit {
       this.disableApplicationDate = true;
       this.loadActivitiesLicensed()
         .then(() => {
-          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+          this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
         })
         .catch((error) => {
           console.error('Error loading activities:', error);
         })
         .finally(() => {
-          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+          this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
         });
     } else if (section === 'Authorized') {
       this.tabIndex = 1;
       this.isEditModeAuth = false;
       this.loadActivitiesAuthorized()
         .then(() => {
-          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+          this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
         })
         .catch((error) => {
           console.error('Error loading auth activities:', error);
         })
         .finally(() => {
-          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+          this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
         });
     }
   }
@@ -1283,7 +1285,7 @@ export class ViewFirmPageComponent implements OnInit {
       if (!this.isEditModeLicense) {
         this.isEditModeLicense = true;
         //this.objectOpType = constants.ObjectOpType.Edit;
-        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+        this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
         return; // Exit the function to prevent running validations
       }
     }
@@ -1414,7 +1416,7 @@ export class ViewFirmPageComponent implements OnInit {
         console.log('License scope updated successfully:', response);
         this.loadActivitiesLicensed(); // Reload license scope details
         this.isEditModeLicense = false; // Toggle edit mode off
-        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+        this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
         this.disableApplicationDate = true;
         this.isLoading = false;
       },
@@ -1522,7 +1524,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadActivitiesLicensed();
       this.isEditModeLicense = false;
       this.disableApplicationDate = true;
-      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+      this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
       this.loadLicScopeRevisions(this.firmId, 2);
       this.showFirmScopeLicSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
     }, error => {
@@ -1543,7 +1545,7 @@ export class ViewFirmPageComponent implements OnInit {
       if (result.isConfirmed) {
         this.isEditModeLicense = false;
         this.disableApplicationDate = true;
-        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+        this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
         this.errorMessages = {};
         this.loadActivitiesLicensed();
       }
@@ -1557,7 +1559,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.applyVaryScopeButtonVisibilityOnEdit();
       if (!this.isEditModeAuth) {
         this.isEditModeAuth = true;  // Set the form to edit mode
-        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+        this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
         this.loadActivityCategories();
         // Loop through each activity and load its activities based on FirmScopeTypeID
         this.ActivityAuth.forEach(activity => {
@@ -1619,7 +1621,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.loadActivitiesAuthorized(); // Reload authorize scope details
         this.isEditModeAuth = false; // Toggle edit mode off
         this.disableApplicationDate = true;
-        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+        this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
 
         // Show success alert after data is successfully saved
         this.showFirmScopeAuthSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
@@ -1918,8 +1920,8 @@ export class ViewFirmPageComponent implements OnInit {
       this.isEditModeAuth = false;
       this.disableApplicationDate = true;
       this.loadActivitiesAuthorized();
-      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
-      this.loadAuthScopeRevisions(this.firmId, 2);
+      this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
+      this.loadAuthScopeRevisions(this.firmId, 3);
       this.showFirmScopeAuthSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
     }, error => {
       console.log('Vary Scope Failed', error);
@@ -1945,7 +1947,7 @@ export class ViewFirmPageComponent implements OnInit {
       },
       lstFirmActivities: this.existingProducts.map(activityAuth => ({
         createdBy: userId, //recheck
-        firmScopeTypeID: 0,
+        firmScopeTypeID: parseInt(activityAuth.FirmScopeTypeID),
         activityTypeID: parseInt(activityAuth.ActivityTypeID),
         effectiveDate: null,
         firmActivityConditions: null,
@@ -1967,7 +1969,7 @@ export class ViewFirmPageComponent implements OnInit {
         activityDetails: null
       })),
       objPrudentialCategory: {
-        firmPrudentialCategoryID: null,
+        firmPrudentialCategoryID: this.PrudentialCategoryIDChanged ? null : this.prudentialCategoryDetails[0].FirmPrudentialCategoryID,
         firmId: this.firmId,
         prudentialCategoryTypeID: this.ActivityAuth[0].PrudentialCategoryTypeID,
         firmScopeID: this.ActivityAuth[0].FirmScopeID,
@@ -2062,7 +2064,7 @@ export class ViewFirmPageComponent implements OnInit {
       if (result.isConfirmed) {
         this.isEditModeAuth = false;
         this.disableApplicationDate = true;
-        this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+        this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
         this.errorMessages = {};
         this.loadActivitiesAuthorized();
         this.loadSectorDetails();
