@@ -40,7 +40,7 @@
     <!-- <button (click)="navigateToNewfirm()" class="addnew-button button-style">
       <i class="bi bi-plus"></i> Add New Firm
     </button> -->
-    <button (click)="navigateToNewfirm()" class="addnew-button button-style">
+    <button *ngIf="getControlVisibility('imgBtnSave')" (click)="navigateToNewfirm()" class="addnew-button button-style">
       <i class="bi bi-plus"></i>
       <span class="button-text">Add New Firm</span>
     </button>
@@ -65,7 +65,7 @@
             <div class="select-wrapper">
               <select name="firmName" id="firmName" [(ngModel)]="firmName">
                 <option value="all">All</option>
-                <option *ngFor="let firm of allfirms" [value]="firm.FirmName">
+                <option *ngFor="let firm of sortedFirms" [value]="firm.FirmName">
                   {{ firm.FirmName }}
                 </option>
               </select>

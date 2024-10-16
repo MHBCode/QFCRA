@@ -30,6 +30,11 @@ export class FirmService {
     return this.http.get<any>(url);
   }
 
+  isFirmAuthorised(firmId: number): Observable<any> {
+    const url = `${this.baseUrl}is_firm_authorised?firmId=${firmId}`
+    return this.http.get<any>(url);
+  }
+
   getFIRMOPData(firmId: number): Observable<any> {
     const url = `${this.baseUrl}get_operational_data?firmID=${firmId}`;  // Construct full URL
     return this.http.get<any>(url);

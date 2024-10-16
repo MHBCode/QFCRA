@@ -172,6 +172,8 @@ import { Component, Input, OnInit, Renderer2 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirmService } from 'src/app/ngServices/firm.service';
 import * as constants from 'src/app/app-constants';
+import { SecurityService } from 'src/app/ngServices/security.service';
+import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 
 @Component({
   selector: 'app-firms-page',
@@ -179,6 +181,7 @@ import * as constants from 'src/app/app-constants';
   styleUrls: ['./firms-page.component.scss'],
 })
 export class FirmsPageComponent implements OnInit {
+  userId = 30;
   @Input() listCount: number = 50;
   firms: any[] = [];
   licenseStatuses: string[] = [];
@@ -188,6 +191,7 @@ export class FirmsPageComponent implements OnInit {
   legalStatuses: string[] = [];
   filteredFirms: any[] = [];
   filteredFirmsdata: any = [];
+  controlsPermissions: any = [];
   showPopup: boolean = false;
   isSortDropdownOpen: boolean = false;
   selectedSortOption: string = 'newFirms'; // Default sort option
@@ -196,7 +200,8 @@ export class FirmsPageComponent implements OnInit {
   allQFCLicenseStatus: any = [];
   allSupervisionCaseOfficer: any = [];
   isLoading: boolean = true;
-  allfirms :any = [] ;
+  allfirms :any = [];
+  sortedFirms: any = [];
   // Form search fields with defaults
   firmName: string = 'all';
   qfcNumber: string = '';
@@ -276,9 +281,10 @@ export class FirmsPageComponent implements OnInit {
   
   alphabet: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('');
 
-  constructor(private router: Router, private firmService: FirmService,private renderer: Renderer2) { }
+  constructor(private router: Router, private firmService: FirmService,private renderer: Renderer2,private securityService: SecurityService) { }
 
   ngOnInit(): void {
+    this.applySecurityOnPage(FrimsObject.CoreDetail);
     this.loadFirms();
     this.LoadAllFirms();
     this.populateQFCLicenseStatus();
@@ -408,8 +414,8 @@ getauthorisationStatus(): void {
   LoadAllFirms(): void {
     this.firmService.getAllFirms().subscribe(
       (data) => {
-        this.allfirms = data.response ;
-
+        this.allfirms = data.response;
+        this.sortedFirms = this.allfirms.sort((a, b) => a.FirmName.localeCompare(b.FirmName));
       },
       (error) => {
         console.error('Error fetching firms:', error);
@@ -431,7 +437,7 @@ getauthorisationStatus(): void {
       CSVauthorisationCategory: this.getAuthorisationCategoriesCSV(),
       CSVPrudentialCategory:this.getPrudentialCategoriesCSV() , 
       CSVSectorTypes:this.getSectorsCSV(), 
-      LoginUserID: 30, 
+      LoginUserID: this.userId, 
       CSVFirmTypes: this.getFirmTypesCSV(),
       CSVFirmStatus: this.getFirmStatusCSV(),
       CSVSupCategories:this.getSupCategoriesCSV(), 
@@ -539,8 +545,7 @@ getauthorisationStatus(): void {
           case 'active': return '4';
           case 'inactive': return '5';
           case 'withdrawn': return '6';
-          default: return "";
-          
+          default: return "";        
         }
       })
       .join(',');
@@ -762,6 +767,33 @@ getAuthorisationCategoriesCSV(): string {
           return 0; // No sorting
       }
     };
+  }
+
+  /* Security */
+
+  applySecurityOnPage(objectId: FrimsObject) {
+    const currentOpType = ObjectOpType.Create;
+    this.applyAppSecurity(this.userId,objectId,currentOpType);
+  }
+
+  applyAppSecurity(userId: number, objectId: number, OpType: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.securityService.getAppRoleAccess(userId, objectId, OpType).subscribe(
+        (response) => {
+          this.controlsPermissions = response.response;
+          resolve(); // Resolve the promise after fetching data
+        },
+        (error) => {
+          console.error('Error fetching app role access: ', error);
+          reject(error); // Reject the promise if there's an error
+        }
+      );
+    });
+  }
+
+  getControlVisibility(controlName: string): boolean {
+    const control = this.controlsPermissions.find(c => c.ControlName === controlName);
+    return control ? control.ShowProperty === 1 : false;
   }
 
   ngOnDestroy(): void {
