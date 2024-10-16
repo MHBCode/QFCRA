@@ -551,8 +551,9 @@
 .ScopeLicPreviousVersionsPopup,
 .ScopeAuthPreviousVersionsPopup {
   position: fixed;
-  top: 15vh;
-  left: 8vw;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 78vw;
   max-height: 70vh;
   overflow-y: auto;
@@ -715,12 +716,9 @@
 .ScopeLicPreviousVersionsPopup,
 .ScopeAuthPreviousVersionsPopup {
   padding: 0 !important;
-  height: 15vh !important;
-  left: 30vw !important;
   width: 40vw !important;
   overflow-y: auto;
   overflow-x: visible;
-  top: 35vh;
 }
 
 /* View Previous Versions Popup Style */
@@ -914,6 +912,10 @@ table .input-field {
   background-color: transparent;
 }
 
+.regulated-activity-table th {
+  border-radius: 0;
+}
+
 .regulated-activity-table thead tr td {
   text-align: center;
 }
@@ -923,10 +925,15 @@ table .input-field {
   cursor: default;
 }
 
+.nested-table {
+  border-radius: 0;
+}
+
 .nested-table tr td,
 .nested-table tr th {
   text-align: left !important;
   cursor: default;
+  border-radius: 0;
 }
 
 .nested-table td {
@@ -1308,9 +1315,6 @@ hr {
 }
 
 /* scope of authorization table */
-.scope-of-auth {
-  border-radius: 0;
-}
 
 .scope-of-auth>thead>tr {
   background-color: #f2b6c0;
@@ -1798,3 +1802,17 @@ hr {
 .ApplicationDetailsPopUp .popup-info-place table thead th:last-child {
   border-top-right-radius: 0;
 }
+
+.ApplicationDetailsPopUp table {
+  border-top-left-radius: initial;
+  border-top-right-radius: initial;
+}
+
+.app-details-tables table {
+  border-radius: 0;
+}
+
+.controller-tables td, .auditor-table td, .contacts-table{
+  cursor: pointer;
+}
+

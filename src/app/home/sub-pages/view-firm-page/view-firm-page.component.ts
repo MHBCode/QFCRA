@@ -26,7 +26,8 @@ export class ViewFirmPageComponent implements OnInit {
   IsEditAuditorVisible: boolean = false;
   canAddNewAddress: boolean = true;
   disableAddressFields: boolean = false;
-  isLicensed: boolean;
+  isFirmLicensed: boolean;
+  isFirmAuthorised: boolean;
   selectedAuditor: any = null;
   categorizedData = [];
   selectedAuditorNameFromSelectBox: string = 'select';
@@ -97,7 +98,6 @@ export class ViewFirmPageComponent implements OnInit {
   appDetails: any = [];
   applicationTypeId: number;
   selectedFirmTypeID: number;
-  originalFirmAddresses: any = [];
   firmAddressesTypeHistory: any = [];
   ActivityLicensed: any = [{}];
   ActivityAuth: any = [{}];
@@ -143,7 +143,7 @@ export class ViewFirmPageComponent implements OnInit {
   disableApplicationDate: boolean = true;
   showVaryBtn: boolean = true;
   resetFirmSector: boolean = false;
-  SectoryTypeIDChanged: boolean = false;
+  SectorTypeIDChanged: boolean = false;
   PrudentialCategoryIDChanged: boolean = false;
   // resetSectorTypeID: boolean = false;
   scopeRevNum: number;
@@ -276,6 +276,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadFirmOPDetails(this.firmId); // Fetch Operational Data
       this.loadAssiRA();
       this.checkFirmLicense();
+      this.checkFirmAuthorisation();
       this.userAllowedToAccessFirm();
 
       this.populateCountries();
@@ -374,7 +375,7 @@ export class ViewFirmPageComponent implements OnInit {
   switchTab(objectId: FrimsObject) {
     console.log('switchTab called with:', objectId);
     this.activeTab = objectId;
-    
+
     // Hide all sections
     this.hideAllSections();
 
@@ -387,6 +388,10 @@ export class ViewFirmPageComponent implements OnInit {
     switch (objectId) {
       case FrimsObject.CoreDetail:
         this.showSection(this.coreDetailSection);
+        this.hideEditBtn = false;
+        this.hideCreateBtn = false;
+        this.hideDeleteBtn = false;
+        this.hideReviseBtn = false;
         this.applySecurityOnPage(FrimsObject.CoreDetail, this.isEditModeCore);
         this.loadPrevFirmAndDate();
         this.loadCurrentAppDetails();
@@ -401,13 +406,29 @@ export class ViewFirmPageComponent implements OnInit {
         if (section === 'Licensed') {
           this.tabIndex = 0;
           this.disableApplicationDate = true;
-          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
-          this.loadActivitiesLicensed();
+          this.loadActivitiesLicensed()
+            .then(() => {
+              this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+            })
+            .catch((error) => {
+              console.error('Error loading activities:', error);
+            })
+            .finally(() => {
+              this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+            });
         } else if (section === 'Authorized') {
           this.tabIndex = 1;
           this.disableApplicationDate = true;
-          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
-          this.loadActivitiesAuthorized();
+          this.loadActivitiesAuthorized()
+            .then(() => {
+              this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+            })
+            .catch((error) => {
+              console.error('Error loading activities:', error);
+            })
+            .finally(() => {
+              this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+            });
         }
         break;
       case FrimsObject.Auditor:
@@ -525,6 +546,9 @@ export class ViewFirmPageComponent implements OnInit {
 
   // This one is used for Core Details and Scope Licensed/Authorized
   applySecurityOnPage(objectId: FrimsObject, isEditMode: boolean) {
+    if (this.activeTab === FrimsObject.Scope) {
+      this.maskCommandActionsControlsScope();
+    }
     this.loading = true;
     const currentOpType = isEditMode ? ObjectOpType.Edit : ObjectOpType.View;
 
@@ -562,11 +586,51 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
+  maskCommandActionsControlsScope() {
+    this.hideCreateBtn = false;
+    this.hideEditBtn = false;
+    this.hideDeleteBtn = false;
+    this.hideReviseBtn = false;
+    if (this.tabIndex === 0) { //Licensed
+      if (!(this.isNullOrEmpty(this.ActivityLicensed[0].FirmScopeID)) && this.ActivityLicensed[0].FirmScopeID) {
+        this.hideCreateBtn = true;
+      }
+      if (this.firmDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Application) {
+        this.hideReviseBtn = true;
+      }
+      if (!(this.isFirmLicensed)) {
+        this.hideCreateBtn = true;
+        this.hideEditBtn = true;
+        this.hideDeleteBtn = true;
+        this.hideReviseBtn = true;
+      }
+    }
+
+    if (this.tabIndex === 1) { //Authorised
+      if (!(this.isNullOrEmpty(this.ActivityAuth[0]?.FirmScopeID) && this.ActivityAuth[0].FirmScopeID)) {
+        this.hideCreateBtn = true;
+      }
+      if (this.firmDetails.AuthorisationStatusTypeID === constants.FirmAuthorizationApplStatusType.Application) {
+        this.hideReviseBtn = true;
+      }
+      if (!(this.isFirmAuthorised)) {
+        this.hideCreateBtn = true;
+        this.hideEditBtn = true;
+        this.hideDeleteBtn = true;
+        this.hideReviseBtn = true;
+      }
+    }
+    if (!this.hideCreateBtn) {
+      this.hideEditBtn = true;
+      this.hideDeleteBtn = true;
+      this.hideReviseBtn = true;
+    }
+  }
+
 
   isValidFirmSupervisor(firmId: number, userId: number): void {
     this.securityService.isValidFirmSupervisor(firmId, userId).subscribe((response) => {
       this.isFirmSupervisor = response.response;
-      // this.applySecurityOnPage(objectId, isEditMode); // Call the function to apply security checks after receiving the result
     });
   }
 
@@ -580,7 +644,6 @@ export class ViewFirmPageComponent implements OnInit {
   isValidFirmAMLSupervisor(firmId: number, userId: number): void {
     this.securityService.isValidFirmAMLSupervisor(firmId, userId).subscribe((response) => {
       this.isFirmAMLSupervisor = response.response;
-      //this.applySecurityOnPage(objectId, isEditMode); // Call the function to apply security checks after receiving the result
     });
   }
 
@@ -633,6 +696,11 @@ export class ViewFirmPageComponent implements OnInit {
     })
   }
 
+  removeHtmlTags(input: string): string {
+    // This regex will remove all HTML tags
+    return input.replace(/<[^>]*>/g, '');
+  }
+
   editFirm() {
     this.isLoading = true;
     this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
@@ -651,7 +719,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.isLoading = true;
     // Start validations
     this.hasValidationErrors = false;
-
+    this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
     // Synchronous firm-level validation checks
     this.validateFirmDetails(); // Perform existing validation logic synchronously
 
@@ -929,8 +997,8 @@ export class ViewFirmPageComponent implements OnInit {
     this.newAddress.ZipCode = address.ZipCode;
     this.newAddress.Province = address.Province;
     this.newAddress.PostalCode = address.PostalCode;
-    this.newAddress.PhoneNum = address.PhoneNum;
-    this.newAddress.FaxNum = address.FaxNum;
+    this.newAddress.PhoneNumber = address.PhoneNumber;
+    this.newAddress.FaxNumber = address.FaxNumber;
   }
 
   // Function to set additional firm details
@@ -1002,6 +1070,16 @@ export class ViewFirmPageComponent implements OnInit {
         prComments: this.firmDetails.PublicRegisterComments || ''
       },
       addressList: this.existingAddresses.map(address => {
+        let addressState: number;
+
+        if (address.isRemoved) {
+          addressState = 4; // Deleted address
+        } else if (address.AddressID === null) {
+          addressState = 2; // New address
+        } else {
+          addressState = 6; // Modified address
+        }
+
         return {
           firmID: this.firmId,
           countryID: Number(address.CountryID) || 0,
@@ -1019,19 +1097,19 @@ export class ViewFirmPageComponent implements OnInit {
           city: address.City || '',
           province: address.Province || '',
           postalCode: address.PostalCode || '',
-          phoneNumber: address.PhoneNum || '',
+          phoneNumber: address.PhoneNumber || '',
           phoneExt: address.PhoneExt || '',
-          faxNumber: address.FaxNum || '',
+          faxNumber: address.FaxNumber || '',
           lastModifiedDate: address.LastModifiedDate || this.currentDate, // Default to current date
-          addressState: address.addressState, // New address state is 2, existing is 6
+          addressState: addressState, // New address state is 2, existing modified or unchanged is 6, 4 is delete
           fromDate: address.FromDate || null,
           toDate: address.ToDate || null,
-          objectID: address.ObjectID || 521,
+          objectID: address.ObjectID || FrimsObject.CoreDetail,
           objectInstanceID: address.ObjectInstanceID || this.firmId,
-          objectInstanceRevNumber: address.ObjectInstanceRevNum || 1,
-          sourceObjectID: address.SourceObjectID || 521,
+          objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
+          sourceObjectID: address.SourceObjectID || FrimsObject.CoreDetail,
           sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
-          sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNum || 1,
+          sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
           objAis: null,
         };
       }),
@@ -1115,7 +1193,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   // This function applies only the Vary Button logic and leaves the application date input always disabled in view mode
-  applyVaryScopeButtonLogicOnEdit() {
+  applyVaryScopeButtonVisibilityOnEdit() {
     if (this.tabIndex === 0) {
       // Logic for showing or hiding the "Vary Scope" button
       if (!(this.isNullOrEmpty(this.ActivityLicensed[0].ScopeAppliedDate)) && !(this.isNullOrEmpty(this.ActivityLicensed[0].ScopeLicensedDate))) {
@@ -1153,13 +1231,29 @@ export class ViewFirmPageComponent implements OnInit {
       this.tabIndex = 0;
       this.isEditModeLicense = false;
       this.disableApplicationDate = true;
-      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
-      this.loadActivitiesLicensed();
+      this.loadActivitiesLicensed()
+        .then(() => {
+          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+        })
+        .catch((error) => {
+          console.error('Error loading activities:', error);
+        })
+        .finally(() => {
+          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeLicense);
+        });
     } else if (section === 'Authorized') {
       this.tabIndex = 1;
       this.isEditModeAuth = false;
-      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
-      this.loadActivitiesAuthorized();
+      this.loadActivitiesAuthorized()
+        .then(() => {
+          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+        })
+        .catch((error) => {
+          console.error('Error loading auth activities:', error);
+        })
+        .finally(() => {
+          this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+        });
     }
   }
 
@@ -1181,7 +1275,7 @@ export class ViewFirmPageComponent implements OnInit {
       //   this.showVaryBtn = false;
       // }
 
-      this.applyVaryScopeButtonLogicOnEdit();
+      this.applyVaryScopeButtonVisibilityOnEdit();
 
       // If the form is not in edit mode, toggle to edit mode
       if (!this.isEditModeLicense) {
@@ -1261,13 +1355,22 @@ export class ViewFirmPageComponent implements OnInit {
 
     this.existingActivities = this.ActivityLicensed;
 
-    // Step 3: Save License Scope Details
+    if (!(this.isNullOrEmpty(this.ActivityLicensed[0].ScopeEffectiveDate)) && this.currentDateOnly > this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeEffectiveDate) || this.ActivityLicensed[0].ScopeRevNum === 1) {
+      this.isLoading = false;
+      this.saveVaryLicenseScope();
+    } else {
 
+      // Step 3: Save License Scope Details
+      this.executeSaveLicense()
+    }
+  }
+
+  executeSaveLicense() {
     const updatedLicenseScope = this.prepareLicenseScopeObject(this.userId);
     this.saveLicenseScopeDetails(updatedLicenseScope, this.userId);
     this.showFirmScopeLicSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
-
   }
+
   prepareLicenseScopeObject(userId: number) {
     return {
       objFirmScope: {
@@ -1320,6 +1423,38 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
 
+  saveVaryLicenseScope(): void {
+    this.firmService.errorMessages(constants.FirmActivitiesEnum.SCOPECHANGED_SAVEORREVISE).subscribe((response) => {
+      Swal.fire({
+        title: 'Alert',
+        text: response.response,
+        icon: 'warning',
+        showCancelButton: true,
+        showDenyButton: true,
+        denyButtonText: 'Vary Scope',
+        confirmButtonText: 'Save',
+        cancelButtonText: 'Cancel',
+        customClass: {
+          cancelButton: 'btn-danger',
+          confirmButton: 'btn-success',
+          denyButton: 'btn-warning',
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Save action
+          this.executeSaveLicense();
+        } else if (result.isDenied) {
+          // Vary Scope action
+          this.varyScopeLicConfirm();
+        } else {
+          console.log('Action canceled');
+          // Handle cancel action if needed
+        }
+      });
+    });
+  }
+
+
   varyLicenseScope() {
     Swal.fire({
       title: 'Alert',
@@ -1331,7 +1466,16 @@ export class ViewFirmPageComponent implements OnInit {
       reverseButtons: false
     }).then((result) => {
       if (result.isConfirmed) {
-        this.varyScopeConfirm();
+        this.validateLicenseScope();
+
+        //Handle Validation Errors
+        if (this.hasValidationErrors) {
+          // If there are validation errors, show an error message and stop the process
+          this.showErrorAlert(constants.FirmActivitiesEnum.ENTER_ALL_REQUIREDFIELDS);
+          return; // Prevent further action if validation fails
+        }
+
+        this.varyScopeLicConfirm();
       }
     });
   }
@@ -1368,8 +1512,7 @@ export class ViewFirmPageComponent implements OnInit {
     };
   }
 
-  varyScopeConfirm() {
-    this.validateLicenseScope();
+  varyScopeLicConfirm() {
     this.existingActivities = this.ActivityLicensed;
     const varyLicenseScope = this.prepareVaryScopeLicenseObject(this.userId);
     this.firmService.editLicenseScope(varyLicenseScope).subscribe((response) => {
@@ -1409,7 +1552,7 @@ export class ViewFirmPageComponent implements OnInit {
   editAuthScope() {
     this.isLoading = true;
     if (this.ActivityAuth[0].ScopeRevNum) {
-      this.applyVaryScopeButtonLogicOnEdit();
+      this.applyVaryScopeButtonVisibilityOnEdit();
       if (!this.isEditModeAuth) {
         this.isEditModeAuth = true;  // Set the form to edit mode
         this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
@@ -1431,7 +1574,7 @@ export class ViewFirmPageComponent implements OnInit {
         } else {
           this.isScopeConditionChecked = false;
         }
-        
+
       }
     }
     this.isLoading = false;
@@ -1452,11 +1595,21 @@ export class ViewFirmPageComponent implements OnInit {
     }
 
     this.existingProducts = this.ActivityAuth;
-    console.log(this.existingProducts);
 
-    const updatedAuthorizeScope = this.prepareAuthoriseScopeObject(this.userId);
+    if (!(this.isNullOrEmpty(this.ActivityAuth[0].ScopeEffectiveDate)) && this.currentDateOnly > this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate || this.ActivityAuth[0].ScopeRevNum === 1)) {
+      this.isLoading = false;
+      this.saveVaryAuthScope();
+    } else {
+
+      // Step 3: Save License Scope Details
+      this.executeSaveAuthorise()
+    }
 
     // Call the function to save the details and handle response inside the subscription
+  }
+
+  executeSaveAuthorise() {
+    const updatedAuthorizeScope = this.prepareAuthoriseScopeObject(this.userId);
     this.firmService.editAuthorizedScope(updatedAuthorizeScope).subscribe(
       response => {
         console.log('Authorise scope updated successfully:', response);
@@ -1476,6 +1629,61 @@ export class ViewFirmPageComponent implements OnInit {
         this.isLoading = false; // Stop loading indicator on error
       }
     );
+  }
+
+  saveVaryAuthScope(): void {
+    this.firmService.errorMessages(constants.FirmActivitiesEnum.SCOPECHANGED_SAVEORREVISE).subscribe((response) => {
+      Swal.fire({
+        title: 'Alert',
+        text: response.response,
+        icon: 'warning',
+        showCancelButton: true,
+        showDenyButton: true,
+        denyButtonText: 'Vary Scope',
+        confirmButtonText: 'Save',
+        cancelButtonText: 'Cancel',
+        customClass: {
+          cancelButton: 'btn-danger',
+          confirmButton: 'btn-success',
+          denyButton: 'btn-warning',
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Save action
+          this.executeSaveAuthorise();
+        } else if (result.isDenied) {
+          // Vary Scope action
+          this.varyScopeAuthConfirm();
+        } else {
+          console.log('Action canceled');
+          // Handle cancel action if needed
+        }
+      });
+    });
+  }
+
+  varyAuthScope() {
+    Swal.fire({
+      title: 'Alert',
+      text: 'Are you sure you want to vary the scope?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.validateAuthScope();
+
+        //Handle Validation Errors
+        if (this.hasValidationErrors) {
+          // If there are validation errors, show an error message and stop the process
+          this.showErrorAlert(constants.FirmActivitiesEnum.ENTER_ALL_REQUIREDFIELDS);
+          return; // Prevent further action if validation fails
+        }
+        this.varyScopeAuthConfirm();
+      }
+    });
   }
 
 
@@ -1532,7 +1740,7 @@ export class ViewFirmPageComponent implements OnInit {
         authorisationCategoryTypeID: this.ActivityAuth[0].AuthorisationCategoryTypeID
       },
       objSector: {
-        firmSectorID: this.SectoryTypeIDChanged ? null : this.sectorDetails[0].FirmSectorID,
+        firmSectorID: this.SectorTypeIDChanged ? null : this.sectorDetails[0].FirmSectorID,
         sectorTypeID: parseInt(this.ActivityAuth[0].SectorTypeID),
         lastModifiedByID: userId, //recheck
         effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].SectorEffectiveDate)
@@ -1605,7 +1813,7 @@ export class ViewFirmPageComponent implements OnInit {
   validateAuthScope() {
     this.hasValidationErrors = false;
 
-    
+
     this.ActivityAuth.forEach(activity => {
       // Reset error messages for each activity
       activity.errorMessages = {};
@@ -1668,7 +1876,7 @@ export class ViewFirmPageComponent implements OnInit {
     });
     // Validation for Prudential Effective Date
     if (this.isNullOrEmpty(this.ActivityAuth[0].PrudentialCategoryEffectiveDate)) {
-      this.getErrorMessages('PrudentialEffectiveDate',constants.FirmActivitiesEnum.ENTER_PRUDENTIAL_EFFECTIVEDATE);
+      this.getErrorMessages('PrudentialEffectiveDate', constants.FirmActivitiesEnum.ENTER_PRUDENTIAL_EFFECTIVEDATE);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages[('PrudentialEffectiveDate')]
@@ -1676,7 +1884,7 @@ export class ViewFirmPageComponent implements OnInit {
 
     // Validation for Sector Effective Date
     if (this.isNullOrEmpty(this.ActivityAuth[0].SectorEffectiveDate)) {
-      this.getErrorMessages('SectorEffectiveDate',constants.FirmActivitiesEnum.ENTER_SECTOR_EFFECTIVEDATE);
+      this.getErrorMessages('SectorEffectiveDate', constants.FirmActivitiesEnum.ENTER_SECTOR_EFFECTIVEDATE);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages[('SectorEffectiveDate')]
@@ -1684,7 +1892,7 @@ export class ViewFirmPageComponent implements OnInit {
 
     // Validation for Sector Effective Date
     if (this.isNullOrEmpty(this.ActivityAuth[0].SectorEffectiveDate)) {
-      this.getErrorMessages('SectorEffectiveDate',constants.FirmActivitiesEnum.ENTER_SECTOR_EFFECTIVEDATE);
+      this.getErrorMessages('SectorEffectiveDate', constants.FirmActivitiesEnum.ENTER_SECTOR_EFFECTIVEDATE);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages[('SectorEffectiveDate')]
@@ -1699,47 +1907,145 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  varyScopeAuthConfirm() {
+    this.existingProducts = this.ActivityAuth;
+    const varyAuthoriseScope = this.prepareVaryScopeAuthoriseObject(this.userId);
+    console.log("vary scope data to be sent" + varyAuthoriseScope);
+    this.firmService.editAuthorizedScope(varyAuthoriseScope).subscribe((response) => {
+      console.log('Vary Scope Successfully', response);
+      this.isEditModeAuth = false;
+      this.disableApplicationDate = true;
+      this.loadActivitiesAuthorized();
+      this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
+      this.loadAuthScopeRevisions(this.firmId, 2);
+      this.showFirmScopeAuthSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
+    }, error => {
+      console.log('Vary Scope Failed', error);
+    })
+  }
 
-
-
-  // validateAuthScope() {
-
-  //   this.hasValidationErrors = false;
-  //   let hasSelectedProducts = false;
-
-  //   // Validation for Activities
-  //   this.ActivityAuth.forEach(activity => {
-  //     if (!activity.ActivityTypeID || activity.ActivityTypeID === 0) {
-  //       this.getErrorMessages('ActivityTypeID', constants.FirmActivitiesEnum.SELECT_ACTIVITIES);
-  //       this.hasValidationErrors = true;
-  //     } else {
-  //       delete this.errorMessages['ActivityTypeID'];
-  //     }
-
-
-  //   // Validation for Products
-  //     // Check if any product is selected (isChecked = true)
-  //     const hasCheckedProducts = activity.categorizedProducts?.some(catProd =>
-  //       catProd.subProducts.some(subProd => subProd.isChecked)
-  //     );
-
-  //     // If any product is selected, set hasSelectedProducts to true
-  //     if (hasCheckedProducts) {
-  //       hasSelectedProducts = true;
-  //     }
-  //   });
-
-  //   // If no product is selected in any activity, set validation error
-  //   if (!hasSelectedProducts) {
-  //     this.getErrorMessages('Products', constants.FirmActivitiesEnum.SELECT_ATLEASTONE_PRODUCTS);
-  //     this.hasValidationErrors = true;
-  //   } else {
-  //     delete this.errorMessages['Products'];
-  //   }
-  // }
-
-
-
+  prepareVaryScopeAuthoriseObject(userId: number) {
+    return {
+      objFirmScope: {
+        firmScopeID: this.ActivityAuth[0].FirmScopeID,
+        scopeRevNum: null,
+        firmID: this.ActivityAuth[0].FirmID,
+        objectID: 524,
+        createdBy: userId, //recheck
+        docReferenceID: null,
+        firmApplTypeID: 3, // Authorised
+        docIDs: null,
+        generalConditions: this.ActivityAuth[0].GeneralCondition,
+        effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate),
+        scopeCertificateLink: null,
+        applicationDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeApplicationDate),
+        licensedOrAuthorisedDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate),
+      },
+      lstFirmActivities: this.existingProducts.map(activityAuth => ({
+        createdBy: userId, //recheck
+        firmScopeTypeID: 0,
+        activityTypeID: parseInt(activityAuth.ActivityTypeID),
+        effectiveDate: null,
+        firmActivityConditions: null,
+        productTypeID: null,
+        appliedDate: null,
+        withDrawnDate: null,
+        objectProductActivity: activityAuth.categorizedProducts
+          .flatMap(catProd =>
+            catProd.subProducts
+              .filter(subProd => subProd.isChecked)  // Only include checked sub-products
+              .map(subProd => ({
+                productTypeID: String(subProd.ID),
+                appliedDate: this.convertDateToYYYYMMDD(activityAuth.appliedDate),
+                withDrawnDate: this.convertDateToYYYYMMDD(activityAuth.withDrawnDate),
+                effectiveDate: this.convertDateToYYYYMMDD(activityAuth.effectiveDate),
+                firmScopeTypeID: subProd.firmScopeTypeID
+              }))
+          ),
+        activityDetails: null
+      })),
+      objPrudentialCategory: {
+        firmPrudentialCategoryID: null,
+        firmId: this.firmId,
+        prudentialCategoryTypeID: this.ActivityAuth[0].PrudentialCategoryTypeID,
+        firmScopeID: this.ActivityAuth[0].FirmScopeID,
+        scopeRevNum: null,
+        lastModifiedByID: userId,
+        effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].PrudentialCategoryEffectiveDate),
+        expirationDate: null,
+        lastModifiedDate: null,
+        authorisationCategoryTypeID: this.ActivityAuth[0].AuthorisationCategoryTypeID
+      },
+      objSector: {
+        firmSectorID: null,
+        sectorTypeID: parseInt(this.ActivityAuth[0].SectorTypeID),
+        lastModifiedByID: userId, //recheck
+        effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].SectorEffectiveDate)
+      },
+      lstFirmScopeCondition: this.isScopeConditionChecked
+        ? [
+          {
+            firmScopeID: this.ActivityAuth[0].FirmScopeID,
+            firmID: null,
+            objectID: null,
+            createdBy: null,
+            docReferenceID: null,
+            firmApplTypeID: null,
+            docIDs: null,
+            generalConditions: null,
+            effectiveDate: null,
+            scopeCertificateLink: null,
+            applicationDate: null,
+            licensedOrAuthorisedDate: null,
+            scopeConditionTypeId: 1,
+            lastModifiedBy: userId,
+            restriction: 1,
+            scopeConditionTypeDesc: "Retail Restriction"
+          }
+        ]
+        : [
+          {
+            firmScopeID: this.ActivityAuth[0].FirmScopeID,
+            firmID: null,
+            objectID: null,
+            createdBy: null,
+            docReferenceID: null,
+            firmApplTypeID: null,
+            docIDs: null,
+            generalConditions: null,
+            effectiveDate: null,
+            scopeCertificateLink: null,
+            applicationDate: null,
+            licensedOrAuthorisedDate: null,
+            scopeConditionTypeId: 1,
+            lastModifiedBy: userId,
+            restriction: 0,
+            scopeConditionTypeDesc: "Retail Restriction"
+          }
+        ], // Send an empty array if the checkbox is not checked
+      objFirmIslamicFinance: this.isIslamicFinanceChecked
+        ? {  // When checked, send the actual values
+          iFinFlag: this.isIslamicFinanceChecked,
+          iFinTypeId: this.islamicFinance.IFinTypeId,
+          iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
+          endorsement: this.islamicFinance.Endorsement,
+          savedIFinTypeID: this.islamicFinance.IFinTypeId,
+          scopeRevNum: null,
+          lastModifiedBy: userId
+        }
+        : {  // When unchecked, send iFinFlag as false and everything else as null
+          iFinFlag: false,
+          iFinTypeId: null,
+          iFinTypeDesc: null,
+          endorsement: null,
+          savedIFinTypeID: null,
+          scopeRevNum: null,
+          lastModifiedBy: null
+        },
+      resetFirmSector: this.resetFirmSector,
+      firmSectorID: null
+    }
+  }
 
   cancelEditAuthScope() {
     Swal.fire({
@@ -1757,6 +2063,8 @@ export class ViewFirmPageComponent implements OnInit {
         this.applySecurityOnPage(FrimsObject.Scope, this.isEditModeAuth);
         this.errorMessages = {};
         this.loadActivitiesAuthorized();
+        this.loadSectorDetails();
+        this.loadPrudentialCategoryDetails();
       }
     });
   }
@@ -1871,16 +2179,11 @@ export class ViewFirmPageComponent implements OnInit {
         // this.firmDetails.LicensedDate = this.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate);
         this.getFirmTypes();
         console.log('Firm details:', this.firmDetails);
-        console.log("AuthorisationStatusTypeLabelDescFormatted", this.AuthorisationStatusTypeLabelDescFormatted)
       },
       error => {
         console.error('Error fetching firm details', error);
       }
     );
-  }
-  formatText() {
-    this.AuthorisationStatusTypeLabelDescFormatted = this.firmDetails.AuthorisationStatusTypeLabelDesc.replace(/:/g, '');
-
   }
   loadFirmOPDetails(firmId: number) {
     this.firmService.getFIRMOPData(firmId).subscribe(
@@ -2753,7 +3056,7 @@ export class ViewFirmPageComponent implements OnInit {
     OtherEmail: '',
     RegulatorID: 0,
     PreferredMethodType: '',
-    RegulatorName:'',
+    RegulatorName: '',
   };
   updateControlTypeDesc(selectedValue: any) {
     switch (selectedValue) {
@@ -2813,7 +3116,7 @@ export class ViewFirmPageComponent implements OnInit {
               isPublicallyTraded: this.CreatecontrollerDetails.IsPublicallyTraded,
               areAnyUBOs: this.CreatecontrollerDetails.More10UBOs,
               controllerInfo: this.CreatecontrollerDetails.ControllerInfo,
-              Output:0,
+              Output: 0,
               FirmID: this.firmId,
               EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               EntityID: this.firmId,
@@ -2845,7 +3148,7 @@ export class ViewFirmPageComponent implements OnInit {
                 addressState: 2,
                 fromDate: null,
                 toDate: null,
-                Output:0,
+                Output: 0,
                 objectID: this.CreatecontrollerDetails.ObjectID,
                 objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
                 objAis: { // Ensure this object is correctly structured
@@ -2859,7 +3162,7 @@ export class ViewFirmPageComponent implements OnInit {
                   placeOfBirth: this.CreatecontrollerDetails.PlaceOfBirth,
                   passportNumber: this.CreatecontrollerDetails.PassportNum,
                   addressAssnID: null,
-                  AddressTypeID:this.CreatecontrollerDetails.AddressTypeID,
+                  AddressTypeID: this.CreatecontrollerDetails.AddressTypeID,
                   statusDate: this.CreatecontrollerDetails.StatusDate,
                   createdDate: this.CreatecontrollerDetails.CreatedDate,
                   mobilePhone: this.CreatecontrollerDetails.MobilePhone,
@@ -2868,7 +3171,7 @@ export class ViewFirmPageComponent implements OnInit {
                   preferredMethodType: this.CreatecontrollerDetails.PreferredMethodType,
                   showReadOnly: true,
                   showEnabled: true,
-                  Output:0,
+                  Output: 0,
                 }
               }
             ],
@@ -2880,7 +3183,7 @@ export class ViewFirmPageComponent implements OnInit {
                 FirmID: null,
                 RelatedEntityTypeID: this.CreatecontrollerDetails.RelatedEntityTypeID,
                 relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
-                Output:0,
+                Output: 0,
                 regulatorState: 2,
                 RegulatorID: 39,
                 RegulatorName: "Bahrain Monetary Agency",
@@ -3126,31 +3429,41 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
 
-  loadActivitiesLicensed() {
+
+  loadActivitiesLicensed(): Promise<void> {
     this.isLoading = true;
-    this.loadFormReference();
-    this.loadActivitiesTypesForLicensed();
-    this.firmService.getCurrentScopeRevNum(this.firmId, 2).subscribe( // 2 here is: Licensed
-      data => {
-        this.scopeRevNum = data.response.Column1;
-        this.firmService.getFirmActivityLicensed(this.firmId).subscribe(
-          data => {
-            this.ActivityLicensed = data.response;
-            console.log('Firm License scope details:', this.ActivityLicensed);
-            this.isLoading = false;
-          },
-          error => {
-            console.error('Error fetching License scope', error);
-            this.isLoading = false;
-          }
-        );
-      },
-      error => {
-        console.error('Error fetching current scope revision number for licensed: ', error);
-        this.isLoading = false;
-      }
-    );
+
+    return new Promise((resolve, reject) => {
+      this.loadFormReference();
+      this.loadActivitiesTypesForLicensed();
+
+      this.firmService.getCurrentScopeRevNum(this.firmId, 2).subscribe(
+        data => {
+          this.scopeRevNum = data.response.Column1;
+
+          this.firmService.getFirmActivityLicensed(this.firmId).subscribe(
+            data => {
+              this.ActivityLicensed = data.response;
+              console.log('Firm License scope details:', this.ActivityLicensed);
+              this.isLoading = false;
+              resolve(); // Resolve the promise when everything is successfully loaded
+            },
+            error => {
+              console.error('Error fetching License scope', error);
+              this.isLoading = false;
+              reject(error); // Reject the promise in case of an error
+            }
+          );
+        },
+        error => {
+          console.error('Error fetching current scope revision number for licensed: ', error);
+          this.isLoading = false;
+          reject(error); // Reject the promise in case of an error
+        }
+      );
+    });
   }
+
 
   loadFormReference() {
     this.firmService.getDocumentDetails(this.firmId).subscribe(
@@ -3162,59 +3475,74 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   // On View Mode
-  loadActivitiesAuthorized(): void {
+  loadActivitiesAuthorized(): Promise<void> {
     this.isLoading = true; // Start loading indicator 
 
-    // Run both API calls in parallel
-    forkJoin({
-      scopeRevNum: this.firmService.getCurrentScopeRevNum(this.firmId, 3),
-      firmActivity: this.firmService.getFirmActivityAuthorized(this.firmId),
-    }).subscribe(
-      ({ scopeRevNum, firmActivity }) => {
-        // Process scope revision number
-        this.scopeRevNum = scopeRevNum.response.Column1;
+    return new Promise((resolve, reject) => {
+      // Run both initial API calls in parallel using forkJoin
+      forkJoin({
+        scopeRevNum: this.firmService.getCurrentScopeRevNum(this.firmId, 3),
+        firmActivity: this.firmService.getFirmActivityAuthorized(this.firmId),
+      }).subscribe(
+        ({ scopeRevNum, firmActivity }) => {
+          // Process scope revision number
+          this.scopeRevNum = scopeRevNum.response.Column1;
 
-        // Process firm activity authorized details
-        this.ActivityAuth = firmActivity.response;
-        this.previousPrudentialCategoryID = parseInt(this.ActivityAuth[0].PrudentialCategoryTypeID);
-        this.previousSectorTypeID = parseInt(this.ActivityAuth[0].SectorTypeID);
-        // Process activities and categorize products
-        this.ActivityAuth.forEach(activity => {
-          activity.categorizedProducts = [];
-          let currentCategory = null;
+          // Process firm activity authorized details
+          this.ActivityAuth = firmActivity.response;
+          this.previousPrudentialCategoryID = parseInt(this.ActivityAuth[0].PrudentialCategoryTypeID);
+          this.previousSectorTypeID = parseInt(this.ActivityAuth[0].SectorTypeID);
 
-          activity.ObjectProductActivity.forEach(product => {
-            if (product.productTypeID === "0") {
-              // Main category
-              currentCategory = {
-                mainCategory: product.productTypeDescription,
-                subProducts: []
-              };
-              activity.categorizedProducts.push(currentCategory);
-            } else if (currentCategory) {
-              // Sub-product
-              product.firmScopeTypeID = product.firmScopeTypeID || ''; // Ensure firmScopeTypeID is set
-              currentCategory.subProducts.push(product);
-            }
+          // Process activities and categorize products
+          this.ActivityAuth.forEach(activity => {
+            activity.categorizedProducts = [];
+            let currentCategory = null;
+
+            activity.ObjectProductActivity.forEach(product => {
+              if (product.productTypeID === "0") {
+                // Main category
+                currentCategory = {
+                  mainCategory: product.productTypeDescription,
+                  subProducts: []
+                };
+                activity.categorizedProducts.push(currentCategory);
+              } else if (currentCategory) {
+                // Sub-product
+                product.firmScopeTypeID = product.firmScopeTypeID || ''; // Ensure firmScopeTypeID is set
+                currentCategory.subProducts.push(product);
+              }
+            });
           });
-        });
 
-        // Load Prudential Return Types based on the first activity
-        const prudentialCategoryTypeID = this.ActivityAuth[0].PrudentialCategoryTypeID;
-        this.loadPrudReturnTypes(prudentialCategoryTypeID);
-        this.loadPrudentialCategoryDetails();
-        this.loadSectorDetails();
-        this.loadIslamicFinance();
-        this.loadScopeOfAuth();
-        // Stop loading indicator once all data is fully loaded
-        this.isLoading = false;
-      },
-      error => {
-        console.error('Error fetching data', error);
-        this.isLoading = false; // Stop loading on error
-      }
-    );
+          // Load additional details using another forkJoin to ensure all calls finish before turning off the loader
+          forkJoin([
+            this.loadPrudReturnTypes(this.ActivityAuth[0].PrudentialCategoryTypeID),
+            this.loadPrudentialCategoryDetails(),
+            this.loadSectorDetails(),
+            this.loadIslamicFinance(),
+            this.loadScopeOfAuth()
+          ]).subscribe(
+            () => {
+              this.isLoading = false;
+              resolve();
+            },
+            error => {
+              console.error('Error loading additional data', error);
+              this.isLoading = false;
+              reject(error);
+            }
+          );
+        },
+        error => {
+          console.error('Error fetching data', error);
+          this.isLoading = false;
+          reject(error);
+        }
+      );
+    });
   }
+
+
 
   loadSectorDetails() {
     // Use the first activity's FirmScopeID and ScopeRevNum if they are the same across all.
@@ -3239,10 +3567,6 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  // storePreviousPrudentialCategory() {
-  //   this.previousPrudentialCategoryID = parseInt(this.ActivityAuth[0].PrudentialCategoryTypeID);
-  // }
-
 
   onPrudentialCategoryChange(prudCategID: string) {
     // Check if the new selection is the same as the previous one
@@ -3261,11 +3585,14 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   onSectorTypeChange(sectorID: string) {
+    console.log("Sector Type Changed:", sectorID);
+    console.log("Previous Sector Type ID:", this.previousSectorTypeID);
     if (parseInt(sectorID) === this.previousSectorTypeID) {
-      this.SectoryTypeIDChanged = false;
+      this.SectorTypeIDChanged = false;
     } else {
-      this.SectoryTypeIDChanged = true;
+      this.SectorTypeIDChanged = true;
     }
+    console.log(this.SectorTypeIDChanged);
   }
 
   showConfirmationAndUpdate(prudCategID: string, msgKey: number) {
@@ -3432,12 +3759,12 @@ export class ViewFirmPageComponent implements OnInit {
 
   userAllowedToAccessFirm() {
     this.isLoading = true;
-    this.securityService.isUserAllowedToAccessFirm(this.userId,this.firmId).subscribe(data => {
+    this.securityService.isUserAllowedToAccessFirm(this.userId, this.firmId).subscribe(data => {
       this.isUserAllowed = data.response;
       this.isLoading = false;
       if (!this.isUserAllowed) {
         this.router.navigate(['error/FirmAccessDenied'])
-      } 
+      }
     }, error => {
       console.error('Error loading is user allowed to access firm: ', error);
       this.isLoading = false;
@@ -3785,11 +4112,11 @@ export class ViewFirmPageComponent implements OnInit {
       CountryID: 0,
       CountryName: '',
       PostalCode: '',
-      PhoneNum: '',
-      FaxNum: '',
+      PhoneNumber: '',
+      FaxNumber: '',
       LastModifiedBy: 0, //todo _userId;
       LastModifiedDate: this.currentDate,
-      addressState: 0,
+      addressState: 2,
       FromDate: null,
       ToDate: null,
       Valid: true,
@@ -4408,7 +4735,7 @@ export class ViewFirmPageComponent implements OnInit {
           this.groupActivitiesByCategory(this.ActivityAuth);
           this.updateAuthLastRevisionNumber();
           this.closeAuthScopePreviousVersions();
-          this.loadSectorDetails(); 
+          this.loadSectorDetails();
           this.loadPrudentialCategoryDetails();
           this.isLoading = false; // Stop loader when data is loaded
         },
@@ -4552,8 +4879,8 @@ export class ViewFirmPageComponent implements OnInit {
       assnDateFrom: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom),
       assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo),
       ShowEnabled: false,
-      ShowReadOnly:false,
-      MajorityStockHolder:false,
+      ShowReadOnly: false,
+      MajorityStockHolder: false,
 
     }
     this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
@@ -4762,16 +5089,27 @@ export class ViewFirmPageComponent implements OnInit {
   checkFirmLicense() {
     this.firmService.isFirmLicensed(this.firmId).subscribe(
       (response) => {
-        this.isLicensed = response.response;
-        console.log('Firm licensed:', this.isLicensed);
+        this.isFirmLicensed = response.response;
+        console.log('Firm licensed:', this.isFirmLicensed);
       },
       error => {
         console.error('Error checking firm license:', error);
-        this.isLicensed = false;
+        this.isFirmLicensed = false;
       }
     );
   }
 
+  checkFirmAuthorisation() {
+    this.firmService.isFirmAuthorised(this.firmId).subscribe(
+      (response) => {
+        this.isFirmAuthorised = response.response;
+        console.log('Firm Authorised: ', response)
+      }, error => {
+        console.error('Error checking firm authorisation:', error);
+        this.isFirmLicensed = false;
+      }
+    )
+  }
 
   onFirmApplicationTypeChange(selectedFirmTypeID: number) {
     const applicationAuthStatus = this.allAuthorisationStatus.find(
@@ -4782,24 +5120,24 @@ export class ViewFirmPageComponent implements OnInit {
     );
 
     // Only apply this logic if the firm is not licensed
-    if (!this.isLicensed) {
+    if (!this.isFirmLicensed) {
       // Set License Status to Application if not already set or it's currently set to Application
       if (applicationLicStatus) {
         this.firmDetails.LicenseStatusTypeID = applicationLicStatus?.FirmApplStatusTypeID;
         this.formattedLicenseApplStatusDate = this.dateOfApplication;
-        this.firmDetails.LicenseStatusTypeLabelDesc = `Date ${applicationLicStatus?.FirmApplStatusTypeDesc}`;
+        this.LicenseStatusTypeLabelDescFormatted = `Date ${applicationLicStatus?.FirmApplStatusTypeDesc}`;
       }
 
       // Set Authorisation Status to Application if not already set or it's currently set to Application
       if (applicationAuthStatus) {
         this.firmDetails.AuthorisationStatusTypeID = applicationAuthStatus?.FirmApplStatusTypeID;
         this.formattedAuthApplStatusDate = this.dateOfApplication;
-        this.firmDetails.AuthorisationStatusTypeLabelDesc = `Date ${applicationAuthStatus?.FirmApplStatusTypeDesc}`;
+        this.AuthorisationStatusTypeLabelDescFormatted = `Date ${applicationAuthStatus?.FirmApplStatusTypeDesc}`;
       }
     }
 
     // If the firm is already licensed, handle switching between License and Authorisation
-    if (this.isLicensed) {
+    if (this.isFirmLicensed) {
       if (selectedFirmTypeID == 2) { // Switching to License
         if (this.firmDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Application) {
           this.formattedLicenseApplStatusDate = this.dateOfApplication;
@@ -4810,7 +5148,7 @@ export class ViewFirmPageComponent implements OnInit {
         if (this.firmDetails.AuthorisationStatusTypeID === constants.FirmAuthorizationApplStatusType.Application || !this.firmDetails.AuthorisationStatusTypeID) {
           this.firmDetails.AuthorisationStatusTypeID = applicationAuthStatus?.FirmApplStatusTypeID;
           this.formattedAuthApplStatusDate = this.dateOfApplication;
-          this.firmDetails.AuthorisationStatusTypeLabelDesc = `Date ${applicationAuthStatus?.FirmApplStatusTypeDesc}`;
+          this.AuthorisationStatusTypeLabelDescFormatted = `Date ${applicationAuthStatus?.FirmApplStatusTypeDesc}`;
         }
       }
     }
@@ -4836,68 +5174,6 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-
-  // onLicenseStatusChange(selectedValue: any) {
-  //   const numericValue = Number(selectedValue);
-
-  //   if (isNaN(numericValue) || !this.firmId) {
-  //     console.error('Invalid value or firm ID');
-  //     return;
-  //   }
-
-  //   this.firmService.getFirmStatusValidation(this.firmId, numericValue, this.currentDate, 2)
-  //     .subscribe(response => {
-  //       if (response.isSuccess && response.response) {
-  //         const { OldFirmApplStatusTypeDesc, OldFirmApplStatusDate, IsFirmApplStatusGroupChanged } = response.response;
-
-  //         // Fallback to selected option's description if no status description is returned
-  //         const selectedOption = this.allQFCLicenseStatus.find(option => option.FirmApplStatusTypeID === numericValue);
-  //         const statusDescription = OldFirmApplStatusTypeDesc || selectedOption?.FirmApplStatusTypeDesc || '';
-
-  //         // Update license status label
-  //         this.firmDetails.LicenseStatusTypeLabelDesc = `Date ${statusDescription}`;
-
-  //         // Set the date if available, otherwise make it null
-  //         this.formattedLicenseApplStatusDate = OldFirmApplStatusDate !== '1900-01-01T00:00:00'
-  //           ? this.formatDateToCustomFormat(OldFirmApplStatusDate)
-  //           : null;
-
-  //         // Save the current status and date
-  //         this.licenseStatusDates[numericValue] = this.formattedLicenseApplStatusDate;
-
-  //         let messagePromises: Promise<string>[] = [];
-  //         if (this.firmDetails.FirmTypeID !== 2) {
-  //           if (this.formattedLicenseApplStatusDate) {
-  //             messagePromises.push(this.getNotePopupMessage(3917));
-  //           }
-  //         } else {
-
-  //           if (this.firmId !== null) {
-  //             if (IsFirmApplStatusGroupChanged > 0) {
-  //               if (IsFirmApplStatusGroupChanged == 1) {
-  //                 messagePromises.push(this.getNotePopupMessage(3913));
-  //               } else if (IsFirmApplStatusGroupChanged == 2) {
-  //                 messagePromises.push(this.getNotePopupMessage(3914));
-  //               }
-  //             }
-  //             if (this.formattedAuthApplStatusDate) {
-  //               messagePromises.push(this.getNotePopupMessage(3917));
-  //             }
-  //           }
-  //         }
-  //         Promise.all(messagePromises).then((messages: string[]) => {
-  //           if (messages.length > 0) {
-  //             this.showCombinedPopup(messages);
-  //           }
-  //         });
-  //       } else {
-  //         // Handle error or default case
-  //         const selectedOption = this.allQFCLicenseStatus.find(option => option.FirmApplStatusTypeID === numericValue);
-  //         this.firmDetails.LicenseStatusTypeLabelDesc = `Date ${selectedOption?.FirmApplStatusTypeDesc || ''}`;
-  //         this.formattedLicenseApplStatusDate = null;
-  //       }
-  //     });
-  // }
   onLicenseStatusChange(selectedValue: any) {
     const numericValue = Number(selectedValue);
 
@@ -4918,7 +5194,7 @@ export class ViewFirmPageComponent implements OnInit {
           statusDescription = statusDescription.trim().replace(/:$/, '');
 
           // Update license status label
-          this.firmDetails.LicenseStatusTypeLabelDesc = `Date ${statusDescription}`;
+          this.LicenseStatusTypeLabelDescFormatted = `Date ${statusDescription}`;
 
           this.formattedLicenseApplStatusDate = OldFirmApplStatusDate !== '1900-01-01T00:00:00'
             ? this.formatDateToCustomFormat(OldFirmApplStatusDate)
@@ -4958,7 +5234,7 @@ export class ViewFirmPageComponent implements OnInit {
           // Remove any trailing colon
           statusDescription = statusDescription.trim().replace(/:$/, '');
 
-          this.firmDetails.LicenseStatusTypeLabelDesc = `Date ${statusDescription}`;
+          this.LicenseStatusTypeLabelDescFormatted = `Date ${statusDescription}`;
           this.formattedLicenseApplStatusDate = null;
         }
       });
@@ -4972,7 +5248,7 @@ export class ViewFirmPageComponent implements OnInit {
       return;
     }
 
-    if (!this.isLicensed) {
+    if (!this.isFirmLicensed) {
       const statusTypes = {
         [constants.FirmAuthorizationApplStatusType.Application]: constants.FirmLicenseApplStatusType.Application,
         [constants.FirmAuthorizationApplStatusType.ApplicationWithdrawn]: constants.FirmLicenseApplStatusType.ApplicationWithdrawn,
@@ -4998,7 +5274,7 @@ export class ViewFirmPageComponent implements OnInit {
           const statusDescription = OldFirmApplStatusTypeDesc || selectedOption?.FirmApplStatusTypeDesc || '';
 
           // Update auth status label
-          this.firmDetails.AuthorisationStatusTypeLabelDesc = `Date ${statusDescription}`;
+          this.AuthorisationStatusTypeLabelDescFormatted = `Date ${statusDescription}`;
 
           // Ensure that the date is null if OldFirmApplStatusDate is invalid or equal to 1900-01-01
           if (OldFirmApplStatusDate && OldFirmApplStatusDate !== '1900-01-01T00:00:00') {
@@ -5031,7 +5307,7 @@ export class ViewFirmPageComponent implements OnInit {
         } else {
           // Handle error or default case
           const selectedOption = this.allAuthorisationStatus.find(option => option.FirmApplStatusTypeID === numericValue);
-          this.firmDetails.AuthorisationStatusTypeLabelDesc = `Date ${selectedOption?.FirmApplStatusTypeDesc || ''}`;
+          this.AuthorisationStatusTypeLabelDescFormatted = `Date ${selectedOption?.FirmApplStatusTypeDesc || ''}`;
           this.formattedAuthApplStatusDate = null; // Ensure it's set to null
         }
       });
@@ -5216,18 +5492,18 @@ export class ViewFirmPageComponent implements OnInit {
     Swal.fire({
       text: 'Do you really want to delete this attachment?',
       icon: 'warning',
-      showCancelButton: true,          
+      showCancelButton: true,
       confirmButtonText: 'Ok',
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        
+
       } else if (result.isDismissed) {
         return;
       }
     });
   }
-  
+
 
   isNullOrEmpty(value: any): boolean {
     return value === null || value === '';

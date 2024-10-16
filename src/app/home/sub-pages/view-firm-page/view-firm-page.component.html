@@ -113,10 +113,14 @@
     <div class="inputs-field-set">
       <div class="form-section-title">
         <h2 class="edit-firm-header">
-           <span>{{ firmDetails?.FirmName }}</span>
+           <p>Firm Details</p>
         </h2>
       </div>
       <div class="inputs-row">
+        <div class="input-field">
+          <label for="firmName"> Firm Name </label>
+          <input disabled name="firmName" id="firmName" type="text" value="{{firmDetails?.FirmName}}"/>
+        </div>
         <div class="input-field">
           <label for="QFCNumber"> QFC Number </label>
           <input disabled name="QFCNumber" id="QFCNumber" type="text" value="{{ firmDetails?.QFCNum }}" />
@@ -277,7 +281,7 @@
         </div>
         <div class="form-section-title">
           <h2 class="edit-firm-header">
-             <span>{{ firmDetails?.FirmName }}</span>
+            <p>Firm Details</p>
             <button [ngClass]="{ 'hidden-button': !isEditModeCore }" class="collapse-button"
               (click)="toggleCollapse('firmDetailsSection')">
               {{ isCollapsed["firmDetailsSection"] ? "▲" : "▼" }}
@@ -509,7 +513,7 @@
             </h2>
           </div>
         </div>
-        <div class="inputs-row" *ngIf="!isEditModeCore">
+        <div class="inputs-row app-details-tables" *ngIf="!isEditModeCore">
           <!-- Licensed Status Table -->
           <table class="aligned-table">
             <thead>
@@ -833,12 +837,12 @@
               <div class="input-field">
                 <label for="phone"> Phone </label>
                 <input [disabled]="!isEditModeCore || (disableAddressFields && !address.AddressID)" name="phone"
-                  id="phone" type="text" [(ngModel)]="address.PhoneNum" />
+                  id="phone" type="text" [(ngModel)]="address.PhoneNumber" />
               </div>
               <div class="input-field">
                 <label for="fax"> Fax </label>
                 <input [disabled]="!isEditModeCore || (disableAddressFields && !address.AddressID)" name="fax" id="fax"
-                  type="text" [(ngModel)]="address.FaxNum" />
+                  type="text" [(ngModel)]="address.FaxNumber" />
               </div>
               <hr *ngIf="i < firmAddresses.length - 1">
             </ng-container>
@@ -881,7 +885,7 @@
             </div>
             <div class="form-section-title">
               <h2 class="edit-firm-header">
-                 <span>{{ firmDetails?.FirmName }}</span>
+                Scope > <span>{{ firmDetails?.FirmName }}</span>
               </h2>
               <div *ngIf="currentLicRevisionNumber === lastLicRevisionNumber" style="display: flex; gap: 10px">
                 <div class="btn"
@@ -1024,12 +1028,12 @@
 
                 <strong>Activity Details: </strong>
                 <div class="input-field fullwidth">
-                  <textarea disabled>{{activityLic?.FirmActivityDetails}}</textarea>
+                  <textarea disabled>{{removeHtmlTags(activityLic?.FirmActivityDetails)}}</textarea>
                 </div>
 
                 <strong>Specific Conditions and Restrictions: </strong>
                 <div class="input-field fullwidth">
-                  <textarea disabled>{{ activityLic?.Column1 }}</textarea>
+                  <textarea disabled>{{ removeHtmlTags(activityLic?.Column1) }}</textarea>
                 </div>
 
               </ng-container>
@@ -1131,7 +1135,7 @@
             </div>
             <div class="form-section-title">
               <h2 class="edit-firm-header">
-                Scope > <span>{{ firmDetails?.FirmName }}</span>
+                Scope ><span>{{ firmDetails?.FirmName }}</span>
               </h2>
               <div *ngIf="currentAuthRevisionNumber === lastAuthRevisionNumber" style="display: flex; gap: 10px">
                 <div class="btn"
@@ -1239,7 +1243,7 @@
                 <input disabled name="" id="" type="text" value="{{ ActivityAuth[0]?.CreatedDate }}" />
               </div>
               <div [hidden]="!isEditModeAuth" class="vary-scope">
-                <button>Vary Scope</button>
+                <button (click)="varyAuthScope()">Vary Scope</button>
               </div>
             </div>
             <div *ngIf="!isEditModeAuth && ActivityAuth[0].ScopeRevNum >= 1" class="view-prev-version-container">
@@ -1260,7 +1264,22 @@
               <div *ngIf="isEditModeAuth && !(AuthTableDocument?.DocSubTypeDesc)" class="inputs-row document-container">
                 <div class="input-field">
                   <label>Document Type</label>
-                  <select></select>
+                  <select>
+                    <option>Scope of Authorisation</option>
+                  </select>
+                </div>
+                <div *ngIf="!(AuthTableDocument?.DocSubTypeDesc)" class="input-field">
+
+                  <label id="uploaded-documents">Uploaded documents go here</label>
+    
+                  <div class="btns-container">
+                    <div class="upload-container">
+                      <button class="choose-document-btn" (click)="selectDocument()">
+                        Choose Document
+                      </button>
+                    </div>
+                    <button class="upload-document-btn" (click)="uploadDocument()">Upload the Document</button>
+                  </div>
                 </div>
               </div>
               <div class="inputs-row">
@@ -1464,7 +1483,7 @@
                     <p>Conditions and Restrictions</p>
                   </div>
 
-                  <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition.length !== 0 || (isEditModeAuth)">
+                  <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length !== 0 || (isEditModeAuth)">
                     <strong>Retail Restriction: </strong> &nbsp;
                     <span *ngIf="!isEditModeAuth">Yes</span>
                     <input *ngIf="isEditModeAuth" [(ngModel)]="isScopeConditionChecked" type="checkbox" />
@@ -1693,7 +1712,7 @@
       <div class="inputs-field-set">
         <div class="section">
           <div class="form-section-title">
-            <h2 class="edit-firm-header"> <span>{{ firmDetails?.FirmName }}</span></h2>
+            <h2 class="edit-firm-header"> Controllers > <span>{{ firmDetails?.FirmName }}</span></h2>
             <div class="btn">
               <button (click)="createController()">
                 <i class="bi bi-pen"></i>
@@ -1701,7 +1720,7 @@
               </button>
             </div>
           </div>
-          <table>
+          <table class="controller-tables">
             <thead>
               <tr>
                 <th>Name</th>
@@ -1734,8 +1753,8 @@
 
     <div class="inputs-field-set">
       <div class="section">
-        <h2 class="edit-firm-header">Ultimate Beneficial Owners For <span>{{ firmDetails?.FirmName }}</span></h2>
-        <table>
+        <h2 class="edit-firm-header">Ultimate Beneficial Owners > <span>{{ firmDetails?.FirmName }}</span></h2>
+        <table class="controller-tables">
           <thead>
             <tr>
               <th>Name</th>
@@ -2402,7 +2421,7 @@
             <input id="InactiveAuditors" type="checkbox" />
             <label>Display Inactive Auditors</label>
           </span>
-          <table>
+          <table class="auditor-table">
             <thead>
               <tr>
 
@@ -2580,7 +2599,7 @@
               <label for="InactiveContacts">Display Inactive Contacts</label>
             </span>
           </div>
-          <table>
+          <table class="contacts-table">
             <thead>
               <tr>
                 <th>Name</th>

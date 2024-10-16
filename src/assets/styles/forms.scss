@@ -269,3 +269,38 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
 .date-center {
     text-align: center;
 }
+
+
+/* custom textarea to render html code */
+/*
+.editable-textarea {
+    border: 1px solid #ccc;        
+    padding: 10px;              
+    min-height: 50px;             
+    max-height: 400px;          
+    overflow-y: hidden;               
+    white-space: pre-wrap;          
+    outline: none;                 
+    width: 100%;                    
+    border-radius: 7.2px;         
+    border: 0.72px #b1b1b1 solid;  
+    resize: vertical;                          
+    font-size: 0.875rem;         
+}
+
+/* When the div is not editable 
+.editable-textarea[contenteditable="false"] {
+    background-color: #47424224;
+    color: #616161;    
+    cursor: default;                
+}
+
+/* Focus state 
+.editable-textarea:focus {
+    border-color: black;         
+}
+
+/* Hide scrollbar in WebKit browsers 
+.editable-textarea::-webkit-scrollbar {
+    display: none;                  
+} */
