@@ -498,12 +498,7 @@ getauthorisationStatus(): void {
     };
     return valueMapping[key] || '0'; // Default value if no match found
   }
-  getPrudentialCategoriesCSV(): string {
-    return Object.keys(this.checkboxes)
-      .filter(key => this.checkboxes[key] && key.startsWith('piib'))
-      .map((key, index) => (index + 1)) // Assuming PIIBs are numbered 1-5
-      .join(',');
-  }
+
   getSectorsCSV(): string {
     return Object.keys(this.checkboxes)
       .filter(key => this.checkboxes[key] && ['investmentManager', 'insurer', 'insuranceIntermediary', 'bank', 'advisor', 'repOffice'].includes(key))
@@ -551,7 +546,24 @@ getauthorisationStatus(): void {
       .join(',');
       
   }
-
+  getPrudentialCategoriesCSV(): string {
+    return Object.keys(this.checkboxes)
+      .filter(key => this.checkboxes[key] && key.startsWith('piib'))
+      .map((key) => {
+        switch (key) {
+          case 'piib1': return '1';
+          case 'piib2': return '2';
+          case 'piib3': return '3';
+          case 'piib4': return '4';
+          case 'piib5': return '5';          
+          case 'directInsurer': return '6';
+          case 'reinsurer': return '7';
+          case 'insuranceIntermediary': return '8';
+          default: return "";
+        }
+      })
+      .join(',');
+  }
   getSupCategoriesCSV(): string {
     return Object.keys(this.checkboxes)
         .filter(key => this.checkboxes[key])  // Check if the checkbox is checked

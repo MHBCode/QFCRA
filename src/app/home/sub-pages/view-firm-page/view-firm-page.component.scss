@@ -167,7 +167,7 @@
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #6b0000;
+  accent-color: #a51e36;
   /* Customize the color of the checkbox */
 }
 
@@ -179,10 +179,36 @@
 }
 
 .enhanced-checkbox label:hover {
-  color: #6b0000;
+  color: #a51e36;
   /* Change color on hover */
 }
+.enhanced-checkbox-auditors {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end; /* Align items to the right */
+  width: 100%; /* Ensure it takes up the full width if needed */
+}
 
+.enhanced-checkbox-auditors input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #a51e36;
+  /* Customize the color of the checkbox */
+}
+
+.enhanced-checkbox-auditors label {
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.enhanced-checkbox-auditors label:hover {
+  color: #a51e36;
+  /* Change color on hover */
+}
 ////////////////////////////////////
 
 .btn {
@@ -1431,7 +1457,9 @@ hr {
   min-height: 200px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
-
+.create--inputs-field-set {
+  width : 100%
+}
 .inputs-field-set {
   width: 100%;
   background: #ffffff;

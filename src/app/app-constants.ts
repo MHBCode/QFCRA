@@ -20,7 +20,7 @@ export const prudentialCategoryTypes = "PrudentialCategoryTypes";
 export const authorisationCategoryTypes = "V_AuthorisationCategoryTypes";
 export const PLACE_OF_INCORPORATION_QFC = "QFC";
 export const firmScopeTypes = "FirmScopeTypes";
-
+export const ControllerType = "V_ControllerType"
 export const firmAuditorName = "V_Firm_AuditorName";
 export const firmAuditorType = "V_Firm_AuditorType";
 
