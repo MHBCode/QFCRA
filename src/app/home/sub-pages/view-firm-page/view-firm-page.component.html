@@ -1801,7 +1801,7 @@
               </div>
             </div>
 
-            <!-- Contact Details Row 1 -->
+            <!-- Contact Details Row 1  -->
             <div class="inputs-row">
               <div class="input-field">
                 <label>Full Name of
@@ -2531,17 +2531,18 @@
                 <label for="auditorName">
                   Auditor Name <span style="color: red">*</span>
                 </label>
-                <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID" (change)="onAuditorChange($event)">
-                  <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">{{ name.OtherEntityName }}</option>
+                <!-- (change)="onAuditorChange($event)" -->
+                <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityName" >
+                  <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityName">{{ name.OtherEntityName }}</option>
                   <option [value]="'other'">Other</option>
                 </select>
               </div>
               
-              <div class="input-field" *ngIf="selectedAuditor.OtherEntityID === 'other'">
+              <div class="input-field" *ngIf="selectedAuditor.OtherEntityName === 'other'">
                 <label for="customAuditorName">
                   Custom Auditor Name <span style="color: red">*</span>
                 </label>
-                <input type="text" [(ngModel)]="selectedAuditor.OtherEntityName" placeholder="Enter Custom Auditor Name" />
+                <input type="text" id="customAuditorName" name="customAuditorName" [(ngModel)]="selectedAuditor.customAuditorName" placeholder="Enter Custom Auditor Name" />
               </div>
               <div class="input-field">
                 <label for="auditorType">

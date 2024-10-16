@@ -27,7 +27,7 @@ export class ViewFirmPageComponent implements OnInit {
   canAddNewAddress: boolean = true;
   disableAddressFields: boolean = false;
   isLicensed: boolean;
-  selectedAuditor: any = null;
+  selectedAuditor: any = {};
   categorizedData = [];
   selectedAuditorNameFromSelectBox: string = 'select';
   flatpickrInstance: any;
@@ -4696,18 +4696,18 @@ export class ViewFirmPageComponent implements OnInit {
     try {
       // Wait for validation to complete
       await this.CreateAuditorValidateForm();
-  
+      
       // If no validation errors, proceed to save the auditor
       this.firmAuditorsObj = {
         OtherEntityID: null,
         CreatedBy: this.userId,
         RelatedEntityID: null,
-        EntitySubTypeID: 6,
-        EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeID,
+        EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
+        EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeDesc,
         RelatedEntityEntityID: null,
         MyState: 2,
         LastModifiedByOfOtherEntity: 30,
-        OtherEntityName: this.selectedAuditor.OtherEntityID === null ? this.selectedAuditor.OtherEntityName : this.selectedAuditor.OtherEntityName, 
+        OtherEntityName: this.selectedAuditor.customAuditorName ? this.selectedAuditor.customAuditorName : this.selectedAuditor.OtherEntityName , 
         DateOfIncorporation: null,
         LegalStatusTypeID: null,
         PlaceOfIncorporation: null,
@@ -4736,7 +4736,7 @@ export class ViewFirmPageComponent implements OnInit {
         assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo),
         LastModifiedByOfRelatedEntity: 30,
       };
-  
+      console.log("selectedAuditor.OtherEntityName:",this.selectedAuditor.OtherEntityName, this.selectedAuditor.customAuditorName)
       console.log("Auditor to be created", this.firmAuditorsObj);
   
       // Call the save function
