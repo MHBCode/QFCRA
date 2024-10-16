@@ -110,19 +110,18 @@ export class FirmService {
     
     let params = new HttpParams()
       .set('firmId', filterDataObj.FirmID)
-      .set('OperationalStatusId', 0)
-      .set('AuthorisationCaseOfficerId', 0)
-      .set('SupervisionCaseOfficerId', 0)
+      .set('AuthorisationCaseOfficerId', filterDataObj.AuthorisationCaseOfficerId.toString())
+      .set('SupervisionCaseOfficerId',filterDataObj.SupervisionCaseOfficerId.toString())
       .set('QFCNumber', filterDataObj.QFCNumber)
+      .set('CSVAuthorisationStatus', filterDataObj.CSVAuthorisationStatus.toString())
       .set('userId', 0)
-      .set('RelevantPerson', 0)
-      .set('CSVAuthorisationStatus',filterDataObj.CSVAuthorisationStatus.toString())
+      .set('RelevantPerson', filterDataObj.RelevantPerson)
       .set('CSVLicenseStatus', filterDataObj.CSVLicenseStatus.toString())
-      .set('CSVLegalStatus', 0)
-      .set('CSVPrudentialCategory',filterDataObj.CSVPrudentialCategory.toString())
+      .set('CSVLegalStatus',filterDataObj.CSVLegalStatus.toString())
+      .set('CSVPrudentialCategory',filterDataObj.CSVPrudentialCategory)
       .set('CSVSectorTypes', filterDataObj.CSVSectorTypes.toString())
       .set('LoginuserId', 30)
-      .set('CSVSupCategories', 0)
+      .set('CSVSupCategories', filterDataObj.CSVSupCategories.toString())
       .set('CSVFirmTypes', filterDataObj.CSVFirmTypes.toString())
       .set('CSVFirmStatus', filterDataObj.CSVFirmStatus.toString())
       .set('startChar', filterDataObj.startChar.toString())
@@ -297,8 +296,12 @@ export class FirmService {
     return this.http.post<any>(url, firmAuditorsObj);
   }  
   //////// Yazan Controller
-  deleteotherentitydetails(OtherEntityID: number): Observable<any> {
-    const url = `${this.baseUrlControllers}delete_other_entity_details?otherEntityID=${OtherEntityID}`;
+  // deleteotherentitydetails(OtherEntityID: number): Observable<any> {
+  //   const url = `${this.baseUrlControllers}delete_other_entity_details?otherEntityID=${OtherEntityID}`;
+  //   return this.http.delete<any>(url);
+  // }
+  deleteotherentitydetails(otherEntityID: number, relatedEntityID: number, entitySubTypeID: number, output: number): Observable<any> {
+    const url = `${this.baseUrlControllers}delete_other_entity_details?otherEntityID=${otherEntityID}&relatedEntityID=${relatedEntityID}&entitySubTypeID=${entitySubTypeID}&output=${output}`;
     return this.http.delete<any>(url);
   }
   insertupdateotherentitydetails(saveControllerPopupChangesObj: any): Observable<any> {

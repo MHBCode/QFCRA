@@ -115,6 +115,7 @@ export class ViewFirmPageComponent implements OnInit {
   firmAppDetailsCurrentLicensed: any;
   firmAppDetailsCurrentAuthorized: any;
   FIRMAuditors: any[] = [];
+  showInactiveAuditors = false;
   FIRMContacts: any[] = [];
   FIRMControllers: any[] = [];
   FIRMControllersIndividual: any[] = [];
@@ -165,7 +166,7 @@ export class ViewFirmPageComponent implements OnInit {
   previousSectorTypeID: number;
   /* */
   displayInactiveContacts: boolean = false;
-
+  displayInactiveAuditors: boolean = false;
   selectedStatusId: number | null = null;
   selectedAuthStatusId: number | null = null;
   licenseStatusDates: { [key: number]: string | null } = {};
@@ -211,6 +212,7 @@ export class ViewFirmPageComponent implements OnInit {
   controlTypeOptionsEdit: any[] = [];
   controlTypeOptionsCreate: any[] = [];
   countryOptionsEdit: any[] = [];
+  controllerTypeOption: any = [];
   countryOptionsCreate: any[] = [];
   addressTypeOptionsEdit: any[] = [];
   TitleEdit: any[] = [];
@@ -306,7 +308,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.getcountries();
       this.getFirmAuditorName();
       this.getFirmAuditorType();
-
+      this.getControllerType();
     });
   }
 
@@ -2210,6 +2212,21 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
+  get filteredAuditors() {
+    if (this.showInactiveAuditors) {
+      return this.FIRMAuditors;
+    } else {
+      // Ensure AssnDateTo is converted to a Date object before comparison
+      return this.FIRMAuditors.filter(auditor => {
+        const assnDateTo = new Date(auditor.AssnDateTo); // Convert string to Date
+        const currentDate = new Date(this.currentDate); // Ensure current date is a Date object
+        return assnDateTo.getTime() >= currentDate.getTime(); // Compare dates
+      });
+    }
+  }
+  onInactiveAuditorsToggle(event: Event) {
+    this.showInactiveAuditors = (event.target as HTMLInputElement).checked;
+  }
   loadContacts() {
     this.isLoading = true;
     this.firmService.getContactsOfFIRM(this.firmId).subscribe(
@@ -2294,11 +2311,11 @@ export class ViewFirmPageComponent implements OnInit {
       return this.FIRMContacts.filter(contact => contact.ContactTypeDesc !== 'Contact- No Longer');
     }
   }
-
   // Method to handle the checkbox change
   onInactiveContactsToggle(event: any): void {
     this.displayInactiveContacts = event.target.checked;
   }
+ 
   closeContactPopup() {
     this.isPopupVisible = false;
   }
@@ -2521,6 +2538,7 @@ export class ViewFirmPageComponent implements OnInit {
         console.error("Error fetching Countries", error);
       });
   }
+  
   getcountriesCreate(): void {
     this.firmService.getobjecttypetableEdit(this.userId, constants.countries, this.objectOpTypeIdCreate)
       .subscribe(data => {
@@ -2587,34 +2605,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     });
   }
-  confarmDeleteControllerDetials(OtherEntityID: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you really want to delete this controller detail?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, cancel!',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.DeleteControllerPopup(OtherEntityID); // Pass the ID to the method
-      }
-    });
-  }
-
-  DeleteControllerPopup(OtherEntityID: number): void {
-    this.firmService.deleteotherentitydetails(OtherEntityID).subscribe({
-      next: (response) => {
-        Swal.fire('Deleted!', 'Controller detail has been deleted.', 'success');
-        console.log('Entity deleted successfully:', response);
-        // Optionally refresh the list or perform other actions here
-      },
-      error: (err) => {
-        Swal.fire('Error!', 'There was a problem deleting the controller detail.', 'error');
-        console.error('Error deleting entity:', err);
-      }
-    });
-  }
+ 
   getLegalStatusDescription(): string {
     const status = this.legalStatusOptionsEdit.find(option => option.LegalStatusTypeID === this.selectedController.LegalStatusTypeID);
     return status ? status.LegalStatusTypeDesc : '';
@@ -2654,19 +2645,53 @@ export class ViewFirmPageComponent implements OnInit {
     this.getlegalStatusControllerCreate();
     this.getControllerControlTypesCreat();
   }
+  confarmDeleteControllerDetials(): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete this controller detail?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.DeleteControllerPopup(); // Pass the ID to the method
+      }
+    });
+  }
+
+  DeleteControllerPopup(): void {
+    const otherEntityID = this.selectedController.OtherEntityID;
+    const relatedEntityID = this.selectedController.RelatedEntityID;
+    const entitySubTypeID = 5;
+    const output = 0; // As per your requirement
+    console.log("DeleteControllerPopup",otherEntityID,relatedEntityID,entitySubTypeID)
+    // Make the DELETE request with all required query parameters
+    this.firmService.deleteotherentitydetails(otherEntityID, relatedEntityID, entitySubTypeID, output).subscribe(
+      response => {
+        console.log("Controller Details Deleted successfully:", response);
+        Swal.fire('Deleted!', 'Controller detail has been deleted.', 'success');
+        this.loadControllers();
+      },
+      error => {
+        console.error("Error deleting Controller:", error);
+        Swal.fire('Error!', 'There was a problem deleting the controller detail.', 'error');
+      }
+    );
+  }
   saveControllerPopupChanges(): void {
     this.isEditable = false;
     this.EditControllerValidateForm().then(() => {
       if (!this.hasValidationErrors) {
         console.log("Selected Controller:", this.selectedController);
         if (
-          ["Parent Entity", "Corporate Controller", "Head_Office", "UBO_Corporate"].includes(this.selectedController.EntityTypeDesc)
+          ["Parent Entity", "Corporate Controller", "Head Office of a Branch", "UBO – Corporate"].includes(this.selectedController.EntityTypeDesc)
         ) {
           const saveControllerPopupChangesObj = {
             otherEntityDetails: {
               UserID: 30,
               UserName: null,
-              OtherEntityName: this.selectedController.EntityTypeDesc,
+              OtherEntityName: this.selectedController.OtherEntityName,
               otherEntityID: this.selectedController.OtherEntityID,
               DateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
               createdBy: this.selectedController.CreatedBy,
@@ -2700,10 +2725,10 @@ export class ViewFirmPageComponent implements OnInit {
               EntityID: this.selectedController.FirmID,
               controllerControlTypeID: this.selectedController.ControllerControlTypeID,
               numOfShares: this.selectedController.numOfShares,
-              pctOfShares: this.selectedController.pctOfShares,
+              PctOfShares: this.selectedController.PctOfShares,
               MajorityStockHolder: false,
-              assnDateFrom: null,
-              assnDateTo: null,
+              AssnDateFrom: this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
+              AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
             },
             addressList: [
@@ -2820,13 +2845,13 @@ export class ViewFirmPageComponent implements OnInit {
         }
       }
       else if (
-        ["IndividualController", "UBO_Individual"].includes(this.selectedController.EntityTypeDesc)
+        ["Individual Controller", "UBO - Individual"].includes(this.selectedController.EntityTypeDesc)
       ) {
         const saveControllerPopupChangesIndividualObj = {
           contactDetails: {
             contactDetails: {
-              firmID: 0,
-              contactID: 0,
+              firmID: this.firmId,
+              contactID: null,
               contactAssnID: 0,
               title: this.selectedController.Title, // Map your inputs accordingly
               firstName: this.selectedController.FirstName,
@@ -2929,18 +2954,19 @@ export class ViewFirmPageComponent implements OnInit {
       // Validate Full Name of Entity
       if (!this.CreatecontrollerDetails.OtherEntityName) {
         this.getErrorMessages('OtherEntityName', constants.ControllerMessages.ENTER_OTHER_ENTITY_NAME);
+        this.hasValidationErrors = true;
       }
 
       // Validate Effective Date
-      if (!this.CreatecontrollerDetails.EffectiveDate) {
-        this.getErrorMessages('EffectiveDate', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
+      if (!this.CreatecontrollerDetails.AssnDateFrom) {
+        this.getErrorMessages('AssnDateFrom', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
       }
 
       // Validate Cessation Date
-      if (!this.CreatecontrollerDetails.CessationDate) {
-        this.getErrorMessages('CessationDate', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
-      } else if (this.CreatecontrollerDetails.EffectiveDate && new Date(this.CreatecontrollerDetails.EffectiveDate) > new Date(this.CreatecontrollerDetails.CessationDate)) {
-        this.getErrorMessages('CessationDate', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+      if (!this.CreatecontrollerDetails.AssnDateTo) {
+        this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+      } else if (this.CreatecontrollerDetails.AssnDateFrom && new Date(this.CreatecontrollerDetails.AssnDateFrom) > new Date(this.CreatecontrollerDetails.AssnDateTo)) {
+        this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
       }
 
       // Validate Place of Establishment
@@ -2986,7 +3012,7 @@ export class ViewFirmPageComponent implements OnInit {
     OtherEntityID: 0,
     OtherEntityName: '',
     LegalStatusTypeID: 0,
-    PctOfShares: null,
+    PctOfShares: '',
     PlaceOfEstablishment: '',
     Title: '',
     FirstName: '',
@@ -3027,9 +3053,9 @@ export class ViewFirmPageComponent implements OnInit {
     CreatedBy: 30,
     RelatedEntityID: 0,
     EntitySubTypeID: null,
-    EntityTypeID: 6,
+    EntityTypeID: 1,
     RelatedEntityEntityID: 0,
-    MyState: 0,
+    MyState: 2,
     PlaceOfIncorporation: '',
     CountryOfIncorporation: 0,
     zebSiteAddress: '',
@@ -3049,7 +3075,9 @@ export class ViewFirmPageComponent implements OnInit {
     ObjectID: 0,
     PrefferdMethod: '',
     ContactId: 0,
+    ThirdName:'',
     ObjectInstanceID: 0,
+    AddressTypeDesc:'',
     StatusDate: '',
     MobilePhone: '',
     businessEmail: '',
@@ -3071,14 +3099,33 @@ export class ViewFirmPageComponent implements OnInit {
         break;
     }
   }
-
+  CreateControlTypeDesc(selectedValue: any) {
+    const selectedEntityTypeDesc = this.CreatecontrollerDetails.EntityTypeDesc;
+    const selectedControllerType = this.controllerTypeOption.find(
+      controllerType => controllerType.EntityTypeDesc === selectedEntityTypeDesc
+    );
+    
+    if (selectedControllerType) {
+      this.CreatecontrollerDetails.EntityTypeID = selectedControllerType.EntityTypeID;
+    }
+  }
+  getControllerType(): void {
+    this.firmService.getobjecttypetableEdit(this.userId, constants.ControllerType, this.objectOpTypeIdEdit)
+      .subscribe(data => {
+        this.controllerTypeOption = data.response;
+        console.log("Controllers", data)
+      }, error => {
+        console.error("Error fetching Controllers", error);
+      });
+  }
+  
   createControllerPopupChanges(): void {
     console.log("CreatecontrollerDetails", this.CreatecontrollerDetails)
     this.CreateControllerValidateForm().then(() => {
       if (!this.hasValidationErrors) {
         console.log("Selected Controller:", this.CreatecontrollerDetails.EntityTypeDesc);
         if (
-          ["parentEntity", "corporateController", "headOfficeBranch", "uboCorporate"].includes(this.CreatecontrollerDetails.EntityTypeDesc)
+          ["Parent Entity", "Corporate Controller", "Head Office of a Branch", "UBO – Corporate"].includes(this.CreatecontrollerDetails.EntityTypeDesc)
         ) {
           const saveControllerPopupChangesObj = {
             otherEntityDetails: {
@@ -3087,23 +3134,24 @@ export class ViewFirmPageComponent implements OnInit {
               OtherEntityName: this.CreatecontrollerDetails.OtherEntityName,
               OtherEntityID: null,
               ControllerControlTypeDesc: this.CreatecontrollerDetails.ControllerControlTypeDesc,
-              EntityTypeDesc: this.CreatecontrollerDetails.EntityTypeDesc,
+              EntityTypeDesc: null,
               DateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
               createdBy: this.CreatecontrollerDetails.CreatedBy,
               CessationDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CessationDate),
               EffectiveDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.EffectiveDate),
               CreatedDate: null,
               ControllerControlTypeID: this.CreatecontrollerDetails.ControllerControlTypeID,
-              relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
-              entitySubTypeID: this.CreatecontrollerDetails.EntitySubTypeID,
-              relatedEntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-              relatedEntityEntityID: this.CreatecontrollerDetails.RelatedEntityEntityID,
-              myState: this.CreatecontrollerDetails.MyState,
+              RelatedEntityID: null,
+              EntitySubTypeID: null,
+              EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+              RelatedEntityTypeID: 6,
+              relatedEntityEntityID: null,
+              MyState: 0,
               LegalStatusTypeID: this.CreatecontrollerDetails.LegalStatusTypeID,
               LegalStatusTypeDesc: this.CreatecontrollerDetails.LegalStatusTypeDesc,
               placeOfIncorporation: this.CreatecontrollerDetails.PlaceOfIncorporation,
-              countryOfIncorporation: 2,
-              PctOfShares: null,
+              countryOfIncorporation: this.CreatecontrollerDetails.PlaceOfEstablishment,
+              PctOfShares: this.CreatecontrollerDetails.PctOfShares,
               addressState: 2,
               registeredNumber: this.CreatecontrollerDetails.RegisteredNum,
               zebSiteAddress: this.CreatecontrollerDetails.zebSiteAddress,
@@ -3118,12 +3166,11 @@ export class ViewFirmPageComponent implements OnInit {
               controllerInfo: this.CreatecontrollerDetails.ControllerInfo,
               Output: 0,
               FirmID: this.firmId,
-              EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               EntityID: this.firmId,
               numOfShares: this.CreatecontrollerDetails.NumOfShares,
               MajorityStockHolder: false,
-              assnDateFrom: null,
-              assnDateTo: null,
+              AssnDateFrom: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
+              AssnDateTo: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
             },
             addressList: [
@@ -3212,107 +3259,117 @@ export class ViewFirmPageComponent implements OnInit {
               }
             ]
           }
-
+            console.log("Controller to be saved",saveControllerPopupChangesObj)
           // Call the insert/update endpoint
           this.firmService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
             response => {
               console.log("Save successful:", response);
               this.isEditable = false;
+              this.loadControllers();
             },
             error => {
               console.error("Error saving changes:", error);
             }
           );
+          
         }
       }
       else if (
-        ["individualController", "uboIndividual"].includes(this.CreatecontrollerDetails.EntityTypeDesc)
+        ["Individual Controller", "UBO - Individual"].includes(this.CreatecontrollerDetails.EntityTypeDesc)
       ) {
         const saveControllerPopupChangesIndividualObj = {
           contactDetails: {
             contactDetails: {
-              firmID: 0,
-              contactID: 0,
-              contactAssnID: 0,
-              title: this.selectedController.Title, // Map your inputs accordingly
-              firstName: this.selectedController.FirstName,
-              secondName: this.selectedController.SecondName,
-              thirdName: this.selectedController.ThirdName,
-              familyName: this.selectedController.FamilyName,
-              countryOfResidence: this.selectedController.CountryOfResidence,
-              createdBy: this.selectedController.CreatedBy,
-              dateOfBirth: this.selectedController.DateOfBirth,
-              fullName: this.selectedController.FullName,
-              lastModifiedBy: this.selectedController.LastModifiedByOfOtherEntities,
-              nationalID: this.selectedController.NationalID,
-              nationality: this.selectedController.Nationality,
-              passportNum: this.selectedController.PassportNum,
-              placeOfBirth: this.selectedController.PlaceOfBirth,
-              previousName: this.selectedController.PreviousName,
-              isExists: this.selectedController.IsExists,
-              nameInPassport: this.selectedController.NameInPassport,
-              contactAddnlInfoTypeID: this.selectedController.ContactAddnlInfoTypeID,
-              isFromContact: this.selectedController.IsFromContact,
-              countryofBirth: this.selectedController.CountryOfBirth,
-              juridictionID: this.selectedController.JuridictionID,
-              objectID: this.selectedController.ObjectID,
-              isPeP: this.selectedController.IsPeP
+              firmID: this.firmId,
+              contactID: null,
+              contactAssnID: null,
+              OtherEntityName: this.CreatecontrollerDetails.OtherEntityName,
+              EntityTypeID:this.CreatecontrollerDetails.EntityTypeID,
+              Title: this.CreatecontrollerDetails.Title, // Map your inputs accordingly
+              FirstName: this.CreatecontrollerDetails.FirstName,
+              secondName: this.CreatecontrollerDetails.SecondName,
+              thirdName: this.CreatecontrollerDetails.ThirdName,
+              familyName: this.CreatecontrollerDetails.FamilyName,
+              PctOfShares: this.CreatecontrollerDetails.PctOfShares,
+              tempContactID: 0,
+              countryOfResidence: null,
+              ControllerControlTypeID : this.CreatecontrollerDetails.ControllerControlTypeID,
+              createdBy: this.userId,
+              dateOfBirth: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.DateOfBirth),
+              fullName: null,
+              lastModifiedBy: this.userId,
+              MyState : 0,
+              nationalID: null,
+              nationality: null,
+              EntityID: this.firmId,
+              passportNum: this.CreatecontrollerDetails.PassportNum,
+              placeOfBirth: this.CreatecontrollerDetails.PlaceOfBirth,
+              previousName: null,
+              isExists: null,
+              nameInPassport: null,
+              contactAddnlInfoTypeID: null,
+              isFromContact: null,
+              countryofBirth: null,
+              juridictionID: null,
+              objectID: this.CreatecontrollerDetails.ObjectID,
+              isPeP: this.CreatecontrollerDetails.IsPEP,
+              AssnDateFrom: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
+              AssnDateTo: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
+              LastModifiedByOfOtherEntity: 30,
+              JurisdictionId:3,
             },
-            lstContactFunctions: this.selectedController.LstContactFunctions.map(func => ({
-              contactFunctionID: func.ContactFunctionID,
-              contactFunctionTypeID: func.ContactFunctionTypeID,
-              contactAssnID: func.ContactAssnID,
-              contactID: func.ContactID,
-              contactFunctionTypeDesc: func.ContactFunctionTypeDesc,
-              effectiveDate: func.EffectiveDate,
-              endDate: func.EndDate,
-              createdDate: func.CreatedDate,
-              createdBy: func.CreatedBy,
-              lastModifiedBy: func.LastModifiedByOfOtherEntities,
-              LastModifiedDate: func.LastModifiedDate,
-              reviewStatus: func.ReviewStatus,
-              selected: func.Selected,
-              isFunctionActive: func.IsFunctionActive,
-              isRecordEditable: func.IsRecordEditable
-            }))
+            lstContactFunctions: {
+              contactFunctionID: null,
+              contactFunctionTypeID: null,
+              contactAssnID: null,
+              contactID: null,
+              contactFunctionTypeDesc: null,
+              effectiveDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
+              endDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
+              CreatedDate: null,
+              createdBy: this.userId,
+              lastModifiedBy: null,
+              LastModifiedDate: null,
+              JurisdictionId:3,
+              isFunctionActive: null,
+              isRecordEditable: false
+            }
           },
-          addresses: this.selectedController.Addresses.map(address => ({
-            firmID: address.FirmID,
-            countryID: address.CountryID,
-            addressTypeID: address.AddressTypeID,
-            sameAsTypeID: address.SameAsTypeID,
-            lastModifiedBy: address.LastModifiedByOfOtherEntities,
-            addressAssnID: address.AddressAssnID,
-            entityTypeID: address.EntityTypeID,
-            entityID: address.EntityID,
-            contactAssnID: address.ContactAssnID,
-            contactID: address.ContactID,
-            addressID: address.AddressID,
-            addressLine1: address.AddressLine1,
-            addressLine2: address.AddressLine2,
-            addressLine3: address.AddressLine3,
-            addressLine4: address.AddressLine4,
-            city: address.City,
-            province: address.Province,
-            postalCode: address.PostalCode,
-            phoneNumber: address.PhoneNumber,
-            phoneExt: address.PhoneExt,
-            faxNumber: address.FaxNumber,
-            LastModifiedDate: address.LastModifiedDate,
-            addressState: address.AddressState,
+          addresses: [
+          {
+            firmID: this.firmId,
+            countryID: this.CreatecontrollerDetails.CountryID,
+            addressTypeID: this.CreatecontrollerDetails.AddressTypeID,
+            AddressTypeDesc: this.CreatecontrollerDetails.AddressTypeDesc,
+            addressState:2,
+            LastModifiedDate:null,
+            SameAsTypeID:0,
+            lastModifiedBy: this.userId,
+            CreatedBy: 0,
+            AddressAssnID:null,
+            EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+            entityID: this.firmId,
+            ContactAssnID: null,
+            ContactID: null,
+            addressID: this.CreatecontrollerDetails.AddressID,
+            addressLine1: this.CreatecontrollerDetails.addressLine1,
+            addressLine2: this.CreatecontrollerDetails.addressLine2,
+            addressLine3: this.CreatecontrollerDetails.addressLine3,
+            addressLine4: this.CreatecontrollerDetails.addressLine4,
+            city: this.CreatecontrollerDetails.city,
+            JurisdictionId:3,
+            Province: this.CreatecontrollerDetails.stateProvince,
+            postalCode:this.CreatecontrollerDetails.zipPostalCode,
+            phoneNumber: null,
             fromDate: "2024-10-01T14:38:59.118Z",
             toDate: "2024-10-01T14:38:59.118Z",
-            objectID: address.ObjectID,
-            objectInstanceID: address.ObjectInstanceID,
-            objectInstanceRevNumber: address.ObjectInstanceRevNumber,
-            sourceObjectID: address.SourceObjectID,
-            sourceObjectInstanceID: address.SourceObjectInstanceID,
-            sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber,
-            objAis: address.ObjAis // Ensure this object is correctly structured
-          }))
-        };
+            objectID: this.CreatecontrollerDetails.ObjectID,
+            objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
+            objAis: null,
+          }
+        ]
+      }; 
 
-        // Call the save/update contact form endpoint
         this.firmService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
           response => {
             console.log("Contact save successful:", response);
@@ -3333,7 +3390,7 @@ export class ViewFirmPageComponent implements OnInit {
 
     console.log('Editing:', this.controllerDetails);
   }
-
+  
   loadControllers(): void {
     this.isLoading = true;
     this.firmService.getFIRMControllers(this.firmId).subscribe(
@@ -4793,11 +4850,22 @@ export class ViewFirmPageComponent implements OnInit {
   ////////// Yazan Auditor
   firmAuditorName: { OtherEntityID: number, OtherEntityName: string }[] = [];
   firmAuditorType: { EntitySubTypeID: number, EntitySubTypeDesc: string }[] = [];
+  // getFirmAuditorName(): void {
+  //   this.firmService.getobjecttypetableEdit(this.userId, constants.firmAuditorName, this.objectOpTypeIdEdit)
+  //     .subscribe(data => {
+  //       this.firmAuditorName = data.response;
+  //       console.log("firmAuditorName", data)
+  //     }, error => {
+  //       console.error("Error fetching controller", error);
+  //     });
+  // }
   getFirmAuditorName(): void {
     this.firmService.getobjecttypetableEdit(this.userId, constants.firmAuditorName, this.objectOpTypeIdEdit)
       .subscribe(data => {
-        this.firmAuditorName = data.response;
-        console.log("firmAuditorName", data)
+        this.firmAuditorName = data.response.filter(item => {
+          return isNaN(item.OtherEntityName) && !/\d/.test(item.OtherEntityName);
+        });
+        console.log("Filtered firmAuditorName", this.firmAuditorName);
       }, error => {
         console.error("Error fetching controller", error);
       });
@@ -4827,6 +4895,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.selectedAuditor = {};
     this.IsCreateAuditorVisible = false;
     this.IsViewAuditorVisible = false;
+    this.firmAuditorsObj = {};
   }
   editAuditor() {
     this.IsEditAuditorVisible = true; // Show the edit section
@@ -4837,22 +4906,23 @@ export class ViewFirmPageComponent implements OnInit {
     this.getFirmAuditorName();
     this.getFirmAuditorType();
   }
+
   firmAuditorsObj: {};
   saveEditAuditor() {
     console.log("selectedAuditor", this.selectedAuditor)
     this.firmAuditorsObj = {
       OtherEntityID: this.selectedAuditor.OtherEntityID,
       CreatedBy: 30,
-      RelatedEntityID: this.selectedAuditor.RelatedEntityID,
+      RelatedEntityID: this.selectedAuditor.RelatedEntityID, // Yazan ?? 
       EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
       EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeDesc,
       // erorr
-      RelatedEntityTypeID: this.selectedAuditor.RelatedEntityID,
-      RelatedEntityEntityID: this.selectedAuditor.OtherEntityID,
-      MyState: 3,
+      RelatedEntityTypeID: 3, // Yazan ??
+      RelatedEntityEntityID: this.selectedAuditor.OtherEntityID, // Yazan ?? 
+      MyState: 2,
       LastModifiedByOfOtherEntity: 30,
       OtherEntityName: this.selectedAuditor.OtherEntityName,
-      DateOfIncorporation: null,
+      DateOfIncorporation: "2024-10-02T11:58:32.911Z",
       LegalStatusTypeID: null,
       PlaceOfIncorporation: null,
       CountryOfIncorporation: null,
@@ -4860,8 +4930,7 @@ export class ViewFirmPageComponent implements OnInit {
       ZebSiteAddress: null,
       LastModifiedDate: this.currentDate,
       lastModifiedBy: 30,
-      isAuditor: 0,
-
+      isAuditor: null,
       isCompanyRegulated: true,
       additionalDetails: null,
       isParentController: true,
@@ -4870,7 +4939,7 @@ export class ViewFirmPageComponent implements OnInit {
       controllerInfo: null,
       output: 0,
       firmId: this.firmId,
-      entityTypeID: 0,
+      entityTypeID:this.selectedAuditor.EntityTypeID,
       entityID: this.firmId,
       controllerControlTypeID: null,
       numOfShares: 0,
@@ -4883,6 +4952,7 @@ export class ViewFirmPageComponent implements OnInit {
       MajorityStockHolder: false,
 
     }
+    console.log("Auditor to be saved",this.firmAuditorsObj)
     this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
       (response) => {
         console.log("Auditor saved successfully", response);
@@ -4897,55 +4967,205 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  saveCreateAuditor() {
-    this.firmAuditorsObj = {
-      otherEntityID: this.selectedAuditor.OtherEntityID,
-      createdBy: this.userId,
-      relatedEntityID: this.selectedAuditor.RelatedEntityID,
-      entitySubTypeID: this.selectedAuditor.EntitySubTypeID,
-      relatedEntityTypeID: 0,
-      relatedEntityEntityID: 0,
-      myState: 2,
-      otherEntityName: this.selectedAuditor.OtherEntityName,
-      dateOfIncorporation: "2024-10-02T11:58:32.911Z",
-      legalStatusTypeID: 0,
-      placeOfIncorporation: null,
-      countryOfIncorporation: 0,
-      registeredNumber: null,
-      zebSiteAddress: null,
-      lastModifiedBy: this.userId,
-      isAuditor: 0,
-      isCompanyRegulated: true,
-      additionalDetails: null,
-      isParentController: true,
-      isPublicallyTraded: true,
-      areAnyUBOs: true,
-      controllerInfo: null,
-      output: 0,
-      firmId: this.firmId,
-      entityTypeID: 0,
-      entityID: 0,
-      controllerControlTypeID: 0,
-      numOfShares: 0,
-      pctOfShares: 0,
-      majorityStockHolder: true,
-      assnDateFrom: "2024-10-02T11:58:32.911Z",
-      assnDateTo: "2024-10-02T11:58:32.911Z"
+  onAuditorChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+  
+    if (value === 'other') {
+      this.selectedAuditor.OtherEntityID = 'other'; // Set to a flag, not relevant since ID is not used
+      this.selectedAuditor.OtherEntityName = ''; // Clear the custom name field for user input
+    } else {
+      const numericValue = Number(value);
+      this.selectedAuditor.OtherEntityID = numericValue;
+  
+      const selectedAuditor = this.firmAuditorName.find(auditor => auditor.OtherEntityID === numericValue);
+      this.selectedAuditor.OtherEntityName = selectedAuditor ? selectedAuditor.OtherEntityName : '';
     }
-    this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
-      (response) => {
-        console.log("Auditor saved successfully", response);
-        Swal.fire('Seaved!', 'Auditors details has been Seaved.', 'success');
-        this.IsEditAuditorVisible = false;
-        this.IsViewAuditorVisible = false;
-        this.loadAuditors();
-      },
-      (error) => {
-        console.error("Error saving auditor", error);
-        Swal.fire('Error!', 'Error Saving Auditor', 'error');
-      }
-    );
   }
+  CreateAuditorValidateForm(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.errorMessages = {};
+      this.hasValidationErrors = false;
+  
+      // Validate 'OtherEntityName'
+      if (this.selectedAuditor.OtherEntityID === 'other' && !this.selectedAuditor.OtherEntityName) {
+        this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
+        this.hasValidationErrors = true;
+      } else if (
+        this.selectedAuditor.OtherEntityID === 'other' &&
+        this.filteredAuditors.some(auditor =>
+          auditor.OtherEntityName?.toLowerCase() === this.selectedAuditor.OtherEntityName?.toLowerCase()
+        )
+      ) {
+        this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
+        this.hasValidationErrors = true;
+      } else if (!this.selectedAuditor.OtherEntityName) {
+        this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
+        this.hasValidationErrors = true;
+      }
+  
+      // Validate 'EntitySubTypeID'
+      if (!this.selectedAuditor.EntitySubTypeID) {
+        this.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
+        this.hasValidationErrors = true;
+      }
+  
+      // Check if there are any errors
+      if (Object.keys(this.errorMessages).length > 0) {
+        this.hasValidationErrors = true;
+        reject(); // Reject the promise if there are validation errors
+      } else {
+        this.hasValidationErrors = false;
+        resolve(); // Resolve if there are no errors
+      }
+    });
+  }
+  async saveCreateAuditor() {
+    try {
+      // Wait for validation to complete
+      await this.CreateAuditorValidateForm();
+  
+      // If no validation errors, proceed to save the auditor
+      this.firmAuditorsObj = {
+        OtherEntityID: null,
+        CreatedBy: this.userId,
+        RelatedEntityID: null,
+        EntitySubTypeID: 6,
+        EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeID,
+        RelatedEntityEntityID: null,
+        MyState: 2,
+        LastModifiedByOfOtherEntity: 30,
+        OtherEntityName: this.selectedAuditor.OtherEntityID === null ? this.selectedAuditor.OtherEntityName : this.selectedAuditor.OtherEntityName, 
+        DateOfIncorporation: null,
+        LegalStatusTypeID: null,
+        PlaceOfIncorporation: null,
+        CountryOfIncorporation: null,
+        RegisteredNumber: null,
+        ZebSiteAddress: null,
+        LastModifiedDate: this.currentDate,
+        lastModifiedBy: this.userId,
+        relatedEntityTypeID: 3,
+        IsAuditor: 2,
+        isCompanyRegulated: true,
+        additionalDetails: null,
+        isParentController: true,
+        isPublicallyTraded: true,
+        areAnyUBOs: true,
+        controllerInfo: null,
+        output: 0,
+        firmId: this.firmId,
+        EntityTypeID: 1,
+        entityID: this.firmId,
+        controllerControlTypeID: null,
+        numOfShares: 0,
+        pctOfShares: 0,
+        majorityStockHolder: true,
+        assnDateFrom: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom),
+        assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo),
+        LastModifiedByOfRelatedEntity: 30,
+      };
+  
+      console.log("Auditor to be created", this.firmAuditorsObj);
+  
+      // Call the save function
+      this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
+        (response) => {
+          console.log("Auditor saved successfully", response);
+          Swal.fire('Saved!', 'Auditors details have been saved.', 'success');
+          this.IsEditAuditorVisible = false;
+          this.IsViewAuditorVisible = false;
+          this.loadAuditors();
+        },
+        (error) => {
+          console.error("Error saving auditor", error);
+          Swal.fire('Error!', 'Error Saving Auditor', 'error');
+        }
+      );
+    } catch (error) {
+      // Handle validation errors
+      Swal.fire('Error!', 'Please fix the validation errors before submitting.', 'error');
+    }
+  }
+  
+  // CreateAuditorValidateForm(): Promise<void> {
+  //   return new Promise<void>((resolve, reject) => {
+  //     this.errorMessages = {}; 
+  //     this.hasValidationErrors = false;
+  
+  //     if (!this.selectedAuditor.OtherEntityName) {
+  //       this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name); // Use the constant for message
+  //     } else if (this.firmAuditorName.some(auditor => auditor.OtherEntityName === this.selectedAuditor.OtherEntityName)) {
+  //       this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
+  //     }
+  //     if (!this.selectedAuditor.EntitySubTypeID) {
+  //       this.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type); // Use the constant for message
+  //     }
+  //     if (Object.keys(this.errorMessages).length > 0) {
+  //       this.hasValidationErrors = true;
+  //       resolve(); 
+  //     } else {
+  //       resolve(); 
+  //     }
+  //   });
+  // }
+  // saveCreateAuditor() {
+  //   this.CreateAuditorValidateForm(); 
+  //   if (this.hasValidationErrors) {
+  //     Swal.fire('Error!', 'Please fix the validation errors before submitting.', 'error');
+  //     return; 
+  //   }
+  //   this.firmAuditorsObj = {
+  //     OtherEntityID: this.selectedAuditor.OtherEntityID, // Yazan ??
+  //     CreatedBy: this.userId,
+  //     RelatedEntityID: null,
+  //     EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
+  //     EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeID,
+  //     RelatedEntityEntityID: 4, // Yazan ??
+  //     MyState: 2,
+  //     LastModifiedByOfOtherEntity: 30,
+  //     OtherEntityName: this.selectedAuditor.OtherEntityName,
+  //     DateOfIncorporation: "2024-10-02T11:58:32.911Z",
+  //     LegalStatusTypeID: null,
+  //     PlaceOfIncorporation: null,
+  //     CountryOfIncorporation: null,
+  //     RegisteredNumber: null,
+  //     ZebSiteAddress: null,
+  //     LastModifiedDate: this.currentDate,
+  //     lastModifiedBy: this.userId,
+  //     relatedEntityTypeID:  3, // Yazan ??
+  //     isAuditor: 2,
+  //     isCompanyRegulated: true,
+  //     additionalDetails: null,
+  //     isParentController: true,
+  //     isPublicallyTraded: true,
+  //     areAnyUBOs: true,
+  //     controllerInfo: null,
+  //     output: 0,
+  //     firmId: this.firmId,
+  //     entityTypeID: 1, // Yazan ??
+  //     entityID: this.firmId,
+  //     controllerControlTypeID: null,
+  //     numOfShares: 0,
+  //     pctOfShares: 0,
+  //     majorityStockHolder: true,
+  //     assnDateFrom: "2020-03-01",
+  //     assnDateTo: "2021-03-31"
+      
+  //   }
+  //   console.log("Auditor to be created",this.firmAuditorsObj)
+  //   this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
+  //     (response) => {
+  //       console.log("Auditor saved successfully", response);
+  //       Swal.fire('Seaved!', 'Auditors details has been Seaved.', 'success');
+  //       this.IsEditAuditorVisible = false;
+  //       this.IsViewAuditorVisible = false;
+  //       this.loadAuditors();
+  //     },
+  //     (error) => {
+  //       console.error("Error saving auditor", error);
+  //       Swal.fire('Error!', 'Error Saving Auditor', 'error');
+  //     }
+  //   );
+  // }
   // Method to cancel the edit action and switch back to view mode
   cancelEdit() {
     this.IsEditAuditorVisible = false;
