@@ -3130,13 +3130,47 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
   addAddressForm(): void {
-    if (this.addressForms.length < 3 && this.isFormValid()) {
+    if (this.addressForms.length === 0) {
+      // If the array is empty, add the first form without validation
       this.addressForms.push({
         AddressTypeID: 0,
         addressLine1: '',
         addressLine2: '',
         firmID: this.firmId,
-        countryID: '',
+        CountryID: '',
+        addressTypeID: '',
+        LastModifiedBy: 30,
+        entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+        entityID: this.CreatecontrollerDetails.EntityID,
+        contactID: '',
+        addressID: null,
+        addressLine3: '',
+        addressLine4: '',
+        city: '',
+        sameAsTypeID:0,
+        createdBy: 0,
+        addressAssnID: null,
+        CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
+        LastModifiedDate: this.currentDate,
+        addressState: 2,
+        fromDate: null,
+        toDate: null,
+        Output: 0,
+        objectID: this.CreatecontrollerDetails.ObjectID,
+        objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
+        objAis: null,
+        zipPostalCode: '',
+        stateProvince: '',
+      });
+    }
+    else if (this.addressForms.length < 3 && this.isFormValid()) {
+      this.addressForms.push({
+        AddressTypeID: 0,
+        addressLine1: '',
+        addressLine2: '',
+        sameAsTypeID: 0,
+        firmID: this.firmId,
+        CountryID: '',
         addressTypeID: '',
         LastModifiedBy: 30,
         entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
@@ -3173,13 +3207,25 @@ export class ViewFirmPageComponent implements OnInit {
   removeAddressForm(index: number): void {
     this.addressForms.splice(index, 1);
   }
+  getAddressTypeDesc(addressTypeID: number): string {
+    const selectedType = this.allAddressTypes.find(type => type.AddressTypeID === addressTypeID);
+    return selectedType ? selectedType.AddressTypeDesc : 'Unknown';
+  }
+  onSameAsTypeChangeg(event: any, address: any): void {
+    const selectedSameAsTypeID = event.target.value;
+  
+    // Set the AddressTypeID based on Same As Type selection
+    if (selectedSameAsTypeID && selectedSameAsTypeID !== '0') {
+      address.AddressTypeID = selectedSameAsTypeID;
+    }
+  }
   addressForms = [
     { 
       AddressTypeID: 0, 
       addressLine1: '', 
       addressLine2: '', 
       firmID: this.firmId,
-      countryID: '',
+      CountryID: '',
       addressTypeID: '',
       LastModifiedBy: 30,
       entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
@@ -3189,6 +3235,7 @@ export class ViewFirmPageComponent implements OnInit {
       addressLine3: '',
       addressLine4:'',
       city: '',
+      sameAsTypeID:0,
       createdBy: 0,
       addressAssnID: null,
       CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
@@ -3258,33 +3305,34 @@ export class ViewFirmPageComponent implements OnInit {
               AssnDateTo: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
             },
-            addressList:this.addressForms.map(address =>({
+            addressList: this.addressForms.map(address => ({
               firmID: this.firmId,
-              countryID: this.CreatecontrollerDetails.CountryID,
-              addressTypeID: this.CreatecontrollerDetails.AddressTypeID,
-              LastModifiedBy: 30,
+              countryID: address.CountryID,
+              addressTypeID: address.AddressTypeID,
+              LastModifiedBy: this.userId,
               entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-              entityID: this.CreatecontrollerDetails.EntityID,
-              contactID: this.CreatecontrollerDetails.ContactID,
-              addressID: null,
-              addressLine1: this.CreatecontrollerDetails.addressLine1,
-              addressLine2: this.CreatecontrollerDetails.addressLine2,
-              addressLine3: this.CreatecontrollerDetails.addressLine3,
-              addressLine4: this.CreatecontrollerDetails.addressLine4,
-              city: this.CreatecontrollerDetails.city,
-              createdBy: 0,
-              addressAssnID: null,
-              CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
-              LastModifiedDate: this.currentDate,
-              addressState: 2,
-              fromDate: null,
-              toDate: null,
-              Output: 0,
-              objectID: this.CreatecontrollerDetails.ObjectID,
-              objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
-              objAis: null,   
-              zipPostalCode:'', 
-            })) ,
+              entityID: this.firmId,
+              contactID: address.contactID,
+              addressID: address.addressID,
+              addressLine1: address.addressLine1,
+              addressLine2: address.addressLine2,
+              addressLine3: address.addressLine3,
+              addressLine4: address.addressLine4,
+              city: address.city,
+              stateProvince: address.stateProvince,
+              createdBy: address.createdBy,
+              addressAssnID: address.addressAssnID,
+              CreatedDate: address.CreatedDate,
+              LastModifiedDate: address.LastModifiedDate,
+              addressState: address.addressState,
+              fromDate: address.fromDate,
+              toDate: address.toDate,
+              Output: address.Output,
+              objectID: address.objectID,
+              objectInstanceID: address.objectInstanceID,
+              objAis: address.objAis, // Ensure this is correctly structured
+              zipPostalCode: address.zipPostalCode,
+            })),
  
             regulatorList: [
               {
@@ -4970,9 +5018,36 @@ export class ViewFirmPageComponent implements OnInit {
     this.getFirmAuditorName();
     this.getFirmAuditorType();
   }
-
+  EditAuditorValidateForm(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.errorMessages = {};
+      this.hasValidationErrors = false;
+  
+      // Validate 'EntitySubTypeID'
+      if (!this.selectedAuditor.EntitySubTypeID && this.selectedAuditor.EntitySubTypeID === undefined) {
+        this.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
+        this.hasValidationErrors = true;
+      }
+      if(this.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined){
+        this.getErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
+        this.hasValidationErrors = true;
+      }
+      if(this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)){
+        this.getErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
+        this.hasValidationErrors = true;
+      }
+    });
+  }
   firmAuditorsObj: {};
   saveEditAuditor() {
+    this.EditAuditorValidateForm();
+        
+    // Check if there are any errors
+    if (this.hasValidationErrors) {
+      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.isLoading = false;
+      return;
+    }
     console.log("selectedAuditor", this.selectedAuditor)
     this.firmAuditorsObj = {
       OtherEntityID: this.selectedAuditor.OtherEntityID,

@@ -2281,80 +2281,118 @@
             <h3>
               Addresses
             </h3>
+            <button 
+            (click)="addAddressForm()" 
+            [disabled]="addressForms.length >= 3" 
+            style="background-color: green; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 5px; float: right;">
+            <i style="size:7px" class="bi bi-plus-lg"></i>
+          </button>
           </div>
-
-          <div class="inputs-row">
-            <div class="input-field">
-              <label for="addressType">
-                Address Type
-              </label>
-              <select [(ngModel)]="CreatecontrollerDetails.AddressTypeID"
-                (change)="onAddressTypeChange($event, Address)"
-                [ngClass]="{
-                'error-border': !Address.AddressID && errorMessages['AddressTypeID'] ,'select-background-edited': isEditModeCore}">
-                <option value="0">Select</option>
-                <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
-                  {{option.AddressTypeDesc}}</option>
-              </select>
-            </div>
-            <div class="input-field">
-              <label for="address1">
-                Address - Line 1
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.addressLine1" name="address1" id="address1" type="text"
-                value="">
-            </div>
-            <div class="input-field">
-              <label for="address2">
-                Address - Line 2
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.addressLine2" name="address2" id="address2" type="text"
-                value="">
-            </div>
-            <div class="input-field">
-              <label for="address3">
-                Address - Line 3
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.addressLine3" name="address3" id="address3" type="text"
-                value="">
-            </div>
-            <div class="input-field">
-              <label for="address4">
-                Address - Line 4
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.addressLine4" name="address4" id="address4" type="text"
-                value="">
-            </div>
-            <div class="input-field">
-              <label for="city">
-                City
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.city" name="city" id="city" type="text" value="">
-            </div>
-            <div class="input-field">
-              <label for="state">
-                State/Province
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.stateProvince" name="state" id="state" type="text" value="">
-            </div>
-            <div class="input-field">
-              <label for="country">
-                Country
-              </label>
-              <select required [(ngModel)]="CreatecontrollerDetails.CountryID" name="placeOfEstablishment">
-                <option *ngFor="let place of countryOptionsCreate" [value]="place.CountryID">{{ place.CountryName }}
-                </option>
-              </select>
-            </div>
-            <div class="input-field">
-              <label for="zipCode">
-                Zip/Postal Code
-              </label>
-              <input [(ngModel)]="CreatecontrollerDetails.zipPostalCode" name="zipCode" id="zipCode" type="text"
-                value="">
+          <div *ngFor="let address of addressForms; let i = index"> 
+            <hr>
+            <button (click)="removeAddressForm(i)" style="float: right; background-color: red; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 5px;">
+              <i style="size: 5px;" class="bi bi-x-lg"></i>
+            </button>
+            
+            <div class="inputs-row">
+              <!-- Address Type -->
+              <div class="input-field">
+                <label for="addressType">
+                  Address Type
+                </label>
+                <select [(ngModel)]="address.AddressTypeID" (change)="onAddressTypeChange($event, address)"
+                  [ngClass]="{'error-border': !address.AddressTypeID && errorMessages['AddressTypeID'], 'select-background-edited': isEditModeCore}"
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0"> <!-- Disable if Same As Type is selected -->
+                  <option value="0">Select</option>
+                  <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
+                    {{option.AddressTypeDesc}}</option>
+                </select>
+              </div>
+              
+              <!-- Same As Type (only for forms after the first one) -->
+              <div *ngIf="i > 0" class="input-field">
+                <label for="sameAsType">Same As Type</label>
+                <select [(ngModel)]="address.sameAsTypeID" (change)="onSameAsTypeChangeg($event, address)"
+                  [ngClass]="{'error-border': !address.sameAsTypeID && errorMessages['sameAsTypeID'], 'select-background-edited': isEditModeCore}"
+                  id="sameAsType" name="sameAsType">
+                  <option value="0">Select</option>
+                  <!-- Dynamically populate the options from previous forms' AddressTypeID -->
+                  <option *ngFor="let form of addressForms.slice(0, i)" [value]="form.AddressTypeID">
+                    {{ getAddressTypeDesc(form.AddressTypeID) }}
+                  </option>
+                </select>
+              </div>
+              
+              <!-- Other fields will be disabled if Same As Type has a value -->
+              <div class="input-field">
+                <label for="address1">
+                  Address - Line 1
+                </label>
+                <input [(ngModel)]="address.addressLine1" name="address1" id="address1" type="text"
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+              </div>
+              
+              <div class="input-field">
+                <label for="address2">
+                  Address - Line 2
+                </label>
+                <input [(ngModel)]="address.addressLine2" name="address2" id="address2" type="text"
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+              </div>
+              
+              <div class="input-field">
+                <label for="address3">
+                  Address - Line 3
+                </label>
+                <input [(ngModel)]="address.addressLine3" name="address3" id="address3" type="text"
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+              </div>
+              
+              <div class="input-field">
+                <label for="address4">
+                  Address - Line 4
+                </label>
+                <input [(ngModel)]="address.addressLine4" name="address4" id="address4" type="text"
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+              </div>
+              
+              <div class="input-field">
+                <label for="city">
+                  City
+                </label>
+                <input [(ngModel)]="address.city" name="city" id="city" type="text" 
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+              </div>
+              
+              <div class="input-field">
+                <label for="state">
+                  State/Province
+                </label>
+                <input [(ngModel)]="address.stateProvince" name="state" id="state" type="text" 
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0 " />
+              </div>
+              
+              <div class="input-field">
+                <label for="country">
+                  Country
+                </label>
+                <select required [(ngModel)]="address.CountryID" name="placeOfEstablishment"
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0">
+                  <option *ngFor="let place of countryOptionsCreate" [value]="place.CountryID">{{ place.CountryName }}</option>
+                </select>
+              </div>
+              
+              <div class="input-field">
+                <label for="zipCode">
+                  Zip/Postal Code
+                </label>
+                <input [(ngModel)]="address.zipPostalCode" name="zipCode" id="zipCode" type="text"
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+              </div>
             </div>
           </div>
         </div>
+
         <div class="create-inputs-field-set" *ngIf="CreatecontrollerDetails.IsCompanyRegulated === true">
           <div class="create-controller-actions">
             <h2 class="create-controller-header">
@@ -2455,7 +2493,14 @@
           </div>
           <button class="close-button" (click)="closeAuditorPopup()"><i class="bi bi-x-circle close-icon"></i></button>
         </div>
-
+        <div class="error-messages" style="color: red">
+          <!-- Auditor Name Error -->
+          <p *ngIf="errorMessages['OtherEntityName']">{{ errorMessages['OtherEntityName'] }}</p>
+          <!-- Auditor Type Error -->
+          <p *ngIf="errorMessages['EntitySubTypeID']">{{ errorMessages['EntitySubTypeID'] }}</p>
+          <p *ngIf="errorMessages['AssnDateFrom']">{{ errorMessages['AssnDateFrom'] }}</p>
+          <p *ngIf="errorMessages['AssnDateTo']">{{ errorMessages['AssnDateTo'] }}</p>
+        </div>
         <form>
           <div class="inputs-row">
             <div class="input-field">
@@ -2548,7 +2593,7 @@
               <input id="customAuditorName" name="customAuditorName" type="text" [(ngModel)]="selectedAuditor.customAuditorName"
                 placeholder="Enter Custom Auditor Name" />
             </div>
-            
+
             <div class="input-field">
               <label for="auditorType">
                 Auditor Type <span style="color: red">*</span>
