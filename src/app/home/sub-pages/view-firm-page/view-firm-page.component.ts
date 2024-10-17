@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { isNullOrUndef } from 'chart.js/dist/helpers/helpers.core';
 
 
 @Component({
@@ -4977,14 +4978,14 @@ export class ViewFirmPageComponent implements OnInit {
       OtherEntityID: this.selectedAuditor.OtherEntityID,
       CreatedBy: 30,
       RelatedEntityID: this.selectedAuditor.RelatedEntityID, // Yazan ?? 
-      EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
+      EntitySubTypeID: this.selectedAuditor.EntitySubTypeID || 0 ,
       EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeDesc,
       // erorr
       RelatedEntityTypeID: 3, // Yazan ??
       RelatedEntityEntityID: this.selectedAuditor.OtherEntityID, // Yazan ?? 
       MyState: 2,
       LastModifiedByOfOtherEntity: 30,
-      OtherEntityName: this.selectedAuditor.OtherEntityName,
+      OtherEntityName: this.selectedAuditor.OtherEntityName || '',
       DateOfIncorporation: "2024-10-02T11:58:32.911Z",
       LegalStatusTypeID: null,
       PlaceOfIncorporation: null,
@@ -5008,8 +5009,8 @@ export class ViewFirmPageComponent implements OnInit {
       numOfShares: 0,
       pctOfShares: 0,
       majorityStockHolder: true,
-      assnDateFrom: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom),
-      assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo),
+      assnDateFrom: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) || '',
+      assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo) || '',
       ShowEnabled: false,
       ShowReadOnly: false,
       MajorityStockHolder: false,
@@ -5030,18 +5031,17 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  onAuditorChange(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
+  onAuditorChange(event: any): void {
+    const selectedAuditorID = event.target.value;
   
-    if (value === 'other') {
-      this.selectedAuditor.OtherEntityID = 'other'; // Set to a flag, not relevant since ID is not used
-      this.selectedAuditor.OtherEntityName = ''; // Clear the custom name field for user input
+    if (selectedAuditorID === 'other') {
+      this.selectedAuditor.OtherEntityID = 'other';
+      this.selectedAuditor.customAuditorName = ''; // Reset the custom name input
     } else {
-      const numericValue = Number(value);
-      this.selectedAuditor.OtherEntityID = numericValue;
-  
-      const selectedAuditor = this.firmAuditorName.find(auditor => auditor.OtherEntityID === numericValue);
-      this.selectedAuditor.OtherEntityName = selectedAuditor ? selectedAuditor.OtherEntityName : '';
+      const selectedAuditor = this.firmAuditorName.find(name => name.OtherEntityID === selectedAuditorID);
+      this.selectedAuditor.OtherEntityID = selectedAuditorID;
+      this.selectedAuditor.OtherEntityName = selectedAuditor?.OtherEntityName;
+      this.selectedAuditor.customAuditorName = null; // Clear custom auditor name if not 'other'
     }
   }
   CreateAuditorValidateForm(): Promise<void> {
@@ -5049,44 +5049,50 @@ export class ViewFirmPageComponent implements OnInit {
       this.errorMessages = {};
       this.hasValidationErrors = false;
   
-      // Validate 'OtherEntityName'
-      if (this.selectedAuditor.OtherEntityID === 'other' && !this.selectedAuditor.OtherEntityName) {
-        this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
-        this.hasValidationErrors = true;
-      } else if (
-        this.selectedAuditor.OtherEntityID === 'other' &&
-        this.filteredAuditors.some(auditor =>
-          auditor.OtherEntityName?.toLowerCase() === this.selectedAuditor.OtherEntityName?.toLowerCase()
-        )
-      ) {
-        this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
-        this.hasValidationErrors = true;
-      } else if (!this.selectedAuditor.OtherEntityName) {
-        this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
-        this.hasValidationErrors = true;
+      if (this.selectedAuditor.OtherEntityID === 'other') {
+        if (!this.selectedAuditor.customAuditorName || this.selectedAuditor.customAuditorName.trim() === '') {
+          this.getErrorMessages('customAuditorName', constants.AuditorsMessages.Select_Auditor_Name);
+          this.hasValidationErrors = true;
+        } else if (
+          this.FIRMAuditors.some(
+            auditor => auditor.OtherEntityName?.toLowerCase() === this.selectedAuditor.customAuditorName?.toLowerCase()
+          )
+        ) {
+          this.getErrorMessages('customAuditorName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
+          this.hasValidationErrors = true;
+        }
+      } else {
+        if (!this.selectedAuditor.OtherEntityID) {
+          this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
+          this.hasValidationErrors = true;
+        }
       }
-  
       // Validate 'EntitySubTypeID'
-      if (!this.selectedAuditor.EntitySubTypeID) {
+      if (!this.selectedAuditor.EntitySubTypeID && this.selectedAuditor.EntitySubTypeID === undefined) {
         this.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
         this.hasValidationErrors = true;
       }
-  
-      // Check if there are any errors
-      if (Object.keys(this.errorMessages).length > 0) {
+      if(this.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined){
+        this.getErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
         this.hasValidationErrors = true;
-        reject(); // Reject the promise if there are validation errors
-      } else {
-        this.hasValidationErrors = false;
-        resolve(); // Resolve if there are no errors
+      }
+      if(this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)){
+        this.getErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
+        this.hasValidationErrors = true;
       }
     });
   }
-  async saveCreateAuditor() {
+   saveCreateAuditor() {
     try {
       // Wait for validation to complete
-      await this.CreateAuditorValidateForm();
-      
+     this.CreateAuditorValidateForm();
+        
+      // Check if there are any errors
+      if (this.hasValidationErrors) {
+        this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+        this.isLoading = false;
+        return;
+      }
       // If no validation errors, proceed to save the auditor
       this.firmAuditorsObj = {
         OtherEntityID: null,
@@ -5097,7 +5103,7 @@ export class ViewFirmPageComponent implements OnInit {
         RelatedEntityEntityID: null,
         MyState: 2,
         LastModifiedByOfOtherEntity: 30,
-        OtherEntityName: this.selectedAuditor.customAuditorName ? this.selectedAuditor.customAuditorName : this.selectedAuditor.OtherEntityName , 
+        OtherEntityName: this.selectedAuditor.OtherEntityID === 'other' ? this.selectedAuditor.customAuditorName : this.selectedAuditor.OtherEntityName,
         DateOfIncorporation: null,
         LegalStatusTypeID: null,
         PlaceOfIncorporation: null,
