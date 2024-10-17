@@ -1,7 +1,96 @@
 <div class="task-section-title">
-    <div class="edit-firm-actions">
-      <h2 class="edit-firm-header">
-        My Team's Tasks
-      </h2>
+  <div class="edit-firm-actions">
+    <h2 class="edit-firm-header">
+      My Team's Tasks
+    </h2>
+  </div>
+</div>
+
+
+<div class="filter-container">
+  <h2>Filter Tasks</h2>
+
+  <div class="date-filters">
+      <label for="due-date-from">Due Date From:</label>
+      <input type="date" id="due-date-from">
+
+      <label for="due-date-to">Due Date To:</label>
+      <input type="date" id="due-date-to">
+  </div>
+
+  <div class="team-filters">
+      <label>By Team Member(s):</label>
+      <div class="checkbox-group">
+          <!-- Parent Checkbox (no functionality, just visual grouping) -->
+          <div class="checkbox parent-checkbox">
+              <input type="checkbox" id="all-team-members">
+              <label for="all-team-members">Ewald Muller</label>
+          </div>
+
+          <!-- Child Checkboxes -->
+          <div class="child-checkbox-group">
+              <div class="checkbox">
+                  <input type="checkbox" id="glen" >
+                  <label for="glen">Glen McKay</label>
+              </div>
+              <div class="checkbox">
+                  <input type="checkbox" id="nurein" >
+                  <label for="nurein">Nurein Said Mohammed</label>
+              </div>
+              <div class="checkbox">
+                  <input type="checkbox" id="stephen" >
+                  <label for="stephen">Stephen Evans</label>
+              </div>
+              <div class="checkbox">
+                  <input type="checkbox" id="perttu" >
+                  <label for="perttu">Perttu Heikki Korhonen</label>
+              </div>
+              <div class="checkbox">
+                  <input type="checkbox" id="tara" >
+                  <label for="tara">Tara Anne Iris Aboury</label>
+              </div>
+              <div class="checkbox">
+                  <input type="checkbox" id="errol" >
+                  <label for="errol">Errol Giancarlo Antonio Cova</label>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <button class="get-tasks-btn">Get Task(s)</button>
+</div>
+
+
+<div class="TaskList-wrapper listing-table">
+  <div class="table customTable">
+    <div class="table-responsive">
+      <table class="task-table">
+        <thead>
+          <tr>
+            <th class="task-table-column">
+              Task Type
+            </th>
+            <th>Action</th>
+            <th class="task-table-column">
+              Firm Name
+            </th>
+            <th>Description</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
+</div>
+
+
