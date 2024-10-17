@@ -44,6 +44,7 @@ tr:nth-child(even) {
     position: relative;
     border-radius: 15px;
     box-shadow: 8px 8px 43px rgba(8, 50, 79, 0.1);
+    min-width: 100%;
     .pagination {
         display: flex;
         justify-content: center;
