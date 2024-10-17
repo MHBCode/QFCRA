@@ -136,7 +136,18 @@
 
         <tbody>
           <tr *ngFor="let item of paginatedTasks" (click)="toggleTaskPopup(item)">
-            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{ item.TaskType }}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">
+              <span class="d-flex align-items-center" style="display: flex; align-items: center;"> <!-- Flexbox to align them horizontally -->
+                <ng-container *ngIf="isTaskOverdue(item.TaskDueDate); else okFlag">
+                  <i style="color: red; font-size: 1rem; margin-right: 5px;" class="bi bi-flag-fill"></i> <!-- Red flag for overdue -->
+                </ng-container>
+                <ng-template #okFlag>
+                  <i style="color: green; font-size: 1rem; margin-right: 5px;" class="bi bi-flag-fill"></i> <!-- Green flag for not overdue -->
+                </ng-template>  
+                  <span>{{ item.TaskType }}</span>
+              </span>
+            </td>
+            
             <td style="text-align: center;">
               <a [href]="item.Link" target="_blank" style="text-decoration: none;">View</a>
             </td>

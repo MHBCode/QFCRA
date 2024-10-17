@@ -255,6 +255,8 @@ export class ViewFirmPageComponent implements OnInit {
   /* loader flag */
   isLoading: boolean = false;
 
+  showAddressesForm = false;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,  // Inject ActivatedRoute
@@ -3007,6 +3009,12 @@ export class ViewFirmPageComponent implements OnInit {
   //     this.CreatecontrollerDetails.ControllerControlTypeDesc = selectedType.ControllerControlTypeDesc;
   //   }
   // }
+  ShowAddressestoggleForm() {
+    this.showAddressesForm = true;
+  }
+  hideForm() {
+    this.showAddressesForm = false; // Hides the form when "x" is clicked
+  }
   CreatecontrollerDetails = {
     SelectedControlType: '',
     TypeOfControl: '',
@@ -3120,7 +3128,81 @@ export class ViewFirmPageComponent implements OnInit {
         console.error("Error fetching Controllers", error);
       });
   }
-  
+  addAddressForm(): void {
+    if (this.addressForms.length < 3 && this.isFormValid()) {
+      this.addressForms.push({
+        AddressTypeID: 0,
+        addressLine1: '',
+        addressLine2: '',
+        firmID: this.firmId,
+        countryID: '',
+        addressTypeID: '',
+        LastModifiedBy: 30,
+        entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+        entityID: this.CreatecontrollerDetails.EntityID,
+        contactID: '',
+        addressID: null,
+        addressLine3: '',
+        addressLine4: '',
+        city: '',
+        createdBy: 0,
+        addressAssnID: null,
+        CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
+        LastModifiedDate: this.currentDate,
+        addressState: 2,
+        fromDate: null,
+        toDate: null,
+        Output: 0,
+        objectID: this.CreatecontrollerDetails.ObjectID,
+        objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
+        objAis: null,
+        zipPostalCode: '',
+        stateProvince:'',
+      });
+    }
+  }
+  isFormValid(): boolean {
+    const lastForm = this.addressForms[this.addressForms.length - 1];
+    if (!lastForm.AddressTypeID) {
+      this.errorMessages['AddressTypeID'] = 'Address Type is required.';
+      return false;
+    }
+    return true;
+  }
+  removeAddressForm(index: number): void {
+    this.addressForms.splice(index, 1);
+  }
+  addressForms = [
+    { 
+      AddressTypeID: 0, 
+      addressLine1: '', 
+      addressLine2: '', 
+      firmID: this.firmId,
+      countryID: '',
+      addressTypeID: '',
+      LastModifiedBy: 30,
+      entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+      entityID: this.CreatecontrollerDetails.EntityID,
+      contactID: '',
+      addressID: null,
+      addressLine3: '',
+      addressLine4:'',
+      city: '',
+      createdBy: 0,
+      addressAssnID: null,
+      CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
+      LastModifiedDate: this.currentDate,
+      addressState: 2,
+      fromDate: null,
+      toDate: null,
+      Output: 0,
+      stateProvince:'',
+      objectID: this.CreatecontrollerDetails.ObjectID,
+      objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
+      objAis: null, 
+      zipPostalCode:'',
+    }
+  ];
   createControllerPopupChanges(): void {
     console.log("CreatecontrollerDetails", this.CreatecontrollerDetails)
     this.CreateControllerValidateForm().then(() => {
@@ -3175,55 +3257,34 @@ export class ViewFirmPageComponent implements OnInit {
               AssnDateTo: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
             },
-            addressList: [
-              {
-                firmID: this.firmId,
-                countryID: this.CreatecontrollerDetails.CountryID,
-                addressTypeID: this.CreatecontrollerDetails.AddressTypeID,
-                LastModifiedBy: 30,
-                entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-                entityID: this.CreatecontrollerDetails.EntityID,
-                contactID: this.CreatecontrollerDetails.ContactID,
-                addressID: null,
-                addressLine1: this.CreatecontrollerDetails.addressLine1,
-                addressLine2: this.CreatecontrollerDetails.addressLine2,
-                addressLine3: this.CreatecontrollerDetails.addressLine3,
-                addressLine4: this.CreatecontrollerDetails.addressLine4,
-                city: this.CreatecontrollerDetails.city,
-                createdBy: 0,
-                addressAssnID: null,
-                CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
-                LastModifiedDate: this.currentDate,
-                addressState: 2,
-                fromDate: null,
-                toDate: null,
-                Output: 0,
-                objectID: this.CreatecontrollerDetails.ObjectID,
-                objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
-                objAis: { // Ensure this object is correctly structured
-                  contactId: this.CreatecontrollerDetails.ContactId,
-                  FirmId: this.firmId,
-                  title: this.CreatecontrollerDetails.Title,
-                  firstName: this.CreatecontrollerDetails.FirstName,
-                  secondName: this.CreatecontrollerDetails.SecondName,
-                  familyName: this.CreatecontrollerDetails.FamilyName,
-                  dateOfBirth: this.CreatecontrollerDetails.DateOfBirth,
-                  placeOfBirth: this.CreatecontrollerDetails.PlaceOfBirth,
-                  passportNumber: this.CreatecontrollerDetails.PassportNum,
-                  addressAssnID: null,
-                  AddressTypeID: this.CreatecontrollerDetails.AddressTypeID,
-                  statusDate: this.CreatecontrollerDetails.StatusDate,
-                  createdDate: this.CreatecontrollerDetails.CreatedDate,
-                  mobilePhone: this.CreatecontrollerDetails.MobilePhone,
-                  businessEmail: this.CreatecontrollerDetails.businessEmail,
-                  otherEmail: this.CreatecontrollerDetails.OtherEmail,
-                  preferredMethodType: this.CreatecontrollerDetails.PreferredMethodType,
-                  showReadOnly: true,
-                  showEnabled: true,
-                  Output: 0,
-                }
-              }
-            ],
+            addressList:this.addressForms.map(address =>({
+              firmID: this.firmId,
+              countryID: this.CreatecontrollerDetails.CountryID,
+              addressTypeID: this.CreatecontrollerDetails.AddressTypeID,
+              LastModifiedBy: 30,
+              entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+              entityID: this.CreatecontrollerDetails.EntityID,
+              contactID: this.CreatecontrollerDetails.ContactID,
+              addressID: null,
+              addressLine1: this.CreatecontrollerDetails.addressLine1,
+              addressLine2: this.CreatecontrollerDetails.addressLine2,
+              addressLine3: this.CreatecontrollerDetails.addressLine3,
+              addressLine4: this.CreatecontrollerDetails.addressLine4,
+              city: this.CreatecontrollerDetails.city,
+              createdBy: 0,
+              addressAssnID: null,
+              CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
+              LastModifiedDate: this.currentDate,
+              addressState: 2,
+              fromDate: null,
+              toDate: null,
+              Output: 0,
+              objectID: this.CreatecontrollerDetails.ObjectID,
+              objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
+              objAis: null,   
+              zipPostalCode:'', 
+            })) ,
+ 
             regulatorList: [
               {
                 EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
