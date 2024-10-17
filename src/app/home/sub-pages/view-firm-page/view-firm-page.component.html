@@ -1015,7 +1015,7 @@
 
               <strong>Activity Details: </strong>
               <div class="input-field fullwidth">
-                <textarea disabled>{{removeHtmlTags(activityLic?.FirmActivityDetails)}}</textarea>
+                <textarea disabled>{{removeHtmlTags(activityLic?.FirmActivityDetails)}}</textarea>        
               </div>
 
               <strong>Specific Conditions and Restrictions: </strong>
@@ -1837,7 +1837,7 @@
               <label>Place of Establishment:</label>
               <ng-container *ngIf="isEditable; else placeOfEstablishmentDisplay">
                 <select required [(ngModel)]="selectedController.PlaceOfEstablishment" name="placeOfEstablishment">
-                  <option *ngFor="let place of countryOptionsEdit" [value]="place.CountryID">{{ place.CountryName }}
+                  <option *ngFor="let place of allCountries" [value]="place.CountryID">{{ place.CountryName }}
                   </option>
                 </select>
               </ng-container>
@@ -1950,7 +1950,7 @@
                 <label>Country</label>
                 <ng-container *ngIf="isEditable; else countryInput">
                   <select [(ngModel)]="selectedController.Country" name="country">
-                    <option *ngFor="let country of countryOptionsEdit" [value]="country.CountryID">{{
+                    <option *ngFor="let country of allCountries" [value]="country.CountryID">{{
                       country.CountryName
                       }}</option>
                   </select>
@@ -2094,7 +2094,7 @@
                 Place of birth
               </label>
               <select required [(ngModel)]="CreatecontrollerDetails.PlaceOfBirth" name="placeOfBirth">
-                <option *ngFor="let place of countryOptionsEdit" [value]="place.CountryID">{{ place.CountryName }}
+                <option *ngFor="let place of allCountries" [value]="place.CountryID">{{ place.CountryName }}
                 </option>
               </select>
             </div>
@@ -2572,7 +2572,7 @@
             </div>
           </div>
           <div class="btn justify-content-end">
-            <button  (click)="saveCreateAuditor()">Save</button>
+            <button (click)="saveCreateAuditor()">Save</button>
           </div>
         </form>
       </div>

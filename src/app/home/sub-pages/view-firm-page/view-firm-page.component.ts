@@ -2,8 +2,8 @@ import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, Output, QueryL
 import { Router, ActivatedRoute } from '@angular/router';  // Import ActivatedRoute
 import { FirmService } from 'src/app/ngServices/firm.service';  // Import FirmService
 import flatpickr from 'flatpickr';
-import { forkJoin, Observable } from 'rxjs';
-import { first, map, switchMap } from 'rxjs/operators';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, first, map, switchMap, tap } from 'rxjs/operators';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
 import { SecurityService } from 'src/app/ngServices/security.service';
@@ -211,7 +211,6 @@ export class ViewFirmPageComponent implements OnInit {
   establishmentOptionsEdit: any[] = [];
   controlTypeOptionsEdit: any[] = [];
   controlTypeOptionsCreate: any[] = [];
-  countryOptionsEdit: any[] = [];
   controllerTypeOption: any = [];
   countryOptionsCreate: any[] = [];
   addressTypeOptionsEdit: any[] = [];
@@ -255,6 +254,7 @@ export class ViewFirmPageComponent implements OnInit {
   /* loader flag */
   isLoading: boolean = false;
 
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,  // Inject ActivatedRoute
@@ -265,7 +265,7 @@ export class ViewFirmPageComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer
   ) { 
-    console.log('FrimsObject: ', this.Page);
+    
      }
 
   ngOnInit(): void {
@@ -307,7 +307,6 @@ export class ViewFirmPageComponent implements OnInit {
       this.getlegalStatusController();
       this.getlegalStatusControllerCreate()
       this.getCorporateController();
-      this.getcountries();
       this.getFirmAuditorName();
       this.getFirmAuditorType();
       this.getControllerType();
@@ -602,7 +601,7 @@ export class ViewFirmPageComponent implements OnInit {
       if (this.firmDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Application) {
         this.hideReviseBtn = true;
       }
-      if (!(this.isFirmLicensed)) {
+      else if (!(this.isFirmLicensed)) {
         this.hideCreateBtn = true;
         this.hideEditBtn = true;
         this.hideDeleteBtn = true;
@@ -611,13 +610,13 @@ export class ViewFirmPageComponent implements OnInit {
     }
 
     if (this.tabIndex === 1) { //Authorised
-      if (!(this.isNullOrEmpty(this.ActivityAuth[0]?.FirmScopeID) && this.ActivityAuth[0].FirmScopeID)) {
+      if (!(this.isNullOrEmpty(this.ActivityAuth[0]?.FirmScopeID)) && this.ActivityAuth[0].FirmScopeID) {
         this.hideCreateBtn = true;
       }
       if (this.firmDetails.AuthorisationStatusTypeID === constants.FirmAuthorizationApplStatusType.Application) {
         this.hideReviseBtn = true;
       }
-      if (!(this.isFirmAuthorised)) {
+      else if (!(this.isFirmAuthorised)) {
         this.hideCreateBtn = true;
         this.hideEditBtn = true;
         this.hideDeleteBtn = true;
@@ -700,7 +699,11 @@ export class ViewFirmPageComponent implements OnInit {
     })
   }
 
-  removeHtmlTags(input: string): string {
+  removeHtmlTags(input: string | null | undefined): string {
+    // Check if input is null or undefined
+    if (!input) {
+      return ''; // Return an empty string if input is null or undefined
+    }
     // This regex will remove all HTML tags
     return input.replace(/<[^>]*>/g, '');
   }
@@ -1264,20 +1267,6 @@ export class ViewFirmPageComponent implements OnInit {
 
   editLicenseScope() {
     if (this.ActivityLicensed[0].ScopeRevNum) {
-      // enable/disable application date input and vary scope/revise button visiblity
-      // Check if the current date is greater than the ScopeLicensedDate
-      // if (!(this.isNullOrEmpty(this.ActivityLicensed[0].ScopeAppliedDate)) && !(this.isNullOrEmpty(this.ActivityLicensed[0].ScopeLicensedDate))) {
-      //   if (this.currentDate > this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate)) {
-      //     this.disableApplicationDate = false;  // Enable the field
-      //     this.showVaryBtn = true;
-      //   } else {
-      //     this.disableApplicationDate = true;  // Disable the field
-      //     this.showVaryBtn = false;
-      //   }
-      // } else {
-      //   this.disableApplicationDate = true;  // Enable if no licensed date is present
-      //   this.showVaryBtn = false;
-      // }
 
       this.applyVaryScopeButtonVisibilityOnEdit();
 
@@ -2531,25 +2520,8 @@ export class ViewFirmPageComponent implements OnInit {
         console.error("Error fetching TitleTypes", error);
       });
   }
-  getcountries(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.countries, this.objectOpTypeIdEdit)
-      .subscribe(data => {
-        this.countryOptionsEdit = data.response;
-        console.log("Countries", data)
-      }, error => {
-        console.error("Error fetching Countries", error);
-      });
-  }
   
-  getcountriesCreate(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.countries, this.objectOpTypeIdCreate)
-      .subscribe(data => {
-        this.countryOptionsCreate = data.response;
-        console.log("Countries", data)
-      }, error => {
-        console.error("Error fetching Countries", error);
-      });
-  }
+
   closeControllerPopup(): void {
     this.isPopupOpen = false;
     this.isEditable = false; // Close the popup
@@ -2612,8 +2584,9 @@ export class ViewFirmPageComponent implements OnInit {
     const status = this.legalStatusOptionsEdit.find(option => option.LegalStatusTypeID === this.selectedController.LegalStatusTypeID);
     return status ? status.LegalStatusTypeDesc : '';
   }
+  
   getPlaceOfEstablishmentName(): string {
-    const place = this.countryOptionsEdit.find(option => option.CountryID === this.selectedController.PlaceOfEstablishment);
+    const place = this.allCountries.find(option => option.CountryID === this.selectedController.PlaceOfEstablishment);
     return place ? place.CountryName : '';
   }
 
@@ -2641,7 +2614,6 @@ export class ViewFirmPageComponent implements OnInit {
 
   createController() {
     this.showCreateControllerSection = true;
-    this.getcountriesCreate();
     this.getTitleCreate();
     this.getAddressTypesControllerCreate();
     this.getlegalStatusControllerCreate();
@@ -3593,7 +3565,7 @@ export class ViewFirmPageComponent implements OnInit {
           );
         },
         error => {
-          console.error('Error fetching data', error);
+          console.error('Error fetching activities authorised data', error);
           this.isLoading = false;
           reject(error);
         }
@@ -3602,30 +3574,28 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
 
-
-  loadSectorDetails() {
-    // Use the first activity's FirmScopeID and ScopeRevNum if they are the same across all.
-    const firstActivity = this.ActivityAuth[0];
-    if (firstActivity) {
-      this.firmService.getSectorDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
-        this.sectorDetails = data.response;
-      }, error => {
-        console.error('Error Fetching Sector Details: ', error);
-      });
-    }
+loadSectorDetails() {
+  // Use the first activity's FirmScopeID and ScopeRevNum if they are the same across all.
+  const firstActivity = this.ActivityAuth[0];
+  if (firstActivity) {
+    this.firmService.getSectorDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
+      this.sectorDetails = data.response;
+    }, error => {
+      console.error('Error Fetching Sector Details: ', error);
+    });
   }
+}
 
-  loadPrudentialCategoryDetails() {
-    const firstActivity = this.ActivityAuth[0];
-    if (firstActivity) {
-      this.firmService.getPrudentialCategoryDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
-        this.prudentialCategoryDetails = data.response;
-      }, error => {
-        console.error('Error Fetching Prudential Category Details: ', error);
-      });
-    }
+loadPrudentialCategoryDetails() {
+  const firstActivity = this.ActivityAuth[0];
+  if (firstActivity) {
+    this.firmService.getPrudentialCategoryDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
+      this.prudentialCategoryDetails = data.response;
+    }, error => {
+      console.error('Error Fetching Prudential Category Details: ', error);
+    });
   }
-
+}
 
   onPrudentialCategoryChange(prudCategID: string) {
     // Check if the new selection is the same as the previous one
@@ -4269,13 +4239,17 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  loadPrudReturnTypes(prudCategID: string) {
-    this.firmService.getPrudReturnTypes(prudCategID).subscribe(data => {
-      this.prudReturnTypesDropdown = data.response;
-      console.log('Firm Scope Prud Return Types: ', this.prudReturnTypesDropdown);
-    }, error => {
-      console.log('Error fetching prud types: ', error)
-    })
+  loadPrudReturnTypes(prudCategID: string): Observable<any> {
+    return this.firmService.getPrudReturnTypes(prudCategID).pipe(
+      tap(data => {
+        this.prudReturnTypesDropdown = data.response;
+        console.log('Firm Scope Prud Return Types: ', this.prudReturnTypesDropdown);
+      }),
+      catchError(error => {
+        console.log('Error fetching prud types: ', error);
+        return of([]); // Return an empty array in case of error
+      })
+    );
   }
 
   populateCountries() {
