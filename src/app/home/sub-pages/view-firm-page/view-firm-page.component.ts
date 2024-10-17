@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { isNullOrUndef } from 'chart.js/dist/helpers/helpers.core';
 
 
 @Component({
@@ -28,7 +29,7 @@ export class ViewFirmPageComponent implements OnInit {
   disableAddressFields: boolean = false;
   isFirmLicensed: boolean;
   isFirmAuthorised: boolean;
-  selectedAuditor: any = null;
+  selectedAuditor: any = {};
   categorizedData = [];
   selectedAuditorNameFromSelectBox: string = 'select';
   flatpickrInstance: any;
@@ -254,6 +255,7 @@ export class ViewFirmPageComponent implements OnInit {
   /* loader flag */
   isLoading: boolean = false;
 
+  showAddressesForm = false;
 
   constructor(
     private router: Router,
@@ -2979,6 +2981,12 @@ export class ViewFirmPageComponent implements OnInit {
   //     this.CreatecontrollerDetails.ControllerControlTypeDesc = selectedType.ControllerControlTypeDesc;
   //   }
   // }
+  ShowAddressestoggleForm() {
+    this.showAddressesForm = true;
+  }
+  hideForm() {
+    this.showAddressesForm = false; // Hides the form when "x" is clicked
+  }
   CreatecontrollerDetails = {
     SelectedControlType: '',
     TypeOfControl: '',
@@ -3092,7 +3100,128 @@ export class ViewFirmPageComponent implements OnInit {
         console.error("Error fetching Controllers", error);
       });
   }
+  addAddressForm(): void {
+    if (this.addressForms.length === 0) {
+      // If the array is empty, add the first form without validation
+      this.addressForms.push({
+        AddressTypeID: 0,
+        addressLine1: '',
+        addressLine2: '',
+        firmID: this.firmId,
+        CountryID: '',
+        addressTypeID: '',
+        LastModifiedBy: 30,
+        entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+        entityID: this.CreatecontrollerDetails.EntityID,
+        contactID: '',
+        addressID: null,
+        addressLine3: '',
+        addressLine4: '',
+        city: '',
+        sameAsTypeID:0,
+        createdBy: 0,
+        addressAssnID: null,
+        CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
+        LastModifiedDate: this.currentDate,
+        addressState: 2,
+        fromDate: null,
+        toDate: null,
+        Output: 0,
+        objectID: this.CreatecontrollerDetails.ObjectID,
+        objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
+        objAis: null,
+        zipPostalCode: '',
+        stateProvince: '',
+      });
+    }
+    else if (this.addressForms.length < 3 && this.isFormValid()) {
+      this.addressForms.push({
+        AddressTypeID: 0,
+        addressLine1: '',
+        addressLine2: '',
+        sameAsTypeID: 0,
+        firmID: this.firmId,
+        CountryID: '',
+        addressTypeID: '',
+        LastModifiedBy: 30,
+        entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+        entityID: this.CreatecontrollerDetails.EntityID,
+        contactID: '',
+        addressID: null,
+        addressLine3: '',
+        addressLine4: '',
+        city: '',
+        createdBy: 0,
+        addressAssnID: null,
+        CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
+        LastModifiedDate: this.currentDate,
+        addressState: 2,
+        fromDate: null,
+        toDate: null,
+        Output: 0,
+        objectID: this.CreatecontrollerDetails.ObjectID,
+        objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
+        objAis: null,
+        zipPostalCode: '',
+        stateProvince:'',
+      });
+    }
+  }
+  isFormValid(): boolean {
+    const lastForm = this.addressForms[this.addressForms.length - 1];
+    if (!lastForm.AddressTypeID) {
+      this.errorMessages['AddressTypeID'] = 'Address Type is required.';
+      return false;
+    }
+    return true;
+  }
+  removeAddressForm(index: number): void {
+    this.addressForms.splice(index, 1);
+  }
+  getAddressTypeDesc(addressTypeID: number): string {
+    const selectedType = this.allAddressTypes.find(type => type.AddressTypeID === addressTypeID);
+    return selectedType ? selectedType.AddressTypeDesc : 'Unknown';
+  }
+  onSameAsTypeChangeg(event: any, address: any): void {
+    const selectedSameAsTypeID = event.target.value;
   
+    // Set the AddressTypeID based on Same As Type selection
+    if (selectedSameAsTypeID && selectedSameAsTypeID !== '0') {
+      address.AddressTypeID = selectedSameAsTypeID;
+    }
+  }
+  addressForms = [
+    { 
+      AddressTypeID: 0, 
+      addressLine1: '', 
+      addressLine2: '', 
+      firmID: this.firmId,
+      CountryID: '',
+      addressTypeID: '',
+      LastModifiedBy: 30,
+      entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+      entityID: this.CreatecontrollerDetails.EntityID,
+      contactID: '',
+      addressID: null,
+      addressLine3: '',
+      addressLine4:'',
+      city: '',
+      sameAsTypeID:0,
+      createdBy: 0,
+      addressAssnID: null,
+      CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
+      LastModifiedDate: this.currentDate,
+      addressState: 2,
+      fromDate: null,
+      toDate: null,
+      Output: 0,
+      stateProvince:'',
+      objectID: this.CreatecontrollerDetails.ObjectID,
+      objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
+      objAis: null, 
+      zipPostalCode:'',
+    }
+  ];
   createControllerPopupChanges(): void {
     console.log("CreatecontrollerDetails", this.CreatecontrollerDetails)
     this.CreateControllerValidateForm().then(() => {
@@ -3147,55 +3276,35 @@ export class ViewFirmPageComponent implements OnInit {
               AssnDateTo: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
             },
-            addressList: [
-              {
-                firmID: this.firmId,
-                countryID: this.CreatecontrollerDetails.CountryID,
-                addressTypeID: this.CreatecontrollerDetails.AddressTypeID,
-                LastModifiedBy: 30,
-                entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-                entityID: this.CreatecontrollerDetails.EntityID,
-                contactID: this.CreatecontrollerDetails.ContactID,
-                addressID: null,
-                addressLine1: this.CreatecontrollerDetails.addressLine1,
-                addressLine2: this.CreatecontrollerDetails.addressLine2,
-                addressLine3: this.CreatecontrollerDetails.addressLine3,
-                addressLine4: this.CreatecontrollerDetails.addressLine4,
-                city: this.CreatecontrollerDetails.city,
-                createdBy: 0,
-                addressAssnID: null,
-                CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
-                LastModifiedDate: this.currentDate,
-                addressState: 2,
-                fromDate: null,
-                toDate: null,
-                Output: 0,
-                objectID: this.CreatecontrollerDetails.ObjectID,
-                objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
-                objAis: { // Ensure this object is correctly structured
-                  contactId: this.CreatecontrollerDetails.ContactId,
-                  FirmId: this.firmId,
-                  title: this.CreatecontrollerDetails.Title,
-                  firstName: this.CreatecontrollerDetails.FirstName,
-                  secondName: this.CreatecontrollerDetails.SecondName,
-                  familyName: this.CreatecontrollerDetails.FamilyName,
-                  dateOfBirth: this.CreatecontrollerDetails.DateOfBirth,
-                  placeOfBirth: this.CreatecontrollerDetails.PlaceOfBirth,
-                  passportNumber: this.CreatecontrollerDetails.PassportNum,
-                  addressAssnID: null,
-                  AddressTypeID: this.CreatecontrollerDetails.AddressTypeID,
-                  statusDate: this.CreatecontrollerDetails.StatusDate,
-                  createdDate: this.CreatecontrollerDetails.CreatedDate,
-                  mobilePhone: this.CreatecontrollerDetails.MobilePhone,
-                  businessEmail: this.CreatecontrollerDetails.businessEmail,
-                  otherEmail: this.CreatecontrollerDetails.OtherEmail,
-                  preferredMethodType: this.CreatecontrollerDetails.PreferredMethodType,
-                  showReadOnly: true,
-                  showEnabled: true,
-                  Output: 0,
-                }
-              }
-            ],
+            addressList: this.addressForms.map(address => ({
+              firmID: this.firmId,
+              countryID: address.CountryID,
+              addressTypeID: address.AddressTypeID,
+              LastModifiedBy: this.userId,
+              entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+              entityID: this.firmId,
+              contactID: address.contactID,
+              addressID: address.addressID,
+              addressLine1: address.addressLine1,
+              addressLine2: address.addressLine2,
+              addressLine3: address.addressLine3,
+              addressLine4: address.addressLine4,
+              city: address.city,
+              stateProvince: address.stateProvince,
+              createdBy: address.createdBy,
+              addressAssnID: address.addressAssnID,
+              CreatedDate: address.CreatedDate,
+              LastModifiedDate: address.LastModifiedDate,
+              addressState: address.addressState,
+              fromDate: address.fromDate,
+              toDate: address.toDate,
+              Output: address.Output,
+              objectID: address.objectID,
+              objectInstanceID: address.objectInstanceID,
+              objAis: address.objAis, // Ensure this is correctly structured
+              zipPostalCode: address.zipPostalCode,
+            })),
+ 
             regulatorList: [
               {
                 EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
@@ -4882,22 +4991,49 @@ loadPrudentialCategoryDetails() {
     this.getFirmAuditorName();
     this.getFirmAuditorType();
   }
-
+  EditAuditorValidateForm(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.errorMessages = {};
+      this.hasValidationErrors = false;
+  
+      // Validate 'EntitySubTypeID'
+      if (!this.selectedAuditor.EntitySubTypeID && this.selectedAuditor.EntitySubTypeID === undefined) {
+        this.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
+        this.hasValidationErrors = true;
+      }
+      if(this.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined){
+        this.getErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
+        this.hasValidationErrors = true;
+      }
+      if(this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)){
+        this.getErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
+        this.hasValidationErrors = true;
+      }
+    });
+  }
   firmAuditorsObj: {};
   saveEditAuditor() {
+    this.EditAuditorValidateForm();
+        
+    // Check if there are any errors
+    if (this.hasValidationErrors) {
+      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.isLoading = false;
+      return;
+    }
     console.log("selectedAuditor", this.selectedAuditor)
     this.firmAuditorsObj = {
       OtherEntityID: this.selectedAuditor.OtherEntityID,
       CreatedBy: 30,
       RelatedEntityID: this.selectedAuditor.RelatedEntityID, // Yazan ?? 
-      EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
+      EntitySubTypeID: this.selectedAuditor.EntitySubTypeID || 0 ,
       EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeDesc,
       // erorr
       RelatedEntityTypeID: 3, // Yazan ??
       RelatedEntityEntityID: this.selectedAuditor.OtherEntityID, // Yazan ?? 
       MyState: 2,
       LastModifiedByOfOtherEntity: 30,
-      OtherEntityName: this.selectedAuditor.OtherEntityName,
+      OtherEntityName: this.selectedAuditor.OtherEntityName || '',
       DateOfIncorporation: "2024-10-02T11:58:32.911Z",
       LegalStatusTypeID: null,
       PlaceOfIncorporation: null,
@@ -4921,8 +5057,8 @@ loadPrudentialCategoryDetails() {
       numOfShares: 0,
       pctOfShares: 0,
       majorityStockHolder: true,
-      assnDateFrom: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom),
-      assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo),
+      assnDateFrom: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) || '',
+      assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo) || '',
       ShowEnabled: false,
       ShowReadOnly: false,
       MajorityStockHolder: false,
@@ -4943,18 +5079,17 @@ loadPrudentialCategoryDetails() {
       }
     );
   }
-  onAuditorChange(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
+  onAuditorChange(event: any): void {
+    const selectedAuditorID = event.target.value;
   
-    if (value === 'other') {
-      this.selectedAuditor.OtherEntityID = 'other'; // Set to a flag, not relevant since ID is not used
-      this.selectedAuditor.OtherEntityName = ''; // Clear the custom name field for user input
+    if (selectedAuditorID === 'other') {
+      this.selectedAuditor.OtherEntityID = 'other';
+      this.selectedAuditor.customAuditorName = ''; // Reset the custom name input
     } else {
-      const numericValue = Number(value);
-      this.selectedAuditor.OtherEntityID = numericValue;
-  
-      const selectedAuditor = this.firmAuditorName.find(auditor => auditor.OtherEntityID === numericValue);
-      this.selectedAuditor.OtherEntityName = selectedAuditor ? selectedAuditor.OtherEntityName : '';
+      const selectedAuditor = this.firmAuditorName.find(name => name.OtherEntityID === selectedAuditorID);
+      this.selectedAuditor.OtherEntityID = selectedAuditorID;
+      this.selectedAuditor.OtherEntityName = selectedAuditor?.OtherEntityName;
+      this.selectedAuditor.customAuditorName = null; // Clear custom auditor name if not 'other'
     }
   }
   CreateAuditorValidateForm(): Promise<void> {
@@ -4962,55 +5097,61 @@ loadPrudentialCategoryDetails() {
       this.errorMessages = {};
       this.hasValidationErrors = false;
   
-      // Validate 'OtherEntityName'
-      if (this.selectedAuditor.OtherEntityID === 'other' && !this.selectedAuditor.OtherEntityName) {
-        this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
-        this.hasValidationErrors = true;
-      } else if (
-        this.selectedAuditor.OtherEntityID === 'other' &&
-        this.filteredAuditors.some(auditor =>
-          auditor.OtherEntityName?.toLowerCase() === this.selectedAuditor.OtherEntityName?.toLowerCase()
-        )
-      ) {
-        this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
-        this.hasValidationErrors = true;
-      } else if (!this.selectedAuditor.OtherEntityName) {
-        this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
-        this.hasValidationErrors = true;
+      if (this.selectedAuditor.OtherEntityID === 'other') {
+        if (!this.selectedAuditor.customAuditorName || this.selectedAuditor.customAuditorName.trim() === '') {
+          this.getErrorMessages('customAuditorName', constants.AuditorsMessages.Select_Auditor_Name);
+          this.hasValidationErrors = true;
+        } else if (
+          this.FIRMAuditors.some(
+            auditor => auditor.OtherEntityName?.toLowerCase() === this.selectedAuditor.customAuditorName?.toLowerCase()
+          )
+        ) {
+          this.getErrorMessages('customAuditorName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
+          this.hasValidationErrors = true;
+        }
+      } else {
+        if (!this.selectedAuditor.OtherEntityID) {
+          this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
+          this.hasValidationErrors = true;
+        }
       }
-  
       // Validate 'EntitySubTypeID'
-      if (!this.selectedAuditor.EntitySubTypeID) {
+      if (!this.selectedAuditor.EntitySubTypeID && this.selectedAuditor.EntitySubTypeID === undefined) {
         this.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
         this.hasValidationErrors = true;
       }
-  
-      // Check if there are any errors
-      if (Object.keys(this.errorMessages).length > 0) {
+      if(this.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined){
+        this.getErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
         this.hasValidationErrors = true;
-        reject(); // Reject the promise if there are validation errors
-      } else {
-        this.hasValidationErrors = false;
-        resolve(); // Resolve if there are no errors
+      }
+      if(this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)){
+        this.getErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
+        this.hasValidationErrors = true;
       }
     });
   }
-  async saveCreateAuditor() {
+   saveCreateAuditor() {
     try {
       // Wait for validation to complete
-      await this.CreateAuditorValidateForm();
-  
+     this.CreateAuditorValidateForm();
+        
+      // Check if there are any errors
+      if (this.hasValidationErrors) {
+        this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+        this.isLoading = false;
+        return;
+      }
       // If no validation errors, proceed to save the auditor
       this.firmAuditorsObj = {
         OtherEntityID: null,
         CreatedBy: this.userId,
         RelatedEntityID: null,
-        EntitySubTypeID: 6,
-        EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeID,
+        EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
+        EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeDesc,
         RelatedEntityEntityID: null,
         MyState: 2,
         LastModifiedByOfOtherEntity: 30,
-        OtherEntityName: this.selectedAuditor.OtherEntityID === null ? this.selectedAuditor.OtherEntityName : this.selectedAuditor.OtherEntityName, 
+        OtherEntityName: this.selectedAuditor.OtherEntityID === 'other' ? this.selectedAuditor.customAuditorName : this.selectedAuditor.OtherEntityName,
         DateOfIncorporation: null,
         LegalStatusTypeID: null,
         PlaceOfIncorporation: null,
@@ -5039,7 +5180,7 @@ loadPrudentialCategoryDetails() {
         assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo),
         LastModifiedByOfRelatedEntity: 30,
       };
-  
+      console.log("selectedAuditor.OtherEntityName:",this.selectedAuditor.OtherEntityName, this.selectedAuditor.customAuditorName)
       console.log("Auditor to be created", this.firmAuditorsObj);
   
       // Call the save function

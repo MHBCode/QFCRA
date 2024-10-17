@@ -46,7 +46,8 @@ export enum AuditorsMessages{
     Select_Auditor_Name = 3901,
     Selected_Auditor_Name_already_Exsists = 3903,
     Select_Auditor_Type = 3904,
-    Select_Valid_Data = 3906
+    Select_Valid_Data_From = 3905,
+    Select_Valid_Data_From_Later_Than_To = 3906
 }
 export enum Firm_CoreDetails_Messages
 {
