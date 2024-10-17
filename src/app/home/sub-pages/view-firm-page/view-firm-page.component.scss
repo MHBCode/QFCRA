@@ -1357,8 +1357,7 @@ hr {
 }
 
 .error-messages p {
-  margin-left: 15px;
-  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .error-border {
@@ -1534,9 +1533,6 @@ hr {
   width: 96% !important;
 }
 
-#controllerType {
-  width: 51%;
-}
 
 .radio-wrapper {
   display: flex;
@@ -1547,7 +1543,7 @@ hr {
 }
 
 .additional-details {
-  width: 100%;
+  width: 100% !important;
 }
 
 .button-wrapper {
