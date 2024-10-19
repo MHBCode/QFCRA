@@ -332,7 +332,6 @@ export class TaskListComponent implements OnInit {
     this.firmService.errorMessages(messageKey).subscribe(
       (response) => {
         Swal.fire({
-          title: 'Alert!',
           text: response.response,
           icon: 'error',
           confirmButtonText: 'Ok',
