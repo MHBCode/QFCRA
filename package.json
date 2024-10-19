@@ -25,10 +25,11 @@
     "flatpickr": "^4.6.13",
     "ng-bootstrap": "^1.6.3",
     "ng-multiselect-dropdown": "^1.0.0",
-    "ngx-bootstrap": "^18.0.2",
+    "ngx-bootstrap": "^11.0.2",
     "rxjs": "~7.8.0",
     "sweetalert2": "^11.14.0",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.13.0"
   },
   "devDependencies": {

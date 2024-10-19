@@ -6,7 +6,7 @@ import * as constants from 'src/app/app-constants';
 import { FirmService } from 'src/app/ngServices/firm.service';
 import Swal from 'sweetalert2';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
-
+import * as XLSX from 'xlsx';
 @Component({
   selector: 'app-tasks-i-assigned',
   templateUrl: './tasks-i-assigned.component.html',
@@ -27,7 +27,7 @@ export class TasksIAssignedComponent implements OnInit {
   currentPage: number = 1;
   startRow: number = 0;
   endRow: number = 0;
-
+  ShowExportButton: boolean = false;
   TaskDropdownVisible: boolean = false;
   FirmsDropdownVisible: boolean = false;
   dueDateInputVisible: boolean = false;
@@ -58,8 +58,13 @@ export class TasksIAssignedComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTasksUserAssignedTo();
-  }
 
+    this.TaskService.showExportButton$.subscribe(value => {
+      this.ShowExportButton = value;
+      console.log('ShowExportButton value in TasksIAssignedComponent:', this.ShowExportButton);
+    });
+  }
+  
   loadTasksUserAssignedTo(): void {
     this.isLoading = true;
     this.TaskService.getMyTasksAssignedByUser(this.userId).subscribe(
@@ -340,4 +345,28 @@ export class TasksIAssignedComponent implements OnInit {
       },
     );
   }
+  exportRowToExcel(rowData: any) {
+     // Prepare data in a format that can be exported to Excel
+    const row = [
+      {
+        'Task Type': rowData.TaskType,
+        'Firm Name': rowData.FirmName,
+        'Description': rowData.ShortDescription,
+        'Due Date': rowData.TaskDueDate,
+        'Days Over Due': rowData.DaysOverDue > 0 ? rowData.DaysOverDue : '',
+        'Comments': rowData.Comments,
+        'Task Assigned To': rowData.TaskAssignedToUserName
+      }
+    ];
+
+    // Convert the data to a worksheet
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(row);
+
+    // Create a new workbook and append the worksheet to it
+    const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
+
+    // Export the file and trigger a download
+    XLSX.writeFile(workbook, `task_row_${rowData.TaskType}.xlsx`);
+  }
+ 
 }
