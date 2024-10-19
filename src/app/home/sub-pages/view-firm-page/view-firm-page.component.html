@@ -258,7 +258,7 @@
     [ngStyle]="{ width: dataWidth, display: activeTab === Page.CoreDetail ? 'flex' : 'none' }">
     <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['firmDetailsSection'] }">
       <!--Error messages for firm details-->
-      <div class="error-messages" style="color: red">
+      <div class="error-messages">
         <p *ngIf="errorMessages['FirmName']">{{ errorMessages['FirmName'] }}</p>
         <p *ngIf="errorMessages['LegalStatusTypeID']">{{ errorMessages['LegalStatusTypeID'] }}</p>
         <p *ngIf="errorMessages['DateOfIncorporation']">{{ errorMessages['DateOfIncorporation'] }}</p>
@@ -623,7 +623,7 @@
     <!---->
     <div class="inputs-field-set" *ngIf="isEditModeCore && selectedFirmTypeID == 3"
       [ngClass]="{collapsed: isCollapsed['pressReleaseSection']}">
-      <div class="error-messages" style="color: red">
+      <div class="error-messages">
         <p *ngIf="errorMessages['uploadDocument']">{{ errorMessages['uploadDocument'] }}</p>
       </div>
       <div class="form-section-title collapse-container">
@@ -711,7 +711,7 @@
     <!---->
     <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['addressesSection']}">
       <!--Error messages for addresses-->
-      <div class="error-messages" style="color: red">
+      <div class="error-messages">
         <p *ngIf="errorMessages['AddressTypeID']">{{ errorMessages['AddressTypeID'] }}</p>
         <p *ngIf="errorMessages['DuplicatedAddressTypeID']">{{ errorMessages['DuplicatedAddressTypeID'] }}</p>
       </div>
@@ -865,7 +865,7 @@
         }">
         <div class="inputs-field-set scopeFor">
           <!--Error messages for firm details-->
-          <div class="error-messages" style="color: red">
+          <div class="error-messages">
             <p *ngIf="errorMessages['ScopeEffectiveDate']">{{ errorMessages['ScopeEffectiveDate'] }}</p>
             <p *ngIf="errorMessages['ScopeAppliedDate']">{{ errorMessages['ScopeAppliedDate'] }}</p>
             <p *ngIf="errorMessages['ScopeEffectiveDateLessThanApplicationDate']">{{
@@ -1070,7 +1070,7 @@
                     <button class="rmvActivityLicBtn bi bi-trash" (click)="removeLicActivity(i)"></button>
                   </td>
                 </tr>
-                <tr class="error-messages" style="color: red">
+                <tr class="error-messages">
                   <p *ngIf="activityLic.ActivityTypeID == 0 && errorMessages['ActivityTypeID']">{{
                     errorMessages['ActivityTypeID'] }}</p>
                 </tr>
@@ -1108,7 +1108,7 @@
     <div class="authorized-section" *ngIf="firmDetails?.AuthorisationStatusTypeID > 0 && tabIndex === 1">
       <div class="authorized-body" [ngClass]="{ collapsed: isCollapsed['authorizeSection'] }">
         <div class="inputs-field-set scopeFor">
-          <div class="error-messages" style="color: red; margin-top: 10px;">
+          <div class="error-messages">
             <p *ngIf="errorMessages['ScopeAppliedDateAuth']">{{ errorMessages['ScopeAppliedDateAuth'] }}</p>
             <p *ngIf="errorMessages['ScopeEffectiveDateAuth']">{{ errorMessages['ScopeEffectiveDateAuth'] }}</p>
             <p *ngIf="errorMessages['EffectiveDateLaterApplicationDate']">{{
@@ -1426,7 +1426,7 @@
                 </table>
 
 
-                <div *ngIf="isEditModeAuth" class="error-messages" style="color: red; margin-top: 10px;">
+                <div *ngIf="isEditModeAuth" class="error-messages">
                   <p *ngIf="activity?.errorMessages?.['ActivityTypeID']">
                     {{ activity.errorMessages['ActivityTypeID'] }}
                   </p>
@@ -1467,7 +1467,7 @@
                   <p>Conditions and Restrictions</p>
                 </div>
 
-                <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length !== 0 || (isEditModeAuth)">
+                <p *ngIf="ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0 || (isEditModeAuth)">
                   <strong>Retail Restriction: </strong> &nbsp;
                   <span *ngIf="!isEditModeAuth">Yes</span>
                   <input *ngIf="isEditModeAuth" [(ngModel)]="isScopeConditionChecked" type="checkbox" />
@@ -1771,7 +1771,7 @@
     <!-- Popup Section -->
     <div *ngIf="isPopupOpen" (click)="closeControllerPopup()" class="contollerPopupOverlay">
       <div (click)="$event.stopPropagation()" class="contollerPopupContent">
-        <div class="error-messages" style="color: red">
+        <div class="error-messages">
           <p *ngIf="errorMessages['OtherEntityName']">{{ errorMessages['OtherEntityName'] }}</p>
           <p *ngIf="errorMessages['EffectiveDate']">{{ errorMessages['EffectiveDate'] }}</p>
           <p *ngIf="errorMessages['CessationDate']">{{ errorMessages['CessationDate'] }}</p>
@@ -2227,7 +2227,7 @@
           </div>
         </div>
 
-        <div class="error-messages" style="color: red">
+        <div class="error-messages">
           <p *ngIf="errorMessages['OtherEntityName']">{{ errorMessages['OtherEntityName'] }}</p>
           <p *ngIf="errorMessages['EffectiveDate']">{{ errorMessages['EffectiveDate'] }}</p>
           <p *ngIf="errorMessages['CessationDate']">{{ errorMessages['CessationDate'] }}</p>
@@ -2711,7 +2711,7 @@
           </div>
           <button class="close-button" (click)="closeAuditorPopup()"><i class="bi bi-x-circle close-icon"></i></button>
         </div>
-        <div class="error-messages" style="color: red">
+        <div class="error-messages">
           <!-- Auditor Name Error -->
           <p *ngIf="errorMessages['OtherEntityName']">{{ errorMessages['OtherEntityName'] }}</p>
           <!-- Auditor Type Error -->
@@ -2784,7 +2784,7 @@
           <!-- Save and Cancel Buttons -->
           <button class="close-button" (click)="closecreateAuditor()"><i class="bi bi-x-circle close-icon"></i></button>
         </div>
-        <div class="error-messages" style="color: red">
+        <div class="error-messages">
           <!-- Auditor Name Error -->
           <p *ngIf="errorMessages['OtherEntityName']">{{ errorMessages['OtherEntityName'] }}</p>
           <!-- Auditor Type Error -->

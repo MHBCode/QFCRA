@@ -155,7 +155,7 @@ export class ViewFirmPageComponent implements OnInit {
   LicPrevRevNumbers: any = [];
   AuthPrevRevNumbers: any = [];
   existingActivities: any = [];
-  existingProducts: any = [];
+  existingPermittedActivites: any = [];
   sectorDetails: any = [];
   prudentialCategoryDetails: any = [];
   currentLicRevisionNumber: number | null = null;
@@ -1165,7 +1165,6 @@ export class ViewFirmPageComponent implements OnInit {
 
   cancelEditFirm() {
     Swal.fire({
-      title: 'Alert',
       text: 'Are you sure you want to cancel your changes ?',
       icon: 'warning',
       showCancelButton: true,
@@ -1422,7 +1421,6 @@ export class ViewFirmPageComponent implements OnInit {
   saveVaryLicenseScope(): void {
     this.firmService.errorMessages(constants.FirmActivitiesEnum.SCOPECHANGED_SAVEORREVISE).subscribe((response) => {
       Swal.fire({
-        title: 'Alert',
         text: response.response,
         icon: 'warning',
         showCancelButton: true,
@@ -1453,7 +1451,6 @@ export class ViewFirmPageComponent implements OnInit {
 
   varyLicenseScope() {
     Swal.fire({
-      title: 'Alert',
       text: 'Are you sure you want to vary the scope?',
       icon: 'warning',
       showCancelButton: true,
@@ -1526,7 +1523,6 @@ export class ViewFirmPageComponent implements OnInit {
 
   cancelEditLicScope() {
     Swal.fire({
-      title: 'Alert',
       text: 'Are you sure you want to cancel your changes ?',
       icon: 'warning',
       showCancelButton: true,
@@ -1590,7 +1586,7 @@ export class ViewFirmPageComponent implements OnInit {
       return; // Prevent further action if validation fails
     }
 
-    this.existingProducts = this.ActivityAuth;
+    this.existingPermittedActivites = this.ActivityAuth;
 
     if (!(this.isNullOrEmpty(this.ActivityAuth[0].ScopeEffectiveDate)) && this.currentDateOnly > this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate || this.ActivityAuth[0].ScopeRevNum === 1)) {
       this.isLoading = false;
@@ -1630,7 +1626,6 @@ export class ViewFirmPageComponent implements OnInit {
   saveVaryAuthScope(): void {
     this.firmService.errorMessages(constants.FirmActivitiesEnum.SCOPECHANGED_SAVEORREVISE).subscribe((response) => {
       Swal.fire({
-        title: 'Alert',
         text: response.response,
         icon: 'warning',
         showCancelButton: true,
@@ -1660,7 +1655,6 @@ export class ViewFirmPageComponent implements OnInit {
 
   varyAuthScope() {
     Swal.fire({
-      title: 'Alert',
       text: 'Are you sure you want to vary the scope?',
       icon: 'warning',
       showCancelButton: true,
@@ -1700,7 +1694,7 @@ export class ViewFirmPageComponent implements OnInit {
         applicationDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeApplicationDate),
         licensedOrAuthorisedDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate),
       },
-      lstFirmActivities: this.existingProducts.map(activityAuth => ({
+      lstFirmActivities: this.existingPermittedActivites.map(activityAuth => ({
         createdBy: userId, //recheck
         firmScopeTypeID: parseInt(activityAuth.FirmScopeTypeID),
         activityTypeID: parseInt(activityAuth.ActivityTypeID),
@@ -1904,7 +1898,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   varyScopeAuthConfirm() {
-    this.existingProducts = this.ActivityAuth;
+    this.existingPermittedActivites = this.ActivityAuth;
     const varyAuthoriseScope = this.prepareVaryScopeAuthoriseObject(this.userId);
     console.log("vary scope data to be sent" + varyAuthoriseScope);
     this.firmService.editAuthorizedScope(varyAuthoriseScope).subscribe((response) => {
@@ -1937,7 +1931,7 @@ export class ViewFirmPageComponent implements OnInit {
         applicationDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeApplicationDate),
         licensedOrAuthorisedDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate),
       },
-      lstFirmActivities: this.existingProducts.map(activityAuth => ({
+      lstFirmActivities: this.existingPermittedActivites.map(activityAuth => ({
         createdBy: userId, //recheck
         firmScopeTypeID: parseInt(activityAuth.FirmScopeTypeID),
         activityTypeID: parseInt(activityAuth.ActivityTypeID),
@@ -1961,7 +1955,7 @@ export class ViewFirmPageComponent implements OnInit {
         activityDetails: null
       })),
       objPrudentialCategory: {
-        firmPrudentialCategoryID: this.PrudentialCategoryIDChanged ? null : this.prudentialCategoryDetails[0].FirmPrudentialCategoryID,
+        firmPrudentialCategoryID: null,
         firmId: this.firmId,
         prudentialCategoryTypeID: this.ActivityAuth[0].PrudentialCategoryTypeID,
         firmScopeID: this.ActivityAuth[0].FirmScopeID,
@@ -2045,7 +2039,6 @@ export class ViewFirmPageComponent implements OnInit {
 
   cancelEditAuthScope() {
     Swal.fire({
-      title: 'Alert',
       text: 'Are you sure you want to cancel your changes ?',
       icon: 'warning',
       showCancelButton: true,
@@ -3792,7 +3785,6 @@ loadPrudentialCategoryDetails() {
   showConfirmationAndUpdate(prudCategID: string, msgKey: number) {
     this.firmService.errorMessages(msgKey).subscribe((response) => {
       Swal.fire({
-        title: 'Alert',
         text: response.response,
         icon: 'warning',
         showCancelButton: true,
@@ -4052,7 +4044,6 @@ loadPrudentialCategoryDetails() {
 
   removePermittedActivity(index: number) {
     Swal.fire({
-      title: 'Alert',
       text: 'Are you sure you want to Remove this record?',
       icon: 'warning',
       showCancelButton: true,
@@ -4234,7 +4225,6 @@ loadPrudentialCategoryDetails() {
 
   removeLicActivity(index: number) {
     Swal.fire({
-      title: 'Alert',
       text: 'Are you sure you want to delete this activity?',
       icon: 'warning',
       showCancelButton: true,
@@ -4254,7 +4244,6 @@ loadPrudentialCategoryDetails() {
             this.ActivityLicensed.splice(index, 1);
           } else {
             Swal.fire({
-              title: 'Alert!',
               text: 'There has to be at least one permitted activity!',
               icon: 'error',
               confirmButtonText: 'Ok',
@@ -4264,7 +4253,6 @@ loadPrudentialCategoryDetails() {
           // Check for new activity at index 0
           if (index === 0 && this.ActivityLicensed.length === 1) {
             Swal.fire({
-              title: 'Alert!',
               text: 'There has to be at least one permitted activity!',
               icon: 'error',
               confirmButtonText: 'Ok',
@@ -4333,7 +4321,6 @@ loadPrudentialCategoryDetails() {
 
   removeAddress(index: number) {
     Swal.fire({
-      title: 'Alert',
       text: 'Are you sure you want to delete this record?',
       icon: 'warning',
       showCancelButton: true,
@@ -4404,17 +4391,13 @@ loadPrudentialCategoryDetails() {
     }
   }
 
-  loadPrudReturnTypes(prudCategID: string): Observable<any> {
-    return this.firmService.getPrudReturnTypes(prudCategID).pipe(
-      tap(data => {
-        this.prudReturnTypesDropdown = data.response;
-        console.log('Firm Scope Prud Return Types: ', this.prudReturnTypesDropdown);
-      }),
-      catchError(error => {
-        console.log('Error fetching prud types: ', error);
-        return of([]); // Return an empty array in case of error
-      })
-    );
+  loadPrudReturnTypes(prudCategID: string) {
+    this.firmService.getPrudReturnTypes(prudCategID).subscribe(data => {
+      this.prudReturnTypesDropdown = data.response;
+      console.log('Firm Scope Prud Return Types: ', this.prudReturnTypesDropdown);
+    }, error => {
+      console.log('Error fetching prud types: ', error)
+    })
   }
 
   populateCountries() {
@@ -5765,7 +5748,6 @@ loadPrudentialCategoryDetails() {
     this.firmService.errorMessages(messageKey).subscribe(
       (response) => {
         Swal.fire({
-          title: 'Alert!',
           text: response.response,
           icon: 'error',
           confirmButtonText: 'Ok',
@@ -5831,7 +5813,6 @@ loadPrudentialCategoryDetails() {
   // Method to show a SweetAlert with combined messages for Authorisation type change
   showCombinedPopup(messages: string[]) {
     Swal.fire({
-      // title: 'Alert!',
       html: messages.join('<br>'), // Combine the messages with a line break
       showCancelButton: false,
       confirmButtonText: 'Ok',
@@ -5841,7 +5822,6 @@ loadPrudentialCategoryDetails() {
   // Method to show a SweetAlert for QFC Licensed type change
   showPopupLicenseTypeChange(messages: string[]) {
     Swal.fire({
-      // title: 'Alert!',
       html: messages.join('<br>'), // Combine the messages with a line break
       showCancelButton: false,
       confirmButtonText: 'Ok',

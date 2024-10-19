@@ -160,9 +160,10 @@
               <a [href]="item.Link" target="_blank" style="text-decoration: none;">View</a>
             </td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">
-              <div *ngIf="!isMainView else expandDesc" class="expandable-text-container">
+              <div *ngIf="!isMainView else expandFirmName" class="expandable-text-container">
                 <span class="expandable-text">{{ item.FirmName }}</span>
               </div>
+              <ng-template #expandFirmName>{{ item.FirmName }}</ng-template>
             </td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">
               <div *ngIf="!isMainView else expandDesc" class="expandable-text-container">
