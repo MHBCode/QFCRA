@@ -320,7 +320,10 @@ export class FirmService {
     const url = `${this.baseUrlParentEntity}get_regulator_details?otherEntityID=${otherEntityID}&entityTypeId=${entityTypeId}`; 
     return this.http.get<any>(url);
   }
-  
+  getRegulatorsByCountry(firmsId : number, countryID : number) : Observable<any> {
+    const url = `${this.baseUrlParentEntity}get_regulators_by_country?firmsId=${firmsId}&countryID=${countryID}`;
+    return this.http.get<any>(url);
+  }
   getFIRMRegisteredFund(firmId: number): Observable<any> {
     const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?firmId=${firmId}`; //https://localhost:7091/api/RegisteredFund/get_registered_fund_data?firmId=69
     return this.http.get<any>(url);

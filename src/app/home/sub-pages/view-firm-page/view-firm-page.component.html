@@ -1804,12 +1804,115 @@
 
           <!-- Contact Details Row 1 -->
           <div class="inputs-row">
-            <div class="input-field">
+            <div class="input-field" *ngIf="selectedController.EntityTypeDesc === 'Parent Entity' || selectedController.EntityTypeDesc === 'Corporate Controller' || selectedController.EntityTypeDesc === 'UBO – Corporate' || selectedController.EntityTypeDesc === 'Head Office of a Branch'">
               <label>Full Name of
                 Entity</label>
               <input [(ngModel)]="selectedController.OtherEntityName" name="fullName" [readonly]="!isEditable"
                 required />
             </div>
+            <div class="input-field"
+              *ngIf="selectedController.EntityTypeDesc === 'UBO - Individual' || selectedController.EntityTypeDesc === 'Individual Controller'">
+              <label for="title">
+                Title
+              </label>
+              <ng-container *ngIf="isEditable; else titleDisplay">
+                <select [(ngModel)]="selectedController.Title" name="title" id="title">
+                  <option *ngFor="let title of TitleEdit" [value]="title.TitleTypeId">
+                    {{ title.TitleDesc }}
+                  </option>
+                </select>
+              </ng-container>
+              <ng-template #titleDisplay>
+                <input [value]="selectedController.Title" name="title" id="title" readonly />
+              </ng-template>           
+            </div>
+            <div class="input-field"
+            *ngIf="selectedController.EntityTypeDesc === 'UBO - Individual' || selectedController.EntityTypeDesc === 'Individual Controller'">
+            <label for="firstName">
+              First Name <span style="color: red;">*</span>
+            </label>
+            <input [(ngModel)]="selectedController.FirstName" name="firstName" id="firstName" type="text" [readonly]="!isEditable">
+          </div>
+          </div>
+          <div class="inputs-row">
+           
+          <!---->
+          <div class="input-field"
+            *ngIf="selectedController.EntityTypeDesc === 'UBO - Individual' || selectedController.EntityTypeDesc === 'Individual Controller'">
+            <label for="secondName">
+              Second Name <span style="color: red;">*</span>
+            </label>
+            <input [(ngModel)]="selectedController.SecondName" name="secondName" id="secondName" type="text" [readonly]="!isEditable">
+          </div>
+          <!---->
+          <div class="input-field"
+            *ngIf="selectedController.EntityTypeDesc === 'UBO - Individual' || selectedController.EntityTypeDesc === 'Individual Controller'">
+            <label for="familyName">
+              Family Name <span style="color: red;">*</span>
+            </label>
+            <input [(ngModel)]="selectedController.FamilyName" name="familyName" id="familyName" type="text" [readonly]="!isEditable">
+          </div>
+          <div class="input-field"
+          *ngIf="CreatecontrollerDetails.EntityTypeDesc === 'UBO - Individual' || CreatecontrollerDetails.EntityTypeDesc === 'Individual Controller'">
+          <label for="placeOfBirth">
+            Place of birth
+          </label>
+          <ng-container *ngIf="isEditable; else placeOfBirthDisplay">
+            <select required [(ngModel)]="CreatecontrollerDetails.PlaceOfBirth" name="placeOfBirth" id="placeOfBirth">
+              <option *ngFor="let place of allCountries" [value]="place.CountryID">{{ place.CountryName }}
+              </option>
+            </select>
+          </ng-container>
+          <ng-template #placeOfBirthDisplay>
+            <input [value]="selectedController.PlaceOfBirth" name="placeOfBirth" id="placeOfBirth" readonly />
+          </ng-template>             
+          </div>
+          </div>
+          <div class="inputs-row">
+           
+            <!---->
+            <div class="input-field"
+            *ngIf="selectedController.EntityTypeDesc === 'UBO - Individual' || selectedController.EntityTypeDesc === 'Individual Controller'">
+            <label for="dateOfBirth">
+              Date of birth <span style="color: red;">*</span>
+            </label>
+            <input [(ngModel)]="selectedController.DateOfBirth" #dateInputs name="dateOfBirth" id="dateOfBirth"
+              type="input" [readonly]="!isEditable">
+            </div>
+            <!---->
+            <div class="input-field"
+            *ngIf="selectedController.EntityTypeDesc === 'UBO - Individual' || selectedController.EntityTypeDesc === 'Individual Controller'">
+            <label for="passportNum">
+              Passport Number
+            </label>
+            <input [(ngModel)]="selectedController.PassportNum" name="passportNum" id="passportNum" type="text" [readonly]="!isEditable">
+            </div>
+            <div class="input-field"
+            *ngIf="selectedController.EntityTypeDesc === 'UBO - Individual' || selectedController.EntityTypeDesc === 'Individual Controller'">
+            <label for="jurisdictionIssue">
+              Jurisdiction of Issue
+            </label>
+            <select name="jurisdictionIssue" id="jurisdictionIssue">
+              <option value="select">Select</option>
+            </select>
+            </div>
+          </div>
+          <div class="inputs-row">
+           
+            <!---->
+            <div class="input-field" style="width: 100%;"
+            *ngIf="selectedController.EntityTypeDesc === 'UBO - Individual' || selectedController.EntityTypeDesc === 'Individual Controller'">
+            <label for="isPEP">
+              Is Politically Exposed Person (PEP)? <span style="color: red;">*</span>
+            </label>
+            <div class="radio-wrapper">
+              <input name="isPEP" id="yes" type="radio" [value]="true" [(ngModel)]="selectedController.IsPEP">
+              Yes
+              <input name="isPEP" id="no" type="radio" [value]="false" [(ngModel)]="selectedController.IsPEP">
+              No
+            </div>
+            </div>
+            <!---->
             <div class="input-field">
               <label>Legal Status</label>
               <ng-container *ngIf="isEditable; else legalStatusDisplay">
@@ -1823,16 +1926,14 @@
                 <input [value]="getLegalStatusDescription()" name="legalStatus" readonly />
               </ng-template>
             </div>
+          </div>
+          <!-- Contact Details Row 2 -->
+          <div class="inputs-row">
             <div class="input-field">
               <label>Registered
                 Number</label>
               <input [(ngModel)]="selectedController.RegisteredNum" name="registeredNum" [readonly]="!isEditable" />
             </div>
-          </div>
-
-          <!-- Contact Details Row 2 -->
-          <div class="inputs-row">
-
             <div class="input-field">
               <label>Place of Establishment:</label>
               <ng-container *ngIf="isEditable; else placeOfEstablishmentDisplay">
@@ -1847,16 +1948,23 @@
             </div>
 
             <div class="input-field">
-              <ng-container>
-                <label>Type of Control</label>
-                <select required [(ngModel)]="selectedController.ControllerControlTypeID"
-                  (ngModelChange)="updateControlTypeDesc($event)" name="typeOfControl" [disabled]="!isEditable">
-                  <option value="1">Percentage</option>
-                  <option value="2">Exercise Control</option>
-                </select>
-              </ng-container>
+              
+                <label for="typeOfControl">Type of Control</label>
+                <ng-container *ngIf="isEditable; else typeOfControlDisplay">
+                  <select required [(ngModel)]="selectedController.ControllerControlTypeID"
+                  (ngModelChange)="updateControlTypeDesc($event)" name="typeOfControl" id="typeOfControl" >
+                  <option *ngFor="let ControlType of controlTypeOptionsCreate" [value]="ControlType.ControllerControlTypeID">
+                    {{ ControlType.ControllerControlTypeDesc }}
+                  </option>                
+                  </select>
+                </ng-container>
+                <ng-template #typeOfControlDisplay>
+                  <input [value]="selectedController.ControllerControlTypeDesc" name="placeOfEstablishment" readonly />
+                </ng-template>
             </div>
-
+          </div>
+          <!-- Contact Details Row 3 -->
+          <div class="inputs-row">
             <!-- Display the % of Holding field only if the control type is "Percentage" -->
             <ng-container *ngIf="selectedController.ControllerControlTypeID == 1">
               <div class="input-field">
@@ -1865,9 +1973,6 @@
                   [readonly]="!isEditable" />
               </div>
             </ng-container>
-          </div>
-          <!-- Contact Details Row 3 -->
-          <div class="inputs-row">
             <div class="input-field">
               <label>Effective
                 Date</label>
@@ -1879,6 +1984,18 @@
               </ng-template>
             </div>
             <div class="input-field">
+              <label>Cessation
+                Date</label>
+              <ng-container *ngIf="isEditable; else cessationDateInput">
+                <input type="text" #dateInputs [(ngModel)]="selectedController.AssnDateTo" name="cessationDate" />
+              </ng-container>
+              <ng-template #cessationDateInput>
+                <input [(ngModel)]="selectedController.AssnDateTo" name="cessationDate" [readonly]="!isEditable" />
+              </ng-template>
+            </div>
+          </div>
+          <div class="inputs-row">
+            <div class="input-field" *ngIf="selectedController.EntityTypeDesc === 'Parent Entity' || selectedController.EntityTypeDesc === 'Corporate Controller' || selectedController.EntityTypeDesc === 'UBO – Corporate' || selectedController.EntityTypeDesc === 'Head Office of a Branch'">
               <label>Is The Company
                 Regulated</label>
               <ng-container *ngIf="isEditable; else regulatedValue">
@@ -1899,18 +2016,76 @@
                 </span>
               </ng-template>
             </div>
-            <div class="input-field">
-              <label>Cessation
-                Date</label>
-              <ng-container *ngIf="isEditable; else cessationDateInput">
-                <input type="text" #dateInputs [(ngModel)]="selectedController.AssnDateTo" name="cessationDate" />
+            <div class="input-field" *ngIf="selectedController.EntityTypeDesc === 'Parent Entity' || selectedController.EntityTypeDesc === 'Corporate Controller' || selectedController.EntityTypeDesc === 'UBO – Corporate' || selectedController.EntityTypeDesc === 'Head Office of a Branch'">
+              <label for="isParent">Is it also Parent / Corporate Controller?</label>
+              <ng-container *ngIf="isEditable; else parentValue">
+                <div style="display: flex; align-items: center;">
+                  <input type="radio" id="parentYes" [(ngModel)]="selectedController.IsParentController"
+                    name="isParent" [value]="true" style="margin-right: 10px; cursor: pointer;" />
+                  <label for="parentYes" style="margin-left: 5px; color: #413b3c;">Yes</label>
+          
+                  <input type="radio" id="parentNo" [(ngModel)]="selectedController.IsParentController"
+                    name="isParent" [value]="false" style="margin-left: 20px; margin-right: 10px; cursor: pointer;" />
+                  <label for="parentNo" style="margin-left: 5px; color: #413b3c;">No</label>
+                </div>
               </ng-container>
-              <ng-template #cessationDateInput>
-                <input [(ngModel)]="selectedController.AssnDateTo" name="cessationDate" [readonly]="!isEditable" />
+              <ng-template #parentValue>
+                <span style="margin-left: 10px; color: #413b3c;">
+                  {{ selectedController.IsParentController ? 'Yes' : 'No' }}
+                </span>
               </ng-template>
             </div>
+          
+            <div class="input-field" *ngIf="selectedController.EntityTypeDesc === 'UBO – Corporate'">
+              <label for="isCompanyTraded">Is the company publicly traded?</label>
+              <ng-container *ngIf="isEditable; else tradedValue">
+                <div style="display: flex; align-items: center;">
+                  <input type="radio" id="tradedYes" [(ngModel)]="selectedController.IsPublicallyTraded"
+                    name="isCompanyTraded" [value]="true" style="margin-right: 10px; cursor: pointer;" />
+                  <label for="tradedYes" style="margin-left: 5px; color: #413b3c;">Yes</label>
+          
+                  <input type="radio" id="tradedNo" [(ngModel)]="selectedController.IsPublicallyTraded"
+                    name="isCompanyTraded" [value]="false" style="margin-left: 20px; margin-right: 10px; cursor: pointer;" />
+                  <label for="tradedNo" style="margin-left: 5px; color: #413b3c;">No</label>
+                </div>
+              </ng-container>
+              <ng-template #tradedValue>
+                <span style="margin-left: 10px; color: #413b3c;">
+                  {{ selectedController.IsPublicallyTraded ? 'Yes' : 'No' }}
+                </span>
+              </ng-template>
+            </div>
+            <div class="input-field"
+            *ngIf="selectedController.IsPublicallyTraded === false && selectedController.EntityTypeDesc === 'UBO – Corporate'">
+            <label for="more10UBOs">Are there any UBOs that own more than 10% of this entity?</label>
+            <ng-container *ngIf="isEditable; else moreUBOsValue">
+              <div style="display: flex; align-items: center;">
+                <input type="radio" id="UBOYes" [(ngModel)]="selectedController.More10UBOs"
+                  name="more10UBOs" [value]="true" style="margin-right: 10px; cursor: pointer;" />
+                <label for="UBOYes" style="margin-left: 5px; color: #413b3c;">Yes</label>
+        
+                <input type="radio" id="UBONo" [(ngModel)]="selectedController.More10UBOs"
+                  name="more10UBOs" [value]="false" style="margin-left: 20px; margin-right: 10px; cursor: pointer;" />
+                <label for="UBONo" style="margin-left: 5px; color: #413b3c;">No</label>
+              </div>
+            </ng-container>
+            <ng-template #moreUBOsValue>
+              <span style="margin-left: 10px; color: #413b3c;">
+                {{ selectedController.More10UBOs ? 'Yes' : 'No' }}
+              </span>
+            </ng-template>
           </div>
-
+         
+          </div>
+          <div class="inputs-row">
+            <div class="input-field additional-details fullwidth">
+              <label for="additionalDetails">
+                Additional Details
+              </label>
+              <textarea [(ngModel)]="selectedController.AdditionalDetails" name="additionalDetails"
+                id="additionalDetails" [readonly]="!isEditable"></textarea>
+            </div>
+          </div>
           <!-- Addresses Section -->
           <div class="addresses">
             <div class="popup-header">
@@ -1920,56 +2095,78 @@
             </div>
 
             <!-- Address Details -->
-            <div class="inputs-row">
-              <div class="input-field">
-                <label>Address Type</label>
-                <select [(ngModel)]="selectedController.AddressType" name="addressType" disabled>
-                  <option *ngFor="let type of addressTypeOptionsEdit" [value]="type.AddressTypeID">
-                    {{ type.AddressTypeDesc }}
-                  </option>
-                </select>
-              </div>
-              <div class="input-field">
-                <label>Address - Line
-                  1</label>
-                <input name="addressLine1" [readonly]="!isEditable" />
-              </div>
-              <div class="input-field">
-                <label>Address - Line
-                  2</label>
-                <input name="addressLine2" [readonly]="!isEditable" />
-              </div>
-            </div>
-
-            <div class="inputs-row">
-              <div class="input-field">
-                <label>State/Province</label>
-                <input name="stateProvince" [readonly]="!isEditable" />
-              </div>
-              <div class="input-field">
-                <label>Country</label>
-                <ng-container *ngIf="isEditable; else countryInput">
-                  <select [(ngModel)]="selectedController.Country" name="country">
-                    <option *ngFor="let country of allCountries" [value]="country.CountryID">{{
-                      country.CountryName
-                      }}</option>
+            <div *ngFor="let address of addressForms; let i = index">
+ 
+              <div class="inputs-row">
+                <div class="input-field">
+                  <label>Address Type</label>
+                  <select [(ngModel)]="address.AddressTypeID" name="addressType" disabled>
+                    <option *ngFor="let type of addressTypeOptionsEdit" [value]="type.AddressTypeID">
+                      {{ type.AddressTypeDesc }}
+                    </option>
                   </select>
-                </ng-container>
-                <ng-template #countryInput>
-                  <input [(ngModel)]="selectedController.Country" name="country" [readonly]="!isEditable" />
-                </ng-template>
+                </div>
+                <div class="input-field">
+                  <label>Address - Line
+                    1</label>
+                  <input type="text" [(ngModel)]="address.addressLine1" name="addressLine1" id="addressLine1" [readonly]="!isEditable" 
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0"/>
+                </div>
+                <div class="input-field">
+                  <label>Address - Line
+                    2</label>
+                  <input [(ngModel)]="address.addressLine2"  name="addressLine2" id="addressLine2" [readonly]="!isEditable" 
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+                </div>
               </div>
-              <div class="input-field">
-                <label>City</label>
-                <input name="city" [readonly]="!isEditable" />
+              <div class="inputs-row">
+                <div class="input-field">
+                  <label for="address3">
+                    Address - Line 3
+                  </label>
+                  <input [(ngModel)]="address.addressLine3" name="address3" id="address3" type="text"
+                    [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" [readonly]="!isEditable"/>
+                </div>
+                
+                <div class="input-field">
+                  <label for="address4">
+                    Address - Line 4
+                  </label>
+                  <input [(ngModel)]="address.addressLine4" name="address4" id="address4" type="text"
+                    [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" [readonly]="!isEditable"/>
+                </div>
+                <div class="input-field">
+                  <label for="city">City</label>
+                  <input [(ngModel)]="address.city" name="city" id="city" type="text" 
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" [readonly]="!isEditable" />
+                </div>
               </div>
-            </div>
-
-            <div class="inputs-row">
-              <div class="input-field">
-                <label>Zip/Postal
-                  Code</label>
-                <input name="zipPostalCode" [readonly]="!isEditable" />
+              <div class="inputs-row">
+                <div class="input-field">
+                  <label for="stateProvince">State/Province</label>
+                  <input [(ngModel)]="address.stateProvince" name="stateProvince" id="stateProvince" 
+                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0 " [readonly]="!isEditable" />
+                </div>
+                <div class="input-field">
+                  <label for="country">Country</label>
+                  <ng-container *ngIf="isEditable; else countryInput">
+                    <select [(ngModel)]="address.CountryID" name="country"
+                    [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0">
+                      <option *ngFor="let country of allCountries" [value]="country.CountryID">{{
+                        country.CountryName
+                        }}</option>
+                    </select>
+                  </ng-container>
+                  <ng-template #countryInput>
+                    <input [(ngModel)]="address.CountryID" name="country" [readonly]="!isEditable" />
+                  </ng-template>
+                </div>
+                <div class="input-field">
+                  <label for="zipPostalCode">Zip/Postal
+                    Code</label>
+                  <input [(ngModel)]="address.zipPostalCode" name="zipPostalCode" id="zipPostalCode" 
+                  [readonly]="!isEditable" [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+                </div>
               </div>
             </div>
           </div>
@@ -1981,16 +2178,30 @@
             </div>
 
             <div style="display: flex; gap: 20px; margin-bottom: 10px;">
-              <div class="input-field">
-                <label>Regulator</label>
-                <input [(ngModel)]="homeRegulater.RegulatorName" name="regulator" [readonly]="!isEditable" />
-              </div>
-              <div class="input-field">
-                <label>Regulator
-                  Contact</label>
-                <input [(ngModel)]="selectedController.RegulatorContact" name="regulatorContact"
-                  [readonly]="!isEditable" />
-              </div>
+              <div *ngFor="let regulator of regulatorList; let i = index">
+
+                <div class="inputs-row">
+                  <div class="input-field">
+                 
+                    <label for="regulators">Regulator <span style="color: red;">*</span></label>  
+                    <ng-container *ngIf="isEditable; else regulatorinput">
+                     <select required [(ngModel)]="regulator.RegulatorName" name="regulators" id="regulators">
+                       <option *ngFor="let Regulater of AllRegulater" [value]="Regulater.RegulatorID">{{ Regulater.RegulatorName }}</option>
+                      </select>
+                    </ng-container>       
+                    <ng-template #regulatorinput>
+                     <input [(ngModel)]="regulator.RegulatorName" name="regulators" id="regulators" [readonly]="!isEditable" />
+                   </ng-template>
+                   
+                 </div>
+                 <div class="input-field">
+                   <label>Regulator
+                     Contact</label>
+                   <input [(ngModel)]="selectedController.RegulatorContact" name="regulatorContact"
+                     [readonly]="!isEditable" />
+                 </div>
+                </div>              
+              </div>        
             </div>
           </ng-container>
           <div class="btn justify-content-end">
@@ -2029,17 +2240,11 @@
             <label for="controllerType">
               Controller Type <span style="color: red;">*</span>
             </label>
-            <select name="controllerType" id="controllerType" [(ngModel)]="CreatecontrollerDetails.EntityTypeDesc"
-              (change)="changeControlType()">
+            <select name="controllerType" id="controllerType" [(ngModel)]="CreatecontrollerDetails" (change)="changeControlType()">
               <option value="select" selected>Select</option>
-              <option *ngFor="let controllerType of controllerTypeOption" [value]="controllerType.EntityTypeDesc">
+              <option *ngFor="let controllerType of controllerTypeOption" [ngValue]="controllerType">
                 {{ controllerType.EntityTypeDesc }}
               </option>
-              <!-- <option value="corporateController">Corporate Controller</option>
-              <option value="uboCorporate">UBO - Corporate</option>
-              <option value="uboIndividual">UBO - Individual</option>
-              <option value="headOfficeBranch">Head Office of a Branch</option>
-              <option value="individualController">Individual Controller</option> -->
             </select>
           </div>
           <ng-container *ngIf="!hideForms">
@@ -2166,7 +2371,7 @@
                 Place of Establishment <span style="color: red;">*</span>
               </label>
               <select required [(ngModel)]="CreatecontrollerDetails.PlaceOfEstablishment" name="placeOfEstablishment">
-                <option *ngFor="let place of countryOptionsCreate" [value]="place.CountryID">{{ place.CountryName }}
+                <option *ngFor="let place of allCountries" [value]="place.CountryID">{{ place.CountryName }}
                 </option>
               </select>
             </div>
@@ -2177,7 +2382,7 @@
               <label for="controlType">
                 Type of Control <span style="color: red;">*</span>
               </label>
-              <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeID" name="typeOfControl"
+              <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeID" name="typeOfControl" id="typeOfControl"
                 (ngModelChange)="CreateControlTypeDesc($event)">
                 <option *ngFor="let ControlType of controlTypeOptionsCreate"
                   [value]="ControlType.ControllerControlTypeID">
@@ -2376,9 +2581,9 @@
                 <label for="country">
                   Country
                 </label>
-                <select required [(ngModel)]="address.CountryID" name="placeOfEstablishment"
+                <select required [(ngModel)]="address.CountryID" (change)="getAllRegulater(+address.CountryID,firmId)" name="Country" id="Country"
                   [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0">
-                  <option *ngFor="let place of countryOptionsCreate" [value]="place.CountryID">{{ place.CountryName }}</option>
+                  <option *ngFor="let place of allCountries" [value]="place.CountryID">{{ place.CountryName }}</option>
                 </select>
               </div>
               
@@ -2393,33 +2598,46 @@
           </div>
         </div>
 
-        <div class="create-inputs-field-set" *ngIf="CreatecontrollerDetails.IsCompanyRegulated === true">
+        <div class="create--inputs-field-set" *ngIf="CreatecontrollerDetails.IsCompanyRegulated === true">
           <div class="create-controller-actions">
             <h2 class="create-controller-header">
               Home State Regulators
             </h2>
           </div>
-          <div class="create-controller-inputs">
-            <div class="button-wrapper">
-              <button class="add-regulator-btn">+</button>
+        
+          <!-- Add regulator button -->
+          
+            <button (click)="addRegulator()" style="background-color: green; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 5px; float: right;">
+              <i style="size:7px" class="bi bi-plus-lg"></i>
+            </button>
+          
+        
+          <!-- Dynamically generate form inputs for each regulator in regulatorList -->
+          <div *ngFor="let regulator of regulatorList; let i = index" class="create-controller-inputs">
+            <hr>
+            <div style="width:100%">
+              <button (click)="removeRegulator(i)" style="float: right; background-color: red; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 5px;">
+                <i style="size: 5px;" class="bi bi-x-lg"></i>
+              </button>
             </div>
             <div class="input-field home-state-regulators-container">
+              <!-- Regulator Name input -->
               <div class="regulator-select-container">
-                <label for="regulators">
-                  Regulator <span style="color: red;">*</span>
-                </label>
-                <input type="text" [(ngModel)]="CreatecontrollerDetails.regulator" name="regulators" id="regulators">
+                <label for="regulators">Regulator <span style="color: red;">*</span></label>         
+                <select required [(ngModel)]="regulator.RegulatorName" name="regulators" id="regulators">
+                  <option *ngFor="let Regulater of AllRegulater" [value]="Regulater.RegulatorID">{{ Regulater.RegulatorName }}</option>
+                </select>
               </div>
-              <div class="del-regulator-btn">
-                <button>x</button>
-              </div>
+              <!-- Remove button for each regulator -->
+               
             </div>
+        
+            <!-- Regulator Contact input (disabled as per your code) -->
             <div class="input-field regulator-contact-container">
-              <label for="regulatorContact">
-                Regulator Contact
-              </label>
-              <input disabled type="text">
+              <label for="regulatorContact-{{i}}">Regulator Contact</label>
+              <input disabled type="text" [(ngModel)]="regulator.RegulatorContacts" name="regulatorContact-{{i}}" id="regulatorContact-{{i}}">
             </div>
+        
           </div>
         </div>
         <div class="btn justify-content-end">

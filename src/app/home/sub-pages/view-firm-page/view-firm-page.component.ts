@@ -256,7 +256,7 @@ export class ViewFirmPageComponent implements OnInit {
   isLoading: boolean = false;
 
   showAddressesForm = false;
-
+  AllRegulater : any = [];
   constructor(
     private router: Router,
     private route: ActivatedRoute,  // Inject ActivatedRoute
@@ -312,6 +312,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.getFirmAuditorName();
       this.getFirmAuditorType();
       this.getControllerType();
+      this.getAllRegulater(this.Address.countryID,this.firmId);
     });
   }
 
@@ -2707,106 +2708,69 @@ export class ViewFirmPageComponent implements OnInit {
               AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
             },
-            addressList: [
-              {
-                firmID: this.selectedController.firmID,
-                countryID: this.selectedController.countryID,
-                addressTypeID: this.selectedController.addressTypeID,
-                sameAsTypeID: this.selectedController.sameAsTypeID,
-                LastModifiedBy: 30,
-                addressAssnID: this.selectedController.addressAssnID,
-                entityTypeID: this.selectedController.entityTypeID,
-                entityID: this.selectedController.entityID,
-                contactAssnID: this.selectedController.contactAssnID,
-                contactID: this.selectedController.contactID,
-                addressID: this.selectedController.addressID,
-                addressLine1: this.selectedController.addressLine1,
-                addressLine2: this.selectedController.addressLine2,
-                addressLine3: this.selectedController.addressLine3,
-                addressLine4: this.selectedController.addressLine4,
-                city: this.selectedController.city,
-                province: this.selectedController.province,
-                postalCode: this.selectedController.postalCode,
-                phoneNumber: this.selectedController.phoneNumber,
-                phoneExt: this.selectedController.phoneExt,
-                faxNumber: this.selectedController.faxNumber,
-                CreatedDate: this.convertDateToYYYYMMDD(this.selectedController.CreatedDate),
-                LastModifiedDate: this.currentDate,
-                addressState: this.selectedController.addressState,
-                fromDate: null,
-                toDate: null,
-                objectID: this.selectedController.objectID,
-                objectInstanceID: this.selectedController.objectInstanceID,
-                objectInstanceRevNumber: this.selectedController.objectInstanceRevNumber,
-                sourceObjectID: this.selectedController.sourceObjectID,
-                sourceObjectInstanceID: this.selectedController.sourceObjectInstanceID,
-                sourceObjectInstanceRevNumber: this.selectedController.sourceObjectInstanceRevNumber,
-                objAis: { // Ensure this object is correctly structured
-                  ainId: this.selectedController.AinId,
-                  contactId: this.selectedController.contactId,
-                  natinality: this.selectedController.natinality,
-                  countryOfResidence: this.selectedController.countryOfResidence,
-                  functionId: this.selectedController.functionId,
-                  formTypeId: this.selectedController.FormTypeId,
-                  formProcessorId: this.selectedController.formProcessorId,
-                  statusofApplicationId: this.selectedController.statusofApplicationId,
-                  applicatioState: this.selectedController.applicatioState,
-                  fromType: this.selectedController.FromType,
-                  contactAssId: this.selectedController.contactAssId,
-                  FirmId: this.selectedController.FirmId,
-                  prefferdMethod: this.selectedController.PrefferdMethod,
-                  customFacingId: this.selectedController.customFacingId,
-                  ainNumber: this.selectedController.ainNumber,
-                  title: this.selectedController.title,
-                  firstName: this.selectedController.firstName,
-                  secondName: this.selectedController.secondName,
-                  thirdName: this.selectedController.thirdName,
-                  familyName: this.selectedController.familyName,
-                  fullName: this.selectedController.fullName,
-                  previousName: this.selectedController.previousName,
-                  dateOfBirth: this.selectedController.DateOfBirth,
-                  placeOfBirth: this.selectedController.placeOfBirth,
-                  nationality: this.selectedController.nationality,
-                  copyOfResidence: this.selectedController.copyOfResidence,
-                  passportNumber: this.selectedController.passportNumber,
-                  nationalId: this.selectedController.nationalId,
-                  functions: this.selectedController.functions,
-                  conditions: this.selectedController.conditions,
-                  FormType: this.selectedController.FormType,
-                  dateReceived: this.selectedController.DateReceived,
-                  formProcessor: this.selectedController.formProcessor,
-                  paymentRequest: this.selectedController.paymentRequest,
-                  paymentReceived: this.selectedController.paymentReceived,
-                  createdBy: this.selectedController.createdBy,
-                  statusOfApplications: this.selectedController.statusOfApplications,
-                  statusDate: this.selectedController.StatusDate,
-                  applicationStatusDate: this.selectedController.ApplicationStatusDate,
-                  customFacingActivity: this.selectedController.CustomFacingActivity,
-                  paymentRequestSentOn: this.selectedController.paymentRequestSentOn,
-                  paymentReceivedOn: this.selectedController.paymentReceivedOn,
-                  conditionsRestriction: this.selectedController.conditionsRestriction,
-                  applicationID: this.selectedController.applicationID,
-                  createdDate: this.selectedController.createdDate,
-                  mobilePhone: this.selectedController.mobilePhone,
-                  businessEmail: this.selectedController.businessEmail,
-                  otherEmail: this.selectedController.otherEmail,
-                  preferredMethodType: this.selectedController.preferredMethodType,
-                  showReadOnly: true,
-                  showEnabled: true
-                }
-              }
-            ],
-            regulatorList: [
-              {
-                regulatorState: this.selectedController.regulatorState,
-                regulatorID: this.selectedController.regulatorID,
-                entityTypeID: this.selectedController.entityTypeID,
-                entityID: this.selectedController.entityID,
-                relatedEntityTypeID: this.selectedController.relatedEntityTypeID,
-                relatedEntityID: this.selectedController.relatedEntityID,
-                contactAssnID: this.selectedController.contactAssnID
-              }
-            ]
+            addressList: this.addressForms.map(address => ({
+              firmID: this.firmId,
+              countryID: address.CountryID,
+              addressTypeID: address.AddressTypeID,
+              LastModifiedBy: this.userId,
+              entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+              entityID: this.firmId,
+              contactID: address.contactID,
+              addressID: address.addressID,
+              addressLine1: address.addressLine1,
+              addressLine2: address.addressLine2,
+              addressLine3: address.addressLine3,
+              addressLine4: address.addressLine4,
+              city: address.city,
+              stateProvince: address.stateProvince,
+              createdBy: address.createdBy,
+              addressAssnID: address.addressAssnID,
+              CreatedDate: address.CreatedDate,
+              LastModifiedDate: address.LastModifiedDate,
+              addressState: 6,
+              fromDate: address.fromDate,
+              toDate: address.toDate,
+              Output: address.Output,
+              objectID: address.objectID,
+              objectInstanceID: address.objectInstanceID,
+              objAis: address.objAis, // Ensure this is correctly structured
+              zipPostalCode: address.zipPostalCode,
+            })),
+ 
+            regulatorList: this.regulatorList.map(regulator => ({
+              EntityTypeID: regulator.EntityTypeID,
+              EntityID: regulator.EntityID,
+              UserID: regulator.UserID,
+              FirmID: regulator.FirmID,
+              RelatedEntityTypeID: regulator.RelatedEntityTypeID,
+              relatedEntityID: regulator.relatedEntityID,
+              Output: regulator.Output,
+              regulatorState: 6,
+              RegulatorID: regulator.RegulatorID,
+              RegulatorName: regulator.RegulatorName,
+              RegulatorContacts: regulator.RegulatorContacts,
+              RelatedEntityID: regulator.RelatedEntityID,
+              ContactID: regulator.ContactID,
+              Title: regulator.Title,
+              FullName: regulator.FullName,
+              BussinessEmail: regulator.BussinessEmail,
+              AddressLine1: regulator.AddressLine1,
+              AddressLine2: regulator.AddressLine2,
+              AddressLine3: regulator.AddressLine3,
+              AddressLine4: regulator.AddressLine4,
+              City: regulator.City,
+              Province: regulator.Province,
+              CountryID: regulator.CountryID,
+              CountryName: regulator.CountryName,
+              PostalCode: regulator.PostalCode,
+              PhoneNumber: regulator.PhoneNumber,
+              PhoneExt: regulator.PhoneExt,
+              FaxNumber: regulator.FaxNumber,
+              EntityRegulators: regulator.EntityRegulators,
+              ShowReadOnly: regulator.ShowReadOnly,
+              ShowEnabled: regulator.ShowEnabled,
+              ContactAssnID: regulator.ContactAssnID
+            }))
           }
 
           // Call the insert/update endpoint
@@ -3113,7 +3077,7 @@ export class ViewFirmPageComponent implements OnInit {
         LastModifiedBy: 30,
         entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
         entityID: this.CreatecontrollerDetails.EntityID,
-        contactID: '',
+        contactID: 0,
         addressID: null,
         addressLine3: '',
         addressLine4: '',
@@ -3146,7 +3110,7 @@ export class ViewFirmPageComponent implements OnInit {
         LastModifiedBy: 30,
         entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
         entityID: this.CreatecontrollerDetails.EntityID,
-        contactID: '',
+        contactID: 0,
         addressID: null,
         addressLine3: '',
         addressLine4: '',
@@ -3201,7 +3165,7 @@ export class ViewFirmPageComponent implements OnInit {
       LastModifiedBy: 30,
       entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
       entityID: this.CreatecontrollerDetails.EntityID,
-      contactID: '',
+      contactID: 0,
       addressID: null,
       addressLine3: '',
       addressLine4:'',
@@ -3222,6 +3186,104 @@ export class ViewFirmPageComponent implements OnInit {
       zipPostalCode:'',
     }
   ];
+  regulatorList: Array<any> = [
+    {
+      EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+      EntityID: null,
+      UserID: null,
+      FirmID: null,
+      RelatedEntityTypeID: this.CreatecontrollerDetails.RelatedEntityTypeID,
+      relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
+      Output: 0,
+      regulatorState: 2,
+      RegulatorID: 39,
+      RegulatorName: "Bahrain Monetary Agency",
+      RegulatorContacts: "",
+      RelatedEntityID: null,
+      ContactID: null,
+      Title: null,
+      FullName: null,
+      BussinessEmail: null,
+      AddressLine1: null,
+      AddressLine2: null,
+      AddressLine3: null,
+      AddressLine4: null,
+      City: null,
+      Province: null,
+      CountryID: 0,
+      CountryName: null,
+      PostalCode: null,
+      PhoneNumber: null,
+      PhoneExt: null,
+      FaxNumber: null,
+      EntityRegulators: null,
+      ShowReadOnly: false,
+      ShowEnabled: true,
+      ContactAssnID: null
+    }
+  ];
+  addRegulator() {
+    this.regulatorList.push({
+      EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+      EntityID: null,
+      UserID: null,
+      FirmID: null,
+      RelatedEntityTypeID: this.CreatecontrollerDetails.RelatedEntityTypeID,
+      relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
+      Output: 0,
+      regulatorState: 2,
+      RegulatorID: null,
+      RegulatorName: '',
+      RegulatorContacts: '',
+      RelatedEntityID: null,
+      ContactID: null,
+      Title: null,
+      FullName: null,
+      BussinessEmail: null,
+      AddressLine1: null,
+      AddressLine2: null,
+      AddressLine3: null,
+      AddressLine4: null,
+      City: null,
+      Province: null,
+      CountryID: 0,
+      CountryName: null,
+      PostalCode: null,
+      PhoneNumber: null,
+      PhoneExt: null,
+      FaxNumber: null,
+      EntityRegulators: null,
+      ShowReadOnly: false,
+      ShowEnabled: true,
+      ContactAssnID: null
+    });
+  }
+
+  // Remove a regulator
+  removeRegulator(index: number) {
+    this.regulatorList.splice(index, 1);
+  }
+  getAllRegulater(countryID: number,firmId : number): void {
+    if (!countryID) {
+        // If no country is selected, get general regulators
+        this.firmService.getObjectTypeTable(constants.Regulaters)
+            .subscribe(data => {
+                this.AllRegulater = data.response;
+                console.log("General Regulators fetched:", data);
+            }, error => {
+                console.error("Error fetching Regulators:", error);
+            });
+    } else {
+        // If a country is selected, get regulators specific to the country
+        this.firmService.getRegulatorsByCountry(firmId, countryID)
+            .subscribe(data => {
+                this.AllRegulater = data.response;
+                console.log("Country-specific Regulators fetched for CountryID:", countryID, data);
+            }, error => {
+                console.error("Error fetching Country-specific Regulators:", error);
+            });
+    }
+}
   createControllerPopupChanges(): void {
     console.log("CreatecontrollerDetails", this.CreatecontrollerDetails)
     this.CreateControllerValidateForm().then(() => {
@@ -3237,9 +3299,9 @@ export class ViewFirmPageComponent implements OnInit {
               OtherEntityName: this.CreatecontrollerDetails.OtherEntityName,
               OtherEntityID: null,
               ControllerControlTypeDesc: this.CreatecontrollerDetails.ControllerControlTypeDesc,
-              EntityTypeDesc: null,
+              EntityTypeDesc: this.CreatecontrollerDetails.EntityTypeDesc,
               DateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
-              createdBy: this.CreatecontrollerDetails.CreatedBy,
+              createdBy: this.userId,
               CessationDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CessationDate),
               EffectiveDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.EffectiveDate),
               CreatedDate: null,
@@ -3247,7 +3309,7 @@ export class ViewFirmPageComponent implements OnInit {
               RelatedEntityID: null,
               EntitySubTypeID: null,
               EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-              RelatedEntityTypeID: 6,
+              RelatedEntityTypeID: this.CreatecontrollerDetails.EntityTypeID, /// yazan
               relatedEntityEntityID: null,
               MyState: 0,
               LegalStatusTypeID: this.CreatecontrollerDetails.LegalStatusTypeID,
@@ -3284,63 +3346,61 @@ export class ViewFirmPageComponent implements OnInit {
               entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               entityID: this.firmId,
               contactID: address.contactID,
-              addressID: address.addressID,
+              addressID: null,
               addressLine1: address.addressLine1,
               addressLine2: address.addressLine2,
               addressLine3: address.addressLine3,
               addressLine4: address.addressLine4,
               city: address.city,
+              SameAsTypeID: address.AddressTypeID,
               stateProvince: address.stateProvince,
-              createdBy: address.createdBy,
-              addressAssnID: address.addressAssnID,
+              createdBy: this.userId,
+              addressAssnID: null,
               CreatedDate: address.CreatedDate,
               LastModifiedDate: address.LastModifiedDate,
-              addressState: address.addressState,
+              addressState: 2,
               fromDate: address.fromDate,
               toDate: address.toDate,
               Output: address.Output,
               objectID: address.objectID,
-              objectInstanceID: address.objectInstanceID,
-              objAis: address.objAis, // Ensure this is correctly structured
+              objectInstanceID: address.objectInstanceID,              
               zipPostalCode: address.zipPostalCode,
             })),
  
-            regulatorList: [
-              {
-                EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-                EntityID: null,
-                UserID: null,
-                FirmID: null,
-                RelatedEntityTypeID: this.CreatecontrollerDetails.RelatedEntityTypeID,
-                relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
-                Output: 0,
-                regulatorState: 2,
-                RegulatorID: 39,
-                RegulatorName: "Bahrain Monetary Agency",
-                RegulatorContacts: "",
-                RelatedEntityID: null,
-                ContactID: null,
-                Title: null,
-                FullName: null,
-                BussinessEmail: null,
-                AddressLine1: null,
-                AddressLine2: null,
-                AddressLine3: null,
-                AddressLine4: null,
-                City: null,
-                Province: null,
-                CountryID: 0,
-                CountryName: null,
-                PostalCode: null,
-                PhoneNumber: null,
-                PhoneExt: null,
-                FaxNumber: null,
-                EntityRegulators: null,
-                ShowReadOnly: false,
-                ShowEnabled: true,
-                ContactAssnID: null
-              }
-            ]
+            regulatorList: this.regulatorList.map(regulator => ({
+              EntityTypeID: regulator.EntityTypeID,
+              EntityID: regulator.EntityID,
+              UserID: regulator.UserID,
+              FirmID: regulator.FirmID,
+              RelatedEntityTypeID: regulator.RelatedEntityTypeID,
+              relatedEntityID: regulator.relatedEntityID,
+              Output: regulator.Output,
+              regulatorState: regulator.regulatorState,
+              RegulatorID: regulator.RegulatorID,
+              RegulatorName: regulator.RegulatorName,
+              RegulatorContacts: regulator.RegulatorContacts,
+              RelatedEntityID: regulator.RelatedEntityID,
+              ContactID: regulator.ContactID,
+              Title: regulator.Title,
+              FullName: regulator.FullName,
+              BussinessEmail: regulator.BussinessEmail,
+              AddressLine1: regulator.AddressLine1,
+              AddressLine2: regulator.AddressLine2,
+              AddressLine3: regulator.AddressLine3,
+              AddressLine4: regulator.AddressLine4,
+              City: regulator.City,
+              Province: regulator.Province,
+              CountryID: regulator.CountryID,
+              CountryName: regulator.CountryName,
+              PostalCode: regulator.PostalCode,
+              PhoneNumber: regulator.PhoneNumber,
+              PhoneExt: regulator.PhoneExt,
+              FaxNumber: regulator.FaxNumber,
+              EntityRegulators: regulator.EntityRegulators,
+              ShowReadOnly: regulator.ShowReadOnly,
+              ShowEnabled: regulator.ShowEnabled,
+              ContactAssnID: regulator.ContactAssnID
+            }))
           }
             console.log("Controller to be saved",saveControllerPopupChangesObj)
           // Call the insert/update endpoint
@@ -3401,7 +3461,7 @@ export class ViewFirmPageComponent implements OnInit {
               LastModifiedByOfOtherEntity: 30,
               JurisdictionId:3,
             },
-            lstContactFunctions: {
+            lstContactFunctions: [{
               contactFunctionID: null,
               contactFunctionTypeID: null,
               contactAssnID: null,
@@ -3414,43 +3474,39 @@ export class ViewFirmPageComponent implements OnInit {
               lastModifiedBy: null,
               LastModifiedDate: null,
               JurisdictionId:3,
-              isFunctionActive: null,
-              isRecordEditable: false
+              isFunctionActive: false,
+              isRecordEditable: 1
             }
+          ]
           },
-          addresses: [
-          {
+          addressList: this.addressForms.map(address => ({
             firmID: this.firmId,
-            countryID: this.CreatecontrollerDetails.CountryID,
-            addressTypeID: this.CreatecontrollerDetails.AddressTypeID,
-            AddressTypeDesc: this.CreatecontrollerDetails.AddressTypeDesc,
-            addressState:2,
-            LastModifiedDate:null,
-            SameAsTypeID:0,
-            lastModifiedBy: this.userId,
-            CreatedBy: 0,
-            AddressAssnID:null,
-            EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+            countryID: address.CountryID,
+            addressTypeID: address.AddressTypeID,
+            LastModifiedBy: this.userId,
+            entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
             entityID: this.firmId,
-            ContactAssnID: null,
-            ContactID: null,
-            addressID: this.CreatecontrollerDetails.AddressID,
-            addressLine1: this.CreatecontrollerDetails.addressLine1,
-            addressLine2: this.CreatecontrollerDetails.addressLine2,
-            addressLine3: this.CreatecontrollerDetails.addressLine3,
-            addressLine4: this.CreatecontrollerDetails.addressLine4,
-            city: this.CreatecontrollerDetails.city,
-            JurisdictionId:3,
-            Province: this.CreatecontrollerDetails.stateProvince,
-            postalCode:this.CreatecontrollerDetails.zipPostalCode,
-            phoneNumber: null,
+            contactID: address.contactID,
+            addressID: null,
+            addressLine1: "",
+            addressLine2: "",
+            addressLine3: "",
+            addressLine4: "",
+            city: address.city,
+            stateProvince: address.stateProvince,
+            createdBy: 0,
+            addressAssnID: null,
+            CreatedDate: address.CreatedDate,
+            LastModifiedDate: address.LastModifiedDate,
+            addressState: 2,
             fromDate: "2024-10-01T14:38:59.118Z",
             toDate: "2024-10-01T14:38:59.118Z",
-            objectID: this.CreatecontrollerDetails.ObjectID,
-            objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
-            objAis: null,
-          }
-        ]
+            Output: address.Output,
+            objectID:0,
+            objectInstanceID: 0,              
+            zipPostalCode:"",
+            objAis: null
+          }))
       }; 
 
         this.firmService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
