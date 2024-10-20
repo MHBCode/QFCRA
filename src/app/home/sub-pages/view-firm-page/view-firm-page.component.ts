@@ -2521,10 +2521,15 @@ export class ViewFirmPageComponent implements OnInit {
   closeControllerPopup(): void {
     this.isPopupOpen = false;
     this.isEditable = false; // Close the popup
+    this.errorMessages = {}; // Clear previous error messages
+    this.hasValidationErrors = false;
   }
   closeCreateControllerPopup(): void {
     this.isEditable = false;
     this.showCreateControllerSection = false; // Close the popup
+    this.errorMessages = {}; // Clear previous error messages
+    this.hasValidationErrors = false;
+    this.hideForms = true;
   }
   EditControllerValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -5022,12 +5027,16 @@ export class ViewFirmPageComponent implements OnInit {
     this.IsEditAuditorVisible = false; // Hide edit section
     this.IsViewAuditorVisible = false; // Hide view section
     this.IsCreateAuditorVisible = false; // Hide create section
+    this.hasValidationErrors = false;
+    this.errorMessages = {};
   }
   closecreateAuditor() {
     this.selectedAuditor = {};
     this.IsCreateAuditorVisible = false;
     this.IsViewAuditorVisible = false;
     this.firmAuditorsObj = {};
+    this.hasValidationErrors = false;
+    this.errorMessages = {};
   }
   editAuditor() {
     this.IsEditAuditorVisible = true; // Show the edit section
