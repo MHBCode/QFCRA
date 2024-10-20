@@ -469,3 +469,21 @@
   border-bottom: 2px solid #a51e36;
   width: 100%;
 }
+.link-button {
+  background: none;
+  border: none;
+  color: blue;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0;
+  font: inherit; /* Inherits the font styling of the surrounding text */
+}
+
+.link-button:hover {
+  color: darkblue; /* Optional: Change color on hover */
+  text-decoration: none;
+}
+
+.export-btn-col {
+  text-align: center;
+}

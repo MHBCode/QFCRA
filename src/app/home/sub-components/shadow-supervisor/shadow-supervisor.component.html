@@ -133,6 +133,9 @@
                 </ul>
               </div>
             </th>
+            <th *ngIf="ShowExportButton">
+              Export To Excel
+            </th>
           </tr>
         </thead>
 
@@ -158,6 +161,9 @@
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.DaysOverDue}}</td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.Comments}}</td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.PrimarySupervisionCaseOfficer}}</td>
+            <td *ngIf="ShowExportButton" class="export-btn-col">
+              <button (click)="exportRowToExcel(item)" class="link-button">Export</button>
+            </td>
           </tr>
         </tbody>
       </table>

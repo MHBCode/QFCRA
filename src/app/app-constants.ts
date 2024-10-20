@@ -23,7 +23,7 @@ export const firmScopeTypes = "FirmScopeTypes";
 export const ControllerType = "V_ControllerType"
 export const firmAuditorName = "V_Firm_AuditorName";
 export const firmAuditorType = "V_Firm_AuditorType";
-
+export const Regulaters = "V_Regulators"
 export enum FirmLicenseApplStatusType
 {
     Application = 4,

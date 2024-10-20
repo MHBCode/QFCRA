@@ -6,7 +6,7 @@ import { TaskServiceService } from 'src/app/ngServices/task-service.service';
 import Swal from 'sweetalert2';
 import * as constants from 'src/app/app-constants';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
-
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-shadow-supervisor',
@@ -18,6 +18,7 @@ export class ShadowSupervisorComponent implements OnInit {
   @Input() pageSize: number = 10;
   isLoading: boolean = true;
   ShadowSupervisorTasks: any[] = [];
+  ShowExportButton: boolean = false;
   filteredTasks: any[] = [];
   taskTypes: string[] = [];
   firmNames: string[] = [];
@@ -59,6 +60,11 @@ export class ShadowSupervisorComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTasksShadowSupervisor();
+
+    this.TaskService.showExportButton$.subscribe(value => {
+      this.ShowExportButton = value;
+      console.log('ShowExportButton value in TasksIAssignedComponent:', this.ShowExportButton);
+    });
   }
 
   loadTasksShadowSupervisor(): void {
@@ -363,4 +369,27 @@ export class ShadowSupervisorComponent implements OnInit {
       },
     );
   }
+  exportRowToExcel(rowData: any) {
+    // Prepare data in a format that can be exported to Excel
+   const row = [
+     {
+       'Task Type': rowData.TaskType,
+       'Firm Name': rowData.FirmName,
+       'Description': rowData.ShortDescription,
+       'Due Date': rowData.TaskDueDate,
+       'Days Over Due': rowData.DaysOverDue > 0 ? rowData.DaysOverDue : '',
+       'Comments': rowData.Comments,
+       'Primary Supervisor': rowData.PrimarySupervisionCaseOfficer,
+     }
+   ];
+
+   // Convert the data to a worksheet
+   const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(row);
+
+   // Create a new workbook and append the worksheet to it
+   const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
+
+   // Export the file and trigger a download
+   XLSX.writeFile(workbook, `task_row_${rowData.TaskType}.xlsx`);
+ }
 }

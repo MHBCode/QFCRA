@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-
+import { BehaviorSubject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
@@ -43,5 +43,11 @@ export class TaskServiceService {
   getMyTeamsTasks(userId: number, teamUsersID: string): Observable<any> {
     const url = `${this.baseUrl}get_my_teams_task?userId=${userId}&teamUsersID=${teamUsersID}`;
     return this.http.get(url);
+  }
+  private showExportButtonSubject = new BehaviorSubject<boolean>(false);
+  showExportButton$ = this.showExportButtonSubject.asObservable();
+
+  setShowExportButton(value: boolean) {
+    this.showExportButtonSubject.next(value);
   }
 }
