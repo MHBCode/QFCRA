@@ -46,6 +46,12 @@
 .checkbox {
     display: inline-flex; /* Keep items in a row */
     align-items: center;
+    flex-wrap: wrap;
+}
+
+.child-checkbox-items {
+    width: 100%;
+    display: flex;
 }
 
 .manager-checkbox {

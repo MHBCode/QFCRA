@@ -312,3 +312,16 @@ input[type="radio"] {
 .justify-content-end{
     justify-content: end;
 }
+
+input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+}
+input[type="checkbox"]:checked {
+    accent-color: #a51e36;
+}
+
+.toggle-icon i {
+    color: #a51e36;
+    margin-inline-start: 10px;
+}

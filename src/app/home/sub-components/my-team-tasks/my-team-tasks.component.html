@@ -43,7 +43,7 @@
         </div>
 
         <!-- Recursively display the sub-members if expanded -->
-        <div *ngIf="isManagerExpanded(manager.UserID)">
+        <div *ngIf="isManagerExpanded(manager.UserID)" class="child-checkboxes">
           <div class="child-checkbox-group">
             <ng-container *ngFor="let subMember of teamMembersByManager[manager.UserID]">
               <div class="checkbox">
@@ -58,7 +58,7 @@
                   <i *ngIf="!isManagerExpanded(subMember.UserID)" class="bi bi-chevron-right"></i>
                 </span>
 
-                <div *ngIf="isManagerExpanded(subMember.UserID)">
+                <div *ngIf="isManagerExpanded(subMember.UserID)"  class="child-checkbox-items">
                   <div class="child-checkbox-group">
                     <ng-container *ngFor="let subSubMember of teamMembersByManager[subMember.UserID]">
                       <div class="checkbox">
@@ -74,7 +74,7 @@
                           <i *ngIf="!isManagerExpanded(subSubMember.UserID)" class="bi bi-chevron-right"></i>
                         </span>
 
-                        <div *ngIf="isManagerExpanded(subSubMember.UserID)">
+                        <div *ngIf="isManagerExpanded(subSubMember.UserID)"  class="child-checkbox-items">
                           <div class="child-checkbox-group">
                             <ng-container *ngFor="let subSubSubMember of teamMembersByManager[subSubMember.UserID]">
                               <div class="checkbox">
