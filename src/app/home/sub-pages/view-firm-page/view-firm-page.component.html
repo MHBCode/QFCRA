@@ -1363,7 +1363,7 @@
                 <div *ngIf="activity?.categorizedProducts?.length > 0 && !isEditModeAuth">
                   <div *ngFor="let category of activity.categorizedProducts">
                     <!-- Display Main Category -->
-                    <h4>{{ category.mainCategory }}</h4>
+                    <h4 *ngIf="category.hasVisibleProducts">{{ category.mainCategory }}</h4>
 
                     <!-- Display Sub Products -->
 

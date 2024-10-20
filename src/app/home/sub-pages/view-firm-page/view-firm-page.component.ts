@@ -256,7 +256,7 @@ export class ViewFirmPageComponent implements OnInit {
   isLoading: boolean = false;
 
   showAddressesForm = false;
-  AllRegulater : any = [];
+  AllRegulater: any = [];
   constructor(
     private router: Router,
     private route: ActivatedRoute,  // Inject ActivatedRoute
@@ -266,9 +266,9 @@ export class ViewFirmPageComponent implements OnInit {
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer
-  ) { 
-    
-     }
+  ) {
+
+  }
 
   ngOnInit(): void {
     console.log('ngOnInit called');
@@ -312,7 +312,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.getFirmAuditorName();
       this.getFirmAuditorType();
       this.getControllerType();
-      this.getAllRegulater(this.Address.countryID,this.firmId);
+      this.getAllRegulater(this.Address.countryID, this.firmId);
     });
   }
 
@@ -2302,7 +2302,7 @@ export class ViewFirmPageComponent implements OnInit {
   onInactiveContactsToggle(event: any): void {
     this.displayInactiveContacts = event.target.checked;
   }
- 
+
   closeContactPopup() {
     this.isPopupVisible = false;
   }
@@ -2516,7 +2516,7 @@ export class ViewFirmPageComponent implements OnInit {
         console.error("Error fetching TitleTypes", error);
       });
   }
-  
+
 
   closeControllerPopup(): void {
     this.isPopupOpen = false;
@@ -2575,12 +2575,12 @@ export class ViewFirmPageComponent implements OnInit {
       }
     });
   }
- 
+
   getLegalStatusDescription(): string {
     const status = this.legalStatusOptionsEdit.find(option => option.LegalStatusTypeID === this.selectedController.LegalStatusTypeID);
     return status ? status.LegalStatusTypeDesc : '';
   }
-  
+
   getPlaceOfEstablishmentName(): string {
     const place = this.allCountries.find(option => option.CountryID === this.selectedController.PlaceOfEstablishment);
     return place ? place.CountryName : '';
@@ -2635,7 +2635,7 @@ export class ViewFirmPageComponent implements OnInit {
     const relatedEntityID = this.selectedController.RelatedEntityID;
     const entitySubTypeID = 5;
     const output = 0; // As per your requirement
-    console.log("DeleteControllerPopup",otherEntityID,relatedEntityID,entitySubTypeID)
+    console.log("DeleteControllerPopup", otherEntityID, relatedEntityID, entitySubTypeID)
     // Make the DELETE request with all required query parameters
     this.firmService.deleteotherentitydetails(otherEntityID, relatedEntityID, entitySubTypeID, output).subscribe(
       response => {
@@ -2729,7 +2729,7 @@ export class ViewFirmPageComponent implements OnInit {
               objAis: address.objAis, // Ensure this is correctly structured
               zipPostalCode: address.zipPostalCode,
             })),
- 
+
             regulatorList: this.regulatorList.map(regulator => ({
               EntityTypeID: regulator.EntityTypeID,
               EntityID: regulator.EntityID,
@@ -3014,9 +3014,9 @@ export class ViewFirmPageComponent implements OnInit {
     ObjectID: 0,
     PrefferdMethod: '',
     ContactId: 0,
-    ThirdName:'',
+    ThirdName: '',
     ObjectInstanceID: 0,
-    AddressTypeDesc:'',
+    AddressTypeDesc: '',
     StatusDate: '',
     MobilePhone: '',
     businessEmail: '',
@@ -3043,7 +3043,7 @@ export class ViewFirmPageComponent implements OnInit {
     const selectedControllerType = this.controllerTypeOption.find(
       controllerType => controllerType.EntityTypeDesc === selectedEntityTypeDesc
     );
-    
+
     if (selectedControllerType) {
       this.CreatecontrollerDetails.EntityTypeID = selectedControllerType.EntityTypeID;
     }
@@ -3075,7 +3075,7 @@ export class ViewFirmPageComponent implements OnInit {
         addressLine3: '',
         addressLine4: '',
         city: '',
-        sameAsTypeID:0,
+        sameAsTypeID: 0,
         createdBy: 0,
         addressAssnID: null,
         CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
@@ -3120,7 +3120,7 @@ export class ViewFirmPageComponent implements OnInit {
         objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
         objAis: null,
         zipPostalCode: '',
-        stateProvince:'',
+        stateProvince: '',
       });
     }
   }
@@ -3141,17 +3141,17 @@ export class ViewFirmPageComponent implements OnInit {
   }
   onSameAsTypeChangeg(event: any, address: any): void {
     const selectedSameAsTypeID = event.target.value;
-  
+
     // Set the AddressTypeID based on Same As Type selection
     if (selectedSameAsTypeID && selectedSameAsTypeID !== '0') {
       address.AddressTypeID = selectedSameAsTypeID;
     }
   }
   addressForms = [
-    { 
-      AddressTypeID: 0, 
-      addressLine1: '', 
-      addressLine2: '', 
+    {
+      AddressTypeID: 0,
+      addressLine1: '',
+      addressLine2: '',
       firmID: this.firmId,
       CountryID: '',
       addressTypeID: '',
@@ -3161,9 +3161,9 @@ export class ViewFirmPageComponent implements OnInit {
       contactID: 0,
       addressID: null,
       addressLine3: '',
-      addressLine4:'',
+      addressLine4: '',
       city: '',
-      sameAsTypeID:0,
+      sameAsTypeID: 0,
       createdBy: 0,
       addressAssnID: null,
       CreatedDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CreatedDate),
@@ -3172,11 +3172,11 @@ export class ViewFirmPageComponent implements OnInit {
       fromDate: null,
       toDate: null,
       Output: 0,
-      stateProvince:'',
+      stateProvince: '',
       objectID: this.CreatecontrollerDetails.ObjectID,
       objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
-      objAis: null, 
-      zipPostalCode:'',
+      objAis: null,
+      zipPostalCode: '',
     }
   ];
   regulatorList: Array<any> = [
@@ -3256,27 +3256,27 @@ export class ViewFirmPageComponent implements OnInit {
   removeRegulator(index: number) {
     this.regulatorList.splice(index, 1);
   }
-  getAllRegulater(countryID: number,firmId : number): void {
+  getAllRegulater(countryID: number, firmId: number): void {
     if (!countryID) {
-        // If no country is selected, get general regulators
-        this.firmService.getObjectTypeTable(constants.Regulaters)
-            .subscribe(data => {
-                this.AllRegulater = data.response;
-                console.log("General Regulators fetched:", data);
-            }, error => {
-                console.error("Error fetching Regulators:", error);
-            });
+      // If no country is selected, get general regulators
+      this.firmService.getObjectTypeTable(constants.Regulaters)
+        .subscribe(data => {
+          this.AllRegulater = data.response;
+          console.log("General Regulators fetched:", data);
+        }, error => {
+          console.error("Error fetching Regulators:", error);
+        });
     } else {
-        // If a country is selected, get regulators specific to the country
-        this.firmService.getRegulatorsByCountry(firmId, countryID)
-            .subscribe(data => {
-                this.AllRegulater = data.response;
-                console.log("Country-specific Regulators fetched for CountryID:", countryID, data);
-            }, error => {
-                console.error("Error fetching Country-specific Regulators:", error);
-            });
+      // If a country is selected, get regulators specific to the country
+      this.firmService.getRegulatorsByCountry(firmId, countryID)
+        .subscribe(data => {
+          this.AllRegulater = data.response;
+          console.log("Country-specific Regulators fetched for CountryID:", countryID, data);
+        }, error => {
+          console.error("Error fetching Country-specific Regulators:", error);
+        });
     }
-}
+  }
   createControllerPopupChanges(): void {
     console.log("CreatecontrollerDetails", this.CreatecontrollerDetails)
     this.CreateControllerValidateForm().then(() => {
@@ -3356,10 +3356,10 @@ export class ViewFirmPageComponent implements OnInit {
               toDate: address.toDate,
               Output: address.Output,
               objectID: address.objectID,
-              objectInstanceID: address.objectInstanceID,              
+              objectInstanceID: address.objectInstanceID,
               zipPostalCode: address.zipPostalCode,
             })),
- 
+
             regulatorList: this.regulatorList.map(regulator => ({
               EntityTypeID: regulator.EntityTypeID,
               EntityID: regulator.EntityID,
@@ -3395,7 +3395,7 @@ export class ViewFirmPageComponent implements OnInit {
               ContactAssnID: regulator.ContactAssnID
             }))
           }
-            console.log("Controller to be saved",saveControllerPopupChangesObj)
+          console.log("Controller to be saved", saveControllerPopupChangesObj)
           // Call the insert/update endpoint
           this.firmService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
             response => {
@@ -3407,7 +3407,7 @@ export class ViewFirmPageComponent implements OnInit {
               console.error("Error saving changes:", error);
             }
           );
-          
+
         }
       }
       else if (
@@ -3420,7 +3420,7 @@ export class ViewFirmPageComponent implements OnInit {
               contactID: null,
               contactAssnID: null,
               OtherEntityName: this.CreatecontrollerDetails.OtherEntityName,
-              EntityTypeID:this.CreatecontrollerDetails.EntityTypeID,
+              EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               Title: this.CreatecontrollerDetails.Title, // Map your inputs accordingly
               FirstName: this.CreatecontrollerDetails.FirstName,
               secondName: this.CreatecontrollerDetails.SecondName,
@@ -3429,12 +3429,12 @@ export class ViewFirmPageComponent implements OnInit {
               PctOfShares: this.CreatecontrollerDetails.PctOfShares,
               tempContactID: 0,
               countryOfResidence: null,
-              ControllerControlTypeID : this.CreatecontrollerDetails.ControllerControlTypeID,
+              ControllerControlTypeID: this.CreatecontrollerDetails.ControllerControlTypeID,
               createdBy: this.userId,
               dateOfBirth: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.DateOfBirth),
               fullName: null,
               lastModifiedBy: this.userId,
-              MyState : 0,
+              MyState: 0,
               nationalID: null,
               nationality: null,
               EntityID: this.firmId,
@@ -3452,7 +3452,7 @@ export class ViewFirmPageComponent implements OnInit {
               AssnDateFrom: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
               AssnDateTo: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
-              JurisdictionId:3,
+              JurisdictionId: 3,
             },
             lstContactFunctions: [{
               contactFunctionID: null,
@@ -3466,11 +3466,11 @@ export class ViewFirmPageComponent implements OnInit {
               createdBy: this.userId,
               lastModifiedBy: null,
               LastModifiedDate: null,
-              JurisdictionId:3,
+              JurisdictionId: 3,
               isFunctionActive: false,
               isRecordEditable: 1
             }
-          ]
+            ]
           },
           addressList: this.addressForms.map(address => ({
             firmID: this.firmId,
@@ -3495,12 +3495,12 @@ export class ViewFirmPageComponent implements OnInit {
             fromDate: "2024-10-01T14:38:59.118Z",
             toDate: "2024-10-01T14:38:59.118Z",
             Output: address.Output,
-            objectID:0,
-            objectInstanceID: 0,              
-            zipPostalCode:"",
+            objectID: 0,
+            objectInstanceID: 0,
+            zipPostalCode: "",
             objAis: null
           }))
-      }; 
+        };
 
         this.firmService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
           response => {
@@ -3522,7 +3522,7 @@ export class ViewFirmPageComponent implements OnInit {
 
     console.log('Editing:', this.controllerDetails);
   }
-  
+
   loadControllers(): void {
     this.isLoading = true;
     this.firmService.getFIRMControllers(this.firmId).subscribe(
@@ -3688,17 +3688,23 @@ export class ViewFirmPageComponent implements OnInit {
             let currentCategory = null;
 
             activity.ObjectProductActivity.forEach(product => {
-              if (product.productTypeID === "0") {
-                // Main category
-                currentCategory = {
-                  mainCategory: product.productTypeDescription,
-                  subProducts: []
-                };
-                activity.categorizedProducts.push(currentCategory);
-              } else if (currentCategory) {
-                // Sub-product
-                product.firmScopeTypeID = product.firmScopeTypeID || ''; // Ensure firmScopeTypeID is set
-                currentCategory.subProducts.push(product);
+              // Check for withdrawal or discontinue actions
+              if (product.firmScopeTypeID !== 2 && product.firmScopeTypeID !== 3) {
+                if (product.productTypeID === "0") {
+                  // Main category
+                  currentCategory = {
+                    mainCategory: product.productTypeDescription,
+                    subProducts: [],
+                    hasVisibleProducts: false // Initialize the visibility flag
+                  };
+                  activity.categorizedProducts.push(currentCategory);
+                } else if (currentCategory) {
+                  // Sub-product
+                  product.firmScopeTypeID = product.firmScopeTypeID || ''; // Ensure firmScopeTypeID is set
+                  currentCategory.subProducts.push(product);
+                  // Set the flag to true if there are visible sub-products
+                  currentCategory.hasVisibleProducts = true;
+                }
               }
             });
           });
@@ -3732,28 +3738,30 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
 
-loadSectorDetails() {
-  // Use the first activity's FirmScopeID and ScopeRevNum if they are the same across all.
-  const firstActivity = this.ActivityAuth[0];
-  if (firstActivity) {
-    this.firmService.getSectorDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
-      this.sectorDetails = data.response;
-    }, error => {
-      console.error('Error Fetching Sector Details: ', error);
-    });
-  }
-}
 
-loadPrudentialCategoryDetails() {
-  const firstActivity = this.ActivityAuth[0];
-  if (firstActivity) {
-    this.firmService.getPrudentialCategoryDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
-      this.prudentialCategoryDetails = data.response;
-    }, error => {
-      console.error('Error Fetching Prudential Category Details: ', error);
-    });
+
+  loadSectorDetails() {
+    // Use the first activity's FirmScopeID and ScopeRevNum if they are the same across all.
+    const firstActivity = this.ActivityAuth[0];
+    if (firstActivity) {
+      this.firmService.getSectorDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
+        this.sectorDetails = data.response;
+      }, error => {
+        console.error('Error Fetching Sector Details: ', error);
+      });
+    }
   }
-}
+
+  loadPrudentialCategoryDetails() {
+    const firstActivity = this.ActivityAuth[0];
+    if (firstActivity) {
+      this.firmService.getPrudentialCategoryDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
+        this.prudentialCategoryDetails = data.response;
+      }, error => {
+        console.error('Error Fetching Prudential Category Details: ', error);
+      });
+    }
+  }
 
   onPrudentialCategoryChange(prudCategID: string) {
     // Check if the new selection is the same as the previous one
@@ -5034,17 +5042,17 @@ loadPrudentialCategoryDetails() {
     return new Promise<void>((resolve, reject) => {
       this.errorMessages = {};
       this.hasValidationErrors = false;
-  
+
       // Validate 'EntitySubTypeID'
       if (!this.selectedAuditor.EntitySubTypeID && this.selectedAuditor.EntitySubTypeID === undefined) {
         this.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
         this.hasValidationErrors = true;
       }
-      if(this.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined){
+      if (this.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined) {
         this.getErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
         this.hasValidationErrors = true;
       }
-      if(this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)){
+      if (this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)) {
         this.getErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
         this.hasValidationErrors = true;
       }
@@ -5053,7 +5061,7 @@ loadPrudentialCategoryDetails() {
   firmAuditorsObj: {};
   saveEditAuditor() {
     this.EditAuditorValidateForm();
-        
+
     // Check if there are any errors
     if (this.hasValidationErrors) {
       this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
@@ -5065,7 +5073,7 @@ loadPrudentialCategoryDetails() {
       OtherEntityID: this.selectedAuditor.OtherEntityID,
       CreatedBy: 30,
       RelatedEntityID: this.selectedAuditor.RelatedEntityID, // Yazan ?? 
-      EntitySubTypeID: this.selectedAuditor.EntitySubTypeID || 0 ,
+      EntitySubTypeID: this.selectedAuditor.EntitySubTypeID || 0,
       EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeDesc,
       // erorr
       RelatedEntityTypeID: 3, // Yazan ??
@@ -5090,7 +5098,7 @@ loadPrudentialCategoryDetails() {
       controllerInfo: null,
       output: 0,
       firmId: this.firmId,
-      entityTypeID:this.selectedAuditor.EntityTypeID,
+      entityTypeID: this.selectedAuditor.EntityTypeID,
       entityID: this.firmId,
       controllerControlTypeID: null,
       numOfShares: 0,
@@ -5103,7 +5111,7 @@ loadPrudentialCategoryDetails() {
       MajorityStockHolder: false,
 
     }
-    console.log("Auditor to be saved",this.firmAuditorsObj)
+    console.log("Auditor to be saved", this.firmAuditorsObj)
     this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
       (response) => {
         console.log("Auditor saved successfully", response);
@@ -5120,7 +5128,7 @@ loadPrudentialCategoryDetails() {
   }
   onAuditorChange(event: any): void {
     const selectedAuditorID = event.target.value;
-  
+
     if (selectedAuditorID === 'other') {
       this.selectedAuditor.OtherEntityID = 'other';
       this.selectedAuditor.customAuditorName = ''; // Reset the custom name input
@@ -5135,7 +5143,7 @@ loadPrudentialCategoryDetails() {
     return new Promise<void>((resolve, reject) => {
       this.errorMessages = {};
       this.hasValidationErrors = false;
-  
+
       if (this.selectedAuditor.OtherEntityID === 'other') {
         if (!this.selectedAuditor.customAuditorName || this.selectedAuditor.customAuditorName.trim() === '') {
           this.getErrorMessages('customAuditorName', constants.AuditorsMessages.Select_Auditor_Name);
@@ -5159,21 +5167,21 @@ loadPrudentialCategoryDetails() {
         this.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
         this.hasValidationErrors = true;
       }
-      if(this.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined){
+      if (this.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined) {
         this.getErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
         this.hasValidationErrors = true;
       }
-      if(this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)){
+      if (this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)) {
         this.getErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
         this.hasValidationErrors = true;
       }
     });
   }
-   saveCreateAuditor() {
+  saveCreateAuditor() {
     try {
       // Wait for validation to complete
-     this.CreateAuditorValidateForm();
-        
+      this.CreateAuditorValidateForm();
+
       // Check if there are any errors
       if (this.hasValidationErrors) {
         this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
@@ -5219,9 +5227,9 @@ loadPrudentialCategoryDetails() {
         assnDateTo: this.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo),
         LastModifiedByOfRelatedEntity: 30,
       };
-      console.log("selectedAuditor.OtherEntityName:",this.selectedAuditor.OtherEntityName, this.selectedAuditor.customAuditorName)
+      console.log("selectedAuditor.OtherEntityName:", this.selectedAuditor.OtherEntityName, this.selectedAuditor.customAuditorName)
       console.log("Auditor to be created", this.firmAuditorsObj);
-  
+
       // Call the save function
       this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
         (response) => {
@@ -5241,12 +5249,12 @@ loadPrudentialCategoryDetails() {
       Swal.fire('Error!', 'Please fix the validation errors before submitting.', 'error');
     }
   }
-  
+
   // CreateAuditorValidateForm(): Promise<void> {
   //   return new Promise<void>((resolve, reject) => {
   //     this.errorMessages = {}; 
   //     this.hasValidationErrors = false;
-  
+
   //     if (!this.selectedAuditor.OtherEntityName) {
   //       this.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name); // Use the constant for message
   //     } else if (this.firmAuditorName.some(auditor => auditor.OtherEntityName === this.selectedAuditor.OtherEntityName)) {
@@ -5305,7 +5313,7 @@ loadPrudentialCategoryDetails() {
   //     majorityStockHolder: true,
   //     assnDateFrom: "2020-03-01",
   //     assnDateTo: "2021-03-31"
-      
+
   //   }
   //   console.log("Auditor to be created",this.firmAuditorsObj)
   //   this.firmService.savefirmauditors(this.firmAuditorsObj).subscribe(
