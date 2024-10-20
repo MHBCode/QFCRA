@@ -3816,45 +3816,43 @@
               <h3>Home State Regulators</h3>
             </div>
 
-            <div style="display: flex; gap: 20px; margin-bottom: 10px">
-              <div *ngFor="let regulator of regulatorList; let i = index">
-                <div class="inputs-row">
-                  <div class="input-field">
-                    <label for="regulators"
-                      >Regulator <span style="color: red">*</span></label
+            <div *ngFor="let regulator of regulatorList; let i = index">
+              <div class="inputs-row">
+                <div class="input-field">
+                  <label for="regulators"
+                    >Regulator <span style="color: red">*</span></label
+                  >
+                  <ng-container *ngIf="isEditable; else regulatorinput">
+                    <select
+                      required
+                      [(ngModel)]="regulator.RegulatorName"
+                      name="regulators"
+                      id="regulators"
                     >
-                    <ng-container *ngIf="isEditable; else regulatorinput">
-                      <select
-                        required
-                        [(ngModel)]="regulator.RegulatorName"
-                        name="regulators"
-                        id="regulators"
+                      <option
+                        *ngFor="let Regulater of AllRegulater"
+                        [value]="Regulater.RegulatorID"
                       >
-                        <option
-                          *ngFor="let Regulater of AllRegulater"
-                          [value]="Regulater.RegulatorID"
-                        >
-                          {{ Regulater.RegulatorName }}
-                        </option>
-                      </select>
-                    </ng-container>
-                    <ng-template #regulatorinput>
-                      <input
-                        [(ngModel)]="regulator.RegulatorName"
-                        name="regulators"
-                        id="regulators"
-                        [readonly]="!isEditable"
-                      />
-                    </ng-template>
-                  </div>
-                  <div class="input-field">
-                    <label>Regulator Contact</label>
+                        {{ Regulater.RegulatorName }}
+                      </option>
+                    </select>
+                  </ng-container>
+                  <ng-template #regulatorinput>
                     <input
-                      [(ngModel)]="selectedController.RegulatorContact"
-                      name="regulatorContact"
+                      [(ngModel)]="regulator.RegulatorName"
+                      name="regulators"
+                      id="regulators"
                       [readonly]="!isEditable"
                     />
-                  </div>
+                  </ng-template>
+                </div>
+                <div class="input-field">
+                  <label>Regulator Contact</label>
+                  <input
+                    [(ngModel)]="selectedController.RegulatorContact"
+                    name="regulatorContact"
+                    [readonly]="!isEditable"
+                  />
                 </div>
               </div>
             </div>

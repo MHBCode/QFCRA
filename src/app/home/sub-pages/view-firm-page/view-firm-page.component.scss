@@ -182,12 +182,15 @@
   color: #a51e36;
   /* Change color on hover */
 }
+
 .enhanced-checkbox-auditors {
   display: flex;
   align-items: center;
   gap: 8px;
-  justify-content: flex-end; /* Align items to the right */
-  width: 100%; /* Ensure it takes up the full width if needed */
+  justify-content: flex-end;
+  /* Align items to the right */
+  width: 100%;
+  /* Ensure it takes up the full width if needed */
 }
 
 .enhanced-checkbox-auditors input[type="checkbox"] {
@@ -209,6 +212,7 @@
   color: #a51e36;
   /* Change color on hover */
 }
+
 ////////////////////////////////////
 
 .btn {
@@ -265,7 +269,7 @@
   align-items: center;
 }
 
-.edit-firm-header > span {
+.edit-firm-header>span {
   color: #a51e36;
   font-size: 1em;
   font-weight: 500;
@@ -1460,9 +1464,11 @@ hr {
   min-height: 200px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
+
 .create--inputs-field-set {
-  width : 100%
+  width: 100%
 }
+
 .inputs-field-set {
   width: 100%;
   background: #ffffff;
@@ -1716,6 +1722,11 @@ hr {
     }
   }
 
+  .inputs-row {
+    gap: 3.5%;
+    justify-content: flex-start;
+  }
+
   .addresses {
     margin: 10px 0px;
   }
@@ -1726,7 +1737,6 @@ hr {
     align-items: flex-start;
     border-bottom: 2px solid #a51e36;
     margin-bottom: 15px;
-
 
     .popup-header {
       width: 50%;
@@ -1836,7 +1846,8 @@ hr {
   border-radius: 0;
 }
 
-.controller-tables td, .auditor-table td, .contacts-table{
+.controller-tables td,
+.auditor-table td,
+.contacts-table {
   cursor: pointer;
 }
-
