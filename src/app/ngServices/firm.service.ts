@@ -31,7 +31,7 @@ export class FirmService {
   }
 
   isFirmAuthorised(firmId: number): Observable<any> {
-    const url = `${this.baseUrl}is_firm_authorised?firmId=${firmId}`
+    const url = `${this.baseUrlApplication}is_firmAuthorised?firmId=${firmId}`
     return this.http.get<any>(url);
   }
 

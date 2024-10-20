@@ -29,4 +29,8 @@ export class UsersService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrlAppRoles}save_user_access`, rowData, { headers: headers });
   }
+  getUsersHierarchyByParent(userId: number):Observable<any> {
+    const url = `${this.baseUrl}get_users_hierarchy_by_parent?userId=${userId}`
+    return this.http.get<any>(url);
+  }
 }

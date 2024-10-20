@@ -283,22 +283,42 @@ export class ShadowSupervisorComponent implements OnInit {
 
   toggleTaskDropdown(): void {
     this.TaskDropdownVisible = !this.TaskDropdownVisible;
+    this.FirmsDropdownVisible = false;
+    this.dueDateInputVisible = false;
+    this.daysOverDueDropdownVisible = false;
+    this.SupervisorDropdownVisible = false;
   }
 
   toggleFirmDropdown(): void {
     this.FirmsDropdownVisible = !this.FirmsDropdownVisible;
+    this.TaskDropdownVisible = false;
+    this.dueDateInputVisible = false;
+    this.daysOverDueDropdownVisible = false;
+    this.SupervisorDropdownVisible = false;
   }
 
   toggleDueDateInput(): void {
     this.dueDateInputVisible = !this.dueDateInputVisible;
+    this.TaskDropdownVisible = false;
+    this.FirmsDropdownVisible = false;
+    this.daysOverDueDropdownVisible = false;
+    this.SupervisorDropdownVisible = false;
   }
 
   toggleDaysOverDueDropdown(): void {
     this.daysOverDueDropdownVisible = !this.daysOverDueDropdownVisible;
+    this.TaskDropdownVisible = false;
+    this.FirmsDropdownVisible = false;
+    this.dueDateInputVisible = false;
+    this.SupervisorDropdownVisible = false;
   }
 
   toggleSupervisorDropdown(): void {
     this.SupervisorDropdownVisible = !this.SupervisorDropdownVisible;
+    this.TaskDropdownVisible = false;
+    this.FirmsDropdownVisible = false;
+    this.dueDateInputVisible = false;
+    this.daysOverDueDropdownVisible = false;
   }
 
   updatePagination(): void {
@@ -328,7 +348,7 @@ export class ShadowSupervisorComponent implements OnInit {
   }
 
   getErrorMessages(fieldName: string) {
-    let errorMessage = 'Please Enter the Note';
+    let errorMessage = 'Please Enter The Note';
     this.errorMessages[fieldName] = errorMessage;
   }
 

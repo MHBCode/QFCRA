@@ -35,8 +35,8 @@ export class TasksIAssignedComponent implements OnInit {
   showTaskPopup: boolean = false;
   UsersAssignedToDropdownVisible: boolean = false;
 
-  hasValidationErrors: boolean = false;
   /* error messages */
+  hasValidationErrors: boolean = false;
   errorMessages: { [key: string]: string } = {};
 
   selectedTaskType: string = '';
@@ -280,22 +280,42 @@ export class TasksIAssignedComponent implements OnInit {
 
   toggleTaskDropdown(): void {
     this.TaskDropdownVisible = !this.TaskDropdownVisible;
+    this.FirmsDropdownVisible = false;
+    this.dueDateInputVisible = false;
+    this.daysOverDueDropdownVisible = false;
+    this.UsersAssignedToDropdownVisible = false;
   }
 
   toggleFirmDropdown(): void {
     this.FirmsDropdownVisible = !this.FirmsDropdownVisible;
+    this.TaskDropdownVisible = false;
+    this.dueDateInputVisible = false;
+    this.daysOverDueDropdownVisible = false;
+    this.UsersAssignedToDropdownVisible = false;
   }
 
   toggleDueDateInput(): void {
     this.dueDateInputVisible = !this.dueDateInputVisible;
+    this.TaskDropdownVisible = false;
+    this.FirmsDropdownVisible = false;
+    this.daysOverDueDropdownVisible = false;
+    this.UsersAssignedToDropdownVisible = false;
   }
 
   toggleDaysOverDueDropdown(): void {
     this.daysOverDueDropdownVisible = !this.daysOverDueDropdownVisible;
+    this.TaskDropdownVisible = false;
+    this.FirmsDropdownVisible = false;
+    this.dueDateInputVisible = false;
+    this.UsersAssignedToDropdownVisible = false;
   }
 
   toggleUsersAssignedToDropdown(): void {
     this.UsersAssignedToDropdownVisible = !this.UsersAssignedToDropdownVisible;
+    this.TaskDropdownVisible = false;
+    this.FirmsDropdownVisible = false;
+    this.dueDateInputVisible = false;
+    this.daysOverDueDropdownVisible = false;
   }
 
   updatePagination(): void {
@@ -325,7 +345,7 @@ export class TasksIAssignedComponent implements OnInit {
   }
 
   getErrorMessages(fieldName: string) {
-    let errorMessage = 'Please Enter the Note';
+    let errorMessage = 'Please Enter The Note';
     this.errorMessages[fieldName] = errorMessage;
 }
 

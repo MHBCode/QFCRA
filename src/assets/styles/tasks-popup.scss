@@ -165,6 +165,7 @@
   list-style-type: none;
   margin: 0;
   padding: 0;
+  max-height: 300px;
 }
 
 /* Individual dropdown items */
@@ -364,6 +365,10 @@
 /* notes table */
 .notes-container {
   margin-top: 20px;
+}
+
+.notes-container table {
+  border-radius: 0;
 }
 
 .notes-container table tbody tr td {

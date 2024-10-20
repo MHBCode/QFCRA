@@ -195,18 +195,30 @@ export class TaskListComponent implements OnInit {
 
   toggleTaskDropdown(): void {
     this.TaskDropdownVisible = !this.TaskDropdownVisible;
+    this.FirmsDropdownVisible = false;
+    this.dueDateInputVisible = false;
+    this.daysOverDueDropdownVisible = false;
   }
 
   toggleFirmDropdown(): void {
     this.FirmsDropdownVisible = !this.FirmsDropdownVisible;
+    this.TaskDropdownVisible = false;
+    this.dueDateInputVisible = false;
+    this.daysOverDueDropdownVisible = false;
   }
 
   toggleDueDateInput(): void {
     this.dueDateInputVisible = !this.dueDateInputVisible;
+    this.TaskDropdownVisible = false;
+    this.FirmsDropdownVisible = false;
+    this.daysOverDueDropdownVisible = false;
   }
 
   toggleDaysOverDueDropdown(): void {
     this.daysOverDueDropdownVisible = !this.daysOverDueDropdownVisible;
+    this.TaskDropdownVisible = false;
+    this.FirmsDropdownVisible = false;
+    this.dueDateInputVisible = false;
   }
 
   goToAllTasks() {
@@ -324,7 +336,7 @@ export class TaskListComponent implements OnInit {
 
   
   getErrorMessages(fieldName: string) {
-        let errorMessage = 'Please Enter the Note';
+        let errorMessage = 'Please Enter The Note';
         this.errorMessages[fieldName] = errorMessage;
   }
 
