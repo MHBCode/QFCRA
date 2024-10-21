@@ -2,14 +2,24 @@ import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, Output, QueryL
 import { Router, ActivatedRoute } from '@angular/router';  // Import ActivatedRoute
 import { FirmService } from 'src/app/ngServices/firm.service';  // Import FirmService
 import flatpickr from 'flatpickr';
-import { forkJoin, Observable, of } from 'rxjs';
-import { catchError, first, map, switchMap, tap } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { isNullOrUndef } from 'chart.js/dist/helpers/helpers.core';
+import { ActivityService } from 'src/app/ngServices/activity.service';
+import { ApplicationService } from 'src/app/ngServices/application.service';
+import { LogformService } from 'src/app/ngServices/logform.service';
+import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
+import { ContactService } from 'src/app/ngServices/contact.service';
+import { ParententityService } from 'src/app/ngServices/parententity.service';
+import { ControllersService } from 'src/app/ngServices/controllers.service';
+import { RegisteredfundService } from 'src/app/ngServices/registeredfund.service';
+import { AddressesService } from 'src/app/ngServices/addresses.service';
+import { WaiverService } from 'src/app/ngServices/waiver.service';
+import { RiskService } from 'src/app/ngServices/risk.service';
+import { NoticeService } from 'src/app/ngServices/notice.service';
 
 
 @Component({
@@ -71,6 +81,7 @@ export class ViewFirmPageComponent implements OnInit {
   callAddressType: boolean = false;
   callLicScopePrev: boolean = false;
   callAuthScopePrev: boolean = false;
+  callRefForm: boolean = false;
   menuId: Number = 0;
   menuWidth: string = '6%';
   dataWidth: string = '93%';
@@ -158,6 +169,8 @@ export class ViewFirmPageComponent implements OnInit {
   existingPermittedActivites: any = [];
   sectorDetails: any = [];
   prudentialCategoryDetails: any = [];
+  formReferenceDocs: any = [];
+  selectedDocument: any;
   currentLicRevisionNumber: number | null = null;
   lastLicRevisionNumber: number | null = null;
   currentAuthRevisionNumber: number | null = null;
@@ -261,7 +274,19 @@ export class ViewFirmPageComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,  // Inject ActivatedRoute
     private firmService: FirmService,  // Inject FirmService
+    private activityService: ActivityService,
+    private applicationService: ApplicationService,
+    private logForm: LogformService,
+    private objectWF: ObjectwfService,
+    private parentEntity: ParententityService,
     private securityService: SecurityService,
+    private contactService: ContactService,
+    private controllerService: ControllersService,
+    private registeredFund: RegisteredfundService,
+    private addressService: AddressesService,
+    private waiverService: WaiverService,
+    private riskService: RiskService,
+    private noticeService: NoticeService,
     private el: ElementRef,
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
@@ -1403,7 +1428,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.isLoading = true;
     console.log('Updated License Scope:', updatedLicenseScope);
 
-    this.firmService.editLicenseScope(updatedLicenseScope).subscribe(
+    this.activityService.editLicenseScope(updatedLicenseScope).subscribe(
       response => {
         console.log('License scope updated successfully:', response);
         this.loadActivitiesLicensed(); // Reload license scope details
@@ -1420,7 +1445,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   saveVaryLicenseScope(): void {
-    this.firmService.errorMessages(constants.FirmActivitiesEnum.SCOPECHANGED_SAVEORREVISE).subscribe((response) => {
+    this.logForm.errorMessages(constants.FirmActivitiesEnum.SCOPECHANGED_SAVEORREVISE).subscribe((response) => {
       Swal.fire({
         text: response.response,
         icon: 'warning',
@@ -1509,7 +1534,7 @@ export class ViewFirmPageComponent implements OnInit {
   varyScopeLicConfirm() {
     this.existingActivities = this.ActivityLicensed;
     const varyLicenseScope = this.prepareVaryScopeLicenseObject(this.userId);
-    this.firmService.editLicenseScope(varyLicenseScope).subscribe((response) => {
+    this.activityService.editLicenseScope(varyLicenseScope).subscribe((response) => {
       console.log('Vary Scope Successfully', response);
       this.loadActivitiesLicensed();
       this.isEditModeLicense = false;
@@ -1603,7 +1628,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   executeSaveAuthorise() {
     const updatedAuthorizeScope = this.prepareAuthoriseScopeObject(this.userId);
-    this.firmService.editAuthorizedScope(updatedAuthorizeScope).subscribe(
+    this.activityService.editAuthorizedScope(updatedAuthorizeScope).subscribe(
       response => {
         console.log('Authorise scope updated successfully:', response);
 
@@ -1625,7 +1650,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   saveVaryAuthScope(): void {
-    this.firmService.errorMessages(constants.FirmActivitiesEnum.SCOPECHANGED_SAVEORREVISE).subscribe((response) => {
+    this.logForm.errorMessages(constants.FirmActivitiesEnum.SCOPECHANGED_SAVEORREVISE).subscribe((response) => {
       Swal.fire({
         text: response.response,
         icon: 'warning',
@@ -1902,7 +1927,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.existingPermittedActivites = this.ActivityAuth;
     const varyAuthoriseScope = this.prepareVaryScopeAuthoriseObject(this.userId);
     console.log("vary scope data to be sent" + varyAuthoriseScope);
-    this.firmService.editAuthorizedScope(varyAuthoriseScope).subscribe((response) => {
+    this.activityService.editAuthorizedScope(varyAuthoriseScope).subscribe((response) => {
       console.log('Vary Scope Successfully', response);
       this.isEditModeAuth = false;
       this.disableApplicationDate = true;
@@ -2217,7 +2242,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
   loadContacts() {
     this.isLoading = true;
-    this.firmService.getContactsOfFIRM(this.firmId).subscribe(
+    this.contactService.getContactsOfFIRM(this.firmId).subscribe(
       data => {
         this.FIRMContacts = data.response;
         console.log('Firm FIRM Contacts details:', this.FIRMContacts);
@@ -2247,7 +2272,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
   deleteContact(output: boolean) {
     console.log(this.selectedContact.ContactID, this.selectedContact.ContactAssnID, "contactID , contactAssnID")
-    this.firmService.deleteContactDetails(this.selectedContact.ContactID, this.selectedContact.ContactAssnID, output).subscribe(
+    this.contactService.deleteContactDetails(this.selectedContact.ContactID, this.selectedContact.ContactAssnID, output).subscribe(
       (response) => {
         console.log('Contact deleted successfully', response);
         Swal.fire(
@@ -2274,7 +2299,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.isPopupVisible = false;
 
     // Fetch contact details based on selected row
-    this.firmService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
+    this.contactService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
       data => {
         if (data && data.response) {
           this.selectedContact = data.response; // Assign the received data to selectedContact
@@ -2339,7 +2364,7 @@ export class ViewFirmPageComponent implements OnInit {
 
     console.log("Data to be saved:", contactDetails);
 
-    this.firmService.saveContactDetails(contactDetails).subscribe(
+    this.contactService.saveContactDetails(contactDetails).subscribe(
       (response) => {
         console.log('Contact saved successfully:', response);
         Swal.fire('Saved!', 'The contact details have been saved.', 'success');
@@ -2410,7 +2435,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.isPopupOpen = true; // Open the popup
     console.log('SSSSSSSSSSSSSSSSSSSSSSSdfgdfgdfhfgjfhjdhdj', this.selectedController.OtherEntityID, this.selectedController.EntityTypeID);
     this.loadControllerFirmAdresses(this.selectedController.EntityTypeID,this.selectedController.OtherEntityID,this.userId,44);
-    this.firmService.getRegulatorDetails(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID).subscribe(
+    this.parentEntity.getRegulatorDetails(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID).subscribe(
       data => {
         if (data.response && data.response.length > 0) {
           this.homeRegulater = data.response[0]; // Assuming it's an array and taking the first element
@@ -2429,7 +2454,7 @@ export class ViewFirmPageComponent implements OnInit {
   objectOpTypeIdEdit = 41;
   objectOpTypeIdCreate = 40;
   getControllerControlTypes(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdEdit)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.controlTypeOptionsEdit = data.response;
         console.log("getControllerControlTypes", data)
@@ -2438,7 +2463,7 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
   getControllerControlTypesCreat(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdCreate)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdCreate)
       .subscribe(data => {
         this.controlTypeOptionsCreate = data.response;
         console.log("getControllerControlTypes", data)
@@ -2447,7 +2472,7 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
   getCorporateController(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.CorporateController, this.objectOpTypeIdEdit)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.CorporateController, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.CorporateControllerEdit = data.response;
         console.log("getCorporateController", data)
@@ -2456,7 +2481,7 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
   getCorporateControllerCreate(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.CorporateController, this.objectOpTypeIdCreate)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.CorporateController, this.objectOpTypeIdCreate)
       .subscribe(data => {
         this.CorporateControllerEdit = data.response;
         console.log("getCorporateController", data)
@@ -2465,7 +2490,7 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
   getlegalStatusController(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdEdit)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.legalStatusOptionsEdit = data.response;
         console.log("getlegalStatusController", data)
@@ -2474,7 +2499,7 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
   getlegalStatusControllerCreate(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdCreate)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdCreate)
       .subscribe(data => {
         this.legalStatusOptionsCreate = data.response;
         console.log("getlegalStatusController", data)
@@ -2484,7 +2509,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getAddressTypesController(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdEdit)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.addressTypeOptionsEdit = data.response;
         console.log("getAddressTypesController", data)
@@ -2493,7 +2518,7 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
   getAddressTypesControllerCreate(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdCreate)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdCreate)
       .subscribe(data => {
         this.addressTypeOptionsEdit = data.response;
         console.log("getAddressTypesController", data)
@@ -2502,7 +2527,7 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
   getTitle(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdEdit)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.TitleEdit = data.response;
         console.log("Countries", data)
@@ -2511,7 +2536,7 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
   getTitleCreate(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdCreate)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdCreate)
       .subscribe(data => {
         this.TitleEdit = data.response;
         console.log("Countries", data)
@@ -2645,7 +2670,7 @@ export class ViewFirmPageComponent implements OnInit {
     const output = 0; // As per your requirement
     console.log("DeleteControllerPopup", otherEntityID, relatedEntityID, entitySubTypeID)
     // Make the DELETE request with all required query parameters
-    this.firmService.deleteotherentitydetails(otherEntityID, relatedEntityID, entitySubTypeID, output).subscribe(
+    this.controllerService.deleteotherentitydetails(otherEntityID, relatedEntityID, entitySubTypeID, output).subscribe(
       response => {
         console.log("Controller Details Deleted successfully:", response);
         Swal.fire('Deleted!', 'Controller detail has been deleted.', 'success');
@@ -2775,7 +2800,7 @@ export class ViewFirmPageComponent implements OnInit {
           }
 
           // Call the insert/update endpoint
-          this.firmService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
+          this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
             response => {
               console.log("Save successful:", response);
             },
@@ -2873,7 +2898,7 @@ export class ViewFirmPageComponent implements OnInit {
         };
 
         // Call the save/update contact form endpoint
-        this.firmService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
+        this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
           response => {
             console.log("Contact save successful:", response);
           },
@@ -3033,7 +3058,7 @@ export class ViewFirmPageComponent implements OnInit {
     PreferredMethodType: '',
     RegulatorName: '',
   };
-  
+
   updateControlTypeDesc(selectedValue: any) {
     switch (selectedValue) {
       case '1':
@@ -3058,7 +3083,7 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
   getControllerType(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.ControllerType, this.objectOpTypeIdEdit)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerType, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.controllerTypeOption = data.response;
         console.log("Controllers", data)
@@ -3066,7 +3091,7 @@ export class ViewFirmPageComponent implements OnInit {
         console.error("Error fetching Controllers", error);
       });
   }
-  getAddressesList(){
+  getAddressesList() {
 
   }
 
@@ -3099,7 +3124,7 @@ export class ViewFirmPageComponent implements OnInit {
         Output: 0,
         objectID: this.CreatecontrollerDetails.ObjectID,
         objectInstanceID: this.firmId,
-        sourceObjectInstanceID:this.firmId,
+        sourceObjectInstanceID: this.firmId,
         objAis: null,
         zipPostalCode: '',
         stateProvince: '',
@@ -3132,7 +3157,7 @@ export class ViewFirmPageComponent implements OnInit {
         Output: 0,
         objectID: this.CreatecontrollerDetails.ObjectID,
         objectInstanceID: this.firmId,
-        sourceObjectInstanceID:this.firmId,
+        sourceObjectInstanceID: this.firmId,
         objAis: null,
         zipPostalCode: '',
         stateProvince: '',
@@ -3190,7 +3215,7 @@ export class ViewFirmPageComponent implements OnInit {
       stateProvince: '',
       objectID: this.CreatecontrollerDetails.ObjectID,
       objectInstanceID: this.firmId,
-      sourceObjectInstanceID:this.firmId,
+      sourceObjectInstanceID: this.firmId,
       objAis: null,
       zipPostalCode: '',
     }
@@ -3275,7 +3300,7 @@ export class ViewFirmPageComponent implements OnInit {
   getAllRegulater(countryID: number, firmId: number): void {
     if (!countryID) {
       // If no country is selected, get general regulators
-      this.firmService.getObjectTypeTable(constants.Regulaters)
+      this.securityService.getObjectTypeTable(constants.Regulaters)
         .subscribe(data => {
           this.AllRegulater = data.response;
           console.log("General Regulators fetched:", data);
@@ -3284,7 +3309,7 @@ export class ViewFirmPageComponent implements OnInit {
         });
     } else {
       // If a country is selected, get regulators specific to the country
-      this.firmService.getRegulatorsByCountry(firmId, countryID)
+      this.parentEntity.getRegulatorsByCountry(firmId, countryID)
         .subscribe(data => {
           this.AllRegulater = data.response;
           console.log("Country-specific Regulators fetched for CountryID:", countryID, data);
@@ -3361,7 +3386,7 @@ export class ViewFirmPageComponent implements OnInit {
               addressLine3: address.addressLine3,
               addressLine4: address.addressLine4,
               city: address.city,
-             // SameAsTypeID: address.AddressTypeID,
+              // SameAsTypeID: address.AddressTypeID,
               stateProvince: address.stateProvince,
               createdBy: this.userId,
               addressAssnID: null,
@@ -3373,11 +3398,11 @@ export class ViewFirmPageComponent implements OnInit {
               Output: address.Output,
               objectID: address.objectID,
               objectInstanceID: this.firmId,
-              sourceObjectInstanceID:this.firmId,
-              ObjectInstanceRevNum:1,
-              SourceObjectInstanceRevNum:1,
+              sourceObjectInstanceID: this.firmId,
+              ObjectInstanceRevNum: 1,
+              SourceObjectInstanceRevNum: 1,
               zipPostalCode: address.zipPostalCode,
-              SourceObjectID:705,
+              SourceObjectID: 705,
             })),
 
             regulatorList: this.regulatorList.map(regulator => ({
@@ -3417,7 +3442,7 @@ export class ViewFirmPageComponent implements OnInit {
           }
           console.log("Controller to be saved", saveControllerPopupChangesObj)
           // Call the insert/update endpoint
-          this.firmService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
+          this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
             response => {
               console.log("Save successful:", response);
               this.isEditable = false;
@@ -3522,7 +3547,7 @@ export class ViewFirmPageComponent implements OnInit {
           }))
         };
 
-        this.firmService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
+        this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
           response => {
             console.log("Contact save successful:", response);
           },
@@ -3545,7 +3570,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   loadControllers(): void {
     this.isLoading = true;
-    this.firmService.getFIRMControllers(this.firmId).subscribe(
+    this.controllerService.getFIRMControllers(this.firmId).subscribe(
       data => {
         if (data && Array.isArray(data.response)) {
           this.FIRMControllers = data.response.filter(controller =>
@@ -3573,7 +3598,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   loadControllersIndividual(): void {
     this.isLoading = true;
-    this.firmService.getFIRMControllers(this.firmId).subscribe(
+    this.controllerService.getFIRMControllers(this.firmId).subscribe(
       (data) => {
         console.log('Raw API Data:', data);
         if (Array.isArray(data.response)) {
@@ -3611,7 +3636,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
   loadRegisteredFund() {
     this.isLoading = true;
-    this.firmService.getFIRMRegisteredFund(this.firmId).subscribe(
+    this.registeredFund.getFIRMRegisteredFund(this.firmId).subscribe(
       data => {
         this.RegisteredFund = data.response;
         console.log('Firm FIRM RegisteredFund details:', this.RegisteredFund);
@@ -3646,11 +3671,11 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadFormReference();
       this.loadActivitiesTypesForLicensed();
 
-      this.firmService.getCurrentScopeRevNum(this.firmId, 2).subscribe(
+      this.activityService.getCurrentScopeRevNum(this.firmId, 2).subscribe(
         data => {
           this.scopeRevNum = data.response.Column1;
 
-          this.firmService.getFirmActivityLicensed(this.firmId).subscribe(
+          this.activityService.getFirmActivityLicensed(this.firmId).subscribe(
             data => {
               this.ActivityLicensed = data.response;
               console.log('Firm License scope details:', this.ActivityLicensed);
@@ -3675,7 +3700,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   loadFormReference() {
-    this.firmService.getDocumentDetails(this.firmId).subscribe(
+    this.logForm.getDocumentDetails(this.firmId).subscribe(
       data => {
         this.documentDetails = data.response;
       }, error => {
@@ -3690,8 +3715,8 @@ export class ViewFirmPageComponent implements OnInit {
     return new Promise((resolve, reject) => {
       // Run both initial API calls in parallel using forkJoin
       forkJoin({
-        scopeRevNum: this.firmService.getCurrentScopeRevNum(this.firmId, 3),
-        firmActivity: this.firmService.getFirmActivityAuthorized(this.firmId),
+        scopeRevNum: this.activityService.getCurrentScopeRevNum(this.firmId, 3),
+        firmActivity: this.activityService.getFirmActivityAuthorized(this.firmId),
       }).subscribe(
         ({ scopeRevNum, firmActivity }) => {
           // Process scope revision number
@@ -3764,7 +3789,7 @@ export class ViewFirmPageComponent implements OnInit {
     // Use the first activity's FirmScopeID and ScopeRevNum if they are the same across all.
     const firstActivity = this.ActivityAuth[0];
     if (firstActivity) {
-      this.firmService.getSectorDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
+      this.activityService.getSectorDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
         this.sectorDetails = data.response;
       }, error => {
         console.error('Error Fetching Sector Details: ', error);
@@ -3775,7 +3800,7 @@ export class ViewFirmPageComponent implements OnInit {
   loadPrudentialCategoryDetails() {
     const firstActivity = this.ActivityAuth[0];
     if (firstActivity) {
-      this.firmService.getPrudentialCategoryDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
+      this.activityService.getPrudentialCategoryDetails(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe((data) => {
         this.prudentialCategoryDetails = data.response;
       }, error => {
         console.error('Error Fetching Prudential Category Details: ', error);
@@ -3811,7 +3836,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   showConfirmationAndUpdate(prudCategID: string, msgKey: number) {
-    this.firmService.errorMessages(msgKey).subscribe((response) => {
+    this.logForm.errorMessages(msgKey).subscribe((response) => {
       Swal.fire({
         text: response.response,
         icon: 'warning',
@@ -3851,7 +3876,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   loadScopeOfAuth() {
     const firstActivity = this.ActivityAuth[0];
-    this.firmService.getDocument(firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
+    this.objectWF.getDocument(firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
 
     ).subscribe(
       data => {
@@ -3887,7 +3912,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   loadIslamicFinance() {
     const firstActivity = this.ActivityAuth[0];
-    this.firmService.getIslamicFinance(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe(
+    this.activityService.getIslamicFinance(this.firmId, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).subscribe(
       data => {
         this.islamicFinance = data.response || { IFinTypeId: null };
         this.isIslamicFinanceDeleted = false; // Data exists, so reset the flag
@@ -3904,7 +3929,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   loadFirmAdresses() {
     this.isLoading = true;
-    this.firmService.getFirmAddresses(this.firmId).subscribe(
+    this.addressService.getFirmAddresses(this.firmId).subscribe(
       data => {
         this.firmAddresses = data.response;
         console.log('Firm Addresses: ', this.firmAddresses);
@@ -3927,7 +3952,7 @@ export class ViewFirmPageComponent implements OnInit {
     };
   
     // Fetch firm addresses from the service
-    this.firmService.getFirmAddresses(this.firmId).subscribe(
+    this.addressService.getFirmAddresses(this.firmId).subscribe(
       data => {
         this.ControllerfirmAddresses = data.response;
         console.log('Firm Addresses: ', this.ControllerfirmAddresses);
@@ -3940,7 +3965,7 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
   loadWaivers() {
-    this.firmService.getFirmwaiver(this.firmId).subscribe(
+    this.waiverService.getFirmwaiver(this.firmId).subscribe(
       data => {
         this.FirmWaivers = data.response;
         console.log('Firm FIRM Waivers details:', this.FirmWaivers);
@@ -3951,7 +3976,7 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
   loadRMPs() {
-    this.firmService.getFirmRisk(this.firmId).subscribe(
+    this.riskService.getFirmRisk(this.firmId).subscribe(
       data => {
         this.FIRMRMP = data.response;
         console.log('Firm FIRM RRM details:', this.FIRMRMP);
@@ -3962,7 +3987,7 @@ export class ViewFirmPageComponent implements OnInit {
     );
   }
   loadNotices() {
-    this.firmService.getNotices(this.firmId).subscribe(
+    this.noticeService.getNotices(this.firmId).subscribe(
       data => {
         this.FIRMNotices = data.response;
         console.log('Firm FIRMNotices details:', this.FIRMNotices);
@@ -3976,7 +4001,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   loadCurrentAppDetails() {
     this.isLoading = true;
-    this.firmService.getCurrentAppDetailsLicensedAndAuth(this.firmId, 2).subscribe(data => {
+    this.applicationService.getCurrentAppDetailsLicensedAndAuth(this.firmId, 2).subscribe(data => {
       this.firmAppDetailsCurrentLicensed = data.response;
       console.log(this.firmAppDetailsCurrentLicensed);
       this.isLoading = false;
@@ -3985,7 +4010,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.isLoading = false;
     })
 
-    this.firmService.getCurrentAppDetailsLicensedAndAuth(this.firmId, 3).subscribe(data => {
+    this.applicationService.getCurrentAppDetailsLicensedAndAuth(this.firmId, 3).subscribe(data => {
       this.firmAppDetailsCurrentAuthorized = data.response;
       console.log(this.firmAppDetailsCurrentAuthorized);
       this.isLoading = false;
@@ -4011,7 +4036,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   getFirmTypes() {
     this.applicationTypeId = this.firmDetails.AuthorisationStatusTypeID != 0 ? 3 : 2;
-    this.firmService.getApplications(this.firmId, this.applicationTypeId).subscribe(
+    this.applicationService.getApplications(this.firmId, this.applicationTypeId).subscribe(
       data => {
         this.appDetails = data.response[0];
         console.log('Loaded firm application types:', this.appDetails);
@@ -4111,7 +4136,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   loadActivityCategories() {
-    this.firmService.getActivityCategories().subscribe(
+    this.activityService.getActivityCategories().subscribe(
       data => {
         this.activityCategories = data.response;
         console.log('Firm activity categories details:', this.activityCategories);
@@ -4125,7 +4150,7 @@ export class ViewFirmPageComponent implements OnInit {
     const firmScopeTypeID = activity.FirmScopeTypeID;
 
     if (firmScopeTypeID) {
-      this.firmService.getAuthActivityTypes(firmScopeTypeID).subscribe(
+      this.activityService.getAuthActivityTypes(firmScopeTypeID).subscribe(
         data => {
           activity.activities = data.response;  // Set activities for the specific activity object
 
@@ -4161,7 +4186,7 @@ export class ViewFirmPageComponent implements OnInit {
       const activityTypeID = activity.ActivityTypeID;
 
       // Call the service to get the products for each ActivityTypeID
-      this.firmService.getAllProducts(activityTypeID).subscribe(
+      this.activityService.getAllProducts(activityTypeID).subscribe(
         data => {
           const products = data.response;
 
@@ -4229,7 +4254,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   loadActivitiesTypesForLicensed() {
     this.isLoading = true;
-    this.firmService.getLicActivityTypes().subscribe(data => {
+    this.activityService.getLicActivityTypes().subscribe(data => {
       this.licensedActivities = data.response;
       console.log('Firm activity types for licensed', this.licensedActivities);
       this.isLoading = false;
@@ -4444,7 +4469,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   loadPrudReturnTypes(prudCategID: string) {
-    this.firmService.getPrudReturnTypes(prudCategID).subscribe(data => {
+    this.activityService.getPrudReturnTypes(prudCategID).subscribe(data => {
       this.prudReturnTypesDropdown = data.response;
       console.log('Firm Scope Prud Return Types: ', this.prudReturnTypesDropdown);
     }, error => {
@@ -4453,7 +4478,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   populateCountries() {
-    this.firmService.getObjectTypeTable(constants.countries).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.countries).subscribe(data => {
       this.allCountries = data.response;
     }, error => {
       console.error('Error Fetching Countries dropdown: ', error);
@@ -4461,7 +4486,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   populateLegalStatus() {
-    this.firmService.getObjectTypeTable(constants.legalStatus).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.legalStatus).subscribe(data => {
       this.allLegalStatus = data.response;
     }, error => {
       console.error('Error Fetching Legal Status dropdown: ', error);
@@ -4469,7 +4494,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   populateQFCLicenseStatus() {
-    this.firmService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
       this.allQFCLicenseStatus = data.response;
     }, error => {
       console.error('Error Fetching QFC License Status dropdown: ', error);
@@ -4477,7 +4502,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   populateAuthorisationStatus() {
-    this.firmService.getObjectTypeTable(constants.authorisationStatus).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.authorisationStatus).subscribe(data => {
       this.allAuthorisationStatus = data.response;
     }, error => {
       console.error('Error Fetching Authorisation Status dropdown: ', error);
@@ -4485,7 +4510,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   populateFinYearEnd() {
-    this.firmService.getObjectTypeTable(constants.FinYearEnd).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.FinYearEnd).subscribe(data => {
       this.allFinYearEnd = data.response;
     }, error => {
       console.error('Error Fetching Fin Year End dropdown: ', error);
@@ -4493,7 +4518,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   populateFinAccStd() {
-    this.firmService.getObjectTypeTable(constants.FinAccStd).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.FinAccStd).subscribe(data => {
       this.allFinAccStd = data.response;
     }, error => {
       console.error('Error Fetching Fin Acc Std dropdown: ', error);
@@ -4501,7 +4526,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   populateFirmAppTypes() {
-    this.firmService.getObjectTypeTable(constants.firmAppTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.firmAppTypes).subscribe(data => {
       this.allFirmTypes = data.response;
     }, error => {
       console.error('Error Fetching Firm Application Types dropdown: ', error);
@@ -4509,7 +4534,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   populateAddressTypes() {
-    this.firmService.getObjectTypeTable(constants.addressTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.addressTypes).subscribe(data => {
       this.allAddressTypes = data.response;
     }, error => {
       console.error('Error Fetching Address Types dropdown: ', error);
@@ -4517,7 +4542,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   populatePrudentialCategoryTypes() {
-    this.firmService.getObjectTypeTable(constants.prudentialCategoryTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.prudentialCategoryTypes).subscribe(data => {
       this.allPrudentialCategoryTypes = data.response;
     }, error => {
       console.error('Error Fetching Prudential Category Types dropdown: ', error);
@@ -4525,7 +4550,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   populateAuthorisationCategoryTypes() {
-    this.firmService.getObjectTypeTable(constants.authorisationCategoryTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.authorisationCategoryTypes).subscribe(data => {
       this.allAuthorisationCategoryTypes = data.response;
     }, error => {
       console.error('Error Fetching Authorisation Category Types dropdown: ', error);
@@ -4533,7 +4558,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   populateFirmScopeTypes() {
-    this.firmService.getObjectTypeTable(constants.firmScopeTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.firmScopeTypes).subscribe(data => {
       this.allFirmScopeTypes = data.response;
     }, error => {
       console.error('Error Fetching Firm Scope Types dropdown: ', error);
@@ -4549,7 +4574,7 @@ export class ViewFirmPageComponent implements OnInit {
       activity.categorizedProducts = [];
 
       // Fetch activities based on the selected category
-      this.firmService.getAuthActivityTypes(selectedCategoryID).subscribe(
+      this.activityService.getAuthActivityTypes(selectedCategoryID).subscribe(
         data => {
           console.log('Fetched Activities for Category:', data.response);
 
@@ -4574,7 +4599,7 @@ export class ViewFirmPageComponent implements OnInit {
       console.log('Selected Activity ID:', activityTypeID);
 
       // Fetch products for the selected activity
-      this.firmService.getAllProducts(activityTypeID).subscribe(
+      this.activityService.getAllProducts(activityTypeID).subscribe(
         data => {
           const products = data.response;
 
@@ -4692,7 +4717,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   getApplicationDetailsHistory() {
     this.callAppDetails = true;
-    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId, 2, false).subscribe(
+    this.applicationService.getAppDetailsLicensedAndAuthHistory(this.firmId, 2, false).subscribe(
       data => {
         this.firmAppDetailsLicensed = data.response;
         console.log('Firm app details licensed history:', this.firmAppDetailsLicensed);
@@ -4701,7 +4726,7 @@ export class ViewFirmPageComponent implements OnInit {
         console.error('Error fetching firm details', error);
       }
     );
-    this.firmService.getAppDetailsLicensedAndAuthHistory(this.firmId, 3, false).subscribe(
+    this.applicationService.getAppDetailsLicensedAndAuthHistory(this.firmId, 3, false).subscribe(
       data => {
         this.firmAppDetailsAuthorization = data.response;
         console.log('Firm app details licensed history:', this.firmAppDetailsAuthorization);
@@ -4816,7 +4841,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   getAddressTypeHistory(addressTypeId: number) {
     this.callAddressType = true;
-    this.firmService.getAddressesTypeHistory(this.firmId, addressTypeId).subscribe(
+    this.addressService.getAddressesTypeHistory(this.firmId, addressTypeId).subscribe(
       data => {
         this.firmAddressesTypeHistory = data.response;
         console.log('Firm History Addresses Type: ', this.firmAddressesTypeHistory);
@@ -4865,13 +4890,13 @@ export class ViewFirmPageComponent implements OnInit {
   loadLicScopeRevisions(firmId: number, firmApplicationTypeId: number) {
     this.isLoading = true;
     if (firmApplicationTypeId === 2) {
-      this.firmService.getFirmActivityLicensed(firmId).subscribe(data => {
+      this.activityService.getFirmActivityLicensed(firmId).subscribe(data => {
         this.ActivityLicensed = data.response;
 
         if (this.ActivityLicensed) {
           const scopeID = this.ActivityLicensed[0].FirmScopeID;
 
-          this.firmService.getRevision(scopeID).subscribe(revisions => {
+          this.objectWF.getRevision(scopeID).subscribe(revisions => {
             console.log('Fetched revisions:', revisions);
             this.LicPrevRevNumbers = revisions.response;
             this.isLoading = false;
@@ -4918,7 +4943,7 @@ export class ViewFirmPageComponent implements OnInit {
       if (this.ActivityAuth) {
         const scopeID = this.ActivityAuth[0].FirmScopeID;
 
-        this.firmService.getRevision(scopeID).subscribe(revisions => {
+        this.objectWF.getRevision(scopeID).subscribe(revisions => {
           console.log('Fetched revisions:', revisions);
           this.AuthPrevRevNumbers = revisions.response;
           this.groupActivitiesByCategory(this.ActivityAuth);
@@ -4945,7 +4970,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.isLoading = true; // Start loader when fetch begins
 
     if (firmApplicationTypeId === 2) {
-      this.firmService.getScopeNum(firmId, scopeRevNum, 2).subscribe(
+      this.activityService.getScopeNum(firmId, scopeRevNum, 2).subscribe(
         data => {
           this.ActivityLicensed = data.response;
           this.currentLicRevisionNumber = scopeRevNum;
@@ -4960,7 +4985,7 @@ export class ViewFirmPageComponent implements OnInit {
         }
       );
     } else if (firmApplicationTypeId === 3) {
-      this.firmService.getScopeNum(firmId, scopeRevNum, 3).subscribe(
+      this.activityService.getScopeNum(firmId, scopeRevNum, 3).subscribe(
         data => {
           this.ActivityAuth = data.response;
           this.currentAuthRevisionNumber = scopeRevNum;
@@ -4977,6 +5002,43 @@ export class ViewFirmPageComponent implements OnInit {
           this.isLoading = false; // Stop loader on error
         }
       );
+    }
+  }
+
+  getFormReferenceDocuments() {
+    let DocType: number = 0;
+    if (this.tabIndex === 0) { //Licensed tab
+      if (this.ActivityLicensed[0].ScopeRevNum > 1) {
+        DocType = constants.DocumentType.Q13;
+      } else {
+        DocType = constants.DocumentType.Q01;
+      }
+    }
+    this.logForm.getDocListByFirmDocType(this.firmId,DocType).subscribe(data => {
+      this.formReferenceDocs = data.response;
+      console.log('Form Reference Docs: ',this.formReferenceDocs);
+    }, error => {
+      console.error('Error Fetching Form Reference Docs: ',error)
+    })
+    this.callRefForm = true;
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.ReferenceFormPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .ReferenceFormPopUp not found');
+      }
+    }, 0)
+  }
+
+
+  closeFormReference() {
+    this.callRefForm = false;
+    const popupWrapper = document.querySelector('.ReferenceFormPopUp') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none';
+    } else {
+      console.error('Element with class .ReferenceFormPopUp not found');
     }
   }
 
@@ -5036,7 +5098,7 @@ export class ViewFirmPageComponent implements OnInit {
   //     });
   // }
   getFirmAuditorName(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.firmAuditorName, this.objectOpTypeIdEdit)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.firmAuditorName, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.firmAuditorName = data.response.filter(item => {
           return isNaN(item.OtherEntityName) && !/\d/.test(item.OtherEntityName);
@@ -5047,7 +5109,7 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
   getFirmAuditorType(): void {
-    this.firmService.getobjecttypetableEdit(this.userId, constants.firmAuditorType, this.objectOpTypeIdEdit)
+    this.securityService.getobjecttypetableEdit(this.userId, constants.firmAuditorType, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.firmAuditorType = data.response;
         console.log("firmAuditorName", data)
@@ -5519,7 +5581,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   checkFirmLicense() {
-    this.firmService.isFirmLicensed(this.firmId).subscribe(
+    this.applicationService.isFirmLicensed(this.firmId).subscribe(
       (response) => {
         this.isFirmLicensed = response.response;
         console.log('Firm licensed:', this.isFirmLicensed);
@@ -5532,7 +5594,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   checkFirmAuthorisation() {
-    this.firmService.isFirmAuthorised(this.firmId).subscribe(
+    this.applicationService.isFirmAuthorised(this.firmId).subscribe(
       (response) => {
         this.isFirmAuthorised = response.response;
         console.log('Firm Authorised: ', response)
@@ -5784,7 +5846,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   getErrorMessages(fieldName: string, msgKey: number, activity?: any, placeholderValue?: string) {
-    this.firmService.errorMessages(msgKey).subscribe(
+    this.logForm.errorMessages(msgKey).subscribe(
       (response) => {
         let errorMessage = response.response;
         // If a placeholder value is provided, replace the placeholder with the actual value
@@ -5801,7 +5863,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   showErrorAlert(messageKey: number) {
-    this.firmService.errorMessages(messageKey).subscribe(
+    this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
         Swal.fire({
           text: response.response,
@@ -5814,7 +5876,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   showFirmDetailsSaveSuccessAlert(messageKey: number) {
-    this.firmService.errorMessages(messageKey).subscribe(
+    this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
         Swal.fire({
           title: 'Success!',
@@ -5828,7 +5890,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   showFirmScopeLicSaveSuccessAlert(messageKey: number) {
     this.isLoading = true;
-    this.firmService.errorMessages(messageKey).subscribe(
+    this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
         const replacedText = response.response.replace('#Tab#', 'Licensed');
         Swal.fire({
@@ -5843,7 +5905,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   showFirmScopeAuthSaveSuccessAlert(messageKey: number) {
-    this.firmService.errorMessages(messageKey).subscribe(
+    this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
         const replacedText = response.response.replace('#Tab#', 'Authorised');
         Swal.fire({
@@ -5859,7 +5921,7 @@ export class ViewFirmPageComponent implements OnInit {
   // Function to return a promise for the note popup message for Authorisation type change
   getNotePopupMessage(messageKey: number): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.firmService.errorMessages(messageKey).subscribe(
+      this.logForm.errorMessages(messageKey).subscribe(
         (response) => resolve(response.response), // Resolve with the message
         (error) => reject(error) // Reject in case of error
       );
@@ -5887,7 +5949,7 @@ export class ViewFirmPageComponent implements OnInit {
   // Popups when you click save
   showApplnStatusValidationPopup(messageKey: number, placeholder: string, onConfirmed?: () => void): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.firmService.errorMessages(messageKey).subscribe(
+      this.logForm.errorMessages(messageKey).subscribe(
         (response) => {
           const messageWithPlaceholder = response.response.replace("{0}", placeholder);
           this.isLoading = false;

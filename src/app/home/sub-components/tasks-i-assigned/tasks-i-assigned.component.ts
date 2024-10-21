@@ -7,6 +7,7 @@ import { FirmService } from 'src/app/ngServices/firm.service';
 import Swal from 'sweetalert2';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import * as XLSX from 'xlsx';
+import { LogformService } from 'src/app/ngServices/logform.service';
 @Component({
   selector: 'app-tasks-i-assigned',
   templateUrl: './tasks-i-assigned.component.html',
@@ -51,6 +52,7 @@ export class TasksIAssignedComponent implements OnInit {
   constructor(
     private TaskService: TaskServiceService,
     private firmService: FirmService,
+    private logForm: LogformService,
     private router: Router,
     private sanitizer: DomSanitizer,
     private dateUtilService: DateUtilService
@@ -355,7 +357,7 @@ export class TasksIAssignedComponent implements OnInit {
 }
 
   showErrorAlert(messageKey: number) {
-    this.firmService.errorMessages(messageKey).subscribe(
+    this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
         Swal.fire({
           text: response.response,

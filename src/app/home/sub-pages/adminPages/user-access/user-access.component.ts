@@ -4,6 +4,7 @@ import flatpickr from 'flatpickr';
 import { FirmService } from 'src/app/ngServices/firm.service';
 import { UsersService } from 'src/app/ngServices/users.service';
 import * as constants from 'src/app/app-constants';
+import { SecurityService } from 'src/app/ngServices/security.service';
 
 @Component({
   selector: 'app-user-access',
@@ -23,7 +24,7 @@ export class UserAccessComponent implements OnInit {
 
   @ViewChildren('dateInputs') dateInputs: QueryList<ElementRef<HTMLInputElement>>;
 
-  constructor(private usersService: UsersService, private firmService: FirmService) {
+  constructor(private usersService: UsersService, private firmService: FirmService, private securityService: SecurityService) {
    
   }
 
@@ -74,7 +75,7 @@ export class UserAccessComponent implements OnInit {
 
 
   populateFirmLevels() {
-    this.firmService.getObjectTypeTable(constants.firmLevels).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.firmLevels).subscribe(data => {
       this.firmLevels = data.response;
     }, error => {
       console.error('Error Fetching Countries dropdown: ', error);

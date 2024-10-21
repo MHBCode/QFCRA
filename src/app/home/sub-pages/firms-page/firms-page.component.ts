@@ -143,7 +143,7 @@ export class FirmsPageComponent implements OnInit {
     this.router.navigate(['home/new-firm']);
   }
   populateQFCLicenseStatus() {
-    this.firmService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
       this.allQFCLicenseStatus = data.response;
       console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
     }, error => {
@@ -152,7 +152,7 @@ export class FirmsPageComponent implements OnInit {
     console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
   }
   getSupervisionCaseOfficer() {
-    this.firmService.getObjectTypeTable(constants.SupervisionCaseOfficer).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.SupervisionCaseOfficer).subscribe(data => {
       this.allSupervisionCaseOfficer = data.response;
       console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
     }, error => {
@@ -161,7 +161,7 @@ export class FirmsPageComponent implements OnInit {
     console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
   }
   getAuthorisationCaseOfficer() {
-    this.firmService.getObjectTypeTable(constants.AuthorisationCaseOfficer).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.AuthorisationCaseOfficer).subscribe(data => {
       this.allAuthorisationCaseOfficer = data.response;
       console.log("allQFCLicenseStatus", this.allAuthorisationCaseOfficer)
     }, error => {
@@ -170,28 +170,28 @@ export class FirmsPageComponent implements OnInit {
     console.log("allQFCLicenseStatus", this.allAuthorisationCaseOfficer)
   }
   getlegalStatus(): void {
-    this.firmService.getObjectTypeTable(constants.legalStatusfilter)
-      .subscribe(data => {
-        this.legalStatusOptions = data.response;
-        console.log("Fetched Legal Status Options:", this.legalStatusOptions);
+    this.securityService.getObjectTypeTable(constants.legalStatusfilter)
+        .subscribe(data => {
+            this.legalStatusOptions = data.response;
+            console.log("Fetched Legal Status Options:", this.legalStatusOptions);
 
-        // Log each LegalStatusTypeDesc
-        this.legalStatusOptions.forEach(status => {
-          console.log("LegalStatusTypeDesc:", status.LegalStatusTypeDesc);
+            // Log each LegalStatusTypeDesc
+            this.legalStatusOptions.forEach(status => {
+                console.log("LegalStatusTypeDesc:", status.LegalStatusTypeDesc);
+            });
+        }, error => {
+            console.error("Error fetching legalStatus", error);
         });
-      }, error => {
-        console.error("Error fetching legalStatus", error);
-      });
-  }
-  getauthorisationStatus(): void {
-    this.firmService.getObjectTypeTable(constants.authorisationStatus)
-      .subscribe(data => {
-        this.authorisationStatusOptions = data.response;
-        console.log("getlegalStatusController", data)
-      }, error => {
-        console.error("Error fetching legalStatus", error);
-      });
-  }
+}
+getauthorisationStatus(): void {
+  this.securityService.getObjectTypeTable(constants.authorisationStatus)
+    .subscribe(data => {
+      this.authorisationStatusOptions = data.response;
+      console.log("getlegalStatusController", data)
+    }, error => {
+      console.error("Error fetching legalStatus", error);
+    });
+}
   // Load initial firms data
   loadFirms(): void {
     this.firmService.getAssignedFirms(30).subscribe(

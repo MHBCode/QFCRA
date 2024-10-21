@@ -5,6 +5,7 @@ import { TaskServiceService } from 'src/app/ngServices/task-service.service';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { LogformService } from 'src/app/ngServices/logform.service';
 
 @Component({
   selector: 'app-create-reminder',
@@ -29,7 +30,7 @@ export class CreateReminderComponent implements OnInit {
   }
 
   showErrorAlert(messageKey: number) {
-    this.firmService.errorMessages(messageKey).subscribe(
+    this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
         Swal.fire({
           text: response.response,
@@ -40,7 +41,12 @@ export class CreateReminderComponent implements OnInit {
     );
   }
   
-  constructor(private TaskService: TaskServiceService, private firmService: FirmService, private router: Router) { }
+  constructor(
+    private TaskService: TaskServiceService,
+    private firmService: FirmService,
+    private logForm: LogformService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.populateAllFirms();
@@ -148,7 +154,7 @@ export class CreateReminderComponent implements OnInit {
   }
 
   getErrorMessages(fieldName: string, msgKey: number) {
-    this.firmService.errorMessages(msgKey).subscribe(
+    this.logForm.errorMessages(msgKey).subscribe(
       (response) => {
         let errorMessage = response.response;
         this.errorMessages[fieldName] = errorMessage;
