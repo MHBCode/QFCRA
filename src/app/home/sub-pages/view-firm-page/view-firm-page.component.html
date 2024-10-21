@@ -2396,7 +2396,7 @@
               <div class="inputs-row">
                 <div class="input-field">
                   <label>Address Type</label>
-                  <select [(ngModel)]="address.AddressTypeID" name="addressType" disabled>
+                  <select [(ngModel)]="ControllerfirmAddresses.AddressTypeID" name="addressType" disabled>
                     <option *ngFor="let type of addressTypeOptionsEdit" [value]="type.AddressTypeID">
                       {{ type.AddressTypeDesc }}
                     </option>
@@ -2404,14 +2404,14 @@
                 </div>
                 <div class="input-field">
                   <label>Address - Line 1</label>
-                  <input type="text" [(ngModel)]="address.addressLine1" name="addressLine1" id="addressLine1"
+                  <input type="text" [(ngModel)]="ControllerfirmAddresses.addressLine1" name="addressLine1" id="addressLine1"
                     [readonly]="!isEditable" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " />
                 </div>
                 <div class="input-field">
                   <label>Address - Line 2</label>
-                  <input [(ngModel)]="address.addressLine2" name="addressLine2" id="addressLine2"
+                  <input [(ngModel)]="ControllerfirmAddresses.addressLine2" name="addressLine2" id="addressLine2"
                     [readonly]="!isEditable" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " />
@@ -2420,20 +2420,20 @@
               <div class="inputs-row">
                 <div class="input-field">
                   <label for="address3"> Address - Line 3 </label>
-                  <input [(ngModel)]="address.addressLine3" name="address3" id="address3" type="text" [disabled]="
+                  <input [(ngModel)]="ControllerfirmAddresses.addressLine3" name="address3" id="address3" type="text" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " [readonly]="!isEditable" />
                 </div>
 
                 <div class="input-field">
                   <label for="address4"> Address - Line 4 </label>
-                  <input [(ngModel)]="address.addressLine4" name="address4" id="address4" type="text" [disabled]="
+                  <input [(ngModel)]="ControllerfirmAddresses.addressLine4" name="address4" id="address4" type="text" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " [readonly]="!isEditable" />
                 </div>
                 <div class="input-field">
                   <label for="city">City</label>
-                  <input [(ngModel)]="address.city" name="city" id="city" type="text" [disabled]="
+                  <input [(ngModel)]="ControllerfirmAddresses.city" name="city" id="city" type="text" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " [readonly]="!isEditable" />
                 </div>
@@ -2441,14 +2441,14 @@
               <div class="inputs-row">
                 <div class="input-field">
                   <label for="stateProvince">State/Province</label>
-                  <input [(ngModel)]="address.stateProvince" name="stateProvince" id="stateProvince" [disabled]="
+                  <input [(ngModel)]="ControllerfirmAddresses.stateProvince" name="stateProvince" id="stateProvince" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " [readonly]="!isEditable" />
                 </div>
                 <div class="input-field">
                   <label for="country">Country</label>
                   <ng-container *ngIf="isEditable; else countryInput">
-                    <select [(ngModel)]="address.CountryID" name="country" [disabled]="
+                    <select [(ngModel)]="ControllerfirmAddresses.CountryID" name="country" [disabled]="
                         address.sameAsTypeID && address.sameAsTypeID != 0
                       ">
                       <option *ngFor="let country of allCountries" [value]="country.CountryID">
@@ -2457,12 +2457,12 @@
                     </select>
                   </ng-container>
                   <ng-template #countryInput>
-                    <input [(ngModel)]="address.CountryID" name="country" [readonly]="!isEditable" />
+                    <input [(ngModel)]="ControllerfirmAddresses.CountryID" name="country" [readonly]="!isEditable" />
                   </ng-template>
                 </div>
                 <div class="input-field">
                   <label for="zipPostalCode">Zip/Postal Code</label>
-                  <input [(ngModel)]="address.zipPostalCode" name="zipPostalCode" id="zipPostalCode"
+                  <input [(ngModel)]="ControllerfirmAddresses.zipPostalCode" name="zipPostalCode" id="zipPostalCode"
                     [readonly]="!isEditable" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " />

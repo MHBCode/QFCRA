@@ -95,6 +95,7 @@ export class ViewFirmPageComponent implements OnInit {
   firmNamesHistory: any = [];
   firmAccountingStandardHistory: any = [];
   firmAddresses: any = [];
+  ControllerfirmAddresses :any = [];
   appDetails: any = [];
   applicationTypeId: number;
   selectedFirmTypeID: number;
@@ -2408,6 +2409,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.controllerDetails = { ...controller }; // Populate the controller details
     this.isPopupOpen = true; // Open the popup
     console.log('SSSSSSSSSSSSSSSSSSSSSSSdfgdfgdfhfgjfhjdhdj', this.selectedController.OtherEntityID, this.selectedController.EntityTypeID);
+    this.loadControllerFirmAdresses(this.selectedController.EntityTypeID,this.selectedController.OtherEntityID,this.userId,44);
     this.firmService.getRegulatorDetails(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID).subscribe(
       data => {
         if (data.response && data.response.length > 0) {
@@ -2415,6 +2417,7 @@ export class ViewFirmPageComponent implements OnInit {
         }
       },
     );
+   
     console.log("controllerDetails", this.controllerDetails)
     console.log("selectedController", this.selectedController)
 
@@ -3911,7 +3914,31 @@ export class ViewFirmPageComponent implements OnInit {
         this.isLoading = false;
       })
   }
-
+  ControllerFirmAdressesObj: any = {};
+  loadControllerFirmAdresses(EntityID: number, userId: number, EntityTypeID: number, opTypeId: 44) {
+    this.isLoading = true;
+    
+    // Define the ControllerFirmAdressesObj as an instance property
+    this.ControllerFirmAdressesObj = {
+      EntityID: this.selectedController.OtherEntityID,
+      userId: this.userId,
+      EntityTypeID: this.selectedController.EntityTypeID,
+      opTypeId: 44,
+    };
+  
+    // Fetch firm addresses from the service
+    this.firmService.getFirmAddresses(this.firmId).subscribe(
+      data => {
+        this.ControllerfirmAddresses = data.response;
+        console.log('Firm Addresses: ', this.ControllerfirmAddresses);
+        this.isLoading = false;
+      }, 
+      error => {
+        console.error('Error Fetching Firm Addresses', error);
+        this.isLoading = false;
+      }
+    );
+  }
   loadWaivers() {
     this.firmService.getFirmwaiver(this.firmId).subscribe(
       data => {
