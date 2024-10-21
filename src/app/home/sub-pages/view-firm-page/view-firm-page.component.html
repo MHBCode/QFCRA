@@ -820,10 +820,11 @@
             <div class="input-field" *ngIf="isEditModeCore">
               <label for="addressType" class="history-row">
                 Address Type
-                <button *ngIf="address.PreviousRecords !== 0 && address.AddressID" class="subbutton"
+                <button *ngIf="address.PreviousRecords !== 0 && address.AddressID" class="subbutton-open-history"
                   (click)="getAddressTypeHistory(address.AddressTypeID)">
-                  <i class="bi bi-clock-history"></i> Open History
+                  <i class="bi bi-clock-history"></i> <span>Open History</span>
                 </button>
+                
               </label>
               <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID"
                 (change)="onAddressTypeChange($event, address)" [ngClass]="{

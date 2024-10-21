@@ -574,7 +574,7 @@ export class MyTeamTasksComponent implements OnInit {
     event.stopPropagation();
 
     // Map over the paginatedTasks array to create an array of row data
-    const tableData = this.paginatedTasks.map(item => {
+    const tableData = this.filteredTasks.map(item => {
       return {
         'Task Type': item.TaskType,
         'Firm Name': item.FirmName,

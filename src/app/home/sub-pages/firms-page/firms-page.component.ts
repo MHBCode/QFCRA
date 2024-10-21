@@ -1,173 +1,3 @@
-// import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-// import { Router } from '@angular/router';
-// import { FirmService } from 'src/app/ngServices/firm.service';
-// @Component({
-//   selector: 'app-firms-page',
-//   templateUrl: './firms-page.component.html',
-//   styleUrls: ['./firms-page.component.scss'],
-// })
-// export class FirmsPageComponent implements OnInit {
-
-//   @Input() listCount: number = 50;
-
-//   firms: any[] = [];
-//   licenseStatuses: string[] = [];
-//   supervisorSupervisions: string[] = [];
-//   legalStatuses: string[] = [];
-//   authorisationStatuses: string[] = [];
-//   amlSupervisors: string[] = [];
-
-//   filteredFirms: any[] = [];
-//   showSearchSection: boolean = false;
-
-//   // Form search fields with defaults
-//   firmName: string = 'all';
-//   qfcNumber: string = '';
-//   firmType: boolean = true;
-//   firmStatus: boolean = true;
-//   licenseStatus: string = 'all';
-//   supervisorSupervision: string = 'all';
-//   prudentialCategory: boolean = true;
-//   sectors: boolean = true;
-
-//   // Toggling Options for expanded views
-//   toggleOptions = {
-//     firmType: false,
-//     firmStatus: false,
-//     prudentialCategory: false,
-//     sectors: false
-//   };
-
-//   // Checkbox model properties
-//   checkboxes = {
-//     authorized: false,
-//     dnfbp: false,
-//     licensed: false,
-//     applicant: false,
-//     applicationWithdrawn: false,
-//     applicationRejected: false,
-//     active: false,
-//     inactive: false,
-//     withdrawn: false,
-//     piib1: false,
-//     piib2: false,
-//     piib3: false,
-//     piib4: false,
-//     piib5: false,
-//     directInsurer: false,
-//     reinsurer: false,
-//     insuranceIntermediary: false,
-//     investmentManager: false,
-//     insurer: false,
-//     bank: false,
-//     advisor: false,
-//     repOffice: false
-//   };
-
-//   alphabet: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('');
-
-//   constructor(private router: Router, private firmService: FirmService) { }
-
-//   ngOnInit(): void {
-//     this.loadFirms();
-//   }
-
-//   toggleSearch() {
-//     this.showSearchSection = !this.showSearchSection;
-//   }
-//   // Load initial firms
-//   loadFirms(): void {
-//     this.firmService.getAssignedFirms(10044).subscribe(
-//       data => {
-//         if (data && data.response) {
-//           this.firms = data.response;
-//           this.filteredFirms = [...this.firms];
-
-//           this.licenseStatuses = [...new Set(this.firms.map(firm => firm.LicenseStatusTypeDesc))];
-//           this.supervisorSupervisions = [...new Set(this.firms.map(firm => firm.Supervisor))];
-//           this.authorisationStatuses = [...new Set(this.firms.map(firm => firm.AuthorisationStatusTypeDesc))];
-//           this.amlSupervisors = [...new Set(this.firms.map(firm => firm.Supervisor_AML))];
-
-//           console.log(this.firms);
-//         } else {
-//           console.warn('No firms data found.');
-//         }
-//       },
-//       error => {
-//         console.error('Error fetching firms', error);
-//       }
-//     );
-//   }
-
-//   // Toggle options for different categories (like Prudential Category)
-//   toggleCategoryOptions(category: string): void {
-//     this.toggleOptions[category] = !this.toggleOptions[category];
-//   }
-
-//   // Generalize search functionality for firms
-//   searchFirms(): void {
-//     const searchCriteria = {
-//       firmName: this.firmName !== 'all' ? this.firmName : null,
-//       qfcNumber: this.qfcNumber || null,
-//       firmType: this.firmType,
-//       firmStatus: this.firmStatus,
-//       licenseStatus: this.licenseStatus !== 'all' ? this.licenseStatus : null,
-//       supervisorSupervision: this.supervisorSupervision !== 'all' ? this.supervisorSupervision : null,
-//       prudentialCategory: this.prudentialCategory,
-//       sectors: this.sectors
-//     };
-
-//     this.firmService.getFirmsList(searchCriteria).subscribe(
-//       data => {
-//         if (data && data.response) {
-//           this.filteredFirms = data.response;
-//           console.log(this.filteredFirms);
-//         } else {
-//           console.warn('No filtered firms found.');
-//         }
-//       },
-//       error => {
-//         console.error('Error fetching firms', error);
-//       }
-//     );
-//   }
-
-//   // Filter firms by letter
-//   filterFirmsByLetter(letter: string): void {
-//     if (letter === '#') {
-//       this.filteredFirms = this.firms;
-//     } else {
-//       this.filteredFirms = this.firms.filter(firm => firm.FirmName.startsWith(letter));
-//     }
-//   }
-
-//   // Reset all filters to default values
-//   resetFilters(): void {
-//     this.setDefaultFilters();
-//     this.filteredFirms = [...this.firms];
-//   }
-
-//   // Set default filter values
-//   setDefaultFilters(): void {
-//     this.firmName = 'all';
-//     this.qfcNumber = '';
-//     this.firmType = true;
-//     this.firmStatus = true;
-//     this.licenseStatus = 'all';
-//     this.supervisorSupervision = 'all';
-//     this.prudentialCategory = true;
-//     this.sectors = true;
-//   }
-
-//   // Navigate to firm details
-//   viewFirm(firmId: number) {
-//     if (firmId) {
-//       this.router.navigate(['home/view-firm', firmId]);
-//     } else {
-//       console.error('Invalid firm ID:', firmId);
-//     }
-//   }
-// }
 import { Component, Input, OnInit, Renderer2 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirmService } from 'src/app/ngServices/firm.service';
@@ -200,7 +30,7 @@ export class FirmsPageComponent implements OnInit {
   allQFCLicenseStatus: any = [];
   allSupervisionCaseOfficer: any = [];
   isLoading: boolean = true;
-  allfirms :any = [];
+  allfirms: any = [];
   sortedFirms: any = [];
   // Form search fields with defaults
   firmName: string = 'all';
@@ -215,10 +45,10 @@ export class FirmsPageComponent implements OnInit {
   prudentialCategory: boolean = true;
   sectors: boolean = true;
   supervisionCategory: boolean = true;
-  authorisationCategory : boolean = true;
+  authorisationCategory: boolean = true;
   legalStatusOptions: any = [];
-  authorisationStatusOptions : any = [];
-  allAuthorisationCaseOfficer : any = [];
+  authorisationStatusOptions: any = [];
+  allAuthorisationCaseOfficer: any = [];
   // Toggling Options for expanded views
   toggleOptions = {
     firmType: false,
@@ -228,7 +58,7 @@ export class FirmsPageComponent implements OnInit {
     supervisionCategory: false,
     authorisationCategory: false,
   };
-  
+
   // Checkbox model properties
   checkboxes = {
     authorized: false,
@@ -246,51 +76,51 @@ export class FirmsPageComponent implements OnInit {
     piib4: false,
     piib5: false,
     directInsurer: false,
-    SupCatdirectInsurer:false,
+    SupCatdirectInsurer: false,
     reinsurer: false,
-    SupCatreinsurer:false,
+    SupCatreinsurer: false,
     insuranceIntermediary: false,
-    sectorInsuranceIntermediary:false,
+    sectorInsuranceIntermediary: false,
     investmentManager: false,
-    sectorInvestmentManager:false,
-    supCatInsuranceIntermediary:false,
+    sectorInvestmentManager: false,
+    supCatInsuranceIntermediary: false,
     insurer: false,
     bank: false,
-    sectorbank:false,
-    authBank:false,
+    sectorbank: false,
+    authBank: false,
     advisor: false,
-    sectorAdvisor:false,
+    sectorAdvisor: false,
     repOffice: false,
-    sectorrepOffice:false,
-    SupCatrepOffice:false,
-    corporateBank:false,
-    
-    auditAndAccountingServices:false,
-    trustServices:false,
-    singleFamilyOffice:false,
-    
-    captiveInsurer:false,
-    captiveManager:false,
-    investmentBank:false,
-    
-    legalServices:false,
-    professionalServices:false,
-    
-   
-    wealthManager:false,    
-    iBANK:false,
-    iNMA:false,
-    cAPI:false,
+    sectorrepOffice: false,
+    SupCatrepOffice: false,
+    corporateBank: false,
+
+    auditAndAccountingServices: false,
+    trustServices: false,
+    singleFamilyOffice: false,
+
+    captiveInsurer: false,
+    captiveManager: false,
+    investmentBank: false,
+
+    legalServices: false,
+    professionalServices: false,
+
+
+    wealthManager: false,
+    iBANK: false,
+    iNMA: false,
+    cAPI: false,
     iMEB: false,
-    pINS:false,
-    rEPO:false,
-    dMEX:false,
+    pINS: false,
+    rEPO: false,
+    dMEX: false,
     relevantPerson: false,
   };
-  
+
   alphabet: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('');
 
-  constructor(private router: Router, private firmService: FirmService,private renderer: Renderer2,private securityService: SecurityService) { }
+  constructor(private router: Router, private firmService: FirmService, private renderer: Renderer2, private securityService: SecurityService) { }
 
   ngOnInit(): void {
     this.applySecurityOnPage(FrimsObject.CoreDetail);
@@ -315,29 +145,29 @@ export class FirmsPageComponent implements OnInit {
   populateQFCLicenseStatus() {
     this.securityService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
       this.allQFCLicenseStatus = data.response;
-      console.log("allQFCLicenseStatus",this.allQFCLicenseStatus)
+      console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
     }, error => {
       console.error('Error Fetching QFC License Status dropdown: ', error);
     })
-    console.log("allQFCLicenseStatus",this.allQFCLicenseStatus)
+    console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
   }
   getSupervisionCaseOfficer() {
     this.securityService.getObjectTypeTable(constants.SupervisionCaseOfficer).subscribe(data => {
       this.allSupervisionCaseOfficer = data.response;
-      console.log("allQFCLicenseStatus",this.allQFCLicenseStatus)
+      console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
     }, error => {
       console.error('Error Fetching QFC License Status dropdown: ', error);
     })
-    console.log("allQFCLicenseStatus",this.allQFCLicenseStatus)
+    console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
   }
   getAuthorisationCaseOfficer() {
     this.securityService.getObjectTypeTable(constants.AuthorisationCaseOfficer).subscribe(data => {
       this.allAuthorisationCaseOfficer = data.response;
-      console.log("allQFCLicenseStatus",this.allAuthorisationCaseOfficer)
+      console.log("allQFCLicenseStatus", this.allAuthorisationCaseOfficer)
     }, error => {
       console.error('Error Fetching QFC License Status dropdown: ', error);
     })
-    console.log("allQFCLicenseStatus",this.allAuthorisationCaseOfficer)
+    console.log("allQFCLicenseStatus", this.allAuthorisationCaseOfficer)
   }
   getlegalStatus(): void {
     this.securityService.getObjectTypeTable(constants.legalStatusfilter)
@@ -385,7 +215,7 @@ getauthorisationStatus(): void {
       },
       error => {
         console.error('Error fetching firms', error);
-        
+
       }
     );
   }
@@ -398,28 +228,28 @@ getauthorisationStatus(): void {
 
   }
   // Search functionality for firms
-   
+
   /////////// Filter Area 
   searchFirms(): void {
     const filterData = this.prepareFilterData();
     this.firmService.getFirmsAlphabetically(filterData).subscribe(
       (data) => {
-        console.log('Response from API:', data.response); 
-        
-        this.filteredFirmsdata = data.response ; 
-        
+        console.log('Response from API:', data.response);
+
+        this.filteredFirmsdata = data.response;
+
         this.filteredFirms = this.filteredFirmsdata;
-      
+
         console.log('Filtered Firms:', this.filteredFirms);
         this.togglePopup();
       },
       (error) => {
         console.error('Error fetching firms:', error);
-       // alert(`Error: ${error.message}`);
+        // alert(`Error: ${error.message}`);
       }
     );
   }
-  
+
   LoadAllFirms(): void {
     this.firmService.getAllFirms().subscribe(
       (data) => {
@@ -433,36 +263,36 @@ getauthorisationStatus(): void {
   }
   prepareFilterData() {
     const filterData = {
-      FirmID: this.firmName !== 'all' ? this.allfirms.find(firm => firm.FirmName === this.firmName)?.FirmID || 0 : 0, 
-      CSVLicenseStatus: this.licenseStatus !== 'all' ? this.allQFCLicenseStatus.find(firm => firm.FirmApplStatusTypeDesc === this.licenseStatus)?.FirmApplStatusTypeID || 0 : 0,   
-      CSVLegalStatus: this.legalStatus !== 'all' ? this.legalStatusOptions.find(firm => firm.LegalStatusTypeDesc === this.legalStatus)?.LegalStatusTypeID || 0 : 0, 
+      FirmID: this.firmName !== 'all' ? this.allfirms.find(firm => firm.FirmName === this.firmName)?.FirmID || 0 : 0,
+      CSVLicenseStatus: this.licenseStatus !== 'all' ? this.allQFCLicenseStatus.find(firm => firm.FirmApplStatusTypeDesc === this.licenseStatus)?.FirmApplStatusTypeID || 0 : 0,
+      CSVLegalStatus: this.legalStatus !== 'all' ? this.legalStatusOptions.find(firm => firm.LegalStatusTypeDesc === this.legalStatus)?.LegalStatusTypeID || 0 : 0,
       OperationalStatusId: 0, // Adjust based on your logic
       QFCNumber: this.qfcNumber || '',
-      SupervisionCaseOfficerId: this.supervisorSupervision !=='all' ? this.allSupervisionCaseOfficer.find(firm => firm.FullName === this.supervisorSupervision)?.UserID || 0 : 0,
+      SupervisionCaseOfficerId: this.supervisorSupervision !== 'all' ? this.allSupervisionCaseOfficer.find(firm => firm.FullName === this.supervisorSupervision)?.UserID || 0 : 0,
       AuthorisationCaseOfficerId: this.amlSup !== 'all' ? this.allAuthorisationCaseOfficer.find(firm => firm.FullName === this.amlSup)?.UserID || 0 : 0,
       PrudentialCategotyId: 0, // Adjust based on your logic
       CSVAuthorisationStatus: this.authorisationStatus !== 'all' ? this.authorisationStatusOptions.find(firm => firm.FirmApplStatusTypeDesc === this.authorisationStatus)?.FirmApplStatusTypeID || 0 : 0,
-      RelevantPerson: this.relevantPerson ? 1 : 0, 
+      RelevantPerson: this.relevantPerson ? 1 : 0,
       CSVauthorisationCategory: this.getAuthorisationCategoriesCSV(),
-      CSVPrudentialCategory:this.getPrudentialCategoriesCSV() , 
-      CSVSectorTypes:this.getSectorsCSV(), 
-      LoginUserID: this.userId, 
+      CSVPrudentialCategory: this.getPrudentialCategoriesCSV(),
+      CSVSectorTypes: this.getSectorsCSV(),
+      LoginUserID: this.userId,
       CSVFirmTypes: this.getFirmTypesCSV(),
       CSVFirmStatus: this.getFirmStatusCSV(),
-      CSVSupCategories:this.getSupCategoriesCSV(), 
+      CSVSupCategories: this.getSupCategoriesCSV(),
       startChar: this.startCharLatter || '',
     };
 
-    console.log('Filter Data:', filterData); 
+    console.log('Filter Data:', filterData);
     return filterData;
   }
-  startCharLatter : string;
+  startCharLatter: string;
   getstartChar(letter: string): string {
 
-    this.startCharLatter = letter === '#' ? '' : letter; 
-    return this.startCharLatter; 
+    this.startCharLatter = letter === '#' ? '' : letter;
+    return this.startCharLatter;
   }
- 
+
   getCSVSelection(type: string): string {
     const selected = Object.keys(this.checkboxes)
       .filter(key => this.checkboxes[key] && key.startsWith(type))
@@ -486,42 +316,40 @@ getauthorisationStatus(): void {
       piib4: '4',
       piib5: '5',
       directInsurer: '6',
-      SupCatdirectInsurer:'13',
+      SupCatdirectInsurer: '13',
       reinsurer: '7',
-      SupCatreinsurer:'15',
+      SupCatreinsurer: '15',
       insuranceIntermediary: '8',
-      sectorInsuranceIntermediary:'3',
+      sectorInsuranceIntermediary: '3',
       investmentManager: '2',
-      sectorInvestmentManager:'1',
-      supCatInsuranceIntermediary:'6',
+      sectorInvestmentManager: '1',
+      supCatInsuranceIntermediary: '6',
       insurer: '2',
-      sectorbank:'4',
-      authBank:'1',
-      sectorAdvisor:'5',
+      sectorbank: '4',
+      authBank: '1',
+      sectorAdvisor: '5',
       sectorrepOffice: '6',
-      SupCatrepOffice:'14',
-    corporateBank:'1',
-    
-    auditAndAccountingServices:'3',
-    trustServices:'4',
-    singleFamilyOffice:'5',
-    captiveInsurer:'7',
-    captiveManager:'8',
-    investmentBank:'9',
-    legalServices:'11',
-    professionalServices:'12',
-    wealthManager:'16',   
-    iBANK:'2',
-    iNMA:'3',
-    cAPI:'4',
-    iMEB: '5',
-    pINS:'6',
-    rEPO:'7',
-    dMEX:'8' 
+      SupCatrepOffice: '14',
+      corporateBank: '1',
+      auditAndAccountingServices: '3',
+      trustServices: '4',
+      singleFamilyOffice: '5',
+      captiveInsurer: '7',
+      captiveManager: '8',
+      investmentBank: '9',
+      legalServices: '11',
+      professionalServices: '12',
+      wealthManager: '16',
+      iBANK: '2',
+      iNMA: '3',
+      cAPI: '4',
+      iMEB: '5',
+      pINS: '6',
+      rEPO: '7',
+      dMEX: '8'
     };
     return valueMapping[key] || '0'; // Default value if no match found
   }
-
   getSectorsCSV(): string {
     return Object.keys(this.checkboxes)
       .filter(key => this.checkboxes[key] && ['sectorInvestmentManager', 'insurer', 'sectorInsuranceIntermediary', 'sectorbank', 'sectorAdvisor', 'repOffice'].includes(key))
@@ -562,11 +390,11 @@ getauthorisationStatus(): void {
           case 'active': return '4';
           case 'inactive': return '5';
           case 'withdrawn': return '6';
-          default: return "";        
+          default: return "";
         }
       })
       .join(',');
-      
+
   }
   getPrudentialCategoriesCSV(): string {
     return Object.keys(this.checkboxes)
@@ -577,7 +405,7 @@ getauthorisationStatus(): void {
           case 'piib2': return '2';
           case 'piib3': return '3';
           case 'piib4': return '4';
-          case 'piib5': return '5';          
+          case 'piib5': return '5';
           case 'directInsurer': return '6';
           case 'reinsurer': return '7';
           case 'insuranceIntermediary': return '8';
@@ -588,71 +416,66 @@ getauthorisationStatus(): void {
   }
   getSupCategoriesCSV(): string {
     return Object.keys(this.checkboxes)
-        .filter(key => this.checkboxes[key])  // Check if the checkbox is checked
-        .map(key => {
-            // Return the corresponding value based on the key
-            switch (key) {
-                case 'corporateBank': return '1';
-                case 'investmentManager': return '2';
-                case 'auditAndAccountingServices': return '3';
-                case 'trustServices': return '4';
-                case 'singleFamilyOffice': return '5';
-                case 'supCatInsuranceIntermediary': return '6';
-                case 'captiveInsurer': return '7';
-                case 'captiveManager': return '8';
-                case 'investmentBank': return '9';
-                case 'advisorSupCat': return '10';
-                case 'legalServices': return '11';
-                case 'professionalServices': return '12';
-                case 'SupCatdirectInsurer': return '13';
-                case 'SupCatrepOffice': return '14';
-                case 'SupCatreinsurer': return '15';
-                case 'wealthManager': return '16';
-                default: return "";  // Return an empty string for unknown keys
-            }
-        })
-        .filter(value => value !== "")  // Filter out empty strings
-        .join(',');  // Join the values into a comma-separated string
-}
-
-getAuthorisationCategoriesCSV(): string {
-  return Object.keys(this.checkboxes)
       .filter(key => this.checkboxes[key])  // Check if the checkbox is checked
       .map(key => {
-          // Return the corresponding value based on the key
-          switch (key) {
-              case 'authBank': return '1';
-              case 'iBANK': return '2';
-              case 'iNMA': return '3';
-              case 'cAPI': return '4';
-              case 'iMEB': return '5';
-              case 'pINS': return '6';
-              case 'rEPO': return '7';
-              case 'dMEX': return '8';
-              default: return "";  // Return an empty string for unknown keys
-          }
+        // Return the corresponding value based on the key
+        switch (key) {
+          case 'corporateBank': return '1';
+          case 'investmentManager': return '2';
+          case 'auditAndAccountingServices': return '3';
+          case 'trustServices': return '4';
+          case 'singleFamilyOffice': return '5';
+          case 'supCatInsuranceIntermediary': return '6';
+          case 'captiveInsurer': return '7';
+          case 'captiveManager': return '8';
+          case 'investmentBank': return '9';
+          case 'advisorSupCat': return '10';
+          case 'legalServices': return '11';
+          case 'professionalServices': return '12';
+          case 'SupCatdirectInsurer': return '13';
+          case 'SupCatrepOffice': return '14';
+          case 'SupCatreinsurer': return '15';
+          case 'wealthManager': return '16';
+          default: return "";  // Return an empty string for unknown keys
+        }
       })
       .filter(value => value !== "")  // Filter out empty strings
       .join(',');  // Join the values into a comma-separated string
-}
-  // Filter firms by letter
-
-
+  }
+  getAuthorisationCategoriesCSV(): string {
+    return Object.keys(this.checkboxes)
+      .filter(key => this.checkboxes[key])  // Check if the checkbox is checked
+      .map(key => {
+        // Return the corresponding value based on the key
+        switch (key) {
+          case 'authBank': return '1';
+          case 'iBANK': return '2';
+          case 'iNMA': return '3';
+          case 'cAPI': return '4';
+          case 'iMEB': return '5';
+          case 'pINS': return '6';
+          case 'rEPO': return '7';
+          case 'dMEX': return '8';
+          default: return "";  // Return an empty string for unknown keys
+        }
+      })
+      .filter(value => value !== "")  // Filter out empty strings
+      .join(',');  // Join the values into a comma-separated string
+  }
   // Reset all filters to default values
   resetFilters(): void {
     this.setDefaultFilters();
     this.filteredFirms = [...this.firms];
     // Apply sorting after reset
-    this.sortFirms('newFirms');
+     this.sortFirms('newFirms');
   }
-
   // Set default filter values
   setDefaultFilters(): void {
     this.firmName = 'all';
     this.qfcNumber = '';
     this.licenseStatus = 'all';
     this.supervisorSupervision = 'all';
-    this.authorisationStatus = 'all' ;
+    this.authorisationStatus = 'all';
     this.legalStatus = 'all';
     this.amlSup = 'all';
     this.firmType = true;
@@ -678,23 +501,23 @@ getAuthorisationCategoriesCSV(): string {
       piib4: false,
       piib5: false,
       directInsurer: false,
-      SupCatdirectInsurer:false,
+      SupCatdirectInsurer: false,
       reinsurer: false,
-      SupCatreinsurer:false,
+      SupCatreinsurer: false,
       insuranceIntermediary: false,
       investmentManager: false,
-      sectorInvestmentManager:false,
-      supCatInsuranceIntermediary:false,
-      sectorInsuranceIntermediary:false,
+      sectorInvestmentManager: false,
+      supCatInsuranceIntermediary: false,
+      sectorInsuranceIntermediary: false,
       insurer: false,
       bank: false,
-      sectorbank:false,
-      authBank:false,
+      sectorbank: false,
+      authBank: false,
       advisor: false,
-      sectorAdvisor:false,
+      sectorAdvisor: false,
       repOffice: false,
-      sectorrepOffice:false,
-      SupCatrepOffice:false,
+      sectorrepOffice: false,
+      SupCatrepOffice: false,
       corporateBank: false,
       auditAndAccountingServices: false,
       trustServices: false,
@@ -713,20 +536,8 @@ getAuthorisationCategoriesCSV(): string {
       dMEX: false,
       relevantPerson: false,
       singleFamilyOffice: false,
-  };  
+    };
   }
-        //directInsurerSupCat: false,  // Ensure this property is included
-      //repOfficeSupCat: false,
-      //reinsurerSupCat: false,
-      //advisorSupCat: false,  // Ensure this property is included
-     //
-      //insuranceIntermediarySupCat: false,  // Ensure this property is included
-     // investmentManagerSupCat: false,  
-      //singleFamilyOffice: false,
-      //insuranceIntermediarySupCat: false,  // Ensure this property is included
- //////////// End Filter Area
-
-  // Navigate to firm details
   viewFirm(firmId: number): void {
     if (firmId) {
       this.router.navigate(['home/view-firm', firmId]);
@@ -734,7 +545,6 @@ getAuthorisationCategoriesCSV(): string {
       console.error('Invalid firm ID:', firmId);
     }
   }
-
   // Toggle sorting dropdown visibility
   toggleSortDropdown(): void {
     this.isSortDropdownOpen = !this.isSortDropdownOpen;
@@ -746,12 +556,9 @@ getAuthorisationCategoriesCSV(): string {
     }
 
   }
-
-
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     const isClickInside = target.closest('.button-style') || target.closest('.dropdown-menu');
-
     if (!isClickInside) {
       this.isSortDropdownOpen = false;
       if (this.unlistenDocumentClick) {
@@ -759,7 +566,6 @@ getAuthorisationCategoriesCSV(): string {
       }
     }
   }
-
   // Handle sorting option selection
   onSortOptionSelected(option: string): void {
     this.selectedSortOption = option;
@@ -776,14 +582,13 @@ getAuthorisationCategoriesCSV(): string {
 
     this.filteredFirms.sort(this.getSortFunction(option));
   }
-  
   // Get the appropriate sort function based on the selected option
   getSortFunction(option: string): (a: any, b: any) => number {
     return (a, b) => {
       // Debug statements to log the FirmName values
       console.log(`Sorting Option: ${option}`);
       console.log(`Firm A: ${a.FirmName}, Firm B: ${b.FirmName}`);
-      
+
       switch (option) {
         case 'AtoZ':
           return a.FirmName.localeCompare(b.FirmName);
@@ -803,7 +608,7 @@ getAuthorisationCategoriesCSV(): string {
 
   applySecurityOnPage(objectId: FrimsObject) {
     const currentOpType = ObjectOpType.Create;
-    this.applyAppSecurity(this.userId,objectId,currentOpType);
+    this.applyAppSecurity(this.userId, objectId, currentOpType);
   }
 
   applyAppSecurity(userId: number, objectId: number, OpType: number): Promise<void> {
