@@ -32,7 +32,6 @@ export class ViewFirmPageComponent implements OnInit {
   selectedAuditor: any = {};
   categorizedData = [];
   selectedAuditorNameFromSelectBox: string = 'select';
-  flatpickrInstance: any;
   initialized = false;
   /* Firm Details */
   @ViewChildren('auditorRadio') auditorRadios!: QueryList<any>;
@@ -327,6 +326,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   initializeFlatpickr() {
     this.dateInputs.forEach((input: ElementRef<HTMLInputElement>) => {
+      input.nativeElement.placeholder = 'Select a date';
       flatpickr(input.nativeElement, {
         allowInput: true,
         dateFormat: 'd/M/Y', // Adjust date format as needed
