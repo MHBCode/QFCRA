@@ -212,14 +212,10 @@ export class FirmService {
     return this.http.get<any>(url);
   }
 
-  // getIslamicFinance(firmId: number): Observable<any> {
-  //   return this.getFirmScopeIdAndRevNum(firmId).pipe(
-  //     switchMap(({ scopeId, scopeRevNum }) => {  // Destructure the object
-  //       const url = `${this.baseUrlActivity}get_islamic_finance?firmId=${firmId}&firmScopeID=${scopeId}&scopeRevNo=${scopeRevNum}`;
-  //       return this.http.get<any>(url);
-  //     })
-  //   );
-  // }
+  deleteDocument(docId: number,objectId: number,objectInstanceId: number,objRevNumber: number) {
+    const url = `${this.baseUrlObjectWF}delete_document?docID=${docId}&objectId=${objectId}&objectInstanceId=${objectInstanceId}&ObjectInstanceRevNum=${objRevNumber}`
+    return this.http.delete<any>(url);
+  }
 
   getIslamicFinance(firmId: number,scopeId:number,scopeRevNum:number): Observable<any> {
     const url = `${this.baseUrlActivity}get_islamic_finance?firmId=${firmId}&firmScopeID=${scopeId}&scopeRevNo=${scopeRevNum}`
