@@ -7,6 +7,12 @@
       Tasks I Have Assigned
     </h2>
   </div>
+  <div class="btns exportBtn">
+    <button (click)="exportRowToExcel($event)">
+        <i class="bi bi-file-earmark-text"></i>
+        <span class="export-text">Export to Excel</span>
+    </button>
+  </div>
 </div>
 <div class="TaskList-wrapper listing-table">
   <div class="table customTable">
@@ -131,9 +137,6 @@
                 </ul>
               </div>
             </th>
-            <th *ngIf="ShowExportButton">
-              Export To Excel
-            </th>
           </tr>
         </thead>
 
@@ -161,9 +164,6 @@
               }}</td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.Comments}}</td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.TaskAssignedToUserName}}</td>
-            <td *ngIf="ShowExportButton" class="export-btn-col">
-              <button (click)="exportRowToExcel(item)" class="link-button">Export</button>
-            </td>
           </tr>
         </tbody>
       </table>

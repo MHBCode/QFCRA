@@ -7,7 +7,7 @@ import { UsersService } from 'src/app/ngServices/users.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import Swal from 'sweetalert2';
 import * as constants from 'src/app/app-constants';
-
+import * as XLSX from 'xlsx';
 @Component({
   selector: 'app-my-team-tasks',
   templateUrl: './my-team-tasks.component.html',
@@ -568,5 +568,30 @@ export class MyTeamTasksComponent implements OnInit {
       },
     );
   }
+  exportRowToExcel(event: Event) {
+    event.stopPropagation();
+
+    // Map over the paginatedTasks array to create an array of row data
+    const tableData = this.paginatedTasks.map(item => {
+      return {
+        'Task Type': item.TaskType,
+        'Firm Name': item.FirmName,
+        'Description': item.ShortDescription,
+        'Due Date': item.TaskDueDate,
+        'Days Over Due': item.DaysOverDue > 0 ? item.DaysOverDue : '',
+        'Comments': item.Comments,
+        'Task Assigned To': item.TaskAssignedToUserName,
+      };
+    });
+
+    // Convert the table data to a worksheet
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(tableData);
+
+    // Create a new workbook and append the worksheet to it
+    const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
+
+    // Export the file and trigger a download
+    XLSX.writeFile(workbook, 'My_Teams_Tasks_table.xlsx');
+ }
 }
 

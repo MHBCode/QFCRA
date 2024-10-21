@@ -246,28 +246,37 @@ export class FirmsPageComponent implements OnInit {
     piib4: false,
     piib5: false,
     directInsurer: false,
+    SupCatdirectInsurer:false,
     reinsurer: false,
+    SupCatreinsurer:false,
     insuranceIntermediary: false,
+    sectorInsuranceIntermediary:false,
     investmentManager: false,
+    sectorInvestmentManager:false,
+    supCatInsuranceIntermediary:false,
     insurer: false,
     bank: false,
+    sectorbank:false,
+    authBank:false,
     advisor: false,
+    sectorAdvisor:false,
     repOffice: false,
+    sectorrepOffice:false,
+    SupCatrepOffice:false,
     corporateBank:false,
-    investmentManagerSupCat:false,
+    
     auditAndAccountingServices:false,
     trustServices:false,
     singleFamilyOffice:false,
-    insuranceIntermediarySupCat:false,
+    
     captiveInsurer:false,
     captiveManager:false,
     investmentBank:false,
-    advisorSupCat:false,
+    
     legalServices:false,
     professionalServices:false,
-    directInsurerSupCat:false,
-    repOfficeSupCat:false,
-    reinsurerSupCat:false,
+    
+   
     wealthManager:false,    
     iBANK:false,
     iNMA:false,
@@ -428,7 +437,7 @@ getauthorisationStatus(): void {
       CSVLicenseStatus: this.licenseStatus !== 'all' ? this.allQFCLicenseStatus.find(firm => firm.FirmApplStatusTypeDesc === this.licenseStatus)?.FirmApplStatusTypeID || 0 : 0,   
       CSVLegalStatus: this.legalStatus !== 'all' ? this.legalStatusOptions.find(firm => firm.LegalStatusTypeDesc === this.legalStatus)?.LegalStatusTypeID || 0 : 0, 
       OperationalStatusId: 0, // Adjust based on your logic
-      QFCNumber: this.qfcNumber,
+      QFCNumber: this.qfcNumber || '',
       SupervisionCaseOfficerId: this.supervisorSupervision !=='all' ? this.allSupervisionCaseOfficer.find(firm => firm.FullName === this.supervisorSupervision)?.UserID || 0 : 0,
       AuthorisationCaseOfficerId: this.amlSup !== 'all' ? this.allAuthorisationCaseOfficer.find(firm => firm.FullName === this.amlSup)?.UserID || 0 : 0,
       PrudentialCategotyId: 0, // Adjust based on your logic
@@ -477,14 +486,22 @@ getauthorisationStatus(): void {
       piib4: '4',
       piib5: '5',
       directInsurer: '6',
+      SupCatdirectInsurer:'13',
       reinsurer: '7',
+      SupCatreinsurer:'15',
       insuranceIntermediary: '8',
-      investmentManager: '1',
+      sectorInsuranceIntermediary:'3',
+      investmentManager: '2',
+      sectorInvestmentManager:'1',
+      supCatInsuranceIntermediary:'6',
       insurer: '2',
-      bank: '4',
-      advisor: '5',
-      repOffice: '6',
+      sectorbank:'4',
+      authBank:'1',
+      sectorAdvisor:'5',
+      sectorrepOffice: '6',
+      SupCatrepOffice:'14',
     corporateBank:'1',
+    
     auditAndAccountingServices:'3',
     trustServices:'4',
     singleFamilyOffice:'5',
@@ -507,15 +524,15 @@ getauthorisationStatus(): void {
 
   getSectorsCSV(): string {
     return Object.keys(this.checkboxes)
-      .filter(key => this.checkboxes[key] && ['investmentManager', 'insurer', 'insuranceIntermediary', 'bank', 'advisor', 'repOffice'].includes(key))
+      .filter(key => this.checkboxes[key] && ['sectorInvestmentManager', 'insurer', 'sectorInsuranceIntermediary', 'sectorbank', 'sectorAdvisor', 'repOffice'].includes(key))
       .map((key) => {
         switch (key) {
-          case 'investmentManager': return '1';
+          case 'sectorInvestmentManager': return '1';
           case 'insurer': return '2';
-          case 'insuranceIntermediary': return '3';
-          case 'bank': return '4';
-          case 'advisor': return '5';
-          case 'repOffice': return '6';
+          case 'sectorInsuranceIntermediary': return '3';
+          case 'sectorbank': return '4';
+          case 'sectorAdvisor': return '5';
+          case 'sectorrepOffice': return '6';
           default: return "";
         }
       })
@@ -580,16 +597,16 @@ getauthorisationStatus(): void {
                 case 'auditAndAccountingServices': return '3';
                 case 'trustServices': return '4';
                 case 'singleFamilyOffice': return '5';
-                case 'insuranceIntermediary': return '6';
+                case 'supCatInsuranceIntermediary': return '6';
                 case 'captiveInsurer': return '7';
                 case 'captiveManager': return '8';
                 case 'investmentBank': return '9';
                 case 'advisorSupCat': return '10';
                 case 'legalServices': return '11';
                 case 'professionalServices': return '12';
-                case 'directInsurer': return '13';
-                case 'repOffice': return '14';
-                case 'reinsurer': return '15';
+                case 'SupCatdirectInsurer': return '13';
+                case 'SupCatrepOffice': return '14';
+                case 'SupCatreinsurer': return '15';
                 case 'wealthManager': return '16';
                 default: return "";  // Return an empty string for unknown keys
             }
@@ -604,7 +621,7 @@ getAuthorisationCategoriesCSV(): string {
       .map(key => {
           // Return the corresponding value based on the key
           switch (key) {
-              case 'bank': return '1';
+              case 'authBank': return '1';
               case 'iBANK': return '2';
               case 'iNMA': return '3';
               case 'cAPI': return '4';
@@ -661,28 +678,31 @@ getAuthorisationCategoriesCSV(): string {
       piib4: false,
       piib5: false,
       directInsurer: false,
+      SupCatdirectInsurer:false,
       reinsurer: false,
+      SupCatreinsurer:false,
       insuranceIntermediary: false,
       investmentManager: false,
+      sectorInvestmentManager:false,
+      supCatInsuranceIntermediary:false,
+      sectorInsuranceIntermediary:false,
       insurer: false,
       bank: false,
+      sectorbank:false,
+      authBank:false,
       advisor: false,
+      sectorAdvisor:false,
       repOffice: false,
+      sectorrepOffice:false,
+      SupCatrepOffice:false,
       corporateBank: false,
-      investmentManagerSupCat: false,  // Ensure this property is included
       auditAndAccountingServices: false,
       trustServices: false,
-      singleFamilyOffice: false,
-      insuranceIntermediarySupCat: false,  // Ensure this property is included
       captiveInsurer: false,
       captiveManager: false,
       investmentBank: false,
-      advisorSupCat: false,  // Ensure this property is included
       legalServices: false,
       professionalServices: false,
-      directInsurerSupCat: false,  // Ensure this property is included
-      repOfficeSupCat: false,
-      reinsurerSupCat: false,
       wealthManager: false,
       iBANK: false,
       iNMA: false,
@@ -691,9 +711,19 @@ getAuthorisationCategoriesCSV(): string {
       pINS: false,
       rEPO: false,
       dMEX: false,
-      relevantPerson: false
+      relevantPerson: false,
+      singleFamilyOffice: false,
   };  
   }
+        //directInsurerSupCat: false,  // Ensure this property is included
+      //repOfficeSupCat: false,
+      //reinsurerSupCat: false,
+      //advisorSupCat: false,  // Ensure this property is included
+     //
+      //insuranceIntermediarySupCat: false,  // Ensure this property is included
+     // investmentManagerSupCat: false,  
+      //singleFamilyOffice: false,
+      //insuranceIntermediarySupCat: false,  // Ensure this property is included
  //////////// End Filter Area
 
   // Navigate to firm details

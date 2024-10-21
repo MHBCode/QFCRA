@@ -14,7 +14,7 @@
 <div class="filter-container">
   <div class="error-messages" style="color: red">
     <p *ngIf="errorMessages['getTasks']">{{ errorMessages['getTasks'] }}</p>
-</div>
+  </div>
   <div class="date-filters">
     <label for="due-date-from">Due Date From:</label>
     <input type="text" id="due-date-from" #dateInputs>
@@ -105,6 +105,14 @@
     <button class="get-tasks-btn" (click)="getTasks()">Get Task(s)</button>
   </div>
 
+</div>
+<div class="task-section-title">
+    <div class="btns exportBtn">
+      <button (click)="exportRowToExcel($event)">
+          <i class="bi bi-file-earmark-text"></i>
+          <span class="export-text">Export to Excel</span>
+      </button>
+    </div>
 </div>
 
 <div class="TaskList-wrapper listing-table">
