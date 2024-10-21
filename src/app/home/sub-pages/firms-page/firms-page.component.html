@@ -9,13 +9,7 @@
       <i style="font-size: 1.2rem;" class="bi bi-funnel-fill"></i>
       <span class="button-text">Filter</span>
     </button>  
-    <!-- <button (click)="togglePopup()" class="button-style">
-      <i class="bi bi-funnel-fill"></i> Filter
-    </button> -->
     <div class="sort-dropdown">
-     <!-- <button class="button-style" (click)="toggleSortDropdown()">
-        <i class="bi bi-filter"></i> Sort <i class="bi bi-caret-down-fill"></i>
-      </button> -->
       <button class="button-style" (click)="toggleSortDropdown()">
         <i class="bi bi-filter"></i>
         <span class="button-text">Sort</span>
@@ -30,16 +24,10 @@
         </ul>
       </div>
     </div>
-    <!-- <button type="button" (click)="resetFilters()" class="button-style">
-      <i class="bi bi-arrow-counterclockwise"></i>Reset Filter
-    </button> -->
     <button type="button" (click)="resetFilters()" class="button-style">
       <i class="bi bi-arrow-counterclockwise"></i>
       <span class="button-text">Reset Filter</span>
     </button>
-    <!-- <button (click)="navigateToNewfirm()" class="addnew-button button-style">
-      <i class="bi bi-plus"></i> Add New Firm
-    </button> -->
     <button *ngIf="getControlVisibility('imgBtnSave')" (click)="navigateToNewfirm()" class="addnew-button button-style">
       <i class="bi bi-plus"></i>
       <span class="button-text">Add New Firm</span>
@@ -74,10 +62,6 @@
 
           <!-- Firm Type (Checkboxes) -->
           <div class="input-field">
-            <!-- <label for="firmType">Firm Type</label>
-            <div class="checkbox-wrapper">
-              <input type="checkbox" [(ngModel)]="firmType" (change)="toggleCategoryOptions('firmType')" /> All
-            </div> -->
             <label for="firmType">Firm Type</label>
             <div class="checkbox-wrapper">
               <label class="custom-checkbox">
