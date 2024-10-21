@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ApplicationService } from 'src/app/ngServices/application.service';
 import { FirmService } from 'src/app/ngServices/firm.service';
 
 @Component({
@@ -19,6 +20,7 @@ export class EditFirmComponent implements OnInit {
   
   constructor(private fb: FormBuilder, private editRowService: FirmService,
     private router: Router,
+    private applicationService: ApplicationService,
     private route: ActivatedRoute,  // Inject ActivatedRoute
   ) {
     this.editFIRM = this.fb.group({
@@ -86,7 +88,7 @@ export class EditFirmComponent implements OnInit {
   }
 
   getApplicationDetailsHistory() {
-    this.editRowService.getAppDetailsLicensedAndAuthHistory(this.firmId,2,false).subscribe(
+    this.applicationService.getAppDetailsLicensedAndAuthHistory(this.firmId,2,false).subscribe(
       data => {
         this.firmAppDetailsLicensed = data.response;
         console.log('Firm app details licensed history:', this.firmAppDetailsLicensed);
@@ -95,7 +97,7 @@ export class EditFirmComponent implements OnInit {
         console.error('Error fetching firm details', error);
       }
     );
-    this.editRowService.getAppDetailsLicensedAndAuthHistory(this.firmId,3,false).subscribe(
+    this.applicationService.getAppDetailsLicensedAndAuthHistory(this.firmId,3,false).subscribe(
       data => {
         this.firmAppDetailsAuthorization = data.response;
         console.log('Firm app details licensed history:', this.firmAppDetailsAuthorization);

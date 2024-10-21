@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { DocumentsService } from './documents.service';
+import { WaiverService } from './waiver.service';
 
-describe('DocumentsService', () => {
-  let service: DocumentsService;
+describe('WaiverService', () => {
+  let service: WaiverService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(DocumentsService);
+    service = TestBed.inject(WaiverService);
   });
 
   it('should be created', () => {

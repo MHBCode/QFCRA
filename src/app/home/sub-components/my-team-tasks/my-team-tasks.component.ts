@@ -8,6 +8,7 @@ import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import Swal from 'sweetalert2';
 import * as constants from 'src/app/app-constants';
 import * as XLSX from 'xlsx';
+import { LogformService } from 'src/app/ngServices/logform.service';
 @Component({
   selector: 'app-my-team-tasks',
   templateUrl: './my-team-tasks.component.html',
@@ -60,10 +61,11 @@ export class MyTeamTasksComponent implements OnInit {
   noteText: string = '';
 
   constructor(
-    private _userService: UsersService,
-    private _taskService: TaskServiceService,
-    private _dateUtilService: DateUtilService,
-    private _firmService: FirmService,
+    private userService: UsersService,
+    private taskService: TaskServiceService,
+    private dateUtilService: DateUtilService,
+    private firmService: FirmService,
+    private logForm: LogformService,
     private sanitizer: DomSanitizer,
   ) { }
 
@@ -98,7 +100,7 @@ export class MyTeamTasksComponent implements OnInit {
 
   userTeamMembers() {
     this.isLoading = true;
-    this._userService.getUsersHierarchyByParent(this.userId).subscribe(data => {
+    this.userService.getUsersHierarchyByParent(this.userId).subscribe(data => {
       const members = data.response;
       this.organizeTeamMembers(members);
       this.isLoading = false;
@@ -208,7 +210,7 @@ export class MyTeamTasksComponent implements OnInit {
       delete this.errorMessages['getTasks'];
 
       // Call API with the selected team members
-      this._taskService.getMyTeamsTasks(this.userId, teamUsersID).subscribe({
+      this.taskService.getMyTeamsTasks(this.userId, teamUsersID).subscribe({
         next: (response) => {
           console.log('API Response:', response); // Log the response
           if (response.isSuccess) {
@@ -277,7 +279,7 @@ export class MyTeamTasksComponent implements OnInit {
       // Safely convert TaskDueDate only if it's not null or empty
       let dueDateFormatted = '';
       if (task.TaskDueDate) {
-        dueDateFormatted = this._dateUtilService.convertApiDateToStandard(task.TaskDueDate);
+        dueDateFormatted = this.dateUtilService.convertApiDateToStandard(task.TaskDueDate);
       }
 
       const daysDue = task.DaysOverDue;
@@ -365,7 +367,7 @@ export class MyTeamTasksComponent implements OnInit {
     this.showTaskPopup = !this.showTaskPopup;  // Toggle popup visibility
 
     // Fetch task details using the new endpoint
-    this._taskService.getMyTaskByObjectDetails(
+    this.taskService.getMyTaskByObjectDetails(
       selectedRow.ObjectID,
       selectedRow.ObjectInstanceID,
       selectedRow.ObjectInstanceRevNum
@@ -427,8 +429,8 @@ export class MyTeamTasksComponent implements OnInit {
     }
 
     // Start the note save and task reload in parallel
-    const saveNotePromise = this._taskService.saveReminderNote(note).toPromise();
-    const loadTasksPromise = this._taskService.getMyTasksAssignedByUser(this.userId).toPromise();
+    const saveNotePromise = this.taskService.saveReminderNote(note).toPromise();
+    const loadTasksPromise = this.taskService.getMyTasksAssignedByUser(this.userId).toPromise();
 
     Promise.all([saveNotePromise, loadTasksPromise])
       .then(([saveNoteResponse, loadTasksResponse]) => {
@@ -538,14 +540,14 @@ export class MyTeamTasksComponent implements OnInit {
   }
 
   isTaskOverdue(dueDate: string): boolean {
-    return this._dateUtilService.isOverdue(dueDate);
+    return this.dateUtilService.isOverdue(dueDate);
   }
 
   getErrorMessages(fieldName: string, msgKey?: number) {
     if (fieldName === 'note' && !msgKey) {
       this.errorMessages['note'] = 'Please Enter The Note';
     } else {
-      this._firmService.errorMessages(msgKey).subscribe(
+      this.logForm.errorMessages(msgKey).subscribe(
         (response) => {
           let errorMessage = response.response;
           this.errorMessages[fieldName] = errorMessage;
@@ -558,7 +560,7 @@ export class MyTeamTasksComponent implements OnInit {
   }
 
   showErrorAlert(messageKey: number) {
-    this._firmService.errorMessages(messageKey).subscribe(
+    this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
         Swal.fire({
           text: response.response,
