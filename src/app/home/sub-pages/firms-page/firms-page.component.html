@@ -213,7 +213,7 @@
             
             <div *ngIf="toggleOptions.sectors" class="checkbox-options">
               <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="checkboxes.investmentManager" value="1" /> 
+                <input type="checkbox" [(ngModel)]="checkboxes.sectorInvestmentManager" value="1" /> 
                 <span class="checkmark"></span> Investment Manager
               </label>
               
@@ -223,17 +223,17 @@
               </label>
               
               <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="checkboxes.insuranceIntermediary" value="3" />
+                <input type="checkbox" [(ngModel)]="checkboxes.sectorInsuranceIntermediary" value="3" />
                 <span class="checkmark"></span> Insurance Intermediary
               </label>
               
               <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="checkboxes.bank" value="4" />
+                <input type="checkbox" [(ngModel)]="checkboxes.sectorbank" value="4" />
                 <span class="checkmark"></span> Bank
               </label>
               
               <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="checkboxes.advisor" value="5" />
+                <input type="checkbox" [(ngModel)]="checkboxes.sectorAdvisor" value="5" />
                 <span class="checkmark"></span> Advisor
               </label>
               
@@ -270,7 +270,7 @@
                 <span class="checkmark"></span> Corporate Bank
               </label>
               <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="checkboxes.investmentManagerSupCat" value="2" />
+                <input type="checkbox" [(ngModel)]="checkboxes.investmentManager" value="2" />
                 <span class="checkmark"></span> Investment Manager
               </label>
               <label class="custom-checkbox">
@@ -286,7 +286,7 @@
                 <span class="checkmark"></span> Single Family Office
               </label>
               <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="checkboxes.insuranceIntermediarySupCat" value="6" />
+                <input type="checkbox" [(ngModel)]="checkboxes.supCatInsuranceIntermediary" value="6" />
                 <span class="checkmark"></span> Insurance Intermediary
               </label>
               <label class="custom-checkbox">
@@ -302,7 +302,7 @@
                 <span class="checkmark"></span> Investment Bank
               </label>
               <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="checkboxes.advisorSupCat" value="10" />
+                <input type="checkbox" [(ngModel)]="checkboxes.advisor" value="10" />
                 <span class="checkmark"></span> Advisor
               </label>
               <label class="custom-checkbox">
@@ -314,15 +314,15 @@
                 <span class="checkmark"></span> Professional Services
               </label>
               <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="checkboxes.directInsurerSupCat" value="13" />
+                <input type="checkbox" [(ngModel)]="checkboxes.SupCatdirectInsurer" value="13" />
                 <span class="checkmark"></span> Direct Insurer
               </label>
               <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="checkboxes.repOfficeSupCat" value="14" />
+                <input type="checkbox" [(ngModel)]="checkboxes.SupCatrepOffice" value="14" />
                 <span class="checkmark"></span> Rep Office
               </label>
               <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="checkboxes.reinsurerSupCat" value="15" />
+                <input type="checkbox" [(ngModel)]="checkboxes.SupCatreinsurer" value="15" />
                 <span class="checkmark"></span> Reinsurer
               </label>
               <label class="custom-checkbox">
@@ -354,7 +354,7 @@
             </div>
             <div *ngIf="toggleOptions.authorisationCategory" class="checkbox-options">
               <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="checkboxes.bank" value="1" />
+                <input type="checkbox" [(ngModel)]="checkboxes.authBank" value="1" />
                 <span class="checkmark"></span> Bank
               </label>
               <label class="custom-checkbox">
