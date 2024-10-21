@@ -140,6 +140,7 @@ export class NewFirmComponent implements OnInit {
 
   initializeFlatpickr() {
     this.dateInputs.forEach((input: ElementRef<HTMLInputElement>) => {
+      input.nativeElement.placeholder = 'DD/MM/YYY';
       flatpickr(input.nativeElement, {
         allowInput: true,
         dateFormat: 'd/M/Y', // Adjust date format as needed

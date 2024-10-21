@@ -109,7 +109,7 @@
             <ng-container *ngIf="FirmDetails.DifferentIncorporationDate">
                 <div class="input-field">
                     <label for="incorporationDate"> Incorporation Date </label>
-                    <input name="incorporationDate" id="incorporationDate" type="text" #dateInputs
+                    <input name="incorporationDate" id="incorporationDate" type="text" #dateInputs placeholder
                         [(ngModel)]="FirmDetails.IncorporationDate" />
                 </div>
             </ng-container>
@@ -128,7 +128,7 @@
                 <label for="financialYearEndEffectiveForm">
                     Financial Year End Effective Form
                 </label>
-                <input name="financialYearEndEffectiveForm" id="financialYearEndEffectiveForm" type="text" #dateInputs
+                <input name="financialYearEndEffectiveForm" id="financialYearEndEffectiveForm" type="text" #dateInputs placeholder
                     [(ngModel)]="FirmDetails.FinYearEndEffectiveDate">
             </div>
             <div class="input-field">
@@ -147,7 +147,7 @@
                     Accounting Standards Effective Form
                 </label>
                 <input name="accountingStandardsEffectiveForm" id="accountingStandardsEffectiveForm" type="text"
-                    #dateInputs [(ngModel)]="FirmDetails.AccStdEffectiveDate">
+                    #dateInputs placeholder [(ngModel)]="FirmDetails.AccStdEffectiveDate">
             </div>
             <div class="input-field">
                 <label for="websiteLink">
@@ -172,7 +172,7 @@
                 <label for="dateOfApplication">
                     Date of Application
                 </label>
-                <input name="dateOfApplication" id="dateOfApplication" type="text" #dateInputs
+                <input name="dateOfApplication" id="dateOfApplication" type="text" #dateInputs placeholder
                     [(ngModel)]="applicationDetails.dateOfApplication"
                     (ngModelChange)=" onDateOfApplicationChange($event)" [ngClass]="{'error-border': errorMessages['DateOfApplication']}">
             </div>
@@ -202,7 +202,7 @@
                 <label for="dateApplication">
                     {{QFCDateApplicationLabel}}
                 </label>
-                <input name="dateApplication" id="dateApplication" type="text" #dateInputs
+                <input name="dateApplication" id="dateApplication" type="text" #dateInputs placeholder
                     [(ngModel)]="applicationDetails.LicensedDate" [ngClass]="{'error-border': errorMessages['LicensedDate']}">
             </div>
             <div class="input-field" *ngIf="selectedFirmTypeID === 3">
@@ -220,7 +220,7 @@
                 <label for="dateApplication">
                     Date Application
                 </label>
-                <input name="dateApplication" id="dateApplication" type="text" #dateInputs
+                <input name="dateApplication" id="dateApplication" type="text" #dateInputs placeholder
                     [(ngModel)]="applicationDetails.AuthorizationDate" [ngClass]="{'error-border': errorMessages['AuthorisationDate']}">
             </div>
         </div>
