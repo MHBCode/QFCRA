@@ -365,28 +365,30 @@ export class TasksIAssignedComponent implements OnInit {
       },
     );
   }
-  exportRowToExcel(rowData: any) {
-     // Prepare data in a format that can be exported to Excel
-    const row = [
-      {
-        'Task Type': rowData.TaskType,
-        'Firm Name': rowData.FirmName,
-        'Description': rowData.ShortDescription,
-        'Due Date': rowData.TaskDueDate,
-        'Days Over Due': rowData.DaysOverDue > 0 ? rowData.DaysOverDue : '',
-        'Comments': rowData.Comments,
-        'Task Assigned To': rowData.TaskAssignedToUserName
-      }
-    ];
+  exportRowToExcel(event: Event) {
+    event.stopPropagation();
 
-    // Convert the data to a worksheet
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(row);
+    // Map over the paginatedTasks array to create an array of row data
+    const tableData = this.paginatedTasks.map(item => {
+      return {
+        'Task Type': item.TaskType,
+        'Firm Name': item.FirmName,
+        'Description': item.ShortDescription,
+        'Due Date': item.TaskDueDate,
+        'Days Over Due': item.DaysOverDue > 0 ? item.DaysOverDue : '',
+        'Comments': item.Comments,
+        'Task Assigned To':item.TaskAssignedToUserName,
+      };
+    });
+
+    // Convert the table data to a worksheet
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(tableData);
 
     // Create a new workbook and append the worksheet to it
     const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
 
     // Export the file and trigger a download
-    XLSX.writeFile(workbook, `task_row_${rowData.TaskType}.xlsx`);
-  }
+    XLSX.writeFile(workbook, 'Tasks_I_Assigned_table.xlsx');
+ }
  
 }

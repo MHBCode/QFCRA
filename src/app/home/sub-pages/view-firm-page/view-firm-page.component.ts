@@ -3030,6 +3030,7 @@ export class ViewFirmPageComponent implements OnInit {
     PreferredMethodType: '',
     RegulatorName: '',
   };
+  
   updateControlTypeDesc(selectedValue: any) {
     switch (selectedValue) {
       case '1':
@@ -3062,6 +3063,10 @@ export class ViewFirmPageComponent implements OnInit {
         console.error("Error fetching Controllers", error);
       });
   }
+  getAddressesList(){
+
+  }
+
   addAddressForm(): void {
     if (this.addressForms.length === 0) {
       // If the array is empty, add the first form without validation
@@ -3090,7 +3095,8 @@ export class ViewFirmPageComponent implements OnInit {
         toDate: null,
         Output: 0,
         objectID: this.CreatecontrollerDetails.ObjectID,
-        objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
+        objectInstanceID: this.firmId,
+        sourceObjectInstanceID:this.firmId,
         objAis: null,
         zipPostalCode: '',
         stateProvince: '',
@@ -3122,7 +3128,8 @@ export class ViewFirmPageComponent implements OnInit {
         toDate: null,
         Output: 0,
         objectID: this.CreatecontrollerDetails.ObjectID,
-        objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
+        objectInstanceID: this.firmId,
+        sourceObjectInstanceID:this.firmId,
         objAis: null,
         zipPostalCode: '',
         stateProvince: '',
@@ -3179,7 +3186,8 @@ export class ViewFirmPageComponent implements OnInit {
       Output: 0,
       stateProvince: '',
       objectID: this.CreatecontrollerDetails.ObjectID,
-      objectInstanceID: this.CreatecontrollerDetails.ObjectInstanceID,
+      objectInstanceID: this.firmId,
+      sourceObjectInstanceID:this.firmId,
       objAis: null,
       zipPostalCode: '',
     }
@@ -3350,7 +3358,7 @@ export class ViewFirmPageComponent implements OnInit {
               addressLine3: address.addressLine3,
               addressLine4: address.addressLine4,
               city: address.city,
-              SameAsTypeID: address.AddressTypeID,
+             // SameAsTypeID: address.AddressTypeID,
               stateProvince: address.stateProvince,
               createdBy: this.userId,
               addressAssnID: null,
@@ -3361,8 +3369,12 @@ export class ViewFirmPageComponent implements OnInit {
               toDate: address.toDate,
               Output: address.Output,
               objectID: address.objectID,
-              objectInstanceID: address.objectInstanceID,
+              objectInstanceID: this.firmId,
+              sourceObjectInstanceID:this.firmId,
+              ObjectInstanceRevNum:1,
+              SourceObjectInstanceRevNum:1,
               zipPostalCode: address.zipPostalCode,
+              SourceObjectID:705,
             })),
 
             regulatorList: this.regulatorList.map(regulator => ({

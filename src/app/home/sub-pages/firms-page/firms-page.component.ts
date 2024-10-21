@@ -437,11 +437,7 @@ getauthorisationStatus(): void {
       CSVLicenseStatus: this.licenseStatus !== 'all' ? this.allQFCLicenseStatus.find(firm => firm.FirmApplStatusTypeDesc === this.licenseStatus)?.FirmApplStatusTypeID || 0 : 0,   
       CSVLegalStatus: this.legalStatus !== 'all' ? this.legalStatusOptions.find(firm => firm.LegalStatusTypeDesc === this.legalStatus)?.LegalStatusTypeID || 0 : 0, 
       OperationalStatusId: 0, // Adjust based on your logic
-<<<<<<< HEAD
       QFCNumber: this.qfcNumber || '',
-=======
-      QFCNumber: this.qfcNumber,
->>>>>>> dbddffd1c3a9d685571f8d0c570ed12f60451006
       SupervisionCaseOfficerId: this.supervisorSupervision !=='all' ? this.allSupervisionCaseOfficer.find(firm => firm.FullName === this.supervisorSupervision)?.UserID || 0 : 0,
       AuthorisationCaseOfficerId: this.amlSup !== 'all' ? this.allAuthorisationCaseOfficer.find(firm => firm.FullName === this.amlSup)?.UserID || 0 : 0,
       PrudentialCategotyId: 0, // Adjust based on your logic

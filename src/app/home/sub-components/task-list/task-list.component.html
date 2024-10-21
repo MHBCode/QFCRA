@@ -7,12 +7,19 @@
       Tasks & Reminders
     </h2>
   </div>
+  <div class="btns exportBtn">
+    <button (click)="exportRowToExcel($event)">
+        <i class="bi bi-file-earmark-text"></i>
+        <span class="export-text">Export to Excel</span>
+    </button>
+  </div>
 </div>
 <div class="TaskList-wrapper" [ngClass]="isMainView ? 'listing-table' : 'home-table'">
   <div class="table customTable">
     <div *ngIf="showTitle" (click)="goToAllTasks()" class="tableTitle">
       <h3>Task List</h3>
     </div>
+   
     <div class="table-responsive">
       <table [ngClass]="isMainView ? 'task-table' : 'home-task-table'">
         <thead>
@@ -113,9 +120,9 @@
               </div>
             </th>
             <th *ngIf="isMainView">Notes</th>
-            <th *ngIf="ShowExportButton && isMainView">
+            <!-- <th *ngIf="ShowExportButton && isMainView">
               Export To Excel
-            </th>
+            </th> -->
           </tr>
         </thead>
 
@@ -155,9 +162,9 @@
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{ item.TaskDueDate }}</td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{ item.DaysOverDue }}</td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}" *ngIf="isMainView">{{ item.Comments }}</td>
-            <td *ngIf="ShowExportButton" class="export-btn-col">
-              <button (click)="exportRowToExcel(item, $event)" class="link-button">Export</button>
-            </td>
+            <!-- <td *ngIf="ShowExportButton" class="export-btn-col">
+              <button (click)="exportRowToExcel(paginatedTasks, $event)" class="link-button">Export</button>
+            </td> -->
           </tr>
         </tbody>
         <tfoot>
