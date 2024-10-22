@@ -25,8 +25,14 @@
   font-weight: bold;
 }
 
-.tableTitle h3:hover {
+.tableTitle h3:hover,.tableTitle small:hover {
   color: #a51e36;
+}
+
+.tableTitle small {
+  color: #717171;
+  text-transform: capitalize;
+  font-size: 12px;
 }
 
 .table-responsive {

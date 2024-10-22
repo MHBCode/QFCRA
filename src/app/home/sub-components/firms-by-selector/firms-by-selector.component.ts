@@ -19,26 +19,38 @@ export class FirmsBySelectorComponent implements OnInit {
     if (!this.sectorFunction || this.sectorFunction.length === 0) {
       return;
     }
-
+  
     const transitionStyle = 'height 0.7s ease-in-out';
-
+  
     this.sectorFunction.forEach((data) => {
       const elementId = this.formatId(data.SectorType);
+      if (!elementId) {
+        data.TotalFirms = 0;
+        return;  // Skip if invalid ID
+      }
+  
       const barElement = this.el.nativeElement.querySelector(`#${elementId}`);
       if (barElement) {
-        const barHeight = `${(data.TotalFirms / 100) * 100 + 10}%`;
+        const barHeight = data.TotalFirms === 0 ? '0%' : `${(data.TotalFirms / 100) * 100 + 10}%`;
         this.renderer.setStyle(barElement, 'transition', transitionStyle);
         this.renderer.setStyle(barElement, 'height', '0%');
-         this.renderer.setStyle(barElement, 'height', barHeight);
+        this.renderer.setStyle(barElement, 'height', barHeight);
       } else {
         console.error(`Element with ID ${elementId} not found`);
       }
     });
   }
+  
 
-  formatId(functionName: string): string { 
-    return functionName.replace(/\s+/g, '').replace(/-/g, '').replace(/[()]/g, '');
+  formatId(functionName: string | null): string {
+    if (!functionName) {
+      return ''; 
+    }
+    return functionName
+      .replace(/\s+/g, '')  // Remove spaces
+      .replace(/[^a-zA-Z0-9-_]/g, '');  // Remove special characters, only allow alphanumeric, dash, and underscore
   }
+  
 
   loadSectorByFunction() {
     this.dashboard.getDashboardFirms(10044).subscribe(

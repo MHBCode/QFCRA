@@ -16,8 +16,8 @@ export class LogformService {
     const url = `${this.baseUrlLogForm}get_document_details?docID=${docID}`;
     return this.http.get<any>(url);
   }
-  getDocListByFirmDocType(firmId: number,docTypeID: number) {
-    const url = `${this.baseUrlLogForm}get_doc_list_by_firm_doc_type?firmId=${firmId}&docTypeID=${docTypeID}`;
+  getDocListByFirmDocType(firmId: number,docTypeID: string) {
+    const url = `${this.baseUrlLogForm}get_doc_list_by_firm_doc_type?firmId=${firmId}&docTypeIDs=${docTypeID}`;
     return this.http.get<any>(url);
   }
   errorMessages(messageKey: number): Observable<any> {

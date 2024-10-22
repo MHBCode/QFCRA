@@ -4980,15 +4980,24 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getFormReferenceDocuments() {
-    let DocType: number = 0;
+    let DocType: number[] = [];
     if (this.tabIndex === 0) { //Licensed tab
       if (this.ActivityLicensed[0].ScopeRevNum > 1) {
-        DocType = constants.DocumentType.Q13;
+        DocType.push(constants.DocumentType.Q13);
       } else {
-        DocType = constants.DocumentType.Q01;
+        DocType.push(constants.DocumentType.Q01);
+        DocType.push(constants.DocumentType.Q02);
+      }
+    } else if (this.tabIndex === 1) {
+      if (this.ActivityAuth[0].ScopeRevNum > 1) {
+        DocType.push(constants.DocumentType.Q13);
+      } else {
+        DocType.push(constants.DocumentType.Q02);
       }
     }
-    this.logForm.getDocListByFirmDocType(this.firmId,DocType).subscribe(data => {
+    
+    const docTypeString = DocType.join(',');
+    this.logForm.getDocListByFirmDocType(this.firmId,docTypeString).subscribe(data => {
       this.formReferenceDocs = data.response;
       console.log('Form Reference Docs: ',this.formReferenceDocs);
     }, error => {
