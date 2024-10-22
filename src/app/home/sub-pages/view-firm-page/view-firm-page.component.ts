@@ -3956,6 +3956,7 @@ export class ViewFirmPageComponent implements OnInit {
       data => {
         this.ControllerfirmAddresses = data.response;
         console.log('Firm Addresses: ', this.ControllerfirmAddresses);
+        console.log("ControllerFirmAdressesObj",this.ControllerFirmAdressesObj);
         this.isLoading = false;
       }, 
       error => {
