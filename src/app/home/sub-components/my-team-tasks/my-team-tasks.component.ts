@@ -34,8 +34,9 @@ export class MyTeamTasksComponent implements OnInit {
   firmNames: string[] = [];
   usersAssignedTaskTo: string[] = [];
   paginatedTasks: any[] = [];
-  dueDateFrom: string;
-  dueDateTo: string;
+  teamUsersID: string;
+  dueDateFrom: string = '';
+  dueDateTo: string = '';
   totalRows: number = 0;
   totalPages: number = 0;
   currentPage: number = 1;
@@ -162,16 +163,16 @@ export class MyTeamTasksComponent implements OnInit {
 
   getTasks() {
     this.isLoading = true;
-    const teamUsersID = this.getCheckedTeamMembers().join(',');
+    this.teamUsersID = this.getCheckedTeamMembers().join(',');
 
-    if (teamUsersID.length === 0) {
+    if (this.teamUsersID.length === 0) {
       this.getErrorMessages('getTasks', constants.Firm_CoreDetails_Messages.SELECT_SUPERVISIORS);
       this.isLoading = false;
     } else {
       delete this.errorMessages['getTasks'];
 
       // Call API with the selected team members
-      this.taskService.getMyTeamsTasks(this.userId, teamUsersID).subscribe({
+      this.taskService.getMyTeamsTasks(this.userId, this.teamUsersID,this.dueDateFrom,this.dueDateTo).subscribe({
         next: (response) => {
           console.log('API Response:', response); // Log the response
           if (response.isSuccess) {
@@ -392,7 +393,7 @@ export class MyTeamTasksComponent implements OnInit {
 
     // Start the note save and task reload in parallel
     const saveNotePromise = this.taskService.saveReminderNote(note).toPromise();
-    const loadTasksPromise = this.taskService.getMyTasksAssignedByUser(this.userId).toPromise();
+    const loadTasksPromise = this.taskService.getMyTeamsTasks(this.userId, this.teamUsersID,this.dueDateFrom,this.dueDateTo).toPromise();
 
     Promise.all([saveNotePromise, loadTasksPromise])
       .then(([saveNoteResponse, loadTasksResponse]) => {

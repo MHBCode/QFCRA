@@ -1,7 +1,7 @@
 <div class="firmList-wrapper" [ngClass]="isMainView ? 'listing-table' : 'home-table'">
   <div class="table customTable">
     <div *ngIf="showTitle" (click)="goToAllFirms()" class="tableTitle">
-      <h3>Firm List</h3>
+      <h3>Firm List <small>view all</small></h3>
     </div>
     <div class="table-responsive">
       <table [ngClass]="isMainView ? 'firm-table' : 'home-firm-table'">

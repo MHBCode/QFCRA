@@ -1377,7 +1377,7 @@
           <div class="inputs-row">
             <div class="input-field">
               <label for="formReff"> Form Reference </label>
-              <input disabled name="formReff" id="formReff" type="text" value="" />
+              <a *ngIf="isEditModeAuth || !(ActivityAuth[0].ScopeRevNum)" (click)="getFormReferenceDocuments()" class="form-ref-btn">Select/De-select document</a>
             </div>
             <div style="width: 100%" class="input-field">
               <label for=""> Link To Scope </label>
