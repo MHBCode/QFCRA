@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import * as constants from 'src/app/app-constants';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import * as XLSX from 'xlsx';
+import { LogformService } from 'src/app/ngServices/logform.service';
 
 @Component({
   selector: 'app-shadow-supervisor',
@@ -55,6 +56,7 @@ export class ShadowSupervisorComponent implements OnInit {
     private firmService: FirmService,
     private router: Router,
     private sanitizer: DomSanitizer,
+    private logForm: LogformService,
     private dateUtilService: DateUtilService
   ) { }
 
@@ -359,7 +361,7 @@ export class ShadowSupervisorComponent implements OnInit {
   }
 
   showErrorAlert(messageKey: number) {
-    this.firmService.errorMessages(messageKey).subscribe(
+    this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
         Swal.fire({
           text: response.response,

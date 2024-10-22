@@ -4,6 +4,8 @@ import { FirmService } from 'src/app/ngServices/firm.service';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { SecurityService } from 'src/app/ngServices/security.service';
+import { LogformService } from 'src/app/ngServices/logform.service';
 
 @Component({
   selector: 'app-new-firm',
@@ -12,7 +14,7 @@ import { Router } from '@angular/router';
 })
 export class NewFirmComponent implements OnInit {
   showErrorAlert(messageKey: number) {
-    this.firmService.errorMessages(messageKey).subscribe(
+    this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
         Swal.fire({
           text: response.response,
@@ -24,7 +26,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   showFirmDetailsSaveSuccessAlert(messageKey: number) {
-    this.firmService.errorMessages(messageKey).subscribe(
+    this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
         Swal.fire({
           title: 'Success!',
@@ -112,7 +114,7 @@ export class NewFirmComponent implements OnInit {
   /* error messages */
   errorMessages: { [key: string]: string } = {};
 
-  constructor(private firmService: FirmService, private router: Router) { }
+  constructor(private firmService: FirmService, private securityService: SecurityService, private logForm: LogformService, private router: Router) { }
 
 
   ngOnInit(): void {
@@ -138,6 +140,7 @@ export class NewFirmComponent implements OnInit {
 
   initializeFlatpickr() {
     this.dateInputs.forEach((input: ElementRef<HTMLInputElement>) => {
+      input.nativeElement.placeholder = 'DD/MM/YYY';
       flatpickr(input.nativeElement, {
         allowInput: true,
         dateFormat: 'd/M/Y', // Adjust date format as needed
@@ -486,7 +489,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateCountries() {
-    this.firmService.getObjectTypeTable(constants.countries).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.countries).subscribe(data => {
       this.allCountries = data.response;
     }, error => {
       console.error('Error Fetching Countries dropdown: ', error);
@@ -494,7 +497,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateLegalStatus() {
-    this.firmService.getObjectTypeTable(constants.legalStatus).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.legalStatus).subscribe(data => {
       this.allLegalStatus = data.response;
     }, error => {
       console.error('Error Fetching Legal Status dropdown: ', error);
@@ -502,7 +505,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateQFCLicenseStatus() {
-    this.firmService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
       this.allQFCLicenseStatus = data.response;
     }, error => {
       console.error('Error Fetching QFC License Status dropdown: ', error);
@@ -510,7 +513,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateAuthorisationStatus() {
-    this.firmService.getObjectTypeTable(constants.authorisationStatus).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.authorisationStatus).subscribe(data => {
       this.allAuthorisationStatus = data.response;
     }, error => {
       console.error('Error Fetching Authorisation Status dropdown: ', error);
@@ -518,7 +521,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateFinYearEnd() {
-    this.firmService.getObjectTypeTable(constants.FinYearEnd).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.FinYearEnd).subscribe(data => {
       this.allFinYearEnd = data.response;
     }, error => {
       console.error('Error Fetching Fin Year End dropdown: ', error);
@@ -526,7 +529,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateFinAccStd() {
-    this.firmService.getObjectTypeTable(constants.FinAccStd).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.FinAccStd).subscribe(data => {
       this.allFinAccStd = data.response;
     }, error => {
       console.error('Error Fetching Fin Acc Std dropdown: ', error);
@@ -534,7 +537,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateFirmAppTypes() {
-    this.firmService.getObjectTypeTable(constants.firmAppTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.firmAppTypes).subscribe(data => {
       this.allFirmTypes = data.response;
     }, error => {
       console.error('Error Fetching Firm Application Types dropdown: ', error);
@@ -542,7 +545,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateAddressTypes() {
-    this.firmService.getObjectTypeTable(constants.addressTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(constants.addressTypes).subscribe(data => {
       this.allAddressTypes = data.response;
       // Add an address if none exists
       if (this.addedAddresses.length === 0) {
@@ -809,7 +812,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   getErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
-    this.firmService.errorMessages(msgKey).subscribe(
+    this.logForm.errorMessages(msgKey).subscribe(
       (response) => {
         let errorMessage = response.response;
         // If a placeholder value is provided, replace the placeholder with the actual value

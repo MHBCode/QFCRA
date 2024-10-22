@@ -8,6 +8,7 @@ import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import Swal from 'sweetalert2';
 import * as constants from 'src/app/app-constants';
 import * as XLSX from 'xlsx';
+import { LogformService } from 'src/app/ngServices/logform.service';
 @Component({
   selector: 'app-my-team-tasks',
   templateUrl: './my-team-tasks.component.html',
@@ -33,6 +34,8 @@ export class MyTeamTasksComponent implements OnInit {
   firmNames: string[] = [];
   usersAssignedTaskTo: string[] = [];
   paginatedTasks: any[] = [];
+  dueDateFrom: string;
+  dueDateTo: string;
   totalRows: number = 0;
   totalPages: number = 0;
   currentPage: number = 1;
@@ -60,10 +63,11 @@ export class MyTeamTasksComponent implements OnInit {
   noteText: string = '';
 
   constructor(
-    private _userService: UsersService,
-    private _taskService: TaskServiceService,
-    private _dateUtilService: DateUtilService,
-    private _firmService: FirmService,
+    private userService: UsersService,
+    private taskService: TaskServiceService,
+    private dateUtilService: DateUtilService,
+    private firmService: FirmService,
+    private logForm: LogformService,
     private sanitizer: DomSanitizer,
   ) { }
 
@@ -83,6 +87,7 @@ export class MyTeamTasksComponent implements OnInit {
 
   initializeFlatpickr() {
     this.dateInputs.forEach((input: ElementRef<HTMLInputElement>) => {
+      input.nativeElement.placeholder = 'DD/MM/YYY';
       flatpickr(input.nativeElement, {
         allowInput: true,
         dateFormat: 'd/M/Y', // Adjust date format as needed
@@ -98,7 +103,7 @@ export class MyTeamTasksComponent implements OnInit {
 
   userTeamMembers() {
     this.isLoading = true;
-    this._userService.getUsersHierarchyByParent(this.userId).subscribe(data => {
+    this.userService.getUsersHierarchyByParent(this.userId).subscribe(data => {
       const members = data.response;
       this.organizeTeamMembers(members);
       this.isLoading = false;
@@ -155,48 +160,6 @@ export class MyTeamTasksComponent implements OnInit {
     }
   }
 
-
-
-  // getTasks() {
-  //   this.isLoading = true;
-  //   const teamUsersID = this.getCheckedTeamMembers().join(',');
-
-  //   // Check if any team members are selected
-  //   if (teamUsersID.length === 0) {
-  //     this.getErrorMessages('getTasks', constants.Firm_CoreDetails_Messages.SELECT_SUPERVISIORS);
-  //     this.isLoading = false;
-  //   } else {
-  //     delete this.errorMessages['getTasks'];
-
-  //     // Make the API call with only the checked user IDs
-  //     this._taskService.getMyTeamsTasks(this.userId, teamUsersID).subscribe({
-  //       next: (response) => {
-  //         console.log('API Response:', response);
-  //         if (response.isSuccess) {
-  //           this.tasks = response.response; // Save tasks in the array
-  //           this.filteredTasks = [...this.tasks]; // Update filtered tasks
-  //           this.totalRows = this.tasks.length;
-  //           this.totalPages = Math.ceil(this.totalRows / this.pageSize);
-  //           this.getTaskTypes(); // Update task types
-  //           this.getFirmNames(); // Update firm names
-  //           this.getTaskAssignedToUsers(); // Update assigned users
-  //           this.updatePagination(); // Update pagination
-  //           this.isLoading = false;
-  //         } else {
-  //           console.error('Error fetching tasks:', response.errorMessage);
-  //           this.isLoading = false;
-  //           this.tasks = [];
-  //         }
-  //       },
-  //       error: (err) => {
-  //         console.error('HTTP Error:', err);
-  //         this.isLoading = false;
-  //         this.tasks = [];
-  //       }
-  //     });
-  //   }
-  // }
-
   getTasks() {
     this.isLoading = true;
     const teamUsersID = this.getCheckedTeamMembers().join(',');
@@ -208,7 +171,7 @@ export class MyTeamTasksComponent implements OnInit {
       delete this.errorMessages['getTasks'];
 
       // Call API with the selected team members
-      this._taskService.getMyTeamsTasks(this.userId, teamUsersID).subscribe({
+      this.taskService.getMyTeamsTasks(this.userId, teamUsersID).subscribe({
         next: (response) => {
           console.log('API Response:', response); // Log the response
           if (response.isSuccess) {
@@ -267,6 +230,7 @@ export class MyTeamTasksComponent implements OnInit {
 
   // Get unique assigned task to usernames from the task list
   getTaskAssignedToUsers() {
+    this.tasks.forEach(task => task.TaskAssignedToUserName = task.TaskAssignedToUserName.trim());
     const taskAssignedTo = this.tasks.map(task => task.TaskAssignedToUserName);
     this.usersAssignedTaskTo = Array.from(new Set(taskAssignedTo)).sort();
     console.log(this.usersAssignedTaskTo);
@@ -277,7 +241,7 @@ export class MyTeamTasksComponent implements OnInit {
       // Safely convert TaskDueDate only if it's not null or empty
       let dueDateFormatted = '';
       if (task.TaskDueDate) {
-        dueDateFormatted = this._dateUtilService.convertApiDateToStandard(task.TaskDueDate);
+        dueDateFormatted = this.dateUtilService.convertApiDateToStandard(task.TaskDueDate);
       }
 
       const daysDue = task.DaysOverDue;
@@ -365,7 +329,7 @@ export class MyTeamTasksComponent implements OnInit {
     this.showTaskPopup = !this.showTaskPopup;  // Toggle popup visibility
 
     // Fetch task details using the new endpoint
-    this._taskService.getMyTaskByObjectDetails(
+    this.taskService.getMyTaskByObjectDetails(
       selectedRow.ObjectID,
       selectedRow.ObjectInstanceID,
       selectedRow.ObjectInstanceRevNum
@@ -427,8 +391,8 @@ export class MyTeamTasksComponent implements OnInit {
     }
 
     // Start the note save and task reload in parallel
-    const saveNotePromise = this._taskService.saveReminderNote(note).toPromise();
-    const loadTasksPromise = this._taskService.getMyTasksAssignedByUser(this.userId).toPromise();
+    const saveNotePromise = this.taskService.saveReminderNote(note).toPromise();
+    const loadTasksPromise = this.taskService.getMyTasksAssignedByUser(this.userId).toPromise();
 
     Promise.all([saveNotePromise, loadTasksPromise])
       .then(([saveNoteResponse, loadTasksResponse]) => {
@@ -538,14 +502,14 @@ export class MyTeamTasksComponent implements OnInit {
   }
 
   isTaskOverdue(dueDate: string): boolean {
-    return this._dateUtilService.isOverdue(dueDate);
+    return this.dateUtilService.isOverdue(dueDate);
   }
 
   getErrorMessages(fieldName: string, msgKey?: number) {
     if (fieldName === 'note' && !msgKey) {
       this.errorMessages['note'] = 'Please Enter The Note';
     } else {
-      this._firmService.errorMessages(msgKey).subscribe(
+      this.logForm.errorMessages(msgKey).subscribe(
         (response) => {
           let errorMessage = response.response;
           this.errorMessages[fieldName] = errorMessage;
@@ -558,7 +522,7 @@ export class MyTeamTasksComponent implements OnInit {
   }
 
   showErrorAlert(messageKey: number) {
-    this._firmService.errorMessages(messageKey).subscribe(
+    this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
         Swal.fire({
           text: response.response,

@@ -17,10 +17,10 @@
   </div>
   <div class="date-filters">
     <label for="due-date-from">Due Date From:</label>
-    <input type="text" id="due-date-from" #dateInputs>
+    <input type="text" id="due-date-from" [(ngModel)]="dueDateFrom" #dateInputs placeholder>
 
     <label for="due-date-to">Due Date To:</label>
-    <input type="text" id="due-date-to" #dateInputs>
+    <input type="text" id="due-date-to" [(ngModel)]="dueDateTo" #dateInputs placeholder>
   </div>
 
 
