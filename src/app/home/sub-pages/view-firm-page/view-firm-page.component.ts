@@ -71,6 +71,7 @@ export class ViewFirmPageComponent implements OnInit {
   @ViewChild('journalSection') journalSection: ElementRef;
 
   showCreateControllerSection: boolean = false;
+  showCreateContactSection: boolean = false;
   /* */
   callFYear: boolean = false;
   callInactiveUsers: boolean = false;
@@ -99,6 +100,7 @@ export class ViewFirmPageComponent implements OnInit {
   AuthorisationStatusTypeLabelDescFormatted: any;
   LicenseStatusTypeLabelDescFormatted: any;
   existingAddresses: any = [];
+  existingControllerAddresses: any = []; 
   firmApp: any = {};
   firmOPDetails: any;
   prudReturnTypesDropdown: any = [];
@@ -142,6 +144,7 @@ export class ViewFirmPageComponent implements OnInit {
   FIRMNotices: any;
   usedAddressTypes: Set<string> = new Set();
   newAddress: any = {};
+  newControllerAddress: any = {};
   newActivity: any = {};
   newPermittedActivity: any = {};
   isEditModeCore: boolean = false;
@@ -242,7 +245,7 @@ export class ViewFirmPageComponent implements OnInit {
   invalidAddress: boolean;
   invalidActivity: boolean;
   isUserAllowed: boolean | null = null;
-
+  AllContactFrom: any = [];
   selectedType: string = '';
   showHoldingsPercentage: boolean = false;
   selectedControlType: string = 'select';
@@ -339,6 +342,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.getFirmAuditorType();
       this.getControllerType();
       this.getAllRegulater(this.Address.countryID, this.firmId);
+      this.getAllContactFromByFrimsId();
     });
   }
 
@@ -2435,7 +2439,13 @@ export class ViewFirmPageComponent implements OnInit {
     this.controllerDetails = { ...controller }; // Populate the controller details
     this.isPopupOpen = true; // Open the popup
     console.log('SSSSSSSSSSSSSSSSSSSSSSSdfgdfgdfhfgjfhjdhdj', this.selectedController.OtherEntityID, this.selectedController.EntityTypeID);
-    this.loadControllerFirmAdresses(this.selectedController.EntityTypeID,this.selectedController.OtherEntityID,this.userId,44);
+    this.loadControllerFirmAdresses(
+      this.selectedController.OtherEntityID,
+      this.selectedController.EntityTypeID,
+      this.userId,
+      44 // Static opTypeId
+    );
+    this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
     this.parentEntity.getRegulatorDetails(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID).subscribe(
       data => {
         if (data.response && data.response.length > 0) {
@@ -2549,7 +2559,6 @@ export class ViewFirmPageComponent implements OnInit {
 
   closeControllerPopup(): void {
     this.isPopupOpen = false;
-    this.isEditable = false; // Close the popup
     this.errorMessages = {}; // Clear previous error messages
     this.hasValidationErrors = false;
   }
@@ -2683,8 +2692,168 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
+  // addControllerAddressForm() {
+
+  //   // Define the total number of address types
+  //   const totalAddressTypes = this.allAddressTypes.length;
+
+  //   // Get the count of valid addresses
+  //   const validAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+  //   // Check if the number of valid addresses is equal to the number of address types
+  //   if (validAddressCount >= totalAddressTypes) {
+  //     // Disable the button if all address types are added
+  //     this.canAddNewAddress = false;
+  //     return;
+  //   }
+
+  //   this.newControllerAddress = {
+  //     AddressID: null,
+  //     AddressTypeID: 0,
+  //     AddressTypeDesc: '',
+  //     AddressLine1: '',
+  //     AddressLine2: '',
+  //     AddressLine3: '',
+  //     AddressLine4: '',
+  //     City: '',
+  //     Province: '',
+  //     CountryID: 0,
+  //     CountryName: '',
+  //     PostalCode: '',
+  //     PhoneNumber: '',
+  //     FaxNumber: '',
+  //     LastModifiedBy: 0, //todo _userId;
+  //     LastModifiedDate: this.currentDate,
+  //     addressState: 2,
+  //     FromDate: null,
+  //     ToDate: null,
+  //     Valid: true,
+  //   };
+  //   this.ControllerfirmAddresses.unshift(this.newControllerAddress);
+  //   const updatedValidAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+  //   this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+  // }
+  get filteredControllerfirmAddresses() {
+    console.log("this.ControllerfirmAddresses.filter(addr => !addr.isRemoved);",this.ControllerfirmAddresses.filter(addr => !addr.isRemoved))
+    return this.ControllerfirmAddresses.filter(addr => !addr.isRemoved);
+    
+    
+  }
+  addControllerAddressForm() {
+    const totalAddressTypes = this.allAddressTypes.length;
+    const validAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+  
+    if (validAddressCount >= totalAddressTypes) {
+      this.canAddNewAddress = false;
+      return;
+    }
+  
+    const newAddress = {
+      AddressID: null,
+      AddressTypeID: 0,
+      AddressTypeDesc: '',
+      AddressLine1: '',
+      AddressLine2: '',
+      AddressLine3: '',
+      AddressLine4: '',
+      City: '',
+      Province: '',
+      CountryID: 0,
+      CountryName: '',
+      PostalCode: '',
+      PhoneNumber: '',
+      FaxNumber: '',
+      LastModifiedBy: 0,
+      LastModifiedDate: this.currentDate,
+      addressState: 2,
+      FromDate: null,
+      ToDate: null,
+      Valid: true,
+    };
+  
+    // Instead of reassigning the array, push the new address to the beginning of the array
+    this.ControllerfirmAddresses.push(newAddress);
+
+    const updatedValidAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+    this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+}
+
+  // addEditAddressForm(): void {
+  //   const newAddress = {
+  //     firmID: this.firmId,
+  //     countryID: 0,
+  //     AddressTypeID: 0,
+  //     LastModifiedBy: this.userId,
+  //     entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+  //     entityID: this.firmId,
+  //     contactID: 0,
+  //     AddressID:null,
+  //     addressState:2,
+  //     AddressLine1: '',
+  //     AddressLine2: '',
+  //     AddressLine3: '',
+  //     AddressLine4: '',
+  //     City:'',
+  //     createdBy: this.userId,
+  //     AddressAssnID: null,
+  //     CreatedDate: '',
+  //     LastModifiedDate: '',
+  //     fromDate: '',
+  //     toDate: '',
+  //     Output: 0,
+  //     ObjectID: null,
+  //     Province: '',
+  //     ObjectInstanceID: null,
+  //     ObjectInstanceRevNumber: 1,
+  //     SourceObjectID: null,
+  //     SourceObjectInstanceID: null,
+  //     SourceObjectInstanceRevNumber: 1,
+  //     PostalCode: '',
+  //     // Add any additional default fields as required
+  //   };
+  //   // Add the new address to the list
+  //   this.ControllerfirmAddresses.push(newAddress);
+  // }
+  // removeEditAddressForm(index: number): void {
+  //   if (this.ControllerfirmAddresses.length > 1) {
+  //     // Remove the address at the given index
+  //     this.ControllerfirmAddresses.splice(index, 1);
+  //   } else {
+  //     console.warn('At least one address must be present.');
+  //   }
+  // }
+  removeControllerAddress(index: number) {
+    Swal.fire({
+      text: 'Are you sure you want to delete this record?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.errorMessages = {};
+        if (index > -1 && index < this.ControllerfirmAddresses.length) {
+          const address = this.ControllerfirmAddresses[index];
+          if (!address.AddressID) { // means newly added address
+            // If the address doesn't have an AddressID, completely remove it from the array
+            this.ControllerfirmAddresses.splice(index, 1);
+          } else {
+            // Otherwise, just mark it as removed
+            address.isRemoved = true;
+          }
+          // Re-check if all address types have been added after removal
+          const validAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+          this.canAddNewAddress = validAddressCount < this.allAddressTypes.length;
+        }
+      }
+      // No action needed if the user cancels
+    });
+  }
+
   saveControllerPopupChanges(): void {
     this.isEditable = false;
+    this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
     this.EditControllerValidateForm().then(() => {
       if (!this.hasValidationErrors) {
         console.log("Selected Controller:", this.selectedController);
@@ -2735,33 +2904,36 @@ export class ViewFirmPageComponent implements OnInit {
               AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
             },
-            addressList: this.addressForms.map(address => ({
+            addressList: this.existingControllerAddresses.map(address => ({
               firmID: this.firmId,
               countryID: address.CountryID,
-              addressTypeID: address.AddressTypeID,
+              AddressTypeID: address.AddressTypeID,
               LastModifiedBy: this.userId,
               entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               entityID: this.firmId,
               contactID: address.contactID,
-              addressID: address.addressID,
-              addressLine1: address.addressLine1,
-              addressLine2: address.addressLine2,
-              addressLine3: address.addressLine3,
-              addressLine4: address.addressLine4,
-              city: address.city,
-              stateProvince: address.stateProvince,
+              AddressID: address.AddressID.toString(),
+              addressState:6,
+              AddressLine1: address.AddressLine1,
+              AddressLine2: address.AddressLine2,
+              AddressLine3: address.AddressLine3,
+              AddressLine4: address.AddressLine4,
+              City: address.City,
               createdBy: address.createdBy,
-              addressAssnID: address.addressAssnID,
+              AddressAssnID: address.AddressAssnID,
               CreatedDate: address.CreatedDate,
               LastModifiedDate: address.LastModifiedDate,
-              addressState: 6,
               fromDate: address.fromDate,
               toDate: address.toDate,
               Output: address.Output,
-              objectID: address.objectID,
-              objectInstanceID: address.objectInstanceID,
-              objAis: address.objAis, // Ensure this is correctly structured
-              zipPostalCode: address.zipPostalCode,
+              ObjectID: address.ObjectID,
+              Province: address.Province,
+              ObjectInstanceID: address.ObjectInstanceID,
+              ObjectInstanceRevNumber: address.ObjectInstanceRevNumber,
+              SourceObjectID: address.SourceObjectID,
+              SourceObjectInstanceID: address.SourceObjectInstanceID,
+              SourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber,
+              PostalCode: address.PostalCode,
             })),
 
             regulatorList: this.regulatorList.map(regulator => ({
@@ -3294,6 +3466,29 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
+  loadControllerFirmAdresses(entityID: number, entityTypeID: number, userId: number, opTypeId: number): void {
+    this.isLoading = true;
+
+    // Logging for debugging
+    console.log("Sending Firm Addresses request with parameters:", { entityID, entityTypeID, userId, opTypeId });
+
+    // Fetch firm addresses from the service
+    this.addressService.getControllerFirmAddresses(entityID, entityTypeID, userId, opTypeId).subscribe(
+      data => {
+        if (data.response) {
+          this.ControllerfirmAddresses = data.response;
+          console.log('Firm Addresses:', this.ControllerfirmAddresses);
+        } else {
+          console.warn('No addresses found for this firm');
+        }
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Error Fetching Firm Addresses', error);
+        this.isLoading = false;
+      }
+    );
+}
   // Remove a regulator
   removeRegulator(index: number) {
     this.regulatorList.splice(index, 1);
@@ -3465,6 +3660,16 @@ export class ViewFirmPageComponent implements OnInit {
               firmID: this.firmId,
               contactID: null,
               contactAssnID: null,
+              AdditionalDetails: 'test',
+              BusPhone:'test',
+              BusEmail:'test',
+              MobileNum:'test',
+              NameAsInPassport:'test',
+              OtherEmail:'test',
+              QfcNumber: this.firmDetails.QFCNum,
+              Fax:'test',
+              ResidencePhone:'test',
+              JobTitle:'test',
               OtherEntityName: this.CreatecontrollerDetails.OtherEntityName,
               EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               Title: this.CreatecontrollerDetails.Title, // Map your inputs accordingly
@@ -3518,7 +3723,7 @@ export class ViewFirmPageComponent implements OnInit {
             }
             ]
           },
-          addressList: this.addressForms.map(address => ({
+          Addresses: this.addressForms.map(address => ({
             firmID: this.firmId,
             countryID: address.CountryID,
             addressTypeID: address.AddressTypeID,
@@ -3940,32 +4145,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.isLoading = false;
       })
   }
-  ControllerFirmAdressesObj: any = {};
-  loadControllerFirmAdresses(EntityID: number, userId: number, EntityTypeID: number, opTypeId: 44) {
-    this.isLoading = true;
-    
-    // Define the ControllerFirmAdressesObj as an instance property
-    this.ControllerFirmAdressesObj = {
-      EntityID: this.selectedController.OtherEntityID,
-      userId: this.userId,
-      EntityTypeID: this.selectedController.EntityTypeID,
-      opTypeId: 44,
-    };
-  
-    // Fetch firm addresses from the service
-    this.addressService.getFirmAddresses(this.firmId).subscribe(
-      data => {
-        this.ControllerfirmAddresses = data.response;
-        console.log('Firm Addresses: ', this.ControllerfirmAddresses);
-        console.log("ControllerFirmAdressesObj",this.ControllerFirmAdressesObj);
-        this.isLoading = false;
-      }, 
-      error => {
-        console.error('Error Fetching Firm Addresses', error);
-        this.isLoading = false;
-      }
-    );
-  }
+ 
   loadWaivers() {
     this.waiverService.getFirmwaiver(this.firmId).subscribe(
       data => {
@@ -5084,9 +5264,7 @@ export class ViewFirmPageComponent implements OnInit {
   //    this.router.navigate(['home/create-controller']);
   //  }
 
-  createContact() {
-    this.router.navigate(['home/create-contact'])
-  }
+
   ////////// Yazan Auditor
   firmAuditorName: { OtherEntityID: number, OtherEntityName: string }[] = [];
   firmAuditorType: { EntitySubTypeID: number, EntitySubTypeDesc: string }[] = [];
@@ -6001,4 +6179,40 @@ export class ViewFirmPageComponent implements OnInit {
   isNullOrEmpty(value: any): boolean {
     return value === null || value === '';
   }
+   
+  createContact() {
+    this.showCreateContactSection = true;
+  }
+   
+  getAllContactFromByFrimsId(){
+    this.contactService.getEntityTypesByFrimsId(this.firmId).subscribe(data => {
+      this.AllContactFrom = data.response;
+      console.log("ContactFrom",this.AllContactFrom)
+    }, error => {
+      console.error("Error fetching ContactFrom", error);
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

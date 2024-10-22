@@ -33,4 +33,8 @@ export class ContactService {
     const url = `${this.baseUrlContact}save_update_contact_form`;
     return this.http.post<any>(url, saveControllerPopupChangesIndividualObj); 
   }
+  getEntityTypesByFrimsId(firmId: number): Observable<any> {
+    const url = `${this.baseUrlContact}get_entity_types_by_firmId?firmId=${firmId}`
+    return this.http.get<any>(url);
+  }
 }
