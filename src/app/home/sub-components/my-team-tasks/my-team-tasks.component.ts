@@ -34,6 +34,8 @@ export class MyTeamTasksComponent implements OnInit {
   firmNames: string[] = [];
   usersAssignedTaskTo: string[] = [];
   paginatedTasks: any[] = [];
+  dueDateFrom: string;
+  dueDateTo: string;
   totalRows: number = 0;
   totalPages: number = 0;
   currentPage: number = 1;
@@ -85,6 +87,7 @@ export class MyTeamTasksComponent implements OnInit {
 
   initializeFlatpickr() {
     this.dateInputs.forEach((input: ElementRef<HTMLInputElement>) => {
+      input.nativeElement.placeholder = 'DD/MM/YYY';
       flatpickr(input.nativeElement, {
         allowInput: true,
         dateFormat: 'd/M/Y', // Adjust date format as needed
@@ -157,48 +160,6 @@ export class MyTeamTasksComponent implements OnInit {
     }
   }
 
-
-
-  // getTasks() {
-  //   this.isLoading = true;
-  //   const teamUsersID = this.getCheckedTeamMembers().join(',');
-
-  //   // Check if any team members are selected
-  //   if (teamUsersID.length === 0) {
-  //     this.getErrorMessages('getTasks', constants.Firm_CoreDetails_Messages.SELECT_SUPERVISIORS);
-  //     this.isLoading = false;
-  //   } else {
-  //     delete this.errorMessages['getTasks'];
-
-  //     // Make the API call with only the checked user IDs
-  //     this._taskService.getMyTeamsTasks(this.userId, teamUsersID).subscribe({
-  //       next: (response) => {
-  //         console.log('API Response:', response);
-  //         if (response.isSuccess) {
-  //           this.tasks = response.response; // Save tasks in the array
-  //           this.filteredTasks = [...this.tasks]; // Update filtered tasks
-  //           this.totalRows = this.tasks.length;
-  //           this.totalPages = Math.ceil(this.totalRows / this.pageSize);
-  //           this.getTaskTypes(); // Update task types
-  //           this.getFirmNames(); // Update firm names
-  //           this.getTaskAssignedToUsers(); // Update assigned users
-  //           this.updatePagination(); // Update pagination
-  //           this.isLoading = false;
-  //         } else {
-  //           console.error('Error fetching tasks:', response.errorMessage);
-  //           this.isLoading = false;
-  //           this.tasks = [];
-  //         }
-  //       },
-  //       error: (err) => {
-  //         console.error('HTTP Error:', err);
-  //         this.isLoading = false;
-  //         this.tasks = [];
-  //       }
-  //     });
-  //   }
-  // }
-
   getTasks() {
     this.isLoading = true;
     const teamUsersID = this.getCheckedTeamMembers().join(',');
@@ -269,6 +230,7 @@ export class MyTeamTasksComponent implements OnInit {
 
   // Get unique assigned task to usernames from the task list
   getTaskAssignedToUsers() {
+    this.tasks.forEach(task => task.TaskAssignedToUserName = task.TaskAssignedToUserName.trim());
     const taskAssignedTo = this.tasks.map(task => task.TaskAssignedToUserName);
     this.usersAssignedTaskTo = Array.from(new Set(taskAssignedTo)).sort();
     console.log(this.usersAssignedTaskTo);

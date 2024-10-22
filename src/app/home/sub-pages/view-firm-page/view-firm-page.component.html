@@ -381,7 +381,6 @@
             <span [hidden]="!isEditModeCore" style="color: red">*</span>
           </label>
           <select [ngClass]="{
-              'select-background-edited': isEditModeCore,
               'error-border': errorMessages['LegalStatusTypeID']
             }" [disabled]="!isEditModeCore" id="legalStatus" (ngModelChange)="onLegalStatusChange($event)"
             [(ngModel)]="firmDetails.LegalStatusTypeID">
@@ -412,7 +411,7 @@
 
         <div class="input-field">
           <label for="homeCountry"> Home Country </label>
-          <select [ngClass]="{ 'select-background-edited': isEditModeCore }" [disabled]="!isEditModeCore"
+          <select [disabled]="!isEditModeCore"
             id="homeCountry" [(ngModel)]="firmDetails.CountyOfIncorporation">
             <option *ngFor="let option of allCountries" [value]="option.CountryID">
               {{ option?.CountryName }}
@@ -440,7 +439,7 @@
             <label for="incorporationDate"> Incorporation Date </label>
             <input [ngClass]="{
                 'error-border': errorMessages['DateOfIncorporation']
-              }" [disabled]="!isEditModeCore" name="incorporationDate" id="incorporationDate" type="text" #dateInputs
+              }" [disabled]="!isEditModeCore" name="incorporationDate" id="incorporationDate" type="text" #dateInputs placeholder
               [(ngModel)]="firmDetails.DateOfIncorporation" />
           </div>
         </ng-container>
@@ -452,7 +451,7 @@
               <i class="bi bi-clock-history"></i> <span> Open History</span>
             </button>
           </label>
-          <select [ngClass]="{ 'select-background-edited': isEditModeCore }" [disabled]="!isEditModeCore"
+          <select [disabled]="!isEditModeCore"
             id="financialYearEnd" [(ngModel)]="firmDetails.FinYearEndTypeID">
             <option *ngFor="let option of allFinYearEnd" [value]="option.FirmFinYearEndTypeID">
               {{ option.FirmFinYearEndTypeDesc }}
@@ -464,7 +463,7 @@
           <label for="financialYearEndEffectiveFrom">
             Financial Year End Effective From
           </label>
-          <input [disabled]="!isEditModeCore" name="financialYearEndEffectiveFrom" type="text" #dateInputs
+          <input [disabled]="!isEditModeCore" name="financialYearEndEffectiveFrom" type="text" #dateInputs placeholder
             id="financialYearEndEffectiveFrom" [(ngModel)]="firmDetails.FirmFinYearEndEffectiveFrom"
             [ngClass]="{ 'error-border': errorMessages['FYearEndDate'] }" />
         </div>
@@ -477,7 +476,7 @@
               <i class="bi bi-clock-history"></i><span> Open History</span>
             </button>
           </label>
-          <select [ngClass]="{ 'select-background-edited': isEditModeCore }" [disabled]="!isEditModeCore"
+          <select [disabled]="!isEditModeCore"
             id="accountingStandards" [(ngModel)]="firmDetails.FinAccStdTypeID">
             <option *ngFor="let option of allFinAccStd" [value]="option.FinAccStdTypeID">
               {{ option.FinAccStdTypeDesc }}
@@ -490,7 +489,7 @@
             Accounting Standards Effective From
           </label>
           <input [disabled]="!isEditModeCore" name="accountingStandardsEffectiveFrom"
-            id="accountingStandardsEffectiveFrom" type="text" #dateInputs
+            id="accountingStandardsEffectiveFrom" type="text" #dateInputs placeholder
             [(ngModel)]="firmDetails.FinAccStdTypeEffectiveFrom"
             [ngClass]="{ 'error-border': errorMessages['AccStandDate'] }" />
         </div>
@@ -521,7 +520,7 @@
             Prev. Firm Name Effective To
           </label>
           <input [disabled]="!isEditModeCore" name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo" type="text"
-            #dateInputs [(ngModel)]="firmNamesHistory[0].DateEffectiveTo" [ngClass]="{
+            #dateInputs placeholder [(ngModel)]="firmNamesHistory[0].DateEffectiveTo" [ngClass]="{
               'error-border': errorMessages['PrevFirmNameEffectiveTo']
             }" />
         </div>
@@ -632,13 +631,13 @@
       <div class="inputs-row" *ngIf="isEditModeCore">
         <div class="input-field">
           <label for="dateOfApplication"> Date of Application </label>
-          <input name="dateOfApplication" id="dateOfApplication" type="text" #dateInputs
+          <input name="dateOfApplication" id="dateOfApplication" type="text" #dateInputs placeholder
             (ngModelChange)="onDateOfApplicationChange($event)" [(ngModel)]="dateOfApplication"
             [ngClass]="{ 'error-border': errorMessages['DateOfApplication'] }" />
         </div>
         <div class="input-field">
           <label for="firmApplicationType"> Firm Application Type </label>
-          <select [ngClass]="{ 'select-background-edited': isEditModeCore }" name="firmApplicationType"
+          <select name="firmApplicationType"
             id="firmApplicationType" [(ngModel)]="selectedFirmTypeID"
             (ngModelChange)="onFirmApplicationTypeChange($event)">
             <option *ngFor="let firmType of allFirmTypes" [value]="firmType.FirmApplTypeID">
@@ -648,7 +647,7 @@
         </div>
         <div class="input-field">
           <label for="qfcLicenseStatus"> QFC License Status </label>
-          <select [ngClass]="{ 'select-background-edited': isEditModeCore }" name="qfcLicenseStatus"
+          <select name="qfcLicenseStatus"
             id="qfcLicenseStatus" [(ngModel)]="firmDetails.LicenseStatusTypeID"
             (ngModelChange)="onLicenseStatusChange($event)">
             <option *ngFor="let option of allQFCLicenseStatus" [value]="option.FirmApplStatusTypeID">
@@ -660,13 +659,13 @@
           <label for="DateLicensed">
             {{ LicenseStatusTypeLabelDescFormatted }}
           </label>
-          <input name="DateLicensed" id="DateLicensed" type="text" #dateInputs
+          <input name="DateLicensed" id="DateLicensed" type="text" #dateInputs placeholder
             [(ngModel)]="formattedLicenseApplStatusDate"
             [ngClass]="{ 'error-border': errorMessages['LicensedDate'] }" />
         </div>
         <div class="input-field" *ngIf="selectedFirmTypeID == 3">
           <label for="authorisationStatus"> Authorisation Status </label>
-          <select [ngClass]="{ 'select-background-edited': isEditModeCore }" name="authorisationStatus"
+          <select name="authorisationStatus"
             id="authorisationStatus" [(ngModel)]="firmDetails.AuthorisationStatusTypeID"
             (ngModelChange)="onAuthorizedStatusChange($event)">
             <option *ngFor="let option of allAuthorisationStatus" [value]="option.FirmApplStatusTypeID">
@@ -678,7 +677,7 @@
           <label for="dateAuthorized">
             {{ AuthorisationStatusTypeLabelDescFormatted }}
           </label>
-          <input name="dateAuthorized" id="dateAuthorized" type="text" #dateInputs
+          <input name="dateAuthorized" id="dateAuthorized" type="text" #dateInputs placeholder
             [(ngModel)]="formattedAuthApplStatusDate"
             [ngClass]="{ 'error-border': errorMessages['AuthorisationDate'] }" />
         </div>
@@ -703,7 +702,7 @@
         <div class="file-container">
           <div class="input-field">
             <label for="documentType"> Document Type </label>
-            <select [disabled]="!isEditModeCore" [ngClass]="{ 'select-background-edited': isEditModeCore }"
+            <select [disabled]="!isEditModeCore"
               class="document-type-select" name="documentType" id="documentType">
               <option value="263">Press Releases</option>
             </select>
@@ -830,7 +829,7 @@
                 (change)="onAddressTypeChange($event, address)" [ngClass]="{
                   'error-border':
                     !address.AddressID && errorMessages['AddressTypeID'],
-                  'select-background-edited': isEditModeCore
+                  
                 }">
                 <option value="0">Select</option>
                 <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
@@ -845,7 +844,7 @@
               ">
               <label for="sameAsType"> Same As Type </label>
               <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChange($event)" name="sameAsType"
-                id="sameAsType" [ngClass]="{ 'select-background-edited': isEditModeCore }">
+                id="sameAsType">
                 <option value="0">Select</option>
                 <option *ngFor="let type of existingAddresses" [value]="type.AddressTypeID">
                   {{ type.AddressTypeDesc }}
@@ -905,9 +904,7 @@
               <select [disabled]="
                   !isEditModeCore ||
                   (disableAddressFields && !address.AddressID)
-                " [(ngModel)]="address.CountryID" [ngClass]="{
-                  'select-background-edited': isEditModeCore
-                }">
+                " [(ngModel)]="address.CountryID">
                 <option *ngFor="let option of allCountries" [value]="option.CountryID">
                   {{ option?.CountryName }}
                 </option>
@@ -1065,7 +1062,7 @@
           <div class="inputs-row">
             <div style="width: 100%" class="input-field">
               <label for="formReff"> Form Reference </label>
-              <a *ngIf="isEditModeLicense" (click)="getFormReferenceDocuments()" class="form-ref-btn">Select/De-select document</a>
+              <a *ngIf="isEditModeLicense || !(ActivityLicensed[0].ScopeRevNum)" (click)="getFormReferenceDocuments()" class="form-ref-btn">Select/De-select document</a>
               <!-- <input [disabled]="isEditModeLicense" [ngModel]="documentDetails.FileName"
                                 name="formReff" id="formReff" type="text" value="" /> -->
               <!-- <a *ngIf="!isEditModeLicense" id="websiteLink"
@@ -1101,9 +1098,11 @@
                   !ActivityLicensed[0]?.ScopeRevNum ||
                   ActivityLicensed[0]?.ScopeRevNum <= 1
                 ">Application Date</label>
-              <input [disabled]="disableApplicationDate" name="appDate" id="appDate" #dateInputs type="text"
-                [(ngModel)]="ActivityLicensed[0].ScopeAppliedDate" />
+              <input [disabled]="disableApplicationDate" name="appDate" id="appDate" #dateInputs placeholder type="text"
+                [(ngModel)]="ActivityLicensed[0].ScopeAppliedDate" [ngClass]="{'error-border': errorMessages['ScopeAppliedDate']}"/>
             </div>
+            <!-- on creation mode -->
+             <input *ngIf="isCreateModeLicense" disabled type="text" #dateInputs placeholder [(ngModel)]="firmDetails.FirmLicApplDate">
             <div class="input-field">
               <label for="licenseDate"> Licensed Date </label>
               <input disabled name="licenseDate" id="licenseDate" type="text"
@@ -1116,7 +1115,7 @@
               ">
               <label for="effectiveDate"> Effective Date </label>
               <input [disabled]="!isEditModeLicense" disabled name="effectiveDate" id="effectiveDate" type="text"
-                #dateInputs [(ngModel)]="ActivityLicensed[0].ScopeEffectiveDate" [ngClass]="{
+                #dateInputs placeholder [(ngModel)]="ActivityLicensed[0].ScopeEffectiveDate" [ngClass]="{
                   'error-border':
                     errorMessages['ScopeEffectiveDate'] ||
                     errorMessages['ScopeEffectiveDateLessThanApplicationDate']
@@ -1202,7 +1201,7 @@
                   <td>
                     <div class="input-field">
                       <select name="activities" id="activities" [ngClass]="{
-                          'select-background-edited': isEditModeLicense,
+                          
                           'error-border':
                             activityLic.ActivityTypeID == 0 &&
                             errorMessages['ActivityTypeID']
@@ -1222,9 +1221,7 @@
                             this.ActivityLicensed[0].ScopeRevNum > 1 &&
                             !isNullOrEmpty(this.ActivityLicensed[0].ScopeRevNum)
                           )
-                        " [ngClass]="{
-                          'select-background-edited': isEditModeLicense
-                        }" name="action" id="action" [(ngModel)]="activityLic.FirmScopeTypeID">
+                        " name="action" id="action" [(ngModel)]="activityLic.FirmScopeTypeID">
                         <option *ngFor="let firmScopeType of allFirmScopeTypes" [value]="firmScopeType.FirmScopeTypeID">
                           {{ firmScopeType.FirmScopeTypeDesc }}
                         </option>
@@ -1408,7 +1405,7 @@
                 ">Application Date</label>
               <input [disabled]="disableApplicationDate" [(ngModel)]="ActivityAuth[0].ScopeApplicationDate" [ngClass]="{
                   'error-border': errorMessages['ScopeAppliedDateAuth']
-                }" name="q13AppDate" id="AppDate" type="text" #dateInputs />
+                }" name="q13AppDate" id="AppDate" type="text" #dateInputs placeholder/>
             </div>
             <div class="input-field">
               <label for="incorporationDate"> Incorporation Date </label>
@@ -1427,7 +1424,7 @@
               ">
               <label for="effectiveDate"> Effective Date </label>
               <input [(ngModel)]="ActivityAuth[0].ScopeEffectiveDate" [disabled]="!isEditModeAuth" name="effectiveDate"
-                id="effectiveDate" type="text" #dateInputs />
+                id="effectiveDate" type="text" #dateInputs placeholder />
             </div>
             <div class="input-field">
               <label for=""> Created By </label>
@@ -1763,9 +1760,7 @@
             <div class="input-field">
               <label for="islamicFinanceType"> Type </label>
               <select [disabled]="!isIslamicFinanceChecked || !isEditModeAuth" name="islamicFinanceType"
-                id="islamicFinanceType" [ngClass]="{
-                  'select-background-edited': isEditModeAuth
-                }" [(ngModel)]="islamicFinance.IFinTypeId">
+                id="islamicFinanceType" [(ngModel)]="islamicFinance.IFinTypeId">
                 <option value="0">Select</option>
                 <option value="1">Islamic Institution</option>
                 <option value="2">Islamic Window</option>
@@ -1803,9 +1798,8 @@
               <label for="prudentialCategory"> Prudential Category </label>
               <select [disabled]="!isEditModeAuth" name="prudentialCategory" id="prudentialCategory"
                 [(ngModel)]="ActivityAuth[0].PrudentialCategoryTypeID"
-                (ngModelChange)="onPrudentialCategoryChange($event)" [ngClass]="{
-                  'select-background-edited': isEditModeAuth
-                }">
+                (ngModelChange)="onPrudentialCategoryChange($event)" 
+                [ngClass]="{'error-border': errorMessages['SectorReturnType']}">
                 <option value="0">Select</option>
                 <option *ngFor="let option of allPrudentialCategoryTypes" [value]="option.PrudentialCategoryTypeID">
                   {{ option?.PrudentialCategoryTypeDesc }}
@@ -1817,9 +1811,7 @@
                 Authorisation Category
               </label>
               <select [disabled]="!isEditModeAuth" name="prudentialCategory" id="prudentialCategory"
-                [(ngModel)]="ActivityAuth[0].AuthorisationCategoryTypeID" [ngClass]="{
-                  'select-background-edited': isEditModeAuth
-                }">
+                [(ngModel)]="ActivityAuth[0].AuthorisationCategoryTypeID">
                 <option *ngFor="let option of allAuthorisationCategoryTypes"
                   [value]="option?.AuthorisationCategoryTypeID">
                   {{ option?.AuthorisationCategoryTypeDesc }}
@@ -1833,7 +1825,7 @@
               <input [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].PrudentialCategoryEffectiveDate"
                 [ngClass]="{
                   'error-border': errorMessages['PrudentialEffectiveDate']
-                }" name="effectiveDate" id="effectiveDate" type="text" #dateInputs />
+                }" name="effectiveDate" id="effectiveDate" type="text" #dateInputs placeholder />
             </div>
             <div class="input-field">
               <label for="lastModifiedBy"> Last Modified By </label>
@@ -1889,9 +1881,7 @@
                 <span *ngIf="isEditModeAuth" style="color: red">*</span></label>
               <select (ngModelChange)="onSectorTypeChange($event)" [disabled]="!isEditModeAuth"
                 [(ngModel)]="ActivityAuth[0].SectorTypeID" name="prudentialReturnType" id="prudentialReturnType"
-                [ngClass]="{
-                  'select-background-edited': isEditModeAuth
-                }">
+                [ngClass]="{'error-border': errorMessages['SectorReturnType']}">
                 <option value="0">Select</option>
                 <option *ngFor="let PrudReturnTypes of prudReturnTypesDropdown" [value]="PrudReturnTypes.SectorTypeID">
                   {{ PrudReturnTypes?.SectorTypeDesc }}
@@ -1904,7 +1894,7 @@
                 <span *ngIf="isEditModeAuth" style="color: red">*</span></label>
               <input [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].SectorEffectiveDate" [ngClass]="{
                   'error-border': errorMessages['SectorEffectiveDate']
-                }" name="effectiveDate" id="effectiveDate" type="text" #dateInputs />
+                }" name="effectiveDate" id="effectiveDate" type="text" #dateInputs placeholder/>
             </div>
             <div class="input-field">
               <label for="lastModifiedBy"> Last Modified By </label>
@@ -2160,7 +2150,7 @@
               <label for="dateOfBirth">
                 Date of birth <span style="color: red">*</span>
               </label>
-              <input [(ngModel)]="selectedController.DateOfBirth" #dateInputs name="dateOfBirth" id="dateOfBirth"
+              <input [(ngModel)]="selectedController.DateOfBirth" #dateInputs placeholder name="dateOfBirth" id="dateOfBirth"
                 type="input" [readonly]="!isEditable" />
             </div>
             <!---->
@@ -2256,7 +2246,7 @@
             <div class="input-field">
               <label>Effective Date</label>
               <ng-container *ngIf="isEditable; else effectiveDateInput">
-                <input type="text" #dateInputs [(ngModel)]="selectedController.AssnDateFrom" name="effectiveDate" />
+                <input type="text" #dateInputs placeholder [(ngModel)]="selectedController.AssnDateFrom" name="effectiveDate" />
               </ng-container>
               <ng-template #effectiveDateInput>
                 <input [(ngModel)]="selectedController.AssnDateFrom" name="effectiveDate" [readonly]="!isEditable" />
@@ -2265,7 +2255,7 @@
             <div class="input-field">
               <label>Cessation Date</label>
               <ng-container *ngIf="isEditable; else cessationDateInput">
-                <input type="text" #dateInputs [(ngModel)]="selectedController.AssnDateTo" name="cessationDate" />
+                <input type="text" #dateInputs placeholder [(ngModel)]="selectedController.AssnDateTo" name="cessationDate" />
               </ng-container>
               <ng-template #cessationDateInput>
                 <input [(ngModel)]="selectedController.AssnDateTo" name="cessationDate" [readonly]="!isEditable" />
@@ -2646,7 +2636,7 @@
               <label for="dateOfBirth">
                 Date of birth <span style="color: red">*</span>
               </label>
-              <input [(ngModel)]="CreatecontrollerDetails.DateOfBirth" #dateInputs name="dateOfBirth" id="dateOfBirth"
+              <input [(ngModel)]="CreatecontrollerDetails.DateOfBirth" #dateInputs placeholder name="dateOfBirth" id="dateOfBirth"
                 type="input" />
             </div>
             <!---->
@@ -2763,13 +2753,13 @@
             <div class="input-field">
               <label for="effectiveDate"> Effective Date </label>
               <input [(ngModel)]="CreatecontrollerDetails.AssnDateFrom" name="effectiveDate" id="effectiveDate"
-                #dateInputs type="text" />
+                #dateInputs placeholder type="text" />
             </div>
             <!---->
             <div class="input-field">
               <label for="cessationDate"> Cessation Date </label>
               <input [(ngModel)]="CreatecontrollerDetails.AssnDateTo" name="cessationDate" id="cessationDate"
-                #dateInputs type="text" />
+                #dateInputs placeholder type="text" />
             </div>
             <!---->
             <div class="input-field" *ngIf="
@@ -2882,7 +2872,7 @@
                 <select [(ngModel)]="address.AddressTypeID" (change)="onAddressTypeChange($event, address)" [ngClass]="{
                     'error-border':
                       !address.AddressTypeID && errorMessages['AddressTypeID'],
-                    'select-background-edited': isEditModeCore
+                    
                   }" [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0">
                   <!-- Disable if Same As Type is selected -->
                   <option value="0">Select</option>
@@ -2898,7 +2888,7 @@
                 <select [(ngModel)]="address.sameAsTypeID" (change)="onSameAsTypeChangeg($event, address)" [ngClass]="{
                     'error-border':
                       !address.sameAsTypeID && errorMessages['sameAsTypeID'],
-                    'select-background-edited': isEditModeCore
+                    
                   }" id="sameAsType" name="sameAsType">
                   <option value="0">Select</option>
                   <!-- Dynamically populate the options from previous forms' AddressTypeID -->
@@ -3149,12 +3139,12 @@
             </div>
             <div class="input-field">
               <label for="effectiveFromDate">Effective From Date</label>
-              <input [disabled]="!IsEditAuditorVisible" #dateInputs name="effectiveFromDate" id="effectiveFromDate"
+              <input [disabled]="!IsEditAuditorVisible" #dateInputs placeholder name="effectiveFromDate" id="effectiveFromDate"
                 type="text" [(ngModel)]="selectedAuditor.AssnDateFrom" />
             </div>
             <div class="input-field">
               <label for="effectiveToDate">Effective To Date</label>
-              <input [disabled]="!IsEditAuditorVisible" #dateInputs name="effectiveToDate" id="effectiveToDate"
+              <input [disabled]="!IsEditAuditorVisible" #dateInputs placeholder name="effectiveToDate" id="effectiveToDate"
                 type="text" [(ngModel)]="selectedAuditor.AssnDateTo" />
             </div>
           </div>
@@ -3243,12 +3233,12 @@
                 Effective From Date <span style="color: red">*</span>
               </label>
               <input name="effectiveFromDate" [(ngModel)]="selectedAuditor.AssnDateFrom" id="effectiveFromDate"
-                type="text" #dateInputs />
+                type="text" #dateInputs placeholder/>
             </div>
             <div class="input-field">
               <label for="effectiveToDate"> Effective To Date </label>
               <input name="effectiveToDate" [(ngModel)]="selectedAuditor.AssnDateTo" id="effectiveToDate" type="text"
-                #dateInputs />
+                #dateInputs placeholder/>
             </div>
           </div>
           <div class="btn justify-content-end">

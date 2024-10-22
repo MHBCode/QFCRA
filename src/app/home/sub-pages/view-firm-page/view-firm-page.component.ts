@@ -150,6 +150,7 @@ export class ViewFirmPageComponent implements OnInit {
   tabIndex: number = 0; // 0 for Licensed, 1 for Authorized
   isEditModeLicense: boolean = false;
   isEditModeAuth: boolean = false;
+  isCreateModeLicense: boolean = false;
   showPermittedActivitiesTable: string | boolean = false;
   isIslamicFinanceChecked: boolean = true;
   isIslamicFinanceDeleted: boolean = false;
@@ -352,7 +353,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   initializeFlatpickr() {
     this.dateInputs.forEach((input: ElementRef<HTMLInputElement>) => {
-      input.nativeElement.placeholder = 'Select a date';
+      input.nativeElement.placeholder = 'DD/MM/YYY';
       flatpickr(input.nativeElement, {
         allowInput: true,
         dateFormat: 'd/M/Y', // Adjust date format as needed
@@ -577,12 +578,12 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   // This one is used for Core Details and Scope Licensed/Authorized
-  applySecurityOnPage(objectId: FrimsObject, isEditMode: boolean) {
+  applySecurityOnPage(objectId: FrimsObject, Mode: boolean) {
     if (this.activeTab === this.Page.Scope) {
       this.maskCommandActionsControlsScope();
     }
     this.loading = true;
-    const currentOpType = isEditMode ? ObjectOpType.Edit : ObjectOpType.View;
+    const currentOpType = Mode ? ObjectOpType.Edit : ObjectOpType.View;
 
     // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
     this.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
