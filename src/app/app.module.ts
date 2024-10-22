@@ -11,7 +11,7 @@ import { CreateContactComponent } from './home/sub-pages/create-contact/create-c
   declarations: [
     AppComponent,
     LoaderComponent,
-    CreateContactComponent,
+    CreateContactComponent
   ],
   imports: [
     BrowserModule,

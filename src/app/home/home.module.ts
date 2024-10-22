@@ -40,6 +40,7 @@ import { ShadowSupervisorComponent } from './sub-components/shadow-supervisor/sh
 import { TasksIAssignedComponent } from './sub-components/tasks-i-assigned/tasks-i-assigned.component';
 import { MyTeamTasksComponent } from './sub-components/my-team-tasks/my-team-tasks.component';
 import { CreateReminderComponent } from './sub-components/create-reminder/create-reminder.component';
+import { TaskTabsComponent } from './sub-components/task-tabs/task-tabs.component';
 
 
 @NgModule({
@@ -50,6 +51,7 @@ import { CreateReminderComponent } from './sub-components/create-reminder/create
     ReportsSubmissionsComponent,
     FirmsBySelectorComponent,
     TaskListComponent,
+    TaskTabsComponent,
     FirmListComponent,
     FirmsPageComponent,
     ViewFirmPageComponent,
