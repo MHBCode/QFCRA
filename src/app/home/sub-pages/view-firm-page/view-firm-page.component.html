@@ -1063,13 +1063,11 @@
             <div style="width: 100%" class="input-field">
               <label for="formReff"> Form Reference </label>
               <a *ngIf="isEditModeLicense || !(ActivityLicensed[0].ScopeRevNum)" (click)="getFormReferenceDocuments()" class="form-ref-btn">Select/De-select document</a>
-              <!-- <input [disabled]="isEditModeLicense" [ngModel]="documentDetails.FileName"
-                                name="formReff" id="formReff" type="text" value="" /> -->
-              <!-- <a *ngIf="!isEditModeLicense" id="websiteLink"
+              <a id="websiteLink"
                 href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{documentDetails.Column3}}" target="_blank"
                 rel="noopener noreferrer">
-                {{documentDetails?.FileName}}
-              </a> -->
+                {{documentDetails?.formattedFileName || documentDetails?.FileName}}
+              </a>
             </div>
             <div style="width: 100%" class="input-field">
               <label for="linkScope"> Link To Scope </label>
@@ -1378,6 +1376,11 @@
             <div class="input-field">
               <label for="formReff"> Form Reference </label>
               <a *ngIf="isEditModeAuth || !(ActivityAuth[0].ScopeRevNum)" (click)="getFormReferenceDocuments()" class="form-ref-btn">Select/De-select document</a>
+              <a id="websiteLink"
+                href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{documentDetails.Column3}}" target="_blank"
+                rel="noopener noreferrer">
+                {{documentDetails?.formattedFileName || documentDetails?.FileName}}
+              </a>
             </div>
             <div style="width: 100%" class="input-field">
               <label for=""> Link To Scope </label>
@@ -4296,16 +4299,17 @@
     <div class="popup-body">
       <ul>
         <li *ngFor="let doc of formReferenceDocs">
-          <input type="radio" name="documentSelection" [value]="doc" [(ngModel)]="selectedDocument">
-          {{doc.DocTypeDesc}} : <a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{doc.FileLoc}}" target="_blank">{{doc.FILENAME}}</a>
+          <input type="radio" name="documentSelection" [value]="doc.DocID" [(ngModel)]="selectedDocId">
+          {{doc.DocTypeDesc}} : 
+          <a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{doc.FileLoc}}" target="_blank">{{doc.FILENAME}}</a>
         </li>
       </ul>
       <p *ngIf="formReferenceDocs.length === 0">There are no documents to select from. Please upload the relevant document and return for selection.</p>
     </div>
   </div>
   <div class="popup-buttons-container">
-    <button class="subbutton">De-Select</button>
-    <button class="subbutton">Ok</button>
+    <button class="subbutton" (click)="deSelectDocument()">De-Select</button>
+    <button class="subbutton" (click)="replaceDocument()">Ok</button>
     <button class="subbutton" (click)="closeFormReference()">Cancel</button>
   </div>
 </div>

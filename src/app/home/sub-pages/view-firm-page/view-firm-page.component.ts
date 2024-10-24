@@ -170,7 +170,7 @@ export class ViewFirmPageComponent implements OnInit {
   sectorDetails: any = [];
   prudentialCategoryDetails: any = [];
   formReferenceDocs: any = [];
-  selectedDocument: any;
+  selectedDocId: string | null = null;
   currentLicRevisionNumber: number | null = null;
   lastLicRevisionNumber: number | null = null;
   currentAuthRevisionNumber: number | null = null;
@@ -755,7 +755,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.isLoading = true;
     // Start validations
     this.hasValidationErrors = false;
-    this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
+    // this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
     // Synchronous firm-level validation checks
     this.validateFirmDetails(); // Perform existing validation logic synchronously
 
@@ -1402,7 +1402,7 @@ export class ViewFirmPageComponent implements OnInit {
         createdBy: userId, //recheck
         docReferenceID: this.ActivityLicensed[0].docReferenceID ?? null,
         firmApplTypeID: 2, // licensed
-        docIDs: this.ActivityLicensed[0].DocID,
+        docIDs: this.selectedDocId.toString(),
         generalConditions: this.ActivityLicensed[0].GeneralConditions,
         effectiveDate: this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityLicensed[0].ScopeCertificateLink,
@@ -1713,7 +1713,7 @@ export class ViewFirmPageComponent implements OnInit {
         createdBy: userId, //recheck
         docReferenceID: this.ActivityAuth[0].docReferenceID ?? null,
         firmApplTypeID: 3, // Authorised
-        docIDs: this.ActivityAuth[0].DocID,
+        docIDs: this.selectedDocId.toString(),
         generalConditions: this.ActivityAuth[0].GeneralCondition,
         effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityAuth[0]?.ScopeCertificateLink,
@@ -3666,7 +3666,6 @@ export class ViewFirmPageComponent implements OnInit {
     this.isLoading = true;
 
     return new Promise((resolve, reject) => {
-      this.loadFormReference();
       this.loadActivitiesTypesForLicensed();
 
       this.activityService.getCurrentScopeRevNum(this.firmId, 2).subscribe(
@@ -3676,12 +3675,14 @@ export class ViewFirmPageComponent implements OnInit {
           this.activityService.getFirmActivityLicensed(this.firmId).subscribe(
             data => {
               this.ActivityLicensed = data.response;
+              this.loadFormReference();
               console.log('Firm License scope details:', this.ActivityLicensed);
               this.isLoading = false;
               resolve(); // Resolve the promise when everything is successfully loaded
             },
             error => {
               console.error('Error fetching License scope', error);
+              this.loadFormReference(),
               this.isLoading = false;
               reject(error); // Reject the promise in case of an error
             }
@@ -3698,13 +3699,43 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   loadFormReference() {
-    this.logForm.getDocumentDetails(this.firmId).subscribe(
+    this.isLoading = true;
+    const firstActivityAuth = this.ActivityAuth[0];
+    const firstActivityLic = this.ActivityLicensed[0];
+    let docID = 0;
+    
+    if (this.tabIndex === 0) {
+      docID = firstActivityLic.DocID;
+    } else if (this.tabIndex === 1) {
+      docID = firstActivityAuth.DocID;
+    }
+
+    this.logForm.getDocumentDetails(docID).subscribe(
       data => {
         this.documentDetails = data.response;
+
+        // Extract and format the file name
+        const fullFileName = this.documentDetails.FileName;
+        const fileParts = fullFileName.split('_');  // Split by underscore (_)
+
+        if (fileParts.length > 1) {
+          // Assume the first part is the Form code and the rest is the full file name
+          const formName = 'Form ' + fileParts[0].replace('Q01', 'Q01 - Application for Licensing');
+          const restOfFileName = fileParts.join('_');  // Join back the parts
+          this.documentDetails.formattedFileName = `${formName}: ${restOfFileName}`;
+        } else {
+          this.documentDetails.formattedFileName = fullFileName; // Fallback for unexpected format
+        }
+
+        this.isLoading = false;
       }, error => {
-        console.error(error)
-      })
-  }
+        console.error(error);
+        this.documentDetails = {};
+        this.isLoading = false;
+      }
+    );
+}
+
 
   // On View Mode
   loadActivitiesAuthorized(): Promise<void> {
@@ -3758,7 +3789,8 @@ export class ViewFirmPageComponent implements OnInit {
             this.loadPrudentialCategoryDetails(),
             this.loadSectorDetails(),
             this.loadIslamicFinance(),
-            this.loadScopeOfAuth()
+            this.loadScopeOfAuth(),
+            this.loadFormReference(),
           ]).subscribe(
             () => {
               this.isLoading = false;
@@ -3773,6 +3805,7 @@ export class ViewFirmPageComponent implements OnInit {
         },
         error => {
           console.error('Error fetching activities authorised data', error);
+          this.loadFormReference(),
           this.isLoading = false;
           reject(error);
         }
@@ -4980,6 +5013,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getFormReferenceDocuments() {
+    this.isLoading = true;
     let DocType: number[] = [];
     if (this.tabIndex === 0) { //Licensed tab
       if (this.ActivityLicensed[0].ScopeRevNum > 1) {
@@ -4999,9 +5033,18 @@ export class ViewFirmPageComponent implements OnInit {
     const docTypeString = DocType.join(',');
     this.logForm.getDocListByFirmDocType(this.firmId,docTypeString).subscribe(data => {
       this.formReferenceDocs = data.response;
+
+      const existingDoc = this.formReferenceDocs.find(doc => doc.FILENAME === this.documentDetails?.FileName);
+      if (existingDoc) {
+        this.selectedDocId = existingDoc.DocID;
+      }
+
       console.log('Form Reference Docs: ',this.formReferenceDocs);
+      this.isLoading = false;
     }, error => {
-      console.error('Error Fetching Form Reference Docs: ',error)
+      this.formReferenceDocs = []; //reintalize the array if it doesn't exist
+      console.error('Error Fetching Form Reference Docs: ',error);
+      this.isLoading = false;
     })
     this.callRefForm = true;
     setTimeout(() => {
@@ -5025,6 +5068,40 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  replaceDocument(): void {
+    if (this.selectedDocId) {
+      const selectedDoc = this.formReferenceDocs.find(doc => doc.DocID === this.selectedDocId);
+      if (selectedDoc) {
+        this.documentDetails = {
+          FileName: selectedDoc.FILENAME,
+          Column3: selectedDoc.FileLoc
+        };
+
+        console.log('Document replaced with:', selectedDoc);
+        this.closeFormReference();
+      } else {
+        console.error('Selected document not found.');
+      }
+    } else {
+      this.closeFormReference();
+      console.warn('No document selected.');
+    }
+  }
+
+  deSelectDocument(): void {
+    if (this.selectedDocId) {
+      this.selectedDocId = null; 
+
+      this.documentDetails = {
+        FileName: '',
+        Column3: ''
+      };
+      this.closeFormReference();
+      console.log('Document de-selected and removed.');
+    } else {
+      console.warn('No document is currently selected.');
+    }
+  }
 
   groupActivitiesByCategory(activityList: any[]) {
     activityList.forEach(activity => {
