@@ -40,8 +40,8 @@ export class TaskServiceService {
     const url = `${this.baseUrl}insert_personal_reminder`;
     return this.http.post<any>(url, reminder);
   }
-  getMyTeamsTasks(userId: number, teamUsersID: string): Observable<any> {
-    const url = `${this.baseUrl}get_my_teams_task?userId=${userId}&teamUsersID=${teamUsersID}`;
+  getMyTeamsTasks(userId: number, teamUsersID: string, fromDate: string, toDate: string): Observable<any> {
+    const url = `${this.baseUrl}get_my_teams_task?userId=${userId}&teamUsersID=${teamUsersID}&fromDate=${fromDate}&toDate=${toDate}`;
     return this.http.get(url);
   }
   private showExportButtonSubject = new BehaviorSubject<boolean>(false);
