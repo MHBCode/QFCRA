@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
 export class FirmService {
 
   private baseUrlFirms = environment.API_URL + '/api/Firms/';  // Base URL
-
+ 
   constructor(private http: HttpClient) { }
 
   getFIRMOPData(firmId: number): Observable<any> {
@@ -155,4 +155,6 @@ export class FirmService {
     console.log("foim-service getFirmsList", params)
     return this.http.get<any>(`${this.baseUrlFirms}get_firms_list`, { params });
   }
+
+
 }

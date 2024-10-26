@@ -20,6 +20,7 @@ import { AddressesService } from 'src/app/ngServices/addresses.service';
 import { WaiverService } from 'src/app/ngServices/waiver.service';
 import { RiskService } from 'src/app/ngServices/risk.service';
 import { NoticeService } from 'src/app/ngServices/notice.service';
+import { AiElectronicswfService } from 'src/app/ngServices/ai-electronicswf.service';
 
 
 @Component({
@@ -71,6 +72,7 @@ export class ViewFirmPageComponent implements OnInit {
   @ViewChild('journalSection') journalSection: ElementRef;
 
   showCreateControllerSection: boolean = false;
+  showCreateContactSection: boolean = false;
   /* */
   callFYear: boolean = false;
   callInactiveUsers: boolean = false;
@@ -99,6 +101,7 @@ export class ViewFirmPageComponent implements OnInit {
   AuthorisationStatusTypeLabelDescFormatted: any;
   LicenseStatusTypeLabelDescFormatted: any;
   existingAddresses: any = [];
+  existingControllerAddresses: any = []; 
   firmApp: any = {};
   firmOPDetails: any;
   prudReturnTypesDropdown: any = [];
@@ -106,6 +109,7 @@ export class ViewFirmPageComponent implements OnInit {
   firmNamesHistory: any = [];
   firmAccountingStandardHistory: any = [];
   firmAddresses: any = [];
+  ControllerfirmAddresses :any = [];
   appDetails: any = [];
   applicationTypeId: number;
   selectedFirmTypeID: number;
@@ -141,6 +145,7 @@ export class ViewFirmPageComponent implements OnInit {
   FIRMNotices: any;
   usedAddressTypes: Set<string> = new Set();
   newAddress: any = {};
+  newControllerAddress: any = {};
   newActivity: any = {};
   newPermittedActivity: any = {};
   isEditModeCore: boolean = false;
@@ -241,7 +246,7 @@ export class ViewFirmPageComponent implements OnInit {
   invalidAddress: boolean;
   invalidActivity: boolean;
   isUserAllowed: boolean | null = null;
-
+  AllContactFrom: any = [];
   selectedType: string = '';
   showHoldingsPercentage: boolean = false;
   selectedControlType: string = 'select';
@@ -267,6 +272,8 @@ export class ViewFirmPageComponent implements OnInit {
 
   /* loader flag */
   isLoading: boolean = false;
+  //  individuals section
+  AllapprovedIndividuals: any = []; 
 
   showAddressesForm = false;
   AllRegulater: any = [];
@@ -287,6 +294,7 @@ export class ViewFirmPageComponent implements OnInit {
     private waiverService: WaiverService,
     private riskService: RiskService,
     private noticeService: NoticeService,
+    private aiElectronicswfService: AiElectronicswfService,
     private el: ElementRef,
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
@@ -338,6 +346,9 @@ export class ViewFirmPageComponent implements OnInit {
       this.getFirmAuditorType();
       this.getControllerType();
       this.getAllRegulater(this.Address.countryID, this.firmId);
+      this.getAllContactFromByFrimsId();
+
+      this.getApprovedIndividuals(this.firmId, 'Approved');
     });
   }
 
@@ -2434,6 +2445,13 @@ export class ViewFirmPageComponent implements OnInit {
     this.controllerDetails = { ...controller }; // Populate the controller details
     this.isPopupOpen = true; // Open the popup
     console.log('SSSSSSSSSSSSSSSSSSSSSSSdfgdfgdfhfgjfhjdhdj', this.selectedController.OtherEntityID, this.selectedController.EntityTypeID);
+    this.loadControllerFirmAdresses(
+      this.selectedController.OtherEntityID,
+      this.selectedController.EntityTypeID,
+      this.userId,
+      44 // Static opTypeId
+    );
+    this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
     this.parentEntity.getRegulatorDetails(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID).subscribe(
       data => {
         if (data.response && data.response.length > 0) {
@@ -2441,6 +2459,7 @@ export class ViewFirmPageComponent implements OnInit {
         }
       },
     );
+   
     console.log("controllerDetails", this.controllerDetails)
     console.log("selectedController", this.selectedController)
 
@@ -2546,7 +2565,6 @@ export class ViewFirmPageComponent implements OnInit {
 
   closeControllerPopup(): void {
     this.isPopupOpen = false;
-    this.isEditable = false; // Close the popup
     this.errorMessages = {}; // Clear previous error messages
     this.hasValidationErrors = false;
   }
@@ -2680,10 +2698,167 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
+  // addControllerAddressForm() {
+
+  //   // Define the total number of address types
+  //   const totalAddressTypes = this.allAddressTypes.length;
+
+  //   // Get the count of valid addresses
+  //   const validAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+  //   // Check if the number of valid addresses is equal to the number of address types
+  //   if (validAddressCount >= totalAddressTypes) {
+  //     // Disable the button if all address types are added
+  //     this.canAddNewAddress = false;
+  //     return;
+  //   }
+
+  //   this.newControllerAddress = {
+  //     AddressID: null,
+  //     AddressTypeID: 0,
+  //     AddressTypeDesc: '',
+  //     AddressLine1: '',
+  //     AddressLine2: '',
+  //     AddressLine3: '',
+  //     AddressLine4: '',
+  //     City: '',
+  //     Province: '',
+  //     CountryID: 0,
+  //     CountryName: '',
+  //     PostalCode: '',
+  //     PhoneNumber: '',
+  //     FaxNumber: '',
+  //     LastModifiedBy: 0, //todo _userId;
+  //     LastModifiedDate: this.currentDate,
+  //     addressState: 2,
+  //     FromDate: null,
+  //     ToDate: null,
+  //     Valid: true,
+  //   };
+  //   this.ControllerfirmAddresses.unshift(this.newControllerAddress);
+  //   const updatedValidAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+  //   this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+  // }
+  get filteredControllerfirmAddresses() {
+    return this.ControllerfirmAddresses.filter(addr => !addr.isRemoved);
+    
+  }
+  addControllerAddressForm() {
+    const totalAddressTypes = this.allAddressTypes.length;
+    const validAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+  
+    if (validAddressCount >= totalAddressTypes) {
+      this.canAddNewAddress = false;
+      return;
+    }
+  
+    const newAddress = {
+      AddressID: null,
+      AddressTypeID: 0,
+      AddressTypeDesc: '',
+      AddressLine1: '',
+      AddressLine2: '',
+      AddressLine3: '',
+      AddressLine4: '',
+      City: '',
+      Province: '',
+      CountryID: 0,
+      CountryName: '',
+      PostalCode: '',
+      PhoneNumber: '',
+      FaxNumber: '',
+      LastModifiedBy: 0,
+      LastModifiedDate: this.currentDate,
+      addressState: 2,
+      FromDate: null,
+      ToDate: null,
+      Valid: true,
+    };
+  
+    // Instead of reassigning the array, push the new address to the beginning of the array
+    this.ControllerfirmAddresses.push(newAddress);
+
+    const updatedValidAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+    this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+}
+
+  // addEditAddressForm(): void {
+  //   const newAddress = {
+  //     firmID: this.firmId,
+  //     countryID: 0,
+  //     AddressTypeID: 0,
+  //     LastModifiedBy: this.userId,
+  //     entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+  //     entityID: this.firmId,
+  //     contactID: 0,
+  //     AddressID:null,
+  //     addressState:2,
+  //     AddressLine1: '',
+  //     AddressLine2: '',
+  //     AddressLine3: '',
+  //     AddressLine4: '',
+  //     City:'',
+  //     createdBy: this.userId,
+  //     AddressAssnID: null,
+  //     CreatedDate: '',
+  //     LastModifiedDate: '',
+  //     fromDate: '',
+  //     toDate: '',
+  //     Output: 0,
+  //     ObjectID: null,
+  //     Province: '',
+  //     ObjectInstanceID: null,
+  //     ObjectInstanceRevNumber: 1,
+  //     SourceObjectID: null,
+  //     SourceObjectInstanceID: null,
+  //     SourceObjectInstanceRevNumber: 1,
+  //     PostalCode: '',
+  //     // Add any additional default fields as required
+  //   };
+  //   // Add the new address to the list
+  //   this.ControllerfirmAddresses.push(newAddress);
+  // }
+  // removeEditAddressForm(index: number): void {
+  //   if (this.ControllerfirmAddresses.length > 1) {
+  //     // Remove the address at the given index
+  //     this.ControllerfirmAddresses.splice(index, 1);
+  //   } else {
+  //     console.warn('At least one address must be present.');
+  //   }
+  // }
+  removeControllerAddress(index: number) {
+    Swal.fire({
+      text: 'Are you sure you want to delete this record?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.errorMessages = {};
+        if (index > -1 && index < this.ControllerfirmAddresses.length) {
+          const address = this.ControllerfirmAddresses[index];
+          if (!address.AddressID) { // means newly added address
+            // If the address doesn't have an AddressID, completely remove it from the array
+            this.ControllerfirmAddresses.splice(index, 1);
+          } else {
+            // Otherwise, just mark it as removed
+            address.isRemoved = true;
+          }
+          // Re-check if all address types have been added after removal
+          const validAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+          this.canAddNewAddress = validAddressCount < this.allAddressTypes.length;
+        }
+      }
+      // No action needed if the user cancels
+    });
+  }
+
   saveControllerPopupChanges(): void {
     this.isEditable = false;
+    this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
     this.EditControllerValidateForm().then(() => {
-      if (!this.hasValidationErrors) {
         console.log("Selected Controller:", this.selectedController);
         if (
           ["Parent Entity", "Corporate Controller", "Head Office of a Branch", "UBO – Corporate"].includes(this.selectedController.EntityTypeDesc)
@@ -2712,7 +2887,6 @@ export class ViewFirmPageComponent implements OnInit {
               zebSiteAddress: this.selectedController.zebSiteAddress,
               lastModifiedBy: 30,
               ControllerControlTypeDesc: null,
-              //LastModifiedDate : "2024-10-01T13:55:58.178Z",
               isAuditor: this.selectedController.isAuditor,
               isCompanyRegulated: this.selectedController.IsCompanyRegulated,
               additionalDetails: this.selectedController.additionalDetails,
@@ -2732,33 +2906,36 @@ export class ViewFirmPageComponent implements OnInit {
               AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
             },
-            addressList: this.addressForms.map(address => ({
+            addressList: this.existingControllerAddresses.map(address => ({
               firmID: this.firmId,
               countryID: address.CountryID,
-              addressTypeID: address.AddressTypeID,
+              AddressTypeID: address.AddressTypeID,
               LastModifiedBy: this.userId,
               entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               entityID: this.firmId,
               contactID: address.contactID,
-              addressID: address.addressID,
-              addressLine1: address.addressLine1,
-              addressLine2: address.addressLine2,
-              addressLine3: address.addressLine3,
-              addressLine4: address.addressLine4,
-              city: address.city,
-              stateProvince: address.stateProvince,
+              AddressID: address.AddressID.toString(),
+              addressState: 6,
+              AddressLine1: address.AddressLine1,
+              AddressLine2: address.AddressLine2,
+              AddressLine3: address.AddressLine3,
+              AddressLine4: address.AddressLine4,
+              City: address.City,
               createdBy: address.createdBy,
-              addressAssnID: address.addressAssnID,
+              AddressAssnID: address.AddressAssnID,
               CreatedDate: address.CreatedDate,
               LastModifiedDate: address.LastModifiedDate,
-              addressState: 6,
               fromDate: address.fromDate,
               toDate: address.toDate,
               Output: address.Output,
-              objectID: address.objectID,
-              objectInstanceID: address.objectInstanceID,
-              objAis: address.objAis, // Ensure this is correctly structured
-              zipPostalCode: address.zipPostalCode,
+              ObjectID: address.ObjectID,
+              Province: address.Province,
+              ObjectInstanceID: address.ObjectInstanceID,
+              ObjectInstanceRevNumber: address.ObjectInstanceRevNumber,
+              SourceObjectID: address.SourceObjectID,
+              SourceObjectInstanceID: address.SourceObjectInstanceID,
+              SourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber,
+              PostalCode: address.PostalCode,
             })),
 
             regulatorList: this.regulatorList.map(regulator => ({
@@ -2795,7 +2972,7 @@ export class ViewFirmPageComponent implements OnInit {
               ShowEnabled: regulator.ShowEnabled,
               ContactAssnID: regulator.ContactAssnID
             }))
-          }
+          };
 
           // Call the insert/update endpoint
           this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
@@ -2806,110 +2983,106 @@ export class ViewFirmPageComponent implements OnInit {
               console.error("Error saving changes:", error);
             }
           );
-        }
-      }
-      else if (
-        ["Individual Controller", "UBO - Individual"].includes(this.selectedController.EntityTypeDesc)
-      ) {
-        const saveControllerPopupChangesIndividualObj = {
-          contactDetails: {
+        } else if (
+          ["Individual Controller", "UBO - Individual"].includes(this.selectedController.EntityTypeDesc)
+        ) {
+          const saveControllerPopupChangesIndividualObj = {
             contactDetails: {
-              firmID: this.firmId,
-              contactID: null,
-              contactAssnID: 0,
-              title: this.selectedController.Title, // Map your inputs accordingly
-              firstName: this.selectedController.FirstName,
-              secondName: this.selectedController.SecondName,
-              thirdName: this.selectedController.ThirdName,
-              familyName: this.selectedController.FamilyName,
-              countryOfResidence: this.selectedController.CountryOfResidence,
-              createdBy: this.selectedController.CreatedBy,
-              dateOfBirth: this.selectedController.DateOfBirth,
-              fullName: this.selectedController.FullName,
-              lastModifiedBy: this.selectedController.LastModifiedByOfOtherEntities,
-              nationalID: this.selectedController.NationalID,
-              nationality: this.selectedController.Nationality,
-              passportNum: this.selectedController.PassportNum,
-              placeOfBirth: this.selectedController.PlaceOfBirth,
-              previousName: this.selectedController.PreviousName,
-              isExists: this.selectedController.IsExists,
-              nameInPassport: this.selectedController.NameInPassport,
-              contactAddnlInfoTypeID: this.selectedController.ContactAddnlInfoTypeID,
-              isFromContact: this.selectedController.IsFromContact,
-              countryofBirth: this.selectedController.CountryOfBirth,
-              juridictionID: this.selectedController.JuridictionID,
-              objectID: this.selectedController.ObjectID,
-              isPeP: this.selectedController.IsPeP
+              contactDetails: {
+                firmID: this.firmId,
+                contactID: null,
+                contactAssnID: null,
+                AdditionalDetails: 'test',
+                BusPhone: 'test',
+                BusEmail: 'test',
+                MobileNum: 'test',
+                NameAsInPassport: 'test',
+                OtherEmail: 'test',
+                QfcNumber: this.firmDetails.QFCNum,
+                Fax: 'test',
+                ResidencePhone: 'test',
+                JobTitle: 'test',
+                OtherEntityName: this.selectedController.OtherEntityName,
+                EntityTypeID: this.selectedController.EntityTypeID,
+                Title: this.selectedController.Title,
+                FirstName: this.selectedController.FirstName,
+                secondName: this.selectedController.SecondName,
+                thirdName: this.selectedController.ThirdName,
+                familyName: this.selectedController.FamilyName,
+                PctOfShares: this.selectedController.PctOfShares,
+                tempContactID: 0,
+                countryOfResidence: null,
+                ControllerControlTypeID: this.selectedController.ControllerControlTypeID,
+                createdBy: this.userId,
+                dateOfBirth: this.convertDateToYYYYMMDD(this.selectedController.DateOfBirth),
+                fullName: null,
+                lastModifiedBy: this.userId,
+                MyState: 0,
+                nationalID: null,
+                nationality: null,
+                EntityID: this.firmId,
+                passportNum: this.selectedController.PassportNum,
+                placeOfBirth: this.selectedController.PlaceOfBirth,
+                previousName: null,
+                isExists: false,
+                FunctionTypeId: 25,
+                nameInPassport: null,
+                contactAddnlInfoTypeID: null,
+                isFromContact: null,
+                countryofBirth: null,
+                juridictionID: null,
+                objectID: this.selectedController.ObjectID,
+                isPeP: this.selectedController.IsPEP,
+                AssnDateFrom: this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
+                AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
+                LastModifiedByOfOtherEntity: 30,
+                JurisdictionId: 3,
+              },
+              lstContactFunctions: null,
             },
-            lstContactFunctions: this.selectedController.LstContactFunctions.map(func => ({
-              contactFunctionID: func.ContactFunctionID,
-              contactFunctionTypeID: func.ContactFunctionTypeID,
-              contactAssnID: func.ContactAssnID,
-              contactID: func.ContactID,
-              contactFunctionTypeDesc: func.ContactFunctionTypeDesc,
-              effectiveDate: func.EffectiveDate,
-              endDate: func.EndDate,
-              createdDate: func.CreatedDate,
-              createdBy: func.CreatedBy,
-              lastModifiedBy: func.LastModifiedByOfOtherEntities,
-              LastModifiedDate: func.LastModifiedDate,
-              reviewStatus: func.ReviewStatus,
-              selected: func.Selected,
-              isFunctionActive: func.IsFunctionActive,
-              isRecordEditable: func.IsRecordEditable
+            Addresses: this.addressForms.map(address => ({
+              firmID: this.firmId,
+              countryID: 16,//address.CountryID,
+              addressTypeID: 2,//address.AddressTypeID,
+              LastModifiedBy: this.userId,
+              entityTypeID: this.selectedController.EntityTypeID,
+              entityID: this.firmId,
+              contactID: address.contactID,
+              addressID: null,
+              addressLine1: "",
+              addressLine2: "",
+              addressLine3: "",
+              addressLine4: "",
+              city: address.city,
+              stateProvince: address.stateProvince,
+              createdBy: 0,
+              addressAssnID: null,
+              CreatedDate: address.CreatedDate,
+              LastModifiedDate: address.LastModifiedDate,
+              addressState: 3,
+              fromDate: "2024-10-01T14:38:59.118Z",
+              toDate: "2024-10-01T14:38:59.118Z",
+              Output: address.Output,
+              objectID: 0,
+              objectInstanceID: 0,
+              zipPostalCode: "",
+              objAis: null
             }))
-          },
-          addresses: this.selectedController.Addresses.map(address => ({
-            firmID: address.FirmID,
-            countryID: address.CountryID,
-            addressTypeID: address.AddressTypeID,
-            sameAsTypeID: address.SameAsTypeID,
-            lastModifiedBy: address.LastModifiedByOfOtherEntities,
-            addressAssnID: address.AddressAssnID,
-            entityTypeID: address.EntityTypeID,
-            entityID: address.EntityID,
-            contactAssnID: address.ContactAssnID,
-            contactID: address.ContactID,
-            addressID: address.AddressID,
-            addressLine1: address.AddressLine1,
-            addressLine2: address.AddressLine2,
-            addressLine3: address.AddressLine3,
-            addressLine4: address.AddressLine4,
-            city: address.City,
-            province: address.Province,
-            postalCode: address.PostalCode,
-            phoneNumber: address.PhoneNumber,
-            phoneExt: address.PhoneExt,
-            faxNumber: address.FaxNumber,
-            LastModifiedDate: address.LastModifiedDate,
-            addressState: address.AddressState,
-            fromDate: "2024-10-01T14:38:59.118Z",
-            toDate: "2024-10-01T14:38:59.118Z",
-            objectID: address.ObjectID,
-            objectInstanceID: address.ObjectInstanceID,
-            objectInstanceRevNumber: address.ObjectInstanceRevNumber,
-            sourceObjectID: address.SourceObjectID,
-            sourceObjectInstanceID: address.SourceObjectInstanceID,
-            sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber,
-            objAis: address.ObjAis // Ensure this object is correctly structured
-          }))
-        };
+          };
 
-        // Call the save/update contact form endpoint
-        this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
-          response => {
-            console.log("Contact save successful:", response);
-          },
-          error => {
-            console.error("Error saving contact:", error);
-          }
-        );
-      }
-      else {
-        console.log('Validation errors found:', this.errorMessages);
-      }
+          // Call the save/update contact form endpoint
+          this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
+            response => {
+              console.log("Contact save successful:", response);
+            },
+            error => {
+              console.error("Error saving contact:", error);
+            }
+          );
+        }
     });
-  }
+}
+
   CreateControllerValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.errorMessages = {}; // Clear previous error messages
@@ -3291,6 +3464,29 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
+  loadControllerFirmAdresses(entityID: number, entityTypeID: number, userId: number, opTypeId: number): void {
+    this.isLoading = true;
+
+    // Logging for debugging
+    console.log("Sending Firm Addresses request with parameters:", { entityID, entityTypeID, userId, opTypeId });
+
+    // Fetch firm addresses from the service
+    this.addressService.getControllerFirmAddresses(entityID, entityTypeID, userId, opTypeId).subscribe(
+      data => {
+        if (data.response) {
+          this.ControllerfirmAddresses = data.response;
+          console.log('Firm Addresses:', this.ControllerfirmAddresses);
+        } else {
+          console.warn('No addresses found for this firm');
+        }
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Error Fetching Firm Addresses', error);
+        this.isLoading = false;
+      }
+    );
+}
   // Remove a regulator
   removeRegulator(index: number) {
     this.regulatorList.splice(index, 1);
@@ -3462,6 +3658,16 @@ export class ViewFirmPageComponent implements OnInit {
               firmID: this.firmId,
               contactID: null,
               contactAssnID: null,
+              AdditionalDetails: 'test',
+              BusPhone:'test',
+              BusEmail:'test',
+              MobileNum:'test',
+              NameAsInPassport:'test',
+              OtherEmail:'test',
+              QfcNumber: this.firmDetails.QFCNum,
+              Fax:'test',
+              ResidencePhone:'test',
+              JobTitle:'test',
               OtherEntityName: this.CreatecontrollerDetails.OtherEntityName,
               EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               Title: this.CreatecontrollerDetails.Title, // Map your inputs accordingly
@@ -3484,7 +3690,8 @@ export class ViewFirmPageComponent implements OnInit {
               passportNum: this.CreatecontrollerDetails.PassportNum,
               placeOfBirth: this.CreatecontrollerDetails.PlaceOfBirth,
               previousName: null,
-              isExists: null,
+              isExists: false,
+              FunctionTypeId: 25,
               nameInPassport: null,
               contactAddnlInfoTypeID: null,
               isFromContact: null,
@@ -3497,25 +3704,9 @@ export class ViewFirmPageComponent implements OnInit {
               LastModifiedByOfOtherEntity: 30,
               JurisdictionId: 3,
             },
-            lstContactFunctions: [{
-              contactFunctionID: null,
-              contactFunctionTypeID: null,
-              contactAssnID: null,
-              contactID: null,
-              contactFunctionTypeDesc: null,
-              effectiveDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
-              endDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
-              CreatedDate: null,
-              createdBy: this.userId,
-              lastModifiedBy: null,
-              LastModifiedDate: null,
-              JurisdictionId: 3,
-              isFunctionActive: false,
-              isRecordEditable: 1
-            }
-            ]
+            lstContactFunctions: null,
           },
-          addressList: this.addressForms.map(address => ({
+          Addresses: this.addressForms.map(address => ({
             firmID: this.firmId,
             countryID: address.CountryID,
             addressTypeID: address.AddressTypeID,
@@ -3970,7 +4161,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.isLoading = false;
       })
   }
-
+ 
   loadWaivers() {
     this.waiverService.getFirmwaiver(this.firmId).subscribe(
       data => {
@@ -4398,6 +4589,52 @@ export class ViewFirmPageComponent implements OnInit {
     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
   }
 
+//   addNewAddress(addressArray: any[]) {
+//     // Define the total number of address types
+//     const totalAddressTypes = this.allAddressTypes.length;
+
+//     // Get the count of valid addresses
+//     const validAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+//     // Check if the number of valid addresses is equal to the number of address types
+//     if (validAddressCount >= totalAddressTypes) {
+//         // Disable the button if all address types are added
+//         this.canAddNewAddress = false;
+//         return;
+//     }
+
+//     const newAddress = {
+//         AddressID: null,
+//         AddressTypeID: 0,
+//         AddressTypeDesc: '',
+//         AddressLine1: '',
+//         AddressLine2: '',
+//         AddressLine3: '',
+//         AddressLine4: '',
+//         City: '',
+//         Province: '',
+//         CountryID: 0,
+//         CountryName: '',
+//         PostalCode: '',
+//         PhoneNumber: '',
+//         FaxNumber: '',
+//         LastModifiedBy: 0, //todo _userId;
+//         LastModifiedDate: this.currentDate,
+//         addressState: 2,
+//         FromDate: null,
+//         ToDate: null,
+//         Valid: true,
+//     };
+
+//     // Add the new address to the beginning of the target array
+//     addressArray.unshift(newAddress);
+
+//     // Update the count of valid addresses
+//     const updatedValidAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+//     // Disable the button if the count of valid addresses matches the number of address types
+//     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+// }
   areAllAddressTypesAdded() {
     const existingTypes = new Set(this.firmAddresses.map(addr => Number(addr.AddressTypeID)));
     return this.allAddressTypes.every(type => existingTypes.has(type.AddressTypeID));
@@ -4435,7 +4672,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   get filteredFirmAddresses() {
-    return this.firmAddresses.filter(addr => !addr.isRemoved);
+    return this.existingAddresses.filter(addr => !addr.isRemoved);
   }
 
   onAddressTypeChange(event: any, address: any) {
@@ -5142,9 +5379,7 @@ export class ViewFirmPageComponent implements OnInit {
   //    this.router.navigate(['home/create-controller']);
   //  }
 
-  createContact() {
-    this.router.navigate(['home/create-contact'])
-  }
+
   ////////// Yazan Auditor
   firmAuditorName: { OtherEntityID: number, OtherEntityName: string }[] = [];
   firmAuditorType: { EntitySubTypeID: number, EntitySubTypeDesc: string }[] = [];
@@ -6059,4 +6294,52 @@ export class ViewFirmPageComponent implements OnInit {
   isNullOrEmpty(value: any): boolean {
     return value === null || value === '';
   }
+   
+  createContact() {
+    this.showCreateContactSection = true;
+  }
+  closeCreateContactPopup(){
+    this.showCreateContactSection = false;
+  }
+  getAllContactFromByFrimsId(){
+    this.contactService.getEntityTypesByFrimsId(this.firmId).subscribe(data => {
+      this.AllContactFrom = data.response;
+      console.log("ContactFrom",this.AllContactFrom)
+    }, error => {
+      console.error("Error fetching ContactFrom", error);
+    });
+  }
+
+ // Yazan Individuals 
+
+ getApprovedIndividuals(firmId: number, status: string): void {
+  this.aiElectronicswfService.getApprovedIndividuals(this.firmId, status).subscribe(
+    (data) => {
+      this.AllapprovedIndividuals = data.response;
+    },
+    (error) => {
+      console.error('Error fetching approved individuals:', error);
+    }
+  );
+  console.log("AllapprovedIndividuals",this.AllapprovedIndividuals)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
