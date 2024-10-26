@@ -1,0 +1,257 @@
+.inputs-field-set {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 15px;
+    min-height: 200px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.notes {
+    width: 100% !important;
+}
+
+.history-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.subbutton-open-history {
+    padding: 0.1rem;
+    color: white;
+    background: #a51e36;
+    border: none;
+    border-radius: 5px;
+    position: relative;
+    width: 40px;
+    transition: width 0.3s ease, height 0.3s ease;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding-left: 13px;
+
+    span {
+        visibility: hidden;
+        opacity: 0;
+        white-space: nowrap;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    &:hover {
+        width: 130px;
+
+        /* Expand the width on hover */
+        span {
+            visibility: visible;
+            opacity: 1;
+            padding-left: 6px;
+        }
+    }
+
+    .subbutton {
+        padding: 0.1rem 1rem;
+        color: white;
+        background: #a51e36;
+        border: none;
+        border-radius: 5px;
+    }
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+}
+
+.popupcontainer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 78vw;
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    padding: 1rem;
+    background: white;
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+    gap: 2rem;
+    display: none;
+    z-index: 100;
+    border-radius: 10px;
+
+
+    .popup-info-place {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .close-icon {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        font-size: 26px;
+        cursor: pointer;
+        color: #a51e36;
+    }
+
+    .popup-operations-place {
+        width: 100%;
+        text-align: end;
+    }
+
+    .subbutton {
+        padding: 10px;
+        color: white;
+        background: #a51e36;
+        border: none;
+        border-radius: 5px;
+    }
+
+    .app-detail-history-header {
+        background: #a51e36;
+        color: white;
+        cursor: default;
+        padding: 10px;
+        width: 100%;
+        font-size: 0.85em;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+}
+
+.ApplicationDetailsPopUp table {
+    border-top-left-radius: initial;
+    border-top-right-radius: initial;
+}
+
+.ApplicationDetailsPopUp .popup-info-place {
+    gap: 0;
+}
+
+.ApplicationDetailsPopUp .popup-header {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.ApplicationDetailsPopUp .popup-info-place table thead th:first-child {
+    border-top-left-radius: 0;
+}
+
+.ApplicationDetailsPopUp .popup-info-place table thead th:last-child {
+    border-top-right-radius: 0;
+}
+
+.app-details-table-header {
+    background: #a51e36;
+    color: white;
+    text-align: start !important;
+    padding: 8px;
+}
+
+
+.edit-firm-header {
+    font-size: 1.25em;
+    font-weight: 500;
+    line-height: 30px;
+    word-wrap: break-word;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.collapse-button {
+    background: #a51e36;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 1rem;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.5s ease;
+    margin-left: 10px;
+}
+
+.hidden-button {
+    display: none;
+}
+
+.btn button {
+    background: #a51e36;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    min-width: 6.5rem;
+    min-height: 40px;
+}
+
+.inputs-field-set.collapsed .inputs-row , .inputs-field-set.collapsed hr , .inputs-field-set.collapsed .regulated-activities-container , .input-field-set.collapsed .add-btn-container , .inputs-field-set.collapsed .file-container , .inputs-field-set.collapsed .file-table-container , .authorized-body.collapsed , .licensed-body.collapsed {
+    display: none;
+}
+
+.inputs-field-set.collapsed{
+    min-height: 50px;
+}
+
+.addAddressBtn{
+    background: #A51E36;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px;
+    border-radius: 7px;
+    margin-right: 10px;
+}
+
+.addressHistoryPopup .address-type-info{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+
+.del-address-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.RmvAddressBtn {
+    background: red;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px 10px;
+    border-radius: 7px;
+}
+hr {
+    background-color: #A51E36;
+    width: 100%;
+    margin: 10px 0px;
+}

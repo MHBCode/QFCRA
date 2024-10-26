@@ -57,4 +57,39 @@ export class DateUtilService {
     // Return the date in 'YYYY-MM-DD' format
     return `${year}-${monthNumber}-${day.padStart(2, '0')}`;
   }
+
+
+  formatDateToCustomFormat(dateString: string | null): string {
+    if (!dateString || isNaN(Date.parse(dateString))) {
+      return '01/Jan/0001';
+    }
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+  
+  convertDateToYYYYMMDD(dateStr: string | Date): string | null {
+    console.log(dateStr);
+
+    if (!dateStr) {
+      return null; // Return null if the input is invalid or empty
+    }
+    const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+
+    if (isNaN(date.getTime())) {
+      console.error('Invalid date format:', dateStr);
+      return null;
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const day = String(date.getDate()).padStart(2, '0');
+
+    // Only return the date in YYYY-MM-DD format, stripping the time part
+    const formattedDate = `${year}-${month}-${day}`;
+
+    return formattedDate;
+  }
 }

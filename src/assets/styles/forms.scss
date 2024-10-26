@@ -325,3 +325,15 @@ input[type="checkbox"]:checked {
     color: #a51e36;
     margin-inline-start: 10px;
 }
+
+.radio-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.input-field[hidden] {
+    display: none !important;
+}

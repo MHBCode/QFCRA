@@ -96,8 +96,12 @@ tr:nth-child(even) {
 
 .listing-table table {
     width: 100%;
+    table-layout: auto !important;
+    border-radius: 15px;
 }
-
+.bold-text {
+    font-weight: bold;
+}
 .home-task-table th {
     padding: 5px;
     white-space: nowrap;

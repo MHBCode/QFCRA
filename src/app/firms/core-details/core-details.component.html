@@ -1,0 +1,863 @@
+<div *ngIf="isLoading" class="loader-overlay">
+    <div class="loader"></div>
+</div>
+
+<div class="form-section">
+    <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['firmDetailsSection'] }">
+        <!--Error messages for firm details-->
+        <div class="error-messages">
+            <p *ngIf="errorMessages['FirmName']">{{ errorMessages['FirmName'] }}</p>
+            <p *ngIf="errorMessages['LegalStatusTypeID']">
+                {{ errorMessages['LegalStatusTypeID'] }}
+            </p>
+            <p *ngIf="errorMessages['DateOfIncorporation']">
+                {{ errorMessages['DateOfIncorporation'] }}
+            </p>
+            <p *ngIf="errorMessages['DateOfApplication']">
+                {{ errorMessages['DateOfApplication'] }}
+            </p>
+            <p *ngIf="errorMessages['LicensedDate']">
+                {{ errorMessages['LicensedDate'] }}
+            </p>
+            <p *ngIf="errorMessages['AuthorisationDate']">
+                {{ errorMessages['AuthorisationDate'] }}
+            </p>
+            <p *ngIf="errorMessages['QFCNum']">{{ errorMessages['QFCNum'] }}</p>
+            <p *ngIf="errorMessages['FYearEndDate']">
+                {{ errorMessages['FYearEndDate'] }}
+            </p>
+            <p *ngIf="errorMessages['AccStandDate']">
+                {{ errorMessages['AccStandDate'] }}
+            </p>
+            <p *ngIf="errorMessages['PrevFirmNameEffectiveTo']">
+                {{ errorMessages['PrevFirmNameEffectiveTo'] }}
+            </p>
+        </div>
+        <div class="form-section-title">
+            <h2 class="edit-firm-header">
+                <p>Firm Details</p>
+                <button [ngClass]="{ 'hidden-button': !isEditModeCore }" class="collapse-button"
+                    (click)="toggleCollapse('firmDetailsSection')">
+                    {{ isCollapsed['firmDetailsSection'] ? '▲' : '▼' }}
+                </button>
+            </h2>
+
+            <div style="display: flex; gap: 10px">
+                <!-- loading flag for rendering buttons, hideSaveBtn..etc flag for supervisor access and other roles, getControlVisiblity function for role access endpoint -->
+                <div class="btn" *ngIf="
+            !loading && !isEditModeCore && getControlVisibility('imgBtnEdit')
+          ">
+                    <button [disabled]="!getControlEnablement('imgBtnEdit')" class="edit-btn" (click)="editFirm()">
+                        <i class="bi bi-pen"></i>Edit
+                    </button>
+                </div>
+
+                <div class="btn" *ngIf="
+            !loading && isEditModeCore && getControlVisibility('imgBtnSave')
+          ">
+                    <button [disabled]="!getControlEnablement('imgBtnSave')" class="save-btn" (click)="saveFirm()">
+                        Save
+                    </button>
+                </div>
+
+                <div class="btn" *ngIf="
+            !loading && isEditModeCore && getControlVisibility('imgBtnCancel')
+          ">
+                    <button [disabled]="!getControlEnablement('imgBtnCancel')" class="cancel-btn"
+                        (click)="cancelEditFirm()">
+                        Cancel
+                    </button>
+                </div>
+
+                <div class="btn" *ngIf="
+            !loading && !hideCreateBtn && getControlVisibility('imgBtnCreate')
+          ">
+                    <button [disabled]="!getControlEnablement('imgBtnCreate')">
+                        Create
+                    </button>
+                </div>
+
+                <div class="btn" *ngIf="
+            !loading && !hideReviseBtn && getControlVisibility('imgBtnRevise')
+          ">
+                    <button [disabled]="!getControlEnablement('imgBtnRevise')">
+                        Revise
+                    </button>
+                </div>
+
+                <div class="btn" *ngIf="
+            !loading && !hideDeleteBtn && getControlVisibility('imgBtnDelete')
+          ">
+                    <button [disabled]="!getControlEnablement('imgBtnDelete')">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="inputs-row" *ngIf="firmDetails">
+            <div class="input-field">
+                <label for="firmName">
+                    Firm Name
+                    <span [hidden]="!isEditModeCore" style="color: red">*</span>
+                </label>
+                <input [disabled]="!isEditModeCore" name="firmName" id="firmName" type="text"
+                    [(ngModel)]="firmDetails.FirmName" [ngClass]="{ 'error-border': errorMessages['FirmName'] }" />
+            </div>
+
+            <div class="input-field">
+                <label for="qfcNumber"> QFC Number </label>
+                <input [disabled]="!isEditModeCore" name="qfcNumber" id="qfcNumber" type="text"
+                    [(ngModel)]="firmDetails.QFCNum" [ngClass]="{ 'error-border': errorMessages['QFCNum'] }" />
+            </div>
+
+            <div class="input-field">
+                <label for="code"> Code </label>
+                <input [disabled]="!isEditModeCore" name="code" id="code" type="text"
+                    [(ngModel)]="firmDetails.FirmCode" />
+            </div>
+
+            <div class="input-field">
+                <label for="legalStatus">
+                    Legal Status
+                    <span [hidden]="!isEditModeCore" style="color: red">*</span>
+                </label>
+                <select [ngClass]="{
+            'error-border': errorMessages['LegalStatusTypeID']
+          }" [disabled]="!isEditModeCore" id="legalStatus" (ngModelChange)="onLegalStatusChange($event)"
+                    [(ngModel)]="firmDetails.LegalStatusTypeID">
+                    <option value="0">Select</option>
+                    <option *ngFor="let option of allLegalStatus" [value]="option.LegalStatusTypeID">
+                        {{ option.LegalStatusTypeDesc }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="input-field">
+                <label for="qfcTradingName"> QFC Trading Name </label>
+                <input [disabled]="!isEditModeCore" name="qfcTradingName" id="qfcTradingName" type="text"
+                    [(ngModel)]="firmDetails.QFCTradingName" />
+            </div>
+
+            <div class="input-field">
+                <label for="prevTradingNames"> Prev. Trading Name(s) </label>
+                <input [disabled]="!isEditModeCore" name="prevTradingNames" id="prevTradingNames" type="text"
+                    [(ngModel)]="firmDetails.PrevTradingName" />
+            </div>
+
+            <div class="input-field">
+                <label for="placeOfIncorporation"> Place of Incorporation </label>
+                <input [disabled]="!isEditModeCore" name="placeOfIncorporation" id="placeOfIncorporation" type="text"
+                    [(ngModel)]="firmDetails.PlaceOfIncorporation" />
+            </div>
+
+            <div class="input-field">
+                <label for="homeCountry"> Home Country </label>
+                <select [disabled]="!isEditModeCore" id="homeCountry" [(ngModel)]="firmDetails.CountyOfIncorporation">
+                    <option *ngFor="let option of allCountries" [value]="option.CountryID">
+                        {{ option?.CountryName }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="input-field" [hidden]="!isEditModeCore">
+                <label for="isDateDifferent">
+                    Is Date of Incorporation different from Date of Licensing or
+                    Authorisation : <span style="color: red">*</span>
+                </label>
+                <div class="radio-wrapper">
+                    <input name="isIncorporationDateDifferent" id="yes" type="radio"
+                        [(ngModel)]="firmDetails.DifferentIncorporationDate" [value]="true" />
+                    Yes
+                    <input name="isIncorporationDateDifferent" id="no" type="radio"
+                        [(ngModel)]="firmDetails.DifferentIncorporationDate" [value]="false" />
+                    No
+                </div>
+            </div>
+
+            <ng-container *ngIf="firmDetails.DifferentIncorporationDate || !isEditModeCore">
+                <div class="input-field">
+                    <label for="incorporationDate"> Incorporation Date </label>
+                    <input [ngClass]="{
+              'error-border': errorMessages['DateOfIncorporation']
+            }" [disabled]="!isEditModeCore" name="incorporationDate" id="incorporationDate" type="text" #dateInputs
+                        placeholder [(ngModel)]="firmDetails.DateOfIncorporation" />
+                </div>
+            </ng-container>
+
+            <div class="input-field">
+                <label for="financialYearEnd" class="history-row">
+                    Financial Year End
+                    <button *ngIf="firmDetails?.FinYearEndTypeDesc" class="subbutton-open-history"
+                        (click)="getFYearHistory()">
+                        <i class="bi bi-clock-history"></i> <span> Open History</span>
+                    </button>
+                </label>
+                <select [disabled]="!isEditModeCore" id="financialYearEnd" [(ngModel)]="firmDetails.FinYearEndTypeID">
+                    <option *ngFor="let option of allFinYearEnd" [value]="option.FirmFinYearEndTypeID">
+                        {{ option.FirmFinYearEndTypeDesc }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="input-field">
+                <label for="financialYearEndEffectiveFrom">
+                    Financial Year End Effective From
+                </label>
+                <input [disabled]="!isEditModeCore" name="financialYearEndEffectiveFrom" type="text" #dateInputs
+                    placeholder id="financialYearEndEffectiveFrom" [(ngModel)]="firmDetails.FirmFinYearEndEffectiveFrom"
+                    [ngClass]="{ 'error-border': errorMessages['FYearEndDate'] }" />
+            </div>
+
+            <div class="input-field">
+                <label for="accountingStandards" class="history-row">
+                    Accounting Standards
+                    <button *ngIf="firmDetails?.FinAccStdTypeDesc" class="subbutton-open-history"
+                        (click)="getAccountingStandardHistory()">
+                        <i class="bi bi-clock-history"></i><span> Open History</span>
+                    </button>
+                </label>
+                <select [disabled]="!isEditModeCore" id="accountingStandards" [(ngModel)]="firmDetails.FinAccStdTypeID">
+                    <option *ngFor="let option of allFinAccStd" [value]="option.FinAccStdTypeID">
+                        {{ option.FinAccStdTypeDesc }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="input-field">
+                <label for="accountingStandardsEffectiveFrom">
+                    Accounting Standards Effective From
+                </label>
+                <input [disabled]="!isEditModeCore" name="accountingStandardsEffectiveFrom"
+                    id="accountingStandardsEffectiveFrom" type="text" #dateInputs placeholder
+                    [(ngModel)]="firmDetails.FinAccStdTypeEffectiveFrom"
+                    [ngClass]="{ 'error-border': errorMessages['AccStandDate'] }" />
+            </div>
+
+            <div class="input-field">
+                <label for="websiteLink"> Website Link </label>
+
+                <input *ngIf="isEditModeCore" type="text" value="" [(ngModel)]="firmDetails.WebSiteAddress"
+                    id="websiteLink" />
+
+                <a *ngIf="!isEditModeCore" id="websiteLink" [href]="firmDetails?.WebSiteAddress" target="_blank"
+                    rel="noopener noreferrer">
+                    {{ firmDetails?.WebSiteAddress }}
+                </a>
+            </div>
+            <div class="input-field" *ngIf="firmNamesHistory[0]?.FirmNameHistoryID">
+                <label for="prevFirmName" class="history-row">
+                    Prev. Firm Name
+                    <button class="subbutton-open-history" (click)="getPrevFirmName()">
+                        <i class="bi bi-clock-history"></i> <span> Open History</span>
+                    </button>
+                </label>
+                <input [disabled]="!isEditModeCore" name="prevFirmName" id="prevFirmName" type="text"
+                    [(ngModel)]="firmNamesHistory[0].PrevFirmName" />
+            </div>
+            <div class="input-field" *ngIf="firmNamesHistory[0]?.FirmNameHistoryID">
+                <label for="prevFirmNameEffectiveTo">
+                    Prev. Firm Name Effective To
+                </label>
+                <input [disabled]="!isEditModeCore" name="prevFirmNameEffectiveTo" id="prevFirmNameEffectiveTo"
+                    type="text" #dateInputs placeholder [(ngModel)]="firmNamesHistory[0].DateEffectiveTo" [ngClass]="{
+            'error-border': errorMessages['PrevFirmNameEffectiveTo']
+          }" />
+            </div>
+        </div>
+    </div>
+    <!---->
+    <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['appDetailsSection'] }">
+        <div class="form-section-title collapse-container">
+            <div class="history-row">
+                <h2 class="edit-firm-header">
+                    Application Details
+                    <button [ngClass]="{ 'hidden-button': !isEditModeCore }" class="collapse-button"
+                        (click)="toggleCollapse('appDetailsSection')">
+                        {{ isCollapsed['appDetailsSection'] ? '▲' : '▼' }}
+                    </button>
+                    <button class="subbutton-open-history" (click)="getApplicationDetailsHistory()">
+                        <i class="bi bi-clock-history"></i> <span> Open History</span>
+                    </button>
+                </h2>
+            </div>
+        </div>
+        <div class="inputs-row app-details-tables" *ngIf="!isEditModeCore">
+            <!-- Licensed Status Table -->
+            <table class="aligned-table">
+                <thead>
+                    <tr>
+                        <td class="app-details-table-header" colspan="6">
+                            Licensed Status
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="aligned-column">Applied On</th>
+                        <th class="aligned-column">Licensed On</th>
+                        <th class="aligned-column">Current Status</th>
+                        <th class="aligned-column">Current Status Effective Date</th>
+                        <th class="aligned-column">Last Modified By</th>
+                        <th class="aligned-column">Last Modified Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            {{
+                            firmAppDetailsCurrentLicensed?.AppliedOn | date: 'dd/MMM/y'
+                            }}
+                        </td>
+                        <td>
+                            {{
+                            firmAppDetailsCurrentLicensed?.GrantedOn | date: 'dd/MMM/y'
+                            }}
+                        </td>
+                        <td>{{ firmAppDetailsCurrentLicensed?.RecentStatus }}</td>
+                        <td>
+                            {{
+                            firmAppDetailsCurrentLicensed?.RecentStatusDate
+                            | date: 'dd/MMM/y'
+                            }}
+                        </td>
+                        <td>{{ firmAppDetailsCurrentLicensed?.LastModifiedBy }}</td>
+                        <td>{{ firmAppDetailsCurrentLicensed?.LastModifiedDate }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Authorisation Status Table -->
+            <table class="aligned-table" *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
+                <thead>
+                    <tr>
+                        <td class="app-details-table-header" colspan="6">
+                            Authorisation Status
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="aligned-column">Applied On</th>
+                        <th class="aligned-column">Authorised On</th>
+                        <th class="aligned-column">Current Status</th>
+                        <th class="aligned-column">Current Status Effective Date</th>
+                        <th class="aligned-column">Last Modified By</th>
+                        <th class="aligned-column">Last Modified Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            {{
+                            firmAppDetailsCurrentAuthorized?.AppliedOn | date: 'dd/MMM/y'
+                            }}
+                        </td>
+                        <td>
+                            {{
+                            firmAppDetailsCurrentAuthorized?.GrantedOn | date: 'dd/MMM/y'
+                            }}
+                        </td>
+                        <td>{{ firmAppDetailsCurrentAuthorized?.RecentStatus }}</td>
+                        <td>
+                            {{
+                            firmAppDetailsCurrentAuthorized?.RecentStatusDate
+                            | date: 'dd/MMM/y'
+                            }}
+                        </td>
+                        <td>{{ firmAppDetailsCurrentAuthorized?.LastModifiedBy }}</td>
+                        <td>{{ firmAppDetailsCurrentAuthorized?.LastModifiedDate }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!--or (edit mode)-->
+        <div class="inputs-row" *ngIf="isEditModeCore">
+            <div class="input-field">
+                <label for="dateOfApplication"> Date of Application </label>
+                <input name="dateOfApplication" id="dateOfApplication" type="text" #dateInputs placeholder
+                    (ngModelChange)="onDateOfApplicationChange($event)" [(ngModel)]="dateOfApplication"
+                    [ngClass]="{ 'error-border': errorMessages['DateOfApplication'] }" />
+            </div>
+            <div class="input-field">
+                <label for="firmApplicationType"> Firm Application Type </label>
+                <select name="firmApplicationType" id="firmApplicationType" [(ngModel)]="selectedFirmTypeID"
+                    (ngModelChange)="onFirmApplicationTypeChange($event)">
+                    <option *ngFor="let firmType of allFirmTypes" [value]="firmType.FirmApplTypeID">
+                        {{ firmType.FirmApplTypeDesc }}
+                    </option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label for="qfcLicenseStatus"> QFC License Status </label>
+                <select name="qfcLicenseStatus" id="qfcLicenseStatus" [(ngModel)]="firmDetails.LicenseStatusTypeID"
+                    (ngModelChange)="onLicenseStatusChange($event)">
+                    <option *ngFor="let option of allQFCLicenseStatus" [value]="option.FirmApplStatusTypeID">
+                        {{ option.FirmApplStatusTypeDesc }}
+                    </option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label for="DateLicensed">
+                    {{ LicenseStatusTypeLabelDescFormatted }}
+                </label>
+                <input name="DateLicensed" id="DateLicensed" type="text" #dateInputs placeholder
+                    [(ngModel)]="formattedLicenseApplStatusDate"
+                    [ngClass]="{ 'error-border': errorMessages['LicensedDate'] }" />
+            </div>
+            <div class="input-field" *ngIf="selectedFirmTypeID == 3">
+                <label for="authorisationStatus"> Authorisation Status </label>
+                <select name="authorisationStatus" id="authorisationStatus"
+                    [(ngModel)]="firmDetails.AuthorisationStatusTypeID"
+                    (ngModelChange)="onAuthorizedStatusChange($event)">
+                    <option *ngFor="let option of allAuthorisationStatus" [value]="option.FirmApplStatusTypeID">
+                        {{ option.FirmApplStatusTypeDesc }}
+                    </option>
+                </select>
+            </div>
+            <div class="input-field" *ngIf="selectedFirmTypeID == 3">
+                <label for="dateAuthorized">
+                    {{ AuthorisationStatusTypeLabelDescFormatted }}
+                </label>
+                <input name="dateAuthorized" id="dateAuthorized" type="text" #dateInputs placeholder
+                    [(ngModel)]="formattedAuthApplStatusDate"
+                    [ngClass]="{ 'error-border': errorMessages['AuthorisationDate'] }" />
+            </div>
+        </div>
+    </div>
+    <!---->
+    <div class="inputs-field-set" *ngIf="isEditModeCore && selectedFirmTypeID == 3"
+        [ngClass]="{ collapsed: isCollapsed['pressReleaseSection'] }">
+        <div class="error-messages">
+            <p *ngIf="errorMessages['uploadDocument']">
+                {{ errorMessages['uploadDocument'] }}
+            </p>
+        </div>
+        <div class="form-section-title collapse-container">
+            <h2 class="edit-firm-header">Press Releases</h2>
+            <button [ngClass]="{ 'hidden-button': !isEditModeCore }" class="collapse-button"
+                (click)="toggleCollapse('pressReleaseSection')">
+                {{ isCollapsed['pressReleaseSection'] ? '▲' : '▼' }}
+            </button>
+        </div>
+        <!-- Aicha : This should be a component -->
+        <div class="inputs-row">
+            <div class="file-container">
+              <div class="input-field">
+                <label for="documentType"> Document Type </label>
+                <select [disabled]="!isEditModeCore"
+                  class="document-type-select" name="documentType" id="documentType">
+                  <option value="263">Press Releases</option>
+                </select>
+              </div>
+              <div class="input-field">
+                <label id="uploaded-documents">Uploaded documents go here</label>
+              </div>
+              <div class="input-field">
+                <div class="btns-container">
+                  <div class="upload-container">
+                    <button class="choose-document-btn" (click)="selectDocument()">
+                      Choose Document
+                    </button>
+                  </div>
+                  <button class="upload-document-btn" (click)="uploadDocument()">
+                    Upload the Document
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="file-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Document Type</th>
+                    <th>File Name</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Attachment</td>
+                    <td></td>
+                    <td>
+                      <button style="display: none" class="delete-file">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+    </div>
+
+    <!---->
+    <div *ngIf="
+      !isNullOrEmpty(firmDetails?.FirmApplicationDataComments) ||
+      !isNullOrEmpty(firmDetails?.PublicRegisterComments)
+    " class="inputs-field-set comments" [ngClass]="{ collapsed: isCollapsed['commentsSection'] }">
+        <div class="form-section-title collapse-container">
+            <h2 class="edit-firm-header">Comments</h2>
+            <button [ngClass]="{ 'hidden-button': !isEditModeCore }" class="collapse-button"
+                (click)="toggleCollapse('commentsSection')">
+                {{ isCollapsed['commentsSection'] ? '▲' : '▼' }}
+            </button>
+        </div>
+        <div class="inputs-row">
+            <div class="input-field">
+                <label for="generalComments"> General Comments </label>
+                <textarea [disabled]="!isEditModeCore" name="generalComments" id="generalComments"
+                    [(ngModel)]="firmDetails.FirmApplicationDataComments"></textarea>
+            </div>
+            <div class="input-field">
+                <label for="publicRegisterComments"> Public Register Comments </label>
+                <textarea [disabled]="!isEditModeCore" name="publicRegisterComments" id="publicRegisterComments"
+                    [(ngModel)]="firmDetails.PublicRegisterComments"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!---->
+    <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['addressesSection'] }">
+        <!--Error messages for addresses-->
+        <div class="error-messages">
+            <p *ngIf="errorMessages['AddressTypeID']">
+                {{ errorMessages['AddressTypeID'] }}
+            </p>
+            <p *ngIf="errorMessages['DuplicatedAddressTypeID']">
+                {{ errorMessages['DuplicatedAddressTypeID'] }}
+            </p>
+        </div>
+        <div class="display-flex space-between align-center border-bottom">
+            <div class="form-section-title collapse-container">
+                <h2 class="edit-firm-header">Addresses</h2>
+                <button class="collapse-button" (click)="toggleCollapse('addressesSection')">
+                    {{ isCollapsed['addressesSection'] ? '▲' : '▼' }}
+                </button>
+            </div>
+            <div class="add-address-container">
+                <button *ngIf="isEditModeCore && canAddNewAddress" (click)="addNewAddress()"
+                    [hidden]="isCollapsed['addressesSection']" class="addAddressBtn">
+                    Add Address
+                </button>
+            </div>
+        </div>
+        <div class="inputs-row">
+            <ng-container *ngFor="let address of filteredFirmAddresses; let i = index">
+                <ng-container *ngIf="address.Valid === true">
+                    <div class="input-field" *ngIf="!isEditModeCore">
+                        <label for="addressType" class="history-row">
+                            Address Type
+                            <button *ngIf="address.PreviousRecords !== 0" class="subbutton-open-history"
+                                (click)="getAddressTypeHistory(address.AddressTypeID)">
+                                <i class="bi bi-clock-history"></i><span> Open History</span>
+                            </button>
+                        </label>
+                        <input disabled name="addressType" id="addressType" type="text"
+                            value="{{ address?.AddressTypeDesc }}" />
+                    </div>
+                    <div *ngIf="isEditModeCore" class="del-address-container">
+                        <button (click)="removeAddress(i)" class="RmvAddressBtn bi-trash"></button>
+                    </div>
+                    <!-- address type on edit mode -->
+                    <div class="input-field" *ngIf="isEditModeCore">
+                        <label for="addressType" class="history-row">
+                            Address Type
+                            <button *ngIf="address.PreviousRecords !== 0 && address.AddressID"
+                                class="subbutton-open-history" (click)="getAddressTypeHistory(address.AddressTypeID)">
+                                <i class="bi bi-clock-history"></i> <span>Open History</span>
+                            </button>
+
+                        </label>
+                        <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID"
+                            (change)="onAddressTypeChange($event, address)" [ngClass]="{
+                'error-border':
+                  !address.AddressID && errorMessages['AddressTypeID'],
+                
+              }">
+                            <option value="0">Select</option>
+                            <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
+                                {{ option.AddressTypeDesc }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="input-field" *ngIf="
+              isEditModeCore &&
+              (!address.AddressID || address.AddressID === '')
+            ">
+                        <label for="sameAsType"> Same As Type </label>
+                        <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChange($event)"
+                            name="sameAsType" id="sameAsType">
+                            <option value="0">Select</option>
+                            <option *ngFor="let type of existingAddresses" [value]="type.AddressTypeID">
+                                {{ type.AddressTypeDesc }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="input-field">
+                        <label for="addressLine1"> Address Line 1 </label>
+                        <input type="text" [disabled]="
+                !isEditModeCore ||
+                (disableAddressFields && !address.AddressID)
+              " name="addressLine1" id="addressLine1" [(ngModel)]="address.AddressLine1" />
+                    </div>
+                    <div class="input-field">
+                        <label for="addressLine2"> Address Line 2 </label>
+                        <input [disabled]="
+                !isEditModeCore ||
+                (disableAddressFields && !address.AddressID)
+              " name="addressLine2" id="addressLine2" type="text" [(ngModel)]="address.AddressLine2" />
+                    </div>
+                    <div class="input-field">
+                        <label for="addressLine3"> Address Line 3 </label>
+                        <input [disabled]="
+                !isEditModeCore ||
+                (disableAddressFields && !address.AddressID)
+              " name="addressLine3" id="addressLine3" type="text" [(ngModel)]="address.AddressLine3" />
+                    </div>
+                    <div class="input-field">
+                        <label for="addressLine4"> Address Line 4 </label>
+                        <input [disabled]="
+                !isEditModeCore ||
+                (disableAddressFields && !address.AddressID)
+              " name="addressLine4" id="addressLine4" type="text" [(ngModel)]="address.AddressLine4" />
+                    </div>
+                    <div class="input-field">
+                        <label for="city"> City </label>
+                        <input [disabled]="
+                !isEditModeCore ||
+                (disableAddressFields && !address.AddressID)
+              " name="city" id="city" type="text" [(ngModel)]="address.City" />
+                    </div>
+                    <div class="input-field">
+                        <label for="state"> state/province </label>
+                        <input [disabled]="
+                !isEditModeCore ||
+                (disableAddressFields && !address.AddressID)
+              " name="state" id="state" type="text" [(ngModel)]="address.Province" />
+                    </div>
+                    <div class="input-field" *ngIf="!isEditModeCore">
+                        <label for="country"> Country </label>
+                        <input disabled type="text" name="country" id="country" [(ngModel)]="address.CountryName" />
+                    </div>
+                    <!-- countries on edit mode-->
+                    <div class="input-field" *ngIf="isEditModeCore">
+                        <label for="country"> Country </label>
+                        <select [disabled]="
+                !isEditModeCore ||
+                (disableAddressFields && !address.AddressID)
+              " [(ngModel)]="address.CountryID">
+                            <option *ngFor="let option of allCountries" [value]="option.CountryID">
+                                {{ option?.CountryName }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="input-field">
+                        <label for="zip"> Zip/Postal Code </label>
+                        <input [disabled]="
+                !isEditModeCore ||
+                (disableAddressFields && !address.AddressID)
+              " name="zip" id="zip" type="text" [(ngModel)]="address.PostalCode" />
+                    </div>
+                    <div class="input-field">
+                        <label for="phone"> Phone </label>
+                        <input [disabled]="
+                !isEditModeCore ||
+                (disableAddressFields && !address.AddressID)
+              " name="phone" id="phone" type="text" [(ngModel)]="address.PhoneNumber" />
+                    </div>
+                    <div class="input-field">
+                        <label for="fax"> Fax </label>
+                        <input [disabled]="
+                !isEditModeCore ||
+                (disableAddressFields && !address.AddressID)
+              " name="fax" id="fax" type="text" [(ngModel)]="address.FaxNumber" />
+                    </div>
+                    <hr *ngIf="i < firmAddresses.length - 1" />
+                </ng-container>
+            </ng-container>
+        </div>
+    </div>
+</div>
+
+
+<!--Financial Year End History-->
+<div *ngIf="callFYear" class="overlay show"></div>
+<div *ngIf="callFYear" class="popup-wrapper popupcontainer">
+    <i class="bi bi-x-circle close-icon" (click)="closeFYearHistory()"></i>
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Financial Year End History</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Firm</th>
+                    <th>Financial Year End</th>
+                    <th class="date-center">Financial Year Effective From</th>
+                    <th class="date-center">Financial Year Effective To</th>
+                    <th>Modified By</th>
+                    <th class="date-center">Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let FR of firmFYearHistory">
+                    <td style="text-align: left">{{ FR?.FirmName }}</td>
+                    <td style="text-align: left">{{ FR?.FirmFinYearEndTypeDesc }}</td>
+                    <td class="date-center">{{ FR?.FirmFinYearEndEffectiveFrom }}</td>
+                    <td class="date-center">
+                        {{ firmDetails?.FirmFinYearEndEffectiveTo }}
+                    </td>
+                    <td style="text-align: left">{{ FR?.UserName }}</td>
+                    <td class="date-center">{{ FR?.Column1 }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button class="subbutton" (click)="closeFYearHistory()">Close</button>
+    </div>
+</div>
+
+<!--Accounting Standards-->
+<div *ngIf="callAccStandard" class="overlay show"></div>
+<div *ngIf="callAccStandard" class="accountingStandardsPopUp popupcontainer">
+    <i class="bi bi-x-circle close-icon" (click)="closeAccountingStandard()"></i>
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Accounting Standards History</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Firm</th>
+                    <th>Financial Standard</th>
+                    <th class="date-center">Financial Standard Effective From</th>
+                    <th class="date-center">Financial Standard Effective To</th>
+                    <th>Modified By</th>
+                    <th class="date-center">Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let AS of firmAccountingStandardHistory">
+                    <td style="text-align: left">{{ AS?.FirmName }}</td>
+                    <td style="text-align: left">{{ AS?.FinAccStdTypeDesc }}</td>
+                    <td class="date-center">{{ AS?.FirmFinYearEndEffectiveFrom }}</td>
+                    <td class="date-center">
+                        {{ firmDetails?.FirmFinYearEndEffectiveTo }}
+                    </td>
+                    <td style="text-align: left">{{ AS?.UserName }}</td>
+                    <td class="date-center">{{ AS?.Column1 }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button class="subbutton" (click)="closeAccountingStandard()">Close</button>
+    </div>
+</div>
+
+<!--Application Details-->
+<div *ngIf="callAppDetails" class="overlay show"></div>
+<div *ngIf="callAppDetails" class="ApplicationDetailsPopUp popupcontainer">
+    <i class="bi bi-x-circle close-icon" (click)="closeApplicationDetails()"></i>
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Application Details History</h3>
+        </div>
+        <div class="app-detail-history-header">Licensed Status</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th class="date-center">Status Date</th>
+                    <th>Last Modified By</th>
+                    <th class="date-center">Last Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let LicenseDetailsHistory of firmAppDetailsLicensed">
+                    <td style="text-align: left">
+                        {{ LicenseDetailsHistory.FirmApplStatusTypeDesc }}
+                    </td>
+                    <td class="date-center">
+                        {{ LicenseDetailsHistory.FirmApplStatusDate }}
+                    </td>
+                    <td>{{ LicenseDetailsHistory.LastModifiedByUser }}</td>
+                    <td class="date-center">
+                        {{ LicenseDetailsHistory.LastModifiedDate }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div *ngIf="firmDetails?.AuthorisationStatusTypeID > 0" style="margin-top: 25px"
+            class="app-detail-history-header">
+            Authorisation Status
+        </div>
+        <table *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th class="date-center">Status Date</th>
+                    <th>Press Release</th>
+                    <th>Last Modified By</th>
+                    <th class="date-center">Last Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let AuthDetailsHistory of firmAppDetailsAuthorization">
+                    <td style="text-align: left">
+                        {{ AuthDetailsHistory.FirmApplStatusTypeDesc }}
+                    </td>
+                    <td class="date-center">
+                        {{ AuthDetailsHistory.FirmApplStatusDate }}
+                    </td>
+                    <td>{{ firmDetails?.PressReleaseLink }}</td>
+                    <td>{{ AuthDetailsHistory.LastModifiedByUser }}</td>
+                    <td class="date-center">{{ AuthDetailsHistory.LastModifiedDate }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button class="subbutton" (click)="closeApplicationDetails()">Close</button>
+    </div>
+</div>
+
+<!--Address Type History-->
+<div *ngIf="callAddressType" class="overlay show"></div>
+<div *ngIf="callAddressType" class="addressHistoryPopup popupcontainer">
+  <i class="bi bi-x-circle close-icon" (click)="closeAddressTypeHistory()"></i>
+  <div class="popup-info-place">
+    <div class="popup-header">
+      <h3>Address History</h3>
+    </div>
+    <br />
+    <div class="address-type-info">
+      <span style="text-decoration: underline">{{
+        firmAddressesTypeHistory[0]?.AddressTypeDesc
+        }}</span>
+      &nbsp; (<span style="color: red">history includes the deleted record for this address type.</span>)
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Address</th>
+          <th class="date-center">Created Date</th>
+          <th class="date-center">Modified Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let addressHistory of firmAddressesTypeHistory">
+          <td>{{ addressHistory?.ShortAddress }}</td>
+          <td class="date-center">{{ addressHistory?.CreatedDate }}</td>
+          <td class="date-center">
+            {{ addressHistory?.LastModifiedDate }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="popup-operations-place">
+    <button class="subbutton" (click)="closeAddressTypeHistory()">Close</button>
+  </div>
+</div>

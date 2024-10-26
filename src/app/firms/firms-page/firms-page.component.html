@@ -1,0 +1,417 @@
+<div class="search-button-container">
+  <div class="brid-crump">
+    <div class="text">
+      <span> Home > </span>All Firms
+    </div>
+  </div>
+  <div class="buttons-section">
+    <button (click)="togglePopup()" class="button-style">
+      <i style="font-size: 1.2rem;" class="bi bi-funnel-fill"></i>
+      <span class="button-text">Filter</span>
+    </button>  
+    <div class="sort-dropdown">
+      <button class="button-style" (click)="toggleSortDropdown()">
+        <i class="bi bi-filter"></i>
+        <span class="button-text">Sort</span>
+        <i  class="bi bi-caret-down-fill"></i>
+      </button>    
+      <div class="dropdown-menu" *ngIf="isSortDropdownOpen">
+        <ul>
+          <li (click)="onSortOptionSelected('AtoZ')">A → Z</li>
+          <li (click)="onSortOptionSelected('ZtoA')">Z → A</li>
+          <li (click)="onSortOptionSelected('newFirms')">Newest</li>
+          <li (click)="onSortOptionSelected('oldFirms')">Oldest</li>
+        </ul>
+      </div>
+    </div>
+    <button type="button" (click)="resetFilters()" class="button-style">
+      <i class="bi bi-arrow-counterclockwise"></i>
+      <span class="button-text">Reset Filter</span>
+    </button>
+    <button *ngIf="getControlVisibility('imgBtnSave')" (click)="navigateToNewfirm()" class="addnew-button button-style">
+      <i class="bi bi-plus"></i>
+      <span class="button-text">Add New Firm</span>
+    </button>
+  </div>
+</div>
+
+<!-- Search Popup -->
+<div class="popup-overlay" *ngIf="showPopup" (click)="togglePopup()">
+  <div class="popup-container" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <h3>Firms Search</h3>
+      <button class="close-button" (click)="togglePopup()"><i class="bi bi-x-circle close-icon"></i></button>
+    </div>
+
+    <div class="popup-content">
+      <div class="search-firms-inputs" style="display: flex; justify-content: space-between;">
+
+        <div class="dropdown-column">
+          <!-- Firm Name (Dropdown) -->
+          <div class="input-field">
+            <label for="firmName">Firm Name</label>
+            <div class="select-wrapper">
+              <select name="firmName" id="firmName" [(ngModel)]="firmName">
+                <option value="all">All</option>
+                <option *ngFor="let firm of sortedFirms" [value]="firm.FirmName">
+                  {{ firm.FirmName }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Firm Type (Checkboxes) -->
+          <div class="input-field">
+            <label for="firmType">Firm Type</label>
+            <div class="checkbox-wrapper">
+              <label class="custom-checkbox">
+                <input type="checkbox" id="firmType" [(ngModel)]="firmType" (change)="toggleCategoryOptions('firmType')" />
+                <span class="checkmark"></span> All
+              </label>
+            </div>
+            <div *ngIf="toggleOptions.firmType" class="checkbox-options">
+              <label class="custom-checkbox">
+                <input  type="checkbox" [(ngModel)]="checkboxes.authorized" value="1" />
+                <span class="checkmark"></span> Authorized 
+              </label>
+              <label class="custom-checkbox"><input type="checkbox" [(ngModel)]="checkboxes.dnfbp" value="2" /><span class="checkmark"></span> DNFBP</label>
+              <label class="custom-checkbox"><input type="checkbox" [(ngModel)]="checkboxes.licensed" value="3" /><span class="checkmark"></span> Licensed</label>
+            </div>
+          </div>
+
+          <!-- QFC Number -->
+          <div class="input-field">
+            <label for="qfcNumber">QFC Number</label>
+            <input name="qfcNumber" id="qfcNumber" type="text" [(ngModel)]="qfcNumber" />
+          </div>
+
+          <!-- Firm Status (Checkboxes) -->
+          <div class="input-field">
+            <label for="firmStatus">Firm Status</label>
+            <div class="checkbox-wrapper">
+              <label class="custom-checkbox">
+                <input type="checkbox" id="firmStatus" [(ngModel)]="firmStatus" (change)="toggleCategoryOptions('firmStatus')" />
+                <span class="checkmark"></span> All
+              </label>
+            </div>
+            <div *ngIf="toggleOptions.firmStatus" class="checkbox-options">
+              <label class="custom-checkbox"><input type="checkbox" [(ngModel)]="checkboxes.applicant" value="1" /><span class="checkmark"></span> Applicant</label>
+              <label class="custom-checkbox"><input type="checkbox" [(ngModel)]="checkboxes.applicationWithdrawn" value="2" /><span class="checkmark"></span> Application
+                Withdrawn</label>
+              <label class="custom-checkbox"><input type="checkbox" [(ngModel)]="checkboxes.applicationRejected" value="3" /><span class="checkmark"></span> Application
+                Rejected</label>
+              <label class="custom-checkbox"><input type="checkbox" [(ngModel)]="checkboxes.active" value="4" /><span class="checkmark"></span> Active</label>
+              <label class="custom-checkbox"><input type="checkbox" [(ngModel)]="checkboxes.inactive" value="5" /><span class="checkmark"></span> Inactive</label>
+              <label class="custom-checkbox"><input type="checkbox" [(ngModel)]="checkboxes.withdrawn" value="6" /> <span class="checkmark"></span>Withdrawn</label>
+            </div>
+          </div>
+
+          <!-- License Status (Dropdown) -->
+          <div class="input-field">
+            <label for="licenseStatus">License Status</label>
+            <div class="select-wrapper">
+              <select name="licenseStatus" id="licenseStatus" [(ngModel)]="licenseStatus">
+                <option value="all">All</option>
+                <option *ngFor="let licstatus of allQFCLicenseStatus" [value]="licstatus.FirmApplStatusTypeDesc">
+                  {{ licstatus.FirmApplStatusTypeDesc }}
+                </option>
+              </select>
+
+              
+            </div>
+          </div>
+           <!-- Prudential Category (Checkboxes) -->
+           <div class="input-field">
+            <label for="prudentialCategory">Prudential Category</label>
+            <div class="checkbox-wrapper">
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="prudentialCategory" (change)="toggleCategoryOptions('prudentialCategory')" />
+                <span class="checkmark"></span> All
+              </label>
+            </div>
+            
+            <div *ngIf="toggleOptions.prudentialCategory" class="checkbox-options">
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.piib1" value="1" />
+                <span class="checkmark"></span> PIIB 1
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.piib2" value="2" />
+                <span class="checkmark"></span> PIIB 2
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.piib3" value="3" />
+                <span class="checkmark"></span> PIIB 3
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.piib4" value="4" />
+                <span class="checkmark"></span> PIIB 4
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.piib5" value="5" />
+                <span class="checkmark"></span> PIIB 5
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.directInsurer" value="6" />
+                <span class="checkmark"></span> Direct Insurer
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.reinsurer" value="7" />
+                <span class="checkmark"></span> Reinsurer
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.insuranceIntermediary" value="8" />
+                <span class="checkmark"></span> Insurance Intermediary
+              </label>
+            </div>
+            
+          </div>
+          <!-- Supervisor - Supervision (Dropdown) -->
+          <div class="input-field">
+            <label for="Supervisor">Supervisor - Supervision</label>
+            <div class="select-wrapper">
+              <select name="Supervisor" id="Supervisor" [(ngModel)]="supervisorSupervision">
+                <option value="all">All</option>
+                <option *ngFor="let supervisorSup of allSupervisionCaseOfficer" [value]="supervisorSup.FullName">
+                  {{ supervisorSup.FullName }}
+                </option>
+              </select>
+            </div>
+          </div>
+           <!-- Sectors (Checkboxes) -->
+           <div class="input-field">
+            <label for="sectors">Sectors</label>
+            <div class="checkbox-wrapper">
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="sectors" (change)="toggleCategoryOptions('sectors')" />
+                <span class="checkmark"></span> All
+              </label>
+            </div>
+            
+            <div *ngIf="toggleOptions.sectors" class="checkbox-options">
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.sectorInvestmentManager" value="1" /> 
+                <span class="checkmark"></span> Investment Manager
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.insurer" value="2" />
+                <span class="checkmark"></span> Insurer
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.sectorInsuranceIntermediary" value="3" />
+                <span class="checkmark"></span> Insurance Intermediary
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.sectorbank" value="4" />
+                <span class="checkmark"></span> Bank
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.sectorAdvisor" value="5" />
+                <span class="checkmark"></span> Advisor
+              </label>
+              
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.repOffice" value="6" />
+                <span class="checkmark"></span> Rep Office
+              </label>
+            </div>
+          </div>
+          <!-- Supervisor -  AML (Dropdown) -->
+          <div class="input-field">
+            <label for="amlSup">Supervisor - AML</label>
+            <div class="select-wrapper">
+              <select name="amlSup" id="amlSup" [(ngModel)]="amlSup">
+                <option value="all">All</option>
+                <option *ngFor="let amlSupo of allAuthorisationCaseOfficer" [value]="amlSupo.FullName">
+                  {{ amlSupo.FullName }}
+                </option>
+              </select>
+            </div>
+          </div>
+           <!-- Supervision Category (Checkboxes) -->
+           <div class="input-field">
+            <label for="supervisionCategory">Supervision Category</label>
+            <div class="checkbox-wrapper">
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="supervisionCategory" (change)="toggleCategoryOptions('supervisionCategory')" />
+                <span class="checkmark"></span> All
+              </label>
+            </div>
+            <div *ngIf="toggleOptions.supervisionCategory" class="checkbox-options">
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.corporateBank" value="1" />
+                <span class="checkmark"></span> Corporate Bank
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.investmentManager" value="2" />
+                <span class="checkmark"></span> Investment Manager
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.auditAndAccountingServices" value="3" />
+                <span class="checkmark"></span> Audit and Accounting Services
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.trustServices" value="4" />
+                <span class="checkmark"></span> Trust Services
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.singleFamilyOffice" value="5" />
+                <span class="checkmark"></span> Single Family Office
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.supCatInsuranceIntermediary" value="6" />
+                <span class="checkmark"></span> Insurance Intermediary
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.captiveInsurer" value="7" />
+                <span class="checkmark"></span> Captive Insurer
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.captiveManager" value="8" />
+                <span class="checkmark"></span> Captive Manager
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.investmentBank" value="9" />
+                <span class="checkmark"></span> Investment Bank
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.advisor" value="10" />
+                <span class="checkmark"></span> Advisor
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.legalServices" value="11" />
+                <span class="checkmark"></span> Legal Services
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.professionalServices" value="12" />
+                <span class="checkmark"></span> Professional Services
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.SupCatdirectInsurer" value="13" />
+                <span class="checkmark"></span> Direct Insurer
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.SupCatrepOffice" value="14" />
+                <span class="checkmark"></span> Rep Office
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.SupCatreinsurer" value="15" />
+                <span class="checkmark"></span> Reinsurer
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.wealthManager" value="16" />
+                <span class="checkmark"></span> Wealth Manager
+              </label>
+            </div>
+        </div>
+          <!-- Legal Status (Dropdown) -->
+          <div class="input-field">
+            <label for="legalStatus">Legal Status</label>
+            <div class="select-wrapper">
+              <select name="legalStatus" id="legalStatus" [(ngModel)]="legalStatus">
+                <option value="all">All</option>
+                <option *ngFor="let status  of legalStatusOptions" [value]="status.LegalStatusTypeDesc">
+                  {{ status.LegalStatusTypeDesc }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <!-- Authorisation Category (Checkboxes) -->
+          <div class="input-field">
+            <label for="authorisationCategory">Authorisation Category</label>
+            <div class="checkbox-wrapper">
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="authorisationCategory" (change)="toggleCategoryOptions('authorisationCategory')" />
+                <span class="checkmark"></span> All
+              </label>
+            </div>
+            <div *ngIf="toggleOptions.authorisationCategory" class="checkbox-options">
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.authBank" value="1" />
+                <span class="checkmark"></span> Bank
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.iBANK" value="2" />
+                <span class="checkmark"></span> IBANK
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.iNMA" value="3" />
+                <span class="checkmark"></span> INMA
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.cAPI" value="4" />
+                <span class="checkmark"></span> CAPI
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.iMEB" value="5" />
+                <span class="checkmark"></span> IMEB
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.pINS" value="6" />
+                <span class="checkmark"></span> PINS
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.rEPO" value="7" />
+                <span class="checkmark"></span> REPO
+              </label>
+              <label class="custom-checkbox">
+                <input type="checkbox" [(ngModel)]="checkboxes.dMEX" value="8" />
+                <span class="checkmark"></span> DMEX
+              </label>
+            </div>
+        </div>           
+
+          <!-- Authorisation Status (Dropdown) -->
+          <div class="input-field">
+            <label for="authorisationStatus">Authorisation Status</label>
+            <div class="select-wrapper">
+              <!-- Bind to a single selected value (authorisationStatus), not the entire array -->
+              <select name="authorisationStatus" id="authorisationStatus" [(ngModel)]="authorisationStatus">
+                <option value="all">All</option>
+                <option *ngFor="let authstatus of authorisationStatusOptions" [value]="authstatus.FirmApplStatusTypeDesc">
+                  {{ authstatus.FirmApplStatusTypeDesc }}
+                </option>
+              </select>
+            </div>
+          </div>
+         <!--Relevant Person (Checkbox)-->
+          <div class="input-field">
+            <label for="relevantPerson">Relevant Person</label>
+            <div class="checkbox-options">
+              <input type="checkbox" [(ngModel)]="relevantPerson" value="1" /> 
+             </div>
+          </div>
+         
+        </div>
+
+      </div>
+
+      <!-- Alphabet Filter -->
+      <div class="alphabet-filter">
+        <span *ngFor="let letter of alphabet" (click)="getstartChar(letter)">
+          {{ letter }}
+        </span>
+      </div>
+
+      <!-- Buttons for Reset and Search -->
+      <div class="input-search-buttons">
+        <button type="button" (click)="resetFilters()" class="reset">Reset</button>
+        <button type="button" (click)="searchFirms()" class="search">Search</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<firms-list [isMainView]="true" [firms]="filteredFirms" [showTitle]="false"></firms-list>

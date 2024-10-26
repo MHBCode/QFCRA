@@ -1,0 +1,73 @@
+<div class="firmList-wrapper" [ngClass]="isMainView ? 'listing-table' : 'home-table'">
+    <div class="table customTable">
+      <div *ngIf="showTitle" (click)="goToAllFirms()" class="tableTitle">
+        <h3>Firm List <small>view all</small></h3>
+      </div>
+      <div class="table-responsive">
+        <table [ngClass]="isMainView ? 'firm-table' : 'home-firm-table'">
+          <thead>
+            <tr>
+              <th>QFC Number</th>
+              <th>Firm Name</th>
+              <th *ngIf="isMainView">Legal Status</th>
+              <th *ngIf="isMainView">License Status</th>
+              <th>Authorization Status</th>
+              <th *ngIf="isMainView">Sector</th>
+              <th>Authorization Category</th>
+              <th *ngIf="isMainView">Supervision Category</th>
+              <th >Prudential Category</th>
+              <th *ngIf="isMainView">Home Country</th>
+              <th *ngIf="isMainView">Supervisor - Supervision</th>
+              <th *ngIf="isMainView">Supervisor - AML</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of paginatedFirms" (click)="viewFirm(item.FirmID)">
+              <td class="bold-text">{{ item.QFCNum }}</td>
+              <!-- <td>
+                  <div class="expandable-text-container">
+                    <span class="expandable-text">{{ item.FirmName }}</span> 
+                  </div>
+              </td> -->
+              <td>
+                <div [ngClass]="{'expandable-text-container': !isMainView}">
+                  <span [ngClass]="{'expandable-text': !isMainView}">{{ item.FirmName }}</span>
+                </div>
+              </td>
+              <td *ngIf="isMainView">{{ item.LegalStatusTypeDesc }}</td>
+              <td *ngIf="isMainView">{{ item.LicenseStatusTypeDesc }}</td>
+              <td>{{ item.AuthorisationStatusTypeDesc }}</td>
+              <td *ngIf="isMainView">{{ item.SectorTypeShortDesc }}</td>
+              <td>{{ item.AuthorisationCategoryTypeDesc }}</td>
+              <td *ngIf="isMainView">{{ item.SupervisionCategory }}</td>
+              <td >{{ item.PrudentialCategoryTypeDesc }}</td>
+              <td *ngIf="isMainView">{{ item.Country }}</td>
+              <td *ngIf="isMainView">
+                {{ item.Supervisor }}
+              </td>
+              <td *ngIf="isMainView">
+               {{ item.Supervisor_AML }}
+              </td>
+            </tr>      
+          </tbody>
+          <tfoot>
+            <tr>
+              <td  [attr.colspan]="!isMainView ? 5 : 12">
+                <div class="pagination">
+                  <button (click)="previousPage()" [disabled]="currentPage === 1">
+                    <span>&lt;</span>
+                  </button>
+                  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                  <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+                    <span>&gt;</span>
+                  </button>
+                  <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
+                </div>        
+              </td>          
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+     
+    </div>
+  </div>

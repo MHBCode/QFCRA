@@ -1,0 +1,94 @@
+<div *ngIf="isUserAllowed" class="brid-crump">
+    <div class="text"><span> Home > {{subsiteName}} > </span> {{ pageTitle }}</div>
+</div>
+
+<div *ngIf="isUserAllowed" class="page">
+    <div class="menu" [ngStyle]="{ width: menuWidth }">
+        <i (click)="toggleFulMenu()" *ngIf="menuWidth.match(width1)"
+            class="menu-icons bi bi-arrow-left-square-fill"></i>
+        <i (click)="toggleFulMenu()" *ngIf="menuWidth.match(width2)"
+            class="menu-icons bi bi-arrow-right-square-fill"></i>
+
+        <div class="menu-item">
+            <h3   id="1-item"
+            [class.active]="activeMenu === 'firmDetails'" 
+            (click)="toggleMenu('firmDetails')" *ngIf="!closedMenu">
+                FIRM Details
+            </h3>
+            <i class="menu-icons bi bi-info-square" *ngIf="closedMenu"></i>
+            <div class="sub-menu" *ngIf="!closedMenu && activeMenu === 'firmDetails'">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/core-details', firmId]" routerLinkActive="active">
+                    Core Details
+                </a>
+                <a class="menu-sub-item" [routerLink]="['/firms/view/scope', firmId]" routerLinkActive="active">
+                    Scope
+                </a>
+                <a class="menu-sub-item" [routerLink]="['/firms/view/controllers', firmId]" routerLinkActive="active">
+                    Controllers
+                </a>
+                <a class="menu-sub-item" [routerLink]="['/firms/view/auditors', firmId]" routerLinkActive="active">
+                    Auditors
+                </a>
+                <a class="menu-sub-item" [routerLink]="['/firms/view/contacts', firmId]" routerLinkActive="active">
+                    Contacts
+                </a>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <h3 *ngIf="!closedMenu"  [class.active]="activeMenu === 'individuals'"
+            (click)="toggleMenu('individuals')">
+                Individuals
+            </h3>
+            <i class="menu-icons bi bi-people" *ngIf="closedMenu"></i>
+            <div class="sub-menu" *ngIf="!closedMenu && activeMenu === 'individuals'">
+                <a class="menu-sub-item">
+                    Individual Details
+                </a>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <h3 *ngIf="!closedMenu"  [class.active]="activeMenu === 'supervision'"
+            (click)="toggleMenu('supervision')">
+                Supervision
+            </h3>
+            <i class="menu-icons bi bi-kanban" *ngIf="closedMenu"></i>
+            <div class="sub-menu" *ngIf="!closedMenu && activeMenu === 'supervision'">
+                <a class="menu-sub-item">
+                    Reporting Schedule
+                </a>
+                <a class="menu-sub-item">
+                    Return Review
+                </a>
+                <a  class="menu-sub-item">
+                    Notices
+                </a>
+                <a class="menu-sub-item">
+                    Admin Fee
+                </a>
+                <a class="menu-sub-item">
+                    RMPs
+                </a>
+                <a class="menu-sub-item">
+                    Breaches
+                </a>
+                <a class="menu-sub-item">
+                    Waivers
+                </a>
+                <a class="menu-sub-item">
+                    Enf. Actions
+                </a>
+                <a class="menu-sub-item">
+                    Reg. Funds
+                </a>
+                <a class="menu-sub-item">
+                    Journal
+                </a>
+            </div>
+        </div>
+    </div>
+    <section [ngStyle]="{width: dataWidth}">
+        <router-outlet></router-outlet>
+    </section>
+</div>
