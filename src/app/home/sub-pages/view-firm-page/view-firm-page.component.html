@@ -4004,7 +4004,6 @@
           <thead>
             <tr>
               <th></th>
-              <!--leave it empty-->
               <th>Individual Name</th>
               <th>Controlled Functions</th>
               <th>Applied Date</th>
@@ -4014,19 +4013,19 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr *ngFor="let individual of AllapprovedIndividuals">
               <td class="radio-table">
                 <label class="radioBtn">
                   <input type="radio" />
                   <span></span>
                 </label>
               </td>
-              <td>Individual Name</td>
-              <td>Controlled Functions</td>
-              <td>Applied Date</td>
-              <td>Conditionally Approved Date</td>
-              <td>Conditional Approved Expiry Date</td>
-              <td>Approved Date</td>
+              <td>{{individual.AppIndividualNum}}</td>
+              <td>{{individual.FunctionActivity}}</td>
+              <td>{{individual.AppliedDate}}</td>
+              <td>{{individual.ConditionalApprovalDate}}</td>
+              <td>{{individual.ConditionalApprovalExpiryDate}}</td>
+              <td>{{individual.ApprovedDate}}</td>
             </tr>
           </tbody>
         </table>

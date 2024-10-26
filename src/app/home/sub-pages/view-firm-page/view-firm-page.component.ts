@@ -20,6 +20,7 @@ import { AddressesService } from 'src/app/ngServices/addresses.service';
 import { WaiverService } from 'src/app/ngServices/waiver.service';
 import { RiskService } from 'src/app/ngServices/risk.service';
 import { NoticeService } from 'src/app/ngServices/notice.service';
+import { AiElectronicswfService } from 'src/app/ngServices/ai-electronicswf.service';
 
 
 @Component({
@@ -271,6 +272,8 @@ export class ViewFirmPageComponent implements OnInit {
 
   /* loader flag */
   isLoading: boolean = false;
+  //  individuals section
+  AllapprovedIndividuals: any = []; 
 
   showAddressesForm = false;
   AllRegulater: any = [];
@@ -291,6 +294,7 @@ export class ViewFirmPageComponent implements OnInit {
     private waiverService: WaiverService,
     private riskService: RiskService,
     private noticeService: NoticeService,
+    private aiElectronicswfService: AiElectronicswfService,
     private el: ElementRef,
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
@@ -343,6 +347,8 @@ export class ViewFirmPageComponent implements OnInit {
       this.getControllerType();
       this.getAllRegulater(this.Address.countryID, this.firmId);
       this.getAllContactFromByFrimsId();
+
+      this.getApprovedIndividuals(this.firmId, 'Approved');
     });
   }
 
@@ -2734,9 +2740,7 @@ export class ViewFirmPageComponent implements OnInit {
   //   this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
   // }
   get filteredControllerfirmAddresses() {
-    console.log("this.ControllerfirmAddresses.filter(addr => !addr.isRemoved);",this.ControllerfirmAddresses.filter(addr => !addr.isRemoved))
     return this.ControllerfirmAddresses.filter(addr => !addr.isRemoved);
-    
     
   }
   addControllerAddressForm() {
@@ -2855,7 +2859,6 @@ export class ViewFirmPageComponent implements OnInit {
     this.isEditable = false;
     this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
     this.EditControllerValidateForm().then(() => {
-      if (!this.hasValidationErrors) {
         console.log("Selected Controller:", this.selectedController);
         if (
           ["Parent Entity", "Corporate Controller", "Head Office of a Branch", "UBO – Corporate"].includes(this.selectedController.EntityTypeDesc)
@@ -2884,7 +2887,6 @@ export class ViewFirmPageComponent implements OnInit {
               zebSiteAddress: this.selectedController.zebSiteAddress,
               lastModifiedBy: 30,
               ControllerControlTypeDesc: null,
-              //LastModifiedDate : "2024-10-01T13:55:58.178Z",
               isAuditor: this.selectedController.isAuditor,
               isCompanyRegulated: this.selectedController.IsCompanyRegulated,
               additionalDetails: this.selectedController.additionalDetails,
@@ -2913,7 +2915,7 @@ export class ViewFirmPageComponent implements OnInit {
               entityID: this.firmId,
               contactID: address.contactID,
               AddressID: address.AddressID.toString(),
-              addressState:6,
+              addressState: 6,
               AddressLine1: address.AddressLine1,
               AddressLine2: address.AddressLine2,
               AddressLine3: address.AddressLine3,
@@ -2970,7 +2972,7 @@ export class ViewFirmPageComponent implements OnInit {
               ShowEnabled: regulator.ShowEnabled,
               ContactAssnID: regulator.ContactAssnID
             }))
-          }
+          };
 
           // Call the insert/update endpoint
           this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
@@ -2981,110 +2983,106 @@ export class ViewFirmPageComponent implements OnInit {
               console.error("Error saving changes:", error);
             }
           );
-        }
-      }
-      else if (
-        ["Individual Controller", "UBO - Individual"].includes(this.selectedController.EntityTypeDesc)
-      ) {
-        const saveControllerPopupChangesIndividualObj = {
-          contactDetails: {
+        } else if (
+          ["Individual Controller", "UBO - Individual"].includes(this.selectedController.EntityTypeDesc)
+        ) {
+          const saveControllerPopupChangesIndividualObj = {
             contactDetails: {
-              firmID: this.firmId,
-              contactID: null,
-              contactAssnID: 0,
-              title: this.selectedController.Title, // Map your inputs accordingly
-              firstName: this.selectedController.FirstName,
-              secondName: this.selectedController.SecondName,
-              thirdName: this.selectedController.ThirdName,
-              familyName: this.selectedController.FamilyName,
-              countryOfResidence: this.selectedController.CountryOfResidence,
-              createdBy: this.selectedController.CreatedBy,
-              dateOfBirth: this.selectedController.DateOfBirth,
-              fullName: this.selectedController.FullName,
-              lastModifiedBy: this.selectedController.LastModifiedByOfOtherEntities,
-              nationalID: this.selectedController.NationalID,
-              nationality: this.selectedController.Nationality,
-              passportNum: this.selectedController.PassportNum,
-              placeOfBirth: this.selectedController.PlaceOfBirth,
-              previousName: this.selectedController.PreviousName,
-              isExists: this.selectedController.IsExists,
-              nameInPassport: this.selectedController.NameInPassport,
-              contactAddnlInfoTypeID: this.selectedController.ContactAddnlInfoTypeID,
-              isFromContact: this.selectedController.IsFromContact,
-              countryofBirth: this.selectedController.CountryOfBirth,
-              juridictionID: this.selectedController.JuridictionID,
-              objectID: this.selectedController.ObjectID,
-              isPeP: this.selectedController.IsPeP
+              contactDetails: {
+                firmID: this.firmId,
+                contactID: null,
+                contactAssnID: null,
+                AdditionalDetails: 'test',
+                BusPhone: 'test',
+                BusEmail: 'test',
+                MobileNum: 'test',
+                NameAsInPassport: 'test',
+                OtherEmail: 'test',
+                QfcNumber: this.firmDetails.QFCNum,
+                Fax: 'test',
+                ResidencePhone: 'test',
+                JobTitle: 'test',
+                OtherEntityName: this.selectedController.OtherEntityName,
+                EntityTypeID: this.selectedController.EntityTypeID,
+                Title: this.selectedController.Title,
+                FirstName: this.selectedController.FirstName,
+                secondName: this.selectedController.SecondName,
+                thirdName: this.selectedController.ThirdName,
+                familyName: this.selectedController.FamilyName,
+                PctOfShares: this.selectedController.PctOfShares,
+                tempContactID: 0,
+                countryOfResidence: null,
+                ControllerControlTypeID: this.selectedController.ControllerControlTypeID,
+                createdBy: this.userId,
+                dateOfBirth: this.convertDateToYYYYMMDD(this.selectedController.DateOfBirth),
+                fullName: null,
+                lastModifiedBy: this.userId,
+                MyState: 0,
+                nationalID: null,
+                nationality: null,
+                EntityID: this.firmId,
+                passportNum: this.selectedController.PassportNum,
+                placeOfBirth: this.selectedController.PlaceOfBirth,
+                previousName: null,
+                isExists: false,
+                FunctionTypeId: 25,
+                nameInPassport: null,
+                contactAddnlInfoTypeID: null,
+                isFromContact: null,
+                countryofBirth: null,
+                juridictionID: null,
+                objectID: this.selectedController.ObjectID,
+                isPeP: this.selectedController.IsPEP,
+                AssnDateFrom: this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
+                AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
+                LastModifiedByOfOtherEntity: 30,
+                JurisdictionId: 3,
+              },
+              lstContactFunctions: null,
             },
-            lstContactFunctions: this.selectedController.LstContactFunctions.map(func => ({
-              contactFunctionID: func.ContactFunctionID,
-              contactFunctionTypeID: func.ContactFunctionTypeID,
-              contactAssnID: func.ContactAssnID,
-              contactID: func.ContactID,
-              contactFunctionTypeDesc: func.ContactFunctionTypeDesc,
-              effectiveDate: func.EffectiveDate,
-              endDate: func.EndDate,
-              createdDate: func.CreatedDate,
-              createdBy: func.CreatedBy,
-              lastModifiedBy: func.LastModifiedByOfOtherEntities,
-              LastModifiedDate: func.LastModifiedDate,
-              reviewStatus: func.ReviewStatus,
-              selected: func.Selected,
-              isFunctionActive: func.IsFunctionActive,
-              isRecordEditable: func.IsRecordEditable
+            Addresses: this.addressForms.map(address => ({
+              firmID: this.firmId,
+              countryID: 16,//address.CountryID,
+              addressTypeID: 2,//address.AddressTypeID,
+              LastModifiedBy: this.userId,
+              entityTypeID: this.selectedController.EntityTypeID,
+              entityID: this.firmId,
+              contactID: address.contactID,
+              addressID: null,
+              addressLine1: "",
+              addressLine2: "",
+              addressLine3: "",
+              addressLine4: "",
+              city: address.city,
+              stateProvince: address.stateProvince,
+              createdBy: 0,
+              addressAssnID: null,
+              CreatedDate: address.CreatedDate,
+              LastModifiedDate: address.LastModifiedDate,
+              addressState: 3,
+              fromDate: "2024-10-01T14:38:59.118Z",
+              toDate: "2024-10-01T14:38:59.118Z",
+              Output: address.Output,
+              objectID: 0,
+              objectInstanceID: 0,
+              zipPostalCode: "",
+              objAis: null
             }))
-          },
-          addresses: this.selectedController.Addresses.map(address => ({
-            firmID: address.FirmID,
-            countryID: address.CountryID,
-            addressTypeID: address.AddressTypeID,
-            sameAsTypeID: address.SameAsTypeID,
-            lastModifiedBy: address.LastModifiedByOfOtherEntities,
-            addressAssnID: address.AddressAssnID,
-            entityTypeID: address.EntityTypeID,
-            entityID: address.EntityID,
-            contactAssnID: address.ContactAssnID,
-            contactID: address.ContactID,
-            addressID: address.AddressID,
-            addressLine1: address.AddressLine1,
-            addressLine2: address.AddressLine2,
-            addressLine3: address.AddressLine3,
-            addressLine4: address.AddressLine4,
-            city: address.City,
-            province: address.Province,
-            postalCode: address.PostalCode,
-            phoneNumber: address.PhoneNumber,
-            phoneExt: address.PhoneExt,
-            faxNumber: address.FaxNumber,
-            LastModifiedDate: address.LastModifiedDate,
-            addressState: address.AddressState,
-            fromDate: "2024-10-01T14:38:59.118Z",
-            toDate: "2024-10-01T14:38:59.118Z",
-            objectID: address.ObjectID,
-            objectInstanceID: address.ObjectInstanceID,
-            objectInstanceRevNumber: address.ObjectInstanceRevNumber,
-            sourceObjectID: address.SourceObjectID,
-            sourceObjectInstanceID: address.SourceObjectInstanceID,
-            sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber,
-            objAis: address.ObjAis // Ensure this object is correctly structured
-          }))
-        };
+          };
 
-        // Call the save/update contact form endpoint
-        this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
-          response => {
-            console.log("Contact save successful:", response);
-          },
-          error => {
-            console.error("Error saving contact:", error);
-          }
-        );
-      }
-      else {
-        console.log('Validation errors found:', this.errorMessages);
-      }
+          // Call the save/update contact form endpoint
+          this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
+            response => {
+              console.log("Contact save successful:", response);
+            },
+            error => {
+              console.error("Error saving contact:", error);
+            }
+          );
+        }
     });
-  }
+}
+
   CreateControllerValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.errorMessages = {}; // Clear previous error messages
@@ -3693,6 +3691,7 @@ export class ViewFirmPageComponent implements OnInit {
               placeOfBirth: this.CreatecontrollerDetails.PlaceOfBirth,
               previousName: null,
               isExists: false,
+              FunctionTypeId: 25,
               nameInPassport: null,
               contactAddnlInfoTypeID: null,
               isFromContact: null,
@@ -6311,9 +6310,19 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
+ // Yazan Individuals 
 
-
-
+ getApprovedIndividuals(firmId: number, status: string): void {
+  this.aiElectronicswfService.getApprovedIndividuals(this.firmId, status).subscribe(
+    (data) => {
+      this.AllapprovedIndividuals = data.response;
+    },
+    (error) => {
+      console.error('Error fetching approved individuals:', error);
+    }
+  );
+  console.log("AllapprovedIndividuals",this.AllapprovedIndividuals)
+}
 
 
 
