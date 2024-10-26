@@ -3322,7 +3322,7 @@
               <div class="popup-header">
                 <h3>Controller For {{ firmDetails?.FirmName }}</h3>
               </div>
-              <button (click)="closeCreateControllerPopup()" class="close-button">
+              <button (click)="closeCreateContactPopup()" class="close-button">
                 <i class="bi bi-x-circle close-icon"></i>
               </button>
               <div class="btn"></div>
@@ -3360,8 +3360,9 @@
                   </option>
                 </select>
               </div>
-                <div class="input-field" style="width: 100%" *ngIf="
-                    ContactFrom.EntityTypeName === 'Firm - Gulf Insurance Group (Gulf) B.S.C.(C)' ">
+              <!-- *ngIf="
+                    ContactFrom.EntityTypeName === 'Firm - Gulf Insurance Group (Gulf) B.S.C.(C)' " -->
+                <div class="input-field" style="width: 100%" >
                   <label for="isBeingProvided">
                     Is contact information being provided for an approved individual or an individual who has applied for approval of controlled functions?
                     <span style="color: red">*</span>

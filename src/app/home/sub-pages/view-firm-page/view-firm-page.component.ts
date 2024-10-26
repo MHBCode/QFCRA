@@ -3692,7 +3692,7 @@ export class ViewFirmPageComponent implements OnInit {
               passportNum: this.CreatecontrollerDetails.PassportNum,
               placeOfBirth: this.CreatecontrollerDetails.PlaceOfBirth,
               previousName: null,
-              isExists: null,
+              isExists: false,
               nameInPassport: null,
               contactAddnlInfoTypeID: null,
               isFromContact: null,
@@ -3705,23 +3705,7 @@ export class ViewFirmPageComponent implements OnInit {
               LastModifiedByOfOtherEntity: 30,
               JurisdictionId: 3,
             },
-            lstContactFunctions: [{
-              contactFunctionID: null,
-              contactFunctionTypeID: null,
-              contactAssnID: null,
-              contactID: null,
-              contactFunctionTypeDesc: null,
-              effectiveDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
-              endDate: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
-              CreatedDate: null,
-              createdBy: this.userId,
-              lastModifiedBy: null,
-              LastModifiedDate: null,
-              JurisdictionId: 3,
-              isFunctionActive: false,
-              isRecordEditable: 1
-            }
-            ]
+            lstContactFunctions: null,
           },
           Addresses: this.addressForms.map(address => ({
             firmID: this.firmId,
@@ -4573,6 +4557,52 @@ export class ViewFirmPageComponent implements OnInit {
     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
   }
 
+//   addNewAddress(addressArray: any[]) {
+//     // Define the total number of address types
+//     const totalAddressTypes = this.allAddressTypes.length;
+
+//     // Get the count of valid addresses
+//     const validAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+//     // Check if the number of valid addresses is equal to the number of address types
+//     if (validAddressCount >= totalAddressTypes) {
+//         // Disable the button if all address types are added
+//         this.canAddNewAddress = false;
+//         return;
+//     }
+
+//     const newAddress = {
+//         AddressID: null,
+//         AddressTypeID: 0,
+//         AddressTypeDesc: '',
+//         AddressLine1: '',
+//         AddressLine2: '',
+//         AddressLine3: '',
+//         AddressLine4: '',
+//         City: '',
+//         Province: '',
+//         CountryID: 0,
+//         CountryName: '',
+//         PostalCode: '',
+//         PhoneNumber: '',
+//         FaxNumber: '',
+//         LastModifiedBy: 0, //todo _userId;
+//         LastModifiedDate: this.currentDate,
+//         addressState: 2,
+//         FromDate: null,
+//         ToDate: null,
+//         Valid: true,
+//     };
+
+//     // Add the new address to the beginning of the target array
+//     addressArray.unshift(newAddress);
+
+//     // Update the count of valid addresses
+//     const updatedValidAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+//     // Disable the button if the count of valid addresses matches the number of address types
+//     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+// }
   areAllAddressTypesAdded() {
     const existingTypes = new Set(this.firmAddresses.map(addr => Number(addr.AddressTypeID)));
     return this.allAddressTypes.every(type => existingTypes.has(type.AddressTypeID));
@@ -4610,7 +4640,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   get filteredFirmAddresses() {
-    return this.firmAddresses.filter(addr => !addr.isRemoved);
+    return this.existingAddresses.filter(addr => !addr.isRemoved);
   }
 
   onAddressTypeChange(event: any, address: any) {
@@ -6192,7 +6222,9 @@ export class ViewFirmPageComponent implements OnInit {
   createContact() {
     this.showCreateContactSection = true;
   }
-   
+  closeCreateContactPopup(){
+    this.showCreateContactSection = false;
+  }
   getAllContactFromByFrimsId(){
     this.contactService.getEntityTypesByFrimsId(this.firmId).subscribe(data => {
       this.AllContactFrom = data.response;
