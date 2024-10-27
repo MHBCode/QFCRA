@@ -14,7 +14,7 @@ import { LogformService } from 'src/app/ngServices/logform.service';
 @Component({
   selector: 'app-core-details',
   templateUrl: './core-details.component.html',
-  styleUrls: ['./core-details.component.scss','../firms.scss']
+  styleUrls: ['./core-details.component.scss', '../firms.scss']
 })
 export class CoreDetailsComponent implements OnInit {
   errorMessages: { [key: string]: string } = {};
@@ -90,6 +90,11 @@ export class CoreDetailsComponent implements OnInit {
   firmFYearHistory: any = [];
   callFYear: boolean = false;
   allLegalStatus: any = [];
+
+
+  // Aicha : Document 
+  callUploadDoc: boolean = false;
+  fileError: string = '';
 
   constructor(
     private securityService: SecurityService,
@@ -1545,6 +1550,66 @@ export class CoreDetailsComponent implements OnInit {
     });
   }
 
+  // [Aicha] : Documents Functions to be moved to document component later
+  selectDocument() {
+    this.callUploadDoc = true;
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.selectDocumentPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .selectDocumentPopUp not found');
+      }
+    }, 0)
+  }
+
+  closeSelectDocument() {
+    this.callUploadDoc = false;
+    const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
+    setTimeout(() => {
+      if (popupWrapper) {
+        popupWrapper.style.display = 'none';
+      } else {
+        console.error('Element with class not found');
+      }
+    }, 0)
+  }
+
+  uploadDocument() {
+    if (!this.selectedFile) {
+      this.showError(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.firmDetailsService.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
+    } else {
+      delete this.errorMessages['uploadDocument'];
+    }
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      const file = input.files[0];
+      if (file.type === 'application/pdf') {
+        this.selectedFile = file;
+        this.fileError = ''; // Clear any previous error message
+      } else {
+        this.fileError = 'Please select a valid PDF file.';
+        this.selectedFile = null;
+      }
+    }
+  }
+  
+  confirmUpload() {
+    if (this.selectedFile) {
+      // Display the selected file name in the main section
+      const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
+      if (uploadedDocumentsDiv) {
+        uploadedDocumentsDiv.textContent = `Uploaded Document: ${this.selectedFile.name}`;
+      }
+      this.closeSelectDocument();
+    } else {
+      console.error('No valid PDF file selected.');
+    }
+  }
 
 
 }

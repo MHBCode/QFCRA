@@ -10,34 +10,42 @@
             class="menu-icons bi bi-arrow-right-square-fill"></i>
 
         <div class="menu-item">
-            <h3   id="1-item"
-            [class.active]="activeMenu === 'firmDetails'" 
-            (click)="toggleMenu('firmDetails')" *ngIf="!closedMenu">
+            <h3 id="1-item" [class.active]="activeMenu === 'firmDetails'" (click)="toggleMenu('firmDetails')"
+                *ngIf="!closedMenu">
                 FIRM Details
             </h3>
             <i class="menu-icons bi bi-info-square" *ngIf="closedMenu"></i>
             <div class="sub-menu" *ngIf="!closedMenu && activeMenu === 'firmDetails'">
-                <a class="menu-sub-item" [routerLink]="['/firms/view/core-details', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view', firmId]"
+                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Firms Details' }" routerLinkActive="active">
+                    Firms Details
+                </a>
+                <a class="menu-sub-item" [routerLink]="['/firms/view/core-details', firmId]"
+                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Core Details' }" routerLinkActive="active">
                     Core Details
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/scope', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/scope', firmId]"
+                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Scope' }" routerLinkActive="active">
                     Scope
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/controllers', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/controllers', firmId]"
+                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Controllers' }" routerLinkActive="active">
                     Controllers
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/auditors', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/auditors', firmId]"
+                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Auditors' }" routerLinkActive="active">
                     Auditors
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/contacts', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/contacts', firmId]"
+                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Contacts' }" routerLinkActive="active">
                     Contacts
                 </a>
             </div>
         </div>
 
+
         <div class="menu-item">
-            <h3 *ngIf="!closedMenu"  [class.active]="activeMenu === 'individuals'"
-            (click)="toggleMenu('individuals')">
+            <h3 *ngIf="!closedMenu" [class.active]="activeMenu === 'individuals'" (click)="toggleMenu('individuals')">
                 Individuals
             </h3>
             <i class="menu-icons bi bi-people" *ngIf="closedMenu"></i>
@@ -49,8 +57,7 @@
         </div>
 
         <div class="menu-item">
-            <h3 *ngIf="!closedMenu"  [class.active]="activeMenu === 'supervision'"
-            (click)="toggleMenu('supervision')">
+            <h3 *ngIf="!closedMenu" [class.active]="activeMenu === 'supervision'" (click)="toggleMenu('supervision')">
                 Supervision
             </h3>
             <i class="menu-icons bi bi-kanban" *ngIf="closedMenu"></i>
@@ -61,7 +68,7 @@
                 <a class="menu-sub-item">
                     Return Review
                 </a>
-                <a  class="menu-sub-item">
+                <a class="menu-sub-item">
                     Notices
                 </a>
                 <a class="menu-sub-item">

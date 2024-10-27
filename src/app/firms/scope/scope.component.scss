@@ -1,0 +1,278 @@
+.edit-scope-section {
+    gap: 0 !important;
+}
+
+.scope-container {
+    width: 100%;
+    margin: 0;
+    padding: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.menu-container {
+    display: flex;
+    justify-content: center;
+    background-color: #ffffff;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    /* margin-top: 20px; */
+    width: 100%;
+}
+
+.scope-container .nav {
+    list-style-type: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.scope-container .nav li {
+    margin: 0 10px;
+}
+
+.scope-container .nav li a.active {
+    background-color: #a51e36;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(90, 103, 216, 0.2);
+    transition: all 0.3s ease;
+}
+
+.scope-container .nav li a.active:hover {
+    background-color: #a51e36;
+    color: #fff;
+}
+
+.scope-container .nav li a {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 16px;
+    color: #555;
+    text-decoration: none;
+    background-color: #f1f5f9;
+    border-radius: 30px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+.scope-container .nav li a:hover {
+    background-color: #e2e8f0;
+    color: #333;
+}
+
+
+.authorized-body,
+.licensed-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.permitted-activity-body {
+    padding: 5px 15px;
+    line-height: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.scope-permitted-activity-header p {
+    text-align: center;
+}
+
+.scope-permitted-activity-header {
+    background-color: #f2b6c0;
+    padding: 5px 0px;
+}
+
+
+.view-prev-version-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+
+.revision-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.revision-list li {
+    margin-bottom: 0.5rem;
+}
+
+.revision-list li a:hover {
+    color: #bc3a52;
+    cursor: pointer;
+}
+
+.change-rev {
+    padding: 10px 15px;
+    border: 0;
+}
+
+
+
+
+.regulated-activities-header {
+    display: flex;
+    justify-content: space-between;
+    /* Space out elements */
+    align-items: center;
+    /* Center items vertically */
+    background-color: #f2b6c0;
+    padding: 5px 10px;
+}
+
+.regulated-activity-view {
+    justify-content: space-evenly;
+}
+
+.select-container {
+    display: flex;
+    gap: 20px;
+    /* Adjust gap as needed */
+    justify-content: center;
+    /* Center selects */
+    flex-grow: 1;
+    /* Allow the selects container to grow and take up space */
+}
+
+
+.regulated-activities-header p {
+    margin: 0;
+}
+
+.conditions-and-restrictions-header {
+    background-color: #f2b6c0;
+    padding: 5px 0px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.conditions-and-restrictions-header p {
+    margin: 0;
+}
+
+.specific-conditions-and-restrictions-header {
+    background-color: #f2b6c0;
+    padding: 5px 0px;
+    text-align: center;
+}
+
+.specific-conditions-and-restrictions-header p {
+    margin: 0;
+}
+
+.scrolablebody {
+    overflow-x: scroll;
+}
+
+.category-select,
+.activity-select {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.category-select select,
+.activity-select select {
+    padding: 6px 5px;
+    border-radius: 7.2px;
+    border: 0.72px #b1b1b1 solid;
+    width: 400px;
+}
+
+.regulated-activity-table {
+    margin-top: 5px;
+}
+
+.regulated-activity-table tr {
+    background-color: transparent;
+}
+
+.regulated-activity-table th {
+    border-radius: 0;
+}
+
+.regulated-activity-table thead tr td {
+    text-align: center;
+}
+
+.regulated-activity-table tbody tr td {
+    text-align: left !important;
+    cursor: default;
+}
+
+.nested-table {
+    border-radius: 0;
+}
+
+.nested-table tr td,
+.nested-table tr th {
+    text-align: left !important;
+    cursor: default;
+    border-radius: 0;
+}
+
+.nested-table td {
+    padding: 6px;
+}
+
+.nested-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.products-header {
+    background-color: #dbdbdb;
+    text-align: center;
+}
+
+.products-header p {
+    padding: 3px 0px;
+}
+
+.action-column {
+    border-radius: 5px;
+    padding: 2px;
+    outline: 0;
+}
+
+.removeRegulatedActivity {
+    background: red;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px 10px;
+    border-radius: 7px;
+}
+
+.add-btn-container {
+    margin-left: auto;
+}
+
+.add-permitted-btn {
+    border: none;
+    font-size: 15px;
+    padding: 5px;
+    border-radius: 7px;
+    background: #A51E36;
+    margin-right: 10px;
+    color: white;
+}
+
+.products-header p {
+    padding: 3px 0px;
+}

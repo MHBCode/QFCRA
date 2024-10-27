@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { SecurityService } from '../ngServices/security.service';
+import { filter, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-details-layout-component',
@@ -8,8 +9,8 @@ import { SecurityService } from '../ngServices/security.service';
   styleUrls: ['./details-layout-component.component.scss']
 })
 export class DetailsLayoutComponent {
-  @Input() subsiteName: string = 'All Firms';
-  @Input() pageTitle: string;
+  subsiteName: string = 'All Firms';
+  pageTitle: string;
   isUserAllowed: boolean | null = null;
   isLoading: boolean = false;
   firmId: number = 0;
@@ -20,7 +21,7 @@ export class DetailsLayoutComponent {
   width2: string = '6%';
   widthData1: string = '98%';
   widthData2: string = '85%';
-  closedMenu : boolean = true;
+  closedMenu: boolean = true;
   activeMenu: string | null = null;
 
   constructor(
@@ -39,7 +40,12 @@ export class DetailsLayoutComponent {
     this.route.url.subscribe(() => {
       this.activeMenu = this.router.url.includes('/firms') ? 'firmDetails' : null;
     });
-    
+
+    this.route.queryParams.subscribe(params => {
+      this.pageTitle = params['pageTitle'];
+      this.subsiteName = params['subsiteName'];
+    });
+
   }
 
 
@@ -58,11 +64,15 @@ export class DetailsLayoutComponent {
   }
 
   toggleFulMenu() {
-    this.menuWidth = this.menuWidth !== this.width2 ? this.width2 : this.width1;
-    this.dataWidth = this.dataWidth === this.widthData1 ? this.widthData2 : this.widthData1;
+    if (this.menuWidth !== this.width2) {
+      this.menuWidth = this.width2;
+      this.dataWidth = this.widthData1;
+    } else {
+      this.menuWidth = this.width1;
+      this.dataWidth = this.widthData2;
+    }
     this.closedMenu = !this.closedMenu;
   }
-
 
   toggleMenu(menu: string) {
     this.activeMenu = this.activeMenu === menu ? null : menu;

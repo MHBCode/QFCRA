@@ -1,1 +1,229 @@
-<p>auditors works!</p>
+<div *ngIf="isLoading" class="loader-overlay">
+    <div class="loader"></div>
+</div>
+
+<div class="form-section">
+  <div class="inputs-field-set">
+    <div class="section">
+      <div class="auditor-header">
+        <h2 class="edit-firm-header">
+          Auditors > <span>{{ firmDetails?.FirmName }}</span>
+        </h2>
+        <div class="btn">
+          <button (click)="createAuditor()">
+            <i class="bi bi-plus"></i>
+            Create
+          </button>
+        </div>
+      </div>
+      <span class="enhanced-checkbox">
+        <input id="InactiveAuditors" type="checkbox" (change)="onInactiveAuditorsToggle($event)" />
+        <label for="InactiveAuditors">Display Inactive Auditors</label>
+      </span>
+      <table class="auditor-table">
+        <thead>
+          <tr>
+            <!--leave it empty-->
+            <th>Auditor Name</th>
+            <th>Auditor Type</th>
+            <th>Effective From Date</th>
+            <th>Effective To Date</th>
+            <th>Last Updated By</th>
+            <th>Last Updated Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let auditor of filteredAuditors" (click)="viewAuditor(auditor)">
+            <td (click)="viewAuditor(auditor)">
+              {{ auditor.OtherEntityName }}
+            </td>
+            <td (click)="viewAuditor(auditor)">
+              {{ auditor.EntitySubTypeDesc }}
+            </td>
+            <td (click)="viewAuditor(auditor)">{{ auditor.AssnDateFrom }}</td>
+            <td (click)="viewAuditor(auditor)">{{ auditor.AssnDateTo }}</td>
+            <td (click)="viewAuditor(auditor)">
+              {{ auditor.LastMeodifiedBy }}
+            </td>
+            <td (click)="viewAuditor(auditor)">
+              {{ auditor.LastModifiedDate }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- Popup for viewing/editing auditor -->
+  <div *ngIf="IsViewAuditorVisible || IsEditAuditorVisible" class="contollerPopupOverlay">
+    <div class="contollerPopupContent">
+      <div class="popup-title-btn-row">
+        <div class="popup-header">
+          <h3>
+            {{
+            IsEditAuditorVisible
+            ? 'Edit Auditor Details'
+            : 'Auditor Details'
+            }}
+          </h3>
+        </div>
+        <button class="close-button" (click)="closeAuditorPopup()">
+          <i class="bi bi-x-circle close-icon"></i>
+        </button>
+      </div>
+      <div class="error-messages">
+        <!-- Auditor Name Error -->
+        <p *ngIf="errorMessages['OtherEntityName']">
+          {{ errorMessages['OtherEntityName'] }}
+        </p>
+        <!-- Auditor Type Error -->
+        <p *ngIf="errorMessages['EntitySubTypeID']">
+          {{ errorMessages['EntitySubTypeID'] }}
+        </p>
+        <p *ngIf="errorMessages['AssnDateFrom']">
+          {{ errorMessages['AssnDateFrom'] }}
+        </p>
+        <p *ngIf="errorMessages['AssnDateTo']">
+          {{ errorMessages['AssnDateTo'] }}
+        </p>
+      </div>
+      <form>
+        <div class="inputs-row">
+          <div class="input-field">
+            <label for="auditorName">Auditor Name</label>
+            <ng-container *ngIf="IsEditAuditorVisible; else viewAuditorName">
+              <select disabled name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID">
+                <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">
+                  {{ name.OtherEntityName }}
+                </option>
+              </select>
+            </ng-container>
+            <ng-template #viewAuditorName>
+              <input name="auditorName" id="auditorName" type="text" [(ngModel)]="selectedAuditor.OtherEntityName"
+                disabled />
+            </ng-template>
+          </div>
+          <div class="input-field">
+            <label for="auditorType">Auditor Type</label>
+            <ng-container *ngIf="IsEditAuditorVisible; else viewAuditorType">
+              <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID">
+                <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">
+                  {{ type.EntitySubTypeDesc }}
+                </option>
+              </select>
+            </ng-container>
+            <ng-template #viewAuditorType>
+              <input name="auditorType" id="auditorType" type="text" [(ngModel)]="selectedAuditor.EntitySubTypeDesc"
+                disabled />
+            </ng-template>
+          </div>
+          <div class="input-field">
+            <label for="effectiveFromDate">Effective From Date</label>
+            <input [disabled]="!IsEditAuditorVisible" #dateInputs placeholder name="effectiveFromDate" id="effectiveFromDate"
+              type="text" [(ngModel)]="selectedAuditor.AssnDateFrom" />
+          </div>
+          <div class="input-field">
+            <label for="effectiveToDate">Effective To Date</label>
+            <input [disabled]="!IsEditAuditorVisible" #dateInputs placeholder name="effectiveToDate" id="effectiveToDate"
+              type="text" [(ngModel)]="selectedAuditor.AssnDateTo" />
+          </div>
+        </div>
+        <div class="btn justify-content-end">
+          <button *ngIf="!IsEditAuditorVisible" (click)="editAuditor()">
+            <i class="bi bi-pen"></i> Edit
+          </button>
+          <button *ngIf="!IsEditAuditorVisible" (click)="confirmDeleteAuditor()">
+            <i class="bi bi-trash"></i> Delete
+          </button>
+          <button *ngIf="IsEditAuditorVisible" (click)="saveEditAuditor()">
+            <i class="bi bi-save"></i> Save
+          </button>
+          <button *ngIf="IsEditAuditorVisible" (click)="cancelEdit()">
+            <i class="bi bi-x"></i> Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- create Auditor popup -->
+  <div class="contollerPopupOverlay" *ngIf="IsCreateAuditorVisible">
+    <div class="contollerPopupContent">
+      <div class="popup-title-btn-row">
+        <div class="popup-header">
+          <h3>
+            Auditor Details For {{ selectedAuditor?.OtherEntityName }}
+          </h3>
+        </div>
+        <!-- Save and Cancel Buttons -->
+        <button class="close-button" (click)="closecreateAuditor()">
+          <i class="bi bi-x-circle close-icon"></i>
+        </button>
+      </div>
+      <div class="error-messages">
+        <!-- Auditor Name Error -->
+        <p *ngIf="errorMessages['OtherEntityName']">
+          {{ errorMessages['OtherEntityName'] }}
+        </p>
+        <!-- Auditor Type Error -->
+        <p *ngIf="errorMessages['EntitySubTypeID']">
+          {{ errorMessages['EntitySubTypeID'] }}
+        </p>
+        <p *ngIf="errorMessages['AssnDateFrom']">
+          {{ errorMessages['AssnDateFrom'] }}
+        </p>
+        <p *ngIf="errorMessages['AssnDateTo']">
+          {{ errorMessages['AssnDateTo'] }}
+        </p>
+      </div>
+      <form>
+        <div class="inputs-row">
+          <div class="input-field">
+            <label for="auditorName">
+              Auditor Name <span style="color: red">*</span>
+            </label>
+            <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID"
+              (change)="onAuditorChange($event)">
+              <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">
+                {{ name.OtherEntityName }}
+              </option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="input-field" *ngIf="selectedAuditor.OtherEntityID === 'other'">
+            <label for="customAuditorName">
+              Custom Auditor Name <span style="color: red">*</span>
+            </label>
+            <input id="customAuditorName" name="customAuditorName" type="text"
+              [(ngModel)]="selectedAuditor.customAuditorName" placeholder="Enter Custom Auditor Name" />
+          </div>
+
+          <div class="input-field">
+            <label for="auditorType">
+              Auditor Type <span style="color: red">*</span>
+            </label>
+            <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID">
+              <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">
+                {{ type.EntitySubTypeDesc }}
+              </option>
+            </select>
+          </div>
+          <div class="input-field">
+            <label for="address2">
+              Effective From Date <span style="color: red">*</span>
+            </label>
+            <input name="effectiveFromDate" [(ngModel)]="selectedAuditor.AssnDateFrom" id="effectiveFromDate"
+              type="text" #dateInputs placeholder/>
+          </div>
+          <div class="input-field">
+            <label for="effectiveToDate"> Effective To Date </label>
+            <input name="effectiveToDate" [(ngModel)]="selectedAuditor.AssnDateTo" id="effectiveToDate" type="text"
+              #dateInputs placeholder/>
+          </div>
+        </div>
+        <div class="btn justify-content-end">
+          <button (click)="saveCreateAuditor()">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

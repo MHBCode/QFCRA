@@ -163,5 +163,13 @@ export class FirmService {
   isNullOrEmpty(value: any): boolean {
     return value === null || value === '';
   }
-
+  
+  removeHtmlTags(input: string | null | undefined): string {
+    // Check if input is null or undefined
+    if (!input) {
+      return ''; // Return an empty string if input is null or undefined
+    }
+    // This regex will remove all HTML tags
+    return input.replace(/<[^>]*>/g, '');
+  }
 }

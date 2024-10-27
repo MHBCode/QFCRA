@@ -38,12 +38,28 @@ const routes: Routes = [
         path: 'view',
         component: DetailsLayoutComponent,
         children: [
-          { path: ':id', component: FirmsDetailsComponent },
-          { path: 'core-details/:id', component: CoreDetailsComponent },
-          { path: 'controllers/:id', component: ControllersComponent },
-          { path: 'auditors/:id', component: AuditorsComponent },
-          { path: 'contacts/:id', component: ContactsComponent },
-          { path: 'scope/:id', component: ScopeComponent },
+          {
+            path: ':id',
+            component: FirmsDetailsComponent          },
+          {
+            path: 'core-details/:id',
+            component: CoreDetailsComponent          },
+          {
+            path: 'controllers/:id',
+            component: ControllersComponent
+          },
+          {
+            path: 'auditors/:id',
+            component: AuditorsComponent
+          },
+          {
+            path: 'contacts/:id',
+            component: ContactsComponent
+          },
+          {
+            path: 'scope/:id',
+            component: ScopeComponent
+          }
         ],
       },
     ],

@@ -138,8 +138,33 @@
         border-top-left-radius: 15px;
         border-top-right-radius: 15px;
     }
+
 }
 
+.ScopeLicPreviousVersionsPopup,
+.ScopeAuthPreviousVersionsPopup {
+    padding: 0 !important;
+    width: 40vw !important;
+    overflow-y: auto;
+    overflow-x: visible;
+}
+
+.ScopeLicPreviousVersionsPopup .popup-header,
+.ScopeAuthPreviousVersionsPopup .popup-header {
+    width: 100% !important;
+    background-color: #a51e36 !important;
+
+    h3 {
+        color: white !important;
+        width: 50% !important;
+        margin: auto !important;
+        text-align: center;
+    }
+}
+
+.close-icon-prev-revisions {
+    top: 2rem !important;
+}
 .ApplicationDetailsPopUp table {
     border-top-left-radius: initial;
     border-top-right-radius: initial;
@@ -210,15 +235,22 @@
     min-height: 40px;
 }
 
-.inputs-field-set.collapsed .inputs-row , .inputs-field-set.collapsed hr , .inputs-field-set.collapsed .regulated-activities-container , .input-field-set.collapsed .add-btn-container , .inputs-field-set.collapsed .file-container , .inputs-field-set.collapsed .file-table-container , .authorized-body.collapsed , .licensed-body.collapsed {
+.inputs-field-set.collapsed .inputs-row,
+.inputs-field-set.collapsed hr,
+.inputs-field-set.collapsed .regulated-activities-container,
+.input-field-set.collapsed .add-btn-container,
+.inputs-field-set.collapsed .file-container,
+.inputs-field-set.collapsed .file-table-container,
+.authorized-body.collapsed,
+.licensed-body.collapsed {
     display: none;
 }
 
-.inputs-field-set.collapsed{
+.inputs-field-set.collapsed {
     min-height: 50px;
 }
 
-.addAddressBtn{
+.addAddressBtn {
     background: #A51E36;
     color: white;
     border: none;
@@ -228,7 +260,7 @@
     margin-right: 10px;
 }
 
-.addressHistoryPopup .address-type-info{
+.addressHistoryPopup .address-type-info {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
@@ -250,8 +282,199 @@
     padding: 5px 10px;
     border-radius: 7px;
 }
+
 hr {
     background-color: #A51E36;
     width: 100%;
     margin: 10px 0px;
+}
+
+.collapse-container {
+    justify-content: flex-start;
+}
+
+.error-messages {
+    margin: 10px;
+}
+
+// Upload document section style 
+.btns-container button {
+    padding: 7px 20px;
+    background-color: #a51e36;
+    color: white;
+    border-radius: 10px;
+    border: 0;
+    font-size: 1em;
+}
+
+.upload-container {
+    position: relative;
+    display: inline-block;
+}
+
+.btns-container {
+    display: flex;
+    gap: 1%;
+    width: 100%;
+}
+
+.file-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.document-type-select {
+    width: 70% !important;
+}
+
+
+.popupcontainer .popup-info-place.upload-container {
+    flex-direction: column;
+    align-items: flex-start;
+    display: flex !important;
+}
+
+.upload-document-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+// end document style
+
+
+.edit-firm-header>span {
+    color: #a51e36;
+    font-size: 1em;
+    font-weight: 500;
+    line-height: 24px;
+    word-wrap: break-word;
+}
+
+#websiteLink {
+    color: #a41e36;
+    text-decoration: none;
+    word-break: break-word;
+}
+
+.view-prev-version {
+    color: blue;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.section p {
+    margin: 0 0 10px;
+}
+
+
+.contollerPopupContent {
+    background-color: #ffffff;
+    padding: 1rem;
+    border-radius: 10px;
+    width: 78vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 0 0 10px rgba(146, 146, 146, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: -moz-fit-content;
+    height: fit-content;
+}
+
+.contollerPopupOverlay{
+    display: flex;
+    justify-content: center;
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    padding-top: 5vh;
+}
+.contollerPopupContent .popup-title-btn-row {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #a51e36;
+    margin-bottom: 15px;
+}
+.contollerPopupContent .popup-header h3{
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #a51e36;
+    width: 95%;
+}
+.contollerPopupContent .popup-title-btn-row h3 {
+    border-bottom: 0px !important;
+}
+.contollerPopupContent .popup-title-btn-row .popup-header {
+    width: 50%;
+}
+.close-button {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.close-icon{
+    font-size: 26px;
+    cursor: pointer;
+    color: #a51e36;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+}
+
+.contollerPopupContent .inputs-row{
+    gap: 3.5%;
+    justify-content: flex-start;
+    padding: 0px;
+}
+.contollerPopupContent .input-field {
+    width: 31%;
+}
+.btn {
+    display: flex;
+    gap: 1%;
+}
+
+.contollerPopupContent .addresses {
+    margin: 10px 0px;
+}
+
+.additional-details {
+    width: 100% !important;
+}
+
+.contollerPopupContent .input-field input:disabled, .contollerPopupContent .input-field input[readonly], .contollerPopupContent .input-field select:disabled, .contollerPopupContent .input-field select[readonly] {
+    background-color: transparent;
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #c2c2c2;
+    background-color: #fffafa;
+}
+
+.auditor-header, .contacts-header, .return-review-header, .ENFAction-header, .Journal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.enhanced-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
