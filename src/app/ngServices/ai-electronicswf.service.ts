@@ -14,4 +14,12 @@ export class AiElectronicswfService {
     const url = `${this.aiElectronicsWFUrl}get_approved_individuals?firmId=${firmId}&status=${"Approved"}`;  
     return this.http.get<any>(url);
   }
+  getWithdrawnIndividualsser(firmId: number, status: string): Observable<any> {
+    const url = `${this.aiElectronicsWFUrl}get_approved_individuals?firmId=${firmId}&status=${"Withdrawn"}`;  
+    return this.http.get<any>(url);
+  }
+  getAppliedIndividuals(firmId: number, status: string): Observable<any> {
+    const url = `${this.aiElectronicsWFUrl}get_approved_individuals?firmId=${firmId}&status=${"Applied"}`;  
+    return this.http.get<any>(url);
+  }
 }

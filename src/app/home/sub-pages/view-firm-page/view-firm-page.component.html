@@ -2026,7 +2026,7 @@
     <!-- Popup Section -->
     <div *ngIf="isPopupOpen" (click)="closeControllerPopup()" class="contollerPopupOverlay">
       <div (click)="$event.stopPropagation()" class="contollerPopupContent">
-        <div class="error-messages">
+        <!-- <div class="error-messages">
           <p *ngIf="errorMessages['OtherEntityName']">
             {{ errorMessages['OtherEntityName'] }}
           </p>
@@ -2045,7 +2045,7 @@
           <p *ngIf="errorMessages['PctOfShares']">
             {{ errorMessages['PctOfShares'] }}
           </p>
-        </div>
+        </div> -->
         <!-- Title -->
         <div class="popup-title-btn-row">
           <div class="popup-header">
@@ -2547,7 +2547,7 @@
           <div class="btn"></div>
         </div>
 
-        <div class="error-messages">
+        <!-- <div class="error-messages">
           <p *ngIf="errorMessages['OtherEntityName']">
             {{ errorMessages['OtherEntityName'] }}
           </p>
@@ -2566,7 +2566,7 @@
           <p *ngIf="errorMessages['PctOfShares']">
             {{ errorMessages['PctOfShares'] }}
           </p>
-        </div>
+        </div> -->
         <div class="inputs-row">
           <div class="input-field">
             <label for="controllerType">
@@ -3331,7 +3331,7 @@
               <div class="btn"></div>
             </div>
     
-            <div class="error-messages">
+            <!-- <div class="error-messages">
               <p *ngIf="errorMessages['OtherEntityName']">
                 {{ errorMessages['OtherEntityName'] }}
               </p>
@@ -3350,7 +3350,7 @@
               <p *ngIf="errorMessages['PctOfShares']">
                 {{ errorMessages['PctOfShares'] }}
               </p>
-            </div>
+            </div> -->
             <div class="inputs-row">
               <div class="input-field">
                 <label for="contactFrom">
@@ -3992,7 +3992,17 @@
               <th>Request Status</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            <tr *ngFor="let individual of AllAppliedIndividuals">
+              <td>{{individual.FullName}} Individual Name</td>
+              <td>{{individual.FunctionActivity}} Controlled Functions</td>
+              <td>{{individual.DocAbbreviation}} Form Type</td>
+              <td>{{individual.AppliedDate}} Applied Date</td>
+              <td>{{individual.CurrentStatus}} Function Status</td>
+              <td>{{individual.RSGAssessmentDate}} RSG Assessment Completion Date</td>
+              <td>{{individual.ObjectStatus}} Request Status</td>
+            </tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -4003,7 +4013,6 @@
         <table>
           <thead>
             <tr>
-              <th></th>
               <th>Individual Name</th>
               <th>Controlled Functions</th>
               <th>Applied Date</th>
@@ -4013,13 +4022,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let individual of AllapprovedIndividuals">
-              <td class="radio-table">
-                <label class="radioBtn">
-                  <input type="radio" />
-                  <span></span>
-                </label>
-              </td>
+            <tr *ngFor="let individual of AllapprovedIndividuals">             
               <td>{{individual.AppIndividualNum}}</td>
               <td>{{individual.FunctionActivity}}</td>
               <td>{{individual.AppliedDate}}</td>
@@ -4028,6 +4031,7 @@
               <td>{{individual.ApprovedDate}}</td>
             </tr>
           </tbody>
+         
         </table>
       </div>
     </div>
@@ -4038,7 +4042,6 @@
         <table>
           <thead>
             <tr>
-              <th></th>
               <th>Individual Name</th>
               <th>Controlled Functions</th>
               <th>Form Type</th>
@@ -4049,25 +4052,39 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="radio-table">
-                <label class="radioBtn">
-                  <input type="radio" />
-                  <span></span>
-                </label>
-              </td>
-              <td>Individual Name</td>
-              <td>Controlled Functions</td>
-              <td>Form Type</td>
-              <td>Previous Status</td>
-              <td>Current Status</td>
-              <td>Current Status Effective Date</td>
-              <td>Request Status</td>
-            </tr>
+            <!-- Loop over grouped individuals -->
+            <ng-container *ngFor="let individualGroup of withdrawnIndividuals | keyvalue">
+              <!-- Loop over each individual -->
+              <ng-container *ngIf="individualGroup.value.length > 0">
+                <!-- Loop over each individual for their activities -->
+                <ng-container *ngFor="let individual of individualGroup.value; let i = index">
+                  <!-- Loop over each FunctionActivity for the individual -->
+                  <ng-container *ngFor="let functionActivity of individual.FunctionActivity; let j = index">
+                    <tr>
+                      <!-- Display the individual name only once per group (first row), using rowspan -->
+                      <td *ngIf="i === 0 && j === 0; else emptyCell" [attr.rowspan]="individual.FunctionActivity.length">
+                        {{ individual.FullName }} ({{ individual.AppIndividualNum }})
+                      </td>
+                      <ng-template #emptyCell>
+                        <td></td>
+                      </ng-template>
+                      <td>{{ functionActivity }} {{ individual.FunctionType }}</td>
+                      <td>{{ individual.DocAbbreviation }}</td>
+                      <td>{{ individual.PreviousStatus }}</td>
+                      <td>{{ individual.CurrentStatus }}</td>
+                      <td>{{ individual.CurrentStatusSetDate ? (individual.CurrentStatusSetDate | date: 'dd/MMM/yyyy') : '' }}</td>
+                      <td>{{ individual.ObjectStatus }}</td>
+                    </tr>
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+            </ng-container>
           </tbody>
         </table>
       </div>
     </div>
+    
+        
   </section>
 
   <!--End Individuals sub sections-->

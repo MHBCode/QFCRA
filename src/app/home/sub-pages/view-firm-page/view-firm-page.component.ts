@@ -272,8 +272,18 @@ export class ViewFirmPageComponent implements OnInit {
 
   /* loader flag */
   isLoading: boolean = false;
+
   //  individuals section
   AllapprovedIndividuals: any = []; 
+  withdrawnIndividuals: { [key: string]: any[] } = {};
+  AllAppliedIndividuals: any = []; 
+  currentPage: number = 1;
+  totalPages: number = 0;
+  totalRows: number = 0;
+  paginatedFirms: any[] = [];
+  startRow: number = 0;
+  endRow: number = 0;
+  pageSize: number = 8;
 
   showAddressesForm = false;
   AllRegulater: any = [];
@@ -306,7 +316,9 @@ export class ViewFirmPageComponent implements OnInit {
   ngOnInit(): void {
     console.log('ngOnInit called');
     this.scrollToTop();
-
+    this.updatePaginationapproved();
+    this.updatePaginationWithdrawn();
+    this.updatePaginationApplied();
 
     this.route.params.subscribe(params => {
       this.firmId = +params['id']; // Retrieve the firm ID from the route parameters
@@ -349,9 +361,15 @@ export class ViewFirmPageComponent implements OnInit {
       this.getAllContactFromByFrimsId();
 
       this.getApprovedIndividuals(this.firmId, 'Approved');
+      this.getWithdrawnIndividuals(this.firmId)
+      this.getAppliedIndividuals(this.firmId, "Applied")
     });
   }
-
+  ngOnChanges(): void {
+    this.updatePaginationapproved();
+    this.updatePaginationWithdrawn();
+    this.updatePaginationApplied();
+  }
   ngAfterViewInit() {
     // Ensure the query list is available
     this.dateInputs.changes.subscribe(() => {
@@ -6324,8 +6342,118 @@ export class ViewFirmPageComponent implements OnInit {
   console.log("AllapprovedIndividuals",this.AllapprovedIndividuals)
 }
 
+getAppliedIndividuals(firmId: number, status: string):void {
+  this.aiElectronicswfService.getAppliedIndividuals(this.firmId, status).subscribe(
+    (data) => {
+      this.AllAppliedIndividuals = data.response;
+    },
+    (error) => {
+      console.error('Error fetching approved individuals:', error);
+    }
+  );
+  console.log("AllAppliedIndividuals",this.AllAppliedIndividuals)
+}
 
+getWithdrawnIndividuals(firmId: number): void {
+  this.aiElectronicswfService.getWithdrawnIndividualsser(firmId, 'Withdrawn').subscribe(
+    (data: { response: any[] }) => {
+      const lstWithdrawn = data.response; 
 
+      if (Array.isArray(lstWithdrawn)) {
+        lstWithdrawn.forEach(item => {
+          if (item.ApprovedDate) {
+            item.AppliedDate = item.ApprovedDate;
+          }
+          if (item.WithdrawnDate) {
+            item.AppliedForWithdrawalDate = item.WithdrawnDate;
+          }
+          if (!Array.isArray(item.FunctionActivity)) {
+            item.FunctionActivity = item.FunctionActivity ? [item.FunctionActivity] : [];
+          }
+        });
+        this.withdrawnIndividuals = this.groupBy(lstWithdrawn, 'AppIndividualID');
+        console.log('withdrawnIndividuals', this.withdrawnIndividuals);
+      } else {
+        console.error('Invalid response format: expected an array.');
+      }
+    },
+    error => {
+      console.error('Error fetching withdrawn individuals:', error);
+    }
+  );
+}
+
+// Helper function to group individuals by AppIndividualID
+groupBy(arr: any[], key: string): { [key: string]: any[] } {
+  return arr.reduce((accumulator, currentValue) => {
+    // If the key doesn’t exist, initialize it as an empty array
+    (accumulator[currentValue[key]] = accumulator[currentValue[key]] || []).push(currentValue);
+    return accumulator;
+  }, {});
+}
+
+  // Navigate to the previous page
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginationapproved();
+      this.updatePaginationWithdrawn();
+      this.updatePaginationApplied();
+    }
+  }
+
+  // Navigate to the next page
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginationapproved();
+      this.updatePaginationWithdrawn();
+      this.updatePaginationApplied();
+    }
+  }
+
+  updatePaginationapproved(): void {
+    if (this.AllapprovedIndividuals && this.AllapprovedIndividuals.length > 0) {
+      this.totalRows = this.AllapprovedIndividuals.length;
+      this.totalPages = Math.ceil(this.totalRows / this.pageSize);
+      const startIndex = (this.currentPage - 1) * this.pageSize;
+      const endIndex = Math.min(startIndex + this.pageSize, this.totalRows);
+      this.paginatedFirms = this.AllapprovedIndividuals.slice(startIndex, endIndex); // Paginated data
+      this.startRow = startIndex + 1;
+      this.endRow = endIndex;
+    } else {
+      this.paginatedFirms = []; // Reset paginated firms if no data
+    }
+  }
+  updatePaginationApplied(): void {
+    if (this.AllAppliedIndividuals && this.AllAppliedIndividuals.length > 0) {
+      this.totalRows = this.AllAppliedIndividuals.length;
+      this.totalPages = Math.ceil(this.totalRows / this.pageSize);
+      const startIndex = (this.currentPage - 1) * this.pageSize;
+      const endIndex = Math.min(startIndex + this.pageSize, this.totalRows);
+      this.paginatedFirms = this.AllAppliedIndividuals.slice(startIndex, endIndex); // Paginated data
+      this.startRow = startIndex + 1;
+      this.endRow = endIndex;
+    } else {
+      this.paginatedFirms = []; // Reset paginated firms if no data
+    }
+  }
+  updatePaginationWithdrawn(): void {
+    if (this.withdrawnIndividuals && Object.keys(this.withdrawnIndividuals).length > 0) {
+      const withdrawnIndividualsArray = Object.values(this.withdrawnIndividuals).flat(); // Flatten the grouped arrays into a single array
+  
+      this.totalRows = withdrawnIndividualsArray.length;
+      this.totalPages = Math.ceil(this.totalRows / this.pageSize);
+      const startIndex = (this.currentPage - 1) * this.pageSize;
+      const endIndex = Math.min(startIndex + this.pageSize, this.totalRows);
+  
+      this.paginatedFirms = withdrawnIndividualsArray.slice(startIndex, endIndex); // Paginated data
+      this.startRow = startIndex + 1;
+      this.endRow = endIndex;
+    } else {
+      this.paginatedFirms = []; // Reset paginated firms if no data
+    }
+  }
 
 
 

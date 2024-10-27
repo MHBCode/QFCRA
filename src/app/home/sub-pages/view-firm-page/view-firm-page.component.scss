@@ -1450,7 +1450,9 @@ hr {
   /* Remove max-width constraint */
   overflow-y: scroll;
 }
-
+tr .pagination{
+  width: 100%;
+}
 .create-controller-overlay {
   display: flex;
   justify-content: center;
