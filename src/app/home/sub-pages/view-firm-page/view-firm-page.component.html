@@ -2391,9 +2391,32 @@
             <div class="popup-header">
               <h3>Addresses</h3>
             </div>
-
+            <button (click)="addAddressForm()" *ngIf="canAddNewAddress" style="
+              background-color: green;
+              color: white;
+              border: none;
+              padding: 5px;
+              cursor: pointer;
+              border-radius: 5px;
+              float: right;
+            ">
+            <i style="size: 7px" class="bi bi-plus-lg"></i>
+          </button>
             <!-- Address Details -->
-            <div *ngFor="let address of addressForms; let i = index">
+            <div *ngFor="let address of filteredControllerfirmAddresses; let i = index">
+            <ng-container *ngIf="address.Valid === true">
+              <hr />
+              <button (click)="removeControllerAddress(i)"  style="
+                  float: right;
+                  background-color: red;
+                  color: white;
+                  border: none;
+                  padding: 5px;
+                  cursor: pointer;
+                  border-radius: 5px;
+                ">
+                <i style="size: 5px" class="bi bi-x-lg"></i>
+              </button>
               <div class="inputs-row">
                 <div class="input-field">
                   <label>Address Type</label>
@@ -2405,14 +2428,14 @@
                 </div>
                 <div class="input-field">
                   <label>Address - Line 1</label>
-                  <input type="text" [(ngModel)]="address.addressLine1" name="addressLine1" id="addressLine1"
+                  <input type="text" [(ngModel)]="address.AddressLine1" name="addressLine1" id="addressLine1"
                     [readonly]="!isEditable" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " />
                 </div>
                 <div class="input-field">
                   <label>Address - Line 2</label>
-                  <input [(ngModel)]="address.addressLine2" name="addressLine2" id="addressLine2"
+                  <input [(ngModel)]="address.AddressLine2" name="addressLine2" id="addressLine2"
                     [readonly]="!isEditable" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " />
@@ -2421,20 +2444,20 @@
               <div class="inputs-row">
                 <div class="input-field">
                   <label for="address3"> Address - Line 3 </label>
-                  <input [(ngModel)]="address.addressLine3" name="address3" id="address3" type="text" [disabled]="
+                  <input [(ngModel)]="address.AddressLine3" name="address3" id="address3" type="text" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " [readonly]="!isEditable" />
                 </div>
 
                 <div class="input-field">
                   <label for="address4"> Address - Line 4 </label>
-                  <input [(ngModel)]="address.addressLine4" name="address4" id="address4" type="text" [disabled]="
+                  <input [(ngModel)]="address.AddressLine4" name="address4" id="address4" type="text" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " [readonly]="!isEditable" />
                 </div>
                 <div class="input-field">
                   <label for="city">City</label>
-                  <input [(ngModel)]="address.city" name="city" id="city" type="text" [disabled]="
+                  <input [(ngModel)]="address.City" name="city" id="city" type="text" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " [readonly]="!isEditable" />
                 </div>
@@ -2442,7 +2465,7 @@
               <div class="inputs-row">
                 <div class="input-field">
                   <label for="stateProvince">State/Province</label>
-                  <input [(ngModel)]="address.stateProvince" name="stateProvince" id="stateProvince" [disabled]="
+                  <input [(ngModel)]="address.Province" name="stateProvince" id="stateProvince" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " [readonly]="!isEditable" />
                 </div>
@@ -2463,12 +2486,13 @@
                 </div>
                 <div class="input-field">
                   <label for="zipPostalCode">Zip/Postal Code</label>
-                  <input [(ngModel)]="address.zipPostalCode" name="zipPostalCode" id="zipPostalCode"
+                  <input [(ngModel)]="address.PostalCode" name="zipPostalCode" id="zipPostalCode"
                     [readonly]="!isEditable" [disabled]="
                       address.sameAsTypeID && address.sameAsTypeID != 0
                     " />
                 </div>
               </div>
+            </ng-container>
             </div>
           </div>
           <ng-container *ngIf="
@@ -3301,7 +3325,527 @@
         </table>
       </div>
     </div>
-
+        <!-- heree -->
+        <div *ngIf="showCreateContactSection" class="contollerPopupOverlay">
+          <div class="contollerPopupContent">
+            <div class="popup-title-btn-row">
+              <div class="popup-header">
+                <h3>Controller For {{ firmDetails?.FirmName }}</h3>
+              </div>
+              <button (click)="closeCreateContactPopup()" class="close-button">
+                <i class="bi bi-x-circle close-icon"></i>
+              </button>
+              <div class="btn"></div>
+            </div>
+    
+            <div class="error-messages">
+              <p *ngIf="errorMessages['OtherEntityName']">
+                {{ errorMessages['OtherEntityName'] }}
+              </p>
+              <p *ngIf="errorMessages['EffectiveDate']">
+                {{ errorMessages['EffectiveDate'] }}
+              </p>
+              <p *ngIf="errorMessages['CessationDate']">
+                {{ errorMessages['CessationDate'] }}
+              </p>
+              <p *ngIf="errorMessages['PlaceOfEstablishment']">
+                {{ errorMessages['PlaceOfEstablishment'] }}
+              </p>
+              <p *ngIf="errorMessages['ControllerControlTypeDesc']">
+                {{ errorMessages['ControllerControlTypeDesc'] }}
+              </p>
+              <p *ngIf="errorMessages['PctOfShares']">
+                {{ errorMessages['PctOfShares'] }}
+              </p>
+            </div>
+            <div class="inputs-row">
+              <div class="input-field">
+                <label for="contactFrom">
+                  Contact From<span style="color: red">*</span>
+                </label>
+                <select name="contactFrom" id="contactFrom" >
+                  <option value="select" selected>Select</option>
+                  <option *ngFor="let ContactFrom of AllContactFrom" [ngValue]="ContactFrom.EntityTypeID">
+                    {{ ContactFrom.EntityTypeName }}
+                  </option>
+                </select>
+              </div>
+              <!-- *ngIf="
+                    ContactFrom.EntityTypeName === 'Firm - Gulf Insurance Group (Gulf) B.S.C.(C)' " -->
+                <div class="input-field" style="width: 100%" >
+                  <label for="isBeingProvided">
+                    Is contact information being provided for an approved individual or an individual who has applied for approval of controlled functions?
+                    <span style="color: red">*</span>
+                  </label>
+                  <div class="radio-wrapper">
+                    <input name="isBeingProvided" id="yes" type="radio" [value]="true"  />
+                    Yes
+                    <input name="isBeingProvided" id="no" type="radio" [value]="false"  />
+                    No
+                  </div>
+                </div>
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'Parent Entity' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Corporate Controller' ||
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO – Corporate' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Head Office of a Branch'
+                  ">
+                  <label for="entityName">
+                    Full Name of Entity <span style="color: red">*</span>
+                  </label>
+                  <input name="entityName" id="entityName" [(ngModel)]="CreatecontrollerDetails.OtherEntityName"
+                    type="text" />
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO - Individual' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Individual Controller'
+                  ">
+                  <label for="individualTitle"> Title </label>
+                  <select [(ngModel)]="CreatecontrollerDetails.Title" name="legalStatus">
+                    <option *ngFor="let title of TitleEdit" [value]="title.TitleTypeId">
+                      {{ title.TitleDesc }}
+                    </option>
+                  </select>
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO - Individual' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Individual Controller'
+                  ">
+                  <label for="firstName">
+                    First Name <span style="color: red">*</span>
+                  </label>
+                  <input [(ngModel)]="CreatecontrollerDetails.FirstName" name="firstName" id="firstName" type="text" />
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO - Individual' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Individual Controller'
+                  ">
+                  <label for="secondName">
+                    Second Name <span style="color: red">*</span>
+                  </label>
+                  <input [(ngModel)]="CreatecontrollerDetails.SecondName" name="secondName" id="secondName" type="text" />
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO - Individual' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Individual Controller'
+                  ">
+                  <label for="familyName">
+                    Family Name <span style="color: red">*</span>
+                  </label>
+                  <input [(ngModel)]="CreatecontrollerDetails.FamilyName" name="familyName" id="familyName" type="text" />
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO - Individual' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Individual Controller'
+                  ">
+                  <label for="placeOfBirth"> Place of birth </label>
+                  <select required [(ngModel)]="CreatecontrollerDetails.PlaceOfBirth" name="placeOfBirth">
+                    <option *ngFor="let place of allCountries" [value]="place.CountryID">
+                      {{ place.CountryName }}
+                    </option>
+                  </select>
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO - Individual' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Individual Controller'
+                  ">
+                  <label for="dateOfBirth">
+                    Date of birth <span style="color: red">*</span>
+                  </label>
+                  <input [(ngModel)]="CreatecontrollerDetails.DateOfBirth" #dateInputs placeholder name="dateOfBirth" id="dateOfBirth"
+                    type="input" />
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO - Individual' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Individual Controller'
+                  ">
+                  <label for="passportNum"> Passport Number </label>
+                  <input [(ngModel)]="CreatecontrollerDetails.PassportNum" name="passportNum" id="passportNum"
+                    type="text" />
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO - Individual' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Individual Controller'
+                  ">
+                  <label for="jurisdictionIssue"> Jurisdiction of Issue </label>
+                  <select name="jurisdictionIssue" id="jurisdictionIssue">
+                    <option value="select">Select</option>
+                  </select>
+                </div>
+                <!---->
+                <div class="input-field" style="width: 100%" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO - Individual' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Individual Controller'
+                  ">
+                  <label for="isPEP">
+                    Is Politically Exposed Person (PEP)?
+                    <span style="color: red">*</span>
+                  </label>
+                  <div class="radio-wrapper">
+                    <input name="isPEP" id="yes" type="radio" [value]="true" [(ngModel)]="CreatecontrollerDetails.IsPEP" />
+                    Yes
+                    <input name="isPEP" id="no" type="radio" [value]="false" [(ngModel)]="CreatecontrollerDetails.IsPEP" />
+                    No
+                  </div>
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'Parent Entity' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Corporate Controller' ||
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO – Corporate' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Head Office of a Branch'
+                  ">
+                  <label for="legalStatus"> Legal Status </label>
+                  <select [(ngModel)]="CreatecontrollerDetails.LegalStatusTypeID" name="legalStatus">
+                    <option *ngFor="let status of legalStatusOptionsEdit" [value]="status.LegalStatusTypeID">
+                      {{ status.LegalStatusTypeDesc }}
+                    </option>
+                  </select>
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'Parent Entity' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Corporate Controller' ||
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO – Corporate' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Head Office of a Branch'
+                  ">
+                  <label for="registeredNumber"> Registered Number </label>
+                  <input [(ngModel)]="CreatecontrollerDetails.RegisteredNum" name="registeredNumber" id="registeredNumber"
+                    type="text" />
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'Parent Entity' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Corporate Controller' ||
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO – Corporate' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Head Office of a Branch'
+                  ">
+                  <label for="establishmentPlace">
+                    Place of Establishment <span style="color: red">*</span>
+                  </label>
+                  <select required [(ngModel)]="CreatecontrollerDetails.PlaceOfEstablishment" name="placeOfEstablishment">
+                    <option *ngFor="let place of allCountries" [value]="place.CountryID">
+                      {{ place.CountryName }}
+                    </option>
+                  </select>
+                </div>
+                <!---->
+                <!-- Display the % of Holding field only if the control type is "Percentage" -->
+    
+                <div class="input-field">
+                  <label for="controlType">
+                    Type of Control <span style="color: red">*</span>
+                  </label>
+                  <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeID" name="typeOfControl"
+                    id="typeOfControl" (ngModelChange)="CreateControlTypeDesc($event)">
+                    <option *ngFor="let ControlType of controlTypeOptionsCreate"
+                      [value]="ControlType.ControllerControlTypeID">
+                      {{ ControlType.ControllerControlTypeDesc }}
+                    </option>
+                  </select>
+                </div>
+    
+                <!-- Conditionally show the 'Percentage' input if the type is 'Percentage' -->
+                <ng-container *ngIf="CreatecontrollerDetails.ControllerControlTypeID == 1">
+                  <div class="input-field">
+                    <label for="holdingsPercentage"> % of Holding </label>
+                    <input [(ngModel)]="CreatecontrollerDetails.PctOfShares" name="holdingsPercentage"
+                      id="holdingsPercentage" type="text" />
+                  </div>
+                </ng-container>
+    
+                <!---->
+                <div class="input-field">
+                  <label for="effectiveDate"> Effective Date </label>
+                  <input [(ngModel)]="CreatecontrollerDetails.AssnDateFrom" name="effectiveDate" id="effectiveDate"
+                    #dateInputs placeholder type="text" />
+                </div>
+                <!---->
+                <div class="input-field">
+                  <label for="cessationDate"> Cessation Date </label>
+                  <input [(ngModel)]="CreatecontrollerDetails.AssnDateTo" name="cessationDate" id="cessationDate"
+                    #dateInputs placeholder type="text" />
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'Parent Entity' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Corporate Controller' ||
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO – Corporate' ||
+                    CreatecontrollerDetails.EntityTypeDesc ===
+                      'Head Office of a Branch'
+                  ">
+                  <label for="isRegulated"> Is the company regulated : </label>
+                  <div class="radio-wrapper">
+                    <input name="isRegulated" id="yes" type="radio" [(ngModel)]="CreatecontrollerDetails.IsCompanyRegulated"
+                      [value]="true" />
+                    Yes
+                    <input name="isRegulated" id="no" type="radio" [(ngModel)]="CreatecontrollerDetails.IsCompanyRegulated"
+                      [value]="false" />
+                    No
+                  </div>
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO – Corporate'
+                  ">
+                  <label for="isParent">
+                    Is it also Parent / Corporate Controller? :
+                  </label>
+                  <div class="radio-wrapper">
+                    <input name="isParent" id="yes" type="radio" [(ngModel)]="CreatecontrollerDetails.IsParentController" />
+                    Yes
+                    <input name="isParent" id="no" type="radio" [(ngModel)]="CreatecontrollerDetails.IsParentController" />
+                    No
+                  </div>
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO – Corporate'
+                  ">
+                  <label for="isCompanyTraded">
+                    Is the company publicly traded :
+                  </label>
+                  <div class="radio-wrapper">
+                    <input name="isCompanyTraded" id="yes" type="radio"
+                      [(ngModel)]="CreatecontrollerDetails.IsPublicallyTraded" [value]="true" />
+                    Yes
+                    <input name="isCompanyTraded" id="no" type="radio"
+                      [(ngModel)]="CreatecontrollerDetails.IsPublicallyTraded" [value]="false" />
+                    No
+                  </div>
+                </div>
+                <!---->
+                <div class="input-field" *ngIf="
+                    CreatecontrollerDetails.IsPublicallyTraded === false &&
+                    CreatecontrollerDetails.EntityTypeDesc === 'UBO – Corporate'
+                  ">
+                  <label for="more10UBOs">
+                    Are there any UBOs that own more than 10% of this entity? :
+                  </label>
+                  <div class="radio-wrapper">
+                    <input name="more10UBOs" id="yes" type="radio" [(ngModel)]="CreatecontrollerDetails.More10UBOs"
+                      [value]="true" />
+                    Yes
+                    <input name="more10UBOs" id="no" type="radio" [(ngModel)]="CreatecontrollerDetails.More10UBOs"
+                      [value]="false" />
+                    No
+                  </div>
+                </div>
+    
+                <div class="input-field additional-details fullwidth">
+                  <label for="additionalDetails"> Additional Details </label>
+                  <textarea [(ngModel)]="CreatecontrollerDetails.AdditionalDetails" name="additionalDetails"
+                    id="additionalDetails"></textarea>
+                </div>
+                <!---->
+            </div>
+            <div class="addresses create--inputs-field-set">
+              <div class="popup-header">
+                <h3>Addresses</h3>
+                <button (click)="addAddressForm()" [disabled]="addressForms.length >= 3" style="
+                    background-color: green;
+                    color: white;
+                    border: none;
+                    padding: 5px;
+                    cursor: pointer;
+                    border-radius: 5px;
+                    float: right;
+                  ">
+                  <i style="size: 7px" class="bi bi-plus-lg"></i>
+                </button>
+              </div>
+              <div *ngFor="let address of addressForms; let i = index">
+                <hr />
+                <button (click)="removeAddressForm(i)" style="
+                    float: right;
+                    background-color: red;
+                    color: white;
+                    border: none;
+                    padding: 5px;
+                    cursor: pointer;
+                    border-radius: 5px;
+                  ">
+                  <i style="size: 5px" class="bi bi-x-lg"></i>
+                </button>
+    
+                <div class="inputs-row">
+                  <!-- Address Type -->
+                  <div class="input-field">
+                    <label for="addressType"> Address Type </label>
+                    <select [(ngModel)]="address.AddressTypeID" (change)="onAddressTypeChange($event, address)" [ngClass]="{
+                        'error-border':
+                          !address.AddressTypeID && errorMessages['AddressTypeID'],
+                        
+                      }" [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0">
+                      <!-- Disable if Same As Type is selected -->
+                      <option value="0">Select</option>
+                      <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
+                        {{ option.AddressTypeDesc }}
+                      </option>
+                    </select>
+                  </div>
+    
+                  <!-- Same As Type (only for forms after the first one) -->
+                  <div *ngIf="i > 0" class="input-field">
+                    <label for="sameAsType">Same As Type</label>
+                    <select [(ngModel)]="address.sameAsTypeID" (change)="onSameAsTypeChangeg($event, address)" [ngClass]="{
+                        'error-border':
+                          !address.sameAsTypeID && errorMessages['sameAsTypeID'],
+                        
+                      }" id="sameAsType" name="sameAsType">
+                      <option value="0">Select</option>
+                      <!-- Dynamically populate the options from previous forms' AddressTypeID -->
+                      <option *ngFor="let form of addressForms.slice(0, i)" [value]="form.AddressTypeID">
+                        {{ getAddressTypeDesc(form.AddressTypeID) }}
+                      </option>
+                    </select>
+                  </div>
+    
+                  <!-- Other fields will be disabled if Same As Type has a value -->
+                  <div class="input-field">
+                    <label for="address1"> Address - Line 1 </label>
+                    <input [(ngModel)]="address.addressLine1" name="address1" id="address1" type="text"
+                      [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+                  </div>
+    
+                  <div class="input-field">
+                    <label for="address2"> Address - Line 2 </label>
+                    <input [(ngModel)]="address.addressLine2" name="address2" id="address2" type="text"
+                      [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+                  </div>
+    
+                  <div class="input-field">
+                    <label for="address3"> Address - Line 3 </label>
+                    <input [(ngModel)]="address.addressLine3" name="address3" id="address3" type="text"
+                      [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+                  </div>
+    
+                  <div class="input-field">
+                    <label for="address4"> Address - Line 4 </label>
+                    <input [(ngModel)]="address.addressLine4" name="address4" id="address4" type="text"
+                      [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+                  </div>
+    
+                  <div class="input-field">
+                    <label for="city"> City </label>
+                    <input [(ngModel)]="address.city" name="city" id="city" type="text"
+                      [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+                  </div>
+    
+                  <div class="input-field">
+                    <label for="state"> State/Province </label>
+                    <input [(ngModel)]="address.stateProvince" name="state" id="state" type="text"
+                      [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+                  </div>
+    
+                  <div class="input-field">
+                    <label for="country"> Country </label>
+                    <select required [(ngModel)]="address.CountryID" (change)="getAllRegulater(+address.CountryID, firmId)"
+                      name="Country" id="Country" [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0">
+                      <option *ngFor="let place of allCountries" [value]="place.CountryID">
+                        {{ place.CountryName }}
+                      </option>
+                    </select>
+                  </div>
+    
+                  <div class="input-field">
+                    <label for="zipCode"> Zip/Postal Code </label>
+                    <input [(ngModel)]="address.zipPostalCode" name="zipCode" id="zipCode" type="text"
+                      [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
+                  </div>
+                </div>
+              </div>
+            </div>
+    
+            <div class="create--inputs-field-set" *ngIf="CreatecontrollerDetails.IsCompanyRegulated === true">
+              <div class="create-controller-actions">
+                <h2 class="create-controller-header">Home State Regulators</h2>
+              </div>
+    
+              <!-- Add regulator button -->
+    
+              <button (click)="addRegulator()" style="
+                  background-color: green;
+                  color: white;
+                  border: none;
+                  padding: 5px;
+                  cursor: pointer;
+                  border-radius: 5px;
+                  float: right;
+                ">
+                <i style="size: 7px" class="bi bi-plus-lg"></i>
+              </button>
+    
+              <!-- Dynamically generate form inputs for each regulator in regulatorList -->
+              <div *ngFor="let regulator of regulatorList; let i = index" class="create-controller-inputs">
+                <hr />
+                <div style="width: 100%">
+                  <button (click)="removeRegulator(i)" style="
+                      float: right;
+                      background-color: red;
+                      color: white;
+                      border: none;
+                      padding: 5px;
+                      cursor: pointer;
+                      border-radius: 5px;
+                    ">
+                    <i style="size: 5px" class="bi bi-x-lg"></i>
+                  </button>
+                </div>
+                <div class="input-field home-state-regulators-container">
+                  <!-- Regulator Name input -->
+                  <div class="regulator-select-container">
+                    <label for="regulators">Regulator <span style="color: red">*</span></label>
+                    <select required [(ngModel)]="regulator.RegulatorName" name="regulators" id="regulators">
+                      <option *ngFor="let Regulater of AllRegulater" [value]="Regulater.RegulatorID">
+                        {{ Regulater.RegulatorName }}
+                      </option>
+                    </select>
+                  </div>
+                  <!-- Remove button for each regulator -->
+                </div>
+    
+                <!-- Regulator Contact input (disabled as per your code) -->
+                <div class="input-field regulator-contact-container">
+                  <label for="regulatorContact-{{ i }}">Regulator Contact</label>
+                  <input disabled type="text" [(ngModel)]="regulator.RegulatorContacts" name="regulatorContact-{{ i }}"
+                    id="regulatorContact-{{ i }}" />
+                </div>
+              </div>
+            </div>
+            <div class="btn justify-content-end">
+              <button class="save-btn" (click)="createControllerPopupChanges()">
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
     <!-- Popup -->
     <div *ngIf="isPopupVisible" (click)="closeContactPopup()" class="contollerPopupOverlay">
       <div (click)="$event.stopPropagation()" class="contollerPopupContent">
@@ -3467,7 +4011,6 @@
           <thead>
             <tr>
               <th></th>
-              <!--leave it empty-->
               <th>Individual Name</th>
               <th>Controlled Functions</th>
               <th>Applied Date</th>
@@ -3477,19 +4020,19 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr *ngFor="let individual of AllapprovedIndividuals">
               <td class="radio-table">
                 <label class="radioBtn">
                   <input type="radio" />
                   <span></span>
                 </label>
               </td>
-              <td>Individual Name</td>
-              <td>Controlled Functions</td>
-              <td>Applied Date</td>
-              <td>Conditionally Approved Date</td>
-              <td>Conditional Approved Expiry Date</td>
-              <td>Approved Date</td>
+              <td>{{individual.AppIndividualNum}}</td>
+              <td>{{individual.FunctionActivity}}</td>
+              <td>{{individual.AppliedDate}}</td>
+              <td>{{individual.ConditionalApprovalDate}}</td>
+              <td>{{individual.ConditionalApprovalExpiryDate}}</td>
+              <td>{{individual.ApprovedDate}}</td>
             </tr>
           </tbody>
         </table>
