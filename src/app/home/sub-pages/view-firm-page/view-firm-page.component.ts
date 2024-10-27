@@ -4955,7 +4955,13 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   closeSubActivity() {
-    
+    this.callSubActivity = false;
+    const popupWrapper = document.querySelector('.SubActivitiesPopUp') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none';
+    } else {
+      console.error('Element with class .SubActivitiesPopUp not found');
+    }
   }
 
 

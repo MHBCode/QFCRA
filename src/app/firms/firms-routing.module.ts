@@ -11,23 +11,6 @@ import { ControllersComponent } from './controllers/controllers.component';
 import { AuditorsComponent } from './auditors/auditors.component';
 import { ContactsComponent } from './contacts/contacts.component';
 
-// const routes: Routes = [
-//   {
-//     path: '',
-//     children: [
-//       { path: '', component: FirmsPageComponent },
-//       { path: 'new-firm', component: NewFirmComponent },
-//       {
-//         path: 'view',
-//         component: DetailsLayoutComponent,
-//         children: [
-//           { path: ':id', component: FirmsDetailsComponent },
-//         ],
-//       },
-//     ],
-//   }
-// ];
-
 const routes: Routes = [
   {
     path: '',

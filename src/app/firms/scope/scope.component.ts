@@ -505,7 +505,7 @@ export class ScopeComponent implements OnInit {
 
   loadScopeOfAuth() {
     const firstActivity = this.ActivityAuth[0];
-    this.objectWF.getDocument(firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
+    this.objectWF.getDocument(this.Page.Scope,firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
 
     ).subscribe(
       data => {
