@@ -4698,7 +4698,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   get filteredFirmAddresses() {
-    return this.existingAddresses.filter(addr => !addr.isRemoved);
+    return this.firmAddresses.filter(addr => !addr.isRemoved);
   }
 
   onAddressTypeChange(event: any, address: any) {
