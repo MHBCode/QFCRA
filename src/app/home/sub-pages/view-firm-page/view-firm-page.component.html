@@ -4881,3 +4881,25 @@
     <button class="subbutton" (click)="closeFormReference()">Cancel</button>
   </div>
 </div>
+
+<!-- sub activities popup -->
+<div *ngIf="callSubActivity" class="overlay show"></div>
+<div *ngIf="callSubActivity" class="SubActivitiesPopUp">
+  <i class="bi bi-x-circle close-icon" (click)="closeSubActivity()"></i>
+  <div>
+    <div class="popup-header">
+      <h3>Please Select Sub Activity</h3>
+    </div>
+    <div class="popup-body">
+      <ul>
+        <li>
+          <input type="checkbox" name="subactivity">
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="popup-buttons-container">
+    <button class="subbutton">Ok</button>
+    <button class="subbutton" (click)="closeSubActivity()">Cancel</button>
+  </div>
+</div>
