@@ -20,6 +20,9 @@ import { AddressesService } from 'src/app/ngServices/addresses.service';
 import { WaiverService } from 'src/app/ngServices/waiver.service';
 import { RiskService } from 'src/app/ngServices/risk.service';
 import { NoticeService } from 'src/app/ngServices/notice.service';
+import { environment } from 'src/environments/environment';
+import { SharepointDocumentsService } from 'src/app/ngServices/sharepoint-documents.service';
+import { SharePointUploadResponse } from 'src/app/models/sharepoint-upload-response.interface';
 
 
 @Component({
@@ -112,7 +115,8 @@ export class ViewFirmPageComponent implements OnInit {
   firmAddressesTypeHistory: any = [];
   ActivityLicensed: any = [{}];
   ActivityAuth: any = [{}];
-  AuthTableDocument: any = [];
+  scopeOfAuthTableDoc: any = [];
+  pressReleaseTableDoc: any = [];
   islamicFinance: any = {};
   activityCategories: any[] = [];
   activityTypes: any[] = [];
@@ -170,6 +174,8 @@ export class ViewFirmPageComponent implements OnInit {
   sectorDetails: any = [];
   prudentialCategoryDetails: any = [];
   formReferenceDocs: any = [];
+  fetchedScopeDocSubTypeID: any = {};
+  fetchedCoreDetailDocSubTypeID: any = {};
   selectedDocId: string | null = null;
   currentLicRevisionNumber: number | null = null;
   lastLicRevisionNumber: number | null = null;
@@ -178,6 +184,7 @@ export class ViewFirmPageComponent implements OnInit {
   isScopeConditionChecked: boolean = false;
   previousPrudentialCategoryID: number;
   previousSectorTypeID: number;
+  newfileNum: number;
   /* */
   displayInactiveContacts: boolean = false;
   displayInactiveAuditors: boolean = false;
@@ -287,6 +294,7 @@ export class ViewFirmPageComponent implements OnInit {
     private waiverService: WaiverService,
     private riskService: RiskService,
     private noticeService: NoticeService,
+    private sharepointService: SharepointDocumentsService,
     private el: ElementRef,
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
@@ -306,10 +314,19 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadFirmDetails(this.firmId);  // Fetch the firm details
       this.loadFirmOPDetails(this.firmId); // Fetch Operational Data
       this.loadAssiRA();
-      this.checkFirmLicense();
-      this.checkFirmAuthorisation();
-      this.userAllowedToAccessFirm();
+      this.checkFirmLicense(); // Check if firm is licensed
+      this.checkFirmAuthorisation(); // Check if firm is authorised
+      this.userAllowedToAccessFirm(); // Check if firm accessible for current user
+      this.loadAssignedUserRoles(); // Fetch User Roles
+      this.isValidFirmAMLSupervisor(this.firmId, this.userId); // Is user AML Supervisor
+      this.isValidFirmSupervisor(this.firmId, this.userId); // Is user Firm Supervisor
+      this.getAssignedLevelUsers(); // Fetch user levels
 
+      // functions for documents
+      this.fetchSubTypeDocIDs();
+      this.getNewFileNumber();
+
+      // functions for dropdowns
       this.populateCountries();
       this.populateQFCLicenseStatus();
       this.populateAuthorisationStatus();
@@ -322,11 +339,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.populateAuthorisationCategoryTypes();
       this.populateFirmScopeTypes();
 
-      this.loadAssignedUserRoles();
-      this.isValidFirmAMLSupervisor(this.firmId, this.userId);
-      this.isValidFirmSupervisor(this.firmId, this.userId);
-      this.getAssignedLevelUsers();
-
+      // functions for dropdowns
       this.getControllerControlTypes();
       this.getControllerControlTypesCreat();
       this.getTitle();
@@ -755,7 +768,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.isLoading = true;
     // Start validations
     this.hasValidationErrors = false;
-    // this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
+    this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
     // Synchronous firm-level validation checks
     this.validateFirmDetails(); // Perform existing validation logic synchronously
 
@@ -1279,6 +1292,7 @@ export class ViewFirmPageComponent implements OnInit {
     } else if (section === 'Authorized') {
       this.tabIndex = 1;
       this.isEditModeAuth = false;
+      this.disableApplicationDate = true;
       this.loadActivitiesAuthorized()
         .then(() => {
           this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
@@ -1402,7 +1416,7 @@ export class ViewFirmPageComponent implements OnInit {
         createdBy: userId, //recheck
         docReferenceID: this.ActivityLicensed[0].docReferenceID ?? null,
         firmApplTypeID: 2, // licensed
-        docIDs: this.selectedDocId.toString(),
+        docIDs: this.selectedDocId == null ? null : this.selectedDocId.toString(),
         generalConditions: this.ActivityLicensed[0].GeneralConditions,
         effectiveDate: this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityLicensed[0].ScopeCertificateLink,
@@ -1577,7 +1591,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.loadActivityCategories();
         // Loop through each activity and load its activities based on FirmScopeTypeID
         this.ActivityAuth.forEach(activity => {
-          if (activity.FirmScopeTypeID) {
+          if (activity.CategoryID) {
             this.loadActivityTypes(activity);  // Load activities for each category
           }
         });
@@ -1713,7 +1727,7 @@ export class ViewFirmPageComponent implements OnInit {
         createdBy: userId, //recheck
         docReferenceID: this.ActivityAuth[0].docReferenceID ?? null,
         firmApplTypeID: 3, // Authorised
-        docIDs: this.selectedDocId.toString(),
+        docIDs: this.selectedDocId == null ? null : this.selectedDocId.toString(),
         generalConditions: this.ActivityAuth[0].GeneralCondition,
         effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityAuth[0]?.ScopeCertificateLink,
@@ -1722,7 +1736,7 @@ export class ViewFirmPageComponent implements OnInit {
       },
       lstFirmActivities: this.existingPermittedActivites.map(activityAuth => ({
         createdBy: userId, //recheck
-        firmScopeTypeID: parseInt(activityAuth.FirmScopeTypeID),
+        firmScopeTypeID: null,
         activityTypeID: parseInt(activityAuth.ActivityTypeID),
         effectiveDate: this.convertDateToYYYYMMDD(activityAuth.ScopeEffectiveDate),
         firmActivityConditions: activityAuth.FirmActivityConditions,
@@ -2254,15 +2268,13 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  confirmDelete() {
+  confirmDeleteContact() {
     console.log("confirmDelete called: ", this.selectedContact)
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to delete this contact?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
       if (result.isConfirmed) {
@@ -3683,7 +3695,7 @@ export class ViewFirmPageComponent implements OnInit {
             error => {
               console.error('Error fetching License scope', error);
               this.loadFormReference(),
-              this.isLoading = false;
+                this.isLoading = false;
               reject(error); // Reject the promise in case of an error
             }
           );
@@ -3703,7 +3715,7 @@ export class ViewFirmPageComponent implements OnInit {
     const firstActivityAuth = this.ActivityAuth[0];
     const firstActivityLic = this.ActivityLicensed[0];
     let docID = 0;
-    
+
     if (this.tabIndex === 0) {
       docID = firstActivityLic.DocID;
     } else if (this.tabIndex === 1) {
@@ -3734,13 +3746,13 @@ export class ViewFirmPageComponent implements OnInit {
         this.isLoading = false;
       }
     );
-}
+  }
 
 
   // On View Mode
   loadActivitiesAuthorized(): Promise<void> {
     this.isLoading = true; // Start loading indicator 
-
+    
     return new Promise((resolve, reject) => {
       // Run both initial API calls in parallel using forkJoin
       forkJoin({
@@ -3789,7 +3801,7 @@ export class ViewFirmPageComponent implements OnInit {
             this.loadPrudentialCategoryDetails(),
             this.loadSectorDetails(),
             this.loadIslamicFinance(),
-            this.loadScopeOfAuth(),
+            this.loadScopeOfAuthDoc(),
             this.loadFormReference(),
           ]).subscribe(
             () => {
@@ -3806,7 +3818,7 @@ export class ViewFirmPageComponent implements OnInit {
         error => {
           console.error('Error fetching activities authorised data', error);
           this.loadFormReference(),
-          this.isLoading = false;
+            this.isLoading = false;
           reject(error);
         }
       );
@@ -3905,41 +3917,36 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  loadScopeOfAuth() {
+  loadScopeOfAuthDoc() {
     const firstActivity = this.ActivityAuth[0];
-    this.objectWF.getDocument(firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
-
+    this.objectWF.getDocument(this.Page.Scope, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
     ).subscribe(
       data => {
-        this.AuthTableDocument = data.response;
+        this.scopeOfAuthTableDoc = data.response;
         console.log('Document Data:', data);
-
       },
       error => {
         console.error('Error loading document:', error);
+        this.scopeOfAuthTableDoc = [];
 
       }
     );
   }
 
-  // loadScopeOfAuth() {
-  //   this.firmService.getFirmScopeIdAndRevNum(this.firmId).pipe(
-  //     switchMap(({ scopeId, scopeRevNum }) =>
-  //       this.firmService.getDocument(scopeId, scopeRevNum)
-  //     )
-  //   ).subscribe(
-  //     data => {
-  //       this.AuthTableDocument = data.response;
-  //       console.log('Document Data:', data);
+  loadPressReleaseDoc() {
+    this.objectWF.getDocument(this.Page.CoreDetail, this.firmAppDetailsCurrentAuthorized.FirmApplStatusID, 1).pipe(
+    ).subscribe(
+      data => {
+        this.pressReleaseTableDoc = data.response;
+        console.log('Document Data:', data);
+      },
+      error => {
+        console.error('Error loading document:', error);
+        this.pressReleaseTableDoc = [];
 
-  //     },
-  //     error => {
-  //       console.error('Error loading document:', error);
-
-  //     }
-  //   );
-  // }
-
+      }
+    );
+  }
 
   loadIslamicFinance() {
     const firstActivity = this.ActivityAuth[0];
@@ -4020,6 +4027,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.applicationService.getCurrentAppDetailsLicensedAndAuth(this.firmId, 3).subscribe(data => {
       this.firmAppDetailsCurrentAuthorized = data.response;
       console.log(this.firmAppDetailsCurrentAuthorized);
+      this.loadPressReleaseDoc();
       this.isLoading = false;
     }, error => {
       console.log(error)
@@ -4154,14 +4162,14 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   loadActivityTypes(activity: any) {
-    const firmScopeTypeID = activity.FirmScopeTypeID;
+    const categoryID = activity.CategoryID;
 
-    if (firmScopeTypeID) {
-      this.activityService.getAuthActivityTypes(firmScopeTypeID).subscribe(
+    if (categoryID) {
+      this.activityService.getAuthActivityTypes(categoryID).subscribe(
         data => {
           activity.activities = data.response;  // Set activities for the specific activity object
 
-          console.log(`Loaded activities for FirmScopeTypeID ${firmScopeTypeID}:`, activity.activities);
+          console.log(`Loaded activities for FirmScopeTypeID ${categoryID}:`, activity.activities);
 
           // Ensure the correct ActivityTypeID is selected
           if (activity.ActivityTypeID) {
@@ -4173,12 +4181,12 @@ export class ViewFirmPageComponent implements OnInit {
             if (selectedActivity) {
               activity.ActivityTypeID = selectedActivity.ActivityTypeID;
             } else {
-              console.warn(`ActivityTypeID ${activity.ActivityTypeID} not found for FirmScopeTypeID ${firmScopeTypeID}`);
+              console.warn(`ActivityTypeID ${activity.ActivityTypeID} not found for FirmScopeTypeID ${categoryID}`);
             }
           }
         },
         error => {
-          console.error('Error fetching activities for FirmScopeTypeID:', firmScopeTypeID, error);
+          console.error('Error fetching activities for FirmScopeTypeID:', categoryID, error);
         }
       );
     }
@@ -4573,7 +4581,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   onCategoryChange(activity: any) {
-    const selectedCategoryID = activity.FirmScopeTypeID; // The selected category ID
+    const selectedCategoryID = activity.CategoryID; // The selected category ID
     if (selectedCategoryID) {
       console.log('Selected Category ID:', selectedCategoryID);
 
@@ -4836,6 +4844,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   closeSelectDocument() {
     this.callUploadDoc = false;
+    this.selectedFile = null;
     const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
     setTimeout(() => {
       if (popupWrapper) {
@@ -5029,9 +5038,9 @@ export class ViewFirmPageComponent implements OnInit {
         DocType.push(constants.DocumentType.Q02);
       }
     }
-    
+
     const docTypeString = DocType.join(',');
-    this.logForm.getDocListByFirmDocType(this.firmId,docTypeString).subscribe(data => {
+    this.logForm.getDocListByFirmDocType(this.firmId, docTypeString).subscribe(data => {
       this.formReferenceDocs = data.response;
 
       const existingDoc = this.formReferenceDocs.find(doc => doc.FILENAME === this.documentDetails?.FileName);
@@ -5039,11 +5048,11 @@ export class ViewFirmPageComponent implements OnInit {
         this.selectedDocId = existingDoc.DocID;
       }
 
-      console.log('Form Reference Docs: ',this.formReferenceDocs);
+      console.log('Form Reference Docs: ', this.formReferenceDocs);
       this.isLoading = false;
     }, error => {
       this.formReferenceDocs = []; //reintalize the array if it doesn't exist
-      console.error('Error Fetching Form Reference Docs: ',error);
+      console.error('Error Fetching Form Reference Docs: ', error);
       this.isLoading = false;
     })
     this.callRefForm = true;
@@ -5090,7 +5099,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   deSelectDocument(): void {
     if (this.selectedDocId) {
-      this.selectedDocId = null; 
+      this.selectedDocId = null;
 
       this.documentDetails = {
         FileName: '',
@@ -5610,14 +5619,23 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  confirmUpload() {
+  confirmOkUpload() {
     if (this.selectedFile) {
       // Display the selected file name in the main section
       const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
       if (uploadedDocumentsDiv) {
-        uploadedDocumentsDiv.textContent = `Uploaded Document: ${this.selectedFile.name}`;
+        uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
       }
-      this.closeSelectDocument();
+      // closes the popup
+      this.callUploadDoc = false;
+      const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
+      setTimeout(() => {
+        if (popupWrapper) {
+          popupWrapper.style.display = 'none';
+        } else {
+          console.error('Element with class not found');
+        }
+      }, 0)
     } else {
       console.error('No valid PDF file selected.');
     }
@@ -5632,12 +5650,191 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   uploadDocument() {
+    this.hasValidationErrors = false;
+    this.isLoading = true;
+
     if (!this.selectedFile) {
-      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       this.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
+      this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['uploadDocument'];
     }
+
+    // If validation errors exist, stop the process
+    if (this.hasValidationErrors) {
+      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.isLoading = false;
+      return;
+    }
+
+    if (this.selectedFile) {
+      const intranetSitePath = 'https://ictmds.sharepoint.com/sites/QFCRA';
+      const filePathAfterDocLib = "";
+      const strfileName = this.selectedFile.name;
+      const strUserEmailAddress = 'k.thomas@ictmds.onmicrosoft.com';
+
+      this.sharepointService.uploadFileToSharepoint(this.selectedFile, intranetSitePath, filePathAfterDocLib, strfileName, strUserEmailAddress).subscribe({
+        next: (response: SharePointUploadResponse) => {
+          console.log('File uploaded successfully', response);
+
+          const [fileLocation, intranetGuid] = response.result.split(';');
+          let documentObj: any;
+          // Scope Of Authorisation (Scope Authorised)
+          if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
+            documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid,constants.DocType.SCOPE,this.Page.Scope,this.fetchedScopeDocSubTypeID.DocSubTypeID,this.ActivityAuth[0].FirmScopeID,this.ActivityAuth[0].ScopeRevNum);
+          // Press Release (Core Detail)
+          } else if (this.activeTab === this.Page.CoreDetail) {
+            documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid,constants.DocType.FIRM_DOCS,this.Page.CoreDetail,this.fetchedCoreDetailDocSubTypeID.DocSubTypeID,this.firmAppDetailsCurrentAuthorized.FirmApplStatusID,1);
+          }
+          this.saveDocument(documentObj);
+
+          const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
+          if (uploadedDocumentsDiv) {
+            uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
+          }
+          // closes the popup
+          this.callUploadDoc = false;
+          const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
+          setTimeout(() => {
+            if (popupWrapper) {
+              popupWrapper.style.display = 'none';
+            } else {
+              console.error('Element with class not found');
+            }
+          }, 0)
+          this.uploadFileSuccess(constants.DocumentAttechment.saveDocument);
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error occurred during file upload', err);
+          this.showErrorAlert(constants.MessagesLogForm.ERROR_UPLOADING_FILE);
+          this.isLoading = false;
+          // Handle the error (e.g., display error message)
+        }
+      });
+    } else {
+      console.error('No valid PDF file selected.');
+      this.isLoading = false;
+    }
+  }
+
+  deleteDocument(docID: number,objectId: number,objectInstanceId: number, ObjectInstanceRevNum: number) {
+
+    this.objectWF.deleteDocument(docID, objectId, objectInstanceId, ObjectInstanceRevNum).subscribe({
+      next: (response) => {
+        console.log('Document deleted successfully:', response);
+        // Scope Of Authorisation (Scope Authorised)
+        if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
+        this.loadScopeOfAuthDoc();
+        }
+        // Press Release (Core Detail)
+        if (this.activeTab === this.Page.CoreDetail) {
+        this.loadPressReleaseDoc();
+        }
+      },
+      error: (err) => {
+        console.error('Error occurred while deleting the document:', err);
+      }
+    });
+  }
+
+  showUploadConfirmation() {
+    Swal.fire({
+      text: 'Are you sure you want to upload the scope of authorisation, please verify the below scope changes and then upload the file?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.uploadDocument();
+      }
+    });
+  }
+
+  uploadFileSuccess(messageKey: number) {
+    this.isLoading = true;
+    this.logForm.errorMessages(messageKey).subscribe(
+      (response) => {
+        Swal.fire({
+          title: 'Success!',
+          text: response.response,
+          icon: 'success',
+          confirmButtonText: 'Ok',
+        });
+      },
+    );
+    this.isLoading = false;
+  }
+
+  fetchSubTypeDocIDs() {
+    this.securityService.getObjectTypeTable(constants.docSubTypes).subscribe(data => {
+      // Scope Of Authorsation in Scope Authorised
+      this.fetchedScopeDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
+        item.DocSubTypeID === 262
+      );
+      // Press Release in Core Detail
+      this.fetchedCoreDetailDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
+        item.DocSubTypeID === 263
+      );
+    });
+  }
+
+  prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number,objectId: number,docSubTypeID: number,objectInstanceID: number,objectInstanceRevNum: number) {
+    return {
+        userId: userId,
+        docID: null,
+        referenceNumber: null,
+        fileName: this.selectedFile.name,
+        fileNumber: this.newfileNum.toString(),
+        firmId: this.firmId,
+        otherFirm: null,
+        docTypeID: docType,
+        loggedBy: userId,
+        loggedDate: this.currentDate,
+        receivedBy: userId,
+        receivedDate: this.currentDate,
+        docRecieptMethodID: constants.LogFormRecieptMethods.InternalDocument,
+        checkPrimaryDocID: true,
+        fileLocation: fileLocation,
+        docAttributeID: null,
+        intranetGuid: intranetGuid,
+        objectID: objectId,
+        objectInstanceID: objectInstanceID,
+        objectInstanceRevNum: objectInstanceRevNum,
+        docSubType: docSubTypeID
+    };
+  }
+
+  saveDocument(documentObj: any) {
+    this.isLoading = true;
+    this.objectWF.insertDocument(documentObj).subscribe(
+      response => {
+        console.log('scope of authorsation document saved successfully:', response);
+        // Scope Of Authorisation (Scope Authorised)
+        if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
+        this.loadScopeOfAuthDoc();
+        }
+        // Press Release (Core Detail)
+        if (this.activeTab === this.Page.CoreDetail) {
+          this.loadPressReleaseDoc();
+        }
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Error updating scope of auth scope:', error);
+        this.isLoading = false;
+      }
+    );
+  }
+
+  getNewFileNumber() {
+    this.logForm.getNewFileNumber(this.firmId,this.currentDate).subscribe(data => {
+      this.newfileNum = data.response.Column1;
+    }, error => {
+      console.error(error);
+    })
   }
 
   checkFirmLicense() {
@@ -5868,7 +6065,6 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   convertDateToYYYYMMDD(dateStr: string | Date): string | null {
-    console.log(dateStr);
 
     if (!dateStr) {
       return null; // Return null if the input is invalid or empty
@@ -6048,7 +6244,16 @@ export class ViewFirmPageComponent implements OnInit {
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-
+        // Scope Of Authorisation (Scope Authorised)
+        if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
+        this.deleteDocument(this.scopeOfAuthTableDoc.DocID,this.Page.Scope,this.ActivityAuth[0].FirmScopeID,this.ActivityAuth[0].ScopeRevNum);
+        this.loadScopeOfAuthDoc();
+        } 
+        // Press Release (Core Detail)
+        if (this.activeTab === this.Page.CoreDetail) {
+          this.deleteDocument(this.pressReleaseTableDoc.DocID,this.Page.CoreDetail,this.firmAppDetailsCurrentAuthorized.FirmApplStatusID,1);
+          this.loadPressReleaseDoc();
+        }
       } else if (result.isDismissed) {
         return;
       }

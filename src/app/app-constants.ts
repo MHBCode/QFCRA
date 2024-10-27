@@ -1,7 +1,7 @@
 // Constant variables
-export const CorporateController = "V_ControllerType" ;
+export const CorporateController = "V_ControllerType";
 export const ControllerControlTypes = "ControllerControlTypes";
-export const legalStatusController = "v_FirmLegalStatusTypesController" ;
+export const legalStatusController = "v_FirmLegalStatusTypesController";
 export const AddressTypesController = "AddressTypes";
 export const Title = "TitleTypes";
 export const countries = "Countries";
@@ -9,7 +9,7 @@ export const qfcLicenseStatus = "v_LicenseStatus";
 export const authorisationStatus = "v_AuthorizationStatus";
 export const legalStatus = "v_FirmLegalStatusTypes";
 export const legalStatusfilter = "LegalStatusTypes";
-export const SupervisionCaseOfficer = "V_SupervisionSupervisor" ;
+export const SupervisionCaseOfficer = "V_SupervisionSupervisor";
 export const AuthorisationCaseOfficer = "V_AMLSupervisors";
 export const FinYearEnd = "FirmFinYearEndTypes";
 export const FinAccStd = "FinAccStdTypes";
@@ -24,8 +24,8 @@ export const ControllerType = "V_ControllerType"
 export const firmAuditorName = "V_Firm_AuditorName";
 export const firmAuditorType = "V_Firm_AuditorType";
 export const Regulaters = "V_Regulators"
-export enum FirmLicenseApplStatusType
-{
+export const docSubTypes = "DocSubTypes"
+export enum FirmLicenseApplStatusType {
     Application = 4,
     Licensed = 5,
     ApplicationWithdrawn = 6,
@@ -33,8 +33,7 @@ export enum FirmLicenseApplStatusType
     LicensedWithdrawn = 8,
     LicensedWithdrawnInvolunatary = 9
 }
-export enum FirmAuthorizationApplStatusType
-{
+export enum FirmAuthorizationApplStatusType {
     Application = 10,
     ApplicationWithdrawn = 11,
     Rejected = 12,
@@ -42,15 +41,14 @@ export enum FirmAuthorizationApplStatusType
     AuthorisedWithdrawnVoluntary = 14,
     AuthorisedWithdrawnInvoluntary = 15
 }
-export enum AuditorsMessages{
+export enum AuditorsMessages {
     Select_Auditor_Name = 3901,
     Selected_Auditor_Name_already_Exsists = 3903,
     Select_Auditor_Type = 3904,
     Select_Valid_Data_From = 3905,
     Select_Valid_Data_From_Later_Than_To = 3906
 }
-export enum Firm_CoreDetails_Messages
-{
+export enum Firm_CoreDetails_Messages {
     Authorisation = 8500,
     ENTER_LEGAL_STATUS = 8501,
     FIRMDETAILS_SAVED_SUCCESSFULLY = 8502,
@@ -71,12 +69,12 @@ export enum Firm_CoreDetails_Messages
     ENTER_DATE_OF_APPLICATION = 8515,
     INVALID_DATE_OF_APPLICATION = 8516,
     CANCEL_FIRMDETAILS = 8517,
-    ENTER_SUMMARY=9097,
-    SELECT_FIRM=9098,
-    PERSONAL_REMINDER_CREATED=90100,
-    PERSONAL_REMINDER_UPDATED=90101,
-    SELECT_SUPERVISIORS=9099,
-    INCORPORATION_DATE_MSG =90102,
+    ENTER_SUMMARY = 9097,
+    SELECT_FIRM = 9098,
+    PERSONAL_REMINDER_CREATED = 90100,
+    PERSONAL_REMINDER_UPDATED = 90101,
+    SELECT_SUPERVISIORS = 9099,
+    INCORPORATION_DATE_MSG = 90102,
     INCORPORATION_DATE_MSG_ERROR = 90103,
     TWO_AUTHORISATION_STATUS_ON_SAME_DATE = 90104,
     SAME_AUTHORISATION_STATUS_ON_TWO_DATES = 90105,
@@ -84,35 +82,32 @@ export enum Firm_CoreDetails_Messages
     SAME_LICENSED_STATUS_ON_TWO_DATES = 90107
 }
 
-export enum AddressControlMessages
-{
+export enum AddressControlMessages {
     SELECT_ADDRESSTYPE = 2290,
     DUPLICATE_ADDRESSTYPES = 2291,
     ENTER_VALIDPHONENUMBER = 2292,
     ENTER_VALIDFAXNUMBER = 2293,
     ENTERDATE_LESSTHAN_TODAY = 2294
 }
-export enum ControllerMessages
-{
-   ENTER_ALL_REQUIREDFIELDS = 4000,
-   ENTER_VALID_EFFECTIVEDATE = 4001,
-   ENTER_OTHER_ENTITY_NAME = 4003,
-   ENTER_GREATER_CESSATION_DATE = 4004,
-   SELECT_RECORD = 4005,
-   RECORD_MODIFIED = 4006,
-   RECORD_DELETED = 4007,
-   RECORD_INSERTED = 4008,
-   NO_RECORD = 4009,
-   ENTER_VALID_BIRTHDATE = 4010,
-   ENTER_VALID_PERCENTAGE = 4011,
-   ENTER_PERCENTAGE_NOTEXCEED = 4012,
-   ENTER_FIRSTNAME = 4013,
-   ENTER_REGISTEREDNUMBERCORPORATE = 4014,
-   SELECT_TYPEOFCONTROL = 4015,
+export enum ControllerMessages {
+    ENTER_ALL_REQUIREDFIELDS = 4000,
+    ENTER_VALID_EFFECTIVEDATE = 4001,
+    ENTER_OTHER_ENTITY_NAME = 4003,
+    ENTER_GREATER_CESSATION_DATE = 4004,
+    SELECT_RECORD = 4005,
+    RECORD_MODIFIED = 4006,
+    RECORD_DELETED = 4007,
+    RECORD_INSERTED = 4008,
+    NO_RECORD = 4009,
+    ENTER_VALID_BIRTHDATE = 4010,
+    ENTER_VALID_PERCENTAGE = 4011,
+    ENTER_PERCENTAGE_NOTEXCEED = 4012,
+    ENTER_FIRSTNAME = 4013,
+    ENTER_REGISTEREDNUMBERCORPORATE = 4014,
+    SELECT_TYPEOFCONTROL = 4015,
 
 }
-export enum FirmActivitiesEnum
-{
+export enum FirmActivitiesEnum {
     ENTER_ALL_REQUIREDFIELDS = 3000,
     ENTER_VALID_SCOPEEFFECTIVEDATE = 3001,
     CORRECT_PERMITTEDACTIVITIES = 3002,
@@ -158,22 +153,20 @@ export enum FirmActivitiesEnum
     PRODUCTREFINAIS_CANNOTDESELECT = 3042,
     DELETE_AIREFERNCE_BEFORE_DELETINGSCOPE = 3043,
     APPLICATIONDATE_LATER_COREDETAIL = 3044,
-    UNSAVECHANGES_MSG=3045,
-    DATEOFINCORPORATION_ERROR=3046,
-    TREEVEIWMSG=3047,
+    UNSAVECHANGES_MSG = 3045,
+    DATEOFINCORPORATION_ERROR = 3046,
+    TREEVEIWMSG = 3047,
     AUTHORISATIONCATEGORYSELECT = 3048,
 }
 
-export enum DocumentAttechment
-{
+export enum DocumentAttechment {
     SelectDocumentType = 8000,
     saveDocument = 8001,
     selectDocument = 8002,
 
 }
 
-export enum InvoicesMessages
-{
+export enum InvoicesMessages {
     INVOICE_AMOUNT = 10500,
     INVOICE_LIST = 10501,
     INVOICE_SELECT = 10502,
@@ -198,26 +191,24 @@ export enum InvoicesMessages
     INVOICES_EMAIL_MESSAGES = 10521,
     INVOICES_WORKFLOWMESSAGE = 10522,
     INVOICES_EMAILCONFIRMATION = 10523,
-    INVOICES_MESSGE=10524,
-    INVOICE_CONFIRM=10525,
+    INVOICES_MESSGE = 10524,
+    INVOICE_CONFIRM = 10525,
 }
 
-export enum EntityType
-{
+export enum EntityType {
     Firm = 1,
     ParentEntity = 2,
     AuditingFirm = 3,
     HomeStateRegulator = 5,
     CorporateController = 6,
     SigShareholder = 7,
-    UBO_Corporate=8,
-    UBO_Individual=9,
-   	Head_Office=10,
-    IndividualController =11
+    UBO_Corporate = 8,
+    UBO_Individual = 9,
+    Head_Office = 10,
+    IndividualController = 11
 }
 
-export enum FrimsObject
-{
+export enum FrimsObject {
     MainMenu = 0,
     OperationMenu = 40,
     FrimsMenu = 80,
@@ -239,7 +230,7 @@ export enum FrimsObject
     Contatcs = 523,
     Controller = 525,
     RegisteredFunds = 526,
-    Auditor=527,
+    Auditor = 527,
     CRO = 900,
     Supervision = 1000,
     Planning = 1001,
@@ -271,39 +262,37 @@ export enum FrimsObject
     //Added By Suhail on 18-Mar-2011
     ReportingScheduleItem = 1026,
     LateAdminFee = 1027,
-    PriorPostition=715,
-    AINOC=717,
-    AINOCRecommendation=718,
-    AIStatusChange=719,
-    GenralSubmission =100,
-    AINOCInternalDocs=720,
+    PriorPostition = 715,
+    AINOC = 717,
+    AINOCRecommendation = 718,
+    AIStatusChange = 719,
+    GenralSubmission = 100,
+    AINOCInternalDocs = 720,
 
 
     RptSchItemXBRL = 601, // By IRIS Report Schedule
     RptSchItemNonXBRL = 602, // By IRIS Report Schedule
-    SupervisionJournal=529,
-    Regulators =528,
-    Notices =800,
-    NoticesResponse=801,
+    SupervisionJournal = 529,
+    Regulators = 528,
+    Notices = 800,
+    NoticesResponse = 801,
     FIRMS_LN_Integration = 2004,
-    Enforcement=530,
-    ReportValidation =1060
+    Enforcement = 530,
+    ReportValidation = 1060
 
 
 }
 
-export enum CRORegisterReports
-{
+export enum CRORegisterReports {
     ENTER_DATE = 3600,
     INVALID_DATE = 3601,
     SELECT_REPORT_TYPE = 3602,
-     SELECT_CRO_REPORT_TYPE = 3603,
-    REPORT_MAIN_HEADER=3604
+    SELECT_CRO_REPORT_TYPE = 3603,
+    REPORT_MAIN_HEADER = 3604
 
 }
 
-export enum ObjectOpType
-{
+export enum ObjectOpType {
     Create = 40,
     Edit = 41,
     Delete = 42,
@@ -320,8 +309,7 @@ export enum ObjectOpType
     ListView = 100
 }
 
-export enum DocumentType
-{
+export enum DocumentType {
     Q01 = 1,
     Q02 = 2,
     Q03 = 3,
@@ -349,9 +337,75 @@ export enum DocumentType
     WN = 200,
     WS = 201,
     AI = 202,
-    Q21 =39,
+    Q21 = 39,
     Q23 = 45,
     MRLRORes = 38,
     Q19 = 32,
-    Q07=19,
+    Q07 = 19,
+}
+
+export enum MessagesLogForm {
+    SELECT_FIRM = 1100,
+    SELECT_FORMTYPE = 1101,
+    SELECT_LOGGEDBY = 1102,
+    ENTER_LOGGEDDATE = 1103,
+    SELECT_RECEIVEDBY = 1104,
+    ENTER_RECIEVEDDATE = 1105,
+    SELECT_RECIEPTMETHOD = 1106,
+    SELECT_RAAFFILIATES = 1107,
+    SELECT_RECIPIENTS = 1108,
+    DOCTYPE_UPLOADED_SUCCESSFULLY = 1109,
+    DOCSUBTYPE_UPLOADED_SUCCESSFULLY = 1110,
+    SELECT_DOCUMENT = 1111,
+    IMPERSONATION_FAILED = 1112,
+    DOCUMENT_DETAILS_SAVED_SUCCESSFULLY = 1113,
+    DOCUMENT_DETAILS_SAVED_SUCCESSFULLY_WITN_EMAIL = 1114,
+    FRIMS_UPLOADDOCUMENT = 1115,
+    FRIMS_EDITDOCUMENT = 1116,
+    SELECT_ATTACHMENTS = 1117,
+    RESEND_EMAIL = 1118,
+    INVALID_EMAIL_CC = 1119,
+    INVALID_EMAIL_TO = 1120,
+    ENTER_OTHER_FIRM = 1121,
+    NO_ATTACHMENTS = 1122,
+    ENTER_SEND_DATE = 1123,
+    ERROR_UPLOADING_FILE = 1124,
+    ENTER_REQUIREDFIELD_PRIORSAVING = 1125,
+    NOT_SHAREPOINT_FILENAME_FRIENDLY = 1126,
+    ENTER_EMAIL_SUBJECT = 1127,
+    ENTER_EMAIL_BODY = 1128,
+    DOCSUBTYPE_EDITED_SUCCESSFULLY = 1129,
+    UPLOAD_DOCUMENT = 1130,
+    DOCTYPE_SAVED_SUCCESSFULLY = 1131,
+    LOGFORMDATAUPLOAD = 1132,
+    SELECT_ATTACHMENT_FILE = 1133,
+    CANCEL_CHANGE_CONFIRMATION = 1134,
+
+
+    // Document Selection user control messages.
+    NO_RELEVANT_DOCUMENT_FOUND = 1191,
+
+    //Added By Abrar on 14 Dec to Add QFCA and CRO users Email Address
+    QFCA_USERS_EmAIL = 1192,
+    CRO_USERS_EmAIL = 1193,
+    FILE_EXIST_ERROR = 1194,
+}
+
+export enum LogFormRecieptMethods {
+    Fax = 1,
+    Email = 2,
+    Mail = 3,
+    InternalDocument = 4
+}
+
+export enum DocType {
+    Waiver = 200,
+    Breaches = 201,
+    AIs = 202,
+    AINOC = 43,
+    JournalAttachment = 204,
+    EnforcementAttachment = 207,
+    RegisteredFund = 208,
+    SCOPE = 209,
+    FIRM_DOCS = 210
 }
