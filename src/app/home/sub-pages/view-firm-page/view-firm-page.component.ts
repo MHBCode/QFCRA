@@ -6601,22 +6601,26 @@ groupBy(arr: any[], key: string): { [key: string]: any[] } {
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.updatePaginationapproved();
-      this.updatePaginationWithdrawn();
-      this.updatePaginationApplied();
+      this.updateActivePagination();  // Call the appropriate pagination function
     }
   }
-
+  
   // Navigate to the next page
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.updatePaginationapproved();
-      this.updatePaginationWithdrawn();
-      this.updatePaginationApplied();
+      this.updateActivePagination();  // Call the appropriate pagination function
     }
   }
-
+  updateActivePagination(): void {
+    if (this.activeSectionind === 'Applied') {
+      this.updatePaginationApplied();
+    } else if (this.activeSectionind === 'Approved') {
+      this.updatePaginationapproved();
+    } else if (this.activeSectionind === 'Withdrawn') {
+      this.updatePaginationWithdrawn();
+    }
+  }
   updatePaginationapproved(): void {
     if (this.AllapprovedIndividuals && this.AllapprovedIndividuals.length > 0) {
       this.totalRows = this.AllapprovedIndividuals.length;
@@ -6660,9 +6664,11 @@ groupBy(arr: any[], key: string): { [key: string]: any[] } {
     }
   }
 
+  activeSectionind: string = 'Applied';
 
-
-
+  switchIndividualTab(section: string): void {
+    this.activeSectionind = section;  // Set the active section to the clicked tab
+  }
 
 
 
