@@ -24,4 +24,8 @@ export class LogformService {
     const url = `${this.baseUrlLogForm}get_message_property?messageKey=${messageKey}`
     return this.http.get<any>(url);
   }
+  getNewFileNumber(firmId: number,receivedDate: string) {
+    const url = `${this.baseUrlLogForm}get_new_file_number?firmId=${firmId}&receivedDate=${receivedDate}`
+    return this.http.get<any>(url);
+  }
 }

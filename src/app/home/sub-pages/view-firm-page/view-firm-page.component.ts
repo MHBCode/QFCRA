@@ -20,6 +20,9 @@ import { AddressesService } from 'src/app/ngServices/addresses.service';
 import { WaiverService } from 'src/app/ngServices/waiver.service';
 import { RiskService } from 'src/app/ngServices/risk.service';
 import { NoticeService } from 'src/app/ngServices/notice.service';
+import { environment } from 'src/environments/environment';
+import { SharepointDocumentsService } from 'src/app/ngServices/sharepoint-documents.service';
+import { SharePointUploadResponse } from 'src/app/models/sharepoint-upload-response.interface';
 import { AiElectronicswfService } from 'src/app/ngServices/ai-electronicswf.service';
 
 
@@ -84,6 +87,7 @@ export class ViewFirmPageComponent implements OnInit {
   callLicScopePrev: boolean = false;
   callAuthScopePrev: boolean = false;
   callRefForm: boolean = false;
+  callSubActivity: boolean = false;
   menuId: Number = 0;
   menuWidth: string = '6%';
   dataWidth: string = '93%';
@@ -101,7 +105,7 @@ export class ViewFirmPageComponent implements OnInit {
   AuthorisationStatusTypeLabelDescFormatted: any;
   LicenseStatusTypeLabelDescFormatted: any;
   existingAddresses: any = [];
-  existingControllerAddresses: any = []; 
+  existingControllerAddresses: any = [];
   firmApp: any = {};
   firmOPDetails: any;
   prudReturnTypesDropdown: any = [];
@@ -109,18 +113,19 @@ export class ViewFirmPageComponent implements OnInit {
   firmNamesHistory: any = [];
   firmAccountingStandardHistory: any = [];
   firmAddresses: any = [];
-  ControllerfirmAddresses :any = [];
+  ControllerfirmAddresses: any = [];
   appDetails: any = [];
   applicationTypeId: number;
   selectedFirmTypeID: number;
   firmAddressesTypeHistory: any = [];
   ActivityLicensed: any = [{}];
   ActivityAuth: any = [{}];
-  AuthTableDocument: any = [];
+  scopeOfAuthTableDoc: any = [];
+  pressReleaseTableDoc: any = [];
   islamicFinance: any = {};
   activityCategories: any[] = [];
   activityTypes: any[] = [];
-  availableProducts: any[] = [];
+  subActivities: any[] = [];
   licensedActivities: any = [];
   AuthRegulatedActivities: any = [];
   AllProducts: any[] = [];
@@ -163,6 +168,7 @@ export class ViewFirmPageComponent implements OnInit {
   resetFirmSector: boolean = false;
   SectorTypeIDChanged: boolean = false;
   PrudentialCategoryIDChanged: boolean = false;
+  isParentActivity: boolean = false;
   // resetSectorTypeID: boolean = false;
   scopeRevNum: number;
   selectedCategory: number;
@@ -175,6 +181,8 @@ export class ViewFirmPageComponent implements OnInit {
   sectorDetails: any = [];
   prudentialCategoryDetails: any = [];
   formReferenceDocs: any = [];
+  fetchedScopeDocSubTypeID: any = {};
+  fetchedCoreDetailDocSubTypeID: any = {};
   selectedDocId: string | null = null;
   currentLicRevisionNumber: number | null = null;
   lastLicRevisionNumber: number | null = null;
@@ -183,6 +191,7 @@ export class ViewFirmPageComponent implements OnInit {
   isScopeConditionChecked: boolean = false;
   previousPrudentialCategoryID: number;
   previousSectorTypeID: number;
+  newfileNum: number;
   /* */
   displayInactiveContacts: boolean = false;
   displayInactiveAuditors: boolean = false;
@@ -272,8 +281,18 @@ export class ViewFirmPageComponent implements OnInit {
 
   /* loader flag */
   isLoading: boolean = false;
+
   //  individuals section
-  AllapprovedIndividuals: any = []; 
+  AllapprovedIndividuals: any = [];
+  withdrawnIndividuals: { [key: string]: any[] } = {};
+  AllAppliedIndividuals: any = [];
+  currentPage: number = 1;
+  totalPages: number = 0;
+  totalRows: number = 0;
+  paginatedFirms: any[] = [];
+  startRow: number = 0;
+  endRow: number = 0;
+  pageSize: number = 8;
 
   showAddressesForm = false;
   AllRegulater: any = [];
@@ -294,6 +313,7 @@ export class ViewFirmPageComponent implements OnInit {
     private waiverService: WaiverService,
     private riskService: RiskService,
     private noticeService: NoticeService,
+    private sharepointService: SharepointDocumentsService,
     private aiElectronicswfService: AiElectronicswfService,
     private el: ElementRef,
     private renderer: Renderer2,
@@ -306,7 +326,9 @@ export class ViewFirmPageComponent implements OnInit {
   ngOnInit(): void {
     console.log('ngOnInit called');
     this.scrollToTop();
-
+    this.updatePaginationapproved();
+    this.updatePaginationWithdrawn();
+    this.updatePaginationApplied();
 
     this.route.params.subscribe(params => {
       this.firmId = +params['id']; // Retrieve the firm ID from the route parameters
@@ -314,10 +336,19 @@ export class ViewFirmPageComponent implements OnInit {
       this.loadFirmDetails(this.firmId);  // Fetch the firm details
       this.loadFirmOPDetails(this.firmId); // Fetch Operational Data
       this.loadAssiRA();
-      this.checkFirmLicense();
-      this.checkFirmAuthorisation();
-      this.userAllowedToAccessFirm();
+      this.checkFirmLicense(); // Check if firm is licensed
+      this.checkFirmAuthorisation(); // Check if firm is authorised
+      this.userAllowedToAccessFirm(); // Check if firm accessible for current user
+      this.loadAssignedUserRoles(); // Fetch User Roles
+      this.isValidFirmAMLSupervisor(this.firmId, this.userId); // Is user AML Supervisor
+      this.isValidFirmSupervisor(this.firmId, this.userId); // Is user Firm Supervisor
+      this.getAssignedLevelUsers(); // Fetch user levels
 
+      // functions for documents
+      this.fetchSubTypeDocIDs();
+      this.getNewFileNumber();
+
+      // functions for dropdowns
       this.populateCountries();
       this.populateQFCLicenseStatus();
       this.populateAuthorisationStatus();
@@ -330,11 +361,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.populateAuthorisationCategoryTypes();
       this.populateFirmScopeTypes();
 
-      this.loadAssignedUserRoles();
-      this.isValidFirmAMLSupervisor(this.firmId, this.userId);
-      this.isValidFirmSupervisor(this.firmId, this.userId);
-      this.getAssignedLevelUsers();
-
+      // functions for dropdowns
       this.getControllerControlTypes();
       this.getControllerControlTypesCreat();
       this.getTitle();
@@ -348,10 +375,14 @@ export class ViewFirmPageComponent implements OnInit {
       this.getAllRegulater(this.Address.countryID, this.firmId);
       this.getAllContactFromByFrimsId();
 
-      this.getApprovedIndividuals(this.firmId, 'Approved');
+      
     });
   }
-
+  ngOnChanges(): void {
+    this.updatePaginationapproved();
+    this.updatePaginationWithdrawn();
+    this.updatePaginationApplied();
+  }
   ngAfterViewInit() {
     // Ensure the query list is available
     this.dateInputs.changes.subscribe(() => {
@@ -493,8 +524,13 @@ export class ViewFirmPageComponent implements OnInit {
           this.loadControllersIndividual();
         }
         break;
+      case FrimsObject.Individual:
+        this.showSection(this.individualSection);
+        this.getApprovedIndividuals(this.firmId, 'Approved');
+        this.getWithdrawnIndividuals(this.firmId)
+        this.getAppliedIndividuals(this.firmId, "Applied")
+        break;
       case FrimsObject.Supervision:
-
         this.showSection(this.supervisionSection);
         break;
       case FrimsObject.ReturnsReview:
@@ -766,7 +802,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.isLoading = true;
     // Start validations
     this.hasValidationErrors = false;
-    // this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
+    this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
     // Synchronous firm-level validation checks
     this.validateFirmDetails(); // Perform existing validation logic synchronously
 
@@ -1290,6 +1326,7 @@ export class ViewFirmPageComponent implements OnInit {
     } else if (section === 'Authorized') {
       this.tabIndex = 1;
       this.isEditModeAuth = false;
+      this.disableApplicationDate = true;
       this.loadActivitiesAuthorized()
         .then(() => {
           this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
@@ -1413,7 +1450,7 @@ export class ViewFirmPageComponent implements OnInit {
         createdBy: userId, //recheck
         docReferenceID: this.ActivityLicensed[0].docReferenceID ?? null,
         firmApplTypeID: 2, // licensed
-        docIDs: this.selectedDocId.toString(),
+        docIDs: this.selectedDocId == null ? null : this.selectedDocId.toString(),
         generalConditions: this.ActivityLicensed[0].GeneralConditions,
         effectiveDate: this.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityLicensed[0].ScopeCertificateLink,
@@ -1588,7 +1625,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.loadActivityCategories();
         // Loop through each activity and load its activities based on FirmScopeTypeID
         this.ActivityAuth.forEach(activity => {
-          if (activity.FirmScopeTypeID) {
+          if (activity.CategoryID) {
             this.loadActivityTypes(activity);  // Load activities for each category
           }
         });
@@ -1724,7 +1761,7 @@ export class ViewFirmPageComponent implements OnInit {
         createdBy: userId, //recheck
         docReferenceID: this.ActivityAuth[0].docReferenceID ?? null,
         firmApplTypeID: 3, // Authorised
-        docIDs: this.selectedDocId.toString(),
+        docIDs: this.selectedDocId == null ? null : this.selectedDocId.toString(),
         generalConditions: this.ActivityAuth[0].GeneralCondition,
         effectiveDate: this.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityAuth[0]?.ScopeCertificateLink,
@@ -1733,7 +1770,7 @@ export class ViewFirmPageComponent implements OnInit {
       },
       lstFirmActivities: this.existingPermittedActivites.map(activityAuth => ({
         createdBy: userId, //recheck
-        firmScopeTypeID: parseInt(activityAuth.FirmScopeTypeID),
+        firmScopeTypeID: null,
         activityTypeID: parseInt(activityAuth.ActivityTypeID),
         effectiveDate: this.convertDateToYYYYMMDD(activityAuth.ScopeEffectiveDate),
         firmActivityConditions: activityAuth.FirmActivityConditions,
@@ -2265,15 +2302,13 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  confirmDelete() {
+  confirmDeleteContact() {
     console.log("confirmDelete called: ", this.selectedContact)
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to delete this contact?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
       if (result.isConfirmed) {
@@ -2459,7 +2494,7 @@ export class ViewFirmPageComponent implements OnInit {
         }
       },
     );
-   
+
     console.log("controllerDetails", this.controllerDetails)
     console.log("selectedController", this.selectedController)
 
@@ -2741,17 +2776,17 @@ export class ViewFirmPageComponent implements OnInit {
   // }
   get filteredControllerfirmAddresses() {
     return this.ControllerfirmAddresses.filter(addr => !addr.isRemoved);
-    
+
   }
   addControllerAddressForm() {
     const totalAddressTypes = this.allAddressTypes.length;
     const validAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
-  
+
     if (validAddressCount >= totalAddressTypes) {
       this.canAddNewAddress = false;
       return;
     }
-  
+
     const newAddress = {
       AddressID: null,
       AddressTypeID: 0,
@@ -2774,13 +2809,13 @@ export class ViewFirmPageComponent implements OnInit {
       ToDate: null,
       Valid: true,
     };
-  
+
     // Instead of reassigning the array, push the new address to the beginning of the array
     this.ControllerfirmAddresses.push(newAddress);
 
     const updatedValidAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
-}
+  }
 
   // addEditAddressForm(): void {
   //   const newAddress = {
@@ -2859,229 +2894,229 @@ export class ViewFirmPageComponent implements OnInit {
     this.isEditable = false;
     this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
     this.EditControllerValidateForm().then(() => {
-        console.log("Selected Controller:", this.selectedController);
-        if (
-          ["Parent Entity", "Corporate Controller", "Head Office of a Branch", "UBO – Corporate"].includes(this.selectedController.EntityTypeDesc)
-        ) {
-          const saveControllerPopupChangesObj = {
-            otherEntityDetails: {
-              UserID: 30,
-              UserName: null,
+      console.log("Selected Controller:", this.selectedController);
+      if (
+        ["Parent Entity", "Corporate Controller", "Head Office of a Branch", "UBO – Corporate"].includes(this.selectedController.EntityTypeDesc)
+      ) {
+        const saveControllerPopupChangesObj = {
+          otherEntityDetails: {
+            UserID: 30,
+            UserName: null,
+            OtherEntityName: this.selectedController.OtherEntityName,
+            otherEntityID: this.selectedController.OtherEntityID,
+            DateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
+            createdBy: this.selectedController.CreatedBy,
+            CessationDate: this.convertDateToYYYYMMDD(this.selectedController.CessationDate),
+            EffectiveDate: this.convertDateToYYYYMMDD(this.selectedController.EffectiveDate),
+            CreatedDate: null,
+            relatedEntityID: this.selectedController.RelatedEntityID,
+            entitySubTypeID: this.selectedController.EntitySubTypeID,
+            relatedEntityTypeID: this.selectedController.EntityTypeID,
+            relatedEntityEntityID: this.selectedController.RelatedEntityEntityID,
+            myState: this.selectedController.myState,
+            LegalStatusTypeID: this.selectedController.LegalStatusTypeID,
+            LegalStatusTypeDesc: this.selectedController.LegalStatusTypeDesc,
+            placeOfIncorporation: this.selectedController.PlaceOfIncorporation,
+            countryOfIncorporation: this.selectedController.countryOfIncorporation,
+            registeredNumber: this.selectedController.RegisteredNum,
+            zebSiteAddress: this.selectedController.zebSiteAddress,
+            lastModifiedBy: 30,
+            ControllerControlTypeDesc: null,
+            isAuditor: this.selectedController.isAuditor,
+            isCompanyRegulated: this.selectedController.IsCompanyRegulated,
+            additionalDetails: this.selectedController.additionalDetails,
+            isParentController: this.selectedController.isParentController,
+            isPublicallyTraded: this.selectedController.isPublicallyTraded,
+            areAnyUBOs: this.selectedController.areAnyUBOs,
+            controllerInfo: this.selectedController.controllerInfo,
+            output: this.selectedController.output,
+            FirmID: this.selectedController.FirmID,
+            EntityTypeID: this.selectedController.EntityTypeID,
+            EntityID: this.selectedController.FirmID,
+            controllerControlTypeID: this.selectedController.ControllerControlTypeID,
+            numOfShares: this.selectedController.numOfShares,
+            PctOfShares: this.selectedController.PctOfShares,
+            MajorityStockHolder: false,
+            AssnDateFrom: this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
+            AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
+            LastModifiedByOfOtherEntity: 30,
+          },
+          addressList: this.existingControllerAddresses.map(address => ({
+            firmID: this.firmId,
+            countryID: address.CountryID,
+            AddressTypeID: address.AddressTypeID,
+            LastModifiedBy: this.userId,
+            entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+            entityID: this.firmId,
+            contactID: address.contactID,
+            AddressID: address.AddressID.toString(),
+            addressState: 6,
+            AddressLine1: address.AddressLine1,
+            AddressLine2: address.AddressLine2,
+            AddressLine3: address.AddressLine3,
+            AddressLine4: address.AddressLine4,
+            City: address.City,
+            createdBy: address.createdBy,
+            AddressAssnID: address.AddressAssnID,
+            CreatedDate: address.CreatedDate,
+            LastModifiedDate: address.LastModifiedDate,
+            fromDate: address.fromDate,
+            toDate: address.toDate,
+            Output: address.Output,
+            ObjectID: address.ObjectID,
+            Province: address.Province,
+            ObjectInstanceID: address.ObjectInstanceID,
+            ObjectInstanceRevNumber: address.ObjectInstanceRevNumber,
+            SourceObjectID: address.SourceObjectID,
+            SourceObjectInstanceID: address.SourceObjectInstanceID,
+            SourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber,
+            PostalCode: address.PostalCode,
+          })),
+
+          regulatorList: this.regulatorList.map(regulator => ({
+            EntityTypeID: regulator.EntityTypeID,
+            EntityID: regulator.EntityID,
+            UserID: regulator.UserID,
+            FirmID: regulator.FirmID,
+            RelatedEntityTypeID: regulator.RelatedEntityTypeID,
+            relatedEntityID: regulator.relatedEntityID,
+            Output: regulator.Output,
+            regulatorState: 6,
+            RegulatorID: regulator.RegulatorID,
+            RegulatorName: regulator.RegulatorName,
+            RegulatorContacts: regulator.RegulatorContacts,
+            RelatedEntityID: regulator.RelatedEntityID,
+            ContactID: regulator.ContactID,
+            Title: regulator.Title,
+            FullName: regulator.FullName,
+            BussinessEmail: regulator.BussinessEmail,
+            AddressLine1: regulator.AddressLine1,
+            AddressLine2: regulator.AddressLine2,
+            AddressLine3: regulator.AddressLine3,
+            AddressLine4: regulator.AddressLine4,
+            City: regulator.City,
+            Province: regulator.Province,
+            CountryID: regulator.CountryID,
+            CountryName: regulator.CountryName,
+            PostalCode: regulator.PostalCode,
+            PhoneNumber: regulator.PhoneNumber,
+            PhoneExt: regulator.PhoneExt,
+            FaxNumber: regulator.FaxNumber,
+            EntityRegulators: regulator.EntityRegulators,
+            ShowReadOnly: regulator.ShowReadOnly,
+            ShowEnabled: regulator.ShowEnabled,
+            ContactAssnID: regulator.ContactAssnID
+          }))
+        };
+
+        // Call the insert/update endpoint
+        this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
+          response => {
+            console.log("Save successful:", response);
+          },
+          error => {
+            console.error("Error saving changes:", error);
+          }
+        );
+      } else if (
+        ["Individual Controller", "UBO - Individual"].includes(this.selectedController.EntityTypeDesc)
+      ) {
+        const saveControllerPopupChangesIndividualObj = {
+          contactDetails: {
+            contactDetails: {
+              firmID: this.firmId,
+              contactID: null,
+              contactAssnID: null,
+              AdditionalDetails: 'test',
+              BusPhone: 'test',
+              BusEmail: 'test',
+              MobileNum: 'test',
+              NameAsInPassport: 'test',
+              OtherEmail: 'test',
+              QfcNumber: this.firmDetails.QFCNum,
+              Fax: 'test',
+              ResidencePhone: 'test',
+              JobTitle: 'test',
               OtherEntityName: this.selectedController.OtherEntityName,
-              otherEntityID: this.selectedController.OtherEntityID,
-              DateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
-              createdBy: this.selectedController.CreatedBy,
-              CessationDate: this.convertDateToYYYYMMDD(this.selectedController.CessationDate),
-              EffectiveDate: this.convertDateToYYYYMMDD(this.selectedController.EffectiveDate),
-              CreatedDate: null,
-              relatedEntityID: this.selectedController.RelatedEntityID,
-              entitySubTypeID: this.selectedController.EntitySubTypeID,
-              relatedEntityTypeID: this.selectedController.EntityTypeID,
-              relatedEntityEntityID: this.selectedController.RelatedEntityEntityID,
-              myState: this.selectedController.myState,
-              LegalStatusTypeID: this.selectedController.LegalStatusTypeID,
-              LegalStatusTypeDesc: this.selectedController.LegalStatusTypeDesc,
-              placeOfIncorporation: this.selectedController.PlaceOfIncorporation,
-              countryOfIncorporation: this.selectedController.countryOfIncorporation,
-              registeredNumber: this.selectedController.RegisteredNum,
-              zebSiteAddress: this.selectedController.zebSiteAddress,
-              lastModifiedBy: 30,
-              ControllerControlTypeDesc: null,
-              isAuditor: this.selectedController.isAuditor,
-              isCompanyRegulated: this.selectedController.IsCompanyRegulated,
-              additionalDetails: this.selectedController.additionalDetails,
-              isParentController: this.selectedController.isParentController,
-              isPublicallyTraded: this.selectedController.isPublicallyTraded,
-              areAnyUBOs: this.selectedController.areAnyUBOs,
-              controllerInfo: this.selectedController.controllerInfo,
-              output: this.selectedController.output,
-              FirmID: this.selectedController.FirmID,
               EntityTypeID: this.selectedController.EntityTypeID,
-              EntityID: this.selectedController.FirmID,
-              controllerControlTypeID: this.selectedController.ControllerControlTypeID,
-              numOfShares: this.selectedController.numOfShares,
+              Title: this.selectedController.Title,
+              FirstName: this.selectedController.FirstName,
+              secondName: this.selectedController.SecondName,
+              thirdName: this.selectedController.ThirdName,
+              familyName: this.selectedController.FamilyName,
               PctOfShares: this.selectedController.PctOfShares,
-              MajorityStockHolder: false,
+              tempContactID: 0,
+              countryOfResidence: null,
+              ControllerControlTypeID: this.selectedController.ControllerControlTypeID,
+              createdBy: this.userId,
+              dateOfBirth: this.convertDateToYYYYMMDD(this.selectedController.DateOfBirth),
+              fullName: null,
+              lastModifiedBy: this.userId,
+              MyState: 0,
+              nationalID: null,
+              nationality: null,
+              EntityID: this.firmId,
+              passportNum: this.selectedController.PassportNum,
+              placeOfBirth: this.selectedController.PlaceOfBirth,
+              previousName: null,
+              isExists: false,
+              FunctionTypeId: 25,
+              nameInPassport: null,
+              contactAddnlInfoTypeID: null,
+              isFromContact: null,
+              countryofBirth: null,
+              juridictionID: null,
+              objectID: this.selectedController.ObjectID,
+              isPeP: this.selectedController.IsPEP,
               AssnDateFrom: this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
               AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
+              JurisdictionId: 3,
             },
-            addressList: this.existingControllerAddresses.map(address => ({
-              firmID: this.firmId,
-              countryID: address.CountryID,
-              AddressTypeID: address.AddressTypeID,
-              LastModifiedBy: this.userId,
-              entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-              entityID: this.firmId,
-              contactID: address.contactID,
-              AddressID: address.AddressID.toString(),
-              addressState: 6,
-              AddressLine1: address.AddressLine1,
-              AddressLine2: address.AddressLine2,
-              AddressLine3: address.AddressLine3,
-              AddressLine4: address.AddressLine4,
-              City: address.City,
-              createdBy: address.createdBy,
-              AddressAssnID: address.AddressAssnID,
-              CreatedDate: address.CreatedDate,
-              LastModifiedDate: address.LastModifiedDate,
-              fromDate: address.fromDate,
-              toDate: address.toDate,
-              Output: address.Output,
-              ObjectID: address.ObjectID,
-              Province: address.Province,
-              ObjectInstanceID: address.ObjectInstanceID,
-              ObjectInstanceRevNumber: address.ObjectInstanceRevNumber,
-              SourceObjectID: address.SourceObjectID,
-              SourceObjectInstanceID: address.SourceObjectInstanceID,
-              SourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber,
-              PostalCode: address.PostalCode,
-            })),
+            lstContactFunctions: null,
+          },
+          Addresses: this.addressForms.map(address => ({
+            firmID: this.firmId,
+            countryID: 16,//address.CountryID,
+            addressTypeID: 2,//address.AddressTypeID,
+            LastModifiedBy: this.userId,
+            entityTypeID: this.selectedController.EntityTypeID,
+            entityID: this.firmId,
+            contactID: address.contactID,
+            addressID: null,
+            addressLine1: "",
+            addressLine2: "",
+            addressLine3: "",
+            addressLine4: "",
+            city: address.city,
+            stateProvince: address.stateProvince,
+            createdBy: 0,
+            addressAssnID: null,
+            CreatedDate: address.CreatedDate,
+            LastModifiedDate: address.LastModifiedDate,
+            addressState: 3,
+            fromDate: "2024-10-01T14:38:59.118Z",
+            toDate: "2024-10-01T14:38:59.118Z",
+            Output: address.Output,
+            objectID: 0,
+            objectInstanceID: 0,
+            zipPostalCode: "",
+            objAis: null
+          }))
+        };
 
-            regulatorList: this.regulatorList.map(regulator => ({
-              EntityTypeID: regulator.EntityTypeID,
-              EntityID: regulator.EntityID,
-              UserID: regulator.UserID,
-              FirmID: regulator.FirmID,
-              RelatedEntityTypeID: regulator.RelatedEntityTypeID,
-              relatedEntityID: regulator.relatedEntityID,
-              Output: regulator.Output,
-              regulatorState: 6,
-              RegulatorID: regulator.RegulatorID,
-              RegulatorName: regulator.RegulatorName,
-              RegulatorContacts: regulator.RegulatorContacts,
-              RelatedEntityID: regulator.RelatedEntityID,
-              ContactID: regulator.ContactID,
-              Title: regulator.Title,
-              FullName: regulator.FullName,
-              BussinessEmail: regulator.BussinessEmail,
-              AddressLine1: regulator.AddressLine1,
-              AddressLine2: regulator.AddressLine2,
-              AddressLine3: regulator.AddressLine3,
-              AddressLine4: regulator.AddressLine4,
-              City: regulator.City,
-              Province: regulator.Province,
-              CountryID: regulator.CountryID,
-              CountryName: regulator.CountryName,
-              PostalCode: regulator.PostalCode,
-              PhoneNumber: regulator.PhoneNumber,
-              PhoneExt: regulator.PhoneExt,
-              FaxNumber: regulator.FaxNumber,
-              EntityRegulators: regulator.EntityRegulators,
-              ShowReadOnly: regulator.ShowReadOnly,
-              ShowEnabled: regulator.ShowEnabled,
-              ContactAssnID: regulator.ContactAssnID
-            }))
-          };
-
-          // Call the insert/update endpoint
-          this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
-            response => {
-              console.log("Save successful:", response);
-            },
-            error => {
-              console.error("Error saving changes:", error);
-            }
-          );
-        } else if (
-          ["Individual Controller", "UBO - Individual"].includes(this.selectedController.EntityTypeDesc)
-        ) {
-          const saveControllerPopupChangesIndividualObj = {
-            contactDetails: {
-              contactDetails: {
-                firmID: this.firmId,
-                contactID: null,
-                contactAssnID: null,
-                AdditionalDetails: 'test',
-                BusPhone: 'test',
-                BusEmail: 'test',
-                MobileNum: 'test',
-                NameAsInPassport: 'test',
-                OtherEmail: 'test',
-                QfcNumber: this.firmDetails.QFCNum,
-                Fax: 'test',
-                ResidencePhone: 'test',
-                JobTitle: 'test',
-                OtherEntityName: this.selectedController.OtherEntityName,
-                EntityTypeID: this.selectedController.EntityTypeID,
-                Title: this.selectedController.Title,
-                FirstName: this.selectedController.FirstName,
-                secondName: this.selectedController.SecondName,
-                thirdName: this.selectedController.ThirdName,
-                familyName: this.selectedController.FamilyName,
-                PctOfShares: this.selectedController.PctOfShares,
-                tempContactID: 0,
-                countryOfResidence: null,
-                ControllerControlTypeID: this.selectedController.ControllerControlTypeID,
-                createdBy: this.userId,
-                dateOfBirth: this.convertDateToYYYYMMDD(this.selectedController.DateOfBirth),
-                fullName: null,
-                lastModifiedBy: this.userId,
-                MyState: 0,
-                nationalID: null,
-                nationality: null,
-                EntityID: this.firmId,
-                passportNum: this.selectedController.PassportNum,
-                placeOfBirth: this.selectedController.PlaceOfBirth,
-                previousName: null,
-                isExists: false,
-                FunctionTypeId: 25,
-                nameInPassport: null,
-                contactAddnlInfoTypeID: null,
-                isFromContact: null,
-                countryofBirth: null,
-                juridictionID: null,
-                objectID: this.selectedController.ObjectID,
-                isPeP: this.selectedController.IsPEP,
-                AssnDateFrom: this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
-                AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
-                LastModifiedByOfOtherEntity: 30,
-                JurisdictionId: 3,
-              },
-              lstContactFunctions: null,
-            },
-            Addresses: this.addressForms.map(address => ({
-              firmID: this.firmId,
-              countryID: 16,//address.CountryID,
-              addressTypeID: 2,//address.AddressTypeID,
-              LastModifiedBy: this.userId,
-              entityTypeID: this.selectedController.EntityTypeID,
-              entityID: this.firmId,
-              contactID: address.contactID,
-              addressID: null,
-              addressLine1: "",
-              addressLine2: "",
-              addressLine3: "",
-              addressLine4: "",
-              city: address.city,
-              stateProvince: address.stateProvince,
-              createdBy: 0,
-              addressAssnID: null,
-              CreatedDate: address.CreatedDate,
-              LastModifiedDate: address.LastModifiedDate,
-              addressState: 3,
-              fromDate: "2024-10-01T14:38:59.118Z",
-              toDate: "2024-10-01T14:38:59.118Z",
-              Output: address.Output,
-              objectID: 0,
-              objectInstanceID: 0,
-              zipPostalCode: "",
-              objAis: null
-            }))
-          };
-
-          // Call the save/update contact form endpoint
-          this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
-            response => {
-              console.log("Contact save successful:", response);
-            },
-            error => {
-              console.error("Error saving contact:", error);
-            }
-          );
-        }
+        // Call the save/update contact form endpoint
+        this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
+          response => {
+            console.log("Contact save successful:", response);
+          },
+          error => {
+            console.error("Error saving contact:", error);
+          }
+        );
+      }
     });
-}
+  }
 
   CreateControllerValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -3486,7 +3521,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.isLoading = false;
       }
     );
-}
+  }
   // Remove a regulator
   removeRegulator(index: number) {
     this.regulatorList.splice(index, 1);
@@ -3659,15 +3694,15 @@ export class ViewFirmPageComponent implements OnInit {
               contactID: null,
               contactAssnID: null,
               AdditionalDetails: 'test',
-              BusPhone:'test',
-              BusEmail:'test',
-              MobileNum:'test',
-              NameAsInPassport:'test',
-              OtherEmail:'test',
+              BusPhone: 'test',
+              BusEmail: 'test',
+              MobileNum: 'test',
+              NameAsInPassport: 'test',
+              OtherEmail: 'test',
               QfcNumber: this.firmDetails.QFCNum,
-              Fax:'test',
-              ResidencePhone:'test',
-              JobTitle:'test',
+              Fax: 'test',
+              ResidencePhone: 'test',
+              JobTitle: 'test',
               OtherEntityName: this.CreatecontrollerDetails.OtherEntityName,
               EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               Title: this.CreatecontrollerDetails.Title, // Map your inputs accordingly
@@ -3874,7 +3909,7 @@ export class ViewFirmPageComponent implements OnInit {
             error => {
               console.error('Error fetching License scope', error);
               this.loadFormReference(),
-              this.isLoading = false;
+                this.isLoading = false;
               reject(error); // Reject the promise in case of an error
             }
           );
@@ -3894,7 +3929,7 @@ export class ViewFirmPageComponent implements OnInit {
     const firstActivityAuth = this.ActivityAuth[0];
     const firstActivityLic = this.ActivityLicensed[0];
     let docID = 0;
-    
+
     if (this.tabIndex === 0) {
       docID = firstActivityLic.DocID;
     } else if (this.tabIndex === 1) {
@@ -3925,7 +3960,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.isLoading = false;
       }
     );
-}
+  }
 
 
   // On View Mode
@@ -3980,7 +4015,7 @@ export class ViewFirmPageComponent implements OnInit {
             this.loadPrudentialCategoryDetails(),
             this.loadSectorDetails(),
             this.loadIslamicFinance(),
-            this.loadScopeOfAuth(),
+            this.loadScopeOfAuthDoc(),
             this.loadFormReference(),
           ]).subscribe(
             () => {
@@ -3997,7 +4032,7 @@ export class ViewFirmPageComponent implements OnInit {
         error => {
           console.error('Error fetching activities authorised data', error);
           this.loadFormReference(),
-          this.isLoading = false;
+            this.isLoading = false;
           reject(error);
         }
       );
@@ -4096,41 +4131,36 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  loadScopeOfAuth() {
+  loadScopeOfAuthDoc() {
     const firstActivity = this.ActivityAuth[0];
-    this.objectWF.getDocument(firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
-
+    this.objectWF.getDocument(this.Page.Scope, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
     ).subscribe(
       data => {
-        this.AuthTableDocument = data.response;
+        this.scopeOfAuthTableDoc = data.response;
         console.log('Document Data:', data);
-
       },
       error => {
         console.error('Error loading document:', error);
+        this.scopeOfAuthTableDoc = [];
 
       }
     );
   }
 
-  // loadScopeOfAuth() {
-  //   this.firmService.getFirmScopeIdAndRevNum(this.firmId).pipe(
-  //     switchMap(({ scopeId, scopeRevNum }) =>
-  //       this.firmService.getDocument(scopeId, scopeRevNum)
-  //     )
-  //   ).subscribe(
-  //     data => {
-  //       this.AuthTableDocument = data.response;
-  //       console.log('Document Data:', data);
+  loadPressReleaseDoc() {
+    this.objectWF.getDocument(this.Page.CoreDetail, this.firmAppDetailsCurrentAuthorized.FirmApplStatusID, 1).pipe(
+    ).subscribe(
+      data => {
+        this.pressReleaseTableDoc = data.response;
+        console.log('Document Data:', data);
+      },
+      error => {
+        console.error('Error loading document:', error);
+        this.pressReleaseTableDoc = [];
 
-  //     },
-  //     error => {
-  //       console.error('Error loading document:', error);
-
-  //     }
-  //   );
-  // }
-
+      }
+    );
+  }
 
   loadIslamicFinance() {
     const firstActivity = this.ActivityAuth[0];
@@ -4161,7 +4191,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.isLoading = false;
       })
   }
- 
+
   loadWaivers() {
     this.waiverService.getFirmwaiver(this.firmId).subscribe(
       data => {
@@ -4211,6 +4241,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.applicationService.getCurrentAppDetailsLicensedAndAuth(this.firmId, 3).subscribe(data => {
       this.firmAppDetailsCurrentAuthorized = data.response;
       console.log(this.firmAppDetailsCurrentAuthorized);
+      this.loadPressReleaseDoc();
       this.isLoading = false;
     }, error => {
       console.log(error)
@@ -4345,14 +4376,14 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   loadActivityTypes(activity: any) {
-    const firmScopeTypeID = activity.FirmScopeTypeID;
+    const categoryID = activity.CategoryID;
 
-    if (firmScopeTypeID) {
-      this.activityService.getAuthActivityTypes(firmScopeTypeID).subscribe(
+    if (categoryID) {
+      this.activityService.getAuthActivityTypes(categoryID).subscribe(
         data => {
           activity.activities = data.response;  // Set activities for the specific activity object
 
-          console.log(`Loaded activities for FirmScopeTypeID ${firmScopeTypeID}:`, activity.activities);
+          console.log(`Loaded activities for FirmScopeTypeID ${categoryID}:`, activity.activities);
 
           // Ensure the correct ActivityTypeID is selected
           if (activity.ActivityTypeID) {
@@ -4364,12 +4395,12 @@ export class ViewFirmPageComponent implements OnInit {
             if (selectedActivity) {
               activity.ActivityTypeID = selectedActivity.ActivityTypeID;
             } else {
-              console.warn(`ActivityTypeID ${activity.ActivityTypeID} not found for FirmScopeTypeID ${firmScopeTypeID}`);
+              console.warn(`ActivityTypeID ${activity.ActivityTypeID} not found for FirmScopeTypeID ${categoryID}`);
             }
           }
         },
         error => {
-          console.error('Error fetching activities for FirmScopeTypeID:', firmScopeTypeID, error);
+          console.error('Error fetching activities for FirmScopeTypeID:', categoryID, error);
         }
       );
     }
@@ -4589,52 +4620,52 @@ export class ViewFirmPageComponent implements OnInit {
     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
   }
 
-//   addNewAddress(addressArray: any[]) {
-//     // Define the total number of address types
-//     const totalAddressTypes = this.allAddressTypes.length;
+  //   addNewAddress(addressArray: any[]) {
+  //     // Define the total number of address types
+  //     const totalAddressTypes = this.allAddressTypes.length;
 
-//     // Get the count of valid addresses
-//     const validAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+  //     // Get the count of valid addresses
+  //     const validAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
 
-//     // Check if the number of valid addresses is equal to the number of address types
-//     if (validAddressCount >= totalAddressTypes) {
-//         // Disable the button if all address types are added
-//         this.canAddNewAddress = false;
-//         return;
-//     }
+  //     // Check if the number of valid addresses is equal to the number of address types
+  //     if (validAddressCount >= totalAddressTypes) {
+  //         // Disable the button if all address types are added
+  //         this.canAddNewAddress = false;
+  //         return;
+  //     }
 
-//     const newAddress = {
-//         AddressID: null,
-//         AddressTypeID: 0,
-//         AddressTypeDesc: '',
-//         AddressLine1: '',
-//         AddressLine2: '',
-//         AddressLine3: '',
-//         AddressLine4: '',
-//         City: '',
-//         Province: '',
-//         CountryID: 0,
-//         CountryName: '',
-//         PostalCode: '',
-//         PhoneNumber: '',
-//         FaxNumber: '',
-//         LastModifiedBy: 0, //todo _userId;
-//         LastModifiedDate: this.currentDate,
-//         addressState: 2,
-//         FromDate: null,
-//         ToDate: null,
-//         Valid: true,
-//     };
+  //     const newAddress = {
+  //         AddressID: null,
+  //         AddressTypeID: 0,
+  //         AddressTypeDesc: '',
+  //         AddressLine1: '',
+  //         AddressLine2: '',
+  //         AddressLine3: '',
+  //         AddressLine4: '',
+  //         City: '',
+  //         Province: '',
+  //         CountryID: 0,
+  //         CountryName: '',
+  //         PostalCode: '',
+  //         PhoneNumber: '',
+  //         FaxNumber: '',
+  //         LastModifiedBy: 0, //todo _userId;
+  //         LastModifiedDate: this.currentDate,
+  //         addressState: 2,
+  //         FromDate: null,
+  //         ToDate: null,
+  //         Valid: true,
+  //     };
 
-//     // Add the new address to the beginning of the target array
-//     addressArray.unshift(newAddress);
+  //     // Add the new address to the beginning of the target array
+  //     addressArray.unshift(newAddress);
 
-//     // Update the count of valid addresses
-//     const updatedValidAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+  //     // Update the count of valid addresses
+  //     const updatedValidAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
 
-//     // Disable the button if the count of valid addresses matches the number of address types
-//     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
-// }
+  //     // Disable the button if the count of valid addresses matches the number of address types
+  //     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+  // }
   areAllAddressTypesAdded() {
     const existingTypes = new Set(this.firmAddresses.map(addr => Number(addr.AddressTypeID)));
     return this.allAddressTypes.every(type => existingTypes.has(type.AddressTypeID));
@@ -4672,7 +4703,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   get filteredFirmAddresses() {
-    return this.existingAddresses.filter(addr => !addr.isRemoved);
+    return this.firmAddresses.filter(addr => !addr.isRemoved);
   }
 
   onAddressTypeChange(event: any, address: any) {
@@ -4810,7 +4841,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   onCategoryChange(activity: any) {
-    const selectedCategoryID = activity.FirmScopeTypeID; // The selected category ID
+    const selectedCategoryID = activity.CategoryID; // The selected category ID
     if (selectedCategoryID) {
       console.log('Selected Category ID:', selectedCategoryID);
 
@@ -4842,58 +4873,90 @@ export class ViewFirmPageComponent implements OnInit {
     if (activityTypeID) {
       console.log('Selected Activity ID:', activityTypeID);
 
-      // Fetch products for the selected activity
-      this.activityService.getAllProducts(activityTypeID).subscribe(
-        data => {
-          const products = data.response;
+      // Check if the activity is a parent
+      this.activityService.isParentActivity(activityTypeID).subscribe(response => {
+        this.isParentActivity = response.response.Column1;
 
-          // If no products are returned, set categorizedProducts to null
-          if (!products || products.length === 0) {
-            activity.categorizedProducts = null;
-            console.log('No products found for the selected activity.');
-            return;
-          }
+        if (this.isParentActivity) {
+          // If it's a parent activity, fetch sub-activities
+          this.activityService.getSubActivities(activityTypeID).subscribe(subActivityData => {
+            this.subActivities = subActivityData.response;
+            console.log('Loaded Sub-Activities:', this.subActivities);
 
-          // Reset categorizedProducts to load new products
-          activity.categorizedProducts = [];
-          let currentCategory = null;
-
-          // Iterate through the products and categorize them
-          products.forEach(product => {
-            if (product.ID === 0) {
-              // If it's a main category, start a new group
-              currentCategory = {
-                mainCategory: product.ProductCategoryTypeDesc,
-                subProducts: []
-              };
-              activity.categorizedProducts.push(currentCategory);
-            } else if (currentCategory) {
-              const subProduct = { ...product }; // Copy product details
-
-              // Uncheck the product by default when loading
-              subProduct.isChecked = false;
-              subProduct.firmScopeTypeID = 1; // Default firmScopeTypeID
-
-              // Add the subProduct to the current category
-              currentCategory.subProducts.push(subProduct);
-            }
+            // Display the sub-activities in a popup
+            this.showSubActivitiesPopup(this.subActivities);
+          }, error => {
+            console.error('Error fetching sub-activities:', error);
           });
-
-          console.log('Loaded Products for Activity:', activity.categorizedProducts);
-        },
-        error => {
-          // If an error occurs, set categorizedProducts to null
-          console.error('Error fetching products for ActivityTypeID', error);
-          activity.categorizedProducts = null;
         }
-      );
+
+        // Fetch products for the selected activity
+        this.activityService.getAllProducts(activityTypeID).subscribe(
+          data => {
+            const products = data.response;
+
+            // If no products are returned, set categorizedProducts to null
+            if (!products || products.length === 0) {
+              activity.categorizedProducts = null;
+              console.log('No products found for the selected activity.');
+              return;
+            }
+
+            // Reset categorizedProducts to load new products
+            activity.categorizedProducts = [];
+            let currentCategory = null;
+
+            // Iterate through the products and categorize them
+            products.forEach(product => {
+              if (product.ID === 0) {
+                // If it's a main category, start a new group
+                currentCategory = {
+                  mainCategory: product.ProductCategoryTypeDesc,
+                  subProducts: []
+                };
+                activity.categorizedProducts.push(currentCategory);
+              } else if (currentCategory) {
+                const subProduct = { ...product }; // Copy product details
+
+                // Uncheck the product by default when loading
+                subProduct.isChecked = false;
+                subProduct.firmScopeTypeID = 1; // Default firmScopeTypeID
+
+                // Add the subProduct to the current category
+                currentCategory.subProducts.push(subProduct);
+              }
+            });
+
+            console.log('Loaded Products for Activity:', activity.categorizedProducts);
+          },
+          error => {
+            // If an error occurs, set categorizedProducts to null
+            console.error('Error fetching products for ActivityTypeID', error);
+            activity.categorizedProducts = null;
+          }
+        );
+      });
     } else {
       // If no activity is selected, clear the products
       activity.categorizedProducts = null;
     }
   }
 
+  showSubActivitiesPopup(subActivities: any) {
+    this.callSubActivity = true;
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.SubActivitiesPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .SubActivitiesPopUp not found');
+      }
+    }, 0);
+  }
 
+  closeSubActivity() {
+    
+  }
 
 
   getFYearHistory() {
@@ -5073,6 +5136,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   closeSelectDocument() {
     this.callUploadDoc = false;
+    this.selectedFile = null;
     const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
     setTimeout(() => {
       if (popupWrapper) {
@@ -5266,9 +5330,9 @@ export class ViewFirmPageComponent implements OnInit {
         DocType.push(constants.DocumentType.Q02);
       }
     }
-    
+
     const docTypeString = DocType.join(',');
-    this.logForm.getDocListByFirmDocType(this.firmId,docTypeString).subscribe(data => {
+    this.logForm.getDocListByFirmDocType(this.firmId, docTypeString).subscribe(data => {
       this.formReferenceDocs = data.response;
 
       const existingDoc = this.formReferenceDocs.find(doc => doc.FILENAME === this.documentDetails?.FileName);
@@ -5276,11 +5340,11 @@ export class ViewFirmPageComponent implements OnInit {
         this.selectedDocId = existingDoc.DocID;
       }
 
-      console.log('Form Reference Docs: ',this.formReferenceDocs);
+      console.log('Form Reference Docs: ', this.formReferenceDocs);
       this.isLoading = false;
     }, error => {
       this.formReferenceDocs = []; //reintalize the array if it doesn't exist
-      console.error('Error Fetching Form Reference Docs: ',error);
+      console.error('Error Fetching Form Reference Docs: ', error);
       this.isLoading = false;
     })
     this.callRefForm = true;
@@ -5327,7 +5391,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   deSelectDocument(): void {
     if (this.selectedDocId) {
-      this.selectedDocId = null; 
+      this.selectedDocId = null;
 
       this.documentDetails = {
         FileName: '',
@@ -5845,14 +5909,23 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  confirmUpload() {
+  confirmOkUpload() {
     if (this.selectedFile) {
       // Display the selected file name in the main section
       const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
       if (uploadedDocumentsDiv) {
-        uploadedDocumentsDiv.textContent = `Uploaded Document: ${this.selectedFile.name}`;
+        uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
       }
-      this.closeSelectDocument();
+      // closes the popup
+      this.callUploadDoc = false;
+      const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
+      setTimeout(() => {
+        if (popupWrapper) {
+          popupWrapper.style.display = 'none';
+        } else {
+          console.error('Element with class not found');
+        }
+      }, 0)
     } else {
       console.error('No valid PDF file selected.');
     }
@@ -5867,12 +5940,191 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   uploadDocument() {
+    this.hasValidationErrors = false;
+    this.isLoading = true;
+
     if (!this.selectedFile) {
-      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       this.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
+      this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['uploadDocument'];
     }
+
+    // If validation errors exist, stop the process
+    if (this.hasValidationErrors) {
+      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.isLoading = false;
+      return;
+    }
+
+    if (this.selectedFile) {
+      const intranetSitePath = 'https://ictmds.sharepoint.com/sites/QFCRA';
+      const filePathAfterDocLib = "";
+      const strfileName = this.selectedFile.name;
+      const strUserEmailAddress = 'k.thomas@ictmds.onmicrosoft.com';
+
+      this.sharepointService.uploadFileToSharepoint(this.selectedFile, intranetSitePath, filePathAfterDocLib, strfileName, strUserEmailAddress).subscribe({
+        next: (response: SharePointUploadResponse) => {
+          console.log('File uploaded successfully', response);
+
+          const [fileLocation, intranetGuid] = response.result.split(';');
+          let documentObj: any;
+          // Scope Of Authorisation (Scope Authorised)
+          if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
+            documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid, constants.DocType.SCOPE, this.Page.Scope, this.fetchedScopeDocSubTypeID.DocSubTypeID, this.ActivityAuth[0].FirmScopeID, this.ActivityAuth[0].ScopeRevNum);
+            // Press Release (Core Detail)
+          } else if (this.activeTab === this.Page.CoreDetail) {
+            documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid, constants.DocType.FIRM_DOCS, this.Page.CoreDetail, this.fetchedCoreDetailDocSubTypeID.DocSubTypeID, this.firmAppDetailsCurrentAuthorized.FirmApplStatusID, 1);
+          }
+          this.saveDocument(documentObj);
+
+          const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
+          if (uploadedDocumentsDiv) {
+            uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
+          }
+          // closes the popup
+          this.callUploadDoc = false;
+          const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
+          setTimeout(() => {
+            if (popupWrapper) {
+              popupWrapper.style.display = 'none';
+            } else {
+              console.error('Element with class not found');
+            }
+          }, 0)
+          this.uploadFileSuccess(constants.DocumentAttechment.saveDocument);
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error occurred during file upload', err);
+          this.showErrorAlert(constants.MessagesLogForm.ERROR_UPLOADING_FILE);
+          this.isLoading = false;
+          // Handle the error (e.g., display error message)
+        }
+      });
+    } else {
+      console.error('No valid PDF file selected.');
+      this.isLoading = false;
+    }
+  }
+
+  deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number) {
+
+    this.objectWF.deleteDocument(docID, objectId, objectInstanceId, ObjectInstanceRevNum).subscribe({
+      next: (response) => {
+        console.log('Document deleted successfully:', response);
+        // Scope Of Authorisation (Scope Authorised)
+        if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
+          this.loadScopeOfAuthDoc();
+        }
+        // Press Release (Core Detail)
+        if (this.activeTab === this.Page.CoreDetail) {
+          this.loadPressReleaseDoc();
+        }
+      },
+      error: (err) => {
+        console.error('Error occurred while deleting the document:', err);
+      }
+    });
+  }
+
+  showUploadConfirmation() {
+    Swal.fire({
+      text: 'Are you sure you want to upload the scope of authorisation, please verify the below scope changes and then upload the file?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.uploadDocument();
+      }
+    });
+  }
+
+  uploadFileSuccess(messageKey: number) {
+    this.isLoading = true;
+    this.logForm.errorMessages(messageKey).subscribe(
+      (response) => {
+        Swal.fire({
+          title: 'Success!',
+          text: response.response,
+          icon: 'success',
+          confirmButtonText: 'Ok',
+        });
+      },
+    );
+    this.isLoading = false;
+  }
+
+  fetchSubTypeDocIDs() {
+    this.securityService.getObjectTypeTable(constants.docSubTypes).subscribe(data => {
+      // Scope Of Authorsation in Scope Authorised
+      this.fetchedScopeDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
+        item.DocSubTypeID === 262
+      );
+      // Press Release in Core Detail
+      this.fetchedCoreDetailDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
+        item.DocSubTypeID === 263
+      );
+    });
+  }
+
+  prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number, objectId: number, docSubTypeID: number, objectInstanceID: number, objectInstanceRevNum: number) {
+    return {
+      userId: userId,
+      docID: null,
+      referenceNumber: null,
+      fileName: this.selectedFile.name,
+      fileNumber: this.newfileNum.toString(),
+      firmId: this.firmId,
+      otherFirm: null,
+      docTypeID: docType,
+      loggedBy: userId,
+      loggedDate: this.currentDate,
+      receivedBy: userId,
+      receivedDate: this.currentDate,
+      docRecieptMethodID: constants.LogFormRecieptMethods.InternalDocument,
+      checkPrimaryDocID: true,
+      fileLocation: fileLocation,
+      docAttributeID: null,
+      intranetGuid: intranetGuid,
+      objectID: objectId,
+      objectInstanceID: objectInstanceID,
+      objectInstanceRevNum: objectInstanceRevNum,
+      docSubType: docSubTypeID
+    };
+  }
+
+  saveDocument(documentObj: any) {
+    this.isLoading = true;
+    this.objectWF.insertDocument(documentObj).subscribe(
+      response => {
+        console.log('scope of authorsation document saved successfully:', response);
+        // Scope Of Authorisation (Scope Authorised)
+        if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
+          this.loadScopeOfAuthDoc();
+        }
+        // Press Release (Core Detail)
+        if (this.activeTab === this.Page.CoreDetail) {
+          this.loadPressReleaseDoc();
+        }
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Error updating scope of auth scope:', error);
+        this.isLoading = false;
+      }
+    );
+  }
+
+  getNewFileNumber() {
+    this.logForm.getNewFileNumber(this.firmId, this.currentDate).subscribe(data => {
+      this.newfileNum = data.response.Column1;
+    }, error => {
+      console.error(error);
+    })
   }
 
   checkFirmLicense() {
@@ -6103,7 +6355,6 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   convertDateToYYYYMMDD(dateStr: string | Date): string | null {
-    console.log(dateStr);
 
     if (!dateStr) {
       return null; // Return null if the input is invalid or empty
@@ -6283,7 +6534,16 @@ export class ViewFirmPageComponent implements OnInit {
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-
+        // Scope Of Authorisation (Scope Authorised)
+        if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
+          this.deleteDocument(this.scopeOfAuthTableDoc.DocID, this.Page.Scope, this.ActivityAuth[0].FirmScopeID, this.ActivityAuth[0].ScopeRevNum);
+          this.loadScopeOfAuthDoc();
+        }
+        // Press Release (Core Detail)
+        if (this.activeTab === this.Page.CoreDetail) {
+          this.deleteDocument(this.pressReleaseTableDoc.DocID, this.Page.CoreDetail, this.firmAppDetailsCurrentAuthorized.FirmApplStatusID, 1);
+          this.loadPressReleaseDoc();
+        }
       } else if (result.isDismissed) {
         return;
       }
@@ -6294,42 +6554,158 @@ export class ViewFirmPageComponent implements OnInit {
   isNullOrEmpty(value: any): boolean {
     return value === null || value === '';
   }
-   
+
   createContact() {
     this.showCreateContactSection = true;
   }
-  closeCreateContactPopup(){
+  closeCreateContactPopup() {
     this.showCreateContactSection = false;
   }
-  getAllContactFromByFrimsId(){
+  getAllContactFromByFrimsId() {
     this.contactService.getEntityTypesByFrimsId(this.firmId).subscribe(data => {
       this.AllContactFrom = data.response;
-      console.log("ContactFrom",this.AllContactFrom)
+      console.log("ContactFrom", this.AllContactFrom)
     }, error => {
       console.error("Error fetching ContactFrom", error);
     });
   }
 
- // Yazan Individuals 
+  // Yazan Individuals 
 
- getApprovedIndividuals(firmId: number, status: string): void {
-  this.aiElectronicswfService.getApprovedIndividuals(this.firmId, status).subscribe(
-    (data) => {
-      this.AllapprovedIndividuals = data.response;
-    },
-    (error) => {
-      console.error('Error fetching approved individuals:', error);
+  getApprovedIndividuals(firmId: number, status: string): void {
+    this.aiElectronicswfService.getApprovedIndividuals(this.firmId, status).subscribe(
+      (data) => {
+        this.AllapprovedIndividuals = data.response;
+      },
+      (error) => {
+        console.error('Error fetching approved individuals:', error);
+      }
+    );
+    console.log("AllapprovedIndividuals", this.AllapprovedIndividuals)
+  }
+
+  getAppliedIndividuals(firmId: number, status: string): void {
+    this.aiElectronicswfService.getAppliedIndividuals(this.firmId, status).subscribe(
+      (data) => {
+        this.AllAppliedIndividuals = data.response;
+      },
+      (error) => {
+        console.error('Error fetching approved individuals:', error);
+      }
+    );
+    console.log("AllAppliedIndividuals", this.AllAppliedIndividuals)
+  }
+
+  getWithdrawnIndividuals(firmId: number): void {
+    this.aiElectronicswfService.getWithdrawnIndividualsser(firmId, 'Withdrawn').subscribe(
+      (data: { response: any[] }) => {
+        const lstWithdrawn = data.response;
+
+        if (Array.isArray(lstWithdrawn)) {
+          lstWithdrawn.forEach(item => {
+            if (item.ApprovedDate) {
+              item.AppliedDate = item.ApprovedDate;
+            }
+            if (item.WithdrawnDate) {
+              item.AppliedForWithdrawalDate = item.WithdrawnDate;
+            }
+            if (!Array.isArray(item.FunctionActivity)) {
+              item.FunctionActivity = item.FunctionActivity ? [item.FunctionActivity] : [];
+            }
+          });
+          this.withdrawnIndividuals = this.groupBy(lstWithdrawn, 'AppIndividualID');
+          console.log('withdrawnIndividuals', this.withdrawnIndividuals);
+        } else {
+          console.error('Invalid response format: expected an array.');
+        }
+      },
+      error => {
+        console.error('Error fetching withdrawn individuals:', error);
+      }
+    );
+  }
+
+  // Helper function to group individuals by AppIndividualID
+  groupBy(arr: any[], key: string): { [key: string]: any[] } {
+    return arr.reduce((accumulator, currentValue) => {
+      // If the key doesn’t exist, initialize it as an empty array
+      (accumulator[currentValue[key]] = accumulator[currentValue[key]] || []).push(currentValue);
+      return accumulator;
+    }, {});
+  }
+
+  // Navigate to the previous page
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updateActivePagination();  // Call the appropriate pagination function
     }
-  );
-  console.log("AllapprovedIndividuals",this.AllapprovedIndividuals)
-}
+  }
 
+  // Navigate to the next page
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updateActivePagination();  // Call the appropriate pagination function
+    }
+  }
+  updateActivePagination(): void {
+    if (this.activeSectionind === 'Applied') {
+      this.updatePaginationApplied();
+    } else if (this.activeSectionind === 'Approved') {
+      this.updatePaginationapproved();
+    } else if (this.activeSectionind === 'Withdrawn') {
+      this.updatePaginationWithdrawn();
+    }
+  }
+  updatePaginationapproved(): void {
+    if (this.AllapprovedIndividuals && this.AllapprovedIndividuals.length > 0) {
+      this.totalRows = this.AllapprovedIndividuals.length;
+      this.totalPages = Math.ceil(this.totalRows / this.pageSize);
+      const startIndex = (this.currentPage - 1) * this.pageSize;
+      const endIndex = Math.min(startIndex + this.pageSize, this.totalRows);
+      this.paginatedFirms = this.AllapprovedIndividuals.slice(startIndex, endIndex); // Paginated data
+      this.startRow = startIndex + 1;
+      this.endRow = endIndex;
+    } else {
+      this.paginatedFirms = []; // Reset paginated firms if no data
+    }
+  }
+  updatePaginationApplied(): void {
+    if (this.AllAppliedIndividuals && this.AllAppliedIndividuals.length > 0) {
+      this.totalRows = this.AllAppliedIndividuals.length;
+      this.totalPages = Math.ceil(this.totalRows / this.pageSize);
+      const startIndex = (this.currentPage - 1) * this.pageSize;
+      const endIndex = Math.min(startIndex + this.pageSize, this.totalRows);
+      this.paginatedFirms = this.AllAppliedIndividuals.slice(startIndex, endIndex); // Paginated data
+      this.startRow = startIndex + 1;
+      this.endRow = endIndex;
+    } else {
+      this.paginatedFirms = []; // Reset paginated firms if no data
+    }
+  }
+  updatePaginationWithdrawn(): void {
+    if (this.withdrawnIndividuals && Object.keys(this.withdrawnIndividuals).length > 0) {
+      const withdrawnIndividualsArray = Object.values(this.withdrawnIndividuals).flat(); // Flatten the grouped arrays into a single array
 
+      this.totalRows = withdrawnIndividualsArray.length;
+      this.totalPages = Math.ceil(this.totalRows / this.pageSize);
+      const startIndex = (this.currentPage - 1) * this.pageSize;
+      const endIndex = Math.min(startIndex + this.pageSize, this.totalRows);
 
+      this.paginatedFirms = withdrawnIndividualsArray.slice(startIndex, endIndex); // Paginated data
+      this.startRow = startIndex + 1;
+      this.endRow = endIndex;
+    } else {
+      this.paginatedFirms = []; // Reset paginated firms if no data
+    }
+  }
 
+  activeSectionind: string = 'Applied';
 
-
-
+  switchIndividualTab(section: string): void {
+    this.activeSectionind = section;  // Set the active section to the clicked tab
+  }
 
 
 

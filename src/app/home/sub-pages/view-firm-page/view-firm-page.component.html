@@ -411,8 +411,7 @@
 
         <div class="input-field">
           <label for="homeCountry"> Home Country </label>
-          <select [disabled]="!isEditModeCore"
-            id="homeCountry" [(ngModel)]="firmDetails.CountyOfIncorporation">
+          <select [disabled]="!isEditModeCore" id="homeCountry" [(ngModel)]="firmDetails.CountyOfIncorporation">
             <option *ngFor="let option of allCountries" [value]="option.CountryID">
               {{ option?.CountryName }}
             </option>
@@ -439,8 +438,8 @@
             <label for="incorporationDate"> Incorporation Date </label>
             <input [ngClass]="{
                 'error-border': errorMessages['DateOfIncorporation']
-              }" [disabled]="!isEditModeCore" name="incorporationDate" id="incorporationDate" type="text" #dateInputs placeholder
-              [(ngModel)]="firmDetails.DateOfIncorporation" />
+              }" [disabled]="!isEditModeCore" name="incorporationDate" id="incorporationDate" type="text" #dateInputs
+              placeholder [(ngModel)]="firmDetails.DateOfIncorporation" />
           </div>
         </ng-container>
 
@@ -451,8 +450,7 @@
               <i class="bi bi-clock-history"></i> <span> Open History</span>
             </button>
           </label>
-          <select [disabled]="!isEditModeCore"
-            id="financialYearEnd" [(ngModel)]="firmDetails.FinYearEndTypeID">
+          <select [disabled]="!isEditModeCore" id="financialYearEnd" [(ngModel)]="firmDetails.FinYearEndTypeID">
             <option *ngFor="let option of allFinYearEnd" [value]="option.FirmFinYearEndTypeID">
               {{ option.FirmFinYearEndTypeDesc }}
             </option>
@@ -476,8 +474,7 @@
               <i class="bi bi-clock-history"></i><span> Open History</span>
             </button>
           </label>
-          <select [disabled]="!isEditModeCore"
-            id="accountingStandards" [(ngModel)]="firmDetails.FinAccStdTypeID">
+          <select [disabled]="!isEditModeCore" id="accountingStandards" [(ngModel)]="firmDetails.FinAccStdTypeID">
             <option *ngFor="let option of allFinAccStd" [value]="option.FinAccStdTypeID">
               {{ option.FinAccStdTypeDesc }}
             </option>
@@ -637,8 +634,7 @@
         </div>
         <div class="input-field">
           <label for="firmApplicationType"> Firm Application Type </label>
-          <select name="firmApplicationType"
-            id="firmApplicationType" [(ngModel)]="selectedFirmTypeID"
+          <select name="firmApplicationType" id="firmApplicationType" [(ngModel)]="selectedFirmTypeID"
             (ngModelChange)="onFirmApplicationTypeChange($event)">
             <option *ngFor="let firmType of allFirmTypes" [value]="firmType.FirmApplTypeID">
               {{ firmType.FirmApplTypeDesc }}
@@ -647,8 +643,7 @@
         </div>
         <div class="input-field">
           <label for="qfcLicenseStatus"> QFC License Status </label>
-          <select name="qfcLicenseStatus"
-            id="qfcLicenseStatus" [(ngModel)]="firmDetails.LicenseStatusTypeID"
+          <select name="qfcLicenseStatus" id="qfcLicenseStatus" [(ngModel)]="firmDetails.LicenseStatusTypeID"
             (ngModelChange)="onLicenseStatusChange($event)">
             <option *ngFor="let option of allQFCLicenseStatus" [value]="option.FirmApplStatusTypeID">
               {{ option.FirmApplStatusTypeDesc }}
@@ -665,9 +660,8 @@
         </div>
         <div class="input-field" *ngIf="selectedFirmTypeID == 3">
           <label for="authorisationStatus"> Authorisation Status </label>
-          <select name="authorisationStatus"
-            id="authorisationStatus" [(ngModel)]="firmDetails.AuthorisationStatusTypeID"
-            (ngModelChange)="onAuthorizedStatusChange($event)">
+          <select name="authorisationStatus" id="authorisationStatus"
+            [(ngModel)]="firmDetails.AuthorisationStatusTypeID" (ngModelChange)="onAuthorizedStatusChange($event)">
             <option *ngFor="let option of allAuthorisationStatus" [value]="option.FirmApplStatusTypeID">
               {{ option.FirmApplStatusTypeDesc }}
             </option>
@@ -684,7 +678,7 @@
       </div>
     </div>
     <!---->
-    <div class="inputs-field-set" *ngIf="isEditModeCore && selectedFirmTypeID == 3"
+    <div class="inputs-field-set" *ngIf="(pressReleaseTableDoc?.DocSubTypeDesc && selectedFirmTypeID == 3) || isEditModeCore"
       [ngClass]="{ collapsed: isCollapsed['pressReleaseSection'] }">
       <div class="error-messages">
         <p *ngIf="errorMessages['uploadDocument']">
@@ -699,18 +693,18 @@
         </button>
       </div>
       <div class="inputs-row">
-        <div class="file-container">
+        <div *ngIf="isEditModeCore && !pressReleaseTableDoc?.DocSubTypeDesc" class="file-container">
           <div class="input-field">
             <label for="documentType"> Document Type </label>
-            <select [disabled]="!isEditModeCore"
+            <select [(ngModel)]="fetchedCoreDetailDocSubTypeID.DocSubTypeID"
               class="document-type-select" name="documentType" id="documentType">
-              <option value="263">Press Releases</option>
+              <option [value]="fetchedCoreDetailDocSubTypeID.DocSubTypeID">Press Releases</option>
             </select>
           </div>
           <div class="input-field">
-            <label id="uploaded-documents">Uploaded documents go here</label>
+            <label id="uploaded-documents"></label>
           </div>
-          <div class="input-field">
+          <div *ngIf="!pressReleaseTableDoc?.DocSubTypeDesc" class="input-field">
             <div class="btns-container">
               <div class="upload-container">
                 <button class="choose-document-btn" (click)="selectDocument()">
@@ -724,20 +718,29 @@
           </div>
         </div>
         <div class="file-table-container">
-          <table>
+          <table class="press-release">
             <thead>
               <tr>
-                <th>Document Type</th>
-                <th>File Name</th>
-                <th>Delete</th>
+                <th style="width:60%">Document Type</th>
+                <th style="width:30%">File Name</th>
+                <th *ngIf="isEditModeCore">Delete</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Attachment</td>
-                <td></td>
-                <td>
-                  <button style="display: none" class="delete-file">
+                <td style="text-align:left">
+                  <span [style.color]="pressReleaseTableDoc?.DocSubTypeDesc ? 'inherit' : 'red'">
+                    {{ pressReleaseTableDoc?.DocSubTypeDesc || 'No documents attached' }}
+                  </span>
+                </td>
+                <td style="text-align: left">
+                  <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{
+                      pressReleaseTableDoc?.FileLoc
+                    }}" target="_blank">{{ pressReleaseTableDoc?.FileName }}</a>
+                </td>
+                <td *ngIf="isEditModeCore" style="text-align: center">
+                  <button class="delete-action" *ngIf="pressReleaseTableDoc?.DocSubTypeDesc"
+                    (click)="showAlertDeleteFile()">
                     Delete
                   </button>
                 </td>
@@ -823,7 +826,7 @@
                   (click)="getAddressTypeHistory(address.AddressTypeID)">
                   <i class="bi bi-clock-history"></i> <span>Open History</span>
                 </button>
-                
+
               </label>
               <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID"
                 (change)="onAddressTypeChange($event, address)" [ngClass]="{
@@ -1062,10 +1065,10 @@
           <div class="inputs-row">
             <div style="width: 100%" class="input-field">
               <label for="formReff"> Form Reference </label>
-              <a *ngIf="isEditModeLicense || !(ActivityLicensed[0].ScopeRevNum)" (click)="getFormReferenceDocuments()" class="form-ref-btn">Select/De-select document</a>
-              <a id="websiteLink"
-                href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{documentDetails.Column3}}" target="_blank"
-                rel="noopener noreferrer">
+              <a *ngIf="isEditModeLicense || !(ActivityLicensed[0].ScopeRevNum)" (click)="getFormReferenceDocuments()"
+                class="form-ref-btn">Select/De-select document</a>
+              <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{documentDetails.Column3}}"
+                target="_blank" rel="noopener noreferrer">
                 {{documentDetails?.formattedFileName || documentDetails?.FileName}}
               </a>
             </div>
@@ -1097,10 +1100,12 @@
                   ActivityLicensed[0]?.ScopeRevNum <= 1
                 ">Application Date</label>
               <input [disabled]="disableApplicationDate" name="appDate" id="appDate" #dateInputs placeholder type="text"
-                [(ngModel)]="ActivityLicensed[0].ScopeAppliedDate" [ngClass]="{'error-border': errorMessages['ScopeAppliedDate']}"/>
+                [(ngModel)]="ActivityLicensed[0].ScopeAppliedDate"
+                [ngClass]="{'error-border': errorMessages['ScopeAppliedDate']}" />
             </div>
             <!-- on creation mode -->
-             <input *ngIf="isCreateModeLicense" disabled type="text" #dateInputs placeholder [(ngModel)]="firmDetails.FirmLicApplDate">
+            <input *ngIf="isCreateModeLicense" disabled type="text" #dateInputs placeholder
+              [(ngModel)]="firmDetails.FirmLicApplDate">
             <div class="input-field">
               <label for="licenseDate"> Licensed Date </label>
               <input disabled name="licenseDate" id="licenseDate" type="text"
@@ -1375,10 +1380,10 @@
           <div class="inputs-row">
             <div class="input-field">
               <label for="formReff"> Form Reference </label>
-              <a *ngIf="isEditModeAuth || !(ActivityAuth[0].ScopeRevNum)" (click)="getFormReferenceDocuments()" class="form-ref-btn">Select/De-select document</a>
-              <a id="websiteLink"
-                href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{documentDetails.Column3}}" target="_blank"
-                rel="noopener noreferrer">
+              <a *ngIf="isEditModeAuth || !(ActivityAuth[0].ScopeRevNum)" (click)="getFormReferenceDocuments()"
+                class="form-ref-btn">Select/De-select document</a>
+              <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{documentDetails.Column3}}"
+                target="_blank" rel="noopener noreferrer">
                 {{documentDetails?.formattedFileName || documentDetails?.FileName}}
               </a>
             </div>
@@ -1408,7 +1413,7 @@
                 ">Application Date</label>
               <input [disabled]="disableApplicationDate" [(ngModel)]="ActivityAuth[0].ScopeApplicationDate" [ngClass]="{
                   'error-border': errorMessages['ScopeAppliedDateAuth']
-                }" name="q13AppDate" id="AppDate" type="text" #dateInputs placeholder/>
+                }" name="q13AppDate" id="AppDate" type="text" #dateInputs placeholder />
             </div>
             <div class="input-field">
               <label for="incorporationDate"> Incorporation Date </label>
@@ -1457,21 +1462,26 @@
         <!--Scope of Authorization-->
         <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['scopeOfAuthorization'] }">
           <div class="section">
+            <div *ngIf="errorMessages['uploadDocument']" class="error-messages" style="width:100%">
+              <p *ngIf="errorMessages['uploadDocument']">
+                {{ errorMessages['uploadDocument'] }}
+              </p>
+            </div>
             <div class="form-section-title collapse-container">
               <h2 class="edit-firm-header">Scope of Authorisation</h2>
               <button class="collapse-button" (click)="toggleCollapse('scopeOfAuthorization')">
                 {{ isCollapsed['scopeOfAuthorization'] ? '▲' : '▼' }}
               </button>
             </div>
-            <div *ngIf="isEditModeAuth && !AuthTableDocument?.DocSubTypeDesc" class="inputs-row document-container">
+            <div *ngIf="isEditModeAuth && !scopeOfAuthTableDoc?.DocSubTypeDesc" class="inputs-row document-container">
               <div class="input-field">
                 <label>Document Type</label>
-                <select>
-                  <option>Scope of Authorisation</option>
+                <select [(ngModel)]="fetchedScopeDocSubTypeID.DocSubTypeID">
+                  <option [value]="fetchedScopeDocSubTypeID.DocSubTypeID">Scope of Authorisation</option>
                 </select>
               </div>
-              <div *ngIf="!AuthTableDocument?.DocSubTypeDesc" class="input-field">
-                <label id="uploaded-documents">Uploaded documents go here</label>
+              <div *ngIf="!scopeOfAuthTableDoc?.DocSubTypeDesc" class="input-field">
+                <label id="uploaded-documents"></label>
 
                 <div class="btns-container">
                   <div class="upload-container">
@@ -1479,7 +1489,7 @@
                       Choose Document
                     </button>
                   </div>
-                  <button class="upload-document-btn" (click)="uploadDocument()">
+                  <button class="upload-document-btn" (click)="showUploadConfirmation()">
                     Upload the Document
                   </button>
                 </div>
@@ -1497,22 +1507,17 @@
                 <tbody>
                   <tr>
                     <td style="text-align: left">
-                      <span [style.color]="
-                          AuthTableDocument?.DocSubTypeDesc ? 'inherit' : 'red'
-                        ">
-                        {{
-                        AuthTableDocument?.DocSubTypeDesc ||
-                        'No documents attached'
-                        }}
+                      <span [style.color]="scopeOfAuthTableDoc?.DocSubTypeDesc ? 'inherit' : 'red'">
+                        {{ scopeOfAuthTableDoc?.DocSubTypeDesc || 'No documents attached' }}
                       </span>
                     </td>
                     <td style="text-align: left">
                       <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{
-                          AuthTableDocument?.FileLoc
-                        }}" target="_blank">{{ AuthTableDocument?.FileName }}</a>
+                          scopeOfAuthTableDoc?.FileLoc
+                        }}" target="_blank">{{ scopeOfAuthTableDoc?.FileName }}</a>
                     </td>
                     <td *ngIf="isEditModeAuth" style="text-align: center">
-                      <button class="delete-action" *ngIf="AuthTableDocument?.DocSubTypeDesc"
+                      <button class="delete-action" *ngIf="scopeOfAuthTableDoc?.DocSubTypeDesc"
                         (click)="showAlertDeleteFile()">
                         Delete
                       </button>
@@ -1562,7 +1567,7 @@
                       <label for="category" style="display: flex; gap: 5px">
                         Category <span style="color: red">*</span>:
                       </label>
-                      <select [(ngModel)]="activity.FirmScopeTypeID" (ngModelChange)="onCategoryChange(activity)"
+                      <select [(ngModel)]="activity.CategoryID" (ngModelChange)="onCategoryChange(activity)"
                         name="category" id="category">
                         <option *ngFor="let category of activityCategories" [value]="category.ActivityCategoryID">
                           {{ category.ActivityCategoryDesc }}
@@ -1801,7 +1806,7 @@
               <label for="prudentialCategory"> Prudential Category </label>
               <select [disabled]="!isEditModeAuth" name="prudentialCategory" id="prudentialCategory"
                 [(ngModel)]="ActivityAuth[0].PrudentialCategoryTypeID"
-                (ngModelChange)="onPrudentialCategoryChange($event)" 
+                (ngModelChange)="onPrudentialCategoryChange($event)"
                 [ngClass]="{'error-border': errorMessages['SectorReturnType']}">
                 <option value="0">Select</option>
                 <option *ngFor="let option of allPrudentialCategoryTypes" [value]="option.PrudentialCategoryTypeID">
@@ -1897,7 +1902,7 @@
                 <span *ngIf="isEditModeAuth" style="color: red">*</span></label>
               <input [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].SectorEffectiveDate" [ngClass]="{
                   'error-border': errorMessages['SectorEffectiveDate']
-                }" name="effectiveDate" id="effectiveDate" type="text" #dateInputs placeholder/>
+                }" name="effectiveDate" id="effectiveDate" type="text" #dateInputs placeholder />
             </div>
             <div class="input-field">
               <label for="lastModifiedBy"> Last Modified By </label>
@@ -2026,7 +2031,7 @@
     <!-- Popup Section -->
     <div *ngIf="isPopupOpen" (click)="closeControllerPopup()" class="contollerPopupOverlay">
       <div (click)="$event.stopPropagation()" class="contollerPopupContent">
-        <div class="error-messages">
+        <!-- <div class="error-messages">
           <p *ngIf="errorMessages['OtherEntityName']">
             {{ errorMessages['OtherEntityName'] }}
           </p>
@@ -2045,7 +2050,7 @@
           <p *ngIf="errorMessages['PctOfShares']">
             {{ errorMessages['PctOfShares'] }}
           </p>
-        </div>
+        </div> -->
         <!-- Title -->
         <div class="popup-title-btn-row">
           <div class="popup-header">
@@ -2153,8 +2158,8 @@
               <label for="dateOfBirth">
                 Date of birth <span style="color: red">*</span>
               </label>
-              <input [(ngModel)]="selectedController.DateOfBirth" #dateInputs placeholder name="dateOfBirth" id="dateOfBirth"
-                type="input" [readonly]="!isEditable" />
+              <input [(ngModel)]="selectedController.DateOfBirth" #dateInputs placeholder name="dateOfBirth"
+                id="dateOfBirth" type="input" [readonly]="!isEditable" />
             </div>
             <!---->
             <div class="input-field" *ngIf="
@@ -2249,7 +2254,8 @@
             <div class="input-field">
               <label>Effective Date</label>
               <ng-container *ngIf="isEditable; else effectiveDateInput">
-                <input type="text" #dateInputs placeholder [(ngModel)]="selectedController.AssnDateFrom" name="effectiveDate" />
+                <input type="text" #dateInputs placeholder [(ngModel)]="selectedController.AssnDateFrom"
+                  name="effectiveDate" />
               </ng-container>
               <ng-template #effectiveDateInput>
                 <input [(ngModel)]="selectedController.AssnDateFrom" name="effectiveDate" [readonly]="!isEditable" />
@@ -2258,7 +2264,8 @@
             <div class="input-field">
               <label>Cessation Date</label>
               <ng-container *ngIf="isEditable; else cessationDateInput">
-                <input type="text" #dateInputs placeholder [(ngModel)]="selectedController.AssnDateTo" name="cessationDate" />
+                <input type="text" #dateInputs placeholder [(ngModel)]="selectedController.AssnDateTo"
+                  name="cessationDate" />
               </ng-container>
               <ng-template #cessationDateInput>
                 <input [(ngModel)]="selectedController.AssnDateTo" name="cessationDate" [readonly]="!isEditable" />
@@ -2547,7 +2554,7 @@
           <div class="btn"></div>
         </div>
 
-        <div class="error-messages">
+        <!-- <div class="error-messages">
           <p *ngIf="errorMessages['OtherEntityName']">
             {{ errorMessages['OtherEntityName'] }}
           </p>
@@ -2566,7 +2573,7 @@
           <p *ngIf="errorMessages['PctOfShares']">
             {{ errorMessages['PctOfShares'] }}
           </p>
-        </div>
+        </div> -->
         <div class="inputs-row">
           <div class="input-field">
             <label for="controllerType">
@@ -2663,8 +2670,8 @@
               <label for="dateOfBirth">
                 Date of birth <span style="color: red">*</span>
               </label>
-              <input [(ngModel)]="CreatecontrollerDetails.DateOfBirth" #dateInputs placeholder name="dateOfBirth" id="dateOfBirth"
-                type="input" />
+              <input [(ngModel)]="CreatecontrollerDetails.DateOfBirth" #dateInputs placeholder name="dateOfBirth"
+                id="dateOfBirth" type="input" />
             </div>
             <!---->
             <div class="input-field" *ngIf="
@@ -3166,13 +3173,13 @@
             </div>
             <div class="input-field">
               <label for="effectiveFromDate">Effective From Date</label>
-              <input [disabled]="!IsEditAuditorVisible" #dateInputs placeholder name="effectiveFromDate" id="effectiveFromDate"
-                type="text" [(ngModel)]="selectedAuditor.AssnDateFrom" />
+              <input [disabled]="!IsEditAuditorVisible" #dateInputs placeholder name="effectiveFromDate"
+                id="effectiveFromDate" type="text" [(ngModel)]="selectedAuditor.AssnDateFrom" />
             </div>
             <div class="input-field">
               <label for="effectiveToDate">Effective To Date</label>
-              <input [disabled]="!IsEditAuditorVisible" #dateInputs placeholder name="effectiveToDate" id="effectiveToDate"
-                type="text" [(ngModel)]="selectedAuditor.AssnDateTo" />
+              <input [disabled]="!IsEditAuditorVisible" #dateInputs placeholder name="effectiveToDate"
+                id="effectiveToDate" type="text" [(ngModel)]="selectedAuditor.AssnDateTo" />
             </div>
           </div>
           <div class="btn justify-content-end">
@@ -3260,12 +3267,12 @@
                 Effective From Date <span style="color: red">*</span>
               </label>
               <input name="effectiveFromDate" [(ngModel)]="selectedAuditor.AssnDateFrom" id="effectiveFromDate"
-                type="text" #dateInputs placeholder/>
+                type="text" #dateInputs placeholder />
             </div>
             <div class="input-field">
               <label for="effectiveToDate"> Effective To Date </label>
               <input name="effectiveToDate" [(ngModel)]="selectedAuditor.AssnDateTo" id="effectiveToDate" type="text"
-                #dateInputs placeholder/>
+                #dateInputs placeholder />
             </div>
           </div>
           <div class="btn justify-content-end">
@@ -3331,7 +3338,7 @@
               <div class="btn"></div>
             </div>
     
-            <div class="error-messages">
+            <!-- <div class="error-messages">
               <p *ngIf="errorMessages['OtherEntityName']">
                 {{ errorMessages['OtherEntityName'] }}
               </p>
@@ -3350,7 +3357,7 @@
               <p *ngIf="errorMessages['PctOfShares']">
                 {{ errorMessages['PctOfShares'] }}
               </p>
-            </div>
+            </div> -->
             <div class="inputs-row">
               <div class="input-field">
                 <label for="contactFrom">
@@ -3858,7 +3865,7 @@
             <button (click)="saveContactPopupChanges()">
               <i class="bi bi-save"></i> Save
             </button>
-            <button (click)="confirmDelete()" type="button">
+            <button (click)="confirmDeleteContact()" type="button">
               <i class="bi bi-trash"></i> Delete
             </button>
             <button style="margin-left: 150px" (click)="closeContactPopup()">
@@ -3977,98 +3984,147 @@
       width: dataWidth,
       display: activeTab === Page.Individual ? 'flex' : 'none'
     }">
-    <div class="inputs-field-set">
-      <div class="section">
-        <h2>Applied For</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Individual Name</th>
-              <th>Controlled Functions</th>
-              <th>Form Type</th>
-              <th>Applied Date</th>
-              <th>Function Status</th>
-              <th>RSG Assessment Completion Date</th>
-              <th>Request Status</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
+         <div class="scope-container">
+          <div class="menu-container tab-container">
+            <ul class="nav">
+              <li>
+                <a (click)="switchIndividualTab('Applied')" [class.active]="activeSectionind === 'Applied'">
+                  <i class="bi bi-shield-check"></i>Applied
+                </a>
+              </li>
+              <li *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
+                <a (click)="switchIndividualTab('Approved')" [class.active]="activeSectionind === 'Approved'">
+                  <i class="bi bi-shield-check"></i>Approved
+                </a>
+              </li>
+              <li *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
+                <a (click)="switchIndividualTab('Withdrawn')" [class.active]="activeSectionind === 'Withdrawn'">
+                  <i class="bi bi-shield-check"></i>Withdrawn
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+<!-- Applied For Table -->
+<div class="inputs-field-set" *ngIf="activeSectionind === 'Applied'">
+  <div class="section">
+    <h2>Applied For {{ firmDetails?.FirmName }}</h2>
+    <table style="min-width:100%">
+      <thead>
+        <tr>
+          <th>Individual Name</th>
+          <th>Controlled Functions</th>
+          <th>Form Type</th>
+          <th>Applied Date</th>
+          <th>Function Status</th>
+          <th>RSG Assessment Completion Date</th>
+          <th>Request Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let individual of AllAppliedIndividuals">
+          <td>{{ individual.FullName }} Individual Name</td>
+          <td>{{ individual.FunctionActivity }} Controlled Functions</td>
+          <td>{{ individual.DocAbbreviation }} Form Type</td>
+          <td>{{ individual.AppliedDate }} Applied Date</td>
+          <td>{{ individual.CurrentStatus }} Function Status</td>
+          <td>{{ individual.RSGAssessmentDate }} RSG Assessment Completion Date</td>
+          <td>{{ individual.ObjectStatus }} Request Status</td>
+        </tr>
+      </tbody>
+      <!-- <tfoot>
+        <tr>
+          <td [attr.colspan]="8">
+            <div class="pagination" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; font-size: 14px;">
+              <button (click)="previousPage()" [disabled]="currentPage === 1"
+                style="padding: 5px 10px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+                <span>&lt;</span>
+              </button>
+              <span style="margin: 0 10px;">Page {{ currentPage }} of {{ totalPages }}</span>
+              <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+                style="padding: 5px 10px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+                <span>&gt;</span>
+              </button>
+              <span style="margin-left: auto;">Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
+            </div>
+          </td>
+        </tr>
+      </tfoot> -->
+    </table>
+  </div>
+</div>
 
-    <div class="inputs-field-set">
-      <div class="section">
-        <h2>Approved Functions For</h2>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Individual Name</th>
-              <th>Controlled Functions</th>
-              <th>Applied Date</th>
-              <th>Conditionally Approved Date</th>
-              <th>Conditional Approved Expiry Date</th>
-              <th>Approved Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let individual of AllapprovedIndividuals">
-              <td class="radio-table">
-                <label class="radioBtn">
-                  <input type="radio" />
-                  <span></span>
-                </label>
-              </td>
-              <td>{{individual.AppIndividualNum}}</td>
-              <td>{{individual.FunctionActivity}}</td>
-              <td>{{individual.AppliedDate}}</td>
-              <td>{{individual.ConditionalApprovalDate}}</td>
-              <td>{{individual.ConditionalApprovalExpiryDate}}</td>
-              <td>{{individual.ApprovedDate}}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<!-- Approved Functions Table -->
+<div class="inputs-field-set" *ngIf="activeSectionind === 'Approved'">
+  <div class="section">
+    <h2>Approved Functions For {{ firmDetails?.FirmName }}</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Individual Name</th>
+          <th>Controlled Functions</th>
+          <th>Applied Date</th>
+          <th>Conditionally Approved Date</th>
+          <th>Conditional Approved Expiry Date</th>
+          <th>Approved Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let individual of AllapprovedIndividuals">
+          <td>{{ individual.AppIndividualNum }}</td>
+          <td>{{ individual.FunctionActivity }}</td>
+          <td>{{ individual.AppliedDate }}</td>
+          <td>{{ individual.ConditionalApprovalDate }}</td>
+          <td>{{ individual.ConditionalApprovalExpiryDate }}</td>
+          <td>{{ individual.ApprovedDate }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    <div class="inputs-field-set">
-      <div class="section">
-        <h2>Withdraw Functions For</h2>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Individual Name</th>
-              <th>Controlled Functions</th>
-              <th>Form Type</th>
-              <th>Previous Status</th>
-              <th>Current Status</th>
-              <th>Current Status Effective Date</th>
-              <th>Request Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="radio-table">
-                <label class="radioBtn">
-                  <input type="radio" />
-                  <span></span>
-                </label>
-              </td>
-              <td>Individual Name</td>
-              <td>Controlled Functions</td>
-              <td>Form Type</td>
-              <td>Previous Status</td>
-              <td>Current Status</td>
-              <td>Current Status Effective Date</td>
-              <td>Request Status</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+<!-- Withdraw Functions Table -->
+<div class="inputs-field-set" *ngIf="activeSectionind === 'Withdrawn'">
+  <div class="section">
+    <h2>Withdraw Functions For {{ firmDetails?.FirmName }}</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Individual Name</th>
+          <th>Controlled Functions</th>
+          <th>Form Type</th>
+          <th>Previous Status</th>
+          <th>Current Status</th>
+          <th>Current Status Effective Date</th>
+          <th>Request Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let individualGroup of withdrawnIndividuals | keyvalue">
+          <ng-container *ngIf="individualGroup.value.length > 0">
+            <ng-container *ngFor="let individual of individualGroup.value; let i = index">
+              <ng-container *ngFor="let functionActivity of individual.FunctionActivity; let j = index">
+                <tr>
+                  <td *ngIf="i === 0 && j === 0; else emptyCell" [attr.rowspan]="individual.FunctionActivity.length">
+                    {{ individual.FullName }} ({{ individual.AppIndividualNum }})
+                  </td>
+                  <ng-template #emptyCell><td></td></ng-template>
+                  <td>{{ functionActivity }} {{ individual.FunctionType }}</td>
+                  <td>{{ individual.DocAbbreviation }}</td>
+                  <td>{{ individual.PreviousStatus }}</td>
+                  <td>{{ individual.CurrentStatus }}</td>
+                  <td>{{ individual.CurrentStatusSetDate ? (individual.CurrentStatusSetDate | date: 'dd/MMM/yyyy') : '' }}</td>
+                  <td>{{ individual.ObjectStatus }}</td>
+                </tr>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
 
   <!--End Individuals sub sections-->
 
@@ -4746,7 +4802,7 @@
     <small style="color: red" *ngIf="fileError">{{ fileError }}</small>
   </div>
   <div class="popup-operations-place">
-    <button style="margin-right: 5px" class="subbutton" (click)="confirmUpload()">
+    <button style="margin-right: 5px" class="subbutton" (click)="confirmOkUpload()">
       Ok
     </button>
     <button class="subbutton" (click)="closeSelectDocument()">Close</button>
@@ -4843,16 +4899,39 @@
       <ul>
         <li *ngFor="let doc of formReferenceDocs">
           <input type="radio" name="documentSelection" [value]="doc.DocID" [(ngModel)]="selectedDocId">
-          {{doc.DocTypeDesc}} : 
+          {{doc.DocTypeDesc}} :
           <a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{doc.FileLoc}}" target="_blank">{{doc.FILENAME}}</a>
         </li>
       </ul>
-      <p *ngIf="formReferenceDocs.length === 0">There are no documents to select from. Please upload the relevant document and return for selection.</p>
+      <p *ngIf="formReferenceDocs.length === 0">There are no documents to select from. Please upload the relevant
+        document and return for selection.</p>
     </div>
   </div>
   <div class="popup-buttons-container">
     <button class="subbutton" (click)="deSelectDocument()">De-Select</button>
     <button class="subbutton" (click)="replaceDocument()">Ok</button>
     <button class="subbutton" (click)="closeFormReference()">Cancel</button>
+  </div>
+</div>
+
+<!-- sub activities popup -->
+<div *ngIf="callSubActivity" class="overlay show"></div>
+<div *ngIf="callSubActivity" class="SubActivitiesPopUp">
+  <i class="bi bi-x-circle close-icon" (click)="closeSubActivity()"></i>
+  <div>
+    <div class="popup-header">
+      <h3>Please Select Sub Activity</h3>
+    </div>
+    <div class="popup-body">
+      <ul>
+        <li>
+          <input type="checkbox" name="subactivity">
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="popup-buttons-container">
+    <button class="subbutton">Ok</button>
+    <button class="subbutton" (click)="closeSubActivity()">Cancel</button>
   </div>
 </div>

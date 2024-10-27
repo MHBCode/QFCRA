@@ -81,4 +81,14 @@ export class ActivityService {
     const url = `${this.baseUrlActivity}get_available_products?activityTypeID=${activityId}`;
     return this.http.get<any>(url);
   }
+
+  isParentActivity(activityType: number) {
+    const url = `${this.baseUrlActivity}is_parent_activity?activityType=${activityType}`;
+    return this.http.get<any>(url);
+  }
+
+  getSubActivities(activityTypeID: number) {
+    const url = `${this.baseUrlActivity}get_activity_in_hirerchy?activityTypeID=${activityTypeID}`;
+    return this.http.get<any>(url);
+  }
 }

@@ -586,7 +586,8 @@
 .addressHistoryPopup,
 .ScopeLicPreviousVersionsPopup,
 .ScopeAuthPreviousVersionsPopup,
-.ReferenceFormPopUp {
+.ReferenceFormPopUp,
+.SubActivitiesPopUp {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -880,6 +881,11 @@ table .input-field {
   /* Center items vertically */
   background-color: #f2b6c0;
   padding: 5px 10px;
+}
+
+.regulated-activities-header p {
+  width: 50%;
+  text-align: center;
 }
 
 .regulated-activity-view {
@@ -1221,17 +1227,13 @@ hr {
   align-items: center;
 }
 
+.press-release {
+  border-radius: 0;
+}
+
 .upload-container {
   position: relative;
   display: inline-block;
-}
-
-.press-release-container {
-  padding: 1rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  flex-wrap: wrap;
 }
 
 .file-table-container {
@@ -1348,8 +1350,8 @@ hr {
 
 /* scope of authorization table */
 
-.scope-of-auth>thead>tr {
-  background-color: #f2b6c0;
+.scope-of-auth, .scope-of-auth > thead > tr > th {
+  border-radius: 0;
 }
 
 .document-container {
@@ -1450,7 +1452,9 @@ hr {
   /* Remove max-width constraint */
   overflow-y: scroll;
 }
-
+tr .pagination{
+  width: 100%;
+}
 .create-controller-overlay {
   display: flex;
   justify-content: center;
@@ -1860,7 +1864,7 @@ hr {
 }
 
 /* form reference style */
-.ReferenceFormPopUp > div {
+.ReferenceFormPopUp > div, .SubActivitiesPopUp > div {
   width: 100%;
 }
 
