@@ -375,9 +375,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.getAllRegulater(this.Address.countryID, this.firmId);
       this.getAllContactFromByFrimsId();
 
-      this.getApprovedIndividuals(this.firmId, 'Approved');
-      this.getWithdrawnIndividuals(this.firmId)
-      this.getAppliedIndividuals(this.firmId, "Applied")
+      
     });
   }
   ngOnChanges(): void {
@@ -528,9 +526,11 @@ export class ViewFirmPageComponent implements OnInit {
         break;
       case FrimsObject.Individual:
         this.showSection(this.individualSection);
-        break;  
+        this.getApprovedIndividuals(this.firmId, 'Approved');
+        this.getWithdrawnIndividuals(this.firmId)
+        this.getAppliedIndividuals(this.firmId, "Applied")
+        break;
       case FrimsObject.Supervision:
-
         this.showSection(this.supervisionSection);
         break;
       case FrimsObject.ReturnsReview:
@@ -6638,9 +6638,7 @@ export class ViewFirmPageComponent implements OnInit {
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.updatePaginationapproved();
-      this.updatePaginationWithdrawn();
-      this.updatePaginationApplied();
+      this.updateActivePagination();  // Call the appropriate pagination function
     }
   }
 
@@ -6648,12 +6646,18 @@ export class ViewFirmPageComponent implements OnInit {
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.updatePaginationapproved();
-      this.updatePaginationWithdrawn();
-      this.updatePaginationApplied();
+      this.updateActivePagination();  // Call the appropriate pagination function
     }
   }
-
+  updateActivePagination(): void {
+    if (this.activeSectionind === 'Applied') {
+      this.updatePaginationApplied();
+    } else if (this.activeSectionind === 'Approved') {
+      this.updatePaginationapproved();
+    } else if (this.activeSectionind === 'Withdrawn') {
+      this.updatePaginationWithdrawn();
+    }
+  }
   updatePaginationapproved(): void {
     if (this.AllapprovedIndividuals && this.AllapprovedIndividuals.length > 0) {
       this.totalRows = this.AllapprovedIndividuals.length;
@@ -6697,9 +6701,11 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
+  activeSectionind: string = 'Applied';
 
-
-
+  switchIndividualTab(section: string): void {
+    this.activeSectionind = section;  // Set the active section to the clicked tab
+  }
 
 
 

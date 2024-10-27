@@ -3984,115 +3984,147 @@
       width: dataWidth,
       display: activeTab === Page.Individual ? 'flex' : 'none'
     }">
-    <div class="inputs-field-set">
-      <div class="section">
-        <h2>Applied For</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Individual Name</th>
-              <th>Controlled Functions</th>
-              <th>Form Type</th>
-              <th>Applied Date</th>
-              <th>Function Status</th>
-              <th>RSG Assessment Completion Date</th>
-              <th>Request Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let individual of AllAppliedIndividuals">
-              <td>{{individual.FullName}} Individual Name</td>
-              <td>{{individual.FunctionActivity}} Controlled Functions</td>
-              <td>{{individual.DocAbbreviation}} Form Type</td>
-              <td>{{individual.AppliedDate}} Applied Date</td>
-              <td>{{individual.CurrentStatus}} Function Status</td>
-              <td>{{individual.RSGAssessmentDate}} RSG Assessment Completion Date</td>
-              <td>{{individual.ObjectStatus}} Request Status</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+         <div class="scope-container">
+          <div class="menu-container tab-container">
+            <ul class="nav">
+              <li>
+                <a (click)="switchIndividualTab('Applied')" [class.active]="activeSectionind === 'Applied'">
+                  <i class="bi bi-shield-check"></i>Applied
+                </a>
+              </li>
+              <li *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
+                <a (click)="switchIndividualTab('Approved')" [class.active]="activeSectionind === 'Approved'">
+                  <i class="bi bi-shield-check"></i>Approved
+                </a>
+              </li>
+              <li *ngIf="firmDetails?.AuthorisationStatusTypeID > 0">
+                <a (click)="switchIndividualTab('Withdrawn')" [class.active]="activeSectionind === 'Withdrawn'">
+                  <i class="bi bi-shield-check"></i>Withdrawn
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+<!-- Applied For Table -->
+<div class="inputs-field-set" *ngIf="activeSectionind === 'Applied'">
+  <div class="section">
+    <h2>Applied For {{ firmDetails?.FirmName }}</h2>
+    <table style="min-width:100%">
+      <thead>
+        <tr>
+          <th>Individual Name</th>
+          <th>Controlled Functions</th>
+          <th>Form Type</th>
+          <th>Applied Date</th>
+          <th>Function Status</th>
+          <th>RSG Assessment Completion Date</th>
+          <th>Request Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let individual of AllAppliedIndividuals">
+          <td>{{ individual.FullName }} Individual Name</td>
+          <td>{{ individual.FunctionActivity }} Controlled Functions</td>
+          <td>{{ individual.DocAbbreviation }} Form Type</td>
+          <td>{{ individual.AppliedDate }} Applied Date</td>
+          <td>{{ individual.CurrentStatus }} Function Status</td>
+          <td>{{ individual.RSGAssessmentDate }} RSG Assessment Completion Date</td>
+          <td>{{ individual.ObjectStatus }} Request Status</td>
+        </tr>
+      </tbody>
+      <!-- <tfoot>
+        <tr>
+          <td [attr.colspan]="8">
+            <div class="pagination" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; font-size: 14px;">
+              <button (click)="previousPage()" [disabled]="currentPage === 1"
+                style="padding: 5px 10px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+                <span>&lt;</span>
+              </button>
+              <span style="margin: 0 10px;">Page {{ currentPage }} of {{ totalPages }}</span>
+              <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+                style="padding: 5px 10px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+                <span>&gt;</span>
+              </button>
+              <span style="margin-left: auto;">Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
+            </div>
+          </td>
+        </tr>
+      </tfoot> -->
+    </table>
+  </div>
+</div>
 
-    <div class="inputs-field-set">
-      <div class="section">
-        <h2>Approved Functions For</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Individual Name</th>
-              <th>Controlled Functions</th>
-              <th>Applied Date</th>
-              <th>Conditionally Approved Date</th>
-              <th>Conditional Approved Expiry Date</th>
-              <th>Approved Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let individual of AllapprovedIndividuals">             
-              <td>{{individual.AppIndividualNum}}</td>
-              <td>{{individual.FunctionActivity}}</td>
-              <td>{{individual.AppliedDate}}</td>
-              <td>{{individual.ConditionalApprovalDate}}</td>
-              <td>{{individual.ConditionalApprovalExpiryDate}}</td>
-              <td>{{individual.ApprovedDate}}</td>
-            </tr>
-          </tbody>
-         
-        </table>
-      </div>
-    </div>
+<!-- Approved Functions Table -->
+<div class="inputs-field-set" *ngIf="activeSectionind === 'Approved'">
+  <div class="section">
+    <h2>Approved Functions For {{ firmDetails?.FirmName }}</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Individual Name</th>
+          <th>Controlled Functions</th>
+          <th>Applied Date</th>
+          <th>Conditionally Approved Date</th>
+          <th>Conditional Approved Expiry Date</th>
+          <th>Approved Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let individual of AllapprovedIndividuals">
+          <td>{{ individual.AppIndividualNum }}</td>
+          <td>{{ individual.FunctionActivity }}</td>
+          <td>{{ individual.AppliedDate }}</td>
+          <td>{{ individual.ConditionalApprovalDate }}</td>
+          <td>{{ individual.ConditionalApprovalExpiryDate }}</td>
+          <td>{{ individual.ApprovedDate }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    <div class="inputs-field-set">
-      <div class="section">
-        <h2>Withdraw Functions For</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Individual Name</th>
-              <th>Controlled Functions</th>
-              <th>Form Type</th>
-              <th>Previous Status</th>
-              <th>Current Status</th>
-              <th>Current Status Effective Date</th>
-              <th>Request Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Loop over grouped individuals -->
-            <ng-container *ngFor="let individualGroup of withdrawnIndividuals | keyvalue">
-              <!-- Loop over each individual -->
-              <ng-container *ngIf="individualGroup.value.length > 0">
-                <!-- Loop over each individual for their activities -->
-                <ng-container *ngFor="let individual of individualGroup.value; let i = index">
-                  <!-- Loop over each FunctionActivity for the individual -->
-                  <ng-container *ngFor="let functionActivity of individual.FunctionActivity; let j = index">
-                    <tr>
-                      <!-- Display the individual name only once per group (first row), using rowspan -->
-                      <td *ngIf="i === 0 && j === 0; else emptyCell" [attr.rowspan]="individual.FunctionActivity.length">
-                        {{ individual.FullName }} ({{ individual.AppIndividualNum }})
-                      </td>
-                      <ng-template #emptyCell>
-                        <td></td>
-                      </ng-template>
-                      <td>{{ functionActivity }} {{ individual.FunctionType }}</td>
-                      <td>{{ individual.DocAbbreviation }}</td>
-                      <td>{{ individual.PreviousStatus }}</td>
-                      <td>{{ individual.CurrentStatus }}</td>
-                      <td>{{ individual.CurrentStatusSetDate ? (individual.CurrentStatusSetDate | date: 'dd/MMM/yyyy') : '' }}</td>
-                      <td>{{ individual.ObjectStatus }}</td>
-                    </tr>
-                  </ng-container>
-                </ng-container>
+<!-- Withdraw Functions Table -->
+<div class="inputs-field-set" *ngIf="activeSectionind === 'Withdrawn'">
+  <div class="section">
+    <h2>Withdraw Functions For {{ firmDetails?.FirmName }}</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Individual Name</th>
+          <th>Controlled Functions</th>
+          <th>Form Type</th>
+          <th>Previous Status</th>
+          <th>Current Status</th>
+          <th>Current Status Effective Date</th>
+          <th>Request Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let individualGroup of withdrawnIndividuals | keyvalue">
+          <ng-container *ngIf="individualGroup.value.length > 0">
+            <ng-container *ngFor="let individual of individualGroup.value; let i = index">
+              <ng-container *ngFor="let functionActivity of individual.FunctionActivity; let j = index">
+                <tr>
+                  <td *ngIf="i === 0 && j === 0; else emptyCell" [attr.rowspan]="individual.FunctionActivity.length">
+                    {{ individual.FullName }} ({{ individual.AppIndividualNum }})
+                  </td>
+                  <ng-template #emptyCell><td></td></ng-template>
+                  <td>{{ functionActivity }} {{ individual.FunctionType }}</td>
+                  <td>{{ individual.DocAbbreviation }}</td>
+                  <td>{{ individual.PreviousStatus }}</td>
+                  <td>{{ individual.CurrentStatus }}</td>
+                  <td>{{ individual.CurrentStatusSetDate ? (individual.CurrentStatusSetDate | date: 'dd/MMM/yyyy') : '' }}</td>
+                  <td>{{ individual.ObjectStatus }}</td>
+                </tr>
               </ng-container>
             </ng-container>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    
-        
-  </section>
+          </ng-container>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
 
   <!--End Individuals sub sections-->
 
