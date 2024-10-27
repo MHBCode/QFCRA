@@ -5901,6 +5901,14 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
 
+  toggleIslamicFinanceFields() {
+    if (this.islamicFinance && this.islamicFinance.IFinTypeId !== undefined) {
+      this.isIslamicFinanceChecked = true;
+    } else {
+      this.isIslamicFinanceChecked = false;
+    }
+  }
+
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
@@ -5914,7 +5922,7 @@ export class ViewFirmPageComponent implements OnInit {
       }
     }
   }
-
+  /* start of  documents functions */
   confirmOkUpload() {
     if (this.selectedFile) {
       // Display the selected file name in the main section
@@ -5934,14 +5942,6 @@ export class ViewFirmPageComponent implements OnInit {
       }, 0)
     } else {
       console.error('No valid PDF file selected.');
-    }
-  }
-
-  toggleIslamicFinanceFields() {
-    if (this.islamicFinance && this.islamicFinance.IFinTypeId !== undefined) {
-      this.isIslamicFinanceChecked = true;
-    } else {
-      this.isIslamicFinanceChecked = false;
     }
   }
 
@@ -6132,6 +6132,7 @@ export class ViewFirmPageComponent implements OnInit {
       console.error(error);
     })
   }
+  /* end of documents functions */
 
   checkFirmLicense() {
     this.applicationService.isFirmLicensed(this.firmId).subscribe(
