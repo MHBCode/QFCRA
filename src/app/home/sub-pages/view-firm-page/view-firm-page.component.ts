@@ -104,7 +104,7 @@ export class ViewFirmPageComponent implements OnInit {
   AuthorisationStatusTypeLabelDescFormatted: any;
   LicenseStatusTypeLabelDescFormatted: any;
   existingAddresses: any = [];
-  existingControllerAddresses: any = []; 
+  existingControllerAddresses: any = []
   firmApp: any = {};
   firmOPDetails: any;
   prudReturnTypesDropdown: any = [];
@@ -112,7 +112,7 @@ export class ViewFirmPageComponent implements OnInit {
   firmNamesHistory: any = [];
   firmAccountingStandardHistory: any = [];
   firmAddresses: any = [];
-  ControllerfirmAddresses :any = [];
+  ControllerfirmAddresses: any = [];
   appDetails: any = [];
   applicationTypeId: number;
   selectedFirmTypeID: number;
@@ -281,9 +281,9 @@ export class ViewFirmPageComponent implements OnInit {
   isLoading: boolean = false;
 
   //  individuals section
-  AllapprovedIndividuals: any = []; 
+  AllapprovedIndividuals: any = [];
   withdrawnIndividuals: { [key: string]: any[] } = {};
-  AllAppliedIndividuals: any = []; 
+  AllAppliedIndividuals: any = [];
   currentPage: number = 1;
   totalPages: number = 0;
   totalRows: number = 0;
@@ -373,9 +373,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.getAllRegulater(this.Address.countryID, this.firmId);
       this.getAllContactFromByFrimsId();
 
-      this.getApprovedIndividuals(this.firmId, 'Approved');
-      this.getWithdrawnIndividuals(this.firmId)
-      this.getAppliedIndividuals(this.firmId, "Applied")
+      
     });
   }
   ngOnChanges(): void {
@@ -524,8 +522,13 @@ export class ViewFirmPageComponent implements OnInit {
           this.loadControllersIndividual();
         }
         break;
+      case FrimsObject.Individual:
+        this.showSection(this.individualSection);
+        this.getApprovedIndividuals(this.firmId, 'Approved');
+        this.getWithdrawnIndividuals(this.firmId)
+        this.getAppliedIndividuals(this.firmId, "Applied")
+        break;
       case FrimsObject.Supervision:
-
         this.showSection(this.supervisionSection);
         break;
       case FrimsObject.ReturnsReview:
@@ -2489,7 +2492,7 @@ export class ViewFirmPageComponent implements OnInit {
         }
       },
     );
-   
+
     console.log("controllerDetails", this.controllerDetails)
     console.log("selectedController", this.selectedController)
 
@@ -2771,17 +2774,17 @@ export class ViewFirmPageComponent implements OnInit {
   // }
   get filteredControllerfirmAddresses() {
     return this.ControllerfirmAddresses.filter(addr => !addr.isRemoved);
-    
+
   }
   addControllerAddressForm() {
     const totalAddressTypes = this.allAddressTypes.length;
     const validAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
-  
+
     if (validAddressCount >= totalAddressTypes) {
       this.canAddNewAddress = false;
       return;
     }
-  
+
     const newAddress = {
       AddressID: null,
       AddressTypeID: 0,
@@ -2804,13 +2807,13 @@ export class ViewFirmPageComponent implements OnInit {
       ToDate: null,
       Valid: true,
     };
-  
+
     // Instead of reassigning the array, push the new address to the beginning of the array
     this.ControllerfirmAddresses.push(newAddress);
 
     const updatedValidAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
-}
+  }
 
   // addEditAddressForm(): void {
   //   const newAddress = {
@@ -2889,229 +2892,229 @@ export class ViewFirmPageComponent implements OnInit {
     this.isEditable = false;
     this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
     this.EditControllerValidateForm().then(() => {
-        console.log("Selected Controller:", this.selectedController);
-        if (
-          ["Parent Entity", "Corporate Controller", "Head Office of a Branch", "UBO – Corporate"].includes(this.selectedController.EntityTypeDesc)
-        ) {
-          const saveControllerPopupChangesObj = {
-            otherEntityDetails: {
-              UserID: 30,
-              UserName: null,
+      console.log("Selected Controller:", this.selectedController);
+      if (
+        ["Parent Entity", "Corporate Controller", "Head Office of a Branch", "UBO – Corporate"].includes(this.selectedController.EntityTypeDesc)
+      ) {
+        const saveControllerPopupChangesObj = {
+          otherEntityDetails: {
+            UserID: 30,
+            UserName: null,
+            OtherEntityName: this.selectedController.OtherEntityName,
+            otherEntityID: this.selectedController.OtherEntityID,
+            DateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
+            createdBy: this.selectedController.CreatedBy,
+            CessationDate: this.convertDateToYYYYMMDD(this.selectedController.CessationDate),
+            EffectiveDate: this.convertDateToYYYYMMDD(this.selectedController.EffectiveDate),
+            CreatedDate: null,
+            relatedEntityID: this.selectedController.RelatedEntityID,
+            entitySubTypeID: this.selectedController.EntitySubTypeID,
+            relatedEntityTypeID: this.selectedController.EntityTypeID,
+            relatedEntityEntityID: this.selectedController.RelatedEntityEntityID,
+            myState: this.selectedController.myState,
+            LegalStatusTypeID: this.selectedController.LegalStatusTypeID,
+            LegalStatusTypeDesc: this.selectedController.LegalStatusTypeDesc,
+            placeOfIncorporation: this.selectedController.PlaceOfIncorporation,
+            countryOfIncorporation: this.selectedController.countryOfIncorporation,
+            registeredNumber: this.selectedController.RegisteredNum,
+            zebSiteAddress: this.selectedController.zebSiteAddress,
+            lastModifiedBy: 30,
+            ControllerControlTypeDesc: null,
+            isAuditor: this.selectedController.isAuditor,
+            isCompanyRegulated: this.selectedController.IsCompanyRegulated,
+            additionalDetails: this.selectedController.additionalDetails,
+            isParentController: this.selectedController.isParentController,
+            isPublicallyTraded: this.selectedController.isPublicallyTraded,
+            areAnyUBOs: this.selectedController.areAnyUBOs,
+            controllerInfo: this.selectedController.controllerInfo,
+            output: this.selectedController.output,
+            FirmID: this.selectedController.FirmID,
+            EntityTypeID: this.selectedController.EntityTypeID,
+            EntityID: this.selectedController.FirmID,
+            controllerControlTypeID: this.selectedController.ControllerControlTypeID,
+            numOfShares: this.selectedController.numOfShares,
+            PctOfShares: this.selectedController.PctOfShares,
+            MajorityStockHolder: false,
+            AssnDateFrom: this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
+            AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
+            LastModifiedByOfOtherEntity: 30,
+          },
+          addressList: this.existingControllerAddresses.map(address => ({
+            firmID: this.firmId,
+            countryID: address.CountryID,
+            AddressTypeID: address.AddressTypeID,
+            LastModifiedBy: this.userId,
+            entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+            entityID: this.firmId,
+            contactID: address.contactID,
+            AddressID: address.AddressID.toString(),
+            addressState: 6,
+            AddressLine1: address.AddressLine1,
+            AddressLine2: address.AddressLine2,
+            AddressLine3: address.AddressLine3,
+            AddressLine4: address.AddressLine4,
+            City: address.City,
+            createdBy: address.createdBy,
+            AddressAssnID: address.AddressAssnID,
+            CreatedDate: address.CreatedDate,
+            LastModifiedDate: address.LastModifiedDate,
+            fromDate: address.fromDate,
+            toDate: address.toDate,
+            Output: address.Output,
+            ObjectID: address.ObjectID,
+            Province: address.Province,
+            ObjectInstanceID: address.ObjectInstanceID,
+            ObjectInstanceRevNumber: address.ObjectInstanceRevNumber,
+            SourceObjectID: address.SourceObjectID,
+            SourceObjectInstanceID: address.SourceObjectInstanceID,
+            SourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber,
+            PostalCode: address.PostalCode,
+          })),
+
+          regulatorList: this.regulatorList.map(regulator => ({
+            EntityTypeID: regulator.EntityTypeID,
+            EntityID: regulator.EntityID,
+            UserID: regulator.UserID,
+            FirmID: regulator.FirmID,
+            RelatedEntityTypeID: regulator.RelatedEntityTypeID,
+            relatedEntityID: regulator.relatedEntityID,
+            Output: regulator.Output,
+            regulatorState: 6,
+            RegulatorID: regulator.RegulatorID,
+            RegulatorName: regulator.RegulatorName,
+            RegulatorContacts: regulator.RegulatorContacts,
+            RelatedEntityID: regulator.RelatedEntityID,
+            ContactID: regulator.ContactID,
+            Title: regulator.Title,
+            FullName: regulator.FullName,
+            BussinessEmail: regulator.BussinessEmail,
+            AddressLine1: regulator.AddressLine1,
+            AddressLine2: regulator.AddressLine2,
+            AddressLine3: regulator.AddressLine3,
+            AddressLine4: regulator.AddressLine4,
+            City: regulator.City,
+            Province: regulator.Province,
+            CountryID: regulator.CountryID,
+            CountryName: regulator.CountryName,
+            PostalCode: regulator.PostalCode,
+            PhoneNumber: regulator.PhoneNumber,
+            PhoneExt: regulator.PhoneExt,
+            FaxNumber: regulator.FaxNumber,
+            EntityRegulators: regulator.EntityRegulators,
+            ShowReadOnly: regulator.ShowReadOnly,
+            ShowEnabled: regulator.ShowEnabled,
+            ContactAssnID: regulator.ContactAssnID
+          }))
+        };
+
+        // Call the insert/update endpoint
+        this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
+          response => {
+            console.log("Save successful:", response);
+          },
+          error => {
+            console.error("Error saving changes:", error);
+          }
+        );
+      } else if (
+        ["Individual Controller", "UBO - Individual"].includes(this.selectedController.EntityTypeDesc)
+      ) {
+        const saveControllerPopupChangesIndividualObj = {
+          contactDetails: {
+            contactDetails: {
+              firmID: this.firmId,
+              contactID: null,
+              contactAssnID: null,
+              AdditionalDetails: 'test',
+              BusPhone: 'test',
+              BusEmail: 'test',
+              MobileNum: 'test',
+              NameAsInPassport: 'test',
+              OtherEmail: 'test',
+              QfcNumber: this.firmDetails.QFCNum,
+              Fax: 'test',
+              ResidencePhone: 'test',
+              JobTitle: 'test',
               OtherEntityName: this.selectedController.OtherEntityName,
-              otherEntityID: this.selectedController.OtherEntityID,
-              DateOfIncorporation: this.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
-              createdBy: this.selectedController.CreatedBy,
-              CessationDate: this.convertDateToYYYYMMDD(this.selectedController.CessationDate),
-              EffectiveDate: this.convertDateToYYYYMMDD(this.selectedController.EffectiveDate),
-              CreatedDate: null,
-              relatedEntityID: this.selectedController.RelatedEntityID,
-              entitySubTypeID: this.selectedController.EntitySubTypeID,
-              relatedEntityTypeID: this.selectedController.EntityTypeID,
-              relatedEntityEntityID: this.selectedController.RelatedEntityEntityID,
-              myState: this.selectedController.myState,
-              LegalStatusTypeID: this.selectedController.LegalStatusTypeID,
-              LegalStatusTypeDesc: this.selectedController.LegalStatusTypeDesc,
-              placeOfIncorporation: this.selectedController.PlaceOfIncorporation,
-              countryOfIncorporation: this.selectedController.countryOfIncorporation,
-              registeredNumber: this.selectedController.RegisteredNum,
-              zebSiteAddress: this.selectedController.zebSiteAddress,
-              lastModifiedBy: 30,
-              ControllerControlTypeDesc: null,
-              isAuditor: this.selectedController.isAuditor,
-              isCompanyRegulated: this.selectedController.IsCompanyRegulated,
-              additionalDetails: this.selectedController.additionalDetails,
-              isParentController: this.selectedController.isParentController,
-              isPublicallyTraded: this.selectedController.isPublicallyTraded,
-              areAnyUBOs: this.selectedController.areAnyUBOs,
-              controllerInfo: this.selectedController.controllerInfo,
-              output: this.selectedController.output,
-              FirmID: this.selectedController.FirmID,
               EntityTypeID: this.selectedController.EntityTypeID,
-              EntityID: this.selectedController.FirmID,
-              controllerControlTypeID: this.selectedController.ControllerControlTypeID,
-              numOfShares: this.selectedController.numOfShares,
+              Title: this.selectedController.Title,
+              FirstName: this.selectedController.FirstName,
+              secondName: this.selectedController.SecondName,
+              thirdName: this.selectedController.ThirdName,
+              familyName: this.selectedController.FamilyName,
               PctOfShares: this.selectedController.PctOfShares,
-              MajorityStockHolder: false,
+              tempContactID: 0,
+              countryOfResidence: null,
+              ControllerControlTypeID: this.selectedController.ControllerControlTypeID,
+              createdBy: this.userId,
+              dateOfBirth: this.convertDateToYYYYMMDD(this.selectedController.DateOfBirth),
+              fullName: null,
+              lastModifiedBy: this.userId,
+              MyState: 0,
+              nationalID: null,
+              nationality: null,
+              EntityID: this.firmId,
+              passportNum: this.selectedController.PassportNum,
+              placeOfBirth: this.selectedController.PlaceOfBirth,
+              previousName: null,
+              isExists: false,
+              FunctionTypeId: 25,
+              nameInPassport: null,
+              contactAddnlInfoTypeID: null,
+              isFromContact: null,
+              countryofBirth: null,
+              juridictionID: null,
+              objectID: this.selectedController.ObjectID,
+              isPeP: this.selectedController.IsPEP,
               AssnDateFrom: this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
               AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
+              JurisdictionId: 3,
             },
-            addressList: this.existingControllerAddresses.map(address => ({
-              firmID: this.firmId,
-              countryID: address.CountryID,
-              AddressTypeID: address.AddressTypeID,
-              LastModifiedBy: this.userId,
-              entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-              entityID: this.firmId,
-              contactID: address.contactID,
-              AddressID: address.AddressID.toString(),
-              addressState: 6,
-              AddressLine1: address.AddressLine1,
-              AddressLine2: address.AddressLine2,
-              AddressLine3: address.AddressLine3,
-              AddressLine4: address.AddressLine4,
-              City: address.City,
-              createdBy: address.createdBy,
-              AddressAssnID: address.AddressAssnID,
-              CreatedDate: address.CreatedDate,
-              LastModifiedDate: address.LastModifiedDate,
-              fromDate: address.fromDate,
-              toDate: address.toDate,
-              Output: address.Output,
-              ObjectID: address.ObjectID,
-              Province: address.Province,
-              ObjectInstanceID: address.ObjectInstanceID,
-              ObjectInstanceRevNumber: address.ObjectInstanceRevNumber,
-              SourceObjectID: address.SourceObjectID,
-              SourceObjectInstanceID: address.SourceObjectInstanceID,
-              SourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber,
-              PostalCode: address.PostalCode,
-            })),
+            lstContactFunctions: null,
+          },
+          Addresses: this.addressForms.map(address => ({
+            firmID: this.firmId,
+            countryID: 16,//address.CountryID,
+            addressTypeID: 2,//address.AddressTypeID,
+            LastModifiedBy: this.userId,
+            entityTypeID: this.selectedController.EntityTypeID,
+            entityID: this.firmId,
+            contactID: address.contactID,
+            addressID: null,
+            addressLine1: "",
+            addressLine2: "",
+            addressLine3: "",
+            addressLine4: "",
+            city: address.city,
+            stateProvince: address.stateProvince,
+            createdBy: 0,
+            addressAssnID: null,
+            CreatedDate: address.CreatedDate,
+            LastModifiedDate: address.LastModifiedDate,
+            addressState: 3,
+            fromDate: "2024-10-01T14:38:59.118Z",
+            toDate: "2024-10-01T14:38:59.118Z",
+            Output: address.Output,
+            objectID: 0,
+            objectInstanceID: 0,
+            zipPostalCode: "",
+            objAis: null
+          }))
+        };
 
-            regulatorList: this.regulatorList.map(regulator => ({
-              EntityTypeID: regulator.EntityTypeID,
-              EntityID: regulator.EntityID,
-              UserID: regulator.UserID,
-              FirmID: regulator.FirmID,
-              RelatedEntityTypeID: regulator.RelatedEntityTypeID,
-              relatedEntityID: regulator.relatedEntityID,
-              Output: regulator.Output,
-              regulatorState: 6,
-              RegulatorID: regulator.RegulatorID,
-              RegulatorName: regulator.RegulatorName,
-              RegulatorContacts: regulator.RegulatorContacts,
-              RelatedEntityID: regulator.RelatedEntityID,
-              ContactID: regulator.ContactID,
-              Title: regulator.Title,
-              FullName: regulator.FullName,
-              BussinessEmail: regulator.BussinessEmail,
-              AddressLine1: regulator.AddressLine1,
-              AddressLine2: regulator.AddressLine2,
-              AddressLine3: regulator.AddressLine3,
-              AddressLine4: regulator.AddressLine4,
-              City: regulator.City,
-              Province: regulator.Province,
-              CountryID: regulator.CountryID,
-              CountryName: regulator.CountryName,
-              PostalCode: regulator.PostalCode,
-              PhoneNumber: regulator.PhoneNumber,
-              PhoneExt: regulator.PhoneExt,
-              FaxNumber: regulator.FaxNumber,
-              EntityRegulators: regulator.EntityRegulators,
-              ShowReadOnly: regulator.ShowReadOnly,
-              ShowEnabled: regulator.ShowEnabled,
-              ContactAssnID: regulator.ContactAssnID
-            }))
-          };
-
-          // Call the insert/update endpoint
-          this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
-            response => {
-              console.log("Save successful:", response);
-            },
-            error => {
-              console.error("Error saving changes:", error);
-            }
-          );
-        } else if (
-          ["Individual Controller", "UBO - Individual"].includes(this.selectedController.EntityTypeDesc)
-        ) {
-          const saveControllerPopupChangesIndividualObj = {
-            contactDetails: {
-              contactDetails: {
-                firmID: this.firmId,
-                contactID: null,
-                contactAssnID: null,
-                AdditionalDetails: 'test',
-                BusPhone: 'test',
-                BusEmail: 'test',
-                MobileNum: 'test',
-                NameAsInPassport: 'test',
-                OtherEmail: 'test',
-                QfcNumber: this.firmDetails.QFCNum,
-                Fax: 'test',
-                ResidencePhone: 'test',
-                JobTitle: 'test',
-                OtherEntityName: this.selectedController.OtherEntityName,
-                EntityTypeID: this.selectedController.EntityTypeID,
-                Title: this.selectedController.Title,
-                FirstName: this.selectedController.FirstName,
-                secondName: this.selectedController.SecondName,
-                thirdName: this.selectedController.ThirdName,
-                familyName: this.selectedController.FamilyName,
-                PctOfShares: this.selectedController.PctOfShares,
-                tempContactID: 0,
-                countryOfResidence: null,
-                ControllerControlTypeID: this.selectedController.ControllerControlTypeID,
-                createdBy: this.userId,
-                dateOfBirth: this.convertDateToYYYYMMDD(this.selectedController.DateOfBirth),
-                fullName: null,
-                lastModifiedBy: this.userId,
-                MyState: 0,
-                nationalID: null,
-                nationality: null,
-                EntityID: this.firmId,
-                passportNum: this.selectedController.PassportNum,
-                placeOfBirth: this.selectedController.PlaceOfBirth,
-                previousName: null,
-                isExists: false,
-                FunctionTypeId: 25,
-                nameInPassport: null,
-                contactAddnlInfoTypeID: null,
-                isFromContact: null,
-                countryofBirth: null,
-                juridictionID: null,
-                objectID: this.selectedController.ObjectID,
-                isPeP: this.selectedController.IsPEP,
-                AssnDateFrom: this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
-                AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
-                LastModifiedByOfOtherEntity: 30,
-                JurisdictionId: 3,
-              },
-              lstContactFunctions: null,
-            },
-            Addresses: this.addressForms.map(address => ({
-              firmID: this.firmId,
-              countryID: 16,//address.CountryID,
-              addressTypeID: 2,//address.AddressTypeID,
-              LastModifiedBy: this.userId,
-              entityTypeID: this.selectedController.EntityTypeID,
-              entityID: this.firmId,
-              contactID: address.contactID,
-              addressID: null,
-              addressLine1: "",
-              addressLine2: "",
-              addressLine3: "",
-              addressLine4: "",
-              city: address.city,
-              stateProvince: address.stateProvince,
-              createdBy: 0,
-              addressAssnID: null,
-              CreatedDate: address.CreatedDate,
-              LastModifiedDate: address.LastModifiedDate,
-              addressState: 3,
-              fromDate: "2024-10-01T14:38:59.118Z",
-              toDate: "2024-10-01T14:38:59.118Z",
-              Output: address.Output,
-              objectID: 0,
-              objectInstanceID: 0,
-              zipPostalCode: "",
-              objAis: null
-            }))
-          };
-
-          // Call the save/update contact form endpoint
-          this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
-            response => {
-              console.log("Contact save successful:", response);
-            },
-            error => {
-              console.error("Error saving contact:", error);
-            }
-          );
-        }
+        // Call the save/update contact form endpoint
+        this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
+          response => {
+            console.log("Contact save successful:", response);
+          },
+          error => {
+            console.error("Error saving contact:", error);
+          }
+        );
+      }
     });
-}
+  }
 
   CreateControllerValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -3516,7 +3519,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.isLoading = false;
       }
     );
-}
+  }
   // Remove a regulator
   removeRegulator(index: number) {
     this.regulatorList.splice(index, 1);
@@ -3689,15 +3692,15 @@ export class ViewFirmPageComponent implements OnInit {
               contactID: null,
               contactAssnID: null,
               AdditionalDetails: 'test',
-              BusPhone:'test',
-              BusEmail:'test',
-              MobileNum:'test',
-              NameAsInPassport:'test',
-              OtherEmail:'test',
+              BusPhone: 'test',
+              BusEmail: 'test',
+              MobileNum: 'test',
+              NameAsInPassport: 'test',
+              OtherEmail: 'test',
               QfcNumber: this.firmDetails.QFCNum,
-              Fax:'test',
-              ResidencePhone:'test',
-              JobTitle:'test',
+              Fax: 'test',
+              ResidencePhone: 'test',
+              JobTitle: 'test',
               OtherEntityName: this.CreatecontrollerDetails.OtherEntityName,
               EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
               Title: this.CreatecontrollerDetails.Title, // Map your inputs accordingly
@@ -3961,7 +3964,7 @@ export class ViewFirmPageComponent implements OnInit {
   // On View Mode
   loadActivitiesAuthorized(): Promise<void> {
     this.isLoading = true; // Start loading indicator 
-    
+
     return new Promise((resolve, reject) => {
       // Run both initial API calls in parallel using forkJoin
       forkJoin({
@@ -4186,7 +4189,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.isLoading = false;
       })
   }
- 
+
   loadWaivers() {
     this.waiverService.getFirmwaiver(this.firmId).subscribe(
       data => {
@@ -4615,52 +4618,52 @@ export class ViewFirmPageComponent implements OnInit {
     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
   }
 
-//   addNewAddress(addressArray: any[]) {
-//     // Define the total number of address types
-//     const totalAddressTypes = this.allAddressTypes.length;
+  //   addNewAddress(addressArray: any[]) {
+  //     // Define the total number of address types
+  //     const totalAddressTypes = this.allAddressTypes.length;
 
-//     // Get the count of valid addresses
-//     const validAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+  //     // Get the count of valid addresses
+  //     const validAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
 
-//     // Check if the number of valid addresses is equal to the number of address types
-//     if (validAddressCount >= totalAddressTypes) {
-//         // Disable the button if all address types are added
-//         this.canAddNewAddress = false;
-//         return;
-//     }
+  //     // Check if the number of valid addresses is equal to the number of address types
+  //     if (validAddressCount >= totalAddressTypes) {
+  //         // Disable the button if all address types are added
+  //         this.canAddNewAddress = false;
+  //         return;
+  //     }
 
-//     const newAddress = {
-//         AddressID: null,
-//         AddressTypeID: 0,
-//         AddressTypeDesc: '',
-//         AddressLine1: '',
-//         AddressLine2: '',
-//         AddressLine3: '',
-//         AddressLine4: '',
-//         City: '',
-//         Province: '',
-//         CountryID: 0,
-//         CountryName: '',
-//         PostalCode: '',
-//         PhoneNumber: '',
-//         FaxNumber: '',
-//         LastModifiedBy: 0, //todo _userId;
-//         LastModifiedDate: this.currentDate,
-//         addressState: 2,
-//         FromDate: null,
-//         ToDate: null,
-//         Valid: true,
-//     };
+  //     const newAddress = {
+  //         AddressID: null,
+  //         AddressTypeID: 0,
+  //         AddressTypeDesc: '',
+  //         AddressLine1: '',
+  //         AddressLine2: '',
+  //         AddressLine3: '',
+  //         AddressLine4: '',
+  //         City: '',
+  //         Province: '',
+  //         CountryID: 0,
+  //         CountryName: '',
+  //         PostalCode: '',
+  //         PhoneNumber: '',
+  //         FaxNumber: '',
+  //         LastModifiedBy: 0, //todo _userId;
+  //         LastModifiedDate: this.currentDate,
+  //         addressState: 2,
+  //         FromDate: null,
+  //         ToDate: null,
+  //         Valid: true,
+  //     };
 
-//     // Add the new address to the beginning of the target array
-//     addressArray.unshift(newAddress);
+  //     // Add the new address to the beginning of the target array
+  //     addressArray.unshift(newAddress);
 
-//     // Update the count of valid addresses
-//     const updatedValidAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+  //     // Update the count of valid addresses
+  //     const updatedValidAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
 
-//     // Disable the button if the count of valid addresses matches the number of address types
-//     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
-// }
+  //     // Disable the button if the count of valid addresses matches the number of address types
+  //     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+  // }
   areAllAddressTypesAdded() {
     const existingTypes = new Set(this.firmAddresses.map(addr => Number(addr.AddressTypeID)));
     return this.allAddressTypes.every(type => existingTypes.has(type.AddressTypeID));
@@ -4698,7 +4701,7 @@ export class ViewFirmPageComponent implements OnInit {
 
 
   get filteredFirmAddresses() {
-    return this.existingAddresses.filter(addr => !addr.isRemoved);
+    return this.firmAddresses.filter(addr => !addr.isRemoved);
   }
 
   onAddressTypeChange(event: any, address: any) {
@@ -5934,10 +5937,10 @@ export class ViewFirmPageComponent implements OnInit {
           let documentObj: any;
           // Scope Of Authorisation (Scope Authorised)
           if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
-            documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid,constants.DocType.SCOPE,this.Page.Scope,this.fetchedScopeDocSubTypeID.DocSubTypeID,this.ActivityAuth[0].FirmScopeID,this.ActivityAuth[0].ScopeRevNum);
-          // Press Release (Core Detail)
+            documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid, constants.DocType.SCOPE, this.Page.Scope, this.fetchedScopeDocSubTypeID.DocSubTypeID, this.ActivityAuth[0].FirmScopeID, this.ActivityAuth[0].ScopeRevNum);
+            // Press Release (Core Detail)
           } else if (this.activeTab === this.Page.CoreDetail) {
-            documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid,constants.DocType.FIRM_DOCS,this.Page.CoreDetail,this.fetchedCoreDetailDocSubTypeID.DocSubTypeID,this.firmAppDetailsCurrentAuthorized.FirmApplStatusID,1);
+            documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid, constants.DocType.FIRM_DOCS, this.Page.CoreDetail, this.fetchedCoreDetailDocSubTypeID.DocSubTypeID, this.firmAppDetailsCurrentAuthorized.FirmApplStatusID, 1);
           }
           this.saveDocument(documentObj);
 
@@ -5971,18 +5974,18 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  deleteDocument(docID: number,objectId: number,objectInstanceId: number, ObjectInstanceRevNum: number) {
+  deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number) {
 
     this.objectWF.deleteDocument(docID, objectId, objectInstanceId, ObjectInstanceRevNum).subscribe({
       next: (response) => {
         console.log('Document deleted successfully:', response);
         // Scope Of Authorisation (Scope Authorised)
         if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
-        this.loadScopeOfAuthDoc();
+          this.loadScopeOfAuthDoc();
         }
         // Press Release (Core Detail)
         if (this.activeTab === this.Page.CoreDetail) {
-        this.loadPressReleaseDoc();
+          this.loadPressReleaseDoc();
         }
       },
       error: (err) => {
@@ -6034,29 +6037,29 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
-  prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number,objectId: number,docSubTypeID: number,objectInstanceID: number,objectInstanceRevNum: number) {
+  prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number, objectId: number, docSubTypeID: number, objectInstanceID: number, objectInstanceRevNum: number) {
     return {
-        userId: userId,
-        docID: null,
-        referenceNumber: null,
-        fileName: this.selectedFile.name,
-        fileNumber: this.newfileNum.toString(),
-        firmId: this.firmId,
-        otherFirm: null,
-        docTypeID: docType,
-        loggedBy: userId,
-        loggedDate: this.currentDate,
-        receivedBy: userId,
-        receivedDate: this.currentDate,
-        docRecieptMethodID: constants.LogFormRecieptMethods.InternalDocument,
-        checkPrimaryDocID: true,
-        fileLocation: fileLocation,
-        docAttributeID: null,
-        intranetGuid: intranetGuid,
-        objectID: objectId,
-        objectInstanceID: objectInstanceID,
-        objectInstanceRevNum: objectInstanceRevNum,
-        docSubType: docSubTypeID
+      userId: userId,
+      docID: null,
+      referenceNumber: null,
+      fileName: this.selectedFile.name,
+      fileNumber: this.newfileNum.toString(),
+      firmId: this.firmId,
+      otherFirm: null,
+      docTypeID: docType,
+      loggedBy: userId,
+      loggedDate: this.currentDate,
+      receivedBy: userId,
+      receivedDate: this.currentDate,
+      docRecieptMethodID: constants.LogFormRecieptMethods.InternalDocument,
+      checkPrimaryDocID: true,
+      fileLocation: fileLocation,
+      docAttributeID: null,
+      intranetGuid: intranetGuid,
+      objectID: objectId,
+      objectInstanceID: objectInstanceID,
+      objectInstanceRevNum: objectInstanceRevNum,
+      docSubType: docSubTypeID
     };
   }
 
@@ -6067,7 +6070,7 @@ export class ViewFirmPageComponent implements OnInit {
         console.log('scope of authorsation document saved successfully:', response);
         // Scope Of Authorisation (Scope Authorised)
         if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
-        this.loadScopeOfAuthDoc();
+          this.loadScopeOfAuthDoc();
         }
         // Press Release (Core Detail)
         if (this.activeTab === this.Page.CoreDetail) {
@@ -6083,7 +6086,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
   getNewFileNumber() {
-    this.logForm.getNewFileNumber(this.firmId,this.currentDate).subscribe(data => {
+    this.logForm.getNewFileNumber(this.firmId, this.currentDate).subscribe(data => {
       this.newfileNum = data.response.Column1;
     }, error => {
       console.error(error);
@@ -6499,12 +6502,12 @@ export class ViewFirmPageComponent implements OnInit {
       if (result.isConfirmed) {
         // Scope Of Authorisation (Scope Authorised)
         if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
-        this.deleteDocument(this.scopeOfAuthTableDoc.DocID,this.Page.Scope,this.ActivityAuth[0].FirmScopeID,this.ActivityAuth[0].ScopeRevNum);
-        this.loadScopeOfAuthDoc();
-        } 
+          this.deleteDocument(this.scopeOfAuthTableDoc.DocID, this.Page.Scope, this.ActivityAuth[0].FirmScopeID, this.ActivityAuth[0].ScopeRevNum);
+          this.loadScopeOfAuthDoc();
+        }
         // Press Release (Core Detail)
         if (this.activeTab === this.Page.CoreDetail) {
-          this.deleteDocument(this.pressReleaseTableDoc.DocID,this.Page.CoreDetail,this.firmAppDetailsCurrentAuthorized.FirmApplStatusID,1);
+          this.deleteDocument(this.pressReleaseTableDoc.DocID, this.Page.CoreDetail, this.firmAppDetailsCurrentAuthorized.FirmApplStatusID, 1);
           this.loadPressReleaseDoc();
         }
       } else if (result.isDismissed) {
@@ -6517,85 +6520,85 @@ export class ViewFirmPageComponent implements OnInit {
   isNullOrEmpty(value: any): boolean {
     return value === null || value === '';
   }
-   
+
   createContact() {
     this.showCreateContactSection = true;
   }
-  closeCreateContactPopup(){
+  closeCreateContactPopup() {
     this.showCreateContactSection = false;
   }
-  getAllContactFromByFrimsId(){
+  getAllContactFromByFrimsId() {
     this.contactService.getEntityTypesByFrimsId(this.firmId).subscribe(data => {
       this.AllContactFrom = data.response;
-      console.log("ContactFrom",this.AllContactFrom)
+      console.log("ContactFrom", this.AllContactFrom)
     }, error => {
       console.error("Error fetching ContactFrom", error);
     });
   }
 
- // Yazan Individuals 
+  // Yazan Individuals 
 
- getApprovedIndividuals(firmId: number, status: string): void {
-  this.aiElectronicswfService.getApprovedIndividuals(this.firmId, status).subscribe(
-    (data) => {
-      this.AllapprovedIndividuals = data.response;
-    },
-    (error) => {
-      console.error('Error fetching approved individuals:', error);
-    }
-  );
-  console.log("AllapprovedIndividuals",this.AllapprovedIndividuals)
-}
-
-getAppliedIndividuals(firmId: number, status: string):void {
-  this.aiElectronicswfService.getAppliedIndividuals(this.firmId, status).subscribe(
-    (data) => {
-      this.AllAppliedIndividuals = data.response;
-    },
-    (error) => {
-      console.error('Error fetching approved individuals:', error);
-    }
-  );
-  console.log("AllAppliedIndividuals",this.AllAppliedIndividuals)
-}
-
-getWithdrawnIndividuals(firmId: number): void {
-  this.aiElectronicswfService.getWithdrawnIndividualsser(firmId, 'Withdrawn').subscribe(
-    (data: { response: any[] }) => {
-      const lstWithdrawn = data.response; 
-
-      if (Array.isArray(lstWithdrawn)) {
-        lstWithdrawn.forEach(item => {
-          if (item.ApprovedDate) {
-            item.AppliedDate = item.ApprovedDate;
-          }
-          if (item.WithdrawnDate) {
-            item.AppliedForWithdrawalDate = item.WithdrawnDate;
-          }
-          if (!Array.isArray(item.FunctionActivity)) {
-            item.FunctionActivity = item.FunctionActivity ? [item.FunctionActivity] : [];
-          }
-        });
-        this.withdrawnIndividuals = this.groupBy(lstWithdrawn, 'AppIndividualID');
-        console.log('withdrawnIndividuals', this.withdrawnIndividuals);
-      } else {
-        console.error('Invalid response format: expected an array.');
+  getApprovedIndividuals(firmId: number, status: string): void {
+    this.aiElectronicswfService.getApprovedIndividuals(this.firmId, status).subscribe(
+      (data) => {
+        this.AllapprovedIndividuals = data.response;
+      },
+      (error) => {
+        console.error('Error fetching approved individuals:', error);
       }
-    },
-    error => {
-      console.error('Error fetching withdrawn individuals:', error);
-    }
-  );
-}
+    );
+    console.log("AllapprovedIndividuals", this.AllapprovedIndividuals)
+  }
 
-// Helper function to group individuals by AppIndividualID
-groupBy(arr: any[], key: string): { [key: string]: any[] } {
-  return arr.reduce((accumulator, currentValue) => {
-    // If the key doesn’t exist, initialize it as an empty array
-    (accumulator[currentValue[key]] = accumulator[currentValue[key]] || []).push(currentValue);
-    return accumulator;
-  }, {});
-}
+  getAppliedIndividuals(firmId: number, status: string): void {
+    this.aiElectronicswfService.getAppliedIndividuals(this.firmId, status).subscribe(
+      (data) => {
+        this.AllAppliedIndividuals = data.response;
+      },
+      (error) => {
+        console.error('Error fetching approved individuals:', error);
+      }
+    );
+    console.log("AllAppliedIndividuals", this.AllAppliedIndividuals)
+  }
+
+  getWithdrawnIndividuals(firmId: number): void {
+    this.aiElectronicswfService.getWithdrawnIndividualsser(firmId, 'Withdrawn').subscribe(
+      (data: { response: any[] }) => {
+        const lstWithdrawn = data.response;
+
+        if (Array.isArray(lstWithdrawn)) {
+          lstWithdrawn.forEach(item => {
+            if (item.ApprovedDate) {
+              item.AppliedDate = item.ApprovedDate;
+            }
+            if (item.WithdrawnDate) {
+              item.AppliedForWithdrawalDate = item.WithdrawnDate;
+            }
+            if (!Array.isArray(item.FunctionActivity)) {
+              item.FunctionActivity = item.FunctionActivity ? [item.FunctionActivity] : [];
+            }
+          });
+          this.withdrawnIndividuals = this.groupBy(lstWithdrawn, 'AppIndividualID');
+          console.log('withdrawnIndividuals', this.withdrawnIndividuals);
+        } else {
+          console.error('Invalid response format: expected an array.');
+        }
+      },
+      error => {
+        console.error('Error fetching withdrawn individuals:', error);
+      }
+    );
+  }
+
+  // Helper function to group individuals by AppIndividualID
+  groupBy(arr: any[], key: string): { [key: string]: any[] } {
+    return arr.reduce((accumulator, currentValue) => {
+      // If the key doesn’t exist, initialize it as an empty array
+      (accumulator[currentValue[key]] = accumulator[currentValue[key]] || []).push(currentValue);
+      return accumulator;
+    }, {});
+  }
 
   // Navigate to the previous page
   previousPage(): void {
@@ -6604,7 +6607,7 @@ groupBy(arr: any[], key: string): { [key: string]: any[] } {
       this.updateActivePagination();  // Call the appropriate pagination function
     }
   }
-  
+
   // Navigate to the next page
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
@@ -6650,12 +6653,12 @@ groupBy(arr: any[], key: string): { [key: string]: any[] } {
   updatePaginationWithdrawn(): void {
     if (this.withdrawnIndividuals && Object.keys(this.withdrawnIndividuals).length > 0) {
       const withdrawnIndividualsArray = Object.values(this.withdrawnIndividuals).flat(); // Flatten the grouped arrays into a single array
-  
+
       this.totalRows = withdrawnIndividualsArray.length;
       this.totalPages = Math.ceil(this.totalRows / this.pageSize);
       const startIndex = (this.currentPage - 1) * this.pageSize;
       const endIndex = Math.min(startIndex + this.pageSize, this.totalRows);
-  
+
       this.paginatedFirms = withdrawnIndividualsArray.slice(startIndex, endIndex); // Paginated data
       this.startRow = startIndex + 1;
       this.endRow = endIndex;
