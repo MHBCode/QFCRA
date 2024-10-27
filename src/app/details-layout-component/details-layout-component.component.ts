@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { Component, Input, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { SecurityService } from '../ngServices/security.service';
 import { filter, switchMap } from 'rxjs/operators';
 
@@ -8,7 +8,7 @@ import { filter, switchMap } from 'rxjs/operators';
   templateUrl: './details-layout-component.component.html',
   styleUrls: ['./details-layout-component.component.scss']
 })
-export class DetailsLayoutComponent {
+export class DetailsLayoutComponent implements OnInit{
   subsiteName: string = 'All Firms';
   pageTitle: string;
   isUserAllowed: boolean | null = null;
@@ -41,13 +41,33 @@ export class DetailsLayoutComponent {
       this.activeMenu = this.router.url.includes('/firms') ? 'firmDetails' : null;
     });
 
-    this.route.queryParams.subscribe(params => {
-      this.pageTitle = params['pageTitle'];
-      this.subsiteName = params['subsiteName'];
+    this.router.events
+    .pipe(filter(event => event instanceof NavigationEnd))
+    .subscribe(() => {
+      this.updateRouteData();
     });
+
+    this.route.firstChild.data.subscribe(data => {
+      this.subsiteName = data['subsiteName'];
+      this.pageTitle = data['pageTitle'];
+    });
+
 
   }
 
+
+  private updateRouteData() {
+    let currentRoute = this.route.firstChild;
+    while (currentRoute?.firstChild) {
+      currentRoute = currentRoute.firstChild;
+    }
+    if (currentRoute) {
+      currentRoute.data.subscribe(data => {
+        this.subsiteName = data['subsiteName'] || 'All Firms'; // Default value
+        this.pageTitle = data['pageTitle'] || 'Default Page Title'; // Default value
+      });
+    }
+  }
 
   userAllowedToAccessFirm() {
     this.isLoading = true;

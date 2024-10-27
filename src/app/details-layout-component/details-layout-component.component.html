@@ -17,27 +17,27 @@
             <i class="menu-icons bi bi-info-square" *ngIf="closedMenu"></i>
             <div class="sub-menu" *ngIf="!closedMenu && activeMenu === 'firmDetails'">
                 <a class="menu-sub-item" [routerLink]="['/firms/view', firmId]"
-                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Firms Details' }" routerLinkActive="active">
+                     routerLinkActive="active">
                     Firms Details
                 </a>
                 <a class="menu-sub-item" [routerLink]="['/firms/view/core-details', firmId]"
-                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Core Details' }" routerLinkActive="active">
+                     routerLinkActive="active">
                     Core Details
                 </a>
                 <a class="menu-sub-item" [routerLink]="['/firms/view/scope', firmId]"
-                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Scope' }" routerLinkActive="active">
+                     routerLinkActive="active">
                     Scope
                 </a>
                 <a class="menu-sub-item" [routerLink]="['/firms/view/controllers', firmId]"
-                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Controllers' }" routerLinkActive="active">
+                     routerLinkActive="active">
                     Controllers
                 </a>
                 <a class="menu-sub-item" [routerLink]="['/firms/view/auditors', firmId]"
-                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Auditors' }" routerLinkActive="active">
+                    routerLinkActive="active">
                     Auditors
                 </a>
                 <a class="menu-sub-item" [routerLink]="['/firms/view/contacts', firmId]"
-                    [queryParams]="{ subsiteName: 'All Firms', pageTitle: 'Contacts' }" routerLinkActive="active">
+                    routerLinkActive="active">
                     Contacts
                 </a>
             </div>

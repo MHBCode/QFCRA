@@ -11,6 +11,23 @@ import { ControllersComponent } from './controllers/controllers.component';
 import { AuditorsComponent } from './auditors/auditors.component';
 import { ContactsComponent } from './contacts/contacts.component';
 
+// const routes: Routes = [
+//   {
+//     path: '',
+//     children: [
+//       { path: '', component: FirmsPageComponent },
+//       { path: 'new-firm', component: NewFirmComponent },
+//       {
+//         path: 'view',
+//         component: DetailsLayoutComponent,
+//         children: [
+//           { path: ':id', component: FirmsDetailsComponent },
+//         ],
+//       },
+//     ],
+//   }
+// ];
+
 const routes: Routes = [
   {
     path: '',
@@ -23,25 +40,33 @@ const routes: Routes = [
         children: [
           {
             path: ':id',
-            component: FirmsDetailsComponent          },
+            component: FirmsDetailsComponent,
+            data: { subsiteName: 'All Firms', pageTitle: 'Firm Details' },
+          },
           {
             path: 'core-details/:id',
-            component: CoreDetailsComponent          },
+            component: CoreDetailsComponent,
+            data: { subsiteName: 'All Firms', pageTitle: 'Core Details' },
+          },
           {
             path: 'controllers/:id',
-            component: ControllersComponent
+            component: ControllersComponent,
+            data: { subsiteName: 'All Firms', pageTitle: 'Controllers' },
           },
           {
             path: 'auditors/:id',
-            component: AuditorsComponent
+            component: AuditorsComponent,
+            data: { subsiteName: 'All Firms', pageTitle: 'Auditors' },
           },
           {
             path: 'contacts/:id',
-            component: ContactsComponent
+            component: ContactsComponent,
+            data: { subsiteName: 'All Firms', pageTitle: 'Contacts' },
           },
           {
             path: 'scope/:id',
-            component: ScopeComponent
+            component: ScopeComponent,
+            data: { subsiteName: 'All Firms', pageTitle: 'Scope' },
           }
         ],
       },
