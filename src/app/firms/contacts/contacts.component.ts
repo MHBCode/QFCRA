@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { FirmService } from '../firm.service';
@@ -9,6 +9,7 @@ import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
 import { ParententityService } from 'src/app/ngServices/parententity.service';
 import { AddressesService } from 'src/app/ngServices/addresses.service';
+import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 
 @Component({
   selector: 'app-contacts',
@@ -16,6 +17,9 @@ import { AddressesService } from 'src/app/ngServices/addresses.service';
   styleUrls: ['./contacts.component.scss','../firms.scss']
 })
 export class ContactsComponent {
+
+  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   userId = 30; // Replace with dynamic userId as needed
   firmId: number = 0;
   errorMessages: { [key: string]: string } = {};
@@ -55,7 +59,8 @@ export class ContactsComponent {
     private contactService: ContactService,
     private parentEntity: ParententityService,
     private cdr: ChangeDetectorRef,
-    private addressService: AddressesService
+    private addressService: AddressesService,
+    private flatpickrService: FlatpickrService
   ) {
 
   }
@@ -64,7 +69,6 @@ export class ContactsComponent {
     this.firmService.scrollToTop();
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
-      this.loadFirmDetails(this.firmId);
       if (this.FIRMContacts.length === 0) {
         this.loadContacts();
       }
@@ -77,6 +81,13 @@ export class ContactsComponent {
       this.getlegalStatusController();
 
     })
+  }
+
+  ngAfterViewInit() {
+    this.dateInputs.changes.subscribe(() => {
+      this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+    });
+    this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
   }
 
 

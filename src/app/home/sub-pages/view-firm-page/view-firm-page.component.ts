@@ -1750,7 +1750,6 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
-
   prepareAuthoriseScopeObject(userId: number) {
     return {
       objFirmScope: {

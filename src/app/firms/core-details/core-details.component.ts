@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { FirmService } from '../firm.service';
@@ -10,6 +10,7 @@ import { FirmDetailsService } from '../firmsDetails.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import Swal from 'sweetalert2';
 import { LogformService } from 'src/app/ngServices/logform.service';
+import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 
 @Component({
   selector: 'app-core-details',
@@ -17,6 +18,9 @@ import { LogformService } from 'src/app/ngServices/logform.service';
   styleUrls: ['./core-details.component.scss', '../firms.scss']
 })
 export class CoreDetailsComponent implements OnInit {
+  
+  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   errorMessages: { [key: string]: string } = {};
   activity: any = { errorMessages: {} };
   controlsPermissions: any = [];
@@ -107,6 +111,7 @@ export class CoreDetailsComponent implements OnInit {
     private dateUtilService: DateUtilService,
     private cdr: ChangeDetectorRef,
     private logForm: LogformService,
+    private flatpickrService: FlatpickrService
   ) {
 
   }
@@ -128,6 +133,13 @@ export class CoreDetailsComponent implements OnInit {
     })
   }
 
+  ngAfterViewInit() {
+    this.dateInputs.changes.subscribe(() => {
+      this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+    });
+    this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+  }
+
   loadFirmAdresses() {
     this.isLoading = true;
     this.addressService.getFirmAddresses(this.firmId).subscribe(
@@ -143,7 +155,6 @@ export class CoreDetailsComponent implements OnInit {
   loadFirmDetails(firmId: number) {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
       data => {
-        debugger
         this.firmDetails = data.firmDetails;
         this.selectedFirmTypeID = this.firmDetails.AuthorisationStatusTypeID != 0 ? 3 : 2;
         this.dateOfApplication = this.firmDetails.AuthorisationStatusTypeID > 0 ? this.firmDetails.FirmAuthApplDate : this.firmDetails.FirmLicApplDate;
@@ -178,16 +189,10 @@ export class CoreDetailsComponent implements OnInit {
     this.isLoading = true;
     // Start validations
     this.hasValidationErrors = false;
-    // this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
+    this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
     // Synchronous firm-level validation checks
     this.validateFirmDetails(); // Perform existing validation logic synchronously
 
-    // If validation errors exist, stop the process
-    if (this.hasValidationErrors) {
-      this.showError(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
-      this.isLoading = false;
-      return;
-    }
 
     try {
       // Perform asynchronous QFC number validation first
@@ -211,7 +216,7 @@ export class CoreDetailsComponent implements OnInit {
 
       // Check if there are any new validation errors
       if (this.hasValidationErrors) {
-        this.showError(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+        this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
         this.isLoading = false;
         return;
       }
@@ -227,7 +232,7 @@ export class CoreDetailsComponent implements OnInit {
     } catch (error) {
       if (error.message !== 'Cancelled by user') {
         console.error('Validation or Save Process failed:', error);
-        this.showError(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+        this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
         this.isLoading = false;
       }
     }
@@ -502,6 +507,7 @@ export class CoreDetailsComponent implements OnInit {
   loadErrorMessages(fieldName: string, msgKey: number, activity?: any) {
     this.firmDetailsService.getErrorMessages(fieldName, msgKey, activity).subscribe(
       () => {
+        this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
         console.log(`Error message for ${fieldName} loaded successfully`);
       },
       error => {

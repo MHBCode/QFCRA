@@ -133,18 +133,18 @@
                     <tr>
                         <th>Function / Role</th>
                         <th>Name</th>
-                        <th class="date-center">Date From</th>
-                        <th class="date-center">Date To</th>
+                        <th class="text-center">Date From</th>
+                        <th class="text-center">Date To</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let RA of FIRMRA">
                         <td style="text-align: left">{{ RA.firmUserAssnTypeDesc }}</td>
                         <td style="text-align: left">{{ RA.name }}</td>
-                        <td class="date-center">
+                        <td class="text-center">
                             {{ RA.firmUserAssnDateFrom | date: 'dd/MMM/yyyy' }}
                         </td>
-                        <td class="date-center">
+                        <td class="text-center">
                             {{ RA.firmUserAssnDateTo | date: 'dd/MMM/yyyy' }}
                         </td>
                     </tr>
@@ -171,8 +171,8 @@
                 <tr>
                     <th>Function / Role</th>
                     <th>Name</th>
-                    <th class="date-center">Date From</th>
-                    <th class="date-center">Date To</th>
+                    <th class="text-center">Date From</th>
+                    <th class="text-center">Date To</th>
                     <th>Reason For Change</th>
                 </tr>
             </thead>
@@ -180,10 +180,10 @@
                 <tr *ngFor="let FYE of firmInactiveUsers">
                     <td style="text-align: left">{{ FYE.FirmUserAssnTypeDesc }}</td>
                     <td style="text-align: left">{{ FYE.Name }}</td>
-                    <td class="date-center">
+                    <td class="text-center">
                         {{ FYE.FirmUserAssnDateFrom | date: 'dd/MMM/yyyy' }}
                     </td>
-                    <td class="date-center">
+                    <td class="text-center">
                         {{ FYE.FirmUserAssnDateTo | date: 'dd/MMM/yyyy' }}
                     </td>
                     <td>{{ FYE.FirmUserAssnReasonTypeDesc }}</td>

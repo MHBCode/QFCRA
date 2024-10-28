@@ -49,76 +49,39 @@
             Scope > <span>{{ firmDetails?.FirmName }}</span>
           </h2>
           <div *ngIf="currentLicRevisionNumber === lastLicRevisionNumber" style="display: flex; gap: 10px">        
-           <!-- <div class="btn" *ngIf="
-                tabIndex === 0 &&
-                !hideEditBtn &&
-                getControlVisibility('imgBtnEdit') &&
-                ActivityLicensed[0].ScopeRevNum
-              "> -->
-              <div class="btn" *ngIf="
-                tabIndex === 0 &&
-                !isEditModeLicense &&
-                getControlVisibility('imgBtnEdit') &&
-                ActivityLicensed[0].ScopeRevNum
-              ">
+              <div class="btn" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn">
               <button [disabled]="!getControlEnablement('imgBtnEdit')" class="edit-btn" (click)="editLicenseScope()">
                 <i class="bi bi-pen"></i>Edit
               </button>
             </div>
 
-            <div class="btn" *ngIf="
-                tabIndex === 0 &&
-                !loading &&
-                isEditModeLicense &&
-                getControlVisibility('imgBtnSave')
-              ">
+            <div class="btn" *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn">
               <button [disabled]="!getControlEnablement('imgBtnSave')" class="save-btn" (click)="saveLicenseScope()">
                 Save
               </button>
             </div>
 
-            <div class="btn" *ngIf="
-                tabIndex === 0 &&
-                !loading &&
-                isEditModeCore &&
-                getControlVisibility('imgBtnCancel')
-              ">
+            <div class="btn" *ngIf="getControlVisibility('imgBtnCancel') && !hideCancelBtn">
               <button [disabled]="!getControlEnablement('imgBtnCancel')" class="cancel-btn"
                 (click)="cancelEditLicScope()">
                 Cancel
               </button>
             </div>
 
-            <div class="btn" *ngIf="
-                tabIndex === 0 &&
-                !loading &&
-                !hideCreateBtn &&
-                getControlVisibility('imgBtnCreate') &&
-                !ActivityLicensed[0].ScopeRevNum
-              ">
+            <div class="btn" *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn">
               <button [disabled]="!getControlEnablement('imgBtnCreate')">
                 Create
               </button>
             </div>
 
-            <div class="btn" *ngIf="
-                tabIndex === 0 &&
-                !loading &&
-                !hideReviseBtn &&
-                getControlVisibility('imgBtnRevise') &&
-                showVaryBtn
+            <div class="btn" *ngIf="getControlVisibility('imgBtnRevise') && !hideReviseBtn
               ">
               <button [disabled]="!getControlEnablement('imgBtnRevise')">
                 Revise
               </button>
             </div>
 
-            <div class="btn" *ngIf="
-                tabIndex === 0 &&
-                !loading &&
-                !hideDeleteBtn &&
-                getControlVisibility('imgBtnDelete')
-              ">
+            <div class="btn" *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
               <button [disabled]="!getControlEnablement('imgBtnDelete')">
                 Delete
               </button>
@@ -128,10 +91,10 @@
         <div class="inputs-row">
           <div style="width: 100%" class="input-field">
             <label for="formReff"> Form Reference </label>
-            <a *ngIf="isEditModeLicense || !(ActivityLicensed[0].ScopeRevNum)" (click)="getFormReferenceDocuments()" class="form-ref-btn">Select/De-select document</a>
-            <a id="websiteLink"
-              href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{documentDetails.Column3}}" target="_blank"
-              rel="noopener noreferrer">
+            <a *ngIf="isEditModeLicense || !(ActivityLicensed[0].ScopeRevNum)" (click)="getFormReferenceDocuments()"
+              class="form-ref-btn">Select/De-select document</a>
+            <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{documentDetails.Column3}}"
+              target="_blank" rel="noopener noreferrer">
               {{documentDetails?.formattedFileName || documentDetails?.FileName}}
             </a>
           </div>
@@ -166,7 +129,7 @@
               [(ngModel)]="ActivityLicensed[0].ScopeAppliedDate" [ngClass]="{'error-border': errorMessages['ScopeAppliedDate']}"/>
           </div>
           <!-- on creation mode -->
-           <input *ngIf="isCreateModeLicense" disabled type="text" #dateInputs placeholder [(ngModel)]="firmDetails.FirmLicApplDate">
+           <!-- <input *ngIf="isCreateModeLicense" disabled type="text" #dateInputs placeholder [(ngModel)]="firmDetails.FirmLicApplDate"> -->
           <div class="input-field">
             <label for="licenseDate"> Licensed Date </label>
             <input disabled name="licenseDate" id="licenseDate" type="text"
@@ -204,7 +167,7 @@
             <input disabled name="createdDate" id="createdDate" type="text"
               value="{{ ActivityLicensed[0]?.ScopeCreatedDate }}" />
           </div>
-          <div *ngIf="isEditModeLicense && !hideReviseBtn && showVaryBtn" class="vary-scope">
+          <div *ngIf="isEditModeLicense && !hideReviseBtn" class="vary-scope">
             <button (click)="varyLicenseScope()">Vary Scope</button>
           </div>
         </div>
@@ -248,7 +211,7 @@
         <!-- Edit Mode License -->
         <div class="add-activity-container">
           <button *ngIf="isEditModeLicense" class="add-permitted-activity" (click)="addNewActivity()">
-            Add Activity
+            Add Permitted Activity
           </button>
         </div>
 
@@ -362,76 +325,47 @@
           <p *ngIf="errorMessages['SectorReturnType']">
             Please select valid "Prudential Return Type".
           </p>
+          <p *ngIf="errorMessages[('islamicType')]">
+            {{errorMessages[('islamicType')]}}
+          </p>
         </div>
         <div class="form-section-title">
           <h2 class="edit-firm-header">
             Scope ><span>{{ firmDetails?.FirmName }}</span>
           </h2>
           <div *ngIf="currentAuthRevisionNumber === lastAuthRevisionNumber" style="display: flex; gap: 10px">
-            <div class="btn" *ngIf="
-                tabIndex === 1 &&
-                !hideEditBtn &&
-                getControlVisibility('imgBtnEdit') &&
-                ActivityAuth[0].ScopeRevNum
-              ">
+            <div class="btn" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn">
               <button [disabled]="!getControlEnablement('imgBtnEdit')" class="edit-btn" (click)="editAuthScope()">
                 <i class="bi bi-pen"></i>Edit
               </button>
             </div>
 
-            <div class="btn" *ngIf="
-                tabIndex === 1 &&
-                !loading &&
-                !hideSaveBtn &&
-                getControlVisibility('imgBtnSave')
-              ">
+            <div class="btn" *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn">
               <button [disabled]="!getControlEnablement('imgBtnSave')" class="save-btn" (click)="saveAuthScope()">
                 Save
               </button>
             </div>
 
-            <div class="btn" *ngIf="
-                tabIndex === 1 &&
-                !loading &&
-                !hideCancelBtn &&
-                getControlVisibility('imgBtnCancel')
-              ">
+            <div class="btn" *ngIf="getControlVisibility('imgBtnCancel') && !hideCancelBtn">
               <button [disabled]="!getControlEnablement('imgBtnCancel')" class="cancel-btn"
                 (click)="cancelEditAuthScope()">
                 Cancel
               </button>
             </div>
 
-            <div class="btn" *ngIf="
-                tabIndex === 1 &&
-                !loading &&
-                !hideCreateBtn &&
-                getControlVisibility('imgBtnCreate') &&
-                !ActivityAuth[0].ScopeRevNum
-              ">
+            <div class="btn" *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn">
               <button [disabled]="!getControlEnablement('imgBtnCreate')">
                 Create
               </button>
             </div>
 
-            <div class="btn" *ngIf="
-                tabIndex === 1 &&
-                !loading &&
-                !hideReviseBtn &&
-                getControlVisibility('imgBtnRevise') &&
-                showVaryBtn
-              ">
+            <div class="btn" *ngIf="getControlVisibility('imgBtnRevise') && !hideReviseBtn">
               <button [disabled]="!getControlEnablement('imgBtnRevise')">
                 Revise
               </button>
             </div>
 
-            <div class="btn" *ngIf="
-                tabIndex === 1 &&
-                !loading &&
-                !hideDeleteBtn &&
-                getControlVisibility('imgBtnDelete')
-              ">
+            <div class="btn" *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
               <button [disabled]="!getControlEnablement('imgBtnDelete')">
                 Delete
               </button>
@@ -511,7 +445,7 @@
             <label for=""> Creation Date </label>
             <input disabled name="" id="" type="text" value="{{ ActivityAuth[0]?.CreatedDate }}" />
           </div>
-          <div [hidden]="!isEditModeAuth" class="vary-scope">
+          <div *ngIf="isEditModeAuth && !hideReviseBtn" class="vary-scope">
             <button (click)="varyAuthScope()">Vary Scope</button>
           </div>
         </div>
@@ -523,21 +457,26 @@
       <!--Scope of Authorization-->
       <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['scopeOfAuthorization'] }">
         <div class="section">
+          <div *ngIf="errorMessages['uploadDocument']" class="error-messages" style="width:100%">
+            <p *ngIf="errorMessages['uploadDocument']">
+              {{ errorMessages['uploadDocument'] }}
+            </p>
+          </div>
           <div class="form-section-title collapse-container">
             <h2 class="edit-firm-header">Scope of Authorisation</h2>
             <button class="collapse-button" (click)="toggleCollapse('scopeOfAuthorization')">
               {{ isCollapsed['scopeOfAuthorization'] ? '▲' : '▼' }}
             </button>
           </div>
-          <div *ngIf="isEditModeAuth && !AuthTableDocument?.DocSubTypeDesc" class="inputs-row document-container">
+          <div *ngIf="isEditModeAuth && !scopeOfAuthTableDoc?.DocSubTypeDesc" class="inputs-row document-container">
             <div class="input-field">
               <label>Document Type</label>
-              <select>
-                <option>Scope of Authorisation</option>
+              <select [(ngModel)]="fetchedScopeDocSubTypeID.DocSubTypeID">
+                <option [value]="fetchedScopeDocSubTypeID.DocSubTypeID">Scope of Authorisation</option>
               </select>
             </div>
-            <div *ngIf="!AuthTableDocument?.DocSubTypeDesc" class="input-field">
-              <label id="uploaded-documents">Uploaded documents go here</label>
+            <div *ngIf="!scopeOfAuthTableDoc?.DocSubTypeDesc" class="input-field">
+              <label id="uploaded-documents"></label>
 
               <div class="btns-container">
                 <div class="upload-container">
@@ -545,7 +484,7 @@
                     Choose Document
                   </button>
                 </div>
-                <button class="upload-document-btn" (click)="uploadDocument()">
+                <button class="upload-document-btn">
                   Upload the Document
                 </button>
               </div>
@@ -563,22 +502,17 @@
               <tbody>
                 <tr>
                   <td style="text-align: left">
-                    <span [style.color]="
-                        AuthTableDocument?.DocSubTypeDesc ? 'inherit' : 'red'
-                      ">
-                      {{
-                      AuthTableDocument?.DocSubTypeDesc ||
-                      'No documents attached'
-                      }}
+                    <span [style.color]="scopeOfAuthTableDoc?.DocSubTypeDesc ? 'inherit' : 'red'">
+                      {{ scopeOfAuthTableDoc?.DocSubTypeDesc || 'No documents attached' }}
                     </span>
                   </td>
                   <td style="text-align: left">
                     <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{
-                        AuthTableDocument?.FileLoc
-                      }}" target="_blank">{{ AuthTableDocument?.FileName }}</a>
+                        scopeOfAuthTableDoc?.FileLoc
+                      }}" target="_blank">{{ scopeOfAuthTableDoc?.FileName }}</a>
                   </td>
                   <td *ngIf="isEditModeAuth" style="text-align: center">
-                    <button class="delete-action" *ngIf="AuthTableDocument?.DocSubTypeDesc"
+                    <button class="delete-action" *ngIf="scopeOfAuthTableDoc?.DocSubTypeDesc"
                       (click)="showAlertDeleteFile()">
                       Delete
                     </button>
@@ -594,14 +528,14 @@
       <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['regulatedActivitiesSection'] }">
         <div class="section">
           <div class="form-section-title collapse-container">
-            <h2>Regulated Activities</h2>
+            <h2 class="edit-firm-header">Regulated Activities</h2>
             <button class="collapse-button" (click)="toggleCollapse('regulatedActivitiesSection')">
               {{ isCollapsed['regulatedActivitiesSection'] ? '▲' : '▼' }}
             </button>
           </div>
           <div [hidden]="isCollapsed['regulatedActivitiesSection']" class="add-btn-container" *ngIf="isEditModeAuth">
             <button class="add-permitted-btn" (click)="addNewPermittedActivity()">
-              Add
+              Add Regulated Activity
             </button>
           </div>
           <!--on view mode-->
@@ -628,7 +562,7 @@
                     <label for="category" style="display: flex; gap: 5px">
                       Category <span style="color: red">*</span>:
                     </label>
-                    <select [(ngModel)]="activity.FirmScopeTypeID" (ngModelChange)="onCategoryChange(activity)"
+                    <select [(ngModel)]="activity.CategoryID" (ngModelChange)="onCategoryChange(activity)"
                       name="category" id="category">
                       <option *ngFor="let category of activityCategories" [value]="category.ActivityCategoryID">
                         {{ category.ActivityCategoryDesc }}
@@ -812,24 +746,25 @@
             {{ isCollapsed['islamicFinanceSection'] ? '▲' : '▼' }}
           </button>
         </div>
+        <!--view mode-->
         <div class="inputs-row">
           <div class="input-field" *ngIf="!isEditModeAuth">
             <label for="isIslamicFinanceExist"> Islamic Finance </label>
             <input disabled name="isIslamicFinanceExist" id="isIslamicFinanceExist" type="text"
               [value]="islamicFinance?.IFinTypeId !== null ? 'Yes' : 'No'" />
           </div>
-          <!-- or -->
+          <!--(edit mode) -->
           <div class="input-field" *ngIf="isEditModeAuth">
             <div style="display: flex; gap: 15px">
               <label for="isIslamicFinanceExist"> Islamic Finance </label>
               <input style="width: 15px" type="checkbox" name="isIslamicFinanceExist" id="isIslamicFinanceExist"
-                [(ngModel)]="isIslamicFinanceChecked" />
+                [(ngModel)]="isIslamicFinanceChecked"/>
             </div>
           </div>
           <div class="input-field">
             <label for="islamicFinanceType"> Type </label>
             <select [disabled]="!isIslamicFinanceChecked || !isEditModeAuth" name="islamicFinanceType"
-              id="islamicFinanceType" [(ngModel)]="islamicFinance.IFinTypeId">
+              id="islamicFinanceType" [(ngModel)]="islamicFinance.IFinTypeId" [ngClass]="{'error-border': errorMessages['islamicType']}">
               <option value="0">Select</option>
               <option value="1">Islamic Institution</option>
               <option value="2">Islamic Window</option>
@@ -1040,5 +975,55 @@
         </button>
       </li>
     </ul>
+  </div>
+</div>
+
+<!-- sub activities popup -->
+<div *ngIf="callSubActivity" class="overlay show"></div>
+<div *ngIf="callSubActivity" class="SubActivitiesPopUp popupcontainer">
+  <i class="bi bi-x-circle close-icon" (click)="closeSubActivity()"></i>
+  <div>
+    <div class="popup-header">
+      <h3>Please Select Sub Activity</h3>
+    </div>
+    <div class="popup-body">
+      <ul>
+        <li>
+          <input type="checkbox" name="subactivity">
+          <input type="checkbox" name="subactivity">
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="popup-buttons-container">
+    <button class="subbutton">Ok</button>
+    <button class="subbutton" (click)="closeSubActivity()">Cancel</button>
+  </div>
+</div>
+
+<!--Reference Form Popup-->
+<div *ngIf="callRefForm" class="overlay show"></div>
+<div *ngIf="callRefForm" class="ReferenceFormPopUp popupcontainer">
+  <i class="bi bi-x-circle close-icon" (click)="closeFormReference()"></i>
+  <div>
+    <div class="popup-header">
+      <h3>Select Document</h3>
+    </div>
+    <div class="popup-body">
+      <ul>
+        <li *ngFor="let doc of formReferenceDocs">
+          <input type="radio" name="documentSelection" [value]="doc.DocID" [(ngModel)]="selectedDocId">
+          {{doc.DocTypeDesc}} :
+          <a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{doc.FileLoc}}" target="_blank">{{doc.FILENAME}}</a>
+        </li>
+      </ul>
+      <p *ngIf="formReferenceDocs.length === 0">There are no documents to select from. Please upload the relevant
+        document and return for selection.</p>
+    </div>
+  </div>
+  <div class="popup-buttons-container">
+    <button class="subbutton" (click)="deSelectDocument()">De-Select</button>
+    <button class="subbutton" (click)="replaceDocument()">Ok</button>
+    <button class="subbutton" (click)="closeFormReference()">Cancel</button>
   </div>
 </div>

@@ -266,7 +266,7 @@ div:where(.swal2-icon).swal2-success .swal2-success-ring {
     transform: rotate(45deg);
 }
 
-.date-center {
+.text-center {
     text-align: center;
 }
 
@@ -336,4 +336,20 @@ input[type="checkbox"]:checked {
 
 .input-field[hidden] {
     display: none !important;
+}
+
+/* custom date picker */
+::ng-deep .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+    font-size: 13px !important;
+    background-color: white !important;
+}
+
+.error-messages p {
+    margin-bottom: 10px;
+    color: red;
+}
+  
+  .error-border {
+    border-color: red !important;
+    outline: 0;
 }

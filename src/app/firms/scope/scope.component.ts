@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { LogformService } from 'src/app/ngServices/logform.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { FirmDetailsService } from '../firmsDetails.service';
@@ -11,13 +11,16 @@ import { ActivityService } from 'src/app/ngServices/activity.service';
 import { forkJoin } from 'rxjs';
 import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 import Swal from 'sweetalert2';
+import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 
 @Component({
   selector: 'app-scope',
   templateUrl: './scope.component.html',
-  styleUrls: ['./scope.component.scss','../firms.scss']
+  styleUrls: ['./scope.component.scss', '../firms.scss']
 })
 export class ScopeComponent implements OnInit {
+  
+  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   firmId: number = 0;
   activeSection: string = 'Licensed';
@@ -33,12 +36,13 @@ export class ScopeComponent implements OnInit {
   resetFirmSector: boolean = false;
   SectorTypeIDChanged: boolean = false;
   PrudentialCategoryIDChanged: boolean = false;
+  isParentActivity: boolean = false;
   Page = FrimsObject;
   firmDetails: any;
   userId = 30;
   loading: boolean;
   isLoading: boolean = false;
-  assignedUserRoles: any = [];
+  assignedUserRoles: any[] = [];
   isFirmAMLSupervisor: boolean = false;
   isFirmSupervisor: boolean = false;
   assignedLevelUsers: any = [];
@@ -70,7 +74,7 @@ export class ScopeComponent implements OnInit {
   prudentialCategoryDetails: any = [];
   sectorDetails: any = [];
   islamicFinance: any = {};
-  AuthTableDocument: any = [];
+  scopeOfAuthTableDoc: any = [];
   hasValidationErrors: boolean = false;
   invalidActivity: boolean;
   existingActivities: any = [];
@@ -78,9 +82,11 @@ export class ScopeComponent implements OnInit {
   LicPrevRevNumbers: any = [];
   activityCategories: any[] = [];
   activityTypes: any[] = [];
-  existingPermittedActivites: any = [];  
+  subActivities: any[] = [];
+  existingPermittedActivites: any = [];
   callLicScopePrev: boolean = false;
   callAuthScopePrev: boolean = false;
+  callSubActivity: boolean = false;
   AuthPrevRevNumbers: any = [];
   isScopeConditionChecked: boolean = false;
   isCollapsed: { [key: string]: boolean } = {};
@@ -92,6 +98,7 @@ export class ScopeComponent implements OnInit {
   fileError: string = '';
   callUploadDoc: boolean = false;
   formReferenceDocs: any = [];
+  fetchedScopeDocSubTypeID: any = {};
   callRefForm: boolean = false;
   currentAuthRevisionNumber: number | null = null;
   lastAuthRevisionNumber: number | null = null;
@@ -110,7 +117,8 @@ export class ScopeComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private logForm: LogformService,
     private activityService: ActivityService,
-    private objectWF: ObjectwfService
+    private objectWF: ObjectwfService,
+    private flatpickrService: FlatpickrService
   ) {
 
   }
@@ -124,8 +132,41 @@ export class ScopeComponent implements OnInit {
       this.populatePrudentialCategoryTypes();
       this.populateFirmScopeTypes();
       this.switchScopeTab('Licensed');
-    })
 
+      this.firmDetailsService.isFirmLicensed$.subscribe(
+        (value) => (this.isFirmLicensed = value)
+      );
+      this.firmDetailsService.isFirmAuthorised$.subscribe(
+        (value) => (this.isFirmAuthorised = value)
+      );
+      this.firmDetailsService.loadAssignedUserRoles(this.userId).subscribe({
+        next: (roles) => {
+          this.assignedUserRoles = roles.response;
+        },
+        error: (error) => console.error('Error in scope component:', error)
+      });
+
+      this.firmDetailsService.checkFirmLicense(this.firmId);
+      this.firmDetailsService.checkFirmAuthorisation(this.firmId);
+    })
+  }
+
+  ngAfterViewInit() {
+    this.dateInputs.changes.subscribe(() => {
+      this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+    });
+    this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+  }
+
+  loadFirmDetails(firmId: number) {
+    this.firmDetailsService.loadFirmDetails(firmId).subscribe(
+      data => {
+        this.firmDetails = data.firmDetails;
+      },
+      error => {
+        console.error(error);
+      }
+    );
   }
 
 
@@ -133,20 +174,8 @@ export class ScopeComponent implements OnInit {
     return this.firmService.isNullOrEmpty(value);
   }
 
-  removeHtmlTags(value){
+  removeHtmlTags(value) {
     return this.firmService.removeHtmlTags(value);
-  }
-
-  loadFirmDetails(firmId: number) {
-    this.firmDetailsService.loadFirmDetails(firmId).subscribe(
-      data => {
-        this.firmDetails = data.firmDetails;
-        this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
-      },
-      error => {
-        console.error(error);
-      }
-    );
   }
 
   getLicScopePreviousVersions(firmId: number, firmApplicationTypeId: number) {
@@ -344,6 +373,7 @@ export class ScopeComponent implements OnInit {
   }
 
 
+  // On View Mode
   loadActivitiesAuthorized(): Promise<void> {
     this.isLoading = true; // Start loading indicator 
 
@@ -395,7 +425,7 @@ export class ScopeComponent implements OnInit {
             this.loadPrudentialCategoryDetails(),
             this.loadSectorDetails(),
             this.loadIslamicFinance(),
-            this.loadScopeOfAuth(),
+            this.loadScopeOfAuthDoc(),
             this.loadFormReference(),
           ]).subscribe(
             () => {
@@ -503,21 +533,30 @@ export class ScopeComponent implements OnInit {
     );
   }
 
-  loadScopeOfAuth() {
+  loadScopeOfAuthDoc() {
     const firstActivity = this.ActivityAuth[0];
-    this.objectWF.getDocument(this.Page.Scope,firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
-
+    this.objectWF.getDocument(this.Page.Scope, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
     ).subscribe(
       data => {
-        this.AuthTableDocument = data.response;
+        this.scopeOfAuthTableDoc = data.response;
         console.log('Document Data:', data);
-
       },
       error => {
         console.error('Error loading document:', error);
+        this.scopeOfAuthTableDoc = [];
 
       }
     );
+  }
+
+  // Added by Moe
+  fetchSubTypeDocIDs() {
+    this.securityService.getObjectTypeTable(constants.docSubTypes).subscribe(data => {
+      // Scope Of Authorsation in Scope Authorised
+      this.fetchedScopeDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
+        item.DocSubTypeID === 262
+      );
+    });
   }
 
   loadFormReference() {
@@ -591,28 +630,28 @@ export class ScopeComponent implements OnInit {
       // Logic for showing or hiding the "Vary Scope" button
       if (!(this.firmService.isNullOrEmpty(this.ActivityLicensed[0].ScopeAppliedDate)) && !(this.firmService.isNullOrEmpty(this.ActivityLicensed[0].ScopeLicensedDate))) {
         if (this.currentDate > this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate)) {
-          this.showVaryBtn = true;
+          this.hideReviseBtn = true;
           this.disableApplicationDate = false;
         } else {
-          this.showVaryBtn = false;
+          this.hideReviseBtn = false;
           this.disableApplicationDate = true;
         }
       } else {
-        this.showVaryBtn = false;
+        this.hideReviseBtn = false;
         this.disableApplicationDate = true;
       }
     } else if (this.tabIndex === 1) {
       if (!(this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeApplicationDate)) && !(this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate))) {
         if (this.currentDateOnly > this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate)) {
           this.disableApplicationDate = false;  // Enable the field
-          this.showVaryBtn = true;
+          this.hideReviseBtn = true;
         } else {
           this.disableApplicationDate = true;  // Disable the field
-          this.showVaryBtn = false;
+          this.hideReviseBtn = false;
         }
       } else {
         this.disableApplicationDate = true;  // Enable if no authorisation date is present
-        this.showVaryBtn = false;
+        this.hideReviseBtn = false;
       }
     }
   }
@@ -620,14 +659,14 @@ export class ScopeComponent implements OnInit {
   validateLicenseScope() {
     // APPLICATION DATE VALIDATION
     if (this.firmService.isNullOrEmpty(this.ActivityLicensed[0].ScopeAppliedDate)) {
-      this.firmDetailsService.getErrorMessages('ScopeAppliedDate', constants.FirmActivitiesEnum.ENTER_VALID_APPLICATIONDATE);
+      this.loadErrorMessages('ScopeAppliedDate', constants.FirmActivitiesEnum.ENTER_VALID_APPLICATIONDATE);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['ScopeAppliedDate'];
     }
 
     if (this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate) < this.dateUtilService.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate)) {
-      this.firmDetailsService.getErrorMessages('ScopeAppliedDateLessThanFirmLicApplDate', constants.FirmActivitiesEnum.APPLICATIONDATE_LATER_COREDETAIL, this.dateUtilService.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate));
+      this.loadErrorMessages('ScopeAppliedDateLessThanFirmLicApplDate', constants.FirmActivitiesEnum.APPLICATIONDATE_LATER_COREDETAIL, this.dateUtilService.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate));
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['ScopeAppliedDateLessThanFirmLicApplDate'];
@@ -636,14 +675,14 @@ export class ScopeComponent implements OnInit {
     // EFFECTIVE DATE VALIDATION
     if (this.ActivityLicensed[0].ScopeEffectiveDate) {
       if (this.ActivityLicensed[0].ScopeEffectiveDate == null || this.ActivityLicensed[0].ScopeEffectiveDate == '') {
-        this.firmDetailsService.getErrorMessages('ScopeEffectiveDate', constants.FirmActivitiesEnum.ENTER_VALID_SCOPEEFFECTIVEDATE);
+        this.loadErrorMessages('ScopeEffectiveDate', constants.FirmActivitiesEnum.ENTER_VALID_SCOPEEFFECTIVEDATE);
         this.hasValidationErrors = true;
       } else {
         delete this.errorMessages['ScopeEffectiveDate'];
       }
     }
     if (this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeEffectiveDate) < this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate)) {
-      this.firmDetailsService.getErrorMessages('ScopeEffectiveDateLessThanApplicationDate', constants.FirmActivitiesEnum.ENTER_EFFECTIVEDATE_LATER_APPLICATIONDATE);
+      this.loadErrorMessages('ScopeEffectiveDateLessThanApplicationDate', constants.FirmActivitiesEnum.ENTER_EFFECTIVEDATE_LATER_APPLICATIONDATE);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['ScopeEffectiveDateLessThanApplicationDate'];
@@ -652,8 +691,8 @@ export class ScopeComponent implements OnInit {
     // ACTIVITY TYPE VALIDATION
     this.invalidActivity = this.ActivityLicensed.find(activity => activity.ActivityTypeID == 0);
     if (this.invalidActivity) {
-      this.firmDetailsService.getErrorMessages('ActivityTypeIDCORRECTION', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
-      this.firmDetailsService.getErrorMessages('ActivityTypeID', constants.FirmActivitiesEnum.SELECT_ACTIVITIES);
+      this.loadErrorMessages('ActivityTypeIDCORRECTION', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
+      this.loadErrorMessages('ActivityTypeID', constants.FirmActivitiesEnum.SELECT_ACTIVITIES);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['ActivityTypeID'];
@@ -695,6 +734,18 @@ export class ScopeComponent implements OnInit {
     }
   }
 
+  loadErrorMessages(fieldName: string, msgKey: number, activity?: any) {
+    this.firmDetailsService.getErrorMessages(fieldName, msgKey, activity).subscribe(
+      () => {
+        this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
+        console.log(`Error message for ${fieldName} loaded successfully`);
+      },
+      error => {
+        console.error(`Error loading error message for ${fieldName}:`, error);
+      }
+    );
+  }
+
   showError(messageKey: number) {
     this.firmDetailsService.showErrorAlert(messageKey, this.isLoading);
   }
@@ -720,7 +771,7 @@ export class ScopeComponent implements OnInit {
     );
     this.isLoading = false;
   }
-  
+
   prepareLicenseScopeObject(userId: number) {
     return {
       objFirmScope: {
@@ -731,7 +782,7 @@ export class ScopeComponent implements OnInit {
         createdBy: userId, //recheck
         docReferenceID: this.ActivityLicensed[0].docReferenceID ?? null,
         firmApplTypeID: 2, // licensed
-        docIDs: this.selectedDocId.toString(),
+        docIDs: this.selectedDocId == null ? null : this.selectedDocId.toString(),
         generalConditions: this.ActivityLicensed[0].GeneralConditions,
         effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityLicensed[0].ScopeCertificateLink,
@@ -929,7 +980,7 @@ export class ScopeComponent implements OnInit {
         this.loadActivityCategories();
         // Loop through each activity and load its activities based on FirmScopeTypeID
         this.ActivityAuth.forEach(activity => {
-          if (activity.FirmScopeTypeID) {
+          if (activity.CategoryID) {
             this.loadActivityTypes(activity);  // Load activities for each category
           }
         });
@@ -962,14 +1013,14 @@ export class ScopeComponent implements OnInit {
   }
 
   loadActivityTypes(activity: any) {
-    const firmScopeTypeID = activity.FirmScopeTypeID;
+    const categoryID = activity.CategoryID;
 
-    if (firmScopeTypeID) {
-      this.activityService.getAuthActivityTypes(firmScopeTypeID).subscribe(
+    if (categoryID) {
+      this.activityService.getAuthActivityTypes(categoryID).subscribe(
         data => {
           activity.activities = data.response;  // Set activities for the specific activity object
 
-          console.log(`Loaded activities for FirmScopeTypeID ${firmScopeTypeID}:`, activity.activities);
+          console.log(`Loaded activities for FirmScopeTypeID ${categoryID}:`, activity.activities);
 
           // Ensure the correct ActivityTypeID is selected
           if (activity.ActivityTypeID) {
@@ -981,12 +1032,12 @@ export class ScopeComponent implements OnInit {
             if (selectedActivity) {
               activity.ActivityTypeID = selectedActivity.ActivityTypeID;
             } else {
-              console.warn(`ActivityTypeID ${activity.ActivityTypeID} not found for FirmScopeTypeID ${firmScopeTypeID}`);
+              console.warn(`ActivityTypeID ${activity.ActivityTypeID} not found for FirmScopeTypeID ${categoryID}`);
             }
           }
         },
         error => {
-          console.error('Error fetching activities for FirmScopeTypeID:', firmScopeTypeID, error);
+          console.error('Error fetching activities for FirmScopeTypeID:', categoryID, error);
         }
       );
     }
@@ -1181,7 +1232,7 @@ export class ScopeComponent implements OnInit {
         createdBy: userId, //recheck
         docReferenceID: this.ActivityAuth[0].docReferenceID ?? null,
         firmApplTypeID: 3, // Authorised
-        docIDs: this.selectedDocId.toString(),
+        docIDs: this.selectedDocId == null ? null : this.selectedDocId.toString(),
         generalConditions: this.ActivityAuth[0].GeneralCondition,
         effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityAuth[0]?.ScopeCertificateLink,
@@ -1190,7 +1241,7 @@ export class ScopeComponent implements OnInit {
       },
       lstFirmActivities: this.existingPermittedActivites.map(activityAuth => ({
         createdBy: userId, //recheck
-        firmScopeTypeID: parseInt(activityAuth.FirmScopeTypeID),
+        firmScopeTypeID: null,
         activityTypeID: parseInt(activityAuth.ActivityTypeID),
         effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(activityAuth.ScopeEffectiveDate),
         firmActivityConditions: activityAuth.FirmActivityConditions,
@@ -1315,7 +1366,7 @@ export class ScopeComponent implements OnInit {
 
       // Validation for Application Date
       if (this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeApplicationDate)) {
-        this.firmDetailsService.getErrorMessages('ScopeAppliedDateAuth', constants.FirmActivitiesEnum.ENTER_VALID_APPLICATIONDATE);
+        this.loadErrorMessages('ScopeAppliedDateAuth', constants.FirmActivitiesEnum.ENTER_VALID_APPLICATIONDATE);
         this.hasValidationErrors = true;
       } else {
         delete this.errorMessages[('ScopeAppliedDateAuth')];
@@ -1324,7 +1375,7 @@ export class ScopeComponent implements OnInit {
       // Validation for Effective Date
       if (!(this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate)) && !(this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeEffectiveDate)) && this.currentDate > this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate)) {
         if (this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeEffectiveDate)) {
-          this.firmDetailsService.getErrorMessages('ScopeEffectiveDateAuth', constants.FirmActivitiesEnum.ENTER_VALID_SCOPEEFFECTIVEDATE);
+          this.loadErrorMessages('ScopeEffectiveDateAuth', constants.FirmActivitiesEnum.ENTER_VALID_SCOPEEFFECTIVEDATE);
           this.hasValidationErrors = true;
         } else {
           delete this.errorMessages[('ScopeEffectiveDateAuth')];
@@ -1334,7 +1385,7 @@ export class ScopeComponent implements OnInit {
       // Validation for Effective Date Later Application Date
       if (!(this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeApplicationDate)) && !(this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeEffectiveDate))) {
         if (this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate) < this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeApplicationDate)) {
-          this.firmDetailsService.getErrorMessages('EffectiveDateLaterApplicationDate', constants.FirmActivitiesEnum.ENTER_EFFECTIVEDATE_LATER_APPLICATIONDATE)
+          this.loadErrorMessages('EffectiveDateLaterApplicationDate', constants.FirmActivitiesEnum.ENTER_EFFECTIVEDATE_LATER_APPLICATIONDATE)
         } else {
           delete this.errorMessages[('EffectiveDateLaterApplicationDate')]
         }
@@ -1342,8 +1393,8 @@ export class ScopeComponent implements OnInit {
 
       // Check if the selected activity is valid (not "Select")
       if (activity.ActivityTypeID == 0) {
-        this.firmDetailsService.getErrorMessages('ActivityTypeID', constants.FirmActivitiesEnum.SELECT_ACTIVITIES, activity);
-        this.firmDetailsService.getErrorMessages('correctPermittedActivities', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
+        this.loadErrorMessages('ActivityTypeID', constants.FirmActivitiesEnum.SELECT_ACTIVITIES, activity);
+        this.loadErrorMessages('correctPermittedActivities', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
         this.hasValidationErrors = true;
       } else {
         delete activity.errorMessages['ActivityTypeID'];
@@ -1361,8 +1412,8 @@ export class ScopeComponent implements OnInit {
       // Validation for Activities
       // If the activity has no products or has products but none are selected, display an error
       if (hasNoProducts || (!hasNoProducts && !hasCheckedProducts)) {
-        this.firmDetailsService.getErrorMessages('Products', constants.FirmActivitiesEnum.SELECT_ATLEASTONE_PRODUCTS, activity);
-        this.firmDetailsService.getErrorMessages('correctPermittedActivities', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
+        this.loadErrorMessages('Products', constants.FirmActivitiesEnum.SELECT_ATLEASTONE_PRODUCTS, activity);
+        this.loadErrorMessages('correctPermittedActivities', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
         this.hasValidationErrors = true;
       } else {
         delete activity.errorMessages['Products'];
@@ -1371,7 +1422,7 @@ export class ScopeComponent implements OnInit {
     });
     // Validation for Prudential Effective Date
     if (this.firmService.isNullOrEmpty(this.ActivityAuth[0].PrudentialCategoryEffectiveDate)) {
-      this.firmDetailsService.getErrorMessages('PrudentialEffectiveDate', constants.FirmActivitiesEnum.ENTER_PRUDENTIAL_EFFECTIVEDATE);
+      this.loadErrorMessages('PrudentialEffectiveDate', constants.FirmActivitiesEnum.ENTER_PRUDENTIAL_EFFECTIVEDATE);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages[('PrudentialEffectiveDate')]
@@ -1379,7 +1430,7 @@ export class ScopeComponent implements OnInit {
 
     // Validation for Sector Effective Date
     if (this.firmService.isNullOrEmpty(this.ActivityAuth[0].SectorEffectiveDate)) {
-      this.firmDetailsService.getErrorMessages('SectorEffectiveDate', constants.FirmActivitiesEnum.ENTER_SECTOR_EFFECTIVEDATE);
+      this.loadErrorMessages('SectorEffectiveDate', constants.FirmActivitiesEnum.ENTER_SECTOR_EFFECTIVEDATE);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages[('SectorEffectiveDate')]
@@ -1387,7 +1438,7 @@ export class ScopeComponent implements OnInit {
 
     // Validation for Sector Effective Date
     if (this.firmService.isNullOrEmpty(this.ActivityAuth[0].SectorEffectiveDate)) {
-      this.firmDetailsService.getErrorMessages('SectorEffectiveDate', constants.FirmActivitiesEnum.ENTER_SECTOR_EFFECTIVEDATE);
+      this.loadErrorMessages('SectorEffectiveDate', constants.FirmActivitiesEnum.ENTER_SECTOR_EFFECTIVEDATE);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages[('SectorEffectiveDate')]
@@ -1395,10 +1446,17 @@ export class ScopeComponent implements OnInit {
 
     // Validation for Sector Effective Date
     if (parseInt(this.ActivityAuth[0].SectorTypeID) === 0) {
-      this.hasValidationErrors = true;
       this.errorMessages['SectorReturnType'] = 'Please select valid "Prudential Return Type".';
+      this.hasValidationErrors = true;
     } else {
       delete this.errorMessages[('SectorReturnType')]
+    }
+
+    if (parseInt(this.islamicFinance.IFinTypeId) === 0) {
+      this.loadErrorMessages('islamicType',constants.FirmActivitiesEnum.SELECT_ISLAMICFINANCE_TYPE);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages[('islamicType')]
     }
   }
 
@@ -1496,6 +1554,28 @@ export class ScopeComponent implements OnInit {
       popupWrapper.style.display = 'none';
     } else {
       console.error('Element with class .ScopeAuthPreviousVersionsPopup not found');
+    }
+  }
+
+  showSubActivitiesPopup(subActivities: any) {
+    this.callSubActivity = true;
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.SubActivitiesPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .SubActivitiesPopUp not found');
+      }
+    }, 0);
+  }
+
+  closeSubActivity() {
+    this.callSubActivity = false;
+    const popupWrapper = document.querySelector('.SubActivitiesPopUp') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none';
+    } else {
+      console.error('Element with class .SubActivitiesPopUp not found');
     }
   }
 
@@ -1733,7 +1813,7 @@ export class ScopeComponent implements OnInit {
       ScopeLicensedDate: this.ActivityLicensed[0].ScopeLicensedDate,
       ScopeRevNum: this.ActivityLicensed[0].ScopeRevNum,
     };
-    this.ActivityLicensed.push(this.newActivity);
+    this.ActivityLicensed.unshift(this.newActivity);
   }
 
   removeLicActivity(index: number) {
@@ -1943,65 +2023,8 @@ export class ScopeComponent implements OnInit {
     product.isChecked = product.subProducts.every(subProduct => subProduct.isChecked);
   }
 
-  onActivityChange(activity: any) {
-    const activityTypeID = activity.ActivityTypeID; // The selected activity ID
-
-    if (activityTypeID) {
-      console.log('Selected Activity ID:', activityTypeID);
-
-      // Fetch products for the selected activity
-      this.activityService.getAllProducts(activityTypeID).subscribe(
-        data => {
-          const products = data.response;
-
-          // If no products are returned, set categorizedProducts to null
-          if (!products || products.length === 0) {
-            activity.categorizedProducts = null;
-            console.log('No products found for the selected activity.');
-            return;
-          }
-
-          // Reset categorizedProducts to load new products
-          activity.categorizedProducts = [];
-          let currentCategory = null;
-
-          // Iterate through the products and categorize them
-          products.forEach(product => {
-            if (product.ID === 0) {
-              // If it's a main category, start a new group
-              currentCategory = {
-                mainCategory: product.ProductCategoryTypeDesc,
-                subProducts: []
-              };
-              activity.categorizedProducts.push(currentCategory);
-            } else if (currentCategory) {
-              const subProduct = { ...product }; // Copy product details
-
-              // Uncheck the product by default when loading
-              subProduct.isChecked = false;
-              subProduct.firmScopeTypeID = 1; // Default firmScopeTypeID
-
-              // Add the subProduct to the current category
-              currentCategory.subProducts.push(subProduct);
-            }
-          });
-
-          console.log('Loaded Products for Activity:', activity.categorizedProducts);
-        },
-        error => {
-          // If an error occurs, set categorizedProducts to null
-          console.error('Error fetching products for ActivityTypeID', error);
-          activity.categorizedProducts = null;
-        }
-      );
-    } else {
-      // If no activity is selected, clear the products
-      activity.categorizedProducts = null;
-    }
-  }
-
   onCategoryChange(activity: any) {
-    const selectedCategoryID = activity.FirmScopeTypeID; // The selected category ID
+    const selectedCategoryID = activity.CategoryID; // The selected category ID
     if (selectedCategoryID) {
       console.log('Selected Category ID:', selectedCategoryID);
 
@@ -2026,6 +2049,81 @@ export class ScopeComponent implements OnInit {
     }
   }
 
+  onActivityChange(activity: any) {
+    const activityTypeID = activity.ActivityTypeID; // The selected activity ID
+
+    if (activityTypeID) {
+      console.log('Selected Activity ID:', activityTypeID);
+
+      // Check if the activity is a parent
+      this.activityService.isParentActivity(activityTypeID).subscribe(response => {
+        this.isParentActivity = response.response.Column1;
+
+        if (this.isParentActivity) {
+          // If it's a parent activity, fetch sub-activities
+          this.activityService.getSubActivities(activityTypeID).subscribe(subActivityData => {
+            this.subActivities = subActivityData.response;
+            console.log('Loaded Sub-Activities:', this.subActivities);
+
+            // Display the sub-activities in a popup
+            this.showSubActivitiesPopup(this.subActivities);
+          }, error => {
+            console.error('Error fetching sub-activities:', error);
+          });
+        }
+
+        // Fetch products for the selected activity
+        this.activityService.getAllProducts(activityTypeID).subscribe(
+          data => {
+            const products = data.response;
+
+            // If no products are returned, set categorizedProducts to null
+            if (!products || products.length === 0) {
+              activity.categorizedProducts = null;
+              console.log('No products found for the selected activity.');
+              return;
+            }
+
+            // Reset categorizedProducts to load new products
+            activity.categorizedProducts = [];
+            let currentCategory = null;
+
+            // Iterate through the products and categorize them
+            products.forEach(product => {
+              if (product.ID === 0) {
+                // If it's a main category, start a new group
+                currentCategory = {
+                  mainCategory: product.ProductCategoryTypeDesc,
+                  subProducts: []
+                };
+                activity.categorizedProducts.push(currentCategory);
+              } else if (currentCategory) {
+                const subProduct = { ...product }; // Copy product details
+
+                // Uncheck the product by default when loading
+                subProduct.isChecked = false;
+                subProduct.firmScopeTypeID = 1; // Default firmScopeTypeID
+
+                // Add the subProduct to the current category
+                currentCategory.subProducts.push(subProduct);
+              }
+            });
+
+            console.log('Loaded Products for Activity:', activity.categorizedProducts);
+          },
+          error => {
+            // If an error occurs, set categorizedProducts to null
+            console.error('Error fetching products for ActivityTypeID', error);
+            activity.categorizedProducts = null;
+          }
+        );
+      });
+    } else {
+      // If no activity is selected, clear the products
+      activity.categorizedProducts = null;
+    }
+  }
+
   toggleCollapse(section: string) {
     this.isCollapsed[section] = !this.isCollapsed[section];
   }
@@ -2046,111 +2144,156 @@ export class ScopeComponent implements OnInit {
     });
   }
 
-    // [Aicha] : Documents Functions to be moved to document component later
-    selectDocument() {
-      this.callUploadDoc = true;
-      setTimeout(() => {
-        const popupWrapper = document.querySelector('.selectDocumentPopUp') as HTMLElement;
-        if (popupWrapper) {
-          popupWrapper.style.display = 'flex';
-        } else {
-          console.error('Element with class .selectDocumentPopUp not found');
-        }
-      }, 0)
-    }
-  
-    closeSelectDocument() {
-      this.callUploadDoc = false;
-      const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
-      setTimeout(() => {
-        if (popupWrapper) {
-          popupWrapper.style.display = 'none';
-        } else {
-          console.error('Element with class not found');
-        }
-      }, 0)
-    }
-  
-    uploadDocument() {
-      if (!this.selectedFile) {
-        this.showError(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
-        this.firmDetailsService.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
+  // [Aicha] : Documents Functions to be moved to document component later
+  selectDocument() {
+    this.callUploadDoc = true;
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.selectDocumentPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
       } else {
-        delete this.errorMessages['uploadDocument'];
+        console.error('Element with class .selectDocumentPopUp not found');
       }
-    }
-  
-    onFileSelected(event: Event) {
-      const input = event.target as HTMLInputElement;
-      if (input.files?.length) {
-        const file = input.files[0];
-        if (file.type === 'application/pdf') {
-          this.selectedFile = file;
-          this.fileError = ''; // Clear any previous error message
-        } else {
-          this.fileError = 'Please select a valid PDF file.';
-          this.selectedFile = null;
-        }
-      }
-    }
-    
-    confirmUpload() {
-      if (this.selectedFile) {
-        // Display the selected file name in the main section
-        const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
-        if (uploadedDocumentsDiv) {
-          uploadedDocumentsDiv.textContent = `Uploaded Document: ${this.selectedFile.name}`;
-        }
-        this.closeSelectDocument();
+    }, 0)
+  }
+
+  closeSelectDocument() {
+    this.callUploadDoc = false;
+    const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
+    setTimeout(() => {
+      if (popupWrapper) {
+        popupWrapper.style.display = 'none';
       } else {
-        console.error('No valid PDF file selected.');
+        console.error('Element with class not found');
+      }
+    }, 0)
+  }
+
+  uploadDocument() {
+    if (!this.selectedFile) {
+      this.showError(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.loadErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
+    } else {
+      delete this.errorMessages['uploadDocument'];
+    }
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      const file = input.files[0];
+      if (file.type === 'application/pdf') {
+        this.selectedFile = file;
+        this.fileError = ''; // Clear any previous error message
+      } else {
+        this.fileError = 'Please select a valid PDF file.';
+        this.selectedFile = null;
+      }
+    }
+  }
+
+  confirmUpload() {
+    if (this.selectedFile) {
+      // Display the selected file name in the main section
+      const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
+      if (uploadedDocumentsDiv) {
+        uploadedDocumentsDiv.textContent = `Uploaded Document: ${this.selectedFile.name}`;
+      }
+      this.closeSelectDocument();
+    } else {
+      console.error('No valid PDF file selected.');
+    }
+  }
+
+
+  getFormReferenceDocuments() {
+    this.isLoading = true;
+    let DocType: number[] = [];
+    if (this.tabIndex === 0) { //Licensed tab
+      if (this.ActivityLicensed[0].ScopeRevNum > 1) {
+        DocType.push(constants.DocumentType.Q13);
+      } else {
+        DocType.push(constants.DocumentType.Q01);
+        DocType.push(constants.DocumentType.Q02);
+      }
+    } else if (this.tabIndex === 1) {
+      if (this.ActivityAuth[0].ScopeRevNum > 1) {
+        DocType.push(constants.DocumentType.Q13);
+      } else {
+        DocType.push(constants.DocumentType.Q02);
       }
     }
 
+    const docTypeString = DocType.join(',');
+    this.logForm.getDocListByFirmDocType(this.firmId, docTypeString).subscribe(data => {
+      this.formReferenceDocs = data.response;
 
-    getFormReferenceDocuments() {
-      this.isLoading = true;
-      let DocType: number[] = [];
-      if (this.tabIndex === 0) { //Licensed tab
-        if (this.ActivityLicensed[0].ScopeRevNum > 1) {
-          DocType.push(constants.DocumentType.Q13);
-        } else {
-          DocType.push(constants.DocumentType.Q01);
-          DocType.push(constants.DocumentType.Q02);
-        }
-      } else if (this.tabIndex === 1) {
-        if (this.ActivityAuth[0].ScopeRevNum > 1) {
-          DocType.push(constants.DocumentType.Q13);
-        } else {
-          DocType.push(constants.DocumentType.Q02);
-        }
+      const existingDoc = this.formReferenceDocs.find(doc => doc.FILENAME === this.documentDetails?.FileName);
+      if (existingDoc) {
+        this.selectedDocId = existingDoc.DocID;
       }
-      
-      const docTypeString = DocType.join(',');
-      this.logForm.getDocListByFirmDocType(this.firmId,docTypeString).subscribe(data => {
-        this.formReferenceDocs = data.response;
-  
-        const existingDoc = this.formReferenceDocs.find(doc => doc.FILENAME === this.documentDetails?.FileName);
-        if (existingDoc) {
-          this.selectedDocId = existingDoc.DocID;
-        }
-  
-        console.log('Form Reference Docs: ',this.formReferenceDocs);
-        this.isLoading = false;
-      }, error => {
-        this.formReferenceDocs = []; //reintalize the array if it doesn't exist
-        console.error('Error Fetching Form Reference Docs: ',error);
-        this.isLoading = false;
-      })
-      this.callRefForm = true;
-      setTimeout(() => {
-        const popupWrapper = document.querySelector('.ReferenceFormPopUp') as HTMLElement;
-        if (popupWrapper) {
-          popupWrapper.style.display = 'flex';
-        } else {
-          console.error('Element with class .ReferenceFormPopUp not found');
-        }
-      }, 0)
-    }
 
+      console.log('Form Reference Docs: ', this.formReferenceDocs);
+      this.isLoading = false;
+    }, error => {
+      this.formReferenceDocs = []; //reintalize the array if it doesn't exist
+      console.error('Error Fetching Form Reference Docs: ', error);
+      this.isLoading = false;
+    })
+    this.callRefForm = true;
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.ReferenceFormPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .ReferenceFormPopUp not found');
+      }
+    }, 0)
+  }
+
+
+  closeFormReference() {
+    this.callRefForm = false;
+    const popupWrapper = document.querySelector('.ReferenceFormPopUp') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none';
+    } else {
+      console.error('Element with class .ReferenceFormPopUp not found');
+    }
+  }
+
+  replaceDocument(): void {
+    if (this.selectedDocId) {
+      const selectedDoc = this.formReferenceDocs.find(doc => doc.DocID === this.selectedDocId);
+      if (selectedDoc) {
+        this.documentDetails = {
+          FileName: selectedDoc.FILENAME,
+          Column3: selectedDoc.FileLoc
+        };
+
+        console.log('Document replaced with:', selectedDoc);
+        this.closeFormReference();
+      } else {
+        console.error('Selected document not found.');
+      }
+    } else {
+      this.closeFormReference();
+      console.warn('No document selected.');
+    }
+  }
+
+  deSelectDocument(): void {
+    if (this.selectedDocId) {
+      this.selectedDocId = null;
+
+      this.documentDetails = {
+        FileName: '',
+        Column3: ''
+      };
+      this.closeFormReference();
+      console.log('Document de-selected and removed.');
+    } else {
+      console.warn('No document is currently selected.');
+    }
+  }
 }

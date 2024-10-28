@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import Swal from 'sweetalert2';
@@ -7,6 +7,7 @@ import { FirmDetailsService } from '../firmsDetails.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { ParententityService } from 'src/app/ngServices/parententity.service';
 import * as constants from 'src/app/app-constants';
+import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 
 @Component({
   selector: 'app-auditors',
@@ -14,6 +15,8 @@ import * as constants from 'src/app/app-constants';
   styleUrls: ['./auditors.component.scss','../firms.scss']
 })
 export class AuditorsComponent {
+
+  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   userId = 30; // Replace with dynamic userId as needed
   firmId: number = 0;
@@ -50,7 +53,8 @@ export class AuditorsComponent {
     private route: ActivatedRoute,
     private firmService: FirmService,
     private firmDetailsService: FirmDetailsService,
-    private dateUtilService: DateUtilService
+    private dateUtilService: DateUtilService,
+    private flatpickrService: FlatpickrService
   ) {
 
   }
@@ -66,6 +70,12 @@ export class AuditorsComponent {
     })
   }
 
+  ngAfterViewInit() {
+    this.dateInputs.changes.subscribe(() => {
+      this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+    });
+    this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+  }
 
   loadFirmDetails(firmId: number) {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
