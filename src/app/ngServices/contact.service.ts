@@ -37,4 +37,8 @@ export class ContactService {
     const url = `${this.baseUrlContact}get_entity_types_by_firmId?firmId=${firmId}`
     return this.http.get<any>(url);
   }
+  getPopulateAis(firmId: number): Observable<any> {
+    const url = `${this.baseUrlContact}get_populate_ais?firmId=${firmId}`
+    return this.http.get<any>(url);
+  }
 }

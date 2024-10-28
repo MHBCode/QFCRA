@@ -281,7 +281,10 @@ export class ViewFirmPageComponent implements OnInit {
 
   /* loader flag */
   isLoading: boolean = false;
-
+  // contact section 
+  contactTypeOption: any = [];
+  MethodofContactOption: any = [];
+  AllAvilabilContact: any = [];
   //  individuals section
   AllapprovedIndividuals: any = [];
   withdrawnIndividuals: { [key: string]: any[] } = {};
@@ -375,7 +378,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.getAllRegulater(this.Address.countryID, this.firmId);
       this.getAllContactFromByFrimsId();
 
-      
+
     });
   }
   ngOnChanges(): void {
@@ -516,6 +519,9 @@ export class ViewFirmPageComponent implements OnInit {
         if (this.FIRMContacts.length === 0) {
           this.loadContacts();
         }
+        this.getContactType();
+        this.getPreferredMethodofContact();
+        this.getAvilabilContact();
         break;
       case FrimsObject.Controller:
         this.showSection(this.controllerSection);
@@ -2374,9 +2380,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.displayInactiveContacts = event.target.checked;
   }
 
-  closeContactPopup() {
-    this.isPopupVisible = false;
-  }
+ 
   saveContactPopupChanges(): void {
     // Prepare the selectedContact object (which is bound to the form) to be saved
     const contactDetails = {
@@ -2912,7 +2916,7 @@ export class ViewFirmPageComponent implements OnInit {
             entitySubTypeID: this.selectedController.EntitySubTypeID,
             relatedEntityTypeID: this.selectedController.EntityTypeID,
             relatedEntityEntityID: this.selectedController.RelatedEntityEntityID,
-            myState: this.selectedController.myState,
+            myState: 3,
             LegalStatusTypeID: this.selectedController.LegalStatusTypeID,
             LegalStatusTypeDesc: this.selectedController.LegalStatusTypeDesc,
             placeOfIncorporation: this.selectedController.PlaceOfIncorporation,
@@ -3024,8 +3028,8 @@ export class ViewFirmPageComponent implements OnInit {
           contactDetails: {
             contactDetails: {
               firmID: this.firmId,
-              contactID: null,
-              contactAssnID: null,
+              contactID: 0,
+              contactAssnID: 0,
               AdditionalDetails: 'test',
               BusPhone: 'test',
               BusEmail: 'test',
@@ -3051,7 +3055,7 @@ export class ViewFirmPageComponent implements OnInit {
               dateOfBirth: this.convertDateToYYYYMMDD(this.selectedController.DateOfBirth),
               fullName: null,
               lastModifiedBy: this.userId,
-              MyState: 0,
+              MyState: 3,
               nationalID: null,
               nationality: null,
               EntityID: this.firmId,
@@ -3103,7 +3107,7 @@ export class ViewFirmPageComponent implements OnInit {
             objAis: null
           }))
         };
-
+        console.log("IndividualObj to be saved", saveControllerPopupChangesIndividualObj)
         // Call the save/update contact form endpoint
         this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
           response => {
@@ -6560,7 +6564,40 @@ export class ViewFirmPageComponent implements OnInit {
   isNullOrEmpty(value: any): boolean {
     return value === null || value === '';
   }
+  // Yazan Contact firms
+  closeContactPopup() {
+    this.isPopupVisible = false;
+  }
+  getAvilabilContact(): void {
+    this.contactService.getPopulateAis(this.firmId).subscribe(data => {
+      this.AllAvilabilContact = data.response;
+      console.log("AllAvilabilContact", this.AllAvilabilContact)
+    }, error => {
+      console.error("Error fetching ContactFrom", error);
+    });
+  }
 
+  getContactType(): void {
+    this.securityService.getobjecttypetableEdit(this.userId, constants.ContactTypes, 40)
+      .subscribe(data => {
+        this.contactTypeOption = data.response;
+        console.log("Controllers", data)
+      }, error => {
+        console.error("Error fetching Controllers", error);
+      });
+  }
+  getPreferredMethodofContact(): void {
+    this.securityService.getobjecttypetableEdit(this.userId, constants.PreferredMethodofContact, 40)
+      .subscribe(data => {
+        this.MethodofContactOption = data.response;
+        console.log("Controllers", data)
+      }, error => {
+        console.error("Error fetching Controllers", error);
+      });
+  }
+  CreateContactIbj = {
+    
+  }
   createContact() {
     this.showCreateContactSection = true;
   }
