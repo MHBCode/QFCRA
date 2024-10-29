@@ -293,35 +293,35 @@
                         </td>
                     </tr>
                     <tr>
-                        <th class="aligned-column">Applied On</th>
-                        <th class="aligned-column">Licensed On</th>
-                        <th class="aligned-column">Current Status</th>
-                        <th class="aligned-column">Current Status Effective Date</th>
-                        <th class="aligned-column">Last Modified By</th>
-                        <th class="aligned-column">Last Modified Date</th>
+                        <th class="text-center">Applied On</th>
+                        <th class="text-center">Licensed On</th>
+                        <th class="text-center">Current Status</th>
+                        <th class="text-center">Current Status Effective Date</th>
+                        <th class="text-center">Last Modified By</th>
+                        <th class="text-center">Last Modified Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
+                        <td class="text-center">
                             {{
                             firmAppDetailsCurrentLicensed?.AppliedOn | date: 'dd/MMM/y'
                             }}
                         </td>
-                        <td>
+                        <td class="text-center">
                             {{
                             firmAppDetailsCurrentLicensed?.GrantedOn | date: 'dd/MMM/y'
                             }}
                         </td>
-                        <td>{{ firmAppDetailsCurrentLicensed?.RecentStatus }}</td>
-                        <td>
+                        <td class="text-center">{{ firmAppDetailsCurrentLicensed?.RecentStatus }}</td>
+                        <td class="text-center">
                             {{
                             firmAppDetailsCurrentLicensed?.RecentStatusDate
                             | date: 'dd/MMM/y'
                             }}
                         </td>
-                        <td>{{ firmAppDetailsCurrentLicensed?.LastModifiedBy }}</td>
-                        <td>{{ firmAppDetailsCurrentLicensed?.LastModifiedDate }}</td>
+                        <td class="text-center">{{ firmAppDetailsCurrentLicensed?.LastModifiedBy }}</td>
+                        <td class="text-center">{{ firmAppDetailsCurrentLicensed?.LastModifiedDate }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -335,35 +335,35 @@
                         </td>
                     </tr>
                     <tr>
-                        <th class="aligned-column">Applied On</th>
-                        <th class="aligned-column">Authorised On</th>
-                        <th class="aligned-column">Current Status</th>
-                        <th class="aligned-column">Current Status Effective Date</th>
-                        <th class="aligned-column">Last Modified By</th>
-                        <th class="aligned-column">Last Modified Date</th>
+                        <th class="text-center">Applied On</th>
+                        <th class="text-center">Authorised On</th>
+                        <th class="text-center">Current Status</th>
+                        <th class="text-center">Current Status Effective Date</th>
+                        <th class="text-center">Last Modified By</th>
+                        <th class="text-center">Last Modified Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
+                        <td class="text-center">
                             {{
                             firmAppDetailsCurrentAuthorized?.AppliedOn | date: 'dd/MMM/y'
                             }}
                         </td>
-                        <td>
+                        <td class="text-center">
                             {{
                             firmAppDetailsCurrentAuthorized?.GrantedOn | date: 'dd/MMM/y'
                             }}
                         </td>
-                        <td>{{ firmAppDetailsCurrentAuthorized?.RecentStatus }}</td>
-                        <td>
+                        <td class="text-center">{{ firmAppDetailsCurrentAuthorized?.RecentStatus }}</td>
+                        <td class="text-center">
                             {{
                             firmAppDetailsCurrentAuthorized?.RecentStatusDate
                             | date: 'dd/MMM/y'
                             }}
                         </td>
-                        <td>{{ firmAppDetailsCurrentAuthorized?.LastModifiedBy }}</td>
-                        <td>{{ firmAppDetailsCurrentAuthorized?.LastModifiedDate }}</td>
+                        <td class="text-center">{{ firmAppDetailsCurrentAuthorized?.LastModifiedBy }}</td>
+                        <td class="text-center">{{ firmAppDetailsCurrentAuthorized?.LastModifiedDate }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -693,22 +693,22 @@
                 <tr>
                     <th>Firm</th>
                     <th>Financial Year End</th>
-                    <th class="date-center">Financial Year Effective From</th>
-                    <th class="date-center">Financial Year Effective To</th>
+                    <th class="text-center">Financial Year Effective From</th>
+                    <th class="text-center">Financial Year Effective To</th>
                     <th>Modified By</th>
-                    <th class="date-center">Modified Date</th>
+                    <th class="text-center">Modified Date</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let FR of firmFYearHistory">
                     <td style="text-align: left">{{ FR?.FirmName }}</td>
                     <td style="text-align: left">{{ FR?.FirmFinYearEndTypeDesc }}</td>
-                    <td class="date-center">{{ FR?.FirmFinYearEndEffectiveFrom }}</td>
-                    <td class="date-center">
+                    <td class="text-center">{{ FR?.FirmFinYearEndEffectiveFrom }}</td>
+                    <td class="text-center">
                         {{ firmDetails?.FirmFinYearEndEffectiveTo }}
                     </td>
                     <td style="text-align: left">{{ FR?.UserName }}</td>
-                    <td class="date-center">{{ FR?.Column1 }}</td>
+                    <td class="text-center">{{ FR?.Column1 }}</td>
                 </tr>
             </tbody>
         </table>
@@ -731,22 +731,22 @@
                 <tr>
                     <th>Firm</th>
                     <th>Financial Standard</th>
-                    <th class="date-center">Financial Standard Effective From</th>
-                    <th class="date-center">Financial Standard Effective To</th>
+                    <th class="text-center">Financial Standard Effective From</th>
+                    <th class="text-center">Financial Standard Effective To</th>
                     <th>Modified By</th>
-                    <th class="date-center">Modified Date</th>
+                    <th class="text-center">Modified Date</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let AS of firmAccountingStandardHistory">
                     <td style="text-align: left">{{ AS?.FirmName }}</td>
                     <td style="text-align: left">{{ AS?.FinAccStdTypeDesc }}</td>
-                    <td class="date-center">{{ AS?.FirmFinYearEndEffectiveFrom }}</td>
-                    <td class="date-center">
+                    <td class="text-center">{{ AS?.FirmFinYearEndEffectiveFrom }}</td>
+                    <td class="text-center">
                         {{ firmDetails?.FirmFinYearEndEffectiveTo }}
                     </td>
                     <td style="text-align: left">{{ AS?.UserName }}</td>
-                    <td class="date-center">{{ AS?.Column1 }}</td>
+                    <td class="text-center">{{ AS?.Column1 }}</td>
                 </tr>
             </tbody>
         </table>
@@ -769,9 +769,9 @@
             <thead>
                 <tr>
                     <th>Status</th>
-                    <th class="date-center">Status Date</th>
+                    <th class="text-center">Status Date</th>
                     <th>Last Modified By</th>
-                    <th class="date-center">Last Modified Date</th>
+                    <th class="text-center">Last Modified Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -779,11 +779,11 @@
                     <td style="text-align: left">
                         {{ LicenseDetailsHistory.FirmApplStatusTypeDesc }}
                     </td>
-                    <td class="date-center">
+                    <td class="text-center">
                         {{ LicenseDetailsHistory.FirmApplStatusDate }}
                     </td>
                     <td>{{ LicenseDetailsHistory.LastModifiedByUser }}</td>
-                    <td class="date-center">
+                    <td class="text-center">
                         {{ LicenseDetailsHistory.LastModifiedDate }}
                     </td>
                 </tr>
@@ -797,10 +797,10 @@
             <thead>
                 <tr>
                     <th>Status</th>
-                    <th class="date-center">Status Date</th>
+                    <th class="text-center">Status Date</th>
                     <th>Press Release</th>
                     <th>Last Modified By</th>
-                    <th class="date-center">Last Modified Date</th>
+                    <th class="text-center">Last Modified Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -808,12 +808,12 @@
                     <td style="text-align: left">
                         {{ AuthDetailsHistory.FirmApplStatusTypeDesc }}
                     </td>
-                    <td class="date-center">
+                    <td class="text-center">
                         {{ AuthDetailsHistory.FirmApplStatusDate }}
                     </td>
                     <td>{{ firmDetails?.PressReleaseLink }}</td>
                     <td>{{ AuthDetailsHistory.LastModifiedByUser }}</td>
-                    <td class="date-center">{{ AuthDetailsHistory.LastModifiedDate }}</td>
+                    <td class="text-center">{{ AuthDetailsHistory.LastModifiedDate }}</td>
                 </tr>
             </tbody>
         </table>
@@ -842,15 +842,15 @@
       <thead>
         <tr>
           <th>Address</th>
-          <th class="date-center">Created Date</th>
-          <th class="date-center">Modified Date</th>
+          <th class="text-center">Created Date</th>
+          <th class="text-center">Modified Date</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let addressHistory of firmAddressesTypeHistory">
           <td>{{ addressHistory?.ShortAddress }}</td>
-          <td class="date-center">{{ addressHistory?.CreatedDate }}</td>
-          <td class="date-center">
+          <td class="text-center">{{ addressHistory?.CreatedDate }}</td>
+          <td class="text-center">
             {{ addressHistory?.LastModifiedDate }}
           </td>
         </tr>

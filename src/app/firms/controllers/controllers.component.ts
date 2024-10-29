@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { FrimsObject } from 'src/app/app-constants';
 import { FirmService } from '../firm.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,6 +11,7 @@ import { ContactService } from 'src/app/ngServices/contact.service';
 import { ParententityService } from 'src/app/ngServices/parententity.service';
 import { AddressesService } from 'src/app/ngServices/addresses.service';
 import Swal from 'sweetalert2';
+import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 
 @Component({
   selector: 'app-controllers',
@@ -18,6 +19,9 @@ import Swal from 'sweetalert2';
   styleUrls: ['./controllers.component.scss','../firms.scss']
 })
 export class ControllersComponent implements OnInit{
+  
+  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   Page = FrimsObject;
   firmDetails: any;
   userId = 30;
@@ -67,7 +71,8 @@ export class ControllersComponent implements OnInit{
     private contactService: ContactService,
     private parentEntity: ParententityService,
     private addressService: AddressesService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private flatpickrService: FlatpickrService
   ) {
 
   }
@@ -93,6 +98,12 @@ export class ControllersComponent implements OnInit{
 
   }
 
+  ngAfterViewInit() {
+    this.dateInputs.changes.subscribe(() => {
+      this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+    });
+    this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+  }
 
   loadFirmDetails(firmId: number) {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(

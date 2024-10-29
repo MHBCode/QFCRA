@@ -1,20 +1,29 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { FirmService } from './firm.service'; // Assuming FirmService makes the HTTP call
 import { DateUtilService } from '../shared/date-util/date-util.service';
 import { LogformService } from '../ngServices/logform.service';
 import Swal from 'sweetalert2';
 import { SecurityService } from '../ngServices/security.service';
 import * as constants from 'src/app/app-constants';
+import { ApplicationService } from '../ngServices/application.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FirmDetailsService {
   firmDetails: any;
+  assignedUserRoles: any[] = [];
+  private isFirmLicensedSubject = new BehaviorSubject<boolean>(false);
+  private isFirmAuthorisedSubject = new BehaviorSubject<boolean>(false);
+
+  // Expose these as Observables to components
+  isFirmLicensed$ = this.isFirmLicensedSubject.asObservable();
+  isFirmAuthorised$ = this.isFirmAuthorisedSubject.asObservable();
+
   errorMessages: { [key: string]: string } = {};
 
-  constructor(private firmService: FirmService,private dateUtilService: DateUtilService,private logForm: LogformService,private securityService: SecurityService) {}
+  constructor(private firmService: FirmService, private dateUtilService: DateUtilService, private logForm: LogformService, private securityService: SecurityService, private applicationService: ApplicationService) { }
 
   loadFirmDetails(firmId: number): Observable<any> {
     return new Observable(observer => {
@@ -48,19 +57,60 @@ export class FirmDetailsService {
     });
   }
 
+  // Added by Moe
+  checkFirmLicense(firmId: number) {
+    this.applicationService.isFirmLicensed(firmId).subscribe(
+      (response) => {
+        this.isFirmLicensedSubject.next(response.response);
+      },
+      (error) => {
+        console.error('Error checking firm license:', error);
+        this.isFirmLicensedSubject.next(false);
+      }
+    );
+  }
+
+  // Added by Moe
+  checkFirmAuthorisation(firmId: number) {
+    this.applicationService.isFirmAuthorised(firmId).subscribe(
+      (response) => {
+        this.isFirmAuthorisedSubject.next(response.response);
+      },
+      (error) => {
+        console.error('Error checking firm authorisation:', error);
+        this.isFirmAuthorisedSubject.next(false);
+      }
+    );
+  }
+
+
+  // Added by Moe
+  loadAssignedUserRoles(userId: number): Observable<any> {
+    return this.securityService.getUserRoles(userId).pipe(
+      tap((assignedRoles) => {
+        this.assignedUserRoles = assignedRoles.response;
+        console.log('Assigned roles:', this.assignedUserRoles);
+      }),
+      error => {
+        console.error('Error fetching assigned roles:', error);
+        return (error);
+      }
+    );
+  }
+
   getErrorMessages(fieldName: string, msgKey: number, activity?: any, placeholderValue?: string): Observable<void> {
     return new Observable(observer => {
       this.logForm.errorMessages(msgKey).subscribe(
         response => {
           let errorMessage = response.response;
-          
+
           // Replace placeholder values if provided
           if (placeholderValue) {
             errorMessage = errorMessage.replace("#Date#", placeholderValue)
-                                       .replace("##DateFieldLabel##", placeholderValue)
-                                       .replace("#ApplicationDate#", placeholderValue);
+              .replace("##DateFieldLabel##", placeholderValue)
+              .replace("#ApplicationDate#", placeholderValue);
           }
-          
+
           // Store in the errorMessages object and the provided activity
           this.errorMessages[fieldName] = errorMessage;
           if (activity) {
@@ -70,7 +120,7 @@ export class FirmDetailsService {
           observer.next();
         },
         error => {
-          console.error(`Failed to load error message for ${fieldName}.`, error);
+          console.error(error);
           observer.error(error);
         }
       );

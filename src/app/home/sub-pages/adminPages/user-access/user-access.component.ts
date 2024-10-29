@@ -95,7 +95,6 @@ export class UserAccessComponent implements OnInit {
 
 
   convertDateToYYYYMMDD(dateStr: string | Date): string | null {
-    console.log(dateStr);
 
     if (!dateStr) {
       return null; // Return null if the input is invalid or empty

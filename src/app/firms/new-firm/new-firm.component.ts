@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { LogformService } from 'src/app/ngServices/logform.service';
 import { FirmService } from '../firm.service';
+import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 
 @Component({
   selector: 'new-firm',
@@ -114,7 +115,12 @@ export class NewFirmComponent implements OnInit {
   /* error messages */
   errorMessages: { [key: string]: string } = {};
 
-  constructor(private firmService: FirmService, private securityService: SecurityService, private logForm: LogformService, private router: Router) { }
+  constructor(
+    private firmService: FirmService,
+    private securityService: SecurityService,
+    private logForm: LogformService,
+    private router: Router,
+    private flatpickrService: FlatpickrService) { }
 
 
   ngOnInit(): void {
@@ -130,29 +136,11 @@ export class NewFirmComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    // Ensure the query list is available
     this.dateInputs.changes.subscribe(() => {
-      this.initializeFlatpickr();
+      this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
     });
-    // Initialize Flatpickr if already available
-    this.initializeFlatpickr();
+    this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
   }
-
-  initializeFlatpickr() {
-    this.dateInputs.forEach((input: ElementRef<HTMLInputElement>) => {
-      input.nativeElement.placeholder = 'DD/MM/YYY';
-      flatpickr(input.nativeElement, {
-        allowInput: true,
-        dateFormat: 'd/M/Y', // Adjust date format as needed
-        onChange: (selectedDates, dateStr) => {
-          console.log('Selected Date:', selectedDates);
-          console.log('Formatted Date String:', dateStr);
-          input.nativeElement.value = dateStr;
-        }
-      });
-    });
-  }
-
 
   onPageload(): void {
     // Set default selected values
@@ -780,7 +768,6 @@ export class NewFirmComponent implements OnInit {
   }
 
   convertDateToYYYYMMDD(dateStr: string | Date): string | null {
-    console.log(dateStr);
 
     if (!dateStr) {
       return null; // Return null if the input is invalid or empty
