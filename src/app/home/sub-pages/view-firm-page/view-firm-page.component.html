@@ -2191,9 +2191,9 @@
                 <span style="color: red">*</span>
               </label>
               <div class="radio-wrapper">
-                <input name="isPEP" id="yes" type="radio" [value]="true" [(ngModel)]="selectedController.IsPEP" />
+                <input name="isPEP" id="yes" type="radio" [value]="true" [(ngModel)]="selectedController.isPEP" />
                 Yes
-                <input name="isPEP" id="no" type="radio" [value]="false" [(ngModel)]="selectedController.IsPEP" />
+                <input name="isPEP" id="no" type="radio" [value]="false" [(ngModel)]="selectedController.isPEP" />
                 No
               </div>
             </div>
@@ -2706,9 +2706,9 @@
                 <span style="color: red">*</span>
               </label>
               <div class="radio-wrapper">
-                <input name="isPEP" id="yes" type="radio" [value]="true" [(ngModel)]="CreatecontrollerDetails.IsPEP" />
+                <input name="isPEP" id="yes" type="radio" [value]="true" [(ngModel)]="CreatecontrollerDetails.isPEP" />
                 Yes
-                <input name="isPEP" id="no" type="radio" [value]="false" [(ngModel)]="CreatecontrollerDetails.IsPEP" />
+                <input name="isPEP" id="no" type="radio" [value]="false" [(ngModel)]="CreatecontrollerDetails.isPEP" />
                 No
               </div>
             </div>
@@ -3433,19 +3433,19 @@
           </div>
           <div class="input-field">
             <label for="firstName"> First Name</label>
-            <input name="firstName" id="firstName" type="text" />
+            <input name="firstName" id="firstName" type="text" [(ngModel)]="selectedController.FirstName"/>
           </div>
           <div class="input-field">
             <label for="SecondName"> Second Name</label>
-            <input name="SecondName" id="SecondName" type="text" />
+            <input name="SecondName" id="SecondName" type="text" [(ngModel)]="selectedController.SecondName"/>
           </div>
           <div class="input-field">
             <label for="FamilyName"> Family Name</label>
-            <input name="FamilyName" id="FamilyName" type="text" />
+            <input name="FamilyName" id="FamilyName" type="text" [(ngModel)]="selectedController.FamilyName"/>
           </div>
           <div class="input-field">
             <label for="MobilePhone">Mobile Phone</label>
-            <input name="MobilePhone" id="MobilePhone" type="text" />
+            <input name="MobilePhone" id="MobilePhone" type="text" [(ngModel)]="selectedController.FirstName"/>
           </div>
 
           <div class="input-field">
@@ -3455,7 +3455,7 @@
 
           <div class="input-field">
             <label for="BusinessPhone">Business Phone</label>
-            <input name="BusinessPhone" id="BusinessPhone" type="text" />
+            <input name="BusinessPhone" id="BusinessPhone" type="text"/>
           </div>
 
           <div class="input-field">
@@ -3622,7 +3622,7 @@
         <!-- Title -->
         <div class="popup-title-btn-row">
           <div class="popup-header">
-            <h3>Controller For {{ firmDetails?.FirmName }}</h3>
+            <h3>Contact For {{ firmDetails?.FirmName }}</h3>
           </div>
           <button (click)="closeContactPopup()" class="close-button">
             <i class="bi bi-x-circle close-icon"></i>
@@ -3631,16 +3631,30 @@
         </div>
         <div class="inputs-row">
           <div class="input-field">
+            <label for="contactFrom">Type of Control</label>
+            <ng-container *ngIf="isEditable; else typeOfControlDisplay">
+              <select required [(ngModel)]="selectedContact.entityName"
+                (ngModelChange)="updateControlTypeDesc($event)" name="contactFrom" id="contactFrom">
+                <option *ngFor="let ContactFrom of AllContactFrom"
+                  [value]="ContactFrom.EntityTypeID">
+                  {{ ContactFrom.EntityTypeName }}
+                </option>
+              </select>
+            </ng-container>
+            <ng-template #typeOfControlDisplay>
+              <input [value]="selectedContact.entityName" name="contactFrom" readonly />
+            </ng-template>
+          </div>
+          <!-- <div class="input-field">
             <label for="contactFrom">
               Contact From<span style="color: red">*</span>
             </label>
-            <select name="contactFrom" id="contactFrom" [(ngModel)]="selectedContact.entityID">
-              <option value="select" selected>Select</option>
+            <select name="contactFrom" id="contactFrom" [(ngModel)]="selectedContact.entityName" >
               <option *ngFor="let ContactFrom of AllContactFrom" [ngValue]="ContactFrom.EntityTypeID">
                 {{ ContactFrom.EntityTypeName }}
               </option>
             </select>
-          </div>
+          </div> -->
           <div class="input-field" style="width: 100%">
             <label for="isCIP">
               Is contact information being provided for an approved individual or an individual who has applied for
@@ -3648,9 +3662,9 @@
 
             </label>
             <div class="radio-wrapper">
-              <input name="isCIP" id="yes" type="radio" [value]="true" />
+              <input name="lstContactFunctions" id="yes" type="radio" [value]="true" [(ngModel)]="selectedContact.lstContactFunctions"/>
               Yes
-              <input name="isCIP" id="no" type="radio" [value]="false" />
+              <input name="lstContactFunctions" id="no" type="radio" [value]="false" [(ngModel)]="selectedContact.lstContactFunctions"/>
               No
             </div>
           </div>

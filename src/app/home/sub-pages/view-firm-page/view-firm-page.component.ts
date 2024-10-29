@@ -2409,7 +2409,7 @@ export class ViewFirmPageComponent implements OnInit {
       countryofBirth: this.selectedContact?.CountryofBirth,
       juridictionID: this.selectedContact?.JuridictionID,
       objectID: this.selectedContact?.ObjectID,
-      isPeP: this.selectedContact?.IsPeP,
+      isPEP: this.selectedContact?.isPEP,
     };
 
     console.log("Data to be saved:", contactDetails);
@@ -2944,6 +2944,7 @@ export class ViewFirmPageComponent implements OnInit {
             AssnDateFrom: this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
             AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
             LastModifiedByOfOtherEntity: 30,
+            isPEP: this.selectedController.isPEP,
           },
           addressList: this.existingControllerAddresses.map(address => ({
             firmID: this.firmId,
@@ -3029,8 +3030,8 @@ export class ViewFirmPageComponent implements OnInit {
           contactDetails: {
             contactDetails: {
               firmID: this.firmId,
-              contactID: 0,
-              contactAssnID: 0,
+              contactID: this.selectedController.OtherEntityID,
+              contactAssnID: this.selectedController.RelatedEntityID,
               AdditionalDetails: 'test',
               BusPhone: 'test',
               BusEmail: 'test',
@@ -3063,7 +3064,7 @@ export class ViewFirmPageComponent implements OnInit {
               passportNum: this.selectedController.PassportNum,
               placeOfBirth: this.selectedController.PlaceOfBirth,
               previousName: null,
-              isExists: false,
+              isExists: true,
               FunctionTypeId: 25,
               nameInPassport: null,
               contactAddnlInfoTypeID: null,
@@ -3071,7 +3072,7 @@ export class ViewFirmPageComponent implements OnInit {
               countryofBirth: null,
               juridictionID: null,
               objectID: this.selectedController.ObjectID,
-              isPeP: this.selectedController.IsPEP,
+              isPEP: this.selectedController.isPEP,
               AssnDateFrom: this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
               AssnDateTo: this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
@@ -3203,7 +3204,7 @@ export class ViewFirmPageComponent implements OnInit {
     PlaceOfBirth: '',
     DateOfBirth: '',
     PassportNum: '',
-    IsPEP: 0,
+    isPEP: true,
     IsPublicallyTraded: false,
     ControllerControlTypeID: 2,
     RegisteredNum: '',
@@ -3604,6 +3605,7 @@ export class ViewFirmPageComponent implements OnInit {
               AssnDateFrom: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
               AssnDateTo: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
+              isPEP: this.CreatecontrollerDetails.isPEP,
             },
             addressList: this.addressForms.map(address => ({
               firmID: this.firmId,
@@ -3737,7 +3739,7 @@ export class ViewFirmPageComponent implements OnInit {
               countryofBirth: null,
               juridictionID: null,
               objectID: this.CreatecontrollerDetails.ObjectID,
-              isPeP: this.CreatecontrollerDetails.IsPEP,
+              isPEP: this.CreatecontrollerDetails.isPEP,
               AssnDateFrom: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
               AssnDateTo: this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
               LastModifiedByOfOtherEntity: 30,
