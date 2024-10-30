@@ -141,7 +141,7 @@ export class ContactsComponent {
     const contactID = this.selectedContact.ContactID;
     const contactAssnID = this.selectedContact.ContactAssnID;
     
-    this.contactService.deleteContactDetails(firmTypeID, contactID, contactAssnID,30, output).subscribe(
+    this.contactService.deleteContactDetails(firmTypeID, contactID, contactAssnID,30).subscribe(
       (response) => {
         Swal.fire(
           'Deleted!',

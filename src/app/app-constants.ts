@@ -25,6 +25,8 @@ export const firmAuditorName = "V_Firm_AuditorName";
 export const firmAuditorType = "V_Firm_AuditorType";
 export const Regulaters = "V_Regulators";
 export const docSubTypes = "DocSubTypes";
+export const BLANK_DATE = "__/___/____";
+export const DataFieldLabel = "\"##DataFieldLable##\"";
 export const ContactTypes = "v_ContactTypes";
 export const PreferredMethodofContact = "ContactMethodTypes";
 export enum FirmLicenseApplStatusType {
@@ -105,9 +107,10 @@ export enum ControllerMessages {
     ENTER_VALID_PERCENTAGE = 4011,
     ENTER_PERCENTAGE_NOTEXCEED = 4012,
     ENTER_FIRSTNAME = 4013,
+    ENTER_FAMILYNAME= 4017,
     ENTER_REGISTEREDNUMBERCORPORATE = 4014,
     SELECT_TYPEOFCONTROL = 4015,
-
+    SELECT_ISPEP = 9024,
 }
 export enum FirmActivitiesEnum {
     ENTER_ALL_REQUIREDFIELDS = 3000,
