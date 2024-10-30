@@ -45,6 +45,7 @@ export class AuditorsComponent {
   firmAuditorType: { EntitySubTypeID: number, EntitySubTypeDesc: string }[] = [];
   objectOpTypeIdEdit = 41;
   objectOpTypeIdCreate = 40;
+  assignedUserRoles: any = [];
 
 
   constructor(
@@ -67,6 +68,21 @@ export class AuditorsComponent {
       if (this.FIRMAuditors.length === 0) {
         this.loadAuditors();
       }
+      this.firmDetailsService.isFirmLicensed$.subscribe(
+        (value) => (this.isFirmLicensed = value)
+      );
+      this.firmDetailsService.isFirmAuthorised$.subscribe(
+        (value) => (this.isFirmAuthorised = value)
+      );
+      this.firmDetailsService.loadAssignedUserRoles(this.userId).subscribe({
+        next: (roles) => {
+          this.assignedUserRoles = roles.response;
+        },
+        error: (error) => console.error('Error in scope component:', error)
+      });
+
+      this.firmDetailsService.checkFirmLicense(this.firmId);
+      this.firmDetailsService.checkFirmAuthorisation(this.firmId);
     })
   }
 

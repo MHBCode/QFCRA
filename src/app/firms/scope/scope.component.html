@@ -305,6 +305,9 @@
     <div class="authorized-body" [ngClass]="{ collapsed: isCollapsed['authorizeSection'] }">
       <div class="inputs-field-set scopeFor">
         <div class="error-messages">
+          <p *ngIf="errorMessages['correctPermittedActivities']">
+            {{ errorMessages['correctPermittedActivities'] }}
+          </p>
           <p *ngIf="errorMessages['ScopeAppliedDateAuth']">
             {{ errorMessages['ScopeAppliedDateAuth'] }}
           </p>
@@ -313,10 +316,7 @@
           </p>
           <p *ngIf="errorMessages['EffectiveDateLaterApplicationDate']">
             {{ errorMessages['EffectiveDateLaterApplicationDate'] }}
-          </p>
-          <p *ngIf="errorMessages['correctPermittedActivities']">
-            {{ errorMessages['correctPermittedActivities'] }}
-          </p>
+          </p>        
           <p *ngIf="errorMessages['PrudentialEffectiveDate']">
             {{ errorMessages['PrudentialEffectiveDate'] }}
           </p>
@@ -678,6 +678,9 @@
                 </p>
                 <p *ngIf="activity?.errorMessages?.['Products']">
                   {{ activity.errorMessages['Products'] }}
+                </p>
+                <p *ngIf="activity?.errorMessages?.['DuplicateActivity']">
+                  {{ activity.errorMessages['DuplicateActivity'] }}
                 </p>
               </div>
 

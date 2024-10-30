@@ -734,18 +734,6 @@ export class ScopeComponent implements OnInit {
     }
   }
 
-  loadErrorMessages(fieldName: string, msgKey: number, activity?: any) {
-    this.firmDetailsService.getErrorMessages(fieldName, msgKey, activity).subscribe(
-      () => {
-        this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
-        console.log(`Error message for ${fieldName} loaded successfully`);
-      },
-      error => {
-        console.error(`Error loading error message for ${fieldName}:`, error);
-      }
-    );
-  }
-
   showError(messageKey: number) {
     this.firmDetailsService.showErrorAlert(messageKey, this.isLoading);
   }
@@ -1361,11 +1349,24 @@ export class ScopeComponent implements OnInit {
 
   validateAuthScope() {
     this.hasValidationErrors = false;
-
+    // Set to check if there are duplicates activity ids added
+    const activityIdsSet = new Set<number>();
+    
 
     this.ActivityAuth.forEach(activity => {
       // Reset error messages for each activity
       activity.errorMessages = {};
+      const activityTypeIdAsNumber = Number(activity.ActivityTypeID);
+      if (activityIdsSet.has(activityTypeIdAsNumber)) {
+        // Flag duplicates and set a validation message
+        this.loadErrorMessages('DuplicateActivity', constants.FirmActivitiesEnum.ACTIVITY_ALREADY_SELECTED, activity,activity.ActivityTypeDescription);
+        this.loadErrorMessages('correctPermittedActivities', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
+        this.hasValidationErrors = true;
+      } else {
+        activityIdsSet.add(activityTypeIdAsNumber);
+        delete activity.errorMessages['DuplicateActivity'];
+        delete activity.errorMessages['correctPermittedActivities'];
+      }
 
       // Validation for Application Date
       if (this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeApplicationDate)) {
@@ -1403,6 +1404,8 @@ export class ScopeComponent implements OnInit {
         delete activity.errorMessages['ActivityTypeID'];
         delete this.errorMessages['correctPermittedActivities'];
       }
+
+
 
       // Check if categorizedProducts exists and is empty
       const hasNoProducts = activity.categorizedProducts == null || activity.categorizedProducts.length == 0;
@@ -1461,6 +1464,8 @@ export class ScopeComponent implements OnInit {
     } else {
       delete this.errorMessages[('islamicType')]
     }
+    
+
   }
 
   varyScopeAuthConfirm() {
@@ -2399,5 +2404,17 @@ export class ScopeComponent implements OnInit {
     } else {
       console.warn('No document is currently selected.');
     }
+  }
+
+  loadErrorMessages(fieldName: string, msgKey: number, activity?: any,customMessage?: string) {
+    this.firmDetailsService.getErrorMessages(fieldName, msgKey, activity,customMessage).subscribe(
+      () => {
+        this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
+        console.log(`Error message for ${fieldName} loaded successfully`);
+      },
+      error => {
+        console.error(`Error loading error message for ${fieldName}:`, error);
+      }
+    );
   }
 }

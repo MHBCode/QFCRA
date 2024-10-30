@@ -125,11 +125,28 @@ export class CoreDetailsComponent implements OnInit {
       this.populateCountries();
       this.populateAddressTypes();
       this.populateQFCLicenseStatus();
+      this.populateAuthorisationStatus();
       this.populateFirmAppTypes();
       this.populateFinAccStd();
       this.populateFinYearEnd();
       this.populateLegalStatus();
       this.loadCurrentAppDetails();
+
+      this.firmDetailsService.isFirmLicensed$.subscribe(
+        (value) => (this.isFirmLicensed = value)
+      );
+      this.firmDetailsService.isFirmAuthorised$.subscribe(
+        (value) => (this.isFirmAuthorised = value)
+      );
+      this.firmDetailsService.loadAssignedUserRoles(this.userId).subscribe({
+        next: (roles) => {
+          this.assignedUserRoles = roles.response;
+        },
+        error: (error) => console.error('Error in scope component:', error)
+      });
+
+      this.firmDetailsService.checkFirmLicense(this.firmId);
+      this.firmDetailsService.checkFirmAuthorisation(this.firmId);
     })
   }
 
@@ -157,11 +174,11 @@ export class CoreDetailsComponent implements OnInit {
       data => {
         this.firmDetails = data.firmDetails;
         this.selectedFirmTypeID = this.firmDetails.AuthorisationStatusTypeID != 0 ? 3 : 2;
-        this.dateOfApplication = this.firmDetails.AuthorisationStatusTypeID > 0 ? this.firmDetails.FirmAuthApplDate : this.firmDetails.FirmLicApplDate;
-        this.formattedLicenseApplStatusDate = data.formattedLicenseApplStatusDate;
-        this.formattedAuthApplStatusDate = data.formattedAuthApplStatusDate;
-        this.AuthorisationStatusTypeLabelDescFormatted = data.AuthorisationStatusTypeLabelDescFormatted;
-        this.LicenseStatusTypeLabelDescFormatted = data.LicenseStatusTypeLabelDescFormatted;
+        this.dateOfApplication = this.firmDetails.AuthorisationStatusTypeID > 0 ? this.dateUtilService.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate) : this.dateUtilService.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate);
+        this.formattedLicenseApplStatusDate = this.dateUtilService.formatDateToCustomFormat(this.firmDetails.LicenseApplStatusDate);
+        this.formattedAuthApplStatusDate = this.dateUtilService.formatDateToCustomFormat(this.firmDetails.AuthApplStatusDate);
+        this.AuthorisationStatusTypeLabelDescFormatted = this.firmDetails.AuthorisationStatusTypeLabelDesc.replace(/:/g, '');
+        this.LicenseStatusTypeLabelDescFormatted = this.firmDetails.LicenseStatusTypeLabelDesc.replace(/:/g, '');
 
         this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
       },
@@ -250,7 +267,6 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   applySecurityOnPage(objectId: FrimsObject, Mode: boolean) {
-    this.maskCommandActionsControlsScope();
     this.loading = true;
     const currentOpType = Mode ? ObjectOpType.Edit : ObjectOpType.View;
 
@@ -337,47 +353,6 @@ export class CoreDetailsComponent implements OnInit {
       }
     }
     return false;
-  }
-
-  maskCommandActionsControlsScope() {
-    this.hideCreateBtn = false;
-    this.hideEditBtn = false;
-    this.hideDeleteBtn = false;
-    this.hideReviseBtn = false;
-    if (this.tabIndex === 0) { //Licensed
-      if (!(this.firmService.isNullOrEmpty(this.ActivityLicensed[0].FirmScopeID)) && this.ActivityLicensed[0].FirmScopeID) {
-        this.hideCreateBtn = true;
-      }
-      if (this.firmDetails.LicenseStatusTypeID === constants.FirmLicenseApplStatusType.Application) {
-        this.hideReviseBtn = true;
-      }
-      else if (!(this.isFirmLicensed)) {
-        this.hideCreateBtn = true;
-        this.hideEditBtn = true;
-        this.hideDeleteBtn = true;
-        this.hideReviseBtn = true;
-      }
-    }
-
-    if (this.tabIndex === 1) { //Authorised
-      if (!(this.firmService.isNullOrEmpty(this.ActivityAuth[0]?.FirmScopeID)) && this.ActivityAuth[0].FirmScopeID) {
-        this.hideCreateBtn = true;
-      }
-      if (this.firmDetails.AuthorisationStatusTypeID === constants.FirmAuthorizationApplStatusType.Application) {
-        this.hideReviseBtn = true;
-      }
-      else if (!(this.isFirmAuthorised)) {
-        this.hideCreateBtn = true;
-        this.hideEditBtn = true;
-        this.hideDeleteBtn = true;
-        this.hideReviseBtn = true;
-      }
-    }
-    if (!this.hideCreateBtn) {
-      this.hideEditBtn = true;
-      this.hideDeleteBtn = true;
-      this.hideReviseBtn = true;
-    }
   }
 
   isNullOrEmpty(value) {
@@ -504,8 +479,8 @@ export class CoreDetailsComponent implements OnInit {
     }
   }
 
-  loadErrorMessages(fieldName: string, msgKey: number, activity?: any) {
-    this.firmDetailsService.getErrorMessages(fieldName, msgKey, activity).subscribe(
+  loadErrorMessages(fieldName: string, msgKey: number,placeholderValue?: string) {
+    this.firmDetailsService.getErrorMessages(fieldName, msgKey,null,null,placeholderValue).subscribe(
       () => {
         this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
         console.log(`Error message for ${fieldName} loaded successfully`);

@@ -98,11 +98,11 @@ export class FirmDetailsService {
     );
   }
 
-  getErrorMessages(fieldName: string, msgKey: number, activity?: any, placeholderValue?: string): Observable<void> {
+  getErrorMessages(fieldName: string, msgKey: number, activity?: any, customMessage?: string,placeholderValue?: string): Observable<void> {
     return new Observable(observer => {
       this.logForm.errorMessages(msgKey).subscribe(
         response => {
-          let errorMessage = response.response;
+          let errorMessage = (customMessage ? customMessage + " " : "") + response.response;
 
           // Replace placeholder values if provided
           if (placeholderValue) {
