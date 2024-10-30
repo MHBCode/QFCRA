@@ -65,6 +65,7 @@ export class AuditorsComponent {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
       this.loadFirmDetails(this.firmId);
+      this.loadAssignedUserRoles(this.userId);
       if (this.FIRMAuditors.length === 0) {
         this.loadAuditors();
       }
@@ -74,12 +75,6 @@ export class AuditorsComponent {
       this.firmDetailsService.isFirmAuthorised$.subscribe(
         (value) => (this.isFirmAuthorised = value)
       );
-      this.firmDetailsService.loadAssignedUserRoles(this.userId).subscribe({
-        next: (roles) => {
-          this.assignedUserRoles = roles.response;
-        },
-        error: (error) => console.error('Error in scope component:', error)
-      });
 
       this.firmDetailsService.checkFirmLicense(this.firmId);
       this.firmDetailsService.checkFirmAuthorisation(this.firmId);
@@ -97,6 +92,18 @@ export class AuditorsComponent {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
       data => {
         this.firmDetails = data.firmDetails;
+      },
+      error => {
+        console.error(error);
+      }
+    );
+  }
+
+  loadAssignedUserRoles(userId: number): void {
+    this.firmDetailsService.loadAssignedUserRoles(userId).subscribe(
+      data => {
+        this.assignedUserRoles = data.assignedUserRoles;
+        console.log('Roles successfully fetched:', this.assignedUserRoles);
       },
       error => {
         console.error(error);

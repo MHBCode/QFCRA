@@ -131,6 +131,7 @@ export class ScopeComponent implements OnInit {
       this.populateAuthorisationCategoryTypes();
       this.populatePrudentialCategoryTypes();
       this.populateFirmScopeTypes();
+      this.loadAssignedUserRoles(this.userId);
       this.switchScopeTab('Licensed');
 
       this.firmDetailsService.isFirmLicensed$.subscribe(
@@ -139,12 +140,6 @@ export class ScopeComponent implements OnInit {
       this.firmDetailsService.isFirmAuthorised$.subscribe(
         (value) => (this.isFirmAuthorised = value)
       );
-      this.firmDetailsService.loadAssignedUserRoles(this.userId).subscribe({
-        next: (roles) => {
-          this.assignedUserRoles = roles.response;
-        },
-        error: (error) => console.error('Error in scope component:', error)
-      });
 
       this.firmDetailsService.checkFirmLicense(this.firmId);
       this.firmDetailsService.checkFirmAuthorisation(this.firmId);
@@ -169,6 +164,17 @@ export class ScopeComponent implements OnInit {
     );
   }
 
+  loadAssignedUserRoles(userId: number): void {
+    this.firmDetailsService.loadAssignedUserRoles(userId).subscribe(
+      data => {
+        this.assignedUserRoles = data.assignedUserRoles;
+        console.log('Roles successfully fetched:', this.assignedUserRoles);
+      },
+      error => {
+        console.error(error);
+      }
+    );
+  }
 
   isNullOrEmpty(value) {
     return this.firmService.isNullOrEmpty(value);

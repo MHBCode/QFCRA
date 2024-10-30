@@ -18,7 +18,7 @@ import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
   styleUrls: ['./core-details.component.scss', '../firms.scss']
 })
 export class CoreDetailsComponent implements OnInit {
-  
+
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   errorMessages: { [key: string]: string } = {};
@@ -131,19 +131,14 @@ export class CoreDetailsComponent implements OnInit {
       this.populateFinYearEnd();
       this.populateLegalStatus();
       this.loadCurrentAppDetails();
-
+      this.loadAssignedUserRoles(this.userId);
+      this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
       this.firmDetailsService.isFirmLicensed$.subscribe(
         (value) => (this.isFirmLicensed = value)
       );
       this.firmDetailsService.isFirmAuthorised$.subscribe(
         (value) => (this.isFirmAuthorised = value)
       );
-      this.firmDetailsService.loadAssignedUserRoles(this.userId).subscribe({
-        next: (roles) => {
-          this.assignedUserRoles = roles.response;
-        },
-        error: (error) => console.error('Error in scope component:', error)
-      });
 
       this.firmDetailsService.checkFirmLicense(this.firmId);
       this.firmDetailsService.checkFirmAuthorisation(this.firmId);
@@ -173,14 +168,24 @@ export class CoreDetailsComponent implements OnInit {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
       data => {
         this.firmDetails = data.firmDetails;
-        this.selectedFirmTypeID = this.firmDetails.AuthorisationStatusTypeID != 0 ? 3 : 2;
-        this.dateOfApplication = this.firmDetails.AuthorisationStatusTypeID > 0 ? this.dateUtilService.formatDateToCustomFormat(this.firmDetails.FirmAuthApplDate) : this.dateUtilService.formatDateToCustomFormat(this.firmDetails.FirmLicApplDate);
-        this.formattedLicenseApplStatusDate = this.dateUtilService.formatDateToCustomFormat(this.firmDetails.LicenseApplStatusDate);
-        this.formattedAuthApplStatusDate = this.dateUtilService.formatDateToCustomFormat(this.firmDetails.AuthApplStatusDate);
-        this.AuthorisationStatusTypeLabelDescFormatted = this.firmDetails.AuthorisationStatusTypeLabelDesc.replace(/:/g, '');
-        this.LicenseStatusTypeLabelDescFormatted = this.firmDetails.LicenseStatusTypeLabelDesc.replace(/:/g, '');
+        this.selectedFirmTypeID = data.selectedFirmTypeID;
+        this.dateOfApplication = data.dateOfApplication;
+        this.formattedLicenseApplStatusDate = data.formattedLicenseApplStatusDate;
+        this.formattedAuthApplStatusDate = data.formattedAuthApplStatusDate;
+        this.AuthorisationStatusTypeLabelDescFormatted = data.AuthorisationStatusTypeLabelDescFormatted;
+        this.LicenseStatusTypeLabelDescFormatted = data.LicenseStatusTypeLabelDescFormatted;
+      },
+      error => {
+        console.error(error);
+      }
+    );
+  }
 
-        this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
+  loadAssignedUserRoles(userId: number): void {
+    this.firmDetailsService.loadAssignedUserRoles(userId).subscribe(
+      data => {
+        this.assignedUserRoles = data.assignedUserRoles;
+        console.log('Roles successfully fetched:', this.assignedUserRoles);
       },
       error => {
         console.error(error);
@@ -367,17 +372,6 @@ export class CoreDetailsComponent implements OnInit {
     this.hideReviseBtn = true;
   }
 
-  checkFirmAuthorisation() {
-    this.applicationService.isFirmAuthorised(this.firmId).subscribe(
-      (response) => {
-        this.isFirmAuthorised = response.response;
-      }, error => {
-        console.error('Error checking firm authorisation:', error);
-        this.isFirmLicensed = false;
-      }
-    )
-  }
-
   validateFirmDetails() {
     // FIRM NAME VALIDATION
     this.firmDetails.FirmName = this.firmDetails.FirmName.trim();
@@ -479,8 +473,8 @@ export class CoreDetailsComponent implements OnInit {
     }
   }
 
-  loadErrorMessages(fieldName: string, msgKey: number,placeholderValue?: string) {
-    this.firmDetailsService.getErrorMessages(fieldName, msgKey,null,null,placeholderValue).subscribe(
+  loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+    this.firmDetailsService.getErrorMessages(fieldName, msgKey, null, null, placeholderValue).subscribe(
       () => {
         this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
         console.log(`Error message for ${fieldName} loaded successfully`);
@@ -1578,7 +1572,7 @@ export class CoreDetailsComponent implements OnInit {
       }
     }
   }
-  
+
   confirmUpload() {
     if (this.selectedFile) {
       // Display the selected file name in the main section
