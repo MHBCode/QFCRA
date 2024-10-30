@@ -135,24 +135,26 @@ export class ContactsComponent {
       }
     });
   }
-  deleteContact(output: boolean) {
-    console.log(this.selectedContact.ContactID, this.selectedContact.ContactAssnID, "contactID , contactAssnID")
-    this.contactService.deleteContactDetails(this.selectedContact.ContactID, this.selectedContact.ContactAssnID, output).subscribe(
+  deleteContact(output: boolean): void {
+    // Replace these with actual values from your component
+    const firmTypeID = '523'; // Assuming firmTypeID is fixed to 1
+    const contactID = this.selectedContact.ContactID;
+    const contactAssnID = this.selectedContact.ContactAssnID;
+    
+    this.contactService.deleteContactDetails(firmTypeID, contactID, contactAssnID,30, output).subscribe(
       (response) => {
-        console.log('Contact deleted successfully', response);
         Swal.fire(
           'Deleted!',
-          'The contact has been deleted.',
+          'The contact has been deleted successfully.',
           'success'
         );
         this.closeContactPopup();
         this.loadContacts();  // Reload contacts after deletion
       },
       (error) => {
-        console.error('Error deleting contact', error);
         Swal.fire(
           'Error!',
-          'There was an issue deleting the contact.',
+          'There was an issue deleting the contact. Please try again.',
           'error'
         );
       }

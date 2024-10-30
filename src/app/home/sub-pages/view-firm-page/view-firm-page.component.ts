@@ -270,7 +270,11 @@ export class ViewFirmPageComponent implements OnInit {
   //Contact Popup 
   isPopupVisible: boolean = false;
   isEditable: boolean = false; // Controls the readonly state of the input fields
+  IsEditContactVisible: boolean = false;
   selectedContact: any = null;
+  isCIP: string = '';
+  Column1: string = '';
+  Column2: string = '';
   /* current date */
   now = new Date();
   currentDate = this.now.toISOString();
@@ -2293,94 +2297,9 @@ export class ViewFirmPageComponent implements OnInit {
   onInactiveAuditorsToggle(event: Event) {
     this.showInactiveAuditors = (event.target as HTMLInputElement).checked;
   }
-  loadContacts() {
-    this.isLoading = true;
-    this.contactService.getContactsOfFIRM(this.firmId).subscribe(
-      data => {
-        this.FIRMContacts = data.response;
-        console.log('Firm FIRM Contacts details:', this.FIRMContacts);
-        this.isLoading = false;
-      },
-      error => {
-        console.error('Error fetching firm details', error);
-        this.isLoading = false;
-      }
-    );
-  }
-  confirmDeleteContact() {
-    console.log("confirmDelete called: ", this.selectedContact)
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this contact?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.deleteContact(true); // Just pass output here, no need for ": boolean"
-      }
-    });
-  }
-  deleteContact(output: boolean) {
-    console.log(this.selectedContact.ContactID, this.selectedContact.ContactAssnID, "contactID , contactAssnID")
-    this.contactService.deleteContactDetails(this.selectedContact.ContactID, this.selectedContact.ContactAssnID, output).subscribe(
-      (response) => {
-        console.log('Contact deleted successfully', response);
-        Swal.fire(
-          'Deleted!',
-          'The contact has been deleted.',
-          'success'
-        );
-        this.closeContactPopup();
-        this.loadContacts();  // Reload contacts after deletion
-      },
-      (error) => {
-        console.error('Error deleting contact', error);
-        Swal.fire(
-          'Error!',
-          'There was an issue deleting the contact.',
-          'error'
-        );
-      }
-    );
-  }
-  onRowClick(contact: any): void {
-    // Reset the selected contact and hide the popup until data is loaded
-    this.selectedContact = {};
-    this.isPopupVisible = false;
 
-    // Fetch contact details based on selected row
-    this.contactService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
-      data => {
-        if (data && data.response) {
-          this.selectedContact = data.response; // Assign the received data to selectedContact
-          console.log("Selected contact: ", this.selectedContact); // Log to check data
-          this.isPopupVisible = true; // Show the popup after data is loaded
-          this.cdr.detectChanges(); // Trigger change detection to update the view
-        } else {
-          console.error('No contact data received:', data);
-          this.isPopupVisible = false; // Hide popup if no data is received
-        }
-      },
-      error => {
-        console.error('Error fetching contact details', error);
-        this.isPopupVisible = false; // Hide popup if there's an error
-      }
-    );
-  }
-  get filteredContacts() {
-    if (this.displayInactiveContacts) {
-      return this.FIRMContacts;
-    } else {
-      return this.FIRMContacts.filter(contact => contact.ContactTypeDesc !== 'Contact- No Longer');
-    }
-  }
-  // Method to handle the checkbox change
-  onInactiveContactsToggle(event: any): void {
-    this.displayInactiveContacts = event.target.checked;
-  }
 
- 
+
   saveContactPopupChanges(): void {
     // Prepare the selectedContact object (which is bound to the form) to be saved
     const contactDetails = {
@@ -6567,6 +6486,89 @@ export class ViewFirmPageComponent implements OnInit {
     return value === null || value === '';
   }
   // Yazan Contact firms
+  loadContacts() {
+    this.isLoading = true;
+    this.contactService.getContactsOfFIRM(this.firmId).subscribe(
+      data => {
+        this.FIRMContacts = data.response;
+        console.log('Firm FIRM Contacts details:', this.FIRMContacts);
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Error fetching firm details', error);
+        this.isLoading = false;
+      }
+    );
+  }
+
+  onRowClick(contact: any): void {
+    // Reset the selected contact and hide the popup until data is loaded
+    this.selectedContact = {};
+    this.isPopupVisible = false;
+
+    // Fetch contact details based on selected row
+    this.contactService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
+      data => {
+        if (data && data.response) {
+          this.selectedContact = data.response; // Assign the received data to selectedContact
+          console.log("Selected contact: ", this.selectedContact); // Log to check data
+          this.isPopupVisible = true; // Show the popup after data is loaded
+          this.cdr.detectChanges(); // Trigger change detection to update the view
+        } else {
+          console.error('No contact data received:', data);
+          this.isPopupVisible = false; // Hide popup if no data is received
+        }
+      },
+      error => {
+        console.error('Error fetching contact details', error);
+        this.isPopupVisible = false; // Hide popup if there's an error
+      }
+    );
+  }
+  get filteredContacts() {
+    if (this.displayInactiveContacts) {
+      return this.FIRMContacts;
+    } else {
+      return this.FIRMContacts.filter(contact => contact.ContactTypeDesc !== 'Contact- No Longer');
+    }
+  }
+  onContactChange(selectedValue: string) {
+    if (selectedValue) {
+      // Parse the selected value (Column1) to extract contactId and contactAssnID
+      const [contactId, contactAssnID] = selectedValue.split(',').map(Number);
+
+      // Call the method to fetch contact details
+      this.fitchContactDetailsCreateContact(contactId, contactAssnID);
+    }
+  }
+  selectedAvilableContactDetails: any = [];
+  fitchContactDetailsCreateContact(contactId: number, contactAssnID: number) {
+    this.contactService.getContactDetailsCreateContact(this.firmId, contactId, contactAssnID).subscribe(
+      data => {
+        if (data && data.response) {
+          this.selectedAvilableContactDetails = data.response; // Assign the received data to selectedContact
+          console.log("Selected contact: ", this.selectedAvilableContactDetails); // Log to check data
+          this.isPopupVisible = true; // Show the popup after data is loaded
+          this.cdr.detectChanges(); // Trigger change detection to update the view
+        } else {
+          console.error('No contact data received:', data);
+          this.isPopupVisible = false; // Hide popup if no data is received
+        }
+      },
+      error => {
+        console.error('Error fetching contact details', error);
+        this.isPopupVisible = false; // Hide popup if there's an error
+      }
+    );
+  }
+
+  // Method to handle the checkbox change
+  onInactiveContactsToggle(event: any): void {
+    this.displayInactiveContacts = event.target.checked;
+  }
+  IsEditableContact() {
+    this.IsEditContactVisible = true
+  }
   closeContactPopup() {
     this.isPopupVisible = false;
   }
@@ -6598,7 +6600,7 @@ export class ViewFirmPageComponent implements OnInit {
       });
   }
   CreateContactIbj = {
-    
+
   }
   createContact() {
     this.showCreateContactSection = true;
@@ -6610,10 +6612,199 @@ export class ViewFirmPageComponent implements OnInit {
     this.contactService.getEntityTypesByFrimsId(this.firmId).subscribe(data => {
       this.AllContactFrom = data.response;
       console.log("ContactFrom", this.AllContactFrom)
+      this.setDefaultContactFrom();
     }, error => {
       console.error("Error fetching ContactFrom", error);
+
     });
   }
+  selectedContactFrom: string = 'select';
+  setDefaultContactFrom(): void {
+    const entity = this.AllContactFrom.find(contact => contact.EntityTypeID.startsWith('1'));
+    if (entity) {
+      this.selectedContactFrom = entity.EntityTypeID;
+    }
+  }
+  isFirmSelected(): boolean {
+    const selectedEntity = this.AllContactFrom.find(contact => contact.EntityTypeID === this.selectedContactFrom);
+    return selectedEntity ? selectedEntity.EntityTypeName.includes('Firm') : false;
+  }
+  
+  createContactObj = {
+    firmID: 0,
+    contactID: 0,
+    contactAssnID: 0,
+    title: "string",
+    contactType: 'string',
+    firstName: "string",
+    secondName: "string",
+    thirdName: "string",
+    familyName: "string",
+    countryOfResidence: 0,
+    createdBy: 0,
+    dateOfBirth: "2024-10-29T11:55:36.901Z",
+    fullName: "string",
+    lastModifiedBy: 0,
+    nationalID: "string",
+    nationality: 0,
+    passportNum: "string",
+    placeOfBirth: "string",
+    previousName: "string",
+    isExists: true,
+    nameInPassport: "string",
+    contactAddnlInfoTypeID: 0,
+    isFromContact: true,
+    countryofBirth: 0,
+    juridictionID: 0,
+    objectID: 0,
+    isPeP: true,
+    entityTypeID: 0,
+    contactTypeId: 0,
+    functionTypeId: 0,
+    mobileNum: "string",
+    busEmail: "string",
+    otherEmail: "string",
+    contactMethodTypeID: 0,
+    entityID: 0,
+    entitySubTypeID: 0,
+    numOfShares: 0,
+    pctOfShares: 0,
+    majorityStockHolder: true,
+    assnDateFrom: "string",
+    assnDateTo: "string",
+    controllerControlTypeID: 0,
+    jobTitle: "string",
+    nameAsInPassport: "string",
+    busPhone: "string",
+    residencePhone: "string",
+    fax: "string",
+    qfcNumber: "string",
+    isContactSelected: true,
+    isIndividualRegulated: true,
+    additionalDetails: "string",
+    ipAddress: "string",
+    ainId: 0,
+    ainNumber: 0,
+    applicationID: 0,
+    docID: 0,
+    dateRecieved: "2024-10-29T11:55:36.901Z",
+    formProcessor: 0,
+    comment: "string",
+    condApprovalReasonTypeID: 0,
+    reasonForDelayInFiling: "string",
+    residentStatus: "string",
+    isOrdinarilyResident: true,
+    applFeeReceived: "string",
+    applFeeComment: "string",
+    wcfAddnlInfo: "string",
+    placeOfBirthCountryID: 0,
+    jurisdictionId: 0,
+    totalIndiustryExperenceYear: 0,
+    totalIndustryExperenceMonth: 0,
+    roleExperenceMonth: 0,
+    roleExperenceYear: 0,
+    pastPositionFlag: 0,
+    experience: "string",
+    appIndividualArrangementTypeID: 0,
+    otherArrangementTypeDesc: "string",
+    appIndividualDataID: 0,
+    pastPositionDesc: "string",
+    fandPAddnlInfo: "string",
+    poposedJobTitle: "string",
+    jobDescription: "string",
+    cfExercise: "string",
+    withdrawlReasonDesc: "string",
+    altArrangementDesc: "string",
+    competenciesAndExp: "string",
+    createdDate: "string",
+    lastModifedDate: "string",
+    proposedToQatarDateDays: "string",
+    proposedToQatarDateMonth: "string",
+    proposedToQatarDateYear: "string",
+    contactFunctionID: 0,
+    contactFunctionTypeID: 0,
+    contactFunctionTypeDesc: "string",
+    effectiveDate: "string",
+    endDate: "string",
+    lastModifiedDate: "string",
+    reviewStatus: "string",
+    selected: true,
+    isFunctionActive: true,
+    isRecordEditable: 0,
+    countryID: 0,
+    addressTypeID: 0,
+    sameAsTypeID: 0,
+    addressAssnID: 0,
+    addressID: "string",
+    addressLine1: "string",
+    addressLine2: "string",
+    addressLine3: "string",
+    addressLine4: "string",
+    city: "string",
+    province: "string",
+    postalCode: "string",
+    phoneNumber: "string",
+    phoneExt: "string",
+    faxNumber: "string",
+    addressState: 0,
+    fromDate: "2024-10-29T11:55:36.901Z",
+    toDate: "2024-10-29T11:55:36.901Z",
+    objectInstanceID: 0,
+    objectInstanceRevNumber: 0,
+    sourceObjectID: 0,
+    sourceObjectInstanceID: 0,
+    sourceObjectInstanceRevNumber: 0
+  };
+  
+  createContactPopup(): void {
+     if(this.createContactObj.contactType != 'Principal Contact'){
+
+     }else if(this.createContactObj.contactType === 'Principal Contact'){
+       
+     }
+  }
+
+  confirmDeleteContact() {
+    console.log("confirmDelete called: ", this.selectedContact)
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this contact?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteContact(true); // Just pass output here, no need for ": boolean"
+      }
+    });
+  }
+  deleteContact(output: boolean): void {
+    // Replace these with actual values from your component
+    const firmTypeID = FrimsObject.Contatcs.toString() ; // Assuming firmTypeID is fixed to 1
+    const contactID = this.selectedContact.contactID;
+    const contactAssnID = this.selectedContact.contactAssnID;
+    const userID = this.userId;
+    console.log(contactID, contactAssnID, "contactAssnID contactID")
+    this.contactService.deleteContactDetails(firmTypeID, contactID, contactAssnID, userID, output).subscribe(
+      (response) => {
+        Swal.fire(
+          'Deleted!',
+          'The contact has been deleted successfully.',
+          'success'
+        );
+        this.closeContactPopup();
+        this.loadContacts();  // Reload contacts after deletion
+      },
+      (error) => {
+        Swal.fire(
+          'Error!',
+          'There was an issue deleting the contact. Please try again.',
+          'error'
+        );
+      }
+    );
+  }
+
 
   // Yazan Individuals 
 

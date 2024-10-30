@@ -20,9 +20,13 @@ export class ContactService {
     const url = `${this.baseUrlContact}get_contact_details_by_contactId?firmId=${firmId}&contactId=${contactId}&contactAssId=${contactAssId}`;
     return this.http.get<any>(url);
   }
+  getContactDetailsCreateContact(firmId: number, contactId: number, contactAssId: number): Observable<any> {
+    const url = `${this.baseUrlContact}get_contact_details_by_contactId?firmId=${firmId}&contactId=${contactId}&contactAssId=${contactAssId}`;
+    return this.http.get<any>(url);
+  }
   ///////////////////
-  deleteContactDetails(contactID: number, contactAssnID: number, output: boolean): Observable<any> {
-    const url = `${this.baseUrlContact}delete_contact_details?contactId=${contactID}&contactAssId=${contactAssnID}&output=${output}`;
+  deleteContactDetails(firmTypeID: string, contactID: number, contactAssnID: number,userID:number, output: boolean): Observable<any> {
+    const url = `${this.baseUrlContact}delete_contact_details?firmTypeID=${firmTypeID}&contactId=${contactID}&contactAssnID=${contactAssnID}&userID=${userID}&output=${output}`;
     return this.http.delete<any>(url);
   }
   saveContactDetails(contactDetails: any): Observable<any> {
