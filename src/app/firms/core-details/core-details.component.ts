@@ -473,18 +473,6 @@ export class CoreDetailsComponent implements OnInit {
     }
   }
 
-  loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
-    this.firmDetailsService.getErrorMessages(fieldName, msgKey, null, null, placeholderValue).subscribe(
-      () => {
-        this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
-        console.log(`Error message for ${fieldName} loaded successfully`);
-      },
-      error => {
-        console.error(`Error loading error message for ${fieldName}:`, error);
-      }
-    );
-  }
-
   showError(messageKey: number) {
     this.firmDetailsService.showErrorAlert(messageKey, this.isLoading);
   }
@@ -1595,5 +1583,16 @@ export class CoreDetailsComponent implements OnInit {
     }
   }
 
+  loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+    this.firmDetailsService.getErrorMessages(fieldName, msgKey, null, null, placeholderValue).subscribe(
+      () => {
+        this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
+        console.log(`Error message for ${fieldName} loaded successfully`);
+      },
+      error => {
+        console.error(`Error loading error message for ${fieldName}:`, error);
+      }
+    );
+  }
 
 }

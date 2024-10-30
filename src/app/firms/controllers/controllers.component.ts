@@ -576,37 +576,37 @@ export class ControllersComponent implements OnInit{
 
       // Validate Full Name of Entity
       if (!this.CreatecontrollerDetails.OtherEntityName) {
-        this.firmDetailsService.getErrorMessages('OtherEntityName', constants.ControllerMessages.ENTER_OTHER_ENTITY_NAME);
+        this.loadErrorMessages('OtherEntityName', constants.ControllerMessages.ENTER_OTHER_ENTITY_NAME);
         this.hasValidationErrors = true;
       }
 
       // Validate Effective Date
       if (!this.CreatecontrollerDetails.AssnDateFrom) {
-        this.firmDetailsService.getErrorMessages('AssnDateFrom', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
+        this.loadErrorMessages('AssnDateFrom', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
       }
 
       // Validate Cessation Date
       if (!this.CreatecontrollerDetails.AssnDateTo) {
-        this.firmDetailsService.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+        this.loadErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
       } else if (this.CreatecontrollerDetails.AssnDateFrom && new Date(this.CreatecontrollerDetails.AssnDateFrom) > new Date(this.CreatecontrollerDetails.AssnDateTo)) {
-        this.firmDetailsService.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+        this.loadErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
       }
 
       // Validate Place of Establishment
       if (!this.CreatecontrollerDetails.PlaceOfEstablishment) {
-        this.firmDetailsService.getErrorMessages('PlaceOfEstablishment', constants.ControllerMessages.SELECT_RECORD);
+        this.loadErrorMessages('PlaceOfEstablishment', constants.ControllerMessages.SELECT_RECORD);
       }
 
       // Validate Type of Control
       if (!this.CreatecontrollerDetails.ControllerControlTypeDesc) {
-        this.firmDetailsService.getErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
+        this.loadErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
       }
 
       // Validate Percentage of Holding
       if (this.CreatecontrollerDetails.PctOfShares) {
         const pct = parseFloat(this.CreatecontrollerDetails.PctOfShares);
         if (isNaN(pct) || pct < 0 || pct > 100) {
-          this.firmDetailsService.getErrorMessages('PctOfShares', constants.ControllerMessages.ENTER_VALID_PERCENTAGE);
+          this.loadErrorMessages('PctOfShares', constants.ControllerMessages.ENTER_VALID_PERCENTAGE);
         }
       }
 
@@ -920,36 +920,36 @@ export class ControllersComponent implements OnInit{
 
       // Validate Full Name of Entity
       if (!this.selectedController.OtherEntityName) {
-        this.firmDetailsService.getErrorMessages('OtherEntityName', constants.ControllerMessages.ENTER_OTHER_ENTITY_NAME);
+        this.loadErrorMessages('OtherEntityName', constants.ControllerMessages.ENTER_OTHER_ENTITY_NAME);
       }
 
       // Validate Effective Date
       if (!this.selectedController.EffectiveDate) {
-        this.firmDetailsService.getErrorMessages('EffectiveDate', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
+        this.loadErrorMessages('EffectiveDate', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
       }
 
       // Validate Cessation Date
       if (!this.selectedController.CessationDate) {
-        this.firmDetailsService.getErrorMessages('CessationDate', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+        this.loadErrorMessages('CessationDate', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
       } else if (this.selectedController.EffectiveDate && new Date(this.selectedController.EffectiveDate) > new Date(this.selectedController.CessationDate)) {
-        this.firmDetailsService.getErrorMessages('CessationDate', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+        this.loadErrorMessages('CessationDate', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
       }
 
       // Validate Place of Establishment
       if (!this.selectedController.PlaceOfEstablishment) {
-        this.firmDetailsService.getErrorMessages('PlaceOfEstablishment', constants.ControllerMessages.SELECT_RECORD);
+        this.loadErrorMessages('PlaceOfEstablishment', constants.ControllerMessages.SELECT_RECORD);
       }
 
       // Validate Type of Control
       if (!this.selectedController.ControllerControlTypeDesc) {
-        this.firmDetailsService.getErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
+        this.loadErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
       }
 
       // Validate Percentage of Holding
       if (this.selectedController.PctOfShares) {
         const pct = parseFloat(this.selectedController.PctOfShares);
         if (isNaN(pct) || pct < 0 || pct > 100) {
-          this.firmDetailsService.getErrorMessages('PctOfShares', constants.ControllerMessages.ENTER_VALID_PERCENTAGE);
+          this.loadErrorMessages('PctOfShares', constants.ControllerMessages.ENTER_VALID_PERCENTAGE);
         }
       }
 
@@ -1431,6 +1431,18 @@ export class ControllersComponent implements OnInit{
   getLegalStatusDescription(): string {
     const status = this.legalStatusOptionsEdit.find(option => option.LegalStatusTypeID === this.selectedController.LegalStatusTypeID);
     return status ? status.LegalStatusTypeDesc : '';
+  }
+
+  loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+    this.firmDetailsService.getErrorMessages(fieldName, msgKey, null, null, placeholderValue).subscribe(
+      () => {
+        this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
+        console.log(`Error message for ${fieldName} loaded successfully`);
+      },
+      error => {
+        console.error(`Error loading error message for ${fieldName}:`, error);
+      }
+    );
   }
 
 }

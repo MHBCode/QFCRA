@@ -5720,7 +5720,7 @@ export class ViewFirmPageComponent implements OnInit {
         RelatedEntityEntityID: null,
         MyState: 2,
         LastModifiedByOfOtherEntity: 30,
-        OtherEntityName: this.selectedAuditor.OtherEntityID === 'other' ? this.selectedAuditor.customAuditorName : this.selectedAuditor.OtherEntityName,
+        OtherEntityName: this.selectedAuditor.OtherEntityID === 'other' ? this.selectedAuditor.customAuditorName : this.selectedAuditor.OtherEntityID,
         DateOfIncorporation: null,
         LegalStatusTypeID: null,
         PlaceOfIncorporation: null,

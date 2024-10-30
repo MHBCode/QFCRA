@@ -463,12 +463,10 @@ hr {
 }
 
 .contollerPopupContent .input-field input:disabled, .contollerPopupContent .input-field input[readonly], .contollerPopupContent .input-field select:disabled, .contollerPopupContent .input-field select[readonly] {
-    background-color: transparent;
     width: 100%;
     padding: 8px;
     border-radius: 5px;
     border: 1px solid #c2c2c2;
-    background-color: #fffafa;
 }
 
 .auditor-header, .contacts-header, .return-review-header, .ENFAction-header, .Journal-header {

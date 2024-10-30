@@ -169,15 +169,15 @@ export class AuditorsComponent {
 
       // Validate 'EntitySubTypeID'
       if (!this.selectedAuditor.EntitySubTypeID && this.selectedAuditor.EntitySubTypeID === undefined) {
-        this.firmDetailsService.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
+        this.loadErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
         this.hasValidationErrors = true;
       }
       if ( this.firmService.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined) {
-        this.firmDetailsService.getErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
+        this.loadErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
         this.hasValidationErrors = true;
       }
       if (this.dateUtilService.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.dateUtilService.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)) {
-        this.firmDetailsService.getErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
+        this.loadErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
         this.hasValidationErrors = true;
       }
     });
@@ -275,33 +275,33 @@ export class AuditorsComponent {
 
       if (this.selectedAuditor.OtherEntityID === 'other') {
         if (!this.selectedAuditor.customAuditorName || this.selectedAuditor.customAuditorName.trim() === '') {
-          this.firmDetailsService.getErrorMessages('customAuditorName', constants.AuditorsMessages.Select_Auditor_Name);
+          this.loadErrorMessages('customAuditorName', constants.AuditorsMessages.Select_Auditor_Name);
           this.hasValidationErrors = true;
         } else if (
           this.FIRMAuditors.some(
             auditor => auditor.OtherEntityName?.toLowerCase() === this.selectedAuditor.customAuditorName?.toLowerCase()
           )
         ) {
-          this.firmDetailsService.getErrorMessages('customAuditorName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
+          this.loadErrorMessages('customAuditorName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
           this.hasValidationErrors = true;
         }
       } else {
         if (!this.selectedAuditor.OtherEntityID) {
-          this.firmDetailsService.getErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
+          this.loadErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
           this.hasValidationErrors = true;
         }
       }
       // Validate 'EntitySubTypeID'
       if (!this.selectedAuditor.EntitySubTypeID && this.selectedAuditor.EntitySubTypeID === undefined) {
-        this.firmDetailsService.getErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
+        this.loadErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
         this.hasValidationErrors = true;
       }
       if ( this.firmService.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined) {
-        this.firmDetailsService.getErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
+        this.loadErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
         this.hasValidationErrors = true;
       }
       if (this.dateUtilService.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.dateUtilService.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)) {
-        this.firmDetailsService.getErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
+        this.loadErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
         this.hasValidationErrors = true;
       }
     });
@@ -327,7 +327,7 @@ export class AuditorsComponent {
         RelatedEntityEntityID: null,
         MyState: 2,
         LastModifiedByOfOtherEntity: 30,
-        OtherEntityName: this.selectedAuditor.OtherEntityID === 'other' ? this.selectedAuditor.customAuditorName : this.selectedAuditor.OtherEntityName,
+        OtherEntityName: this.selectedAuditor.OtherEntityID === 'other' ? this.selectedAuditor.customAuditorName : this.selectedAuditor.OtherEntityID,
         DateOfIncorporation: null,
         LegalStatusTypeID: null,
         PlaceOfIncorporation: null,
@@ -366,6 +366,7 @@ export class AuditorsComponent {
           Swal.fire('Saved!', 'Auditors details have been saved.', 'success');
           this.IsEditAuditorVisible = false;
           this.IsViewAuditorVisible = false;
+          this.IsCreateAuditorVisible = false;
           this.loadAuditors();
         },
         (error) => {
@@ -493,6 +494,18 @@ export class AuditorsComponent {
   }
   onInactiveAuditorsToggle(event: Event) {
     this.showInactiveAuditors = (event.target as HTMLInputElement).checked;
+  }
+
+  loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+    this.firmDetailsService.getErrorMessages(fieldName, msgKey, null, null, placeholderValue).subscribe(
+      () => {
+        this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
+        console.log(`Error message for ${fieldName} loaded successfully`);
+      },
+      error => {
+        console.error(`Error loading error message for ${fieldName}:`, error);
+      }
+    );
   }
 
 }
