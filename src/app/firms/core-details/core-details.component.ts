@@ -121,7 +121,7 @@ export class CoreDetailsComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
       this.loadFirmDetails(this.firmId);
-      this.loadFirmAdresses();
+      this.loadFirmAddresses(this.firmId);
       this.populateCountries();
       this.populateAddressTypes();
       this.populateQFCLicenseStatus();
@@ -152,16 +152,16 @@ export class CoreDetailsComponent implements OnInit {
     this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
   }
 
-  loadFirmAdresses() {
-    this.isLoading = true;
-    this.addressService.getFirmAddresses(this.firmId).subscribe(
+  loadFirmAddresses(firmId: number): void {
+    this.firmDetailsService.loadFirmAddresses(firmId).subscribe(
       data => {
-        this.firmAddresses = data.response;
-        this.isLoading = false;
-      }, error => {
-        console.error('Error Fetching Firm Addresses', error);
-        this.isLoading = false;
-      })
+        this.firmAddresses = data.firmAddresses;
+        console.log('Firm Addresses:', this.firmAddresses);
+      },
+      error => {
+        console.error(error);
+      }
+    );
   }
 
   loadFirmDetails(firmId: number) {
@@ -762,7 +762,7 @@ export class CoreDetailsComponent implements OnInit {
         this.loadPrevFirmAndDate();
         this.loadFirmDetails(this.firmId);
         this.loadCurrentAppDetails();
-        this.loadFirmAdresses();
+        this.loadFirmAddresses(this.firmId);
         this.resetCollapsibleSections();
         this.cdr.detectChanges();
 
@@ -796,7 +796,7 @@ export class CoreDetailsComponent implements OnInit {
         this.loadPrevFirmAndDate();
         this.loadFirmDetails(this.firmId);
         this.loadCurrentAppDetails();
-        this.loadFirmAdresses();
+        this.loadFirmAddresses(this.firmId);
       }
     });
   }
@@ -885,35 +885,6 @@ export class CoreDetailsComponent implements OnInit {
     this.isCollapsed['pressReleaseSection'] = false;
     this.isCollapsed['commentsSection'] = false;
     this.isCollapsed['addressesSection'] = false;
-  }
-
-  onSameAsTypeChange(selectedTypeID: number) {
-    const numericTypeID = Number(selectedTypeID);
-    if (selectedTypeID && selectedTypeID != 0) {
-      // flag to disable address fields after you select exisiting address type from same on as type field
-      this.disableAddressFields = true;
-      const selectedAddress = this.existingAddresses.find(address => address.AddressTypeID === numericTypeID);
-      if (selectedAddress) {
-        this.populateNewAddressFields(selectedAddress);
-      }
-    } else {
-      // enable address fields if 'select' is selected
-      this.disableAddressFields = false;
-    }
-  }
-  populateNewAddressFields(address: any) {
-    this.newAddress.AddressLine1 = address.AddressLine1;
-    this.newAddress.AddressLine2 = address.AddressLine2;
-    this.newAddress.AddressLine3 = address.AddressLine2;
-    this.newAddress.AddressLine4 = address.AddressLine2;
-    this.newAddress.City = address.City;
-    this.newAddress.CountryID = address.CountryID;
-    this.newAddress.State = address.State;
-    this.newAddress.ZipCode = address.ZipCode;
-    this.newAddress.Province = address.Province;
-    this.newAddress.PostalCode = address.PostalCode;
-    this.newAddress.PhoneNumber = address.PhoneNumber;
-    this.newAddress.FaxNumber = address.FaxNumber;
   }
 
   populateCountries() {
@@ -1051,53 +1022,91 @@ export class CoreDetailsComponent implements OnInit {
   }
 
 
+  //   addNewAddress(targetArray: any[]): void {
+  //     const totalAddressTypes = this.allAddressTypes.length;
+  //     const validAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+  //     // Check if the number of valid addresses has reached the total number of address types
+  //     if (validAddressCount >= totalAddressTypes) {
+  //       this.canAddNewAddress = false;
+  //       return;
+  //     }
+
+  //    this.newAddress = {
+  //       AddressID: null,
+  //       AddressTypeID: 0,
+  //       AddressTypeDesc: '',
+  //       AddressLine1: '',
+  //       AddressLine2: '',
+  //       AddressLine3: '',
+  //       AddressLine4: '',
+  //       City: '',
+  //       Province: '',
+  //       CountryID: 0,
+  //       CountryName: '',
+  //       PostalCode: '',
+  //       PhoneNumber: '',
+  //       FaxNumber: '',
+  //       LastModifiedBy: 0,
+  //       LastModifiedDate: this.currentDate,
+  //       addressState: 2, // New entry state
+  //       FromDate: null,
+  //       ToDate: null,
+  //       Valid: true,
+  //     };
+
+  //     targetArray.unshift(this.newAddress);
+
+  //     // Update the count of valid addresses in the target array
+  //     const updatedValidAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+  //     // Set whether the button should be disabled based on the new count
+  //     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+  //   }
+
+  //   onSameAsTypeChange(selectedTypeID: number, targetArray: any[]) {
+  //     const numericTypeID = Number(selectedTypeID);
+  //     if (selectedTypeID && selectedTypeID != 0) {
+  //         this.disableAddressFields = true;
+  //         const selectedAddress = targetArray.find(address => address.AddressTypeID === numericTypeID);
+  //         if (selectedAddress) {
+  //             this.populateNewAddressFields(selectedAddress);
+  //         }
+  //     } else {
+  //         this.disableAddressFields = false;
+  //     }
+  // }
+
+
+  //   populateNewAddressFields(address: any) {
+  //     this.newAddress.AddressLine1 = address.AddressLine1;
+  //     this.newAddress.AddressLine2 = address.AddressLine2;
+  //     this.newAddress.AddressLine3 = address.AddressLine2;
+  //     this.newAddress.AddressLine4 = address.AddressLine2;
+  //     this.newAddress.City = address.City;
+  //     this.newAddress.CountryID = address.CountryID;
+  //     this.newAddress.State = address.State;
+  //     this.newAddress.ZipCode = address.ZipCode;
+  //     this.newAddress.Province = address.Province;
+  //     this.newAddress.PostalCode = address.PostalCode;
+  //     this.newAddress.PhoneNumber = address.PhoneNumber;
+  //     this.newAddress.FaxNumber = address.FaxNumber;
+  //   }
+
+
   addNewAddress() {
-
-    // Define the total number of address types
-    const totalAddressTypes = this.allAddressTypes.length;
-
-    // Get the count of valid addresses
-    const validAddressCount = this.firmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
-
-    // Check if the number of valid addresses is equal to the number of address types
-    if (validAddressCount >= totalAddressTypes) {
-      // Disable the button if all address types are added
-      this.canAddNewAddress = false;
-      return;
+    const { canAddNewAddress, newAddress } = this.firmDetailsService.addNewAddress(this.firmAddresses, this.allAddressTypes, this.currentDate);
+    if (newAddress) {
+      this.newAddress = newAddress;
+      this.canAddNewAddress = canAddNewAddress;
     }
-
-    this.newAddress = {
-      AddressID: null,
-      AddressTypeID: 0,
-      AddressTypeDesc: '',
-      AddressLine1: '',
-      AddressLine2: '',
-      AddressLine3: '',
-      AddressLine4: '',
-      City: '',
-      Province: '',
-      CountryID: 0,
-      CountryName: '',
-      PostalCode: '',
-      PhoneNumber: '',
-      FaxNumber: '',
-      LastModifiedBy: 0, //todo _userId;
-      LastModifiedDate: this.currentDate,
-      addressState: 2,
-      FromDate: null,
-      ToDate: null,
-      Valid: true,
-    };
-
-    // Add the new address to the list
-    this.firmAddresses.unshift(this.newAddress);
-
-    // Update the count of valid addresses
-    const updatedValidAddressCount = this.firmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
-
-    // Disable the button if the count of valid addresses matches the number of address types
-    this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
   }
+
+  onSameAsTypeChange(selectedTypeID: number) {
+    this.disableAddressFields = selectedTypeID && selectedTypeID != 0; // Set disableAddressFields here
+    this.firmDetailsService.onSameAsTypeChange(selectedTypeID, this.existingAddresses, this.newAddress);
+  }
+
 
   toggleCollapse(section: string) {
     this.isCollapsed[section] = !this.isCollapsed[section];

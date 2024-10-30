@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { SecurityService } from '../ngServices/security.service';
 import * as constants from 'src/app/app-constants';
 import { ApplicationService } from '../ngServices/application.service';
+import { AddressesService } from '../ngServices/addresses.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +22,18 @@ export class FirmDetailsService {
 
   errorMessages: { [key: string]: string } = {};
 
-  constructor(private firmService: FirmService, private dateUtilService: DateUtilService, private logForm: LogformService, private securityService: SecurityService, private applicationService: ApplicationService) { }
+  newAddress: any = {};
+
+  currentDate = new Date();
+
+  constructor(
+    private firmService: FirmService,
+    private dateUtilService: DateUtilService,
+    private logForm: LogformService,
+    private securityService: SecurityService,
+    private applicationService: ApplicationService,
+    private addressService: AddressesService
+  ) { }
 
   loadFirmDetails(firmId: number): Observable<any> {
     return new Observable(observer => {
@@ -69,15 +81,88 @@ export class FirmDetailsService {
     });
   }
 
-  // loadFirmAdresses(): Observable<any> {
-  //   this.addressService.getFirmAddresses(this.firmId).subscribe(
-  //     data => {
-  //       this.firmAddresses = data.response;
-  //       console.log('Firm Addresses: ', this.firmAddresses);
-  //     }, error => {
-  //       console.error('Error Fetching Firm Addresses', error);
-  //     })
-  // }
+  addNewAddress(targetArray: any[], allAddressTypes: any[], currentDate: string): { canAddNewAddress: boolean, newAddress: any } {
+    const totalAddressTypes = allAddressTypes.length;
+    const validAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+    if (validAddressCount >= totalAddressTypes) {
+      return { canAddNewAddress: false, newAddress: null };
+    }
+
+    // Reset newAddress with default values
+    this.newAddress = {
+      AddressID: null,
+      AddressTypeID: 0,
+      AddressTypeDesc: '',
+      AddressLine1: '',
+      AddressLine2: '',
+      AddressLine3: '',
+      AddressLine4: '',
+      City: '',
+      Province: '',
+      CountryID: 0,
+      CountryName: '',
+      PostalCode: '',
+      PhoneNumber: '',
+      FaxNumber: '',
+      LastModifiedBy: 0,
+      LastModifiedDate: currentDate,
+      addressState: 2, // New entry state
+      FromDate: null,
+      ToDate: null,
+      Valid: true,
+    };
+
+    targetArray.unshift(this.newAddress);
+
+    const updatedValidAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+    return { canAddNewAddress: updatedValidAddressCount < totalAddressTypes, newAddress: this.newAddress };
+  }
+
+  onSameAsTypeChange(selectedTypeID: number, targetArray: any[], newAddress: any): void {
+    const numericTypeID = Number(selectedTypeID);
+
+    if (numericTypeID && numericTypeID !== 0) {
+      const selectedAddress = targetArray.find(address => address.AddressTypeID === numericTypeID);
+      if (selectedAddress) {
+        this.populateNewAddressFields(selectedAddress, newAddress); // Directly populate newAddress
+      }
+    }
+  }
+
+  populateNewAddressFields(sourceAddress: any, targetAddress: any): void {
+    Object.assign(targetAddress, {
+      AddressLine1: sourceAddress.AddressLine1,
+      AddressLine2: sourceAddress.AddressLine2,
+      AddressLine3: sourceAddress.AddressLine2,
+      AddressLine4: sourceAddress.AddressLine2,
+      City: sourceAddress.City,
+      CountryID: sourceAddress.CountryID,
+      State: sourceAddress.State,
+      ZipCode: sourceAddress.ZipCode,
+      Province: sourceAddress.Province,
+      PostalCode: sourceAddress.PostalCode,
+      PhoneNumber: sourceAddress.PhoneNumber,
+      FaxNumber: sourceAddress.FaxNumber
+    });
+  }
+
+
+
+  // Added by Moe
+  loadFirmAddresses(firmId: number): Observable<any> {
+    return new Observable(observer => {
+      this.addressService.getCoreFirmAddresses(firmId).subscribe(
+        data => {
+          const firmAddresses = data.response;
+          observer.next({ firmAddresses });
+        },
+        error => {
+          observer.error('Error fetching firm addresses: ' + error);
+        }
+      );
+    });
+  }
 
   // Added by Moe
   checkFirmLicense(firmId: number) {
@@ -105,7 +190,11 @@ export class FirmDetailsService {
     );
   }
 
-  getErrorMessages(fieldName: string, msgKey: number, activity?: any, customMessage?: string,placeholderValue?: string): Observable<void> {
+
+
+
+
+  getErrorMessages(fieldName: string, msgKey: number, activity?: any, customMessage?: string, placeholderValue?: string): Observable<void> {
     return new Observable(observer => {
       this.logForm.errorMessages(msgKey).subscribe(
         response => {

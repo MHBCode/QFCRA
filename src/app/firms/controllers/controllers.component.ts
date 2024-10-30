@@ -756,17 +756,18 @@ export class ControllersComponent implements OnInit{
     this.firmDetailsService.showErrorAlert(messageKey, this.isLoading);
   }
 
-  loadFirmAdresses() {
-    this.isLoading = true;
-    this.addressService.getFirmAddresses(this.firmId).subscribe(
-      data => {
-        this.firmAddresses = data.response;
-        this.isLoading = false;
-      }, error => {
-        console.error('Error Fetching Firm Addresses', error);
-        this.isLoading = false;
-      })
-  }
+  // loadControllerFirmAdresses() {
+  //   this.isLoading = true;
+  //   this.addressService.getControllerFirmAddressesFirmAddresses(this.firmId).subscribe(
+  //     data => {
+  //       this.firmAddresses = data.response;
+  //       this.isLoading = false;
+  //     }, error => {
+  //       console.error('Error Fetching Firm Addresses', error);
+  //       this.isLoading = false;
+  //     })
+  // }
+  
   removeAddressForm(index: number): void {
     this.addressForms.splice(index, 1);
   }

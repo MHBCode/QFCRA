@@ -797,7 +797,7 @@
           </button>
         </div>
         <div class="add-address-container">
-          <button *ngIf="isEditModeCore && canAddNewAddress" (click)="addNewAddress()"
+          <button *ngIf="isEditModeCore && canAddNewAddress" (click)="addNewAddress(firmAddresses)"
             [hidden]="isCollapsed['addressesSection']" class="addAddressBtn">
             Add Address
           </button>
@@ -847,7 +847,7 @@
                 (!address.AddressID || address.AddressID === '')
               ">
               <label for="sameAsType"> Same As Type </label>
-              <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChange($event)" name="sameAsType"
+              <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChange($event,existingAddresses)" name="sameAsType"
                 id="sameAsType">
                 <option value="0">Select</option>
                 <option *ngFor="let type of existingAddresses" [value]="type.AddressTypeID">

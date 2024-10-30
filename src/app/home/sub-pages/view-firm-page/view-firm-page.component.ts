@@ -1064,20 +1064,19 @@ export class ViewFirmPageComponent implements OnInit {
 
 
 
-  onSameAsTypeChange(selectedTypeID: number) {
+  onSameAsTypeChange(selectedTypeID: number, targetArray: any[]) {
     const numericTypeID = Number(selectedTypeID);
     if (selectedTypeID && selectedTypeID != 0) {
-      // flag to disable address fields after you select exisiting address type from same on as type field
-      this.disableAddressFields = true;
-      const selectedAddress = this.existingAddresses.find(address => address.AddressTypeID === numericTypeID);
-      if (selectedAddress) {
-        this.populateNewAddressFields(selectedAddress);
-      }
+        this.disableAddressFields = true;
+        const selectedAddress = targetArray.find(address => address.AddressTypeID === numericTypeID);
+        if (selectedAddress) {
+            this.populateNewAddressFields(selectedAddress);
+        }
     } else {
-      // enable address fields if 'select' is selected
-      this.disableAddressFields = false;
+        this.disableAddressFields = false;
     }
-  }
+}
+
 
   populateNewAddressFields(address: any) {
     this.newAddress.AddressLine1 = address.AddressLine1;
@@ -4105,7 +4104,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   loadFirmAdresses() {
     this.isLoading = true;
-    this.addressService.getFirmAddresses(this.firmId).subscribe(
+    this.addressService.getCoreFirmAddresses(this.firmId).subscribe(
       data => {
         this.firmAddresses = data.response;
         console.log('Firm Addresses: ', this.firmAddresses);
@@ -4496,22 +4495,65 @@ export class ViewFirmPageComponent implements OnInit {
   }
 
 
-  addNewAddress() {
+  // addNewAddress() {
 
-    // Define the total number of address types
+  //   // Define the total number of address types
+  //   const totalAddressTypes = this.allAddressTypes.length;
+
+  //   // Get the count of valid addresses
+  //   const validAddressCount = this.firmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+  //   // Check if the number of valid addresses is equal to the number of address types
+  //   if (validAddressCount >= totalAddressTypes) {
+  //     // Disable the button if all address types are added
+  //     this.canAddNewAddress = false;
+  //     return;
+  //   }
+
+  //   this.newAddress = {
+  //     AddressID: null,
+  //     AddressTypeID: 0,
+  //     AddressTypeDesc: '',
+  //     AddressLine1: '',
+  //     AddressLine2: '',
+  //     AddressLine3: '',
+  //     AddressLine4: '',
+  //     City: '',
+  //     Province: '',
+  //     CountryID: 0,
+  //     CountryName: '',
+  //     PostalCode: '',
+  //     PhoneNumber: '',
+  //     FaxNumber: '',
+  //     LastModifiedBy: 0, //todo _userId;
+  //     LastModifiedDate: this.currentDate,
+  //     addressState: 2,
+  //     FromDate: null,
+  //     ToDate: null,
+  //     Valid: true,
+  //   };
+
+  //   // Add the new address to the list
+  //   this.firmAddresses.unshift(this.newAddress);
+
+  //   // Update the count of valid addresses
+  //   const updatedValidAddressCount = this.firmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+
+  //   // Disable the button if the count of valid addresses matches the number of address types
+  //   this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+  // }
+
+  addNewAddress(targetArray: any[]): void {
     const totalAddressTypes = this.allAddressTypes.length;
-
-    // Get the count of valid addresses
-    const validAddressCount = this.firmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
-
-    // Check if the number of valid addresses is equal to the number of address types
+    const validAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+  
+    // Check if the number of valid addresses has reached the total number of address types
     if (validAddressCount >= totalAddressTypes) {
-      // Disable the button if all address types are added
       this.canAddNewAddress = false;
       return;
     }
-
-    this.newAddress = {
+  
+   this.newAddress = {
       AddressID: null,
       AddressTypeID: 0,
       AddressTypeDesc: '',
@@ -4526,74 +4568,27 @@ export class ViewFirmPageComponent implements OnInit {
       PostalCode: '',
       PhoneNumber: '',
       FaxNumber: '',
-      LastModifiedBy: 0, //todo _userId;
+      LastModifiedBy: 0,
       LastModifiedDate: this.currentDate,
-      addressState: 2,
+      addressState: 2, // New entry state
       FromDate: null,
       ToDate: null,
       Valid: true,
     };
-
-    // Add the new address to the list
-    this.firmAddresses.unshift(this.newAddress);
-
-    // Update the count of valid addresses
-    const updatedValidAddressCount = this.firmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
-
-    // Disable the button if the count of valid addresses matches the number of address types
+  
+    targetArray.unshift(this.newAddress);
+  
+    // Update the count of valid addresses in the target array
+    const updatedValidAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+  
+    // Set whether the button should be disabled based on the new count
     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
   }
-
-  //   addNewAddress(addressArray: any[]) {
-  //     // Define the total number of address types
-  //     const totalAddressTypes = this.allAddressTypes.length;
-
-  //     // Get the count of valid addresses
-  //     const validAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
-
-  //     // Check if the number of valid addresses is equal to the number of address types
-  //     if (validAddressCount >= totalAddressTypes) {
-  //         // Disable the button if all address types are added
-  //         this.canAddNewAddress = false;
-  //         return;
-  //     }
-
-  //     const newAddress = {
-  //         AddressID: null,
-  //         AddressTypeID: 0,
-  //         AddressTypeDesc: '',
-  //         AddressLine1: '',
-  //         AddressLine2: '',
-  //         AddressLine3: '',
-  //         AddressLine4: '',
-  //         City: '',
-  //         Province: '',
-  //         CountryID: 0,
-  //         CountryName: '',
-  //         PostalCode: '',
-  //         PhoneNumber: '',
-  //         FaxNumber: '',
-  //         LastModifiedBy: 0, //todo _userId;
-  //         LastModifiedDate: this.currentDate,
-  //         addressState: 2,
-  //         FromDate: null,
-  //         ToDate: null,
-  //         Valid: true,
-  //     };
-
-  //     // Add the new address to the beginning of the target array
-  //     addressArray.unshift(newAddress);
-
-  //     // Update the count of valid addresses
-  //     const updatedValidAddressCount = addressArray.filter(addr => addr.Valid && !addr.isRemoved).length;
-
-  //     // Disable the button if the count of valid addresses matches the number of address types
-  //     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
+  
+  // areAllAddressTypesAdded() {
+  //   const existingTypes = new Set(this.firmAddresses.map(addr => Number(addr.AddressTypeID)));
+  //   return this.allAddressTypes.every(type => existingTypes.has(type.AddressTypeID));
   // }
-  areAllAddressTypesAdded() {
-    const existingTypes = new Set(this.firmAddresses.map(addr => Number(addr.AddressTypeID)));
-    return this.allAddressTypes.every(type => existingTypes.has(type.AddressTypeID));
-  }
 
   removeAddress(index: number) {
     Swal.fire({
