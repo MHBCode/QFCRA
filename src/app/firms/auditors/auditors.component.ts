@@ -45,6 +45,7 @@ export class AuditorsComponent {
   firmAuditorType: { EntitySubTypeID: number, EntitySubTypeDesc: string }[] = [];
   objectOpTypeIdEdit = 41;
   objectOpTypeIdCreate = 40;
+  assignedUserRoles: any = [];
 
 
   constructor(
@@ -64,9 +65,19 @@ export class AuditorsComponent {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
       this.loadFirmDetails(this.firmId);
+      this.loadAssignedUserRoles(this.userId);
       if (this.FIRMAuditors.length === 0) {
         this.loadAuditors();
       }
+      this.firmDetailsService.isFirmLicensed$.subscribe(
+        (value) => (this.isFirmLicensed = value)
+      );
+      this.firmDetailsService.isFirmAuthorised$.subscribe(
+        (value) => (this.isFirmAuthorised = value)
+      );
+
+      this.firmDetailsService.checkFirmLicense(this.firmId);
+      this.firmDetailsService.checkFirmAuthorisation(this.firmId);
     })
   }
 
@@ -81,6 +92,18 @@ export class AuditorsComponent {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
       data => {
         this.firmDetails = data.firmDetails;
+      },
+      error => {
+        console.error(error);
+      }
+    );
+  }
+
+  loadAssignedUserRoles(userId: number): void {
+    this.firmDetailsService.loadAssignedUserRoles(userId).subscribe(
+      data => {
+        this.assignedUserRoles = data.assignedUserRoles;
+        console.log('Roles successfully fetched:', this.assignedUserRoles);
       },
       error => {
         console.error(error);

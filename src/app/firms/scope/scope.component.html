@@ -1,5 +1,5 @@
 <div *ngIf="isLoading" class="loader-overlay">
-    <div class="loader"></div>
+  <div class="loader"></div>
 </div>
 
 <div class="form-section edit-scope-section">
@@ -48,8 +48,8 @@
           <h2 class="edit-firm-header">
             Scope > <span>{{ firmDetails?.FirmName }}</span>
           </h2>
-          <div *ngIf="currentLicRevisionNumber === lastLicRevisionNumber" style="display: flex; gap: 10px">        
-              <div class="btn" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn">
+          <div *ngIf="currentLicRevisionNumber === lastLicRevisionNumber" style="display: flex; gap: 10px">
+            <div class="btn" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn">
               <button [disabled]="!getControlEnablement('imgBtnEdit')" class="edit-btn" (click)="editLicenseScope()">
                 <i class="bi bi-pen"></i>Edit
               </button>
@@ -126,10 +126,11 @@
                 ActivityLicensed[0]?.ScopeRevNum <= 1
               ">Application Date</label>
             <input [disabled]="disableApplicationDate" name="appDate" id="appDate" #dateInputs placeholder type="text"
-              [(ngModel)]="ActivityLicensed[0].ScopeAppliedDate" [ngClass]="{'error-border': errorMessages['ScopeAppliedDate']}"/>
+              [(ngModel)]="ActivityLicensed[0].ScopeAppliedDate"
+              [ngClass]="{'error-border': errorMessages['ScopeAppliedDate']}" />
           </div>
           <!-- on creation mode -->
-           <!-- <input *ngIf="isCreateModeLicense" disabled type="text" #dateInputs placeholder [(ngModel)]="firmDetails.FirmLicApplDate"> -->
+          <!-- <input *ngIf="isCreateModeLicense" disabled type="text" #dateInputs placeholder [(ngModel)]="firmDetails.FirmLicApplDate"> -->
           <div class="input-field">
             <label for="licenseDate"> Licensed Date </label>
             <input disabled name="licenseDate" id="licenseDate" type="text"
@@ -304,6 +305,9 @@
     <div class="authorized-body" [ngClass]="{ collapsed: isCollapsed['authorizeSection'] }">
       <div class="inputs-field-set scopeFor">
         <div class="error-messages">
+          <p *ngIf="errorMessages['correctPermittedActivities']">
+            {{ errorMessages['correctPermittedActivities'] }}
+          </p>
           <p *ngIf="errorMessages['ScopeAppliedDateAuth']">
             {{ errorMessages['ScopeAppliedDateAuth'] }}
           </p>
@@ -312,10 +316,7 @@
           </p>
           <p *ngIf="errorMessages['EffectiveDateLaterApplicationDate']">
             {{ errorMessages['EffectiveDateLaterApplicationDate'] }}
-          </p>
-          <p *ngIf="errorMessages['correctPermittedActivities']">
-            {{ errorMessages['correctPermittedActivities'] }}
-          </p>
+          </p>        
           <p *ngIf="errorMessages['PrudentialEffectiveDate']">
             {{ errorMessages['PrudentialEffectiveDate'] }}
           </p>
@@ -375,10 +376,10 @@
         <div class="inputs-row">
           <div class="input-field">
             <label for="formReff"> Form Reference </label>
-            <a *ngIf="isEditModeAuth || !(ActivityAuth[0].ScopeRevNum)" (click)="getFormReferenceDocuments()" class="form-ref-btn">Select/De-select document</a>
-            <a id="websiteLink"
-              href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{documentDetails.Column3}}" target="_blank"
-              rel="noopener noreferrer">
+            <a *ngIf="isEditModeAuth || !(ActivityAuth[0].ScopeRevNum)" (click)="getFormReferenceDocuments()"
+              class="form-ref-btn">Select/De-select document</a>
+            <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{documentDetails.Column3}}"
+              target="_blank" rel="noopener noreferrer">
               {{documentDetails?.formattedFileName || documentDetails?.FileName}}
             </a>
           </div>
@@ -408,7 +409,7 @@
               ">Application Date</label>
             <input [disabled]="disableApplicationDate" [(ngModel)]="ActivityAuth[0].ScopeApplicationDate" [ngClass]="{
                 'error-border': errorMessages['ScopeAppliedDateAuth']
-              }" name="q13AppDate" id="AppDate" type="text" #dateInputs placeholder/>
+              }" name="q13AppDate" id="AppDate" type="text" #dateInputs placeholder />
           </div>
           <div class="input-field">
             <label for="incorporationDate"> Incorporation Date </label>
@@ -678,6 +679,9 @@
                 <p *ngIf="activity?.errorMessages?.['Products']">
                   {{ activity.errorMessages['Products'] }}
                 </p>
+                <p *ngIf="activity?.errorMessages?.['DuplicateActivity']">
+                  {{ activity.errorMessages['DuplicateActivity'] }}
+                </p>
               </div>
 
               <!-- on view mode -->
@@ -758,13 +762,14 @@
             <div style="display: flex; gap: 15px">
               <label for="isIslamicFinanceExist"> Islamic Finance </label>
               <input style="width: 15px" type="checkbox" name="isIslamicFinanceExist" id="isIslamicFinanceExist"
-                [(ngModel)]="isIslamicFinanceChecked"/>
+                [(ngModel)]="isIslamicFinanceChecked" />
             </div>
           </div>
           <div class="input-field">
             <label for="islamicFinanceType"> Type </label>
             <select [disabled]="!isIslamicFinanceChecked || !isEditModeAuth" name="islamicFinanceType"
-              id="islamicFinanceType" [(ngModel)]="islamicFinance.IFinTypeId" [ngClass]="{'error-border': errorMessages['islamicType']}">
+              id="islamicFinanceType" [(ngModel)]="islamicFinance.IFinTypeId"
+              [ngClass]="{'error-border': errorMessages['islamicType']}">
               <option value="0">Select</option>
               <option value="1">Islamic Institution</option>
               <option value="2">Islamic Window</option>
@@ -802,7 +807,7 @@
             <label for="prudentialCategory"> Prudential Category </label>
             <select [disabled]="!isEditModeAuth" name="prudentialCategory" id="prudentialCategory"
               [(ngModel)]="ActivityAuth[0].PrudentialCategoryTypeID"
-              (ngModelChange)="onPrudentialCategoryChange($event)" 
+              (ngModelChange)="onPrudentialCategoryChange($event)"
               [ngClass]="{'error-border': errorMessages['SectorReturnType']}">
               <option value="0">Select</option>
               <option *ngFor="let option of allPrudentialCategoryTypes" [value]="option.PrudentialCategoryTypeID">
@@ -826,8 +831,7 @@
             <label for="effectiveDate">
               Effective Date
               <span *ngIf="isEditModeAuth" style="color: red">*</span></label>
-            <input [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].PrudentialCategoryEffectiveDate"
-              [ngClass]="{
+            <input [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].PrudentialCategoryEffectiveDate" [ngClass]="{
                 'error-border': errorMessages['PrudentialEffectiveDate']
               }" name="effectiveDate" id="effectiveDate" type="text" #dateInputs placeholder />
           </div>
@@ -898,7 +902,7 @@
               <span *ngIf="isEditModeAuth" style="color: red">*</span></label>
             <input [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].SectorEffectiveDate" [ngClass]="{
                 'error-border': errorMessages['SectorEffectiveDate']
-              }" name="effectiveDate" id="effectiveDate" type="text" #dateInputs placeholder/>
+              }" name="effectiveDate" id="effectiveDate" type="text" #dateInputs placeholder />
           </div>
           <div class="input-field">
             <label for="lastModifiedBy"> Last Modified By </label>
@@ -994,10 +998,10 @@
         </li>
       </ul>
     </div>
-  </div>
-  <div class="popup-buttons-container">
+    </div>
+    <div class="popup-buttons-container">
     <button class="subbutton">Ok</button>
-    <button class="subbutton" (click)="closeSubActivity()">Cancel</button>
+      <button class="subbutton" (click)="closeSubActivity()">Cancel</button>
   </div>
 </div>
 

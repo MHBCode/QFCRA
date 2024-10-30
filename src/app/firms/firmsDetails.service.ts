@@ -12,8 +12,6 @@ import { ApplicationService } from '../ngServices/application.service';
   providedIn: 'root',
 })
 export class FirmDetailsService {
-  firmDetails: any;
-  assignedUserRoles: any[] = [];
   private isFirmLicensedSubject = new BehaviorSubject<boolean>(false);
   private isFirmAuthorisedSubject = new BehaviorSubject<boolean>(false);
 
@@ -51,11 +49,35 @@ export class FirmDetailsService {
           });
         },
         error => {
-          observer.error('Error fetching firm details');
+          observer.error('Error fetching firm details: ' + error);
         }
       );
     });
   }
+
+  loadAssignedUserRoles(userId: number): Observable<any> {
+    return new Observable(observer => {
+      this.securityService.getUserRoles(userId).subscribe(
+        data => {
+          const assignedUserRoles = data.response;  // Process data if needed
+          observer.next({ assignedUserRoles });
+        },
+        error => {
+          observer.error('Error fetching assigned user roles: ' + error);
+        }
+      );
+    });
+  }
+
+  // loadFirmAdresses(): Observable<any> {
+  //   this.addressService.getFirmAddresses(this.firmId).subscribe(
+  //     data => {
+  //       this.firmAddresses = data.response;
+  //       console.log('Firm Addresses: ', this.firmAddresses);
+  //     }, error => {
+  //       console.error('Error Fetching Firm Addresses', error);
+  //     })
+  // }
 
   // Added by Moe
   checkFirmLicense(firmId: number) {
@@ -83,26 +105,11 @@ export class FirmDetailsService {
     );
   }
 
-
-  // Added by Moe
-  loadAssignedUserRoles(userId: number): Observable<any> {
-    return this.securityService.getUserRoles(userId).pipe(
-      tap((assignedRoles) => {
-        this.assignedUserRoles = assignedRoles.response;
-        console.log('Assigned roles:', this.assignedUserRoles);
-      }),
-      error => {
-        console.error('Error fetching assigned roles:', error);
-        return (error);
-      }
-    );
-  }
-
-  getErrorMessages(fieldName: string, msgKey: number, activity?: any, placeholderValue?: string): Observable<void> {
+  getErrorMessages(fieldName: string, msgKey: number, activity?: any, customMessage?: string,placeholderValue?: string): Observable<void> {
     return new Observable(observer => {
       this.logForm.errorMessages(msgKey).subscribe(
         response => {
-          let errorMessage = response.response;
+          let errorMessage = (customMessage ? customMessage + " " : "") + response.response;
 
           // Replace placeholder values if provided
           if (placeholderValue) {

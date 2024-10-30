@@ -125,12 +125,9 @@
 
 .select-container {
     display: flex;
-    gap: 20px;
-    /* Adjust gap as needed */
+    gap: 100px;
     justify-content: center;
-    /* Center selects */
     flex-grow: 1;
-    /* Allow the selects container to grow and take up space */
 }
 
 
@@ -197,6 +194,48 @@
 .regulated-activity-table tbody tr td {
     text-align: left !important;
     cursor: default;
+}
+
+/* sub activity popup expandable style */
+.parent-activity {
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.arrow-icon {
+    border: solid black;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+}
+
+.arrow-icon.rotated {
+    transform: rotate(225deg);
+}
+
+.sub-activity-list {
+    margin-left: 20px;
+    list-style-type: none;
+}
+
+/* */
+
+.sub-activity-container {
+    margin-left: auto;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    background-color: #f2b6c0;
+    padding: 5px 10px;
+}
+
+.sub-activity-container p {
+    width: 47%;
 }
 
 .nested-table {
@@ -316,10 +355,12 @@
     text-decoration: none;
     color: #a41e36;
 }
+
 /* */
 
 /* Prudential Category style */
-.prudentialTable tr th, .prudentialTable tr td {
+.prudentialTable tr th,
+.prudentialTable tr td {
     text-align: center;
 }
 
@@ -327,7 +368,7 @@
 /* */
 
 /* Sub Activities Popup style */
-.SubActivitiesPopUp > div {
+.SubActivitiesPopUp>div {
     width: 100%;
 }
 
@@ -335,72 +376,72 @@
 
 .licensed-header,
 .authorised-header {
-  padding: 5px 0px;
-  text-align: center;
-  background-color: #a51e36;
-  color: white;
+    padding: 5px 0px;
+    text-align: center;
+    background-color: #a51e36;
+    color: white;
 }
 
 .scope-permitted-activity-header {
-  background-color: #f2b6c0;
-  padding: 5px 0px;
+    background-color: #f2b6c0;
+    padding: 5px 0px;
 }
 
 .scope-permitted-activity-header p {
-  text-align: center;
+    text-align: center;
 }
 
 .permitted-activity-body {
-  padding: 0px 15px;
-  line-height: 25px;
-  display: flex;
-  flex-direction: column;
+    padding: 0px 15px;
+    line-height: 25px;
+    display: flex;
+    flex-direction: column;
 }
 
 .permitted-activity-body table tr th {
-  text-align: center;
+    text-align: center;
 }
 
 .permitted-activity-body table tr th,
 .permitted-activity-body table tr td {
-  padding: 0px 3px;
-  cursor: default;
+    padding: 0px 3px;
+    cursor: default;
 }
 
 .permitted-activity-body table tr {
-  background-color: transparent;
+    background-color: transparent;
 }
 
 .permitted-activity-body table {
-  box-shadow: none;
-  border-radius: 0;
-  width: auto;
+    box-shadow: none;
+    border-radius: 0;
+    width: auto;
 }
 
 table .input-field {
-  width: 100%;
+    width: 100%;
 }
 
 .add-permitted-activity {
-  margin-top: 5px;
-  border: none;
-  font-size: 15px;
-  padding: 5px;
-  border-radius: 7px;
-  background: #A51E36;
-  margin-right: 10px;
-  color: white;
+    margin-top: 5px;
+    border: none;
+    font-size: 15px;
+    padding: 5px;
+    border-radius: 7px;
+    background: #A51E36;
+    margin-right: 10px;
+    color: white;
 }
 
 .rmvActivityLicBtn {
-  height: 30px;
-  background: red;
-  color: white;
-  border: none;
-  font-size: 15px;
-  padding: 5px 10px;
-  border-radius: 7px;
-  margin-right: 10px;
+    height: 30px;
+    background: red;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px 10px;
+    border-radius: 7px;
+    margin-right: 10px;
 }
 
 .add-activity-container {
@@ -411,3 +452,15 @@ table .input-field {
 }
 
 /**/
+
+.scope-of-auth, .scope-of-auth > thead > tr > th {
+    border-radius: 0;
+}
+  
+.document-container {
+    padding: 0rem 1rem 1rem 1rem;
+}
+
+.prudentialTable {
+    border-radius: 0;
+}
