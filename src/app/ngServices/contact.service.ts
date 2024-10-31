@@ -25,8 +25,8 @@ export class ContactService {
     return this.http.get<any>(url);
   }
   ///////////////////
-  deleteContactDetails(firmTypeID: string, contactID: number, contactAssnID: number,userID:number): Observable<any> {
-    const url = `${this.baseUrlContact}delete_contact_details?firmTypeID=${firmTypeID}&contactId=${contactID}&contactAssnID=${contactAssnID}&userID=${userID}`;
+  deleteContactDetails(objectID: number, contactID: number, contactAssnID: number,userID:number): Observable<any> {
+    const url = `${this.baseUrlContact}delete_contact_details?firmTypeID=${objectID}&contactId=${contactID}&contactAssnID=${contactAssnID}&userID=${userID}`;
     return this.http.delete<any>(url);
   }
   saveContactDetails(contactDetails: any): Observable<any> {
@@ -44,5 +44,13 @@ export class ContactService {
   getPopulateAis(firmId: number): Observable<any> {
     const url = `${this.baseUrlContact}get_populate_ais?firmId=${firmId}`
     return this.http.get<any>(url);
+  }
+  IsMainContact(firmId: number, entityId: number, entityTypeID: number) {
+    const url = `${this.baseUrlContact}is_main_contact?firmId=${firmId}&EntityTypeId=${entityTypeID}&EntityId=${entityId}`;
+    return this.http.get<number>(url); 
+  }
+  IsContactTypeExists(firmId: number, entityId: number, entityTypeID: number, contactID: number, contactAssnID: number): Observable<any> {
+    const url = `${this.baseUrlContact}is_contact_type_exists?firmId=${firmId}&EntityTypeId=${entityTypeID}&EntityId=${entityId}&ContactID=${contactID}&ContactAssnID=${contactAssnID}`;
+    return this.http.get<number>(url); 
   }
 }

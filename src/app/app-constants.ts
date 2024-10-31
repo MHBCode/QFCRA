@@ -112,6 +112,31 @@ export enum ControllerMessages {
     SELECT_TYPEOFCONTROL = 4015,
     SELECT_ISPEP = 9024,
 }
+export enum ContactMessage
+{
+    FIRMEXIST = 9000,
+    NotFound = 9001,
+    UnableToSave = 9002,
+    ContactFoundMessage = 9003,
+    UpdateMessage = 9004,
+    SaveContact = 9005,
+    SELECTCONTACTTYPE = 9006,
+    SELECTENTITYTYPE = 9007,
+    INVALIDEMAIL = 9008,
+    SAVEERROR = 726,
+    MAIN_CONTACT_EXISTS = 9009,
+    UPDATECONTACT = 9010,
+    ASSOCIATION_CREATED = 9011,
+    CONTACT_TYPE_EXISTS = 9012,
+    VALIDDATE = 9013,
+    EFFECTIVEDATE_AND_ENDDATE = 9014,
+
+     //Added By Salim on 02-June-2011
+    SelectAvaiContact = 9015,
+
+    //Added by Abrar on 12 sep 2011
+    SELECTCONTACT = 9016
+}
 export enum FirmActivitiesEnum {
     ENTER_ALL_REQUIREDFIELDS = 3000,
     ENTER_VALID_SCOPEEFFECTIVEDATE = 3001,

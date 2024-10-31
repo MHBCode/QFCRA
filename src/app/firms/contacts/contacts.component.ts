@@ -137,11 +137,13 @@ export class ContactsComponent {
   }
   deleteContact(output: boolean): void {
     // Replace these with actual values from your component
-    const firmTypeID = '523'; // Assuming firmTypeID is fixed to 1
+    const firmTypeID = 523; // Assuming firmTypeID is fixed to 1
     const contactID = this.selectedContact.ContactID;
     const contactAssnID = this.selectedContact.ContactAssnID;
     
-    this.contactService.deleteContactDetails(firmTypeID, contactID, contactAssnID,30).subscribe(
+    this.contactService.deleteContactDetails(firmTypeID, contactID, contactAssnID,30
+
+    ).subscribe(
       (response) => {
         Swal.fire(
           'Deleted!',
