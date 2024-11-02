@@ -15,11 +15,11 @@
             Create
           </button>
         </div>
-        <span class="enhanced-checkbox">
-          <input id="InactiveContacts" type="checkbox" (change)="onInactiveContactsToggle($event)" />
-          <label for="InactiveContacts">Display Inactive Contacts</label>
-        </span>
       </div>
+      <span class="enhanced-checkbox">
+        <input id="InactiveContacts" type="checkbox" (change)="onInactiveContactsToggle($event)" />
+        <label for="InactiveContacts">Display Inactive Contacts</label>
+      </span>
       <table class="contacts-table">
         <thead>
           <tr>
@@ -45,7 +45,9 @@
         <div class="contollerPopupContent">
           <div class="popup-title-btn-row">
             <div class="popup-header">
-              <h3>Controller For {{ firmDetails?.FirmName }}</h3>
+              <h2>
+                Controller For <span>{{ firmDetails?.FirmName }}</span>
+              </h2>
             </div>
             <button (click)="closeCreateContactPopup()" class="close-button">
               <i class="bi bi-x-circle close-icon"></i>

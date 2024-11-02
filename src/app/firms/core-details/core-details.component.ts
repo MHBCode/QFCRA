@@ -975,36 +975,6 @@ export class CoreDetailsComponent implements OnInit {
   }
 
 
-  removeAddress(index: number) {
-    Swal.fire({
-      text: 'Are you sure you want to delete this record?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ok',
-      cancelButtonText: 'Cancel',
-      reverseButtons: false
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.errorMessages = {};
-        if (index > -1 && index < this.firmAddresses.length) {
-          const address = this.firmAddresses[index];
-          if (!address.AddressID) { // means newly added address
-            // If the address doesn't have an AddressID, completely remove it from the array
-            this.firmAddresses.splice(index, 1);
-          } else {
-            // Otherwise, just mark it as removed
-            address.isRemoved = true;
-          }
-          // Re-check if all address types have been added after removal
-          const validAddressCount = this.firmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
-          this.canAddNewAddress = validAddressCount < this.allAddressTypes.length;
-        }
-      }
-      // No action needed if the user cancels
-    });
-  }
-
-
   get filteredFirmAddresses() {
     return this.firmAddresses.filter(addr => !addr.isRemoved);
   }
@@ -1082,17 +1052,29 @@ export class CoreDetailsComponent implements OnInit {
   //   }
 
 
-  addNewAddress() {
-    const { canAddNewAddress, newAddress } = this.firmDetailsService.addNewAddress(this.firmAddresses, this.allAddressTypes, this.currentDate);
+  addNewAddressOnEditMode() {
+    const { canAddNewAddress, newAddress } = this.firmDetailsService.addNewAddressOnEditMode(this.firmAddresses, this.allAddressTypes, this.currentDate);
     if (newAddress) {
       this.newAddress = newAddress;
       this.canAddNewAddress = canAddNewAddress;
     }
   }
 
-  onSameAsTypeChange(selectedTypeID: number) {
+  removeAddressOnEditMode(index: number) {
+    this.firmDetailsService.removeAddressOnEditMode(
+      index,
+      this.firmAddresses,
+      this.allAddressTypes.length,
+      this.errorMessages
+    ).then(({ canAddNewAddress, updatedArray }) => {
+      this.canAddNewAddress = canAddNewAddress;
+      this.firmAddresses = updatedArray;
+    });
+  }
+
+  onSameAsTypeChangeOnEditMode(selectedTypeID: number) {
     this.disableAddressFields = selectedTypeID && selectedTypeID != 0; // Set disableAddressFields here
-    this.firmDetailsService.onSameAsTypeChange(selectedTypeID, this.existingAddresses, this.newAddress);
+    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, this.existingAddresses, this.newAddress);
   }
 
 

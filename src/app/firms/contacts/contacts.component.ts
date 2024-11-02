@@ -72,6 +72,7 @@ export class ContactsComponent {
       if (this.FIRMContacts.length === 0) {
         this.loadContacts();
       }
+      this.loadFirmDetails(this.firmId);
       this.getAllRegulater(this.Address.countryID, this.firmId);
       this.populateCountries();
       this.populateAddressTypes();

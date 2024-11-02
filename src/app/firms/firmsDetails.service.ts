@@ -81,7 +81,9 @@ export class FirmDetailsService {
     });
   }
 
-  addNewAddress(targetArray: any[], allAddressTypes: any[], currentDate: string): { canAddNewAddress: boolean, newAddress: any } {
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  addNewAddressOnEditMode(targetArray: any[], allAddressTypes: any[], currentDate: string): { canAddNewAddress: boolean, newAddress: any } {
     const totalAddressTypes = allAddressTypes.length;
     const validAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
 
@@ -119,18 +121,51 @@ export class FirmDetailsService {
     return { canAddNewAddress: updatedValidAddressCount < totalAddressTypes, newAddress: this.newAddress };
   }
 
-  onSameAsTypeChange(selectedTypeID: number, targetArray: any[], newAddress: any): void {
+  removeAddressOnEditMode(index: number, targetArray: any[], totalAddressTypes: number, errorMessages: any): Promise<{ canAddNewAddress: boolean; updatedArray: any[] }> {
+    return Swal.fire({
+      text: 'Are you sure you want to delete this record?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        errorMessages = {}; // Reset error messages
+        if (index > -1 && index < targetArray.length) {
+          const address = targetArray[index];
+          if (!address.AddressID) { // Check for newly added address
+            // Remove directly if no AddressID
+            targetArray.splice(index, 1);
+          } else {
+            // Mark existing address as removed
+            address.isRemoved = true;
+          }
+
+          // Calculate the updated valid address count
+          const validAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
+          const canAddNewAddress = validAddressCount < totalAddressTypes;
+
+          return { canAddNewAddress, updatedArray: targetArray };
+        }
+      }
+      // Return the current state if the user cancels
+      return { canAddNewAddress: true, updatedArray: targetArray };
+    });
+  }
+
+  onSameAsTypeChangeOnEditMode(selectedTypeID: number, targetArray: any[], newAddress: any): void {
     const numericTypeID = Number(selectedTypeID);
 
     if (numericTypeID && numericTypeID !== 0) {
       const selectedAddress = targetArray.find(address => address.AddressTypeID === numericTypeID);
       if (selectedAddress) {
-        this.populateNewAddressFields(selectedAddress, newAddress); // Directly populate newAddress
+        this.populateNewAddressFieldsOnEditMode(selectedAddress, newAddress); // Directly populate newAddress
       }
     }
   }
 
-  populateNewAddressFields(sourceAddress: any, targetAddress: any): void {
+  populateNewAddressFieldsOnEditMode(sourceAddress: any, targetAddress: any): void {
     Object.assign(targetAddress, {
       AddressLine1: sourceAddress.AddressLine1,
       AddressLine2: sourceAddress.AddressLine2,
@@ -147,6 +182,133 @@ export class FirmDetailsService {
     });
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  addNewAddressOnCreateMode(targetArray: any[], allAddressTypes: any[], currentDate: string) {
+
+    const totalAddressTypes = allAddressTypes.length;
+
+    if (targetArray.length > 0 && targetArray[targetArray.length - 1].AddressTypeID === 0) {
+      return; // Exit without adding if the last added address has AddressTypeID of 0
+  }
+
+    // Ensure there are unused address types
+    if (targetArray.length < totalAddressTypes) {
+      // Ensure the last added address is marked as selected
+      if (targetArray.length > 0) {
+        targetArray[targetArray.length - 1].isAddressTypeSelected = true;
+      }
+
+      const newAddress = {
+        AddressID: null,
+        AddressTypeID: 0, // Default value, ensuring it's not selected yet
+        AddressTypeDesc: '',
+        AddressLine1: '',
+        AddressLine2: '',
+        AddressLine3: '',
+        AddressLine4: '',
+        City: '',
+        Province: '',
+        CountryID: 0,
+        CountryName: '',
+        PostalCode: '',
+        PhoneNum: '',
+        FaxNum: '',
+        LastModifiedBy: 0,
+        LastModifiedDate: currentDate,
+        addressState: 0,
+        FromDate: null,
+        ToDate: null,
+        Valid: true,
+        isAddressTypeSelected: false // Initially false
+      };
+
+      targetArray.unshift(newAddress); // Add new address at the beginning
+      this.checkCanAddNewAddressOnCreateMode(targetArray, allAddressTypes); // Re-evaluate if more addresses can be added
+    }
+  }
+
+  checkCanAddNewAddressOnCreateMode(targetArray: any[], allAddressTypes: any[]): { canAddNewAddressOnCreate: boolean, isAllAddressesAddedOnCreate: boolean } {
+    const totalAddressTypes = allAddressTypes.length;
+
+    // Check if all addresses have a selected AddressTypeID
+    const allTypesSelected = targetArray.every(address => address.AddressTypeID !== 0);
+
+    // Calculate flags based on conditions
+    const canAddNewAddressOnCreate = allTypesSelected && targetArray.length < totalAddressTypes;
+    const isAllAddressesAddedOnCreate = targetArray.length >= totalAddressTypes;
+
+    return { canAddNewAddressOnCreate, isAllAddressesAddedOnCreate };
+  }
+
+  removeAddressOnCreateMode(index: number, targetArray: any[], allAddressTypes: any[]): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (targetArray.length > 1) {
+        Swal.fire({
+          text: 'Are you sure you want to delete this record?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Ok',
+          cancelButtonText: 'Cancel',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            targetArray.splice(index, 1);
+            this.checkCanAddNewAddressOnCreateMode(targetArray, allAddressTypes);
+            resolve();
+          } else {
+            reject('Operation canceled by user');
+          }
+        });
+      } else {
+        reject('Minimum one address is required');
+      }
+    });
+  }
+
+
+  onSameAsTypeChangeOnCreateMode(selectedTypeID: any, index: number, targetArray: any[]) {
+    const numericTypeID = Number(selectedTypeID); // Convert the selected value to a number
+    const currentAddress = targetArray[index];
+
+    if (!currentAddress) {
+      console.error('No current address found at index:', index);
+      return;
+    }
+
+    if (numericTypeID && numericTypeID != 0) {
+      // Find the selected address from the list
+      const selectedAddress = targetArray.find(address => address.AddressTypeID == numericTypeID);
+      if (selectedAddress) {
+        this.populateNewAddressFieldsOnCreateMode(currentAddress, selectedAddress);
+        currentAddress.isFieldsDisabled = true; // Disable the fields for the current address
+      }
+    } else {
+      // If 'Select' is chosen, enable the address fields
+      currentAddress.isFieldsDisabled = false;
+    }
+  }
+
+  // Updated to accept the target address to populate fields for
+  populateNewAddressFieldsOnCreateMode(targetAddress: any, sourceAddress: any) {
+    targetAddress.AddressLine1 = sourceAddress.AddressLine1;
+    targetAddress.AddressLine2 = sourceAddress.AddressLine2;
+    targetAddress.AddressLine3 = sourceAddress.AddressLine3;
+    targetAddress.AddressLine4 = sourceAddress.AddressLine4;
+    targetAddress.City = sourceAddress.City;
+    targetAddress.CountryID = sourceAddress.CountryID;
+    targetAddress.State = sourceAddress.State;
+    targetAddress.ZipCode = sourceAddress.ZipCode;
+    targetAddress.Province = sourceAddress.Province;
+    targetAddress.PostalCode = sourceAddress.PostalCode;
+    targetAddress.PhoneNum = sourceAddress.PhoneNum;
+    targetAddress.FaxNum = sourceAddress.FaxNum;
+  }
+
+  getAvailableSameAsTypeOptionsOnCreateMode(index: number, targetArray: any[]) {
+    return targetArray.filter((address, i) => i !== index && address.AddressTypeID !== 0);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
   // Added by Moe
