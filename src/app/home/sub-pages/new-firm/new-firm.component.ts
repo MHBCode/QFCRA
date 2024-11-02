@@ -647,7 +647,6 @@ export class NewFirmComponent implements OnInit {
   removeAddress(index: number) {
     if (this.addedAddresses.length > 1) {
       Swal.fire({
-        title: 'Alert',
         text: 'Are you sure you want to delete this record?',
         icon: 'warning',
         showCancelButton: true,

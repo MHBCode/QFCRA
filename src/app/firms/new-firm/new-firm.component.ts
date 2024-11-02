@@ -308,10 +308,10 @@ export class NewFirmComponent implements OnInit {
         firmApplicationDataComments: this.comments.FirmApplicationDataComments || '',
         firmYearEndEffectiveFrom: this.convertDateToYYYYMMDD(this.FirmDetails.FinYearEndEffectiveDate) || null,
         finAccStandardTypeID: this.FirmDetails.AccStdID || 0,
-        finAccStandardID: 0, // What is that??
+        finAccStandardID: 0, 
         firmAccountingEffectiveFrom: this.convertDateToYYYYMMDD(this.FirmDetails.AccStdEffectiveDate) || null,
         dateOfIncorporation: this.convertDateToYYYYMMDD(this.FirmDetails.IncorporationDate),
-        differentIncorporationDate: this.FirmDetails.DifferentIncorporationDate || false,
+        differentIncorporationDate: this.FirmDetails.DifferentIncorporationDate == null ? false : this.FirmDetails.DifferentIncorporationDate,
         firmNameAsinFactSheet: this.FirmDetails.FirmName,
         requiresCoOp: '',
         prComments: this.comments.PublicRegisterComments || ''
@@ -625,13 +625,11 @@ export class NewFirmComponent implements OnInit {
   removeAddress(index: number) {
     if (this.addedAddresses.length > 1) {
       Swal.fire({
-        title: 'Alert',
         text: 'Are you sure you want to delete this record?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Ok',
         cancelButtonText: 'Cancel',
-        reverseButtons: true
       }).then((result) => {
         if (result.isConfirmed) {
           this.addedAddresses.splice(index, 1);

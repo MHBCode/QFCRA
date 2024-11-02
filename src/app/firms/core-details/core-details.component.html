@@ -521,7 +521,7 @@
                 </button>
             </div>
             <div class="add-address-container">
-                <button *ngIf="isEditModeCore && canAddNewAddress" (click)="addNewAddress()"
+                <button *ngIf="isEditModeCore && canAddNewAddress" (click)="addNewAddressOnEditMode()"
                     [hidden]="isCollapsed['addressesSection']" class="addAddressBtn">
                     Add Address
                 </button>
@@ -542,7 +542,7 @@
                             value="{{ address?.AddressTypeDesc }}" />
                     </div>
                     <div *ngIf="isEditModeCore" class="del-address-container">
-                        <button (click)="removeAddress(i)" class="RmvAddressBtn bi-trash"></button>
+                        <button (click)="removeAddressOnEditMode(i)" class="RmvAddressBtn bi-trash"></button>
                     </div>
                     <!-- address type on edit mode -->
                     <div class="input-field" *ngIf="isEditModeCore">
@@ -572,7 +572,7 @@
               (!address.AddressID || address.AddressID === '')
             ">
                         <label for="sameAsType"> Same As Type </label>
-                        <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChange($event)"
+                        <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChangeOnEditMode($event)"
                             name="sameAsType" id="sameAsType">
                             <option value="0">Select</option>
                             <option *ngFor="let type of existingAddresses" [value]="type.AddressTypeID">

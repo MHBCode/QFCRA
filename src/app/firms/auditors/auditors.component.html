@@ -32,7 +32,7 @@
             <th>Last Updated Date</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody *ngIf="filteredAuditors?.length > 0; else noFirmAuditorRecords">
           <tr *ngFor="let auditor of filteredAuditors" (click)="viewAuditor(auditor)">
             <td (click)="viewAuditor(auditor)">
               {{ auditor.OtherEntityName }}
@@ -53,6 +53,13 @@
       </table>
     </div>
   </div>
+  <ng-template #noFirmAuditorRecords>
+    <tbody>
+      <tr>
+        <td colspan="6" class="norecords" style="color: red">No Records Found</td>
+      </tr>
+    </tbody>
+  </ng-template>
   <!-- Popup for viewing/editing auditor -->
   <div *ngIf="IsViewAuditorVisible || IsEditAuditorVisible" class="contollerPopupOverlay">
     <div class="contollerPopupContent">

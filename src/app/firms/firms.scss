@@ -478,5 +478,10 @@ hr {
 .enhanced-checkbox {
     display: flex;
     align-items: center;
+    justify-content: end;
     gap: 8px;
+}
+
+.controller-tables td, .auditor-table td, .contacts-table td {
+    cursor: pointer;
 }

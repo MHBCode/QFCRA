@@ -3343,9 +3343,7 @@ export class ViewFirmPageComponent implements OnInit {
         console.error("Error fetching Controllers", error);
       });
   }
-  getAddressesList() {
-
-  }
+  
 
   addAddressForm(): void {
     if (this.addressForms.length === 0) {
