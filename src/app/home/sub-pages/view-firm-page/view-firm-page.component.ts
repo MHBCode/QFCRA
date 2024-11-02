@@ -2812,6 +2812,7 @@ export class ViewFirmPageComponent implements OnInit {
           console.log("Controller Details Deleted successfully:", response);
           Swal.fire('Deleted!', 'Controller detail has been deleted.', 'success');
           this.loadControllers();
+          this.isPopupOpen = false;
         },
         error => {
           console.error("Error deleting Controller:", error);
@@ -2819,11 +2820,12 @@ export class ViewFirmPageComponent implements OnInit {
         }
       );
     } else {
-      this.contactService.deleteContactDetails(objectID, contactID, relatedEntityID, this.userId).subscribe(
+      this.contactService.deleteContactDetails(objectID, contactID, contactAssnID, this.userId).subscribe(
         response => {
           console.log("Controller Details Deleted successfully:", response);
           Swal.fire('Deleted!', 'Controller detail has been deleted.', 'success');
-          this.loadControllers();
+          this.loadControllersIndividual();
+          this.isPopupOpen = false;
         },
         error => {
           console.error("Error deleting Controller:", error);
@@ -3595,7 +3597,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
   createControllerPopupChanges(): void {
     console.log("CreatecontrollerDetails", this.CreatecontrollerDetails)
-    //this.CreateControllerValidateForm();
+    this.CreateControllerValidateForm();
 
     // Check if there are any errors
     if (this.hasValidationErrors) {
@@ -7159,10 +7161,10 @@ export class ViewFirmPageComponent implements OnInit {
     // Replace these with actual values from your component
     const objectID = FrimsObject.Contatcs; // Assuming firmTypeID is fixed to 1
     const contactID = this.selectedContact.contactID;
-    const contactAssnID = this.selectedContact.contactAssnID;
+    const contactAssId = this.selectedContact.contactAssnID;
     const userID = this.userId;
-    console.log(contactID, contactAssnID, "contactAssnID contactID")
-    this.contactService.deleteContactDetails(objectID, contactID, contactAssnID, userID).subscribe(
+    console.log(contactID, contactAssId, "contactAssnID contactID")
+    this.contactService.deleteContactDetails(objectID, contactID, contactAssId, userID).subscribe(
       (response) => {
         Swal.fire(
           'Deleted!',
