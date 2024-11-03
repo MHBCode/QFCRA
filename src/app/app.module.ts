@@ -8,12 +8,13 @@ import { CreateContactComponent } from './home/sub-pages/create-contact/create-c
 import { DetailsLayoutComponent } from './details-layout-component/details-layout-component.component';
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
     LoaderComponent,
     CreateContactComponent,
-    DetailsLayoutComponent
+    DetailsLayoutComponent,
   ],
   imports: [
     BrowserModule,

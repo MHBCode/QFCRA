@@ -16,28 +16,22 @@
             </h3>
             <i class="menu-icons bi bi-info-square" *ngIf="closedMenu"></i>
             <div class="sub-menu" *ngIf="!closedMenu && activeMenu === 'firmDetails'">
-                <a class="menu-sub-item" [routerLink]="['/firms/view', firmId]"
-                     routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view', firmId]" routerLinkActive="active">
                     Firms Details
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/core-details', firmId]"
-                     routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/core-details', firmId]" routerLinkActive="active">
                     Core Details
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/scope', firmId]"
-                     routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/scope', firmId]" routerLinkActive="active">
                     Scope
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/controllers', firmId]"
-                     routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/controllers', firmId]" routerLinkActive="active">
                     Controllers
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/auditors', firmId]"
-                    routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/auditors', firmId]" routerLinkActive="active">
                     Auditors
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/contacts', firmId]"
-                    routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/contacts', firmId]" routerLinkActive="active">
                     Contacts
                 </a>
             </div>
@@ -62,34 +56,43 @@
             </h3>
             <i class="menu-icons bi bi-kanban" *ngIf="closedMenu"></i>
             <div class="sub-menu" *ngIf="!closedMenu && activeMenu === 'supervision'">
-                <a class="menu-sub-item">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view', firmId]" routerLinkActive="active">
+                    Supervision
+                </a>
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/reporting-schedule', firmId]"
+                    routerLinkActive="active">
                     Reporting Schedule
                 </a>
-                <a class="menu-sub-item">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/return-review', firmId]"
+                    routerLinkActive="active">
                     Return Review
                 </a>
-                <a class="menu-sub-item">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/notices', firmId]" routerLinkActive="active">
                     Notices
                 </a>
-                <a class="menu-sub-item">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/admin-fee', firmId]"
+                    routerLinkActive="active">
                     Admin Fee
                 </a>
-                <a class="menu-sub-item">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/RMPs', firmId]" routerLinkActive="active">
                     RMPs
                 </a>
-                <a class="menu-sub-item">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/breaches', firmId]"
+                    routerLinkActive="active">
                     Breaches
                 </a>
-                <a class="menu-sub-item">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/waivers', firmId]" routerLinkActive="active">
                     Waivers
                 </a>
-                <a class="menu-sub-item">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/enforcement-actions', firmId]"
+                    routerLinkActive="active">
                     Enf. Actions
                 </a>
-                <a class="menu-sub-item">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/registered-fund', firmId]"
+                    routerLinkActive="active">
                     Reg. Funds
                 </a>
-                <a class="menu-sub-item">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/journal', firmId]" routerLinkActive="active">
                     Journal
                 </a>
             </div>

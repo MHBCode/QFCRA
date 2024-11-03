@@ -1,0 +1,515 @@
+<div class="form-section">
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="section-header">
+                    <!-- Supervision > <span>{{ firmDetails?.FirmName }}</span> -->
+                    Supervision Category > <span>Al Rayyan</span>
+                </h2>
+                <div>
+                    <button class="subbutton-open-history" (click)="getSupervisionCategory()">
+                        <i class="bi bi-clock-history"></i><span> Open History</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="inputs-row">
+            <div class="input-field">
+                <label for="authorisationCategory">Authorisation Category</label>
+                <input disabled name="authorisationCategory" id="authorisationCategory" type="text" value="IBANK" />
+            </div>
+            <div class="input-field">
+                <label for="authorisationCategory">Supervision Category</label>
+                <input disabled name="authorisationCategory" id="authorisationCategory" type="text"
+                    value="Investment Manager" />
+            </div>
+            <div class="input-field">
+                <label for="authorisationCategory">Date Effective From</label>
+                <input disabled name="authorisationCategory" id="authorisationCategory" type="text"
+                    value="01/Dec/2013" />
+            </div>
+        </div>
+    </div>
+
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="section-header">
+                    Client Assets
+                </h2>
+            </div>
+        </div>
+
+        <div class="inputs-row">
+            <div class="input-field">
+                <label for="holdsclientmoney">Holds Client Money</label>
+                <input disabled name="holdsclientmoney" id="holdsclientmoney" type="text" value="holdsclientmoney" />
+            </div>
+        </div>
+    </div>
+
+
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="section-header">
+                    Firm Report Basis
+                </h2>
+            </div>
+        </div>
+
+        <div class="inputs-row">
+            <div class="input-field">
+                <label for="firmreportbasistype">Firm Report Basis Type</label>
+                <input disabled name="firmreportbasistype" id="firmreportbasistype" type="text" value="Solo" />
+            </div>
+            <div class="input-field">
+                <label for="effectivedate">Effective Date</label>
+                <input disabled name="effectivedate" id="effectivedate" type="text" value="01/Apr/2014" />
+            </div>
+        </div>
+    </div>
+
+
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="section-header">
+                    Operational Data
+                </h2>
+                <div>
+                    <button class="subbutton-open-history" (click)="getOperationalData()">
+                        <i class="bi bi-clock-history"></i><span> Open History</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="inputs-row">
+            <div class="input-field">
+                <label for="Noofstaffinqatar"> No. of Staff in Qatar</label>
+                <input disabled name="Noofstaffinqatar" id=" Noofstaffinqatar" type="text" value="15" />
+            </div>
+            <div class="input-field">
+                <label for="stafftotal">Staff Total</label>
+                <input disabled name="stafftotal" id="stafftotal" type="text" value="15" />
+            </div>
+            <div class="input-field">
+                <label for="operationalDateEffectiveFrom">Date Effective From</label>
+                <input disabled name="operationalDateEffectiveFrom" id="operationalDateEffectiveFrom" type="text"
+                    value="01/Dec/2013" />
+            </div>
+            <div class="input-field fullwidth">
+                <label for="notes"> Notes </label>
+                <textarea name="notes" disabled id="notes"
+                    value="As at 30 September 2023, the staff nos. are 15, please refer Quarterly Prudential return of Q3-2023.
+                  They were approved to become operational on 3 June 2008 and moved to be a Category 2 Firm on 26 October 2008.
+                  
+                  As at 31 December 2021, ARI's head count is 15 nos. as reported in Quarterly return of 31 December 2021. ARI recruited a business analyst in June21. Out of 25 positions at ARI, 5 positions are frozen and 5 are open for recruitment. (Refer C & C report 31 December 2021)."></textarea>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="section-header">
+                    Firm Report Basis
+                </h2>
+            </div>
+        </div>
+
+        <div class="inputs-row">
+            <div class="input-field">
+                <label for="firmreportbasistype">Firm Report Basis Type</label>
+                <input disabled name="firmreportbasistype" id="firmreportbasistype" type="text" value="Solo" />
+            </div>
+            <div class="input-field">
+                <label for="effectivedate">Effective Date</label>
+                <input disabled name="effectivedate" id="effectivedate" type="text" value="01/Apr/2014" />
+            </div>
+        </div>
+    </div>
+
+
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="section-header">
+                    Credit Ratings - Firm
+                </h2>
+                <div>
+                    <button class="subbutton-open-history" (click)="getCreditRatingsData()">
+                        <i class="bi bi-clock-history"></i><span> Open History</span>
+                    </button>
+                </div>
+            </div>
+            <table class="supervision-tables">
+                <thead>
+                    <tr>
+                        <th>Rating Name</th>
+                        <th>Rating Assigned</th>
+                        <th>Rating Effective From</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3" class="agency-name">Rating Agency: Fitch</td>
+                    </tr>
+                    <tr class="rating-row">
+                        <td>Long Term Issuer Default Rating</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                    </tr>
+                    <tr class="rating-row">
+                        <td>Short Term Issuer Default Rating</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                    </tr>
+                    <tr class="rating-row">
+                        <td>Support Rating</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                    </tr>
+
+
+                    <tr>
+                        <td colspan="3" class="agency-name">Rating Agency: Moody's</td>
+                      </tr>
+                      <tr class="rating-row">
+                        <td>Long Term Rating</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                      </tr>
+                      <tr class="rating-row">
+                        <td>Short Term Rating</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                      </tr>
+                      <tr class="rating-row">
+                        <td>Bank Financial Strength</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                      </tr>
+                      <tr>
+                        <td colspan="3" class="agency-name">Rating Agency: Standard & Poors</td>
+                      </tr>
+                      <tr class="rating-row">
+                        <td>Long Term Foreign Issuer Credit</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                      </tr>
+                      <tr class="rating-row">
+                        <td>Short Term Foreign Issuer Credit</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                      </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="section-header">
+                    Credit Ratings - Sovereign ( Home Country - Qatar )
+                </h2>
+                <div>
+                    <button class="subbutton-open-history" (click)="getCreditRatingsSovereignData()">
+                        <i class="bi bi-clock-history"></i><span> Open History</span>
+                    </button>
+                </div>
+            </div>
+            <table class="supervision-tables">
+                <thead>
+                    <tr>
+                        <th>Rating Name</th>
+                        <th>Rating Assigned</th>
+                        <th>Rating Effective From</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3" class="agency-name">Rating Agency: Fitch</td>
+                    </tr>
+                    <tr class="rating-row">
+                        <td>Long Term Issuer Default Rating</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                    </tr>
+                    <tr class="rating-row">
+                        <td>Short Term Issuer Default Rating</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="3" class="agency-name">Rating Agency: Moody's</td>
+                      </tr>
+                      <tr class="rating-row">
+                        <td>Long Term Rating</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                      </tr>
+                      <tr class="rating-row">
+                        <td>Short Term Rating</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                      </tr>
+                      <tr>
+                        <td colspan="3" class="agency-name">Rating Agency: Standard & Poors</td>
+                      </tr>
+                      <tr class="rating-row">
+                        <td>Long Term Foreign Issuer Credit</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                      </tr>
+                      <tr class="rating-row">
+                        <td>Short Term Foreign Issuer Credit</td>
+                        <td>NR</td>
+                        <td>15/Oct/2015</td>
+                      </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Supervision Category Popup -->
+<div *ngIf="callSupervisionCategory" class="overlay show"></div>
+<div *ngIf="callSupervisionCategory" class="popup-wrapper popupcontainer">
+    <i class="bi bi-x-circle close-icon" (click)="closeCategoryPopup()"></i>
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Financial Year End History</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Authorisation Category</th>
+                    <th>Supervision Category</th>
+                    <th>Date Effective From</th>
+                    <th>Date Effective To</th>
+                    <th>Last Modified By</th>
+                    <th>Last Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>IBANK</td>
+                    <td>Investment Management</td>
+                    <td>01/Dec/2023</td>
+                    <td>
+                        01/Dec/2023
+                    </td>
+                    <td>01/Dec/2023</td>
+                    <td>01/Dec/2023</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button class="subbutton" (click)="closeCategoryPopup()">Close</button>
+    </div>
+</div>
+
+
+<!-- Operational Data -->
+<div *ngIf="callOperationalData" class="overlay show"></div>
+<div *ngIf="callOperationalData" class="OperationalData popupcontainer">
+    <i class="bi bi-x-circle close-icon" (click)="closeOperationalDataPopup()"></i>
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Operational Data</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>No. of Staff in Qatar</th>
+                    <th>Staff Total</th>
+                    <th>Notes</th>
+                    <th>Date Effective From</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>IBANK</td>
+                    <td>Investment Management</td>
+                    <td>As at 30 September 2023, the staff nos. are 15, please refer Quarterly Prudential return of Q3-2023.
+                        They were approved to become operational on 3 June 2008 and moved to be a Category 2 Firm on 26 October 2008.
+                        
+                        As at 31 December 2021, ARI's head count is 15 nos. as reported in Quarterly return of 31 December 2021. ARI recruited a business analyst in June21. Out of 25 positions at ARI, 5 positions are frozen and 5 are open for recruitment. (Refer C & C report 31 December 2021).</td>
+                    <td>
+                        01/Dec/2023
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button class="subbutton" (click)="closeCategoryPopup()">Close</button>
+    </div>
+</div>
+
+
+<!-- Credit Ratings - Firm -->
+<div *ngIf="callCreditRatings" class="overlay show"></div>
+<div *ngIf="callCreditRatings" class="CreditRatings popupcontainer">
+    <i class="bi bi-x-circle close-icon" (click)="closeCreditRatingsPopup()"></i>
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Credit Ratings - Firm</h3>
+        </div>
+        <table class="supervision-tables">
+            <thead>
+                <tr>
+                    <th>Rating Name</th>
+                    <th>Rating Assigned</th>
+                    <th>Rating Effective From</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="3" class="agency-name">Rating Agency: Fitch</td>
+                </tr>
+                <tr class="rating-row">
+                    <td>Long Term Issuer Default Rating</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                </tr>
+                <tr class="rating-row">
+                    <td>Short Term Issuer Default Rating</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                </tr>
+                <tr class="rating-row">
+                    <td>Support Rating</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                </tr>
+
+
+                <tr>
+                    <td colspan="3" class="agency-name">Rating Agency: Moody's</td>
+                  </tr>
+                  <tr class="rating-row">
+                    <td>Long Term Rating</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                  </tr>
+                  <tr class="rating-row">
+                    <td>Short Term Rating</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                  </tr>
+                  <tr class="rating-row">
+                    <td>Bank Financial Strength</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" class="agency-name">Rating Agency: Standard & Poors</td>
+                  </tr>
+                  <tr class="rating-row">
+                    <td>Long Term Foreign Issuer Credit</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                  </tr>
+                  <tr class="rating-row">
+                    <td>Short Term Foreign Issuer Credit</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                  </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button class="subbutton" (click)="closeCreditRatingsPopup()">Close</button>
+    </div>
+</div>
+
+<!-- Credit Ratings - Sovereign ( Home Country - Qatar ) -->
+<div *ngIf="callCreditRatingsSovereign " class="overlay show"></div>
+<div *ngIf="callCreditRatingsSovereign" class="CreditRatingsSovereign popupcontainer">
+    <i class="bi bi-x-circle close-icon" (click)="closeCreditRatingsSovereignPopup()"></i>
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Credit Ratings - Sovereign ( Home Country - Qatar )</h3>
+        </div>
+        <table class="supervision-tables">
+            <thead>
+                <tr>
+                    <th>Rating Name</th>
+                    <th>Rating Assigned</th>
+                    <th>Rating Effective From</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="3" class="agency-name">Rating Agency: Fitch</td>
+                </tr>
+                <tr class="rating-row">
+                    <td>Long Term Issuer Default Rating</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                </tr>
+                <tr class="rating-row">
+                    <td>Short Term Issuer Default Rating</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                </tr>
+                <tr class="rating-row">
+                    <td>Support Rating</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                </tr>
+
+
+                <tr>
+                    <td colspan="3" class="agency-name">Rating Agency: Moody's</td>
+                  </tr>
+                  <tr class="rating-row">
+                    <td>Long Term Rating</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                  </tr>
+                  <tr class="rating-row">
+                    <td>Short Term Rating</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                  </tr>
+                  <tr class="rating-row">
+                    <td>Bank Financial Strength</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" class="agency-name">Rating Agency: Standard & Poors</td>
+                  </tr>
+                  <tr class="rating-row">
+                    <td>Long Term Foreign Issuer Credit</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                  </tr>
+                  <tr class="rating-row">
+                    <td>Short Term Foreign Issuer Credit</td>
+                    <td>NR</td>
+                    <td>15/Oct/2015</td>
+                  </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <div class="popup-operations-place">
+        <button class="subbutton" (click)="closeCreditRatingsSovereignPopup()">Close</button>
+    </div>
+</div>

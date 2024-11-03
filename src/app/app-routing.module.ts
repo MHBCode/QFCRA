@@ -14,6 +14,10 @@ const routes: Routes = [
   { path: 'firms',
     loadChildren: () => import('./firms/firms.module').then(m => m.FirmsModule) 
   },
+  { path: 'supervision',
+    loadChildren: () => import('./supervision/supervision.module').then(m => m.SupervisionModule) 
+  },
+  
   {
     path: 'error',
     loadChildren: () => import('./error/error.module').then(mod => mod.ErrorModule)

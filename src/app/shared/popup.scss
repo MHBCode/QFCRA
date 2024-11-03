@@ -1,0 +1,75 @@
+.popupcontainer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 78vw;
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    padding: 1rem;
+    background: white;
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+    gap: 2rem;
+    display: none;
+    z-index: 100;
+    border-radius: 10px;
+
+
+    .popup-info-place {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .close-icon {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        font-size: 26px;
+        cursor: pointer;
+        color: #a51e36;
+    }
+
+    .popup-operations-place {
+        width: 100%;
+        text-align: end;
+    }
+
+    .subbutton {
+        padding: 10px;
+        color: white;
+        background: #a51e36;
+        border: none;
+        border-radius: 5px;
+    }
+
+    .app-detail-history-header {
+        background: #a51e36;
+        color: white;
+        cursor: default;
+        padding: 10px;
+        width: 100%;
+        font-size: 0.85em;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+
+}
+
+.overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+}
