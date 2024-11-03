@@ -26,7 +26,8 @@ import { AttachmentComponent } from './attachment/attachment.component';
     DataPlaceComponent,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    AttachmentComponent
   ]
 })
 export class SharedModule { }

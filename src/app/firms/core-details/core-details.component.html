@@ -427,53 +427,14 @@
         </div>
         <!-- Aicha : This should be a component -->
         <div class="inputs-row">
-            <div class="file-container">
-              <div class="input-field">
-                <label for="documentType"> Document Type </label>
-                <select [disabled]="!isEditModeCore"
-                  class="document-type-select" name="documentType" id="documentType">
-                  <option value="263">Press Releases</option>
-                </select>
-              </div>
-              <div class="input-field">
-                <label id="uploaded-documents">Uploaded documents go here</label>
-              </div>
-              <div class="input-field">
-                <div class="btns-container">
-                  <div class="upload-container">
-                    <button class="choose-document-btn" (click)="selectDocument()">
-                      Choose Document
-                    </button>
-                  </div>
-                  <button class="upload-document-btn" (click)="uploadDocument()">
-                    Upload the Document
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="file-table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Document Type</th>
-                    <th>File Name</th>
-                    <th>Delete</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Attachment</td>
-                    <td></td>
-                    <td>
-                      <button style="display: none" class="delete-file">
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+            <app-attachment 
+            [documentObj]="documentObj" 
+            [isEditModeCore]="isEditModeCore"
+            [DocSubTypeID]="fetchedCoreDetailDocSubTypeID"
+            [loadDocuments]="loadDocuments.bind(this)"
+            (documentUploaded)="onDocumentUploaded($event)">
+          </app-attachment>
+        </div>
     </div>
 
     <!---->

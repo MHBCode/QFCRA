@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import Swal from 'sweetalert2';
 import * as constants from 'src/app/app-constants';
 import { SharepointDocumentsService } from 'src/app/ngServices/sharepoint-documents.service';
@@ -15,6 +15,11 @@ import { SharePointUploadResponse } from 'src/app/models/sharepoint-upload-respo
   styleUrls: ['./attachment.component.scss']
 })
 export class AttachmentComponent implements OnInit {
+  @Input() loadDocuments: (documentObj?: any) => void;
+  @Input() isEditModeCore: boolean = false;
+  @Input() documentObj: any;
+  @Input() DocSubTypeID: any = {};
+
   selectedFile: File | null = null;
   fileError: string = '';
   callUploadDoc: boolean = false;
@@ -26,34 +31,30 @@ export class AttachmentComponent implements OnInit {
   now = new Date();
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
+  @Output() documentUploaded = new EventEmitter<any>();
 
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private logForm: LogformService,
     private objectWF: ObjectwfService,
     private securityService: SecurityService,
     private sharepointService: SharepointDocumentsService
-  ) {
-
-  }
+  ) { }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.firmId = +params['id']; 
-    })
-
+      this.firmId = +params['id'];
+    });
   }
-  /* start of  documents functions */
+
   confirmOkUpload() {
     if (this.selectedFile) {
-      // Display the selected file name in the main section
       const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
       if (uploadedDocumentsDiv) {
         uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
       }
-      // closes the popup
       this.callUploadDoc = false;
       const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
       setTimeout(() => {
@@ -62,7 +63,7 @@ export class AttachmentComponent implements OnInit {
         } else {
           console.error('Element with class not found');
         }
-      }, 0)
+      }, 0);
     } else {
       console.error('No valid PDF file selected.');
     }
@@ -79,7 +80,6 @@ export class AttachmentComponent implements OnInit {
       delete this.errorMessages['uploadDocument'];
     }
 
-    // If validation errors exist, stop the process
     if (this.hasValidationErrors) {
       this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       this.isLoading = false;
@@ -97,22 +97,14 @@ export class AttachmentComponent implements OnInit {
           console.log('File uploaded successfully', response);
 
           const [fileLocation, intranetGuid] = response.result.split(';');
-          let documentObj: any;
-          // Scope Of Authorisation (Scope Authorised)
-          if (this.activeTab === this.Page.Scope && this.tabIndex === 1) {
-            docu
-            mentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid, constants.DocType.SCOPE, this.Page.Scope, this.fetchedScopeDocSubTypeID.DocSubTypeID, this.ActivityAuth[0].FirmScopeID, this.ActivityAuth[0].ScopeRevNum);
-            // Press Release (Core Detail)
-          } else if (this.activeTab === this.Page.CoreDetail) {
-            documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid, constants.DocType.FIRM_DOCS, this.Page.CoreDetail, this.fetchedCoreDetailDocSubTypeID.DocSubTypeID, this.firmAppDetailsCurrentAuthorized.FirmApplStatusID, 1);
-          }
-          this.saveDocument(documentObj);
+
+          this.documentUploaded.emit({ fileLocation, intranetGuid });
 
           const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
           if (uploadedDocumentsDiv) {
             uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
           }
-          // closes the popup
+
           this.callUploadDoc = false;
           const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
           setTimeout(() => {
@@ -121,7 +113,8 @@ export class AttachmentComponent implements OnInit {
             } else {
               console.error('Element with class not found');
             }
-          }, 0)
+          }, 0);
+
           this.uploadFileSuccess(constants.DocumentAttechment.saveDocument);
           this.isLoading = false;
         },
@@ -129,7 +122,6 @@ export class AttachmentComponent implements OnInit {
           console.error('Error occurred during file upload', err);
           this.showErrorAlert(constants.MessagesLogForm.ERROR_UPLOADING_FILE);
           this.isLoading = false;
-          // Handle the error (e.g., display error message)
         }
       });
     } else {
@@ -138,37 +130,21 @@ export class AttachmentComponent implements OnInit {
     }
   }
 
-  // deleteDocument(
-  //   docID: number,
-  //   objectId: number,
-  //   objectInstanceId: number,
-  //   objectInstanceRevNum: number,
-  //   postDeleteCallback: () => void // Accept a callback function
-  // ): Observable<any> {
-  //   return this.objectWF.deleteDocument(docID, objectId, objectInstanceId, objectInstanceRevNum).pipe(
-  //     tap(response => {
-  //       console.log('Document deleted successfully:', response);
-  //       postDeleteCallback(); // Call the callback after deletion
-  //     })
-  //   );
-  // }
-
-  deleteDocument(
-    docID: number,
-    objectId: number,
-    objectInstanceId: number,
-    objectInstanceRevNum: number,
-    postDeleteCallback: () => void // Accept a callback function
-  ): Observable<any> {
-    return this.objectWF.deleteDocument(docID, objectId, objectInstanceId, objectInstanceRevNum).pipe(
-      tap(response => {
+  deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number) {
+    this.objectWF.deleteDocument(docID, objectId, objectInstanceId, ObjectInstanceRevNum).subscribe({
+      next: (response) => {
         console.log('Document deleted successfully:', response);
-        postDeleteCallback(); // Call the callback after deletion
-      })
-    );
+        if (this.loadDocuments) {
+          this.loadDocuments();
+        }
+      },
+      error: (err) => {
+        console.error('Error occurred while deleting the document:', err);
+      }
+    });
   }
 
-  showUploadConfirmation() {
+  showUploadConfirmation(documentObj: any) {
     Swal.fire({
       text: 'Are you sure you want to upload the scope of authorisation, please verify the below scope changes and then upload the file?',
       icon: 'warning',
@@ -198,56 +174,6 @@ export class AttachmentComponent implements OnInit {
     this.isLoading = false;
   }
 
-  // fetchSubTypeDocIDs() {
-  //   this.securityService.getObjectTypeTable(constants.docSubTypes).subscribe(data => {
-  //     // Scope Of Authorsation in Scope Authorised
-  //     this.fetchedScopeDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
-  //       item.DocSubTypeID === 262
-  //     );
-  //     // Press Release in Core Detail
-  //     this.fetchedCoreDetailDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
-  //       item.DocSubTypeID === 263
-  //     );
-  //   });
-  // }
-
-
-  fetchSubTypeDocIDs(docSubTypeIDs: number[]): Observable<any[]> {
-    return this.securityService.getObjectTypeTable(constants.docSubTypes).pipe(
-      map(data => {
-        return docSubTypeIDs.map(id => 
-          data.response.find((item: { DocSubTypeID: number }) => item.DocSubTypeID === id)
-        );
-      })
-    );
-  }
-  
-  prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number, objectId: number, docSubTypeID: number, objectInstanceID: number, objectInstanceRevNum: number) {
-    return {
-      userId: userId,
-      docID: null,
-      referenceNumber: null,
-      fileName: this.selectedFile.name,
-      fileNumber: this.newfileNum.toString(),
-      firmId: this.firmId,
-      otherFirm: null,
-      docTypeID: docType,
-      loggedBy: userId,
-      loggedDate: this.currentDate,
-      receivedBy: userId,
-      receivedDate: this.currentDate,
-      docRecieptMethodID: constants.LogFormRecieptMethods.InternalDocument,
-      checkPrimaryDocID: true,
-      fileLocation: fileLocation,
-      docAttributeID: null,
-      intranetGuid: intranetGuid,
-      objectID: objectId,
-      objectInstanceID: objectInstanceID,
-      objectInstanceRevNum: objectInstanceRevNum,
-      docSubType: docSubTypeID
-    };
-  }
-
   getNewFileNumber() {
     this.logForm.getNewFileNumber(this.firmId, this.currentDate).subscribe(data => {
       this.newfileNum = data.response.Column1;
@@ -255,43 +181,36 @@ export class AttachmentComponent implements OnInit {
       console.error(error);
     })
   }
-  
-  saveDocument(documentObj: any, callback?: () => void) {
-    this.isLoading = true;
-    this.objectWF.insertDocument(documentObj).subscribe(
-      response => {
-        console.log('Document saved successfully:', response);
-  
-        // Call the callback function if provided
-        if (callback) {
-          callback();
-        }
-  
-        this.isLoading = false;
-      },
-      error => {
-        console.error('Error saving document:', error);
-        this.isLoading = false;
-      }
-    );
-  }
-  
 
   getErrorMessages(fieldName: string, msgKey: number, activity?: any, placeholderValue?: string) {
     this.logForm.errorMessages(msgKey).subscribe(
       (response) => {
         let errorMessage = response.response;
-        // If a placeholder value is provided, replace the placeholder with the actual value
         if (placeholderValue) {
           errorMessage = errorMessage.replace("#Date#", placeholderValue).replace("##DateFieldLabel##", placeholderValue).replace("#ApplicationDate#", placeholderValue);
         }
         this.errorMessages[fieldName] = errorMessage;
-        activity.errorMessages[fieldName] = errorMessage;
+        if (activity) {
+          activity.errorMessages[fieldName] = errorMessage;
+        }
       },
       (error) => {
         console.error(`Failed to load error message for ${fieldName}.`, error);
       }
     );
+  }
+
+
+  selectDocument() {
+    this.callUploadDoc = true;
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.selectDocumentPopUp') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .selectDocumentPopUp not found');
+      }
+    }, 0)
   }
 
   showErrorAlert(messageKey: number) {
@@ -307,4 +226,30 @@ export class AttachmentComponent implements OnInit {
     this.isLoading = false;
   }
 
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      const file = input.files[0];
+      if (file.type === 'application/pdf') {
+        this.selectedFile = file;
+        this.fileError = ''; // Clear any previous error message
+      } else {
+        this.fileError = 'Please select a valid PDF file.';
+        this.selectedFile = null;
+      }
+    }
+  }
+  
+  closeSelectDocument() {
+    this.callUploadDoc = false;
+    this.selectedFile = null;
+    const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
+    setTimeout(() => {
+      if (popupWrapper) {
+        popupWrapper.style.display = 'none';
+      } else {
+        console.error('Element with class not found');
+      }
+    }, 0)
+  }
 }
