@@ -130,7 +130,7 @@ export enum ContactMessage
     CONTACT_TYPE_EXISTS = 9012,
     VALIDDATE = 9013,
     EFFECTIVEDATE_AND_ENDDATE = 9014,
-
+    SELECT_ISPEP = 9024,
      //Added By Salim on 02-June-2011
     SelectAvaiContact = 9015,
 

@@ -24,6 +24,7 @@ import { environment } from 'src/environments/environment';
 import { SharepointDocumentsService } from 'src/app/ngServices/sharepoint-documents.service';
 import { SharePointUploadResponse } from 'src/app/models/sharepoint-upload-response.interface';
 import { AiElectronicswfService } from 'src/app/ngServices/ai-electronicswf.service';
+import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 
 
 @Component({
@@ -325,7 +326,8 @@ export class ViewFirmPageComponent implements OnInit {
     private el: ElementRef,
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private firmDetailsService: FirmDetailsService
   ) {
 
   }
@@ -336,7 +338,6 @@ export class ViewFirmPageComponent implements OnInit {
     this.updatePaginationapproved();
     this.updatePaginationWithdrawn();
     this.updatePaginationApplied();
-
     this.route.params.subscribe(params => {
       this.firmId = +params['id']; // Retrieve the firm ID from the route parameters
       console.log(`Loaded firm with ID: ${this.firmId}`);
@@ -2415,7 +2416,7 @@ export class ViewFirmPageComponent implements OnInit {
         }
       },
     );
-
+    this.assignFieldsFromOtherEntityName();
     console.log("controllerDetails", this.controllerDetails)
     console.log("selectedController", this.selectedController)
 
@@ -2524,6 +2525,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.errorMessages = {}; // Clear previous error messages
     this.hasValidationErrors = false;
   }
+ 
   closeCreateControllerPopup(): void {
     this.isEditable = false;
     this.showCreateControllerSection = false; // Close the popup
@@ -2532,53 +2534,146 @@ export class ViewFirmPageComponent implements OnInit {
     this.hideForms = true;
   }
   EditControllerValidateForm(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.errorMessages = {}; // Clear previous error messages
-      this.hasValidationErrors = false;
+    if (
+      ["Parent Entity", "Corporate Controller", "Head Office of a Branch", "UBO – Corporate"].includes(this.selectedController.EntityTypeDesc)
+    ) {
+      return new Promise<void>((resolve, reject) => {
+        this.errorMessages = {}; // Clear previous error messages
+        this.hasValidationErrors = false;
 
-      // Validate Full Name of Entity
-      if (!this.selectedController.OtherEntityName) {
-        this.getErrorMessages('OtherEntityName', constants.ControllerMessages.ENTER_OTHER_ENTITY_NAME);
-      }
-
-      // Validate Effective Date
-      if (!this.selectedController.EffectiveDate) {
-        this.getErrorMessages('EffectiveDate', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
-      }
-
-      // Validate Cessation Date
-      if (!this.selectedController.CessationDate) {
-        this.getErrorMessages('CessationDate', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
-      } else if (this.selectedController.EffectiveDate && new Date(this.selectedController.EffectiveDate) > new Date(this.selectedController.CessationDate)) {
-        this.getErrorMessages('CessationDate', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
-      }
-
-      // Validate Place of Establishment
-      if (!this.selectedController.PlaceOfEstablishment) {
-        this.getErrorMessages('PlaceOfEstablishment', constants.ControllerMessages.SELECT_RECORD);
-      }
-
-      // Validate Type of Control
-      if (!this.selectedController.ControllerControlTypeDesc) {
-        this.getErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
-      }
-
-      // Validate Percentage of Holding
-      if (this.selectedController.PctOfShares) {
-        const pct = parseFloat(this.selectedController.PctOfShares);
-        if (isNaN(pct) || pct < 0 || pct > 100) {
-          this.getErrorMessages('PctOfShares', constants.ControllerMessages.ENTER_VALID_PERCENTAGE);
+        // Validate Full Name of Entity
+        if (!this.selectedController.OtherEntityName) {
+          this.getErrorMessages('OtherEntityName', constants.ControllerMessages.ENTER_OTHER_ENTITY_NAME);
+          this.hasValidationErrors = true;
         }
-      }
 
-      // Check for any validation errors
-      if (Object.keys(this.errorMessages).length > 0) {
-        this.hasValidationErrors = true;
-        resolve(); // Resolve with errors
-      } else {
-        resolve(); // Resolve with no errors
-      }
-    });
+        // Validate Effective Date
+        if (this.isNullOrEmpty(this.selectedController.AssnDateFrom) || this.selectedController.AssnDateFrom === undefined) {
+          this.getErrorMessages('AssnDateFrom', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
+          this.hasValidationErrors = true;
+        }
+        if (this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo)) {
+          this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+          this.hasValidationErrors = true;
+        }
+
+
+        // Validate Place of Establishment
+        if (!this.selectedController.PlaceOfEstablishment || this.selectedController.PlaceOfEstablishment === '0') {
+          this.getErrorMessages('PlaceOfEstablishment', constants.ControllerMessages.SELECT_RECORD);
+          this.hasValidationErrors = true;
+        }
+
+        // Validate Type of Control
+        if (!this.selectedController.ControllerControlTypeDesc || this.selectedController.ControllerControlTypeDesc === '0') {
+          this.getErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
+          this.hasValidationErrors = true;
+        }
+
+        // Validate Percentage of Holding
+        if (this.selectedController.PctOfShares) {
+          const pct = parseFloat(this.selectedController.PctOfShares);
+          if (isNaN(pct) || pct < 0 || pct > 100) {
+            this.getErrorMessages('PctOfShares', constants.ControllerMessages.ENTER_VALID_PERCENTAGE);
+            this.hasValidationErrors = true;
+          }
+        }
+
+        // Check if there are any validation errors
+        if (Object.keys(this.errorMessages).length > 0) {
+          this.hasValidationErrors = true;
+          resolve(); // Resolve the promise with errors
+        } else {
+          resolve(); // Resolve with no errors
+        }
+      });
+    } else {
+      return new Promise<void>((resolve, reject) => {
+        this.errorMessages = {}; // Clear previous error messages
+        this.hasValidationErrors = false;
+
+        // Validate First Name
+        if (!this.selectedController.FirstName || this.selectedController.FirstName.trim().length === 0) {
+          this.getErrorMessages('firstName', constants.ControllerMessages.ENTER_FIRSTNAME);
+          this.hasValidationErrors = true;
+        }
+
+        // Validate Family Name
+        if (!this.selectedController.FamilyName || this.selectedController.FamilyName.trim().length === 0) {
+          this.getErrorMessages('familyName', constants.ControllerMessages.ENTER_FAMILYNAME);
+          this.hasValidationErrors = true;
+        }
+
+        // Validate Date of Birth
+      
+
+        // Validate Is PEP
+         if (this.selectedController.isPEP === undefined || this.selectedController.isPEP === null) {
+           this.getErrorMessages('isPEP', constants.ControllerMessages.SELECT_ISPEP, 'Is Politically Exposed Person (PEP)?*');
+           this.hasValidationErrors = true;
+         }
+
+        // Validate Controller Control Type
+        // if (!this.CreatecontrollerDetails.ControllerControlTypeID || this.CreatecontrollerDetails.ControllerControlTypeDesc === '0' || this.CreatecontrollerDetails.ControllerControlTypeDesc == undefined || this.CreatecontrollerDetails.ControllerControlTypeDesc == null) {
+        //   this.getErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
+        //   this.hasValidationErrors = true;
+        // }
+        if (!this.selectedController.ControllerControlTypeID) {
+          this.getErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
+          this.hasValidationErrors = true;
+        } 
+        // if (!this.CreatecontrollerDetails.AssnDateFrom || this.selectedAuditor.AssnDateFrom === undefined) {
+        //   this.getErrorMessages('AssnDateFrom', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
+        //   this.hasValidationErrors = true;
+        // } 
+       
+        // // Validate Cessation Date
+        // if (!this.CreatecontrollerDetails.AssnDateTo) {
+        //   this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+        //   this.hasValidationErrors = true;
+        // } else if (
+        //   this.CreatecontrollerDetails.AssnDateFrom &&
+        //   new Date(this.CreatecontrollerDetails.AssnDateFrom) > new Date(this.CreatecontrollerDetails.AssnDateTo)
+        // ) {
+        //   this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+        //   this.hasValidationErrors = true;
+        // }
+        // /////////////////////////
+        if (this.isNullOrEmpty(this.selectedController.DateOfBirth) || this.selectedController.DateOfBirth === undefined) {
+          this.getErrorMessages('dateOfBirth', constants.ControllerMessages.ENTER_VALID_BIRTHDATE);
+          this.hasValidationErrors = true;
+        } 
+        if (this.isNullOrEmpty(this.selectedController.AssnDateFrom) || this.selectedController.AssnDateFrom === undefined) {
+          this.getErrorMessages('AssnDateFrom', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
+          this.hasValidationErrors = true;
+        }
+        if (this.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.selectedController.AssnDateTo)) {
+          this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+          this.hasValidationErrors = true;
+        }
+        // // Validate Percentage of Holding
+        // if (this.CreatecontrollerDetails.percentOfHolding) {
+        //   const pct = parseFloat(this.CreatecontrollerDetails.percentOfHolding);
+        //   if (isNaN(pct) || pct < 0 || pct > 100) {
+        //     this.getErrorMessages('percentOfHolding', constants.ControllerMessages.ENTER_VALID_PERCENTAGE);
+        //     this.hasValidationErrors = true;
+        //   } else {
+        //     // Validate Total Percentage of Holding
+        //     const totalPctofShares = this.getTotalPctOfShares(this.CreatecontrollerDetails.contactId);
+        //     if (pct + totalPctofShares > 100) {
+        //       this.getErrorMessages('percentOfHolding', constants.ControllerMessages.ENTERED_PERCENTAGE_NOTEXCEED);
+        //       this.hasValidationErrors = true;
+        //     }
+        //   }
+        // }
+        // Resolve promise based on validation result
+        if (this.hasValidationErrors) {
+          resolve(); // Form is invalid
+        } else {
+          resolve(); // Form is valid
+        }
+      });
+    }
   }
 
   getLegalStatusDescription(): string {
@@ -2812,6 +2907,7 @@ export class ViewFirmPageComponent implements OnInit {
           console.log("Controller Details Deleted successfully:", response);
           Swal.fire('Deleted!', 'Controller detail has been deleted.', 'success');
           this.loadControllers();
+          this.isPopupOpen = false;
         },
         error => {
           console.error("Error deleting Controller:", error);
@@ -2819,11 +2915,12 @@ export class ViewFirmPageComponent implements OnInit {
         }
       );
     } else {
-      this.contactService.deleteContactDetails(objectID, contactID, relatedEntityID, this.userId).subscribe(
+      this.contactService.deleteContactDetails(objectID, contactID, contactAssnID, this.userId).subscribe(
         response => {
           console.log("Controller Details Deleted successfully:", response);
           Swal.fire('Deleted!', 'Controller detail has been deleted.', 'success');
-          this.loadControllers();
+          this.loadControllersIndividual();
+          this.isPopupOpen = false;
         },
         error => {
           console.error("Error deleting Controller:", error);
@@ -2956,6 +3053,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
           response => {
             console.log("Save successful:", response);
+            this.loadControllers();
           },
           error => {
             console.error("Error saving changes:", error);
@@ -3052,6 +3150,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
           response => {
             console.log("Contact save successful:", response);
+            this.loadControllersIndividual();
           },
           error => {
             console.error("Error saving contact:", error);
@@ -3063,6 +3162,21 @@ export class ViewFirmPageComponent implements OnInit {
   isValidDate(dateString: string): boolean {
     const regEx = /^\d{2}\/\d{2}\/\d{4}$/;
     return regEx.test(dateString) && !isNaN(new Date(dateString).getTime());
+  }
+  assignFieldsFromOtherEntityName(): void {
+    if (this.selectedController.OtherEntityName) {
+      const nameParts = this.selectedController.OtherEntityName.split(" ");
+      
+      // Assuming a consistent format: Title, First Name, Second Name, Family Name
+      if (nameParts.length === 4) {
+        this.selectedController.Title = nameParts[0];       // e.g., "Mr"
+        this.selectedController.FirstName = nameParts[1];    // e.g., "Yazan"
+        this.selectedController.SecondName = nameParts[2];   // e.g., "Ali"
+        this.selectedController.FamilyName = nameParts[3];   // e.g., "Abdullah"
+      } else {
+        console.warn("Unexpected name format. Expected 'Title FirstName SecondName FamilyName'.");
+      }
+    }
   }
   CreateControllerValidateForm(): Promise<void> {
     if (
@@ -3079,25 +3193,15 @@ export class ViewFirmPageComponent implements OnInit {
         }
 
         // Validate Effective Date
-        if (!this.CreatecontrollerDetails.AssnDateFrom) {
+        if (this.isNullOrEmpty(this.CreatecontrollerDetails.AssnDateFrom) || this.CreatecontrollerDetails.AssnDateFrom === undefined) {
           this.getErrorMessages('AssnDateFrom', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
           this.hasValidationErrors = true;
-        } else if (!this.isValidDate(this.CreatecontrollerDetails.AssnDateFrom)) {
-          this.getErrorMessages('AssnDateFrom', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
+        }
+        if (this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo)) {
+          this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
           this.hasValidationErrors = true;
         }
 
-        // Validate Cessation Date
-        if (!this.CreatecontrollerDetails.AssnDateTo) {
-          this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
-          this.hasValidationErrors = true;
-        } else if (
-          this.CreatecontrollerDetails.AssnDateFrom &&
-          new Date(this.CreatecontrollerDetails.AssnDateFrom) > new Date(this.CreatecontrollerDetails.AssnDateTo)
-        ) {
-          this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
-          this.hasValidationErrors = true;
-        }
 
         // Validate Place of Establishment
         if (!this.CreatecontrollerDetails.PlaceOfEstablishment || this.CreatecontrollerDetails.PlaceOfEstablishment === '0') {
@@ -3146,50 +3250,52 @@ export class ViewFirmPageComponent implements OnInit {
         }
 
         // Validate Date of Birth
-        if (!this.CreatecontrollerDetails.DateOfBirth || this.CreatecontrollerDetails.DateOfBirth === constants.BLANK_DATE) {
-          this.getErrorMessages('dateOfBirth', constants.ControllerMessages.ENTER_VALID_BIRTHDATE);
-          this.hasValidationErrors = true;
-        } else if (!this.isValidDate(this.CreatecontrollerDetails.DateOfBirth)) {
-          this.getErrorMessages('dateOfBirth', constants.ControllerMessages.ENTER_VALID_BIRTHDATE);
-          this.hasValidationErrors = true;
-        }
+      
 
         // Validate Is PEP
          if (this.CreatecontrollerDetails.isPEP === undefined || this.CreatecontrollerDetails.isPEP === null) {
-           this.getErrorMessages('isPEP', constants.ControllerMessages.SELECT_ISPEP, null, 'Is Politically Exposed Person (PEP)?*');
+           this.getErrorMessages('isPEP', constants.ControllerMessages.SELECT_ISPEP,null, 'Is Politically Exposed Person (PEP)?*');
            this.hasValidationErrors = true;
          }
 
         // Validate Controller Control Type
-        if (!this.CreatecontrollerDetails.ControllerControlTypeID || this.CreatecontrollerDetails.ControllerControlTypeDesc === '0') {
-          this.getErrorMessages('controllerControlType', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
+        // if (!this.CreatecontrollerDetails.ControllerControlTypeID || this.CreatecontrollerDetails.ControllerControlTypeDesc === '0' || this.CreatecontrollerDetails.ControllerControlTypeDesc == undefined || this.CreatecontrollerDetails.ControllerControlTypeDesc == null) {
+        //   this.getErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
+        //   this.hasValidationErrors = true;
+        // }
+        if (!this.CreatecontrollerDetails.ControllerControlTypeID) {
+          this.getErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
+          this.hasValidationErrors = true;
+        } 
+        // if (!this.CreatecontrollerDetails.AssnDateFrom || this.selectedAuditor.AssnDateFrom === undefined) {
+        //   this.getErrorMessages('AssnDateFrom', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
+        //   this.hasValidationErrors = true;
+        // } 
+       
+        // // Validate Cessation Date
+        // if (!this.CreatecontrollerDetails.AssnDateTo) {
+        //   this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+        //   this.hasValidationErrors = true;
+        // } else if (
+        //   this.CreatecontrollerDetails.AssnDateFrom &&
+        //   new Date(this.CreatecontrollerDetails.AssnDateFrom) > new Date(this.CreatecontrollerDetails.AssnDateTo)
+        // ) {
+        //   this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+        //   this.hasValidationErrors = true;
+        // }
+        // /////////////////////////
+        if (this.isNullOrEmpty(this.CreatecontrollerDetails.DateOfBirth) || this.CreatecontrollerDetails.DateOfBirth === undefined) {
+          this.getErrorMessages('dateOfBirth', constants.ControllerMessages.ENTER_VALID_BIRTHDATE);
+          this.hasValidationErrors = true;
+        } 
+        if (this.isNullOrEmpty(this.CreatecontrollerDetails.AssnDateFrom) || this.CreatecontrollerDetails.AssnDateFrom === undefined) {
+          this.getErrorMessages('AssnDateFrom', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
           this.hasValidationErrors = true;
         }
-
-        // Validate Effective Date
-        if (this.CreatecontrollerDetails.EffectiveDate && this.CreatecontrollerDetails.EffectiveDate !== constants.BLANK_DATE) {
-          if (!this.isValidDate(this.CreatecontrollerDetails.EffectiveDate)) {
-            this.getErrorMessages('effectiveDate', constants.ControllerMessages.ENTER_VALID_EFFECTIVEDATE);
-            this.hasValidationErrors = true;
-          }
+        if (this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom) >= this.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo)) {
+          this.getErrorMessages('AssnDateTo', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
+          this.hasValidationErrors = true;
         }
-
-        // Validate Cessation Date
-        if (this.CreatecontrollerDetails.CessationDate && this.CreatecontrollerDetails.CessationDate !== constants.BLANK_DATE) {
-          if (!this.isValidDate(this.CreatecontrollerDetails.CessationDate)) {
-            this.getErrorMessages('cessationDate', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
-            this.hasValidationErrors = true;
-          }
-          // Ensure Effective Date is earlier than Cessation Date
-          if (
-            this.CreatecontrollerDetails.EffectiveDate &&
-            new Date(this.CreatecontrollerDetails.EffectiveDate) > new Date(this.CreatecontrollerDetails.CessationDate)
-          ) {
-            this.getErrorMessages('cessationDate', constants.ControllerMessages.ENTER_GREATER_CESSATION_DATE);
-            this.hasValidationErrors = true;
-          }
-        }
-
         // // Validate Percentage of Holding
         // if (this.CreatecontrollerDetails.percentOfHolding) {
         //   const pct = parseFloat(this.CreatecontrollerDetails.percentOfHolding);
@@ -3343,8 +3449,76 @@ export class ViewFirmPageComponent implements OnInit {
         console.error("Error fetching Controllers", error);
       });
   }
-  
+  ///
+  newAddressOnEdit: any = {};
+  canAddNewAddressOnEdit: boolean = true;
+  disableAddressFieldsOnEdit: boolean = false;
 
+
+  // used variables on create mode
+  addedAddresses: any = []; // Array will hold the newly added addresses
+  addedAddressesOnCreate: any = [];
+  canAddNewAddressOnCreate: boolean = true;
+  isAllAddressesAddedOnCreate: boolean;
+  addNewAddressOnEditMode() {
+    const { canAddNewAddress, newAddress } = this.firmDetailsService.addNewAddressOnEditMode(this.ControllerfirmAddresses, this.allAddressTypes, this.currentDate);
+    if (newAddress) {
+      this.newAddressOnEdit = newAddress;
+      this.canAddNewAddressOnEdit = canAddNewAddress;
+    }
+  }
+  removeAddressOnEditMode(index: number) {
+    this.firmDetailsService.removeAddressOnEditMode(
+      index,
+      this.ControllerfirmAddresses,
+      this.allAddressTypes.length,
+      this.errorMessages
+    ).then(({ canAddNewAddress, updatedArray }) => {
+      this.canAddNewAddressOnEdit = canAddNewAddress;
+      this.ControllerfirmAddresses = updatedArray;
+    });
+  }
+  onAddressTypeChangeOnEditMode(event: any, address: any) {
+    const selectedAddressTypeId = Number(event.target.value);
+
+    if (selectedAddressTypeId === 0) {
+      // Do nothing if the "Select" option is chosen
+      address.AddressTypeID = 0;
+      address.AddressTypeDesc = '';
+      return;
+    }
+
+    // Get all valid addresses
+    const validAddresses = this.ControllerfirmAddresses.filter(addr => addr.Valid);
+
+    // Check if the selected address type already exists in valid addresses
+    const isDuplicate = validAddresses.some(addr => addr.AddressTypeID === selectedAddressTypeId);
+
+    if (isDuplicate) {
+      // Show an alert message if duplicate is found
+      this.showErrorAlert(constants.AddressControlMessages.DUPLICATE_ADDRESSTYPES);
+
+      // Reset the dropdown to default ("Select" option)
+      event.target.value = "0";
+      address.AddressTypeID = 0;  // Also reset the AddressTypeID in the model
+      address.AddressTypeDesc = ''; // Reset the description as well
+      return;
+    }
+
+
+    // Update the AddressTypeID and AddressTypeDesc based on the selection
+    const selectedAddressType = this.allAddressTypes.find(type => type.AddressTypeID === selectedAddressTypeId);
+
+    if (selectedAddressType) {
+      // Update the Address model
+      address.AddressTypeID = selectedAddressType.AddressTypeID;
+      address.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
+    }
+  }
+  onSameAsTypeChangeOnEditMode(selectedTypeID: number) {
+    this.disableAddressFieldsOnEdit = selectedTypeID && selectedTypeID != 0; // Set disableAddressFields here
+    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, this.existingControllerAddresses, this.newAddressOnEdit);
+  }
   addAddressForm(): void {
     if (this.addressForms.length === 0) {
       // If the array is empty, add the first form without validation
@@ -3593,7 +3767,7 @@ export class ViewFirmPageComponent implements OnInit {
   }
   createControllerPopupChanges(): void {
     console.log("CreatecontrollerDetails", this.CreatecontrollerDetails)
-    //this.CreateControllerValidateForm();
+    this.CreateControllerValidateForm();
 
     // Check if there are any errors
     if (this.hasValidationErrors) {
@@ -3824,6 +3998,7 @@ export class ViewFirmPageComponent implements OnInit {
       this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
         response => {
           console.log("Contact save successful:", response);
+          this.loadControllersIndividual();
         },
         error => {
           console.error("Error saving contact:", error);
@@ -6449,7 +6624,7 @@ export class ViewFirmPageComponent implements OnInit {
         let errorMessage = response.response;
         // If a placeholder value is provided, replace the placeholder with the actual value
         if (placeholderValue) {
-          errorMessage = errorMessage.replace("#Date#", placeholderValue).replace("##DateFieldLabel##", placeholderValue).replace("#ApplicationDate#", placeholderValue).replace(constants.DataFieldLabel);
+          errorMessage = errorMessage.replace("#Date#", placeholderValue).replace("##DateFieldLabel##", placeholderValue).replace("#ApplicationDate#", placeholderValue).replace(constants.DataFieldLabel,placeholderValue);
         }
         this.errorMessages[fieldName] = errorMessage;
         activity.errorMessages[fieldName] = errorMessage;
@@ -6808,7 +6983,7 @@ export class ViewFirmPageComponent implements OnInit {
     countryofBirth: 0,
     juridictionID: 0,
     objectID: 0,
-    isPeP: false,
+    isPeP: null,
     EntityTypeID: 0,
     contactTypeId: 0,
     functionTypeId: 0,
@@ -6917,7 +7092,42 @@ export class ViewFirmPageComponent implements OnInit {
       this.createContactObj.EntityTypeID = entityTypeIDParts[0]; // Take the first part
     }
   }
+  CreateContactValidateForm(): Promise<void> {
+      return new Promise<void>((resolve, reject) => {
+        this.errorMessages = {}; // Clear previous error messages
+        this.hasValidationErrors = false;
+
+        // Validate First Name
+        if (!this.createContactObj.firstName || this.createContactObj.firstName.trim().length === 0) {
+          this.getErrorMessages('firstName', constants.ControllerMessages.ENTER_FIRSTNAME);
+          this.hasValidationErrors = true;
+        }
+
+        if (this.createContactObj.isPeP === undefined || this.createContactObj.isPeP === null) {
+           this.getErrorMessages('isPeP', constants.ContactMessage.SELECT_ISPEP,null, 'Is Politically Exposed Person (PEP)?*');
+           this.hasValidationErrors = true;
+        }
+        if (!this.createContactObj.contactType) {
+          this.getErrorMessages('contactType', constants.ContactMessage.SELECTCONTACTTYPE);
+          this.hasValidationErrors = true;
+        } 
+
+
+        if (this.hasValidationErrors) {
+          resolve(); // Form is invalid
+        } else {
+          resolve(); // Form is valid
+        }
+    });
+  }
   createContactPopup(): void {
+    this.CreateContactValidateForm();
+
+    if (this.hasValidationErrors) {
+      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.isLoading = false;
+      return;
+    }
     const saveCreateContactObj = {
       contactDetails: {
         contactDetails: {
@@ -7029,7 +7239,41 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
+  EditContactValidateForm(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.errorMessages = {}; // Clear previous error messages
+      this.hasValidationErrors = false;
+
+      // Validate First Name
+      if (!this.selectedContact.firstName || this.selectedContact.firstName.trim().length === 0) {
+        this.getErrorMessages('firstName', constants.ControllerMessages.ENTER_FIRSTNAME);
+        this.hasValidationErrors = true;
+      }
+
+      if (this.selectedContact.isPeP === undefined || this.selectedContact.isPeP === null) {
+         this.getErrorMessages('isPeP', constants.ContactMessage.SELECT_ISPEP,null, 'Is Politically Exposed Person (PEP)?*');
+         this.hasValidationErrors = true;
+      }
+      if (!this.selectedContact.contactType) {
+        this.getErrorMessages('contactType', constants.ContactMessage.SELECTCONTACTTYPE);
+        this.hasValidationErrors = true;
+      } 
+
+
+      if (this.hasValidationErrors) {
+        resolve(); // Form is invalid
+      } else {
+        resolve(); // Form is valid
+      }
+  });
+}
   saveEditContactPopup(): void {
+    this.EditContactValidateForm();
+    if (this.hasValidationErrors) {
+      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.isLoading = false;
+      return;
+    }
     const saveEditContactObj = {
       contactDetails: {
         contactDetails: {
@@ -7157,10 +7401,10 @@ export class ViewFirmPageComponent implements OnInit {
     // Replace these with actual values from your component
     const objectID = FrimsObject.Contatcs; // Assuming firmTypeID is fixed to 1
     const contactID = this.selectedContact.contactID;
-    const contactAssnID = this.selectedContact.contactAssnID;
+    const contactAssId = this.selectedContact.contactAssnID;
     const userID = this.userId;
-    console.log(contactID, contactAssnID, "contactAssnID contactID")
-    this.contactService.deleteContactDetails(objectID, contactID, contactAssnID, userID).subscribe(
+    console.log(contactID, contactAssId, "contactAssnID contactID")
+    this.contactService.deleteContactDetails(objectID, contactID, contactAssId, userID).subscribe(
       (response) => {
         Swal.fire(
           'Deleted!',

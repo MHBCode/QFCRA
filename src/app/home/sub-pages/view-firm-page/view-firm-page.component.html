@@ -847,8 +847,8 @@
                 (!address.AddressID || address.AddressID === '')
               ">
               <label for="sameAsType"> Same As Type </label>
-              <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChange($event,existingAddresses)" name="sameAsType"
-                id="sameAsType">
+              <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChange($event,existingAddresses)"
+                name="sameAsType" id="sameAsType">
                 <option value="0">Select</option>
                 <option *ngFor="let type of existingAddresses" [value]="type.AddressTypeID">
                   {{ type.AddressTypeDesc }}
@@ -2032,15 +2032,9 @@
     <!-- Popup Section -->
     <div *ngIf="isPopupOpen" (click)="closeControllerPopup()" class="contollerPopupOverlay">
       <div (click)="$event.stopPropagation()" class="contollerPopupContent">
-        <!-- <div class="error-messages">
+        <div class="error-messages">
           <p *ngIf="errorMessages['OtherEntityName']">
             {{ errorMessages['OtherEntityName'] }}
-          </p>
-          <p *ngIf="errorMessages['EffectiveDate']">
-            {{ errorMessages['EffectiveDate'] }}
-          </p>
-          <p *ngIf="errorMessages['CessationDate']">
-            {{ errorMessages['CessationDate'] }}
           </p>
           <p *ngIf="errorMessages['PlaceOfEstablishment']">
             {{ errorMessages['PlaceOfEstablishment'] }}
@@ -2051,7 +2045,26 @@
           <p *ngIf="errorMessages['PctOfShares']">
             {{ errorMessages['PctOfShares'] }}
           </p>
-        </div> -->
+          <!--Ibdevidual-->
+          <p *ngIf="errorMessages['firstName']">
+            {{ errorMessages['firstName'] }}
+          </p>
+          <p *ngIf="errorMessages['familyName']">
+            {{ errorMessages['familyName'] }}
+          </p>
+          <p *ngIf="errorMessages['AssnDateFrom']">
+            {{ errorMessages['AssnDateFrom'] }}
+          </p>
+          <p *ngIf="errorMessages['AssnDateTo']">
+            {{ errorMessages['AssnDateTo'] }}
+          </p>
+          <p *ngIf="errorMessages['dateOfBirth']">
+            {{ errorMessages['dateOfBirth'] }}
+          </p>
+          <p *ngIf="errorMessages['isPEP']">
+            {{ errorMessages['isPEP'] }}
+          </p>
+        </div>
         <!-- Title -->
         <div class="popup-title-btn-row">
           <div class="popup-header">
@@ -2387,115 +2400,146 @@
                 id="additionalDetails" [readonly]="!isEditable"></textarea>
             </div>
           </div>
-          <!-- Addresses Section -->
-          <div class="addresses">
-            <div class="popup-header">
-              <h3>Addresses</h3>
-            </div>
-            <button (click)="addAddressForm()" *ngIf="canAddNewAddress" style="
-              background-color: green;
-              color: white;
-              border: none;
-              padding: 5px;
-              cursor: pointer;
-              border-radius: 5px;
-              float: right;
-            ">
-              <i style="size: 7px" class="bi bi-plus-lg"></i>
-            </button>
-            <!-- Address Details -->
-            <div *ngFor="let address of filteredControllerfirmAddresses; let i = index">
-              <ng-container *ngIf="address.Valid === true">
-                <hr />
-                <button (click)="removeControllerAddress(i)" style="
-                  float: right;
-                  background-color: red;
-                  color: white;
-                  border: none;
-                  padding: 5px;
-                  cursor: pointer;
-                  border-radius: 5px;
-                ">
-                  <i style="size: 5px" class="bi bi-x-lg"></i>
-                </button>
-                <div class="inputs-row">
-                  <div class="input-field">
-                    <label>Address Type</label>
-                    <select [(ngModel)]="address.AddressTypeID" name="addressType" disabled>
-                      <option *ngFor="let type of addressTypeOptionsEdit" [value]="type.AddressTypeID">
-                        {{ type.AddressTypeDesc }}
-                      </option>
-                    </select>
-                  </div>
-                  <div class="input-field">
-                    <label>Address - Line 1</label>
-                    <input type="text" [(ngModel)]="address.AddressLine1" name="addressLine1" id="addressLine1"
-                      [readonly]="!isEditable" [disabled]="
-                      address.sameAsTypeID && address.sameAsTypeID != 0
-                    " />
-                  </div>
-                  <div class="input-field">
-                    <label>Address - Line 2</label>
-                    <input [(ngModel)]="address.AddressLine2" name="addressLine2" id="addressLine2"
-                      [readonly]="!isEditable" [disabled]="
-                      address.sameAsTypeID && address.sameAsTypeID != 0
-                    " />
-                  </div>
-                </div>
-                <div class="inputs-row">
-                  <div class="input-field">
-                    <label for="address3"> Address - Line 3 </label>
-                    <input [(ngModel)]="address.AddressLine3" name="address3" id="address3" type="text" [disabled]="
-                      address.sameAsTypeID && address.sameAsTypeID != 0
-                    " [readonly]="!isEditable" />
-                  </div>
-
-                  <div class="input-field">
-                    <label for="address4"> Address - Line 4 </label>
-                    <input [(ngModel)]="address.AddressLine4" name="address4" id="address4" type="text" [disabled]="
-                      address.sameAsTypeID && address.sameAsTypeID != 0
-                    " [readonly]="!isEditable" />
-                  </div>
-                  <div class="input-field">
-                    <label for="city">City</label>
-                    <input [(ngModel)]="address.City" name="city" id="city" type="text" [disabled]="
-                      address.sameAsTypeID && address.sameAsTypeID != 0
-                    " [readonly]="!isEditable" />
-                  </div>
-                </div>
-                <div class="inputs-row">
-                  <div class="input-field">
-                    <label for="stateProvince">State/Province</label>
-                    <input [(ngModel)]="address.Province" name="stateProvince" id="stateProvince" [disabled]="
-                      address.sameAsTypeID && address.sameAsTypeID != 0
-                    " [readonly]="!isEditable" />
-                  </div>
-                  <div class="input-field">
-                    <label for="country">Country</label>
-                    <ng-container *ngIf="isEditable; else countryInput">
-                      <select [(ngModel)]="address.CountryID" name="country" [disabled]="
-                        address.sameAsTypeID && address.sameAsTypeID != 0
-                      ">
-                        <option *ngFor="let country of allCountries" [value]="country.CountryID">
-                          {{ country.CountryName }}
-                        </option>
-                      </select>
-                    </ng-container>
-                    <ng-template #countryInput>
-                      <input [(ngModel)]="address.CountryID" name="country" [readonly]="!isEditable" />
-                    </ng-template>
-                  </div>
-                  <div class="input-field">
-                    <label for="zipPostalCode">Zip/Postal Code</label>
-                    <input [(ngModel)]="address.PostalCode" name="zipPostalCode" id="zipPostalCode"
-                      [readonly]="!isEditable" [disabled]="
-                      address.sameAsTypeID && address.sameAsTypeID != 0
-                    " />
-                  </div>
-                </div>
-              </ng-container>
-            </div>
+        <!-- Addresses Section -->
+        <div class="addresses">
+          <div class="popup-header">
+            <h3>Addresses</h3>
           </div>
+          <button (click)="addNewAddressOnEditMode()" *ngIf="isEditable && canAddNewAddressOnEdit" style="
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            float: right;
+          ">
+            <i style="size: 7px" class="bi bi-plus-lg"></i>
+          </button>
+          <!--Address Details-->
+          <div class="inputs-row">
+            <ng-container *ngFor="let address of filteredControllerfirmAddresses; let i = index">
+              <ng-container *ngIf="address.Valid === true">
+                <div class="input-field" *ngIf="!isEditable">
+                  <label for="addressType" class="history-row">
+                    Address Type
+                    <button *ngIf="address.PreviousRecords !== 0" class="subbutton-open-history">
+                      <i class="bi bi-clock-history"></i><span> Open History</span>
+                    </button>
+                  </label>
+                  <input disabled name="addressType" id="addressType" type="text"
+                    value="{{ address?.AddressTypeDesc }}" />
+                </div>
+                <div *ngIf="isEditable" class="del-address-container">
+                  <button (click)="removeAddressOnEditMode(i)" class="RmvAddressBtn bi-trash"></button>
+                </div>
+                <!-- address type on edit mode -->
+                <div class="input-field" *ngIf="isEditable">
+                  <label for="addressType" class="history-row">
+                    Address Type
+                    <button *ngIf="address.PreviousRecords !== 0 && address.AddressID" class="subbutton-open-history">
+                      <i class="bi bi-clock-history"></i> <span>Open History</span>
+                    </button>
+
+                  </label>
+                  <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID"
+                    (change)="onAddressTypeChangeOnEditMode($event, address)" [ngClass]="{
+          'error-border':
+            !address.AddressID && errorMessages['AddressTypeID'],
+          
+        }">
+                    <option value="0">Select</option>
+                    <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
+                      {{ option.AddressTypeDesc }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="input-field" *ngIf="
+        isEditable &&
+        (!address.AddressID || address.AddressID === '')
+      ">
+                  <label for="sameAsType"> Same As Type </label>
+                  <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChangeOnEditMode($event)"
+                    name="sameAsType" id="sameAsType">
+                    <option value="0">Select</option>
+                    <option *ngFor="let type of existingControllerAddresses" [value]="type.AddressTypeID">
+                      {{ type.AddressTypeDesc }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="input-field">
+                  <label for="addressLine1"> Address Line 1 </label>
+                  <input type="text" [disabled]="
+          !isEditable ||
+          (disableAddressFieldsOnEdit && !address.AddressID)
+        " name="addressLine1" id="addressLine1" [(ngModel)]="address.AddressLine1" />
+                </div>
+                <div class="input-field">
+                  <label for="addressLine2"> Address Line 2 </label>
+                  <input [disabled]="
+          !isEditable ||
+          (disableAddressFieldsOnEdit && !address.AddressID)
+        " name="addressLine2" id="addressLine2" type="text" [(ngModel)]="address.AddressLine2" />
+                </div>
+                <div class="input-field">
+                  <label for="addressLine3"> Address Line 3 </label>
+                  <input [disabled]="
+          !isEditable ||
+          (disableAddressFieldsOnEdit && !address.AddressID)
+        " name="addressLine3" id="addressLine3" type="text" [(ngModel)]="address.AddressLine3" />
+                </div>
+                <div class="input-field">
+                  <label for="addressLine4"> Address Line 4 </label>
+                  <input [disabled]="
+          !isEditable ||
+          (disableAddressFieldsOnEdit && !address.AddressID)
+        " name="addressLine4" id="addressLine4" type="text" [(ngModel)]="address.AddressLine4" />
+                </div>
+                <div class="input-field">
+                  <label for="city"> City </label>
+                  <input [disabled]="
+          !isEditable ||
+          (disableAddressFieldsOnEdit && !address.AddressID)
+        " name="city" id="city" type="text" [(ngModel)]="address.City" />
+                </div>
+                <div class="input-field">
+                  <label for="state"> state/province </label>
+                  <input [disabled]="
+          !isEditable ||
+          (disableAddressFieldsOnEdit && !address.AddressID)
+        " name="state" id="state" type="text" [(ngModel)]="address.Province" />
+                </div>
+                <div class="input-field" *ngIf="!isEditable">
+                  <label for="country"> Country </label>
+                  <input disabled type="text" name="country" id="country" [(ngModel)]="address.CountryName" />
+                </div>
+                <!-- countries on edit mode-->
+                <div class="input-field" *ngIf="isEditable">
+                  <label for="country"> Country </label>
+                  <select [disabled]="
+          !isEditable ||
+          (disableAddressFieldsOnEdit && !address.AddressID)
+        " [(ngModel)]="address.CountryID">
+                    <option *ngFor="let option of allCountries" [value]="option.CountryID">
+                      {{ option?.CountryName }}
+                    </option>
+                  </select>
+                </div>
+                <div class="input-field">
+                  <label for="zip"> Zip/Postal Code </label>
+                  <input [disabled]="
+          !isEditable ||
+          (disableAddressFieldsOnEdit && !address.AddressID)
+        " name="zip" id="zip" type="text" [(ngModel)]="address.PostalCode" />
+                </div>
+                <hr *ngIf="i < ControllerfirmAddresses.length - 1" />
+              </ng-container>
+            </ng-container>
+          </div>
+
+        </div>
           <ng-container *ngIf="
               !isEditable ||
               (isEditable && selectedController.IsCompanyRegulated)
@@ -2555,15 +2599,9 @@
           <div class="btn"></div>
         </div>
 
-         <div class="error-messages">
+        <div class="error-messages">
           <p *ngIf="errorMessages['OtherEntityName']">
             {{ errorMessages['OtherEntityName'] }}
-          </p>
-          <p *ngIf="errorMessages['EffectiveDate']">
-            {{ errorMessages['EffectiveDate'] }}
-          </p>
-          <p *ngIf="errorMessages['CessationDate']">
-            {{ errorMessages['CessationDate'] }}
           </p>
           <p *ngIf="errorMessages['PlaceOfEstablishment']">
             {{ errorMessages['PlaceOfEstablishment'] }}
@@ -2574,7 +2612,26 @@
           <p *ngIf="errorMessages['PctOfShares']">
             {{ errorMessages['PctOfShares'] }}
           </p>
-        </div> 
+          <!--Ibdevidual-->
+          <p *ngIf="errorMessages['firstName']">
+            {{ errorMessages['firstName'] }}
+          </p>
+          <p *ngIf="errorMessages['familyName']">
+            {{ errorMessages['familyName'] }}
+          </p>
+          <p *ngIf="errorMessages['AssnDateFrom']">
+            {{ errorMessages['AssnDateFrom'] }}
+          </p>
+          <p *ngIf="errorMessages['AssnDateTo']">
+            {{ errorMessages['AssnDateTo'] }}
+          </p>
+          <p *ngIf="errorMessages['dateOfBirth']">
+            {{ errorMessages['dateOfBirth'] }}
+          </p>
+          <p *ngIf="errorMessages['isPEP']">
+            {{ errorMessages['isPEP'] }}
+          </p>
+        </div>
         <div class="inputs-row">
           <div class="input-field">
             <label for="controllerType">
@@ -2767,7 +2824,7 @@
                 Type of Control <span style="color: red">*</span>
               </label>
               <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeID" name="typeOfControl"
-                id="typeOfControl" (ngModelChange)="CreateControlTypeDesc($event)">
+                id="typeOfControl">
                 <option *ngFor="let ControlType of controlTypeOptionsCreate"
                   [value]="ControlType.ControllerControlTypeID">
                   {{ ControlType.ControllerControlTypeDesc }}
@@ -2871,123 +2928,7 @@
             <!---->
           </ng-container>
         </div>
-        <div *ngIf="!hideForms" class="addresses create--inputs-field-set">
-          <div class="popup-header">
-            <h3>Addresses</h3>
-            <button (click)="addAddressForm()" [disabled]="addressForms.length >= 3" style="
-                background-color: green;
-                color: white;
-                border: none;
-                padding: 5px;
-                cursor: pointer;
-                border-radius: 5px;
-                float: right;
-              ">
-              <i style="size: 7px" class="bi bi-plus-lg"></i>
-            </button>
-          </div>
-          <div *ngFor="let address of addressForms; let i = index">
-            <hr />
-            <button (click)="removeAddressForm(i)" style="
-                float: right;
-                background-color: red;
-                color: white;
-                border: none;
-                padding: 5px;
-                cursor: pointer;
-                border-radius: 5px;
-              ">
-              <i style="size: 5px" class="bi bi-x-lg"></i>
-            </button>
 
-            <div class="inputs-row">
-              <!-- Address Type -->
-              <div class="input-field">
-                <label for="addressType"> Address Type </label>
-                <select [(ngModel)]="address.AddressTypeID" (change)="onAddressTypeChange($event, address)" [ngClass]="{
-                    'error-border':
-                      !address.AddressTypeID && errorMessages['AddressTypeID'],
-                    
-                  }" [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0">
-                  <!-- Disable if Same As Type is selected -->
-                  <option value="0">Select</option>
-                  <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
-                    {{ option.AddressTypeDesc }}
-                  </option>
-                </select>
-              </div>
-
-              <!-- Same As Type (only for forms after the first one) -->
-              <div *ngIf="i > 0" class="input-field">
-                <label for="sameAsType">Same As Type</label>
-                <select [(ngModel)]="address.sameAsTypeID" (change)="onSameAsTypeChangeg($event, address)" [ngClass]="{
-                    'error-border':
-                      !address.sameAsTypeID && errorMessages['sameAsTypeID'],
-                    
-                  }" id="sameAsType" name="sameAsType">
-                  <option value="0">Select</option>
-                  <!-- Dynamically populate the options from previous forms' AddressTypeID -->
-                  <option *ngFor="let form of addressForms.slice(0, i)" [value]="form.AddressTypeID">
-                    {{ getAddressTypeDesc(form.AddressTypeID) }}
-                  </option>
-                </select>
-              </div>
-
-              <!-- Other fields will be disabled if Same As Type has a value -->
-              <div class="input-field">
-                <label for="address1"> Address - Line 1 </label>
-                <input [(ngModel)]="address.addressLine1" name="address1" id="address1" type="text"
-                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
-              </div>
-
-              <div class="input-field">
-                <label for="address2"> Address - Line 2 </label>
-                <input [(ngModel)]="address.addressLine2" name="address2" id="address2" type="text"
-                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
-              </div>
-
-              <div class="input-field">
-                <label for="address3"> Address - Line 3 </label>
-                <input [(ngModel)]="address.addressLine3" name="address3" id="address3" type="text"
-                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
-              </div>
-
-              <div class="input-field">
-                <label for="address4"> Address - Line 4 </label>
-                <input [(ngModel)]="address.addressLine4" name="address4" id="address4" type="text"
-                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
-              </div>
-
-              <div class="input-field">
-                <label for="city"> City </label>
-                <input [(ngModel)]="address.city" name="city" id="city" type="text"
-                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
-              </div>
-
-              <div class="input-field">
-                <label for="state"> State/Province </label>
-                <input [(ngModel)]="address.stateProvince" name="state" id="state" type="text"
-                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
-              </div>
-
-              <div class="input-field">
-                <label for="country"> Country </label>
-                <select required [(ngModel)]="address.CountryID" (change)="getAllRegulater(+address.CountryID, firmId)"
-                  name="Country" id="Country" [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0">
-                  <option *ngFor="let place of allCountries" [value]="place.CountryID">
-                    {{ place.CountryName }}
-                  </option>
-                </select>
-              </div>
-
-              <div class="input-field">
-                <label for="zipCode"> Zip/Postal Code </label>
-                <input [(ngModel)]="address.zipPostalCode" name="zipCode" id="zipCode" type="text"
-                  [disabled]="address.sameAsTypeID && address.sameAsTypeID != 0" />
-              </div>
-            </div>
-          </div>
-        </div>
 
         <div class="create--inputs-field-set" *ngIf="CreatecontrollerDetails.IsCompanyRegulated === true">
           <div class="create-controller-actions">
@@ -3301,11 +3242,12 @@
               Create
             </button>
           </div>
-          <span class="enhanced-checkbox">
-            <input id="InactiveContacts" type="checkbox" (change)="onInactiveContactsToggle($event)" />
-            <label for="InactiveContacts">Display Inactive Contacts</label>
-          </span>
         </div>
+        <span class="enhanced-checkbox">
+          <input id="InactiveContacts" type="checkbox" (change)="onInactiveContactsToggle($event)" />
+          <label for="InactiveContacts">Display Inactive Contacts</label>
+        </span>
+
         <table class="contacts-table">
           <thead>
             <tr>
@@ -3340,37 +3282,29 @@
           <div class="btn"></div>
         </div>
 
-        <!-- <div class="error-messages">
-              <p *ngIf="errorMessages['OtherEntityName']">
-                {{ errorMessages['OtherEntityName'] }}
-              </p>
-              <p *ngIf="errorMessages['EffectiveDate']">
-                {{ errorMessages['EffectiveDate'] }}
-              </p>
-              <p *ngIf="errorMessages['CessationDate']">
-                {{ errorMessages['CessationDate'] }}
-              </p>
-              <p *ngIf="errorMessages['PlaceOfEstablishment']">
-                {{ errorMessages['PlaceOfEstablishment'] }}
-              </p>
-              <p *ngIf="errorMessages['ControllerControlTypeDesc']">
-                {{ errorMessages['ControllerControlTypeDesc'] }}
-              </p>
-              <p *ngIf="errorMessages['PctOfShares']">
-                {{ errorMessages['PctOfShares'] }}
-              </p>
-            </div> -->
+        <div class="error-messages">
+          <p *ngIf="errorMessages['contactType']">
+            {{ errorMessages['contactType'] }}
+          </p>
+          <p *ngIf="errorMessages['isPeP']">
+            {{ errorMessages['isPeP'] }}
+          </p>
+          <p *ngIf="errorMessages['firstName']">
+            {{ errorMessages['firstName'] }}
+          </p>
+          <p *ngIf="errorMessages['busEmail']">
+            {{ errorMessages['busEmail'] }}
+          </p>
+        </div>
         <div class="inputs-row">
           <div class="input-field">
             <label for="contactFrom">
               Contact From <span style="color: red">*</span>
             </label>
-            <select name="contactFrom" id="contactFrom" 
-                    [(ngModel)]="selectedContactFrom" 
-                    (ngModelChange)="onContactFromChange($event)">
+            <select name="contactFrom" id="contactFrom" [(ngModel)]="selectedContactFrom"
+              (ngModelChange)="onContactFromChange($event)">
               <option value="select" selected>Select</option>
-              <option *ngFor="let ContactFrom of AllContactFrom" 
-                      [value]="ContactFrom.EntityTypeID">
+              <option *ngFor="let ContactFrom of AllContactFrom" [value]="ContactFrom.EntityTypeID">
                 {{ ContactFrom.EntityTypeName }}
               </option>
             </select>
@@ -3392,7 +3326,8 @@
           <!-- Available Contacts Section -->
           <div class="input-field" *ngIf="isFirmSelected()">
             <label for="contactType">Available Contacts</label>
-            <select name="contactType" id="contactType" [(ngModel)]="Column2" (ngModelChange)="onContactChange($event)" [disabled]="isCIP === '' || isCIP === 'false'">
+            <select name="contactType" id="contactType" [(ngModel)]="Column2" (ngModelChange)="onContactChange($event)"
+              [disabled]="isCIP === '' || isCIP === 'false'">
               <option value="select" selected>Select</option>
               <option *ngFor="let AvilabilContact of AllAvilabilContact" [ngValue]="AvilabilContact.Column1">
                 {{ AvilabilContact.Column2 }}
@@ -3403,7 +3338,8 @@
           <!-- Contact Type Section -->
           <div class="input-field">
             <label for="contactType">Contact Type<span style="color: red">*</span></label>
-            <select name="contactType" id="contactType" [disabled]="isCIP === '' || isCIP === 'true'" [(ngModel)]="createContactObj.contactType">
+            <select name="contactType" id="contactType" [disabled]="isCIP === '' || isCIP === 'true'"
+              [(ngModel)]="createContactObj.contactType">
               <option value="select" selected>Select</option>
               <option *ngFor="let contactType of contactTypeOption" [ngValue]="contactType.ContactTypeID">
                 {{ contactType.ContactTypeDesc }}
@@ -3415,9 +3351,11 @@
           <div class="input-field">
             <label for="isPEP">Is Politically Exposed Person (PEP)?<span style="color: red">*</span></label>
             <div class="radio-wrapper">
-              <input name="isPEP" id="yes" type="radio" [value]="true" [disabled]="isCIP === '' || isCIP === 'true'" [(ngModel)]="createContactObj.isPeP"/>
+              <input name="isPEP" id="yes" type="radio" [value]="true" [disabled]="isCIP === '' || isCIP === 'true'"
+                [(ngModel)]="createContactObj.isPeP" />
               Yes
-              <input name="isPEP" id="no" type="radio" [value]="false" [disabled]="isCIP === '' || isCIP === 'true'" [(ngModel)]="createContactObj.isPeP"/>
+              <input name="isPEP" id="no" type="radio" [value]="false" [disabled]="isCIP === '' || isCIP === 'true'"
+                [(ngModel)]="createContactObj.isPeP" />
               No
             </div>
           </div>
@@ -3426,7 +3364,7 @@
           <div class="input-field">
             <label for="position/JobTitle">Position/Job Title</label>
             <input name="position/JobTitle" id="position/JobTitle" type="text"
-              [disabled]="isCIP === '' || isCIP === 'true'"  [(ngModel)]="createContactObj.jobTitle"/>
+              [disabled]="isCIP === '' || isCIP === 'true'" [(ngModel)]="createContactObj.jobTitle" />
           </div>
 
           <!-- Title Section -->
@@ -3442,55 +3380,64 @@
           <!-- First Name Section -->
           <div class="input-field">
             <label for="firstName">First Name</label>
-            <input name="firstName" id="firstName" type="text" [disabled]="isCIP === ''" [(ngModel)]="createContactObj.firstName"/>
+            <input name="firstName" id="firstName" type="text" [disabled]="isCIP === ''"
+              [(ngModel)]="createContactObj.firstName" />
           </div>
 
           <!-- Second Name Section -->
           <div class="input-field">
             <label for="SecondName">Second Name</label>
-            <input name="SecondName" id="SecondName" type="text" [disabled]="isCIP === ''" [(ngModel)]="createContactObj.secondName"/>
+            <input name="SecondName" id="SecondName" type="text" [disabled]="isCIP === ''"
+              [(ngModel)]="createContactObj.secondName" />
           </div>
 
           <!-- Family Name Section -->
           <div class="input-field">
             <label for="FamilyName">Family Name</label>
-            <input name="FamilyName" id="FamilyName" type="text" [disabled]="isCIP === ''" [(ngModel)]="createContactObj.familyName"/>
+            <input name="FamilyName" id="FamilyName" type="text" [disabled]="isCIP === ''"
+              [(ngModel)]="createContactObj.familyName" />
           </div>
 
           <!-- Mobile Phone Section -->
           <div class="input-field">
             <label for="MobilePhone">Mobile Phone</label>
-            <input name="MobilePhone" id="MobilePhone" type="text" [disabled]="isCIP === '' || isCIP === 'true'" [(ngModel)]="createContactObj.mobileNum"/>
+            <input name="MobilePhone" id="MobilePhone" type="text" [disabled]="isCIP === '' || isCIP === 'true'"
+              [(ngModel)]="createContactObj.mobileNum" />
           </div>
 
           <!-- Fax Section -->
           <div class="input-field">
             <label for="Fax">Fax</label>
-            <input name="Fax" id="Fax" type="text" [disabled]="isCIP === '' || isCIP === 'true'" [(ngModel)]="createContactObj.fax"/>
+            <input name="Fax" id="Fax" type="text" [disabled]="isCIP === '' || isCIP === 'true'"
+              [(ngModel)]="createContactObj.fax" />
           </div>
 
           <!-- Business Phone Section -->
           <div class="input-field">
             <label for="BusinessPhone">Business Phone</label>
-            <input name="BusinessPhone" id="BusinessPhone" type="text" [disabled]="isCIP === '' || isCIP === 'true'" [(ngModel)]="createContactObj.fax"/>
+            <input name="BusinessPhone" id="BusinessPhone" type="text" [disabled]="isCIP === '' || isCIP === 'true'"
+              [(ngModel)]="createContactObj.fax" />
           </div>
 
           <!-- Business Email Section -->
           <div class="input-field">
             <label for="BusinessEmail">Business Email</label>
-            <input name="BusinessEmail" id="BusinessEmail" type="text" [disabled]="isCIP === '' || isCIP === 'true'" [(ngModel)]="createContactObj.busPhone"/>
+            <input name="BusinessEmail" id="BusinessEmail" type="text" [disabled]="isCIP === '' || isCIP === 'true'"
+              [(ngModel)]="createContactObj.busPhone" />
           </div>
 
           <!-- Other Email Section -->
           <div class="input-field">
             <label for="OtherEmail">Other Email</label>
-            <input name="OtherEmail" id="OtherEmail" type="text" [disabled]="isCIP === '' || isCIP === 'true'" [(ngModel)]="createContactObj.otherEmail"/>
+            <input name="OtherEmail" id="OtherEmail" type="text" [disabled]="isCIP === '' || isCIP === 'true'"
+              [(ngModel)]="createContactObj.otherEmail" />
           </div>
 
           <!-- Method of Contact Section -->
           <div class="input-field">
             <label for="MethodofContact">Preferred Method of Contact</label>
-            <select name="MethodofContact" id="MethodofContact" [disabled]="isCIP === '' || isCIP === 'true'" [(ngModel)]="createContactObj.contactMethodTypeID">
+            <select name="MethodofContact" id="MethodofContact" [disabled]="isCIP === '' || isCIP === 'true'"
+              [(ngModel)]="createContactObj.contactMethodTypeID">
               <option *ngFor="let MethodofContact of MethodofContactOption"
                 [value]="MethodofContact.ContactMethodTypeID">
                 {{ MethodofContact.ContactMethodTypeDesc }}
@@ -3692,7 +3639,9 @@
             <label for="contactType">
               Available Contacts
             </label>
-            <select name="contactType" id="contactType" [(ngModel)]="selectedContact.entityTypeID" (ngModelChange)="onContactChange($event)" [disabled]="isCIP === '' || isCIP === 'false' || !IsEditContactVisible">
+            <select name="contactType" id="contactType" [(ngModel)]="selectedContact.entityTypeID"
+              (ngModelChange)="onContactChange($event)"
+              [disabled]="isCIP === '' || isCIP === 'false' || !IsEditContactVisible">
               <option value="select" selected>Select</option>
               <option *ngFor="let AvilabilContact of AllAvilabilContact" [ngValue]="AvilabilContact.Column1">
                 {{ AvilabilContact.Column2 }}
@@ -3703,7 +3652,8 @@
             <label for="contactType">
               Contact Type<span style="color: red">*</span>
             </label>
-            <select name="contactType" id="contactType" [(ngModel)]="selectedContact.entityTypeID" [disabled]="isCIP === '' || isCIP === 'true' || !IsEditContactVisible">
+            <select name="contactType" id="contactType" [(ngModel)]="selectedContact.contactTypeID"
+              [disabled]="isCIP === '' || isCIP === 'true' || !IsEditContactVisible">
               <option value="select" selected>Select</option>
               <option *ngFor="let contactType of contactTypeOption" [ngValue]="contactType.ContactTypeID">
                 {{ contactType.ContactTypeDesc }}
@@ -3716,19 +3666,23 @@
               <span style="color: red">*</span>
             </label>
             <div class="radio-wrapper">
-              <input name="isPEP" id="yes" type="radio" [value]="true" [(ngModel)]="selectedContact.isPEP" [disabled]="isCIP === '' || isCIP === 'true' || !IsEditContactVisible"/>
+              <input name="isPEP" id="yes" type="radio" [value]="true" [(ngModel)]="selectedContact.isPEP"
+                [disabled]="isCIP === '' || isCIP === 'true' || !IsEditContactVisible" />
               Yes
-              <input name="isPEP" id="no" type="radio" [value]="false" [(ngModel)]="selectedContact.isPEP" [disabled]="isCIP === '' || isCIP === 'true' || !IsEditContactVisible"/>
+              <input name="isPEP" id="no" type="radio" [value]="false" [(ngModel)]="selectedContact.isPEP"
+                [disabled]="isCIP === '' || isCIP === 'true' || !IsEditContactVisible" />
               No
             </div>
           </div>
           <div class="input-field">
             <label for="position/JobTitle"> Position/Job Title</label>
-            <input name="position/JobTitle" id="position/JobTitle" type="text" [(ngModel)]="selectedContact.jobTitle" [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible"/>
+            <input name="position/JobTitle" id="position/JobTitle" type="text" [(ngModel)]="selectedContact.jobTitle"
+              [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
           </div>
           <div class="input-field">
             <label for="Title"> Title </label>
-            <select name="Title" id="Title" [(ngModel)]="selectedContact.title" [disabled]="isCIP === '' || !IsEditContactVisible">
+            <select name="Title" id="Title" [(ngModel)]="selectedContact.title"
+              [disabled]="isCIP === '' || !IsEditContactVisible">
               <option *ngFor="let title of TitleEdit" [value]="title.TitleTypeId">
                 {{ title.TitleDesc }}
               </option>
@@ -3736,42 +3690,56 @@
           </div>
           <div class="input-field">
             <label for="firstName"> First Name</label>
-            <input name="firstName" id="firstName" type="text" [(ngModel)]="selectedContact.firstName" [disabled]="isCIP === ''|| !IsEditContactVisible"/>
+            <input name="firstName" id="firstName" type="text" [(ngModel)]="selectedContact.firstName"
+              [disabled]="isCIP === ''|| !IsEditContactVisible" />
           </div>
           <div class="input-field">
             <label for="SecondName"> Second Name</label>
-            <input name="SecondName" id="SecondName" type="text" [(ngModel)]="selectedContact.secondName" [disabled]="isCIP === ''|| !IsEditContactVisible"/>
+            <input name="SecondName" id="SecondName" type="text" [(ngModel)]="selectedContact.secondName"
+              [disabled]="isCIP === ''|| !IsEditContactVisible" />
           </div>
           <div class="input-field">
             <label for="FamilyName"> Family Name</label>
-            <input name="FamilyName" id="FamilyName" type="text" [(ngModel)]="selectedContact.familyName" [disabled]="isCIP === ''|| !IsEditContactVisible"/>
+            <input name="FamilyName" id="FamilyName" type="text" [(ngModel)]="selectedContact.familyName"
+              [disabled]="isCIP === ''|| !IsEditContactVisible" />
           </div>
           <div class="input-field">
             <label for="MobilePhone">Mobile Phone</label>
-            <input name="MobilePhone" id="MobilePhone" type="text" [(ngModel)]="selectedContact.mobileNum" [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible"/>
+            <input name="MobilePhone" id="MobilePhone" type="text" [(ngModel)]="selectedContact.mobileNum"
+              [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
           </div>
 
           <div class="input-field">
             <label for="Fax">Fax</label>
-            <input name="Fax" id="Fax" type="text" [(ngModel)]="selectedContact.fax" [(ngModel)]="selectedContact.mobileNum" [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible"/>
+            <input name="Fax" id="Fax" type="text" [(ngModel)]="selectedContact.fax"
+              [(ngModel)]="selectedContact.mobileNum"
+              [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
           </div>
 
           <div class="input-field">
             <label for="BusinessPhone">Business Phone</label>
-            <input name="BusinessPhone" id="BusinessPhone" type="text" [(ngModel)]="selectedContact.busPhone" [(ngModel)]="selectedContact.mobileNum" [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible"/>
+            <input name="BusinessPhone" id="BusinessPhone" type="text" [(ngModel)]="selectedContact.busPhone"
+              [(ngModel)]="selectedContact.mobileNum"
+              [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
           </div>
 
           <div class="input-field">
             <label for="BusinessEmail">Business Email</label>
-            <input name="BusinessEmail" id="BusinessEmail" type="text" [(ngModel)]="selectedContact.busEmail" [(ngModel)]="selectedContact.mobileNum" [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible"/>
+            <input name="BusinessEmail" id="BusinessEmail" type="text" [(ngModel)]="selectedContact.busEmail"
+              [(ngModel)]="selectedContact.mobileNum"
+              [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
           </div>
           <div class="input-field">
             <label for="OtherEmail">Other Email</label>
-            <input name="OtherEmail" id="OtherEmail" type="text" [(ngModel)]="selectedContact.otherEmail" [(ngModel)]="selectedContact.mobileNum" [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible"/>
+            <input name="OtherEmail" id="OtherEmail" type="text" [(ngModel)]="selectedContact.otherEmail"
+              [(ngModel)]="selectedContact.mobileNum"
+              [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
           </div>
           <div class="input-field">
             <label for="MethodofContact"> Preferred Method of Contact </label>
-            <select name="MethodofContact" id="MethodofContact" [(ngModel)]="selectedContact.contactMethodTypeID" [(ngModel)]="selectedContact.mobileNum" [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible">
+            <select name="MethodofContact" id="MethodofContact" [(ngModel)]="selectedContact.contactMethodTypeID"
+              [(ngModel)]="selectedContact.mobileNum"
+              [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible">
               <option *ngFor="let MethodofContact of MethodofContactOption"
                 [value]="MethodofContact.ContactMethodTypeID">
                 {{ MethodofContact.ContactMethodTypeDesc }}
