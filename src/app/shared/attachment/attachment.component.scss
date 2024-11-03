@@ -76,9 +76,6 @@
     font-size: 26px;
     cursor: pointer;
     color: #a51e36;
-    position: absolute;
-    right: 1rem;
-    top: 1rem;
 }
 
 .upload-document-body {
@@ -95,4 +92,22 @@
     background: #a51e36;
     border: none;
     border-radius: 5px;
+}
+
+.popup-operations-place .subbutton {
+    padding: 10px;
+}
+
+.popup-operations-place {
+    width: 100%;
+    text-align: end;
+}
+.closeBtn{
+    display: inline-block;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    background-color: transparent;
+    border: none;
+    z-index: 9999;
 }

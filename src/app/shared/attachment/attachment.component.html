@@ -47,10 +47,9 @@
 <!--Select Document PopUp-->
 <div *ngIf="callUploadDoc" class="overlay show"></div>
 <div *ngIf="callUploadDoc" class="selectDocumentPopUp">
-  <button type="button" (click)="closeSelectDocument()">
+  <button type="button" class="closeBtn" (click)="closeSelectDocument()">
     <i class="bi bi-x-circle close-icon"></i>
   </button>
-  <i class="bi bi-x-circle close-icon" (click)="closeSelectDocument()"></i>
   <div class="popup-info-place upload-container">
     <div class="popup-header">
       <h3>Upload Document</h3>
