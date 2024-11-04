@@ -1780,7 +1780,7 @@ export class ControllersComponent implements OnInit {
       this.contactService.deleteContactDetails(objectID, contactID, contactAssnID, this.userId).subscribe(
         response => {
           console.log("Controller Details Deleted successfully:", response);
-          Swal.fire('Deleted!', 'Controller detail has been deleted.', 'success');
+          this.firmDetailsService.showSaveSuccessAlert(constants.ControllerMessages.RECORD_DELETED);
           this.loadControllersIndividual();
           this.isPopupOpen = false;
         },

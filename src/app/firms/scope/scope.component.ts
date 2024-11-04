@@ -752,24 +752,24 @@ export class ScopeComponent implements OnInit {
   executeSaveLicense() {
     const updatedLicenseScope = this.prepareLicenseScopeObject(this.userId);
     this.saveLicenseScopeDetails(updatedLicenseScope, this.userId);
-    this.showFirmScopeLicSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
+    this.firmDetailsService.showSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
   }
 
-  showFirmScopeLicSaveSuccessAlert(messageKey: number) {
-    this.isLoading = true;
-    this.logForm.errorMessages(messageKey).subscribe(
-      (response) => {
-        const replacedText = response.response.replace('#Tab#', 'Licensed');
-        Swal.fire({
-          title: 'Success!',
-          text: replacedText,
-          icon: 'success',
-          confirmButtonText: 'Ok',
-        });
-      },
-    );
-    this.isLoading = false;
-  }
+  // showFirmScopeLicSaveSuccessAlert(messageKey: number) {
+  //   this.isLoading = true;
+  //   this.logForm.errorMessages(messageKey).subscribe(
+  //     (response) => {
+  //       const replacedText = response.response.replace('#Tab#', 'Licensed');
+  //       Swal.fire({
+  //         title: 'Success!',
+  //         text: replacedText,
+  //         icon: 'success',
+  //         confirmButtonText: 'Ok',
+  //       });
+  //     },
+  //   );
+  //   this.isLoading = false;
+  // }
 
   prepareLicenseScopeObject(userId: number) {
     return {
@@ -921,7 +921,7 @@ export class ScopeComponent implements OnInit {
       this.disableApplicationDate = true;
       this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
       this.loadLicScopeRevisions(this.firmId, 2);
-      this.showFirmScopeLicSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
+      this.firmDetailsService.showSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
     }, error => {
       console.log('Vary Scope Failed', error);
     })
