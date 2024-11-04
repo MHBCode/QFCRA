@@ -1,1 +1,48 @@
-<p>journal works!</p>
+<!-- <div *ngIf="isLoading" class="loader-overlay">
+    <div class="loader"></div>
+</div> -->
+
+<div class="form-section">
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="edit-firm-header">
+                    <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
+                    Journal > <span>Al Rayyan </span>
+                </h2>
+                <div class="btn">
+                    <button>
+                        <i class="bi bi-pen"></i>
+                        Create
+                    </button>
+                </div>
+            </div>
+            <span class="enhanced-checkbox"><input id="deletedRecords" type="checkbox"><label
+                    for="deletedRecords">Display Deleted Entities</label></span>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Entry Type</th>
+                        <th>Title</th>
+                        <th>Entry Date</th>
+                        <th>Last Modified By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- <tr *ngFor="let enf of enfActions">
+                        <td>{{ rmp?.FirmRMPID }}</td>
+                        <td>{{ rmp?.RMPCreatedDate }}</td>
+                        <td>{{ rmp?.FirmRMPTypeDesc }}</td>
+                        <td>{{ rmp?.DateFirmAgreedOn }}</td>
+                    </tr> -->
+                    <tr>
+                        <td>Entry Type</td>
+                        <td>Title</td>
+                        <td>Entry Date</td>
+                        <td>Last Modified By</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

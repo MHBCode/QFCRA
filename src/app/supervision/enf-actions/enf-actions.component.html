@@ -1,1 +1,56 @@
-<p>enf-actions works!</p>
+<!-- <div *ngIf="isLoading" class="loader-overlay">
+    <div class="loader"></div>
+</div> -->
+
+<div class="form-section">
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="edit-firm-header">
+                    <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
+                    Enforcement & Disciplinary Actions > <span>Al Rayyan </span>
+                </h2>
+                <div class="btn">
+                    <button>
+                        <i class="bi bi-pen"></i>
+                        Create
+                    </button>
+                </div>
+            </div>
+            <span class="enhanced-checkbox"><input id="deletedRecords" type="checkbox"><label for="deletedRecords">Display Deleted Records</label></span>
+            <table>
+                <thead>						
+                    <tr>
+                        <th>Action On</th>
+                        <th>Type of Action</th>
+                        <th>Firm Name</th>
+                        <th>Individual Name</th>
+                        <th>Action Effective From</th>
+                        <th>Action Effective Until</th>
+                        <th>Published</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- <tr *ngFor="let enf of enfActions">
+                        <td>{{ rmp?.FirmRMPID }}</td>
+                        <td>{{ rmp?.RMPCreatedDate }}</td>
+                        <td>{{ rmp?.FirmRMPTypeDesc }}</td>
+                        <td>{{ rmp?.DateFirmAgreedOn }}</td>
+                        <td>{{ rmp?.AgreedBy }}</td>
+                        <td>{{ rmp?.RMPStatus }}</td>
+                        <td>{{ rmp?.SignOffStatus }}</td>
+                    </tr> -->
+                    <tr>
+                        <td>Action</td>
+                        <td>Type Of Action</td>
+                        <td>Date Of Action</td>
+                        <td>Firm Name</td>
+                        <td>Approved Individual</td>
+                        <td>Approved Individual</td>
+                        <td>Approved Individual</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
