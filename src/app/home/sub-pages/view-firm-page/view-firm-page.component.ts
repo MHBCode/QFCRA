@@ -3205,12 +3205,12 @@ export class ViewFirmPageComponent implements OnInit {
 
         // Validate Place of Establishment
         if (!this.CreatecontrollerDetails.PlaceOfEstablishment || this.CreatecontrollerDetails.PlaceOfEstablishment === '0') {
-          this.getErrorMessages('PlaceOfEstablishment', constants.ControllerMessages.SELECT_RECORD);
+          this.getErrorMessages('PlaceOfEstablishment', constants.ControllerMessages.Select_Place_Establishment);
           this.hasValidationErrors = true;
         }
 
         // Validate Type of Control
-        if (!this.CreatecontrollerDetails.ControllerControlTypeDesc || this.CreatecontrollerDetails.ControllerControlTypeDesc === '0') {
+        if (!this.CreatecontrollerDetails.ControllerControlTypeID) {
           this.getErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
           this.hasValidationErrors = true;
         }
