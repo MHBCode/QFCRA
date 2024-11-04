@@ -73,7 +73,7 @@ export class FirmsDetailsComponent implements OnInit{
   loadFirmOPDetails(firmId: number) {
     this.firmService.getFIRMOPData(firmId).subscribe(
       data => {
-        this.firmOPDetails = data.response;
+        this.firmOPDetails = data.response[0];
       },
       error => {
         console.error('Error fetching firm details', error);

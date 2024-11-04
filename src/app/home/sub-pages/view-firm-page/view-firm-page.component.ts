@@ -3053,6 +3053,7 @@ export class ViewFirmPageComponent implements OnInit {
         this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
           response => {
             console.log("Save successful:", response);
+            
             this.loadControllers();
           },
           error => {
@@ -5375,7 +5376,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   getAddressTypeHistory(addressTypeId: number) {
     this.callAddressType = true;
-    this.addressService.getAddressesTypeHistory(this.firmId, addressTypeId).subscribe(
+    this.addressService.getAddressesTypeHistory(this.firmId, addressTypeId,null,null).subscribe(
       data => {
         this.firmAddressesTypeHistory = data.response;
         console.log('Firm History Addresses Type: ', this.firmAddressesTypeHistory);

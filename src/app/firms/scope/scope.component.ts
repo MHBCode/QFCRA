@@ -8,7 +8,7 @@ import { SecurityService } from 'src/app/ngServices/security.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import * as constants from 'src/app/app-constants';
 import { ActivityService } from 'src/app/ngServices/activity.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, switchMap } from 'rxjs';
 import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 import Swal from 'sweetalert2';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
@@ -36,6 +36,11 @@ export class ScopeComponent implements OnInit {
   SectorTypeIDChanged: boolean = false;
   PrudentialCategoryIDChanged: boolean = false;
   isParentActivity: boolean = false;
+  parentActivity: number | null = null;
+  selectedSubActivity: any = null;
+  selectedSubActivityID: number | null = null;
+  activitySubActivities: { [key: number]: any } = {};
+  activityProducts: { [key: number]: any } = {};
   Page = FrimsObject;
   firmDetails: any;
   userId = 30;
@@ -911,6 +916,7 @@ export class ScopeComponent implements OnInit {
     this.activityService.editLicenseScope(varyLicenseScope).subscribe((response) => {
       console.log('Vary Scope Successfully', response);
       this.loadActivitiesLicensed();
+      this.getFormReferenceDocuments();
       this.isEditModeLicense = false;
       this.disableApplicationDate = true;
       this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
@@ -1357,7 +1363,7 @@ export class ScopeComponent implements OnInit {
     this.hasValidationErrors = false;
     // Set to check if there are duplicates activity ids added
     const activityIdsSet = new Set<number>();
-    
+
 
     this.ActivityAuth.forEach(activity => {
       // Reset error messages for each activity
@@ -1365,7 +1371,7 @@ export class ScopeComponent implements OnInit {
       const activityTypeIdAsNumber = Number(activity.ActivityTypeID);
       if (activityIdsSet.has(activityTypeIdAsNumber)) {
         // Flag duplicates and set a validation message
-        this.loadErrorMessages('DuplicateActivity', constants.FirmActivitiesEnum.ACTIVITY_ALREADY_SELECTED, activity,activity.ActivityTypeDescription);
+        this.loadErrorMessages('DuplicateActivity', constants.FirmActivitiesEnum.ACTIVITY_ALREADY_SELECTED, activity, activity.ActivityTypeDescription);
         this.loadErrorMessages('correctPermittedActivities', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
         this.hasValidationErrors = true;
       } else {
@@ -1470,7 +1476,7 @@ export class ScopeComponent implements OnInit {
     } else {
       delete this.errorMessages[('islamicType')]
     }
-    
+
 
   }
 
@@ -2159,88 +2165,116 @@ export class ScopeComponent implements OnInit {
   // }
 
   onActivityChange(activity: any) {
-    const activityTypeID = activity.ActivityTypeID; // The selected activity ID
+    const activityTypeID = activity.ActivityTypeID;
 
     if (activityTypeID) {
       console.log('Selected Activity ID:', activityTypeID);
 
-      // Check if the activity is a parent
-      this.activityService.isParentActivity(activityTypeID).subscribe(response => {
-        this.isParentActivity = response.response.Column1;
+      // First, check if the activity is a parent
+      this.activityService.isParentActivity(activityTypeID).pipe(
+        switchMap(response => {
+          this.isParentActivity = response.response.Column1;
 
-        if (this.isParentActivity) {
-          // If it's a parent activity, fetch sub-activities
-          this.activityService.getSubActivities(activityTypeID).subscribe(subActivityData => {
-            this.subActivities = subActivityData.response;
-            console.log('Loaded Sub-Activities:', this.subActivities);
-
-            // Display the sub-activities in a popup
-            this.showSubActivitiesPopup(this.subActivities);
-          }, error => {
-            console.error('Error fetching sub-activities:', error);
-          });
-        }
-
-        // Fetch products for the selected activity
-        this.activityService.getAllProducts(activityTypeID).subscribe(
-          data => {
-            const products = data.response;
-
-            // If no products are returned, set categorizedProducts to null
-            if (!products || products.length === 0) {
-              activity.categorizedProducts = null;
-              console.log('No products found for the selected activity.');
-              return;
-            }
-
-            // Reset categorizedProducts to load new products
-            activity.categorizedProducts = [];
-            let currentCategory = null;
-
-            // Iterate through the products and categorize them
-            products.forEach(product => {
-              if (product.ID === 0) {
-                // If it's a main category, start a new group
-                currentCategory = {
-                  mainCategory: product.ProductCategoryTypeDesc,
-                  subProducts: []
-                };
-                activity.categorizedProducts.push(currentCategory);
-              } else if (currentCategory) {
-                const subProduct = { ...product }; // Copy product details
-
-                // Uncheck the product by default when loading
-                subProduct.isChecked = false;
-                subProduct.firmScopeTypeID = 1; // Default firmScopeTypeID
-
-                // Add the subProduct to the current category
-                currentCategory.subProducts.push(subProduct);
-              }
-            });
-
-            console.log('Loaded Products for Activity:', activity.categorizedProducts);
-          },
-          error => {
-            // If an error occurs, set categorizedProducts to null
-            console.error('Error fetching products for ActivityTypeID', error);
-            activity.categorizedProducts = null;
+          if (this.isParentActivity) {
+            // If it's a parent, load sub-activities
+            return this.activityService.getSubActivities(activityTypeID);
+          } else {
+            // If it's not a parent, load products
+            return this.activityService.getAllProducts(activityTypeID);
           }
-        );
-      });
-    } else {
-      // If no activity is selected, clear the products
-      activity.categorizedProducts = null;
+        })
+      ).subscribe(
+        data => {
+          if (this.isParentActivity) {
+            // Process sub-activities if the activity is a parent
+            this.subActivities = data.response.map(sub => ({ ...sub, isSelected: false }));
+            console.log('Loaded Sub-Activities:', this.subActivities);
+            this.showSubActivitiesPopup(this.subActivities);
+          } else {
+            // Process products if it's not a parent
+            activity.categorizedProducts = this.categorizeProducts(data.response);
+            console.log("Categorized Products:", activity.categorizedProducts);
+          }
+        },
+        error => {
+          console.error('Error fetching data:', error);
+          activity.categorizedProducts = [];
+        }
+      );
     }
   }
+
+  // Fetch and categorize products in a single function
+  fetchAndCategorizeProducts(activityTypeID: number, activity: any) {
+    this.activityService.getAllProducts(activityTypeID).subscribe(
+      data => {
+        const products = data.response;
+        if (!products || products.length === 0) {
+          activity.categorizedProducts = [];
+          console.log('No products found.');
+          return;
+        }
+        activity.categorizedProducts = this.categorizeProducts(products);
+        console.log("Updated activity.categorizedProducts:", activity.categorizedProducts); // Confirm update here
+      },
+      error => {
+        console.error('Error fetching products:', error);
+        activity.categorizedProducts = [];
+      }
+    );
+  }
+
+
+
+  // Helper function to categorize products
+  categorizeProducts(products: any[]) {
+    const categorizedProducts = [];
+    let currentCategory = null;
+
+    products.forEach(product => {
+      if (product.ID === 0) {
+        // Start a new category group
+        currentCategory = {
+          mainCategory: product.ProductCategoryTypeDesc,
+          subProducts: []
+        };
+        categorizedProducts.push(currentCategory);
+      } else if (currentCategory) {
+        const subProduct = { ...product, isChecked: false, firmScopeTypeID: 1 };
+        currentCategory.subProducts.push(subProduct);
+      }
+    });
+
+    return categorizedProducts;
+  }
+
+  selectSubActivity(sub: any) {
+    this.subActivities.forEach(activity => activity.isSelected = false); // Clear previous selection
+    sub.isSelected = true; // Set selected sub-activity
+    this.selectedSubActivityID = sub.ActivityTypeID; // Track selected ID if needed
+  }
+
+  confirmSelection(activity: any) {
+    const selectedSubActivity = this.subActivities.find(sub => sub.isSelected);
+    if (selectedSubActivity) {
+        activity.selectedSubActivity = selectedSubActivity; // Attach directly to the activity
+        console.log("Selected Sub-Activity:", selectedSubActivity);
+        // Fetch products for this specific sub-activity and save to this activity
+        this.fetchAndCategorizeProducts(selectedSubActivity.ActivityTypeID, activity);
+    }
+    this.closeSubActivity();
+}
+
+
+  toggleExpand(activityTypeID: number) {
+    this.parentActivity = this.parentActivity === activityTypeID ? null : activityTypeID;
+  }
+
 
 
 
   toggleCollapse(section: string) {
     this.isCollapsed[section] = !this.isCollapsed[section];
-  }
-
-  toggleSubActivities(parent: any) {
-    parent.isCollapsed = !parent.isCollapsed;
   }
 
   showAlertDeleteFile() {
@@ -2412,8 +2446,8 @@ export class ScopeComponent implements OnInit {
     }
   }
 
-  loadErrorMessages(fieldName: string, msgKey: number, activity?: any,customMessage?: string) {
-    this.firmDetailsService.getErrorMessages(fieldName, msgKey, activity,customMessage).subscribe(
+  loadErrorMessages(fieldName: string, msgKey: number, activity?: any, customMessage?: string) {
+    this.firmDetailsService.getErrorMessages(fieldName, msgKey, activity, customMessage).subscribe(
       () => {
         this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
         console.log(`Error message for ${fieldName} loaded successfully`);

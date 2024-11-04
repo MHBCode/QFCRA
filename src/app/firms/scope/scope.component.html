@@ -300,7 +300,7 @@
       </div>
     </div>
   </div>
-  <!--Authorized Section-->
+  <!--Authorised Section-->
   <div class="authorized-section" *ngIf="firmDetails?.AuthorisationStatusTypeID > 0 && tabIndex === 1">
     <div class="authorized-body" [ngClass]="{ collapsed: isCollapsed['authorizeSection'] }">
       <div class="inputs-field-set scopeFor">
@@ -316,7 +316,7 @@
           </p>
           <p *ngIf="errorMessages['EffectiveDateLaterApplicationDate']">
             {{ errorMessages['EffectiveDateLaterApplicationDate'] }}
-          </p>        
+          </p>
           <p *ngIf="errorMessages['PrudentialEffectiveDate']">
             {{ errorMessages['PrudentialEffectiveDate'] }}
           </p>
@@ -587,6 +587,11 @@
                       </option>
                     </select>
                   </div>
+                </div>
+
+                <div *ngIf="activity.selectedSubActivity">
+                  <label>Sub Activity:</label>
+                  <span>{{ activity.selectedSubActivity.ActivityTypeDesc }}</span>
                 </div>
 
                 <button class="removeRegulatedActivity bi bi-trash" style="margin-left: auto"
@@ -982,7 +987,7 @@
   </div>
 </div>
 
-<!-- sub activities popup -->
+<!-- Sub Activities Popup -->
 <div *ngIf="callSubActivity" class="overlay show"></div>
 <div *ngIf="callSubActivity" class="SubActivitiesPopUp popupcontainer">
   <i class="bi bi-x-circle close-icon" (click)="closeSubActivity()"></i>
@@ -992,18 +997,39 @@
     </div>
     <div class="popup-body">
       <ul>
-        <li>
-          <input type="checkbox" name="subactivity">
-          <input type="checkbox" name="subactivity">
+        <!-- Parent Activity -->
+        <li *ngFor="let activity of subActivities">
+          <!-- Check if activity is a parent (no ParentActivityTypeID) -->
+          <ng-container *ngIf="!activity.ParentActivityTypeID">
+            <div (click)="toggleExpand(activity.ActivityTypeID)">
+              <i
+                [ngClass]="parentActivity === activity.ActivityTypeID ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+              <strong>{{ activity.ActivityTypeDesc }}</strong>
+            </div>
+
+            <!-- Sub Activities -->
+            <ul *ngIf="parentActivity === activity.ActivityTypeID">
+              <li *ngFor="let sub of subActivities">
+                <ng-container *ngIf="sub.ParentActivityTypeID === activity.ActivityTypeID">
+                  <input type="radio" name="subactivity" [value]="sub.ActivityTypeID"
+                    [(ngModel)]="selectedSubActivityID" (change)="selectSubActivity(sub)">
+                  <label>{{ sub.ActivityTypeDesc }}</label>
+                </ng-container>
+              </li>
+            </ul>
+          </ng-container>
         </li>
       </ul>
     </div>
-    </div>
-    <div class="popup-buttons-container">
-    <button class="subbutton">Ok</button>
-      <button class="subbutton" (click)="closeSubActivity()">Cancel</button>
+
+  </div>
+  <div class="popup-buttons-container">
+    <button class="subbutton" (click)="confirmSelection(activity)">Ok</button>
+    <button class="subbutton" (click)="closeSubActivity()">Cancel</button>
   </div>
 </div>
+
+
 
 <!--Reference Form Popup-->
 <div *ngIf="callRefForm" class="overlay show"></div>

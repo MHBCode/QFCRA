@@ -167,7 +167,8 @@
             ">
           <label for="title"> Title </label>
           <ng-container *ngIf="isEditable; else titleDisplay">
-            <select [(ngModel)]="selectedController.Title" (ngModelChange)="onTitleChange($event)" name="title" id="title">
+            <select [(ngModel)]="selectedController.Title" (ngModelChange)="onTitleChange($event)" name="title"
+              id="title">
               <option *ngFor="let title of Titles" [value]="title.TitleDesc">
                 {{ title.TitleDesc }}
               </option>
@@ -301,7 +302,7 @@
             </select>
           </ng-container>
           <ng-template #placeOfEstablishmentDisplay>
-            <input [value]="getPlaceOfEstablishmentName()" name="placeOfEstablishment" disabled />
+            <input type="text" [value]="getPlaceOfEstablishmentName()" name="placeOfEstablishment" disabled />
           </ng-template>
         </div>
 
@@ -437,7 +438,7 @@
         </div>
       </div>
       <!-- Addresses Section -->
-      <div class="addresses">
+      <div *ngIf="ControllerfirmAddresses && ControllerfirmAddresses.length > 0" class="addresses">
         <div class="popup-header">
           <h3>Addresses</h3>
         </div>
@@ -459,7 +460,8 @@
               <div class="input-field" *ngIf="!isEditable">
                 <label for="addressType" class="history-row">
                   Address Type
-                  <button *ngIf="address.PreviousRecords !== 0" class="subbutton-open-history">
+                  <button *ngIf="address.PreviousRecords != 0" class="subbutton-open-history"
+                  (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID)">
                     <i class="bi bi-clock-history"></i><span> Open History</span>
                   </button>
                 </label>
@@ -574,98 +576,6 @@
             </ng-container>
           </ng-container>
         </div>
-        <!-- Address Details -->
-        <!-- <div *ngFor="let address of filteredControllerfirmAddresses; let i = index">
-          <ng-container *ngIf="address.Valid === true">
-            <hr />
-            <button (click)="removeControllerAddress(i)"  style="
-                float: right;
-                background-color: red;
-                color: white;
-                border: none;
-                padding: 5px;
-                cursor: pointer;
-                border-radius: 5px;
-              ">
-              <i style="size: 5px" class="bi bi-x-lg"></i>
-            </button>
-            <div class="inputs-row">
-              <div class="input-field">
-                <label>Address Type</label>
-                <select [(ngModel)]="address.AddressTypeID" name="addressType" disabled>
-                  <option *ngFor="let type of addressTypeOptionsEdit" [value]="type.AddressTypeID">
-                    {{ type.AddressTypeDesc }}
-                  </option>
-                </select>
-              </div>
-              <div class="input-field">
-                <label>Address - Line 1</label>
-                <input type="text" [(ngModel)]="address.AddressLine1" name="addressLine1" id="addressLine1"
-                  [readonly]="!isEditable" [disabled]="
-                    address.sameAsTypeID && address.sameAsTypeID != 0
-                  " />
-              </div>
-              <div class="input-field">
-                <label>Address - Line 2</label>
-                <input [(ngModel)]="address.AddressLine2" name="addressLine2" id="addressLine2"
-                  [readonly]="!isEditable" [disabled]="
-                    address.sameAsTypeID && address.sameAsTypeID != 0
-                  " />
-              </div>
-            </div>
-            <div class="inputs-row">
-              <div class="input-field">
-                <label for="address3"> Address - Line 3 </label>
-                <input [(ngModel)]="address.AddressLine3" name="address3" id="address3" type="text" [disabled]="
-                    address.sameAsTypeID && address.sameAsTypeID != 0
-                  " [readonly]="!isEditable" />
-              </div>
-
-              <div class="input-field">
-                <label for="address4"> Address - Line 4 </label>
-                <input [(ngModel)]="address.AddressLine4" name="address4" id="address4" type="text" [disabled]="
-                    address.sameAsTypeID && address.sameAsTypeID != 0
-                  " [readonly]="!isEditable" />
-              </div>
-              <div class="input-field">
-                <label for="city">City</label>
-                <input [(ngModel)]="address.City" name="city" id="city" type="text" [disabled]="
-                    address.sameAsTypeID && address.sameAsTypeID != 0
-                  " [readonly]="!isEditable" />
-              </div>
-            </div>
-            <div class="inputs-row">
-              <div class="input-field">
-                <label for="stateProvince">State/Province</label>
-                <input [(ngModel)]="address.Province" name="stateProvince" id="stateProvince" [disabled]="
-                    address.sameAsTypeID && address.sameAsTypeID != 0
-                  " [readonly]="!isEditable" />
-              </div>
-              <div class="input-field">
-                <label for="country">Country</label>
-                <ng-container *ngIf="isEditable; else countryInput">
-                  <select [(ngModel)]="address.CountryID" name="country" [disabled]="
-                      address.sameAsTypeID && address.sameAsTypeID != 0
-                    ">
-                    <option *ngFor="let country of allCountries" [value]="country.CountryID">
-                      {{ country.CountryName }}
-                    </option>
-                  </select>
-                </ng-container>
-                <ng-template #countryInput>
-                  <input [(ngModel)]="address.CountryID" name="country" [readonly]="!isEditable" />
-                </ng-template>
-              </div>
-              <div class="input-field">
-                <label for="zipPostalCode">Zip/Postal Code</label>
-                <input [(ngModel)]="address.PostalCode" name="zipPostalCode" id="zipPostalCode"
-                  [readonly]="!isEditable" [disabled]="
-                    address.sameAsTypeID && address.sameAsTypeID != 0
-                  " />
-              </div>
-            </div>
-          </ng-container>
-          </div> -->
       </div>
       <ng-container *ngIf="
             !isEditable ||
@@ -680,15 +590,15 @@
             <div class="input-field">
               <label for="regulators">Regulator <span style="color: red">*</span></label>
               <ng-container *ngIf="isEditable; else regulatorinput">
-                <select required [(ngModel)]="regulator.RegulatorName" name="regulators" id="regulators">
+                <select required [(ngModel)]="regulator.RegulatorID" name="regulators" id="regulators">
                   <option *ngFor="let Regulater of AllRegulater" [value]="Regulater.RegulatorID">
                     {{ Regulater.RegulatorName }}
                   </option>
                 </select>
               </ng-container>
               <ng-template #regulatorinput>
-                <input [(ngModel)]="regulator.RegulatorName" name="regulators" id="regulators"
-                  [disabled]="!isEditable" />
+                <input type="text" name="regulators" id="regulators" [disabled]="!isEditable"
+                  value="{{regulator.RegulatorName}}" />
               </ng-template>
             </div>
             <div class="input-field">
@@ -704,7 +614,7 @@
           <i class="bi bi-pen"></i> Edit
         </button>
         <button *ngIf="isEditable" (click)="saveControllerPopupChanges()">
-          <i class="bi bi-save"></i> Save
+          <i></i> Save
         </button>
         <button (click)="confarmDeleteControllerDetials()">
           <i class="bi bi-trash"></i> Delete
@@ -727,6 +637,9 @@
       </div>
 
       <div class="error-messages">
+        <p *ngIf="errorMessages['EntityTypeName']">
+          {{ errorMessages['EntityTypeName'] }}
+        </p>
         <p *ngIf="errorMessages['OtherEntityName']">
           {{ errorMessages['OtherEntityName'] }}
         </p>
@@ -1222,5 +1135,44 @@
         </button>
       </div>
     </div>
+  </div>
+</div>
+
+<!--Address Type History-->
+<div *ngIf="callAddressType" class="overlay show"></div>
+<div *ngIf="callAddressType" class="addressHistoryPopup popupcontainer">
+  <i class="bi bi-x-circle close-icon" (click)="closeAddressTypeHistory()"></i>
+  <div class="popup-info-place">
+    <div class="popup-header">
+      <h3>Address History</h3>
+    </div>
+    <br />
+    <div class="address-type-info">
+      <span style="text-decoration: underline">{{
+        controllerFirmAddressesTypeHistory[0]?.AddressTypeDesc
+        }}</span>
+      &nbsp; (<span style="color: red">history includes the deleted record for this address type.</span>)
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Address</th>
+          <th class="text-center">Created Date</th>
+          <th class="text-center">Modified Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let addressHistory of controllerFirmAddressesTypeHistory">
+          <td>{{ addressHistory?.ShortAddress }}</td>
+          <td class="text-center">{{ addressHistory?.CreatedDate }}</td>
+          <td class="text-center">
+            {{ addressHistory?.LastModifiedDate }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="popup-operations-place">
+    <button class="subbutton" (click)="closeAddressTypeHistory()">Close</button>
   </div>
 </div>

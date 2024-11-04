@@ -21,10 +21,21 @@ export class AddressesService {
     return this.http.get<any>(url);
   }
 
-  getAddressesTypeHistory(firmId: number, addressTypeId: number) {
-    const url = `${this.baseUrlAddress}get_address_type_history?firmId=${firmId}&addressTypeId=${addressTypeId}&valId=false`
+  getAddressesTypeHistory(firmId: number | null, addressTypeId: number, entityTypeId: number | null, entityId: number | null) {
+    let url = `${this.baseUrlAddress}get_address_type_history?addressTypeId=${addressTypeId}&valId=false`;
+    
+    if (firmId !== null) {
+        url += `&firmId=${firmId}`;
+    }
+    if (entityTypeId !== null) {
+        url += `&entityTypeId=${entityTypeId}`;
+    }
+    if (entityId !== null) {
+        url += `&entityId=${entityId}`;
+    }
     return this.http.get<any>(url);
-  }
+}
+
 
   editCoreAddress(userId: number, rowData: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
