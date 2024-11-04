@@ -37,23 +37,28 @@ export class ContactsComponent {
   isEditable: boolean = false; // Controls the readonly state of the input fields
   selectedContact: any = null;
   displayInactiveContacts: boolean = false;
+  existingControllerAddresses: any = [];
   showCreateContactSection: boolean = false;
   Address: any = {};
   allCountries: any = [];
   allAddressTypes: any = [];
   firmAddresses: any = [];
+  canAddNewAddressOnCreate: boolean = true;
   controlTypeOptionsCreate: any[] = [];
   controllerTypeOption: any = [];
   objectOpTypeIdEdit = 41;
   objectOpTypeIdCreate = 40;
   legalStatusOptionsEdit: any[] = [];
-  TitleEdit: any[] = [];
+  Titles: any[] = [];
   MethodofContactOption: any = [];
   AllContactFrom: any = [];
   AllAvilabilContact: any = [];
   contactTypeOption: any = [];
   Column2: string = '';
   IsEditContactVisible: boolean = false;
+  isAllAddressesAddedOnCreate: boolean;
+
+  addedAddresses: any = [];
   constructor(
     private securityService: SecurityService,
     private router: Router,
@@ -86,7 +91,10 @@ export class ContactsComponent {
       this.getAllContactFromByFrimsId();
       this.getControllerControlTypesCreat();
       this.getlegalStatusController();
-
+      this.getContactType();
+      this.getPreferredMethodofContact();
+      this.getAvilabilContact();
+      this.getTitleCreate();
     })
   }
 
@@ -156,6 +164,13 @@ export class ContactsComponent {
           console.log("Selected contact: ", this.selectedContact); // Log to check data
           this.isPopupVisible = true; // Show the popup after data is loaded
           this.cdr.detectChanges(); // Trigger change detection to update the view
+          this.loadContactFirmAdresses(
+            this.selectedContact.OtherEntityID,
+            this.selectedContact.EntityTypeID,
+            this.userId,
+            44 // Static opTypeId
+          );
+          this.existingControllerAddresses = this.ContactfirmAddresses.filter(address => address.Valid);
         } else {
           console.error('No contact data received:', data);
           this.isPopupVisible = false; // Hide popup if no data is received
@@ -164,6 +179,28 @@ export class ContactsComponent {
       error => {
         console.error('Error fetching contact details', error);
         this.isPopupVisible = false; // Hide popup if there's an error
+      }
+    );
+  }
+  loadContactFirmAdresses(entityID: number, entityTypeID: number, userId: number, opTypeId: number): void {
+    this.isLoading = true;
+
+    // Fetch firm addresses from the service
+    this.addressService.getControllerFirmAddresses(entityID, entityTypeID, userId, opTypeId).subscribe(
+      data => {
+        if (data.response) {
+          this.ContactfirmAddresses = data.response;
+        
+          console.log('Controller Corporate Firm Addresses:', this.ContactfirmAddresses);
+        } else {
+          console.warn('No addresses found for this firm');
+        }
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Error Fetching Firm Addresses', error);
+        this.ContactfirmAddresses = [];
+        this.isLoading = false;
       }
     );
   }
@@ -182,7 +219,18 @@ export class ContactsComponent {
   closeContactPopup() {
     this.isPopupVisible = false;
   }
+  getContactType(): void {
+    this.securityService.getobjecttypetableEdit(this.userId, constants.ContactTypes, 40)
+      .subscribe(data => {
+        this.contactTypeOption = data.response;
+        console.log("Controllers", data)
+      }, error => {
+        console.error("Error fetching Controllers", error);
+      });
+  }
+  ControllerfirmAddresses: any = [];
   saveContactPopupChanges(): void {
+    this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
     // Prepare the selectedContact object (which is bound to the form) to be saved
     const contactDetails = {
       firmId: this.firmId, // Ensure firmId is correctly passed
@@ -227,8 +275,15 @@ export class ContactsComponent {
       }
     );
   }
-
+  disableAddressFieldsOnEdit: any = [];
+  newAddressOnEdit: any = [];
+  onSameAsTypeChangeOnEditMode(selectedTypeID: number) {
+    this.disableAddressFieldsOnEdit = selectedTypeID && selectedTypeID != 0; // Set disableAddressFields here
+    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, this.existingControllerAddresses, this.newAddressOnEdit);
+  }
+  ContactfirmAddresses: any = [];
   enableEditing() {
+    this.existingControllerAddresses = this.ContactfirmAddresses.filter(address => address.Valid);
     this.isEditable = true;
   }
 
@@ -474,14 +529,66 @@ export class ContactsComponent {
     this.firmDetailsService.getAddressTypes().subscribe(
       addressTypes => {
         this.allAddressTypes = addressTypes;
+        if (this.addedAddresses.length === 0) {
+          this.addNewAddressOnCreateMode();
+        }
+        console.log('Added Addresses', this.addedAddresses);
+        this.checkCanAddNewAddressOnCreateMode()
       },
       error => {
         console.error('Error fetching address types:', error);
       }
     );
   }
+  addNewAddressOnCreateMode() {
+    this.firmDetailsService.addNewAddressOnCreateMode(this.addedAddresses, this.allAddressTypes, this.currentDate);
 
+    // Now call checkCanAddNewAddressOnCreateMode to get the updated flags
+    this.checkCanAddNewAddressOnCreateMode()
+  }
+  checkCanAddNewAddressOnCreateMode() {
+    const { canAddNewAddressOnCreate, isAllAddressesAddedOnCreate } =
+      this.firmDetailsService.checkCanAddNewAddressOnCreateMode(this.addedAddresses, this.allAddressTypes);
 
+    // Assign the values to component-level properties
+    this.canAddNewAddressOnCreate = canAddNewAddressOnCreate;
+    this.isAllAddressesAddedOnCreate = isAllAddressesAddedOnCreate;
+  }
+  onAddressTypeChangeOnCreateMode(event: any, index: number) {
+    const selectedTypeID = Number(event.target.value); // Convert the selected value to a number
+    const currentAddress = this.addedAddresses[index];
+
+    if (!currentAddress) {
+      console.error('No current address found at index:', index);
+      return;
+    }
+
+    // Check if the selected type is already in use by another address
+    const isDuplicate = this.addedAddresses.some((address, i) => {
+      return i !== index && address.AddressTypeID === selectedTypeID;
+    });
+
+    if (isDuplicate) {
+      // Show an alert message if a duplicate is found
+      this.showError(constants.AddressControlMessages.DUPLICATE_ADDRESSTYPES);
+
+      // Reset the dropdown to default ("Select" option)
+      event.target.value = "0";
+      currentAddress.AddressTypeID = 0;  // Also reset the AddressTypeID in the model
+      currentAddress.AddressTypeDesc = ''; // Reset the description as well
+    } else {
+      // If not a duplicate, update the current address
+      const selectedAddressType = this.allAddressTypes.find(type => type.AddressTypeID === selectedTypeID);
+      if (selectedAddressType) {
+        currentAddress.AddressTypeID = selectedAddressType.AddressTypeID;
+        currentAddress.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
+      }
+      currentAddress.isAddressTypeSelected = true; // Disable the dropdown after selection
+    }
+
+    // Check if the "Add Address" button should be enabled
+    this.checkCanAddNewAddressOnCreateMode();
+  }
   getAddressTypeDesc(addressTypeID: number): string {
     const selectedType = this.allAddressTypes.find(type => type.AddressTypeID === addressTypeID);
     return selectedType ? selectedType.AddressTypeDesc : 'Unknown';
@@ -533,7 +640,6 @@ export class ContactsComponent {
       address.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
     }
   }
-
   // loadFirmAdresses() {
   //   this.isLoading = true;
   //   this.addressService.getCoreFirmAddresses(this.firmId).subscribe(
@@ -660,17 +766,34 @@ export class ContactsComponent {
         console.error("Error fetching legalStatus", error);
       });
   }
-
+  addressTypeOptionsEdit: any = [];
+  getAddressTypesController(): void {
+    this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdEdit)
+      .subscribe(data => {
+        this.addressTypeOptionsEdit = data.response;
+        console.log("getAddressTypesContact", data)
+      }, error => {
+        console.error("Error fetching AddressTypes", error);
+      });
+  }
+  getAddressTypesControllerCreate(): void {
+    this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdCreate)
+      .subscribe(data => {
+        this.addressTypeOptionsEdit = data.response;
+        console.log("getAddressTypesContact", data)
+      }, error => {
+        console.error("Error fetching AddressTypes", error);
+      });
+  }
   getTitleCreate(): void {
     this.securityService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdCreate)
       .subscribe(data => {
-        this.TitleEdit = data.response;
-        console.log("Countries", data)
+        this.Titles = data.response;
+        console.log("All Titles", data)
       }, error => {
         console.error("Error fetching TitleTypes", error);
       });
   }
-
   showError(messageKey: number) {
     this.firmDetailsService.showErrorAlert(messageKey, this.isLoading);
   }
@@ -961,7 +1084,7 @@ export class ContactsComponent {
         },
         lstContactFunctions: null,
       },
-      Addresses: this.addressForms.map(address => ({
+      Addresses: this.existingControllerAddresses.map(address => ({
         firmID: this.firmId,
         countryID: address.CountryID,
         addressTypeID: address.AddressTypeID,
@@ -1010,6 +1133,9 @@ export class ContactsComponent {
     this.contactService.saveupdatecontactform(data).subscribe(
       response => {
         console.log("Contact save successful:", response);
+        this.isEditable = false;
+        this.getPlaceOfEstablishmentName();
+        this.firmDetailsService.showSaveSuccessAlert(constants.ControllerMessages.RECORD_MODIFIED);
         this.loadContacts();
       },
       error => {
@@ -1264,5 +1390,8 @@ deleteContact(output: boolean): void {
     }
   );
 }
-
+getPlaceOfEstablishmentName(): string {
+  const place = this.allCountries.find(option => option.CountryID === parseInt(this.selectedContact.CountryOfIncorporation));
+  return place ? place.CountryName : '';
+}
 }

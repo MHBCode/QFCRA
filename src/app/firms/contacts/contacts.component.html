@@ -65,7 +65,7 @@
               </p>
               <p *ngIf="errorMessages['busEmail']">
                 {{ errorMessages['busEmail'] }}
-              </p>
+              </p> 
             </div>
             <div class="inputs-row">
               <div class="input-field">
@@ -141,8 +141,8 @@
               <!-- Title Section -->
               <div class="input-field">
                 <label for="Title">Title</label>
-                <select name="Title" id="Title" [disabled]="isCIP === ''">
-                  <option *ngFor="let title of TitleEdit" [value]="title.TitleTypeId" [(ngModel)]="createContactObj.title">
+                <select name="Title" id="Title" [disabled]="isCIP === ''" [(ngModel)]="createContactObj.title">
+                  <option *ngFor="let title of Titles" [value]="title.TitleDesc" >
                     {{ title.TitleDesc }}
                   </option>
                 </select>
@@ -454,7 +454,7 @@
                 <label for="Title"> Title </label>
                 <select name="Title" id="Title" [(ngModel)]="selectedContact.title"
                   [disabled]="isCIP === '' || !IsEditContactVisible">
-                  <option *ngFor="let title of TitleEdit" [value]="title.TitleTypeId">
+                  <option *ngFor="let title of Titles" [value]="title.TitleDesc">
                     {{ title.TitleDesc }}
                   </option>
                 </select>
