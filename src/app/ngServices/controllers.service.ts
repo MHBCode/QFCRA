@@ -11,6 +11,7 @@ export class ControllersService {
   constructor(private http: HttpClient) { }
 
   private baseUrlControllers = environment.API_URL + '/api/OtherEntity/'; //Controllers
+  private UrlContact = environment.API_URL + '/api/Contact/';
 
   getFIRMControllers(firmId: number): Observable<any> {
     const url = `${this.baseUrlControllers}get_corporate_controller_details_list?firmId=${firmId}`; //https://localhost:7091/api/OtherEntity/get_corporate_controller_details_list?firmId=66
@@ -31,5 +32,9 @@ export class ControllersService {
   insertupdateotherentitydetails(saveControllerPopupChangesObj: any): Observable<any> {
     const url = `${this.baseUrlControllers}insert_update_other_entity_details`;
     return this.http.post<any>(url, saveControllerPopupChangesObj); 
+  }
+  loadControllerIndividualDetails(firmId: number,functionTypeId:number, contactId:number, contactAssId:number): Observable<any>{
+    const url = `${this.UrlContact}get_individual_controller_details?firmId=${firmId}&functionTypeId=${functionTypeId}&contactId=${contactId}&contactAssId=${contactAssId}`;
+    return this.http.get<any>(url); 
   }
 }

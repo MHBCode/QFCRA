@@ -103,12 +103,6 @@
         <p *ngIf="errorMessages['OtherEntityName']">
           {{ errorMessages['OtherEntityName'] }}
         </p>
-        <p *ngIf="errorMessages['EffectiveDate']">
-          {{ errorMessages['EffectiveDate'] }}
-        </p>
-        <p *ngIf="errorMessages['CessationDate']">
-          {{ errorMessages['CessationDate'] }}
-        </p>
         <p *ngIf="errorMessages['PlaceOfEstablishment']">
           {{ errorMessages['PlaceOfEstablishment'] }}
         </p>
@@ -117,6 +111,25 @@
         </p>
         <p *ngIf="errorMessages['PctOfShares']">
           {{ errorMessages['PctOfShares'] }}
+        </p>
+        <!--Ibdevidual-->
+        <p *ngIf="errorMessages['firstName']">
+          {{ errorMessages['firstName'] }}
+        </p>
+        <p *ngIf="errorMessages['familyName']">
+          {{ errorMessages['familyName'] }}
+        </p>
+        <p *ngIf="errorMessages['AssnDateFrom']">
+          {{ errorMessages['AssnDateFrom'] }}
+        </p>
+        <p *ngIf="errorMessages['AssnDateTo']">
+          {{ errorMessages['AssnDateTo'] }}
+        </p>
+        <p *ngIf="errorMessages['dateOfBirth']">
+          {{ errorMessages['dateOfBirth'] }}
+        </p>
+        <p *ngIf="errorMessages['isPEP']">
+          {{ errorMessages['isPEP'] }}
         </p>
       </div>
       <!-- Title -->
@@ -154,14 +167,14 @@
             ">
           <label for="title"> Title </label>
           <ng-container *ngIf="isEditable; else titleDisplay">
-            <select [(ngModel)]="selectedController.Title" name="title" id="title">
-              <option *ngFor="let title of TitleEdit" [value]="title.TitleTypeId">
+            <select [(ngModel)]="selectedController.Title" (ngModelChange)="onTitleChange($event)" name="title" id="title">
+              <option *ngFor="let title of Titles" [value]="title.TitleDesc">
                 {{ title.TitleDesc }}
               </option>
             </select>
           </ng-container>
           <ng-template #titleDisplay>
-            <input [value]="selectedController.Title" name="title" id="title" readonly />
+            <input [value]="selectedIndividualController.Title" name="title" id="title" disabled />
           </ng-template>
         </div>
         <div class="input-field" *ngIf="
@@ -171,7 +184,7 @@
           <label for="firstName">
             First Name <span style="color: red">*</span>
           </label>
-          <input [(ngModel)]="selectedController.FirstName" name="firstName" id="firstName" type="text"
+          <input [(ngModel)]="selectedIndividualController.FirstName" name="firstName" id="firstName" type="text"
             [disabled]="!isEditable" />
         </div>
         <!---->
@@ -182,7 +195,7 @@
           <label for="secondName">
             Second Name <span style="color: red">*</span>
           </label>
-          <input [(ngModel)]="selectedController.SecondName" name="secondName" id="secondName" type="text"
+          <input [(ngModel)]="selectedIndividualController.SecondName" name="secondName" id="secondName" type="text"
             [disabled]="!isEditable" />
         </div>
         <!---->
@@ -193,7 +206,7 @@
           <label for="familyName">
             Family Name <span style="color: red">*</span>
           </label>
-          <input [(ngModel)]="selectedController.FamilyName" name="familyName" id="familyName" type="text"
+          <input [(ngModel)]="selectedIndividualController.FamilyName" name="familyName" id="familyName" type="text"
             [disabled]="!isEditable" />
         </div>
         <div class="input-field" *ngIf="
@@ -717,12 +730,6 @@
         <p *ngIf="errorMessages['OtherEntityName']">
           {{ errorMessages['OtherEntityName'] }}
         </p>
-        <p *ngIf="errorMessages['EffectiveDate']">
-          {{ errorMessages['EffectiveDate'] }}
-        </p>
-        <p *ngIf="errorMessages['CessationDate']">
-          {{ errorMessages['CessationDate'] }}
-        </p>
         <p *ngIf="errorMessages['PlaceOfEstablishment']">
           {{ errorMessages['PlaceOfEstablishment'] }}
         </p>
@@ -731,6 +738,25 @@
         </p>
         <p *ngIf="errorMessages['PctOfShares']">
           {{ errorMessages['PctOfShares'] }}
+        </p>
+        <!--Ibdevidual-->
+        <p *ngIf="errorMessages['firstName']">
+          {{ errorMessages['firstName'] }}
+        </p>
+        <p *ngIf="errorMessages['familyName']">
+          {{ errorMessages['familyName'] }}
+        </p>
+        <p *ngIf="errorMessages['AssnDateFrom']">
+          {{ errorMessages['AssnDateFrom'] }}
+        </p>
+        <p *ngIf="errorMessages['AssnDateTo']">
+          {{ errorMessages['AssnDateTo'] }}
+        </p>
+        <p *ngIf="errorMessages['dateOfBirth']">
+          {{ errorMessages['dateOfBirth'] }}
+        </p>
+        <p *ngIf="errorMessages['isPEP']">
+          {{ errorMessages['isPEP'] }}
         </p>
       </div>
       <div class="inputs-row">
@@ -769,7 +795,7 @@
             ">
             <label for="individualTitle"> Title </label>
             <select [(ngModel)]="CreatecontrollerDetails.Title" name="legalStatus">
-              <option *ngFor="let title of TitleEdit" [value]="title.TitleTypeId">
+              <option *ngFor="let title of Titles" [value]="title.TitleDesc">
                 {{ title.TitleDesc }}
               </option>
             </select>
