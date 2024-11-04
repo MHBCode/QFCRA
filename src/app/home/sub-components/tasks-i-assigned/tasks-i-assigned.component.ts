@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import * as XLSX from 'xlsx';
 import { LogformService } from 'src/app/ngServices/logform.service';
+import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 @Component({
   selector: 'app-tasks-i-assigned',
   templateUrl: './tasks-i-assigned.component.html',
@@ -55,7 +56,8 @@ export class TasksIAssignedComponent implements OnInit {
     private logForm: LogformService,
     private router: Router,
     private sanitizer: DomSanitizer,
-    private dateUtilService: DateUtilService
+    private dateUtilService: DateUtilService,
+    private firmDetailsService: FirmDetailsService
   ) { }
 
   ngOnInit(): void {
@@ -255,7 +257,7 @@ export class TasksIAssignedComponent implements OnInit {
 
     // Step 2: Handle Validation Errors
     if (this.hasValidationErrors) {
-      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       return; // Prevent further action if validation fails
     }
   
@@ -356,17 +358,6 @@ export class TasksIAssignedComponent implements OnInit {
     this.errorMessages[fieldName] = errorMessage;
 }
 
-  showErrorAlert(messageKey: number) {
-    this.logForm.errorMessages(messageKey).subscribe(
-      (response) => {
-        Swal.fire({
-          text: response.response,
-          icon: 'error',
-          confirmButtonText: 'Ok',
-        });
-      },
-    );
-  }
   exportRowToExcel(event: Event) {
     event.stopPropagation();
 

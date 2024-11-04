@@ -8,6 +8,7 @@ import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, Observable, tap } from 'rxjs';
 import { SharePointUploadResponse } from 'src/app/models/sharepoint-upload-response.interface';
+import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 
 @Component({
   selector: 'app-attachment',
@@ -40,7 +41,8 @@ export class AttachmentComponent implements OnInit {
     private logForm: LogformService,
     private objectWF: ObjectwfService,
     private securityService: SecurityService,
-    private sharepointService: SharepointDocumentsService
+    private sharepointService: SharepointDocumentsService,
+    private firmDetailsService: FirmDetailsService
   ) { }
 
   ngOnInit(): void {
@@ -81,7 +83,7 @@ export class AttachmentComponent implements OnInit {
     }
 
     if (this.hasValidationErrors) {
-      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       this.isLoading = false;
       return;
     }
@@ -120,7 +122,7 @@ export class AttachmentComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error occurred during file upload', err);
-          this.showErrorAlert(constants.MessagesLogForm.ERROR_UPLOADING_FILE);
+          this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ERROR_UPLOADING_FILE);
           this.isLoading = false;
         }
       });
@@ -211,19 +213,6 @@ export class AttachmentComponent implements OnInit {
         console.error('Element with class .selectDocumentPopUp not found');
       }
     }, 0)
-  }
-
-  showErrorAlert(messageKey: number) {
-    this.logForm.errorMessages(messageKey).subscribe(
-      (response) => {
-        Swal.fire({
-          text: response.response,
-          icon: 'error',
-          confirmButtonText: 'Ok',
-        });
-      },
-    );
-    this.isLoading = false;
   }
 
   onFileSelected(event: Event) {
