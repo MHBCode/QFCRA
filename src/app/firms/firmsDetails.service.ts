@@ -522,4 +522,18 @@ export class FirmDetailsService {
     });
   }
 
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+  showSaveSuccessAlert(messageKey: number) {
+    this.logForm.errorMessages(messageKey).subscribe(
+      (response) => {
+        Swal.fire({
+          title: 'Success!',
+          text: response.response,
+          icon: 'success',
+          confirmButtonText: 'Ok',
+        });
+      },
+    );
+  }
+
 }
