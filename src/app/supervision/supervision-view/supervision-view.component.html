@@ -14,20 +14,20 @@
             </div>
         </div>
 
-        <div class="inputs-row">
+        <div class="inputs-row" *ngIf="SupervisionCategory">
             <div class="input-field">
                 <label for="authorisationCategory">Authorisation Category</label>
-                <input disabled name="authorisationCategory" id="authorisationCategory" type="text" value="IBANK" />
+                <input disabled name="authorisationCategory" id="authorisationCategory" type="text" [(ngModel)]="SupervisionCategory[0].AuthorisationCategoryTypeDesc" />
             </div>
             <div class="input-field">
-                <label for="authorisationCategory">Supervision Category</label>
-                <input disabled name="authorisationCategory" id="authorisationCategory" type="text"
-                    value="Investment Manager" />
+                <label for="supervisionCategory">Supervision Category</label>
+                <input disabled name="supervisionCategory" id="supervisionCategory" type="text"
+                [(ngModel)]="SupervisionCategory[0].FirmRptClassificationTypeDesc" />
             </div>
             <div class="input-field">
-                <label for="authorisationCategory">Date Effective From</label>
-                <input disabled name="authorisationCategory" id="authorisationCategory" type="text"
-                    value="01/Dec/2013" />
+                <label for="effectiveFromDate">Date Effective From</label>
+                <input disabled name="effectiveFromDate" id="effectiveFromDate" type="text"
+                [(ngModel)]="SupervisionCategory[0].EffectiveFromDate" />
             </div>
         </div>
     </div>
@@ -71,7 +71,6 @@
         </div>
     </div>
 
-
     <div class="inputs-field-set">
         <div class="section">
             <div class="form-section-title">
@@ -79,34 +78,32 @@
                     Operational Data
                 </h2>
                 <div>
-                    <button class="subbutton-open-history" (click)="getOperationalData()">
+                    <button class="subbutton-open-history" (click)="getOperationalDataHistory()">
                         <i class="bi bi-clock-history"></i><span> Open History</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="inputs-row">
+        <div class="inputs-row" *ngIf="OperationalData">
             <div class="input-field">
                 <label for="Noofstaffinqatar"> No. of Staff in Qatar</label>
-                <input disabled name="Noofstaffinqatar" id=" Noofstaffinqatar" type="text" value="15" />
+                <input disabled name="Noofstaffinqatar" id=" Noofstaffinqatar" type="text"
+                    [(ngModel)]="OperationalData[0].NumOfLocalStaff" />
             </div>
             <div class="input-field">
                 <label for="stafftotal">Staff Total</label>
-                <input disabled name="stafftotal" id="stafftotal" type="text" value="15" />
+                <input disabled name="stafftotal" id="stafftotal" type="text"
+                    [(ngModel)]="OperationalData[0].NumOfTotalStaff" />
             </div>
             <div class="input-field">
                 <label for="operationalDateEffectiveFrom">Date Effective From</label>
                 <input disabled name="operationalDateEffectiveFrom" id="operationalDateEffectiveFrom" type="text"
-                    value="01/Dec/2013" />
+                    [(ngModel)]="OperationalData[0].EffectiveFromDate" />
             </div>
             <div class="input-field fullwidth">
                 <label for="notes"> Notes </label>
-                <textarea name="notes" disabled id="notes"
-                    value="As at 30 September 2023, the staff nos. are 15, please refer Quarterly Prudential return of Q3-2023.
-                  They were approved to become operational on 3 June 2008 and moved to be a Category 2 Firm on 26 October 2008.
-                  
-                  As at 31 December 2021, ARI's head count is 15 nos. as reported in Quarterly return of 31 December 2021. ARI recruited a business analyst in June21. Out of 25 positions at ARI, 5 positions are frozen and 5 are open for recruitment. (Refer C & C report 31 December 2021)."></textarea>
+                <textarea name="notes" disabled id="notes" [(ngModel)]="OperationalData[0].Notes"></textarea>
             </div>
         </div>
     </div>
@@ -121,14 +118,14 @@
             </div>
         </div>
 
-        <div class="inputs-row">
+        <div class="inputs-row" *ngIf="RPTBasis">
             <div class="input-field">
                 <label for="firmreportbasistype">Firm Report Basis Type</label>
-                <input disabled name="firmreportbasistype" id="firmreportbasistype" type="text" value="Solo" />
+                <input disabled name="firmreportbasistype" id="firmreportbasistype" type="text" [(ngModel)]="RPTBasis.FirmRptBasisTypeDesc"  />
             </div>
             <div class="input-field">
                 <label for="effectivedate">Effective Date</label>
-                <input disabled name="effectivedate" id="effectivedate" type="text" value="01/Apr/2014" />
+                <input disabled name="effectivedate" id="effectivedate" type="text" [(ngModel)]="RPTBasis.Column1" />
             </div>
         </div>
     </div>
@@ -141,7 +138,7 @@
                     Credit Ratings - Firm
                 </h2>
                 <div>
-                    <button class="subbutton-open-history" (click)="getCreditRatingsData()">
+                    <button class="subbutton-open-history" (click)="getCreditRatingsHistory()">
                         <i class="bi bi-clock-history"></i><span> Open History</span>
                     </button>
                 </div>
@@ -155,58 +152,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td colspan="3" class="agency-name">Rating Agency: Fitch</td>
-                    </tr>
-                    <tr class="rating-row">
-                        <td>Long Term Issuer Default Rating</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                    </tr>
-                    <tr class="rating-row">
-                        <td>Short Term Issuer Default Rating</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                    </tr>
-                    <tr class="rating-row">
-                        <td>Support Rating</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                    </tr>
-
-
-                    <tr>
-                        <td colspan="3" class="agency-name">Rating Agency: Moody's</td>
-                      </tr>
-                      <tr class="rating-row">
-                        <td>Long Term Rating</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                      </tr>
-                      <tr class="rating-row">
-                        <td>Short Term Rating</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                      </tr>
-                      <tr class="rating-row">
-                        <td>Bank Financial Strength</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                      </tr>
-                      <tr>
-                        <td colspan="3" class="agency-name">Rating Agency: Standard & Poors</td>
-                      </tr>
-                      <tr class="rating-row">
-                        <td>Long Term Foreign Issuer Credit</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                      </tr>
-                      <tr class="rating-row">
-                        <td>Short Term Foreign Issuer Credit</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                      </tr>
-
+                    <ng-container *ngFor="let agency of CreditRatingsFirm | keyvalue">             
+                        <tr>
+                          <td colspan="3" class="agency-name">Rating Agency: {{ agency.key }}</td>
+                        </tr>
+                        <tr *ngFor="let rating of agency.value" class="rating-row">
+                          <td>{{ rating.CreditRatingDisplayName }}</td>
+                          <td>{{ rating.Ratings }}</td>
+                          <td>{{ rating.RatingsAsOfDate }}</td>
+                        </tr>
+                      </ng-container>
                 </tbody>
             </table>
         </div>
@@ -221,7 +176,7 @@
                     Credit Ratings - Sovereign ( Home Country - Qatar )
                 </h2>
                 <div>
-                    <button class="subbutton-open-history" (click)="getCreditRatingsSovereignData()">
+                    <button class="subbutton-open-history" (click)="getCreditRatingsSovereignDataHistory()">
                         <i class="bi bi-clock-history"></i><span> Open History</span>
                     </button>
                 </div>
@@ -234,48 +189,16 @@
                         <th>Rating Effective From</th>
                     </tr>
                 </thead>
-                <tbody>
+                <ng-container *ngFor="let agency of CountryCreditRatingsFirm | keyvalue">             
                     <tr>
-                        <td colspan="3" class="agency-name">Rating Agency: Fitch</td>
+                      <td colspan="3" class="agency-name">Rating Agency: {{ agency.key }}</td>
                     </tr>
-                    <tr class="rating-row">
-                        <td>Long Term Issuer Default Rating</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
+                    <tr *ngFor="let rating of agency.value" class="rating-row">
+                      <td>{{ rating.CreditRatingDisplayName }}</td>
+                      <td>{{ rating.Ratings }}</td>
+                      <td>{{ rating.RatingsAsOfDate }}</td>
                     </tr>
-                    <tr class="rating-row">
-                        <td>Short Term Issuer Default Rating</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                    </tr>
-
-                    <tr>
-                        <td colspan="3" class="agency-name">Rating Agency: Moody's</td>
-                      </tr>
-                      <tr class="rating-row">
-                        <td>Long Term Rating</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                      </tr>
-                      <tr class="rating-row">
-                        <td>Short Term Rating</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                      </tr>
-                      <tr>
-                        <td colspan="3" class="agency-name">Rating Agency: Standard & Poors</td>
-                      </tr>
-                      <tr class="rating-row">
-                        <td>Long Term Foreign Issuer Credit</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                      </tr>
-                      <tr class="rating-row">
-                        <td>Short Term Foreign Issuer Credit</td>
-                        <td>NR</td>
-                        <td>15/Oct/2015</td>
-                      </tr>
-                </tbody>
+                  </ng-container>
             </table>
         </div>
 
@@ -303,15 +226,13 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>IBANK</td>
-                    <td>Investment Management</td>
-                    <td>01/Dec/2023</td>
-                    <td>
-                        01/Dec/2023
-                    </td>
-                    <td>01/Dec/2023</td>
-                    <td>01/Dec/2023</td>
+                <tr *ngFor="let category of SupervisionCategory">
+                    <td>{{category.AuthorisationCategoryTypeDesc}}</td>
+                    <td>{{category.FirmRptClassificationTypeDesc}}</td>
+                    <td>{{category.EffectiveFromDate}}</td>
+                    <td>{{category.EffectiveToDate}}</td>
+                    <td>{{category.LastModifiedBy}}</td>
+                    <td>{{category.LastModifiedDate}}</td>
                 </tr>
             </tbody>
         </table>
@@ -340,17 +261,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>IBANK</td>
-                    <td>Investment Management</td>
-                    <td>As at 30 September 2023, the staff nos. are 15, please refer Quarterly Prudential return of Q3-2023.
-                        They were approved to become operational on 3 June 2008 and moved to be a Category 2 Firm on 26 October 2008.
-                        
-                        As at 31 December 2021, ARI's head count is 15 nos. as reported in Quarterly return of 31 December 2021. ARI recruited a business analyst in June21. Out of 25 positions at ARI, 5 positions are frozen and 5 are open for recruitment. (Refer C & C report 31 December 2021).</td>
-                    <td>
-                        01/Dec/2023
-                    </td>
-                </tr>
+                <tr *ngFor="let operational of OperationalData">
+                    <td>{{operational.NumOfLocalStaff}}</td>
+                    <td>{{operational.NumOfTotalStaff}}</td>
+                    <td>{{operational.EffectiveFromDate}}</td>
+                    <td>{{operational.Notes}}</td>
+                  </tr>
             </tbody>
         </table>
     </div>
@@ -377,58 +293,16 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="3" class="agency-name">Rating Agency: Fitch</td>
-                </tr>
-                <tr class="rating-row">
-                    <td>Long Term Issuer Default Rating</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                </tr>
-                <tr class="rating-row">
-                    <td>Short Term Issuer Default Rating</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                </tr>
-                <tr class="rating-row">
-                    <td>Support Rating</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                </tr>
-
-
-                <tr>
-                    <td colspan="3" class="agency-name">Rating Agency: Moody's</td>
-                  </tr>
-                  <tr class="rating-row">
-                    <td>Long Term Rating</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                  </tr>
-                  <tr class="rating-row">
-                    <td>Short Term Rating</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                  </tr>
-                  <tr class="rating-row">
-                    <td>Bank Financial Strength</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                  </tr>
-                  <tr>
-                    <td colspan="3" class="agency-name">Rating Agency: Standard & Poors</td>
-                  </tr>
-                  <tr class="rating-row">
-                    <td>Long Term Foreign Issuer Credit</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                  </tr>
-                  <tr class="rating-row">
-                    <td>Short Term Foreign Issuer Credit</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                  </tr>
-
+                <ng-container *ngFor="let agency of HistoryCreditRatingGrouped | keyvalue">             
+                    <tr>
+                      <td colspan="3" class="agency-name">Rating Agency: {{ agency.key }}</td>
+                    </tr>
+                    <tr *ngFor="let rating of agency.value" class="rating-row">
+                      <td>{{ rating.CreditRatingDisplayName }}</td>
+                      <td>{{ rating.Ratings }}</td>
+                      <td>{{ rating.RatingsAsOfDate }}</td>
+                    </tr>
+                  </ng-container>
             </tbody>
         </table>
     </div>
@@ -454,58 +328,16 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="3" class="agency-name">Rating Agency: Fitch</td>
-                </tr>
-                <tr class="rating-row">
-                    <td>Long Term Issuer Default Rating</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                </tr>
-                <tr class="rating-row">
-                    <td>Short Term Issuer Default Rating</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                </tr>
-                <tr class="rating-row">
-                    <td>Support Rating</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                </tr>
-
-
-                <tr>
-                    <td colspan="3" class="agency-name">Rating Agency: Moody's</td>
-                  </tr>
-                  <tr class="rating-row">
-                    <td>Long Term Rating</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                  </tr>
-                  <tr class="rating-row">
-                    <td>Short Term Rating</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                  </tr>
-                  <tr class="rating-row">
-                    <td>Bank Financial Strength</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                  </tr>
-                  <tr>
-                    <td colspan="3" class="agency-name">Rating Agency: Standard & Poors</td>
-                  </tr>
-                  <tr class="rating-row">
-                    <td>Long Term Foreign Issuer Credit</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                  </tr>
-                  <tr class="rating-row">
-                    <td>Short Term Foreign Issuer Credit</td>
-                    <td>NR</td>
-                    <td>15/Oct/2015</td>
-                  </tr>
-
+                <ng-container *ngFor="let agency of HistoryCreditRatingCountryGrouped | keyvalue">             
+                    <tr>
+                      <td colspan="3" class="agency-name">Rating Agency: {{ agency.key }}</td>
+                    </tr>
+                    <tr *ngFor="let rating of agency.value" class="rating-row">
+                      <td>{{ rating.CreditRatingDisplayName }}</td>
+                      <td>{{ rating.Ratings }}</td>
+                      <td>{{ rating.RatingsAsOfDate }}</td>
+                    </tr>
+                  </ng-container>
             </tbody>
         </table>
     </div>

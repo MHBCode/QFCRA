@@ -1,5 +1,21 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FirmService } from 'src/app/ngServices/firm.service';
+import { RiskService } from 'src/app/ngServices/risk.service';
+import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 
+
+interface CreditRating {
+  CreditRatingTypeID: number;
+  CreditRatingAgencyName: string;
+  CreditRatingDisplayName: string;
+  Ratings: string;
+  RatingsAsOfDate: string;
+  DisplayOrder: number;
+  IsLatest: number;
+}
+
+type CreditRatingsGrouped = { [key: string]: CreditRating[] };
 @Component({
   selector: 'app-supervision-view',
   templateUrl: './supervision-view.component.html',
@@ -10,12 +26,50 @@ export class SupervisionViewComponent {
   callOperationalData: boolean = false;
   callCreditRatingsSovereign: boolean = false;
   callCreditRatings: boolean = false;
-  constructor() {
+
+  clientClassification: any;
+  isLoading: boolean = false;
+  firmId: number = 0;
+  OperationalData: any;
+  RPTBasis: any;
+  SupervisionCategory: any;
+  CreditRatings: CreditRating[] = [];
+  FiltredCreditRatingsFirm: CreditRating[] = [];
+  FiltredHistoryCreditRatingFirm: CreditRating[] = [];
+  FiltredHistoryCreditRatingCountry: CreditRating[] = [];
+  CreditRatingsFirm: CreditRatingsGrouped = {};
+  FiltredCountryCreditRatingFirm: CreditRating[] = [];
+  CountryCreditRatingsFirm: CreditRatingsGrouped = {};
+  SupervisionCategories: any;
+  HistoryCreditRatingGrouped: CreditRatingsGrouped = {};
+  HistoryCreditRatingCountryGrouped: CreditRatingsGrouped = {};
+
+  constructor(private router: Router,
+    private route: ActivatedRoute,
+    private firmsService: FirmService,
+    private riskService: RiskService,
+    private dateUtilService: DateUtilService) {
 
   }
 
+  ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      this.firmId = +params['id'];
+      this.getSupervisionCategoryData();
+      this.getClientClassificationData();
+      this.getOperationalData();
+      this.getRPTBasisData();
+      // Credit Ratings - Firm
+      this.getCreditRatingsData(true, false);
+      // Credit Ratings - Sovereign ( Home Country - Qatar )
+      this.getCreditRatingsData(false, false);
+    })
+  }
+
+
   getSupervisionCategory() {
     this.callSupervisionCategory = true;
+    this.getSupervisionCategoryData();
     setTimeout(() => {
       const popupWrapper = document.querySelector('.popup-wrapper') as HTMLElement;
       if (popupWrapper) {
@@ -37,8 +91,9 @@ export class SupervisionViewComponent {
   }
 
 
-  getOperationalData() {
+  getOperationalDataHistory() {
     this.callOperationalData = true;
+    this.getOperationalData();
     setTimeout(() => {
       const popupWrapper = document.querySelector('.OperationalData') as HTMLElement;
       if (popupWrapper) {
@@ -59,11 +114,10 @@ export class SupervisionViewComponent {
     }
   }
 
-
-
-
-  getCreditRatingsSovereignData() {
+  
+  getCreditRatingsSovereignDataHistory() {
     this.callCreditRatingsSovereign = true;
+    this.getCreditRatingsData(false,true)
     setTimeout(() => {
       const popupWrapper = document.querySelector('.CreditRatingsSovereign') as HTMLElement;
       if (popupWrapper) {
@@ -85,8 +139,9 @@ export class SupervisionViewComponent {
   }
 
 
-  getCreditRatingsData() {
+  getCreditRatingsHistory() {
     this.callCreditRatings = true;
+    this.getCreditRatingsData(true,true);
     setTimeout(() => {
       const popupWrapper = document.querySelector('.CreditRatings') as HTMLElement;
       if (popupWrapper) {
@@ -98,7 +153,7 @@ export class SupervisionViewComponent {
   }
 
   closeCreditRatingsPopup() {
-    this.callCreditRatings= false;
+    this.callCreditRatings = false;
     const popupWrapper = document.querySelector('.CreditRatings') as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none';
@@ -106,4 +161,151 @@ export class SupervisionViewComponent {
       console.error('Element with class .CreditRatings not found');
     }
   }
+
+  getClientClassificationData() {
+    this.firmsService.getClientClassification(this.firmId).subscribe(
+      data => {
+        this.clientClassification = data.response;
+        console.log('Firm FIRM clientClassification details:', this.clientClassification);
+      },
+      error => {
+        console.error('Error fetching Firm clientClassification ', error);
+      }
+    );
+  }
+
+
+  getOperationalData() {
+    this.firmsService.getOperationalData(this.firmId).subscribe(
+      data => {
+        this.OperationalData = data.response;
+        console.log('Firm FIRM OperationalData details:', this.OperationalData);
+      },
+      error => {
+        console.error('Error fetching Firm OperationalData ', error);
+      }
+    );
+  }
+
+  getRPTBasisData() {
+    this.firmsService.getRPTBasis(this.firmId).subscribe(
+      data => {
+        this.RPTBasis = data.response;
+        console.log('Firm FIRM RPTBasis details:', this.RPTBasis);
+      },
+      error => {
+        console.error('Error fetching Firm RPTBasis ', error);
+      }
+    );
+  }
+
+  getSupervisionCategoryData() {
+    this.firmsService.getSupervisionCategory(this.firmId).subscribe(
+      data => {
+        this.SupervisionCategory = data.response;
+      },
+      error => {
+        console.error('Error fetching Firm SupervisionCategory ', error);
+      }
+    );
+  }
+  getCreditRatingsData(isFirm?: boolean, isHistory?: boolean) {
+    this.riskService.getCreditRatings(this.firmId).subscribe(
+      data => {
+        this.CreditRatings = data.response;
+        if (isFirm) {
+          if (!isHistory) {
+            // Credit Firm View Table
+            this.FiltredCreditRatingsFirm = this.CreditRatings
+              .filter(item => item.CreditRatingTypeID === 1 && item.IsLatest === 1)
+              .sort((a, b) => a.DisplayOrder - b.DisplayOrder);
+            this.CreditRatingsFirm = this.FiltredCreditRatingsFirm.reduce((acc, item) => {
+              const agencyName = item.CreditRatingAgencyName;
+              if (!acc[agencyName]) {
+                acc[agencyName] = [];
+              }
+              acc[agencyName].push(item);
+              return acc;
+            }, {} as CreditRatingsGrouped);
+          } else {
+            // Credit Firm Popup Table
+            this.FiltredHistoryCreditRatingFirm = this.CreditRatings
+              .filter(item => item.CreditRatingTypeID === 1)
+              .sort((a, b) => {
+                // Sort by DisplayOrder
+                const displayOrderComparison = a.DisplayOrder - b.DisplayOrder;
+                if (displayOrderComparison !== 0) {
+                  return displayOrderComparison; // Ascending order for DisplayOrder
+                }
+
+                const formattedDateA = this.dateUtilService.formatDateToCustomFormat(a.RatingsAsOfDate);
+                const formattedDateB = this.dateUtilService.formatDateToCustomFormat(b.RatingsAsOfDate);
+  
+                const dateA = new Date(formattedDateA.split('/').reverse().join('/'));
+                const dateB = new Date(formattedDateB.split('/').reverse().join('/'));
+        
+                return dateB.getTime() - dateA.getTime();
+              });
+  
+            // Group by CreditRatingAgencyName
+            this.HistoryCreditRatingGrouped = this.FiltredHistoryCreditRatingFirm.reduce((acc, item) => {
+              const agencyName = item.CreditRatingAgencyName;
+              if (!acc[agencyName]) {
+                acc[agencyName] = [];
+              }
+              acc[agencyName].push(item);
+              return acc;
+            }, {} as CreditRatingsGrouped);
+          }
+        } else {
+          if (!isHistory) {
+            // second table 
+            this.FiltredCountryCreditRatingFirm = this.CreditRatings
+              .filter(item => item.CreditRatingTypeID === 2 && item.IsLatest === 1)
+              .sort((a, b) => a.DisplayOrder - b.DisplayOrder);
+            this.CountryCreditRatingsFirm = this.FiltredCountryCreditRatingFirm.reduce((acc, item) => {
+              const agencyName = item.CreditRatingAgencyName;
+              if (!acc[agencyName]) {
+                acc[agencyName] = [];
+              }
+              acc[agencyName].push(item);
+              return acc;
+            }, {} as CreditRatingsGrouped);
+          } else {
+            this.FiltredHistoryCreditRatingCountry = this.CreditRatings
+            .filter(item => item.CreditRatingTypeID === 2)
+            .sort((a, b) => {
+              // Sort by DisplayOrder
+              const displayOrderComparison = a.DisplayOrder - b.DisplayOrder;
+              if (displayOrderComparison !== 0) {
+                return displayOrderComparison; // Ascending order for DisplayOrder
+              }
+
+              const formattedDateA = this.dateUtilService.formatDateToCustomFormat(a.RatingsAsOfDate);
+              const formattedDateB = this.dateUtilService.formatDateToCustomFormat(b.RatingsAsOfDate);
+
+              const dateA = new Date(formattedDateA.split('/').reverse().join('/'));
+              const dateB = new Date(formattedDateB.split('/').reverse().join('/'));
+      
+              return dateB.getTime() - dateA.getTime();
+            });
+
+          // Group by CreditRatingAgencyName
+          this.HistoryCreditRatingCountryGrouped = this.FiltredHistoryCreditRatingCountry.reduce((acc, item) => {
+            const agencyName = item.CreditRatingAgencyName;
+            if (!acc[agencyName]) {
+              acc[agencyName] = [];
+            }
+            acc[agencyName].push(item);
+            return acc;
+          }, {} as CreditRatingsGrouped);
+          }
+        }
+      },
+      error => {
+        console.error('Error fetching Firm CreditRatings ', error);
+      }
+    );
+  }
+  
 }

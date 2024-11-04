@@ -16,4 +16,12 @@ export class RiskService {
     const url = `${this.baseUrlRisk}get_rmp_list?firmId=${firmId}`;  //https://localhost:7091/api/Risk/get_rmp_list?firmId=40
     return this.http.get<any>(url);
   }
+
+  // supervision
+  getCreditRatings(firmId: number): Observable<any> {
+    const url = `${this.baseUrlRisk}get_credit_ratings_data?firmId=${firmId}`;  //https://localhost:7091/api/Risk/get_rmp_list?firmId=40
+    return this.http.get<any>(url);
+  }
+
+
 }
