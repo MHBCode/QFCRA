@@ -1,1 +1,50 @@
-<p>notices works!</p>
+<!-- <div *ngIf="isLoading" class="loader-overlay">
+    <div class="loader"></div>
+  </div> -->
+
+  <div class="form-section">
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="edit-firm-header">
+                    <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
+                    Notices > <span>Al Rayyan </span>
+                </h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Notice Type</th>
+                        <th>Notice Name</th>
+                        <th>Internal Reference Number</th>
+                        <th>Notice Issuer</th>
+                        <th>Notice Issued Date</th>
+                        <th>Issuer's Reference Number</th>
+                        <th>Subject</th>
+                        <th>Notice Finalized Date</th>
+                        <th>Date Published on Website</th>
+                        <th>Notice Sent Date</th>
+                        <th>Response Due Date</th>
+                        <th>Response Provided Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let notice of FIRMNotices">
+                        <td>{{ notice?.TypeOfNotice }}</td>
+                        <td>{{ notice?.NoticeName }}</td>
+                        <td>{{ notice?.InternalReferenceNumber }}</td>
+                        <td>{{ notice?.NoticeIssuedBy }}</td>
+                        <td>{{ notice?.NoticeIssuedDate }}</td>
+                        <td>{{ notice?.IssuersReferenceNumber }}</td>
+                        <td>{{ notice?.Subject }}</td>
+                        <td>{{ notice?.NoticeFinalizedDate }}</td>
+                        <td>{{ notice?.DatePublishedonWebsite }}</td>
+                        <td>{{ notice?.NotificationSentDate }}</td>
+                        <td>{{ notice?.ResponseDueDate }}</td>
+                        <td>{{ notice?.ResponseProvidedDate }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

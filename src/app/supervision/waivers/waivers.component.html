@@ -1,1 +1,44 @@
-<p>waivers works!</p>
+<div *ngIf="isLoading" class="loader-overlay">
+    <div class="loader"></div>
+  </div>
+
+  <div class="form-section">
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="edit-firm-header">
+                    <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
+                    Admin Fee > <span>Al Rayyan </span>
+                </h2>
+            </div>
+            <table>
+                <thead>
+                  <tr>
+                    <th>Waiver Number</th>
+                    <th>Version</th>
+                    <th>Waiver Type</th>
+                    <th>Subject</th>
+                    <th>Waiver Status</th>
+                    <th>Status Date</th>
+                    <th>Review Date</th>
+                    <th>Review Decision</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let waiver of FirmWaivers">
+                    <td>{{ waiver?.WaiverNumber }}</td>
+                    <td>{{ waiver?.WaiverRevNum }}</td>
+                    <td>{{ waiver?.WaiverTypeDesc }}</td>
+                    <td>{{ waiver?.WaiverSubject }}</td>
+                    <td>{{ waiver?.WaiverStatusTypeDesc }}</td>
+                    <td>{{ waiver?.WaiverStatusDate }}</td>
+                    <td>{{ waiver?.ReviewMeetingDate }}</td>
+                    <td>{{ waiver?.WaiverDecisionTypeDesc }}</td>
+                    <td>{{ waiver?.WaiverExpirationDate }}</td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>

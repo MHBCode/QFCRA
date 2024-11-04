@@ -1,1 +1,42 @@
-<p>rmps works!</p>
+<div *ngIf="isLoading" class="loader-overlay">
+    <div class="loader"></div>
+  </div>
+
+<div class="form-section">
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="edit-firm-header">
+                    <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
+                    RMPs > <span>Al Rayyan </span>
+                </h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>RMP ID</th>
+                        <th>Date Created</th>
+                        <th>Type</th>
+                        <th>Date Firm Agreed</th>
+                        <th>Agreed By</th>
+                        <th>RMP Status</th>
+                        <th>Review Status</th>
+                        <th>Review Status Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let rmp of FIRMRMP">
+                        <td>{{ rmp?.FirmRMPID }}</td>
+                        <td>{{ rmp?.RMPCreatedDate }}</td>
+                        <td>{{ rmp?.FirmRMPTypeDesc }}</td>
+                        <td>{{ rmp?.DateFirmAgreedOn }}</td>
+                        <td>{{ rmp?.AgreedBy }}</td>
+                        <td>{{ rmp?.RMPStatus }}</td>
+                        <td>{{ rmp?.SignOffStatus }}</td>
+                        <td>{{ rmp?.SignOffDate }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,1 +1,38 @@
-<p>admin-fee works!</p>
+<!-- <div *ngIf="isLoading" class="loader-overlay">
+    <div class="loader"></div>
+  </div> -->
+
+<div class="form-section">
+    <div class="inputs-field-set">
+        <div class="section">
+            <div class="form-section-title">
+                <h2 class="edit-firm-header">
+                    <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
+                    Admin Fee > <span>Al Rayyan </span>
+                </h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th> Report Name</th>
+                        <th>Report Due Date</th>
+                        <th>Materially Complete Report Received Date</th>
+                        <th>Fee Calculated</th>
+                        <th>Fee Imposed</th>
+                        <th>Review Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let fee of FirmAdminFees">
+                        <td>{{ fee?.RptName }}</td>
+                        <td>{{ fee?.FirmRptDueDate }}</td>
+                        <td>{{ fee?.FirstMateriallyCompleteRptReceivedDate }}</td>
+                        <td>{{ fee?.CalculatedAmountCurrencyTypeDesc }} {{ fee?.CalculatedAmount }}</td>
+                        <td>{{ fee?.ImposedAmountCurrencyTypeDesc }} {{ fee?.ImposedAmount }}</td>
+                        <td>{{ fee?.ObjectWFStatusTypeDesc }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
