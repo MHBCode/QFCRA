@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import * as constants from 'src/app/app-constants';
 import * as XLSX from 'xlsx';
 import { LogformService } from 'src/app/ngServices/logform.service';
+import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 @Component({
   selector: 'app-my-team-tasks',
   templateUrl: './my-team-tasks.component.html',
@@ -70,6 +71,7 @@ export class MyTeamTasksComponent implements OnInit {
     private firmService: FirmService,
     private logForm: LogformService,
     private sanitizer: DomSanitizer,
+    private firmDetailsService: FirmDetailsService,
   ) { }
 
 
@@ -387,7 +389,7 @@ export class MyTeamTasksComponent implements OnInit {
 
     // Step 2: Handle Validation Errors
     if (this.hasValidationErrors) {
-      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       return; // Prevent further action if validation fails
     }
 
@@ -522,17 +524,6 @@ export class MyTeamTasksComponent implements OnInit {
     }
   }
 
-  showErrorAlert(messageKey: number) {
-    this.logForm.errorMessages(messageKey).subscribe(
-      (response) => {
-        Swal.fire({
-          text: response.response,
-          icon: 'error',
-          confirmButtonText: 'Ok',
-        });
-      },
-    );
-  }
   exportRowToExcel(event: Event) {
     event.stopPropagation();
 

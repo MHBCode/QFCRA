@@ -522,4 +522,19 @@ export class FirmDetailsService {
     });
   }
 
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+  showSaveSuccessAlert(messageKey: number) {
+    this.logForm.errorMessages(messageKey).subscribe(
+      (response) => {
+        const replacedText = response.response.replace('#Tab#', 'Licensed');
+        Swal.fire({
+          title: 'Success!',
+          text: replacedText,
+          icon: 'success',
+          confirmButtonText: 'Ok',
+        });
+      },
+    );
+  }
+
 }

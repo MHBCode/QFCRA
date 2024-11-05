@@ -767,7 +767,7 @@ export class CoreDetailsComponent implements OnInit {
         this.resetCollapsibleSections();
         this.cdr.detectChanges();
 
-        this.showFirmDetailsSaveSuccessAlert(constants.Firm_CoreDetails_Messages.FIRMDETAILS_SAVED_SUCCESSFULLY);
+        this.firmDetailsService.showSaveSuccessAlert(constants.Firm_CoreDetails_Messages.FIRMDETAILS_SAVED_SUCCESSFULLY);
         this.isEditModeCore = false;
         this.isLoading = false;
       },
@@ -800,19 +800,6 @@ export class CoreDetailsComponent implements OnInit {
         this.loadFirmAddresses(this.firmId);
       }
     });
-  }
-
-  showFirmDetailsSaveSuccessAlert(messageKey: number) {
-    this.logForm.errorMessages(messageKey).subscribe(
-      (response) => {
-        Swal.fire({
-          title: 'Success!',
-          text: response.response,
-          icon: 'success',
-          confirmButtonText: 'Ok',
-        });
-      },
-    );
   }
 
   loadPrevFirmAndDate() {
@@ -961,7 +948,7 @@ export class CoreDetailsComponent implements OnInit {
 
   getAddressTypeHistory(addressTypeId: number) {
     this.callAddressType = true;
-    this.addressService.getAddressesTypeHistory(this.firmId, addressTypeId).subscribe(
+    this.addressService.getAddressesTypeHistory(this.firmId, addressTypeId,null,null).subscribe(
       data => {
         this.firmAddressesTypeHistory = data.response;
       }, error => {

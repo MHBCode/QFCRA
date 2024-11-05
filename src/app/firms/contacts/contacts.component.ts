@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import { ParententityService } from 'src/app/ngServices/parententity.service';
 import { AddressesService } from 'src/app/ngServices/addresses.service';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
-
+import { LogformService } from 'src/app/ngServices/logform.service';
 @Component({
   selector: 'app-contacts',
   templateUrl: './contacts.component.html',
@@ -29,6 +29,7 @@ export class ContactsComponent {
   loading: boolean;
   isLoading: boolean = false;
   now = new Date();
+  isCIP: string = '';
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   FIRMContacts: any[] = [];
@@ -36,19 +37,28 @@ export class ContactsComponent {
   isEditable: boolean = false; // Controls the readonly state of the input fields
   selectedContact: any = null;
   displayInactiveContacts: boolean = false;
+  existingControllerAddresses: any = [];
   showCreateContactSection: boolean = false;
   Address: any = {};
   allCountries: any = [];
   allAddressTypes: any = [];
   firmAddresses: any = [];
+  canAddNewAddressOnCreate: boolean = true;
   controlTypeOptionsCreate: any[] = [];
   controllerTypeOption: any = [];
   objectOpTypeIdEdit = 41;
   objectOpTypeIdCreate = 40;
   legalStatusOptionsEdit: any[] = [];
-  TitleEdit: any[] = [];
+  Titles: any[] = [];
+  MethodofContactOption: any = [];
   AllContactFrom: any = [];
+  AllAvilabilContact: any = [];
+  contactTypeOption: any = [];
+  Column2: string = '';
+  IsEditContactVisible: boolean = false;
+  isAllAddressesAddedOnCreate: boolean;
 
+  addedAddresses: any = [];
   constructor(
     private securityService: SecurityService,
     private router: Router,
@@ -60,7 +70,8 @@ export class ContactsComponent {
     private parentEntity: ParententityService,
     private cdr: ChangeDetectorRef,
     private addressService: AddressesService,
-    private flatpickrService: FlatpickrService
+    private flatpickrService: FlatpickrService,
+    private logForm: LogformService,
   ) {
 
   }
@@ -80,7 +91,10 @@ export class ContactsComponent {
       this.getAllContactFromByFrimsId();
       this.getControllerControlTypesCreat();
       this.getlegalStatusController();
-
+      this.getContactType();
+      this.getPreferredMethodofContact();
+      this.getAvilabilContact();
+      this.getTitleCreate();
     })
   }
 
@@ -136,33 +150,7 @@ export class ContactsComponent {
       }
     });
   }
-  deleteContact(output: boolean): void {
-    // Replace these with actual values from your component
-    const firmTypeID = 523; // Assuming firmTypeID is fixed to 1
-    const contactID = this.selectedContact.ContactID;
-    const contactAssnID = this.selectedContact.ContactAssnID;
-    
-    this.contactService.deleteContactDetails(firmTypeID, contactID, contactAssnID,30
 
-    ).subscribe(
-      (response) => {
-        Swal.fire(
-          'Deleted!',
-          'The contact has been deleted successfully.',
-          'success'
-        );
-        this.closeContactPopup();
-        this.loadContacts();  // Reload contacts after deletion
-      },
-      (error) => {
-        Swal.fire(
-          'Error!',
-          'There was an issue deleting the contact. Please try again.',
-          'error'
-        );
-      }
-    );
-  }
   onRowClick(contact: any): void {
     // Reset the selected contact and hide the popup until data is loaded
     this.selectedContact = {};
@@ -176,6 +164,13 @@ export class ContactsComponent {
           console.log("Selected contact: ", this.selectedContact); // Log to check data
           this.isPopupVisible = true; // Show the popup after data is loaded
           this.cdr.detectChanges(); // Trigger change detection to update the view
+          this.loadContactFirmAdresses(
+            this.selectedContact.OtherEntityID,
+            this.selectedContact.EntityTypeID,
+            this.userId,
+            44 // Static opTypeId
+          );
+          this.existingControllerAddresses = this.ContactfirmAddresses.filter(address => address.Valid);
         } else {
           console.error('No contact data received:', data);
           this.isPopupVisible = false; // Hide popup if no data is received
@@ -184,6 +179,28 @@ export class ContactsComponent {
       error => {
         console.error('Error fetching contact details', error);
         this.isPopupVisible = false; // Hide popup if there's an error
+      }
+    );
+  }
+  loadContactFirmAdresses(entityID: number, entityTypeID: number, userId: number, opTypeId: number): void {
+    this.isLoading = true;
+
+    // Fetch firm addresses from the service
+    this.addressService.getControllerFirmAddresses(entityID, entityTypeID, userId, opTypeId).subscribe(
+      data => {
+        if (data.response) {
+          this.ContactfirmAddresses = data.response;
+        
+          console.log('Controller Corporate Firm Addresses:', this.ContactfirmAddresses);
+        } else {
+          console.warn('No addresses found for this firm');
+        }
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Error Fetching Firm Addresses', error);
+        this.ContactfirmAddresses = [];
+        this.isLoading = false;
       }
     );
   }
@@ -202,7 +219,18 @@ export class ContactsComponent {
   closeContactPopup() {
     this.isPopupVisible = false;
   }
+  getContactType(): void {
+    this.securityService.getobjecttypetableEdit(this.userId, constants.ContactTypes, 40)
+      .subscribe(data => {
+        this.contactTypeOption = data.response;
+        console.log("Controllers", data)
+      }, error => {
+        console.error("Error fetching Controllers", error);
+      });
+  }
+  ControllerfirmAddresses: any = [];
   saveContactPopupChanges(): void {
+    this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
     // Prepare the selectedContact object (which is bound to the form) to be saved
     const contactDetails = {
       firmId: this.firmId, // Ensure firmId is correctly passed
@@ -247,8 +275,15 @@ export class ContactsComponent {
       }
     );
   }
-
+  disableAddressFieldsOnEdit: any = [];
+  newAddressOnEdit: any = [];
+  onSameAsTypeChangeOnEditMode(selectedTypeID: number) {
+    this.disableAddressFieldsOnEdit = selectedTypeID && selectedTypeID != 0; // Set disableAddressFields here
+    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, this.existingControllerAddresses, this.newAddressOnEdit);
+  }
+  ContactfirmAddresses: any = [];
   enableEditing() {
+    this.existingControllerAddresses = this.ContactfirmAddresses.filter(address => address.Valid);
     this.isEditable = true;
   }
 
@@ -494,14 +529,66 @@ export class ContactsComponent {
     this.firmDetailsService.getAddressTypes().subscribe(
       addressTypes => {
         this.allAddressTypes = addressTypes;
+        if (this.addedAddresses.length === 0) {
+          this.addNewAddressOnCreateMode();
+        }
+        console.log('Added Addresses', this.addedAddresses);
+        this.checkCanAddNewAddressOnCreateMode()
       },
       error => {
         console.error('Error fetching address types:', error);
       }
     );
   }
+  addNewAddressOnCreateMode() {
+    this.firmDetailsService.addNewAddressOnCreateMode(this.addedAddresses, this.allAddressTypes, this.currentDate);
 
+    // Now call checkCanAddNewAddressOnCreateMode to get the updated flags
+    this.checkCanAddNewAddressOnCreateMode()
+  }
+  checkCanAddNewAddressOnCreateMode() {
+    const { canAddNewAddressOnCreate, isAllAddressesAddedOnCreate } =
+      this.firmDetailsService.checkCanAddNewAddressOnCreateMode(this.addedAddresses, this.allAddressTypes);
 
+    // Assign the values to component-level properties
+    this.canAddNewAddressOnCreate = canAddNewAddressOnCreate;
+    this.isAllAddressesAddedOnCreate = isAllAddressesAddedOnCreate;
+  }
+  onAddressTypeChangeOnCreateMode(event: any, index: number) {
+    const selectedTypeID = Number(event.target.value); // Convert the selected value to a number
+    const currentAddress = this.addedAddresses[index];
+
+    if (!currentAddress) {
+      console.error('No current address found at index:', index);
+      return;
+    }
+
+    // Check if the selected type is already in use by another address
+    const isDuplicate = this.addedAddresses.some((address, i) => {
+      return i !== index && address.AddressTypeID === selectedTypeID;
+    });
+
+    if (isDuplicate) {
+      // Show an alert message if a duplicate is found
+      this.showError(constants.AddressControlMessages.DUPLICATE_ADDRESSTYPES);
+
+      // Reset the dropdown to default ("Select" option)
+      event.target.value = "0";
+      currentAddress.AddressTypeID = 0;  // Also reset the AddressTypeID in the model
+      currentAddress.AddressTypeDesc = ''; // Reset the description as well
+    } else {
+      // If not a duplicate, update the current address
+      const selectedAddressType = this.allAddressTypes.find(type => type.AddressTypeID === selectedTypeID);
+      if (selectedAddressType) {
+        currentAddress.AddressTypeID = selectedAddressType.AddressTypeID;
+        currentAddress.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
+      }
+      currentAddress.isAddressTypeSelected = true; // Disable the dropdown after selection
+    }
+
+    // Check if the "Add Address" button should be enabled
+    this.checkCanAddNewAddressOnCreateMode();
+  }
   getAddressTypeDesc(addressTypeID: number): string {
     const selectedType = this.allAddressTypes.find(type => type.AddressTypeID === addressTypeID);
     return selectedType ? selectedType.AddressTypeDesc : 'Unknown';
@@ -553,7 +640,6 @@ export class ContactsComponent {
       address.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
     }
   }
-
   // loadFirmAdresses() {
   //   this.isLoading = true;
   //   this.addressService.getCoreFirmAddresses(this.firmId).subscribe(
@@ -680,27 +766,649 @@ export class ContactsComponent {
         console.error("Error fetching legalStatus", error);
       });
   }
-
+  addressTypeOptionsEdit: any = [];
+  getAddressTypesController(): void {
+    this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdEdit)
+      .subscribe(data => {
+        this.addressTypeOptionsEdit = data.response;
+        console.log("getAddressTypesContact", data)
+      }, error => {
+        console.error("Error fetching AddressTypes", error);
+      });
+  }
+  getAddressTypesControllerCreate(): void {
+    this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdCreate)
+      .subscribe(data => {
+        this.addressTypeOptionsEdit = data.response;
+        console.log("getAddressTypesContact", data)
+      }, error => {
+        console.error("Error fetching AddressTypes", error);
+      });
+  }
   getTitleCreate(): void {
     this.securityService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdCreate)
       .subscribe(data => {
-        this.TitleEdit = data.response;
-        console.log("Countries", data)
+        this.Titles = data.response;
+        console.log("All Titles", data)
       }, error => {
         console.error("Error fetching TitleTypes", error);
       });
   }
-
-  getAllContactFromByFrimsId(){
+  showError(messageKey: number) {
+    this.firmDetailsService.showErrorAlert(messageKey, this.isLoading);
+  }
+  selectedContactFrom: string = 'select';
+  onContactFromChange(selectedValue: string): void {
+    this.selectedContactFrom = selectedValue;
+    const selectedContact = this.AllContactFrom.find(item => item.EntityTypeID === selectedValue);
+  
+    if (selectedContact) {
+      const entityTypeIDParts = selectedContact.EntityTypeID.split(',');
+      this.createContactObj.ContactFrom = selectedContact.EntityTypeName;
+      this.createContactObj.EntityTypeID = entityTypeIDParts[0]; // Take the first part
+    }
+  }
+  getAllContactFromByFrimsId() {
     this.contactService.getEntityTypesByFrimsId(this.firmId).subscribe(data => {
       this.AllContactFrom = data.response;
-      console.log("ContactFrom",this.AllContactFrom)
+      console.log("ContactFrom", this.AllContactFrom)
+      this.setDefaultContactFrom();
+    }, error => {
+      console.error("Error fetching ContactFrom", error);
+
+    });
+  }
+  setDefaultContactFrom(): void {
+    const entity = this.AllContactFrom.find(contact => contact.EntityTypeID.startsWith('1'));
+    if (entity) {
+      this.selectedContactFrom = entity.EntityTypeID; // This will trigger the dropdown selection
+      this.onContactFromChange(this.selectedContactFrom); // Make sure to update createContactObj accordingly
+    }
+  }
+  isFirmSelected(): boolean {
+    const selectedEntity = this.AllContactFrom.find(contact => contact.EntityTypeID === this.selectedContactFrom);
+    return selectedEntity ? selectedEntity.EntityTypeName.includes('Firm') : false;
+  }
+  onContactChange(selectedValue: string) {
+    if (selectedValue) {
+      // Parse the selected value (Column1) to extract contactId and contactAssnID
+      const [contactId, contactAssnID] = selectedValue.split(',').map(Number);
+
+      // Call the method to fetch contact details
+      this.fitchContactDetailsCreateContact(contactId, contactAssnID);
+    }
+  }
+  selectedAvilableContactDetails: any = [];
+  fitchContactDetailsCreateContact(contactId: number, contactAssnID: number) {
+    this.contactService.getContactDetailsCreateContact(this.firmId, contactId, contactAssnID).subscribe(
+      data => {
+        if (data && data.response) {
+          const response = data.response;
+
+          // Map the response data to createContactObj
+          this.createContactObj = {
+            ...this.createContactObj, // Keep other properties unchanged
+            firmID: response.firmID || 0,
+            contactID: response.contactID || 0,
+            contactAssnID: response.contactAssnID || 0,
+            title: response.title || '',
+            contactType: response.contactTypeID || '',
+            firstName: response.firstName || '',
+            secondName: response.secondName || '',
+            familyName: response.familyName || '',
+            countryOfResidence: response.countryID || 0,
+            dateOfBirth: response.dateOfBirth || '',
+            nationalID: response.nationalID || '',
+            nationality: response.nationality || 0,
+            passportNum: response.passportNum || '',
+            placeOfBirth: response.placeOfBirth || '',
+            isPeP: response.isPEP || false,
+            mobileNum: response.mobileNum || '',
+            busEmail: response.busEmail,
+            otherEmail: response.otherEmail || '',
+            contactMethodTypeID: response.contactMethodTypeID || 0,
+            entityId: response.entityID || 0,
+            jobTitle: response.jobTitle || '',
+            fax: response.fax || '',
+            // Map any other relevant fields...
+          };
+
+          console.log("Updated createContactObj: ", this.createContactObj);
+          this.cdr.detectChanges(); // Trigger change detection to update the view
+        } else {
+          console.error('No contact data received:', data);
+          this.isPopupVisible = false; // Hide popup if no data is received
+        }
+      },
+      error => {
+        console.error('Error fetching contact details', error);
+        this.isPopupVisible = false; // Hide popup if there's an error
+      }
+    );
+  }
+  getAvilabilContact(): void {
+    this.contactService.getPopulateAis(this.firmId).subscribe(data => {
+      this.AllAvilabilContact = data.response;
+      console.log("AllAvilabilContact", this.AllAvilabilContact)
     }, error => {
       console.error("Error fetching ContactFrom", error);
     });
   }
+  createContactObj = {
+    firmID: 0,
+    contactID: 0,
+    contactAssnID: 0,
+    title: "",
+    contactType: 0,
+    firstName: "",
+    secondName: "",
+    thirdName: "",
+    familyName: "",
+    countryOfResidence: 0,
+    ContactMethodTypeID:0,
+    createdBy: 0,
+    dateOfBirth: "",
+    fullName: "",
+    lastModifiedBy: 0,
+    ContactFrom: '',
+    nationalID: "",
+    nationality: 0,
+    passportNum: "",
+    placeOfBirth: "",
+    previousName: "",
+    isExists: true,
+    nameInPassport: "",
+    contactAddnlInfoTypeID: 0,
+    isFromContact: true,
+    countryofBirth: 0,
+    juridictionID: 0,
+    objectID: 0,
+    isPeP: null,
+    EntityTypeID: 0,
+    contactTypeId: 0,
+    functionTypeId: 0,
+    mobileNum: "",
+    busEmail: "",
+    otherEmail: "",
+    contactMethodTypeID: 0,
+    entitySubTypeID: 0,
+    numOfShares: 0,
+    pctOfShares: 0,
+    majorityStockHolder: true,
+    assnDateFrom: "",
+    assnDateTo: "",
+    controllerControlTypeID: 0,
+    jobTitle: "",
+    nameAsInPassport: "",
+    busPhone: "",
+    residencePhone: "",
+    fax: "",
+    qfcNumber: "",
+    isContactSelected: true,
+    isIndividualRegulated: true,
+    additionalDetails: "",
+    ipAddress: "",
+    ainId: 0,
+    ainNumber: 0,
+    applicationID: 0,
+    docID: 0,
+    dateRecieved: "",
+    formProcessor: 0,
+    comment: "",
+    condApprovalReasonTypeID: 0,
+    reasonForDelayInFiling: "",
+    residentStatus: "",
+    isOrdinarilyResident: true,
+    applFeeReceived: "",
+    applFeeComment: "",
+    wcfAddnlInfo: "",
+    placeOfBirthCountryID: 0,
+    jurisdictionId: 0,
+    totalIndiustryExperenceYear: 0,
+    totalIndustryExperenceMonth: 0,
+    roleExperenceMonth: 0,
+    roleExperenceYear: 0,
+    pastPositionFlag: 0,
+    experience: "",
+    appIndividualArrangementTypeID: 0,
+    otherArrangementTypeDesc: "",
+    appIndividualDataID: 0,
+    pastPositionDesc: "",
+    fandPAddnlInfo: "",
+    poposedJobTitle: "",
+    jobDescription: "",
+    cfExercise: "",
+    withdrawlReasonDesc: "",
+    altArrangementDesc: "",
+    competenciesAndExp: "",
+    createdDate: "",
+    lastModifedDate: "",
+    proposedToQatarDateDays: "",
+    proposedToQatarDateMonth: "",
+    proposedToQatarDateYear: "",
+    contactFunctionID: 0,
+    contactFunctionTypeID: 0,
+    contactFunctionTypeDesc: "",
+    effectiveDate: "",
+    endDate: "",
+    lastModifiedDate: "",
+    reviewStatus: "",
+    selected: true,
+    isFunctionActive: true,
+    isRecordEditable: 0,
+    countryID: 0,
+    addressTypeID: 0,
+    sameAsTypeID: 0,
+    addressAssnID: 0,
+    addressID: "",
+    addressLine1: "",
+    addressLine2: "",
+    addressLine3: "",
+    addressLine4: "",
+    city: "",
+    province: "",
+    postalCode: "",
+    entityId : this.firmId,
+    phoneNumber: "",
+    phoneExt: "",
+    faxNumber: "",
+    addressState: 0,
+    fromDate: "",
+    toDate: "",
+    objectInstanceID: 0,
+    objectInstanceRevNumber: 0,
+    sourceObjectID: 0,
+    sourceObjectInstanceID: 0,
+    sourceObjectInstanceRevNumber: 0,
+    selectedContactFrom: '',
+  };
+  createContactPopup(): void {
+    this.CreateContactValidateForm();
 
-  showError(messageKey: number) {
-    this.firmDetailsService.showErrorAlert(messageKey, this.isLoading);
+    if (this.hasValidationErrors) {
+      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.isLoading = false;
+      return;
+    }
+    const saveCreateContactObj = {
+      contactDetails: {
+        contactDetails: {
+          firmID: this.firmId,
+          contactID: null,
+          contactAssnID: null,
+          AdditionalDetails: 'test',
+          BusPhone: this.createContactObj.mobileNum,
+          BusEmail: this.createContactObj.busEmail,
+          MobileNum: this.createContactObj.mobileNum, // Correct binding
+          NameAsInPassport: 'test',
+          ContactTypeID: this.createContactObj.contactType,
+          OtherEmail: this.createContactObj.otherEmail,
+          QfcNumber: this.firmDetails.QFCNum,
+          Fax: this.createContactObj.fax,
+          ResidencePhone: 'test',
+          JobTitle: this.createContactObj.jobTitle,
+          EntityTypeID: this.createContactObj.EntityTypeID,
+          contactMethodTypeID: this.createContactObj.ContactMethodTypeID,
+          Title: this.createContactObj.title,
+          FirstName: this.createContactObj.firstName,
+          secondName: this.createContactObj.secondName,
+          thirdName: this.createContactObj.thirdName,
+          familyName: this.createContactObj.familyName,
+          PctOfShares: this.createContactObj.pctOfShares,
+          tempContactID: 0,
+          countryOfResidence: null,
+          ContactFrom: this.createContactObj.ContactFrom,
+          ControllerControlTypeID: null,
+          createdBy: this.userId,
+          dateOfBirth: this.dateUtilService.convertDateToYYYYMMDD(this.createContactObj.dateOfBirth),
+          fullName: null,
+          lastModifiedBy: this.userId,
+          MyState: 0,
+          nationalID: null,
+          nationality: null,
+          EntityID: this.firmId,
+          passportNum: this.createContactObj.passportNum,
+          placeOfBirth: this.createContactObj.placeOfBirth,
+          previousName: null,
+          isExists: false,
+          FunctionTypeId: null,
+          nameInPassport: null,
+          contactAddnlInfoTypeID: null,
+          isFromContact: null,
+          countryofBirth: null,
+          juridictionID: null,
+          objectID: 523,
+          isPEP: this.createContactObj.isPeP,
+          AssnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.createContactObj.assnDateFrom),
+          AssnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.createContactObj.assnDateTo),
+          LastModifiedByOfOtherEntity: 30,
+          JurisdictionId: 3,
+        },
+        lstContactFunctions: null,
+      },
+      Addresses: this.existingControllerAddresses.map(address => ({
+        firmID: this.firmId,
+        countryID: address.CountryID,
+        addressTypeID: address.AddressTypeID,
+        LastModifiedBy: this.userId,
+        entityTypeID: this.createContactObj.EntityTypeID,
+        entityID: this.firmId,
+        contactID: address.contactID,
+        addressID: null,
+        addressLine1: "",
+        addressLine2: "",
+        addressLine3: "",
+        addressLine4: "",
+        city: address.city,
+        stateProvince: address.stateProvince,
+        createdBy: 0,
+        addressAssnID: null,
+        CreatedDate: address.CreatedDate,
+        LastModifiedDate: address.LastModifiedDate,
+        addressState: 2,
+        fromDate: "2024-10-01T14:38:59.118Z",
+        toDate: "2024-10-01T14:38:59.118Z",
+        Output: address.Output,
+        objectID: 0,
+        objectInstanceID: 0,
+        zipPostalCode: "",
+        objAis: null
+      }))
+    };
+  
+    if (this.createContactObj.contactType !== 1 || !this.createContactObj.contactType) {
+      this.saveContactForm(saveCreateContactObj);
+      Swal.fire(
+        'Created!',
+        'The contact has been Created successfully.',
+        'success'
+      );
+      this.closeContactPopup();
+      this.loadContacts();  
+    } else {
+      this.contactService.IsMainContact(this.firmId, this.createContactObj.entityId, this.createContactObj.contactType)
+        .subscribe(response => {
+          if (response != null) {
+            this.showErrorAlert(constants.ContactMessage.MAIN_CONTACT_EXISTS);
+            this.isLoading = false;
+            return;
+          } else {
+            this.saveContactForm(saveCreateContactObj);
+          }
+        });
+    }
   }
+  private saveContactForm(data: any): void {
+    this.contactService.saveupdatecontactform(data).subscribe(
+      response => {
+        console.log("Contact save successful:", response);
+        this.isEditable = false;
+        this.getPlaceOfEstablishmentName();
+        this.firmDetailsService.showSaveSuccessAlert(constants.ControllerMessages.RECORD_MODIFIED);
+        this.loadContacts();
+      },
+      error => {
+        console.error("Error saving contact:", error);
+      }
+    );
+  }
+  showErrorAlert(messageKey: number) {
+    this.logForm.errorMessages(messageKey).subscribe(
+      (response) => {
+        Swal.fire({
+          text: response.response,
+          icon: 'error',
+          confirmButtonText: 'Ok',
+        });
+      },
+    );
+    this.isLoading = false;
+  }
+  CreateContactValidateForm(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.errorMessages = {}; // Clear previous error messages
+      this.hasValidationErrors = false;
+
+      // Validate First Name
+      if (!this.createContactObj.firstName || this.createContactObj.firstName.trim().length === 0) {
+        this.loadErrorMessages('firstName', constants.ControllerMessages.ENTER_FIRSTNAME);
+        this.hasValidationErrors = true;
+      }
+
+      if (this.createContactObj.isPeP === undefined || this.createContactObj.isPeP === null) {
+         this.loadErrorMessages('isPeP', constants.ContactMessage.SELECT_ISPEP, 'Is Politically Exposed Person (PEP)?*');
+         this.hasValidationErrors = true;
+      }
+      if (!this.createContactObj.contactType) {
+        this.loadErrorMessages('contactType', constants.ContactMessage.SELECTCONTACTTYPE);
+        this.hasValidationErrors = true;
+      } 
+
+
+      if (this.hasValidationErrors) {
+        resolve(); // Form is invalid
+      } else {
+        resolve(); // Form is valid
+      }
+  });
+}
+loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+  this.firmDetailsService.getErrorMessages(fieldName, msgKey, null, null, placeholderValue).subscribe(
+    () => {
+      this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
+      console.log(`Error message for ${fieldName} loaded successfully`);
+    },
+    error => {
+      console.error(`Error loading error message for ${fieldName}:`, error);
+    }
+  );
+}
+getPreferredMethodofContact(): void {
+  this.securityService.getobjecttypetableEdit(this.userId, constants.PreferredMethodofContact, 40)
+    .subscribe(data => {
+      this.MethodofContactOption = data.response;
+      console.log("Controllers", data)
+    }, error => {
+      console.error("Error fetching Controllers", error);
+    });
+}
+IsEditableContact() {
+  this.IsEditContactVisible = true
+}
+saveEditContactPopup(): void {
+  this.EditContactValidateForm();
+  if (this.hasValidationErrors) {
+    this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+    this.isLoading = false;
+    return;
+  }
+  const saveEditContactObj = {
+    contactDetails: {
+      contactDetails: {
+        firmID: this.firmId,
+        contactID: this.selectedContact.contactID,
+        contactAssnID: this.selectedContact.contactAssnID,
+        AdditionalDetails: 'test',
+        BusPhone: this.selectedContact.BusPhone,
+        BusEmail: this.selectedContact.busEmail,
+        MobileNum: this.selectedContact.mobileNum, // Correct binding
+        NameAsInPassport: 'test',
+        ContactTypeID: this.selectedContact.contactTypeID,
+        OtherEmail: this.selectedContact.otherEmail,
+        QfcNumber: this.firmDetails.QFCNum,
+        Fax: this.selectedContact.fax,
+        ResidencePhone: 'test',
+        JobTitle: this.selectedContact.jobTitle,
+        EntityTypeID: this.selectedContact.entityTypeID,
+        Title: this.selectedContact.title,
+        FirstName: this.selectedContact.firstName,
+        secondName: this.selectedContact.secondName,
+        thirdName: this.selectedContact.thirdName,
+        familyName: this.selectedContact.familyName,
+        PctOfShares: this.selectedContact.pctOfShares,
+        contactMethodTypeID: this.selectedContact.ContactMethodTypeID,
+        tempContactID: 0,
+        countryOfResidence: null,
+        ContactFrom: this.selectedContact.ContactFrom,
+        ControllerControlTypeID: null,
+        createdBy: this.userId,
+        dateOfBirth: this.dateUtilService.convertDateToYYYYMMDD(this.selectedContact.dateOfBirth),
+        fullName: null,
+        lastModifiedBy: this.userId,
+        MyState: 0,
+        nationalID: null,
+        nationality: null,
+        EntityID: this.firmId,
+        passportNum: this.selectedContact.passportNum,
+        placeOfBirth: this.selectedContact.placeOfBirth,
+        previousName: null,
+        isExists: false,
+        FunctionTypeId: null,
+        nameInPassport: null,
+        contactAddnlInfoTypeID: null,
+        isFromContact: null,
+        countryofBirth: null,
+        juridictionID: null,
+        objectID: 523,
+        isPEP: this.selectedContact.isPEP,
+        AssnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.selectedContact.assnDateFrom),
+        AssnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.selectedContact.assnDateTo),
+        LastModifiedByOfOtherEntity: 30,
+        JurisdictionId: 3,
+      },
+      lstContactFunctions: null,
+    },
+    Addresses: this.addressForms.map(address => ({
+      firmID: this.firmId,
+      countryID: address.CountryID,
+      addressTypeID: address.AddressTypeID,
+      LastModifiedBy: this.userId,
+      entityTypeID: this.createContactObj.EntityTypeID,
+      entityID: this.firmId,
+      contactID: address.contactID,
+      addressID: null,
+      addressLine1: "",
+      addressLine2: "",
+      addressLine3: "",
+      addressLine4: "",
+      city: address.city,
+      stateProvince: address.stateProvince,
+      createdBy: 0,
+      addressAssnID: null,
+      CreatedDate: address.CreatedDate,
+      LastModifiedDate: address.LastModifiedDate,
+      addressState: 2,
+      fromDate: "2024-10-01T14:38:59.118Z",
+      toDate: "2024-10-01T14:38:59.118Z",
+      Output: address.Output,
+      objectID: 0,
+      objectInstanceID: 0,
+      zipPostalCode: "",
+      objAis: null
+    }))
+  };
+   console.log("saveEditContactObj",saveEditContactObj)
+  if (this.selectedContact.contactTypeID !== 1 || !this.selectedContact.contactTypeID) {
+    this.saveContactForm(saveEditContactObj);
+    Swal.fire(
+      'Modified!',
+      'The contact has been Modified successfully.',
+      'success'
+    );
+    this.closeContactPopup();
+    this.loadContacts();  
+  } else {
+    this.contactService.IsMainContact(this.firmId, this.selectedContact.entityID, this.selectedContact.entityTypeID)
+      .subscribe(response => {
+        if (response != null) {
+          this.showErrorAlert(constants.ContactMessage.MAIN_CONTACT_EXISTS);
+          this.isLoading = false;
+          return;
+        } else {
+          this.contactService.IsContactTypeExists(this.firmId, this.selectedContact.entityID, this.selectedContact.entityTypeID, this.selectedContact.contactID, this.selectedContact.contactAssnID)
+          .subscribe(response => {
+            if(response != null){
+              this.showErrorAlert(constants.ContactMessage.CONTACT_TYPE_EXISTS);
+              this.isLoading = false;
+              return;
+            } else {
+              this.saveContactForm(saveEditContactObj);
+            }
+          })
+        }
+      });
+  }
+}
+EditContactValidateForm(): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    this.errorMessages = {}; // Clear previous error messages
+    this.hasValidationErrors = false;
+
+    // Validate First Name
+    if (!this.selectedContact.firstName || this.selectedContact.firstName.trim().length === 0) {
+      this.loadErrorMessages('firstName', constants.ControllerMessages.ENTER_FIRSTNAME);
+      this.hasValidationErrors = true;
+    }
+
+    if (this.selectedContact.isPEP === undefined || this.selectedContact.isPEP === null) {
+       this.loadErrorMessages('isPEP', constants.ContactMessage.SELECT_ISPEP, 'Is Politically Exposed Person (PEP)?*');
+       this.hasValidationErrors = true;
+    }
+    if (!this.selectedContact.contactTypeDesc) {
+      this.loadErrorMessages('contactTypeDesc', constants.ContactMessage.SELECTCONTACTTYPE);
+      this.hasValidationErrors = true;
+    } 
+
+
+    if (this.hasValidationErrors) {
+      resolve(); // Form is invalid
+    } else {
+      resolve(); // Form is valid
+    }
+});
+}
+confirmDeleteContact() {
+  console.log("confirmDelete called: ", this.selectedContact)
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to delete this contact?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.deleteContact(true); // Just pass output here, no need for ": boolean"
+    }
+  });
+}
+deleteContact(output: boolean): void {
+  // Replace these with actual values from your component
+  const objectID = 523; // Assuming firmTypeID is fixed to 1
+  const contactID = this.selectedContact.contactID;
+  const contactAssId = this.selectedContact.contactAssnID;
+  const userID = this.userId;
+  console.log(contactID, contactAssId, "contactAssnID contactID")
+  this.contactService.deleteContactDetails(objectID, contactID, contactAssId, userID).subscribe(
+    (response) => {
+      Swal.fire(
+        'Deleted!',
+        'The contact has been deleted successfully.',
+        'success'
+      );
+      this.closeContactPopup();
+      this.loadContacts();  // Reload contacts after deletion
+    },
+    (error) => {
+      Swal.fire(
+        'Error!',
+        'There was an issue deleting the contact. Please try again.',
+        'error'
+      );
+    }
+  );
+}
+getPlaceOfEstablishmentName(): string {
+  const place = this.allCountries.find(option => option.CountryID === parseInt(this.selectedContact.CountryOfIncorporation));
+  return place ? place.CountryName : '';
+}
 }

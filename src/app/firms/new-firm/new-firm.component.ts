@@ -7,6 +7,7 @@ import { SecurityService } from 'src/app/ngServices/security.service';
 import { LogformService } from 'src/app/ngServices/logform.service';
 import { FirmService } from '../firm.service';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
+import { FirmDetailsService } from '../firmsDetails.service';
 
 @Component({
   selector: 'new-firm',
@@ -14,30 +15,6 @@ import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
   styleUrls: ['./new-firm.component.scss']
 })
 export class NewFirmComponent implements OnInit {
-  showErrorAlert(messageKey: number) {
-    this.logForm.errorMessages(messageKey).subscribe(
-      (response) => {
-        Swal.fire({
-          text: response.response,
-          icon: 'error',
-          confirmButtonText: 'Ok',
-        });
-      },
-    );
-  }
-
-  showFirmDetailsSaveSuccessAlert(messageKey: number) {
-    this.logForm.errorMessages(messageKey).subscribe(
-      (response) => {
-        Swal.fire({
-          title: 'Success!',
-          text: response.response,
-          icon: 'success',
-          confirmButtonText: 'Ok',
-        });
-      },
-    );
-  }
 
 
   @ViewChildren('dateInputs') dateInputs: QueryList<ElementRef<HTMLInputElement>>;
@@ -120,7 +97,9 @@ export class NewFirmComponent implements OnInit {
     private securityService: SecurityService,
     private logForm: LogformService,
     private router: Router,
-    private flatpickrService: FlatpickrService) { }
+    private flatpickrService: FlatpickrService,
+    private firmDetailsService: FirmDetailsService
+  ) { }
 
 
   ngOnInit(): void {
@@ -240,14 +219,14 @@ export class NewFirmComponent implements OnInit {
 
       // Step 2: Handle Validation Errors
       if (this.hasValidationErrors) {
-        this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+        this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
         return; // Prevent further action if validation fails
       }
 
       // Step 3: Create New Firm (Save)
       const firmObj = this.prepareFirmObject(userId);
       this.saveFirmDetails(firmObj, userId);
-      this.showFirmDetailsSaveSuccessAlert(constants.Firm_CoreDetails_Messages.FIRMDETAILS_SAVED_SUCCESSFULLY);
+      this.firmDetailsService.showSaveSuccessAlert(constants.Firm_CoreDetails_Messages.FIRMDETAILS_SAVED_SUCCESSFULLY);
     })
   }
 
@@ -602,7 +581,7 @@ export class NewFirmComponent implements OnInit {
 
     if (isDuplicate) {
       // Show an alert message if a duplicate is found
-      this.showErrorAlert(constants.AddressControlMessages.DUPLICATE_ADDRESSTYPES);
+      this.firmDetailsService.showErrorAlert(constants.AddressControlMessages.DUPLICATE_ADDRESSTYPES);
 
       // Reset the dropdown to default ("Select" option)
       event.target.value = "0";
@@ -704,7 +683,7 @@ export class NewFirmComponent implements OnInit {
             resolve(); // Proceed with validation
           }).catch(error => {
             console.error('Error checking QFC number existence', error);
-            this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+            this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
             this.hasValidationErrors = true;
             resolve(); // Proceed with validation, but hasValidationErrors is true
           });
@@ -729,7 +708,7 @@ export class NewFirmComponent implements OnInit {
           resolve(); // Proceed with validation
         }).catch(error => {
           console.error('Error checking Firm name existence', error);
-          this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+          this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
           this.hasValidationErrors = true;
           resolve(); // Proceed with validation, but hasValidationErrors is true
         });

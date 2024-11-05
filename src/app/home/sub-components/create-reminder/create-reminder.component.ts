@@ -6,6 +6,7 @@ import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { LogformService } from 'src/app/ngServices/logform.service';
+import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 
 @Component({
   selector: 'app-create-reminder',
@@ -28,22 +29,10 @@ export class CreateReminderComponent implements OnInit {
     dueDate: null,
     status: 1,
   }
-
-  showErrorAlert(messageKey: number) {
-    this.logForm.errorMessages(messageKey).subscribe(
-      (response) => {
-        Swal.fire({
-          text: response.response,
-          icon: 'error',
-          confirmButtonText: 'Ok',
-        });
-      },
-    );
-  }
   
   constructor(
     private TaskService: TaskServiceService,
-    private firmService: FirmService,
+    private firmDetailsService: FirmDetailsService,
     private logForm: LogformService,
     private router: Router
   ) { }
@@ -115,12 +104,13 @@ export class CreateReminderComponent implements OnInit {
 
     // Step 2: Handle Validation Errors
     if (this.hasValidationErrors) {
-      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       return; // Prevent further action if validation fails
     }
 
     const reminder = this.prepareReminderObject();
     this.TaskService.createReminder(reminder).subscribe((data => {
+      this.firmDetailsService.showSaveSuccessAlert(constants.Firm_CoreDetails_Messages.PERSONAL_REMINDER_CREATED);
       console.log('Reminder Created Successfully: ', data.response);
     }), error => {
       console.error('Faile to create: ', error);
