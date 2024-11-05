@@ -110,6 +110,7 @@ export class CreateReminderComponent implements OnInit {
 
     const reminder = this.prepareReminderObject();
     this.TaskService.createReminder(reminder).subscribe((data => {
+      this.firmDetailsService.showSaveSuccessAlert(constants.Firm_CoreDetails_Messages.PERSONAL_REMINDER_CREATED);
       console.log('Reminder Created Successfully: ', data.response);
     }), error => {
       console.error('Faile to create: ', error);
