@@ -3829,8 +3829,8 @@ export class ViewFirmPageComponent implements OnInit {
         },
         addressList: this.addressForms.map(address => ({
           firmID: this.firmId,
-          countryID: address.CountryID,
-          addressTypeID: address.AddressTypeID,
+          countryID: 16,
+          addressTypeID: 2,
           LastModifiedBy: this.userId,
           entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
           entityID: this.firmId,

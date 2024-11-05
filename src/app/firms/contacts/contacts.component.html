@@ -78,16 +78,15 @@
                 </select>
               </div>
               <div class="input-field" style="width: 100%" *ngIf="isFirmSelected()">
-                <label for="isCIP">
+                <label for="aIsContactTypeID">
                   Is contact information being provided for an approved individual or an individual who has applied for
                   approval of controlled functions?
-    
-                </label>
-                <select name="isCIP" id="isCIP" class="input-field" [(ngModel)]="isCIP">
-                  <option value="" selected>Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
+                </label>              
+                <div class="radio-wrapper">
+                    <input type="radio" id="true" name="aIsContactTypeID" [(ngModel)]="createContactObj.aIsContactTypeID" [value]="true" /> Yes
+
+                    <input type="radio" id="false" name="aIsContactTypeID" [(ngModel)]="createContactObj.aIsContactTypeID" [value]="false" /> No
+                </div>
               </div>
     
     
@@ -95,7 +94,7 @@
               <div class="input-field" *ngIf="isFirmSelected()">
                 <label for="contactType">Available Contacts</label>
                 <select name="contactType" id="contactType" [(ngModel)]="Column2" (ngModelChange)="onContactChange($event)"
-                  [disabled]="isCIP === '' || isCIP === 'false'">
+                  [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === false ">
                   <option value="select" selected>Select</option>
                   <option *ngFor="let AvilabilContact of AllAvilabilContact" [ngValue]="AvilabilContact.Column1">
                     {{ AvilabilContact.Column2 }}
@@ -106,7 +105,7 @@
               <!-- Contact Type Section -->
               <div class="input-field">
                 <label for="contactType">Contact Type<span style="color: red">*</span></label>
-                <select name="contactType" id="contactType" [disabled]="isCIP === '' || isCIP === 'true'"
+                <select name="contactType" id="contactType" [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
                   [(ngModel)]="createContactObj.contactType">
                   <option value="select" selected>Select</option>
                   <option *ngFor="let contactType of contactTypeOption" [ngValue]="contactType.ContactTypeID">
@@ -119,10 +118,10 @@
               <div class="input-field">
                 <label for="isPEP">Is Politically Exposed Person (PEP)?<span style="color: red">*</span></label>
                 <div class="radio-wrapper">
-                  <input name="isPEP" id="yes" type="radio" [value]="true" [disabled]="isCIP === '' || isCIP === 'true'"
+                  <input name="isPEP" id="yes" type="radio" [value]="true" [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
                     [(ngModel)]="createContactObj.isPeP" />
                   Yes
-                  <input name="isPEP" id="no" type="radio" [value]="false" [disabled]="isCIP === '' || isCIP === 'true'"
+                  <input name="isPEP" id="no" type="radio" [value]="false" [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
                     [(ngModel)]="createContactObj.isPeP" />
                   No
                 </div>
@@ -132,13 +131,13 @@
               <div class="input-field">
                 <label for="position/JobTitle">Position/Job Title</label>
                 <input name="position/JobTitle" id="position/JobTitle" type="text"
-                  [disabled]="isCIP === '' || isCIP === 'true'" [(ngModel)]="createContactObj.jobTitle" />
+                  [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true" [(ngModel)]="createContactObj.jobTitle" />
               </div>
     
               <!-- Title Section -->
               <div class="input-field">
                 <label for="Title">Title</label>
-                <select name="Title" id="Title" [disabled]="isCIP === ''" [(ngModel)]="createContactObj.title">
+                <select name="Title" id="Title" [disabled]="createContactObj.aIsContactTypeID === null" [(ngModel)]="createContactObj.title">
                   <option *ngFor="let title of Titles" [value]="title.TitleDesc" >
                     {{ title.TitleDesc }}
                   </option>
@@ -148,63 +147,63 @@
               <!-- First Name Section -->
               <div class="input-field">
                 <label for="firstName">First Name</label>
-                <input name="firstName" id="firstName" type="text" [disabled]="isCIP === ''"
+                <input name="firstName" id="firstName" type="text" [disabled]="createContactObj.aIsContactTypeID === null"
                   [(ngModel)]="createContactObj.firstName" />
               </div>
     
               <!-- Second Name Section -->
               <div class="input-field">
                 <label for="SecondName">Second Name</label>
-                <input name="SecondName" id="SecondName" type="text" [disabled]="isCIP === ''"
+                <input name="SecondName" id="SecondName" type="text" [disabled]="createContactObj.aIsContactTypeID === null"
                   [(ngModel)]="createContactObj.secondName" />
               </div>
     
               <!-- Family Name Section -->
               <div class="input-field">
                 <label for="FamilyName">Family Name</label>
-                <input name="FamilyName" id="FamilyName" type="text" [disabled]="isCIP === ''"
+                <input name="FamilyName" id="FamilyName" type="text" [disabled]="createContactObj.aIsContactTypeID === null"
                   [(ngModel)]="createContactObj.familyName" />
               </div>
     
               <!-- Mobile Phone Section -->
               <div class="input-field">
                 <label for="MobilePhone">Mobile Phone</label>
-                <input name="MobilePhone" id="MobilePhone" type="text" [disabled]="isCIP === '' || isCIP === 'true'"
+                <input name="MobilePhone" id="MobilePhone" type="text" [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
                   [(ngModel)]="createContactObj.mobileNum" />
               </div>
     
               <!-- Fax Section -->
               <div class="input-field">
                 <label for="Fax">Fax</label>
-                <input name="Fax" id="Fax" type="text" [disabled]="isCIP === '' || isCIP === 'true'"
+                <input name="Fax" id="Fax" type="text" [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
                   [(ngModel)]="createContactObj.fax" />
               </div>
     
               <!-- Business Phone Section -->
               <div class="input-field">
                 <label for="BusinessPhone">Business Phone</label>
-                <input name="BusinessPhone" id="BusinessPhone" type="text" [disabled]="isCIP === '' || isCIP === 'true'"
-                  [(ngModel)]="createContactObj.busEmail" />
+                <input name="BusinessPhone" id="BusinessPhone" type="text" [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
+                  [(ngModel)]="createContactObj.busPhone" />
               </div>
     
               <!-- Business Email Section -->
               <div class="input-field">
                 <label for="BusinessEmail">Business Email</label>
-                <input name="BusinessEmail" id="BusinessEmail" type="text" [disabled]="isCIP === '' || isCIP === 'true'"
-                  [(ngModel)]="createContactObj.busPhone" />
+                <input name="BusinessEmail" id="BusinessEmail" type="text" [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
+                  [(ngModel)]="createContactObj.busEmail" />
               </div>
     
               <!-- Other Email Section -->
               <div class="input-field">
                 <label for="OtherEmail">Other Email</label>
-                <input name="OtherEmail" id="OtherEmail" type="text" [disabled]="isCIP === '' || isCIP === 'true'"
+                <input name="OtherEmail" id="OtherEmail" type="text" [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
                   [(ngModel)]="createContactObj.otherEmail" />
               </div>
     
               <!-- Method of Contact Section -->
               <div class="input-field">
                 <label for="MethodofContact">Preferred Method of Contact</label>
-                <select name="MethodofContact" id="MethodofContact" [disabled]="isCIP === '' || isCIP === 'true'"
+                <select name="MethodofContact" id="MethodofContact" [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
                   [(ngModel)]="createContactObj.ContactMethodTypeID">
                   <option *ngFor="let MethodofContact of MethodofContactOption"
                     [value]="MethodofContact.ContactMethodTypeID">
@@ -403,16 +402,15 @@
                 </select>
               </div> -->
               <div class="input-field" style="width: 100%" *ngIf="isFirmSelected()">
-                <label for="isCIP">
+                <label for="aIsContactTypeID">
                   Is contact information being provided for an approved individual or an individual who has applied for
                   approval of controlled functions?
-    
-                </label>
-                <select name="isCIP" id="isCIP" class="input-field" [(ngModel)]="isCIP">
-                  <option value="" selected>Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
+                </label>              
+                <div class="radio-wrapper">
+                    <input type="radio" id="true" name="aIsContactTypeID" [(ngModel)]="selectedContact.aIsContactTypeID" [value]="true" /> Yes
+
+                    <input type="radio" id="false" name="aIsContactTypeID" [(ngModel)]="selectedContact.aIsContactTypeID" [value]="false" /> No
+                </div>
               </div>
               <div class="input-field" *ngIf="isFirmSelected()">
                 <label for="contactType">
@@ -420,7 +418,7 @@
                 </label>
                 <select name="contactType" id="contactType" [(ngModel)]="selectedContact.entityTypeID"
                   (ngModelChange)="onContactChange($event)"
-                  [disabled]="isCIP === '' || isCIP === 'false' || !IsEditContactVisible">
+                  [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === false || !IsEditContactVisible">
                   <option value="select" selected>Select</option>
                   <option *ngFor="let AvilabilContact of AllAvilabilContact" [ngValue]="AvilabilContact.Column1">
                     {{ AvilabilContact.Column2 }}
@@ -432,7 +430,7 @@
                   Contact Type<span style="color: red">*</span>
                 </label>
                 <select name="contactType" id="contactType" [(ngModel)]="selectedContact.contactTypeID"
-                  [disabled]="isCIP === '' || isCIP === 'true' || !IsEditContactVisible">
+                  [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !IsEditContactVisible">
                   <option value="select" selected>Select</option>
                   <option *ngFor="let contactType of contactTypeOption" [ngValue]="contactType.ContactTypeID">
                     {{ contactType.ContactTypeDesc }}
@@ -446,22 +444,22 @@
                 </label>
                 <div class="radio-wrapper">
                   <input name="isPEP" id="yes" type="radio" [value]="true" [(ngModel)]="selectedContact.isPEP"
-                    [disabled]="isCIP === '' || isCIP === 'true' || !IsEditContactVisible" />
+                    [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !IsEditContactVisible" />
                   Yes
                   <input name="isPEP" id="no" type="radio" [value]="false" [(ngModel)]="selectedContact.isPEP"
-                    [disabled]="isCIP === '' || isCIP === 'true' || !IsEditContactVisible" />
+                    [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !IsEditContactVisible" />
                   No
                 </div>
               </div>
               <div class="input-field">
                 <label for="position/JobTitle"> Position/Job Title</label>
                 <input name="position/JobTitle" id="position/JobTitle" type="text" [(ngModel)]="selectedContact.jobTitle"
-                  [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
+                  [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !IsEditContactVisible" />
               </div>
               <div class="input-field">
                 <label for="Title"> Title </label>
                 <select name="Title" id="Title" [(ngModel)]="selectedContact.title"
-                  [disabled]="isCIP === '' || !IsEditContactVisible">
+                  [disabled]="selectedContact.aIsContactTypeID === null || !IsEditContactVisible">
                   <option *ngFor="let title of Titles" [value]="title.TitleDesc">
                     {{ title.TitleDesc }}
                   </option>
@@ -470,50 +468,50 @@
               <div class="input-field">
                 <label for="firstName"> First Name</label>
                 <input name="firstName" id="firstName" type="text" [(ngModel)]="selectedContact.firstName"
-                  [disabled]="isCIP === ''|| !IsEditContactVisible" />
+                  [disabled]="selectedContact.aIsContactTypeID === null || !IsEditContactVisible" />
               </div>
               <div class="input-field">
                 <label for="SecondName"> Second Name</label>
                 <input name="SecondName" id="SecondName" type="text" [(ngModel)]="selectedContact.secondName"
-                  [disabled]="isCIP === ''|| !IsEditContactVisible" />
+                  [disabled]="selectedContact.aIsContactTypeID === null || !IsEditContactVisible" />
               </div>
               <div class="input-field">
                 <label for="FamilyName"> Family Name</label>
                 <input name="FamilyName" id="FamilyName" type="text" [(ngModel)]="selectedContact.familyName"
-                  [disabled]="isCIP === ''|| !IsEditContactVisible" />
+                  [disabled]="selectedContact.aIsContactTypeID === null || !IsEditContactVisible" />
               </div>
               <div class="input-field">
                 <label for="MobilePhone">Mobile Phone</label>
                 <input name="MobilePhone" id="MobilePhone" type="text" [(ngModel)]="selectedContact.mobileNum"
-                  [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
+                  [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !IsEditContactVisible" />
               </div>
     
               <div class="input-field">
                 <label for="Fax">Fax</label>
                 <input name="Fax" id="Fax" type="text" [(ngModel)]="selectedContact.fax"
-                  [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
+                  [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !IsEditContactVisible" />
               </div>
     
               <div class="input-field">
                 <label for="BusinessPhone">Business Phone</label>
                 <input name="BusinessPhone" id="BusinessPhone" type="text" [(ngModel)]="selectedContact.busPhone"
-                  [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
+                  [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !IsEditContactVisible" />
               </div>
     
               <div class="input-field">
                 <label for="BusinessEmail">Business Email</label>
                 <input name="BusinessEmail" id="BusinessEmail" type="text" [(ngModel)]="selectedContact.busEmail"
-                  [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
+                  [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !IsEditContactVisible" />
               </div>
               <div class="input-field">
                 <label for="OtherEmail">Other Email</label>
                 <input name="OtherEmail" id="OtherEmail" type="text" [(ngModel)]="selectedContact.otherEmail"
-                  [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
+                  [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !IsEditContactVisible" />
               </div>
               <div class="input-field">
                 <label for="MethodofContact"> Preferred Method of Contact </label>
                 <select name="MethodofContact" id="MethodofContact" [(ngModel)]="selectedContact.contactMethodTypeID"
-                  [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible">
+                  [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !IsEditContactVisible">
                   <option *ngFor="let MethodofContact of MethodofContactOption"
                     [value]="MethodofContact.ContactMethodTypeID">
                     {{ MethodofContact.ContactMethodTypeDesc }}

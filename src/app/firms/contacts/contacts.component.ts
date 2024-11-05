@@ -95,6 +95,8 @@ export class ContactsComponent {
       this.getPreferredMethodofContact();
       this.getAvilabilContact();
       this.getTitleCreate();
+      this.getAddressTypesContactCreate();
+      this.getAddressTypesContact();
     })
   }
 
@@ -218,6 +220,8 @@ export class ContactsComponent {
 
   closeContactPopup() {
     this.isPopupVisible = false;
+    this.IsEditContactVisible = false;
+    
   }
   getContactType(): void {
     this.securityService.getobjecttypetableEdit(this.userId, constants.ContactTypes, 40)
@@ -296,6 +300,91 @@ export class ContactsComponent {
   }
   closeCreateContactPopup(){
     this.showCreateContactSection = false;
+   this.CreatecontrollerDetails = this.CreatecontrollerDetailsDefualt();
+  }
+  CreatecontrollerDetailsDefualt(){
+     return {
+      SelectedControlType: '',
+      TypeOfControl: '',
+      EntityTypeDesc: '',
+      OtherEntityID: 0,
+      OtherEntityName: '',
+      LegalStatusTypeID: 0,
+      PctOfShares: '',
+      PlaceOfEstablishment: '',
+      aIsContactTypeID :'',
+      Title: '',
+      FirstName: '',
+      SecondName: '',
+      FamilyName: '',
+      PlaceOfBirth: '',
+      DateOfBirth: '',
+      PassportNum: '',
+      IsPEP: 0,
+      IsPublicallyTraded: false,
+      ControllerControlTypeID: 2,
+      RegisteredNum: '',
+      ControllerControlTypeDesc: '',
+      HoldingsPercentage: '',
+      EffectiveDate: '',
+      CessationDate: '',
+      More10UBOs: true,
+      IsParentController: true,
+      AssnDateFrom: '',
+      AssnDateTo: '',
+      IsCompanyRegulated: false,
+      LegalStatusTypeDesc: '',
+      CountryName: '',
+      AdditionalDetails: '',
+      LastModifiedByOfOtherEntities: '',
+      LastModifiedDate: '',
+      AddressType: '',
+      addressLine1: '',
+      addressLine2: '',
+      addressLine3: '',
+      addressLine4: '',
+      city: '',
+      stateProvince: '',
+      country: '',
+      zipPostalCode: '',
+      regulator: '',
+      RegulatorContact: '',
+      CreatedBy: 30,
+      RelatedEntityID: 0,
+      EntitySubTypeID: null,
+      EntityTypeID: 1,
+      RelatedEntityEntityID: 0,
+      MyState: 2,
+      PlaceOfIncorporation: '',
+      CountryOfIncorporation: 0,
+      zebSiteAddress: '',
+      IsAuditor: 0,
+      ControllerInfo: '',
+      FirmID: 0,
+      Output: 0,
+      NumOfShares: 0,
+      CountryID: 0,
+      AddressTypeID: 0,
+      CreatedDate: '',
+      EntityID: 0,
+      ContactID: 0,
+      AddressID: '',
+      AddressState: 0,
+      RelatedEntityTypeID: 6,
+      ObjectID: 0,
+      PrefferdMethod: '',
+      ContactId: 0,
+      ThirdName: '',
+      ObjectInstanceID: 0,
+      AddressTypeDesc: '',
+      StatusDate: '',
+      MobilePhone: '',
+      businessEmail: '',
+      OtherEmail: '',
+      RegulatorID: 0,
+      PreferredMethodType: '',
+      RegulatorName: '',
+     }   
   }
   CreatecontrollerDetails = {
     SelectedControlType: '',
@@ -310,6 +399,7 @@ export class ContactsComponent {
     FirstName: '',
     SecondName: '',
     FamilyName: '',
+    aIsContactTypeID :'',
     PlaceOfBirth: '',
     DateOfBirth: '',
     PassportNum: '',
@@ -767,7 +857,7 @@ export class ContactsComponent {
       });
   }
   addressTypeOptionsEdit: any = [];
-  getAddressTypesController(): void {
+  getAddressTypesContact(): void {
     this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdEdit)
       .subscribe(data => {
         this.addressTypeOptionsEdit = data.response;
@@ -776,7 +866,7 @@ export class ContactsComponent {
         console.error("Error fetching AddressTypes", error);
       });
   }
-  getAddressTypesControllerCreate(): void {
+  getAddressTypesContactCreate(): void {
     this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdCreate)
       .subscribe(data => {
         this.addressTypeOptionsEdit = data.response;
@@ -906,6 +996,7 @@ export class ContactsComponent {
     familyName: "",
     countryOfResidence: 0,
     ContactMethodTypeID:0,
+    aIsContactTypeID: null,
     createdBy: 0,
     dateOfBirth: "",
     fullName: "",
@@ -1045,6 +1136,7 @@ export class ContactsComponent {
           OtherEmail: this.createContactObj.otherEmail,
           QfcNumber: this.firmDetails.QFCNum,
           Fax: this.createContactObj.fax,
+          aIsContactTypeID: this.createContactObj.aIsContactTypeID,
           ResidencePhone: 'test',
           JobTitle: this.createContactObj.jobTitle,
           EntityTypeID: this.createContactObj.EntityTypeID,
@@ -1086,7 +1178,7 @@ export class ContactsComponent {
         },
         lstContactFunctions: null,
       },
-      Addresses: this.existingControllerAddresses.map(address => ({
+      Addresses: this.addedAddresses.map(address => ({
         firmID: this.firmId,
         countryID: address.CountryID,
         addressTypeID: address.AddressTypeID,
@@ -1115,16 +1207,17 @@ export class ContactsComponent {
         objAis: null
       }))
     };
-  
+    console.log("Contact Object to be creted",saveCreateContactObj)
     if (this.createContactObj.contactType !== 1 || !this.createContactObj.contactType) {
       this.saveContactForm(saveCreateContactObj);
+      this.closeContactPopup();
+      this.loadContacts(); 
       Swal.fire(
         'Created!',
         'The contact has been Created successfully.',
         'success'
       );
-      this.closeContactPopup();
-      this.loadContacts();  
+       
     } else {
       this.contactService.IsMainContact(this.firmId, this.createContactObj.entityId, this.createContactObj.contactType)
         .subscribe(response => {
