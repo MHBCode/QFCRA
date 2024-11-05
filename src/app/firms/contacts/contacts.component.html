@@ -42,7 +42,7 @@
   </div>
         <!-- Create Contact Popup -->
         <div *ngIf="showCreateContactSection" class="contollerPopupOverlay">
-          <div class="contollerPopupContent">
+          <div class="contollerPopupContent" (click)="$event.stopPropagation()">
             <div class="popup-title-btn-row">
               <div class="popup-header">
                 <h3>Contact For {{ firmDetails?.FirmName }}</h3>
@@ -63,9 +63,6 @@
               <p *ngIf="errorMessages['firstName']">
                 {{ errorMessages['firstName'] }}
               </p>
-              <p *ngIf="errorMessages['busEmail']">
-                {{ errorMessages['busEmail'] }}
-              </p> 
             </div>
             <div class="inputs-row">
               <div class="input-field">
@@ -187,7 +184,7 @@
               <div class="input-field">
                 <label for="BusinessPhone">Business Phone</label>
                 <input name="BusinessPhone" id="BusinessPhone" type="text" [disabled]="isCIP === '' || isCIP === 'true'"
-                  [(ngModel)]="createContactObj.fax" />
+                  [(ngModel)]="createContactObj.busEmail" />
               </div>
     
               <!-- Business Email Section -->
@@ -208,7 +205,7 @@
               <div class="input-field">
                 <label for="MethodofContact">Preferred Method of Contact</label>
                 <select name="MethodofContact" id="MethodofContact" [disabled]="isCIP === '' || isCIP === 'true'"
-                  [(ngModel)]="createContactObj.contactMethodTypeID">
+                  [(ngModel)]="createContactObj.ContactMethodTypeID">
                   <option *ngFor="let MethodofContact of MethodofContactOption"
                     [value]="MethodofContact.ContactMethodTypeID">
                     {{ MethodofContact.ContactMethodTypeDesc }}
@@ -357,8 +354,8 @@
         </div>
     
         <!-- view Details & Edit Contact Popup -->
-        <div *ngIf="isPopupVisible" (click)="closeContactPopup()" class="contollerPopupOverlay">
-          <div (click)="$event.stopPropagation()" class="contollerPopupContent">
+        <div *ngIf="isPopupVisible" class="contollerPopupOverlay">
+          <div class="contollerPopupContent" (click)="$event.stopPropagation()">
             <!-- Title -->
             <div class="popup-title-btn-row">
               <div class="popup-header">
@@ -368,6 +365,17 @@
                 <i class="bi bi-x-circle close-icon"></i>
               </button>
               <div class="btn"></div>
+            </div>
+            <div class="error-messages">
+              <p *ngIf="errorMessages['contactTypeDesc']">
+                {{ errorMessages['contactTypeDesc'] }}
+              </p>
+              <p *ngIf="errorMessages['isPEP']">
+                {{ errorMessages['isPEP'] }}
+              </p>
+              <p *ngIf="errorMessages['firstName']">
+                {{ errorMessages['firstName'] }}
+              </p>
             </div>
             <div class="inputs-row">
               <div class="input-field">
@@ -483,33 +491,28 @@
               <div class="input-field">
                 <label for="Fax">Fax</label>
                 <input name="Fax" id="Fax" type="text" [(ngModel)]="selectedContact.fax"
-                  [(ngModel)]="selectedContact.mobileNum"
                   [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
               </div>
     
               <div class="input-field">
                 <label for="BusinessPhone">Business Phone</label>
                 <input name="BusinessPhone" id="BusinessPhone" type="text" [(ngModel)]="selectedContact.busPhone"
-                  [(ngModel)]="selectedContact.mobileNum"
                   [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
               </div>
     
               <div class="input-field">
                 <label for="BusinessEmail">Business Email</label>
                 <input name="BusinessEmail" id="BusinessEmail" type="text" [(ngModel)]="selectedContact.busEmail"
-                  [(ngModel)]="selectedContact.mobileNum"
                   [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
               </div>
               <div class="input-field">
                 <label for="OtherEmail">Other Email</label>
                 <input name="OtherEmail" id="OtherEmail" type="text" [(ngModel)]="selectedContact.otherEmail"
-                  [(ngModel)]="selectedContact.mobileNum"
                   [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible" />
               </div>
               <div class="input-field">
                 <label for="MethodofContact"> Preferred Method of Contact </label>
                 <select name="MethodofContact" id="MethodofContact" [(ngModel)]="selectedContact.contactMethodTypeID"
-                  [(ngModel)]="selectedContact.mobileNum"
                   [disabled]="isCIP === '' || isCIP === 'true'|| !IsEditContactVisible">
                   <option *ngFor="let MethodofContact of MethodofContactOption"
                     [value]="MethodofContact.ContactMethodTypeID">

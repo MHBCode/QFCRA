@@ -905,6 +905,7 @@ export class ContactsComponent {
     thirdName: "",
     familyName: "",
     countryOfResidence: 0,
+    ContactMethodTypeID:0,
     createdBy: 0,
     dateOfBirth: "",
     fullName: "",
@@ -1047,6 +1048,7 @@ export class ContactsComponent {
           ResidencePhone: 'test',
           JobTitle: this.createContactObj.jobTitle,
           EntityTypeID: this.createContactObj.EntityTypeID,
+          contactMethodTypeID: this.createContactObj.ContactMethodTypeID,
           Title: this.createContactObj.title,
           FirstName: this.createContactObj.firstName,
           secondName: this.createContactObj.secondName,
@@ -1116,6 +1118,13 @@ export class ContactsComponent {
   
     if (this.createContactObj.contactType !== 1 || !this.createContactObj.contactType) {
       this.saveContactForm(saveCreateContactObj);
+      Swal.fire(
+        'Created!',
+        'The contact has been Created successfully.',
+        'success'
+      );
+      this.closeContactPopup();
+      this.loadContacts();  
     } else {
       this.contactService.IsMainContact(this.firmId, this.createContactObj.entityId, this.createContactObj.contactType)
         .subscribe(response => {
@@ -1237,6 +1246,7 @@ saveEditContactPopup(): void {
         thirdName: this.selectedContact.thirdName,
         familyName: this.selectedContact.familyName,
         PctOfShares: this.selectedContact.pctOfShares,
+        contactMethodTypeID: this.selectedContact.ContactMethodTypeID,
         tempContactID: 0,
         countryOfResidence: null,
         ContactFrom: this.selectedContact.ContactFrom,
@@ -1298,8 +1308,15 @@ saveEditContactPopup(): void {
     }))
   };
    console.log("saveEditContactObj",saveEditContactObj)
-  if (this.selectedContact.entityTypeID !== 1 || !this.selectedContact.entityTypeID) {
+  if (this.selectedContact.contactTypeID !== 1 || !this.selectedContact.contactTypeID) {
     this.saveContactForm(saveEditContactObj);
+    Swal.fire(
+      'Modified!',
+      'The contact has been Modified successfully.',
+      'success'
+    );
+    this.closeContactPopup();
+    this.loadContacts();  
   } else {
     this.contactService.IsMainContact(this.firmId, this.selectedContact.entityID, this.selectedContact.entityTypeID)
       .subscribe(response => {
@@ -1333,12 +1350,12 @@ EditContactValidateForm(): Promise<void> {
       this.hasValidationErrors = true;
     }
 
-    if (this.selectedContact.isPeP === undefined || this.selectedContact.isPeP === null) {
-       this.loadErrorMessages('isPeP', constants.ContactMessage.SELECT_ISPEP, 'Is Politically Exposed Person (PEP)?*');
+    if (this.selectedContact.isPEP === undefined || this.selectedContact.isPEP === null) {
+       this.loadErrorMessages('isPEP', constants.ContactMessage.SELECT_ISPEP, 'Is Politically Exposed Person (PEP)?*');
        this.hasValidationErrors = true;
     }
-    if (!this.selectedContact.contactType) {
-      this.loadErrorMessages('contactType', constants.ContactMessage.SELECTCONTACTTYPE);
+    if (!this.selectedContact.contactTypeDesc) {
+      this.loadErrorMessages('contactTypeDesc', constants.ContactMessage.SELECTCONTACTTYPE);
       this.hasValidationErrors = true;
     } 
 
