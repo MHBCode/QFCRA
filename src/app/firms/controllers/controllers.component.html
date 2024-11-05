@@ -637,9 +637,6 @@
       </div>
 
       <div class="error-messages">
-        <p *ngIf="errorMessages['EntityTypeName']">
-          {{ errorMessages['EntityTypeName'] }}
-        </p>
         <p *ngIf="errorMessages['OtherEntityName']">
           {{ errorMessages['OtherEntityName'] }}
         </p>
@@ -677,10 +674,10 @@
           <label for="controllerType">
             Controller Type <span style="color: red">*</span>
           </label>
-          <select name="controllerType" id="controllerType" [(ngModel)]="CreatecontrollerDetails.EntityTypeDesc"
+          <select name="controllerType" id="controllerType" [(ngModel)]="CreatecontrollerDetails"
             (change)="changeControlType()">
-            <option value="Select">Select</option>
-            <option *ngFor="let controllerType of controllerTypeOption" [value]="controllerType.EntityTypeDesc">
+            <option value="select" selected>Select</option>
+            <option *ngFor="let controllerType of controllerTypeOption" [ngValue]="controllerType">
               {{ controllerType.EntityTypeDesc }}
             </option>
           </select>
@@ -708,7 +705,7 @@
             ">
             <label for="individualTitle"> Title </label>
             <select [(ngModel)]="CreatecontrollerDetails.Title" name="legalStatus">
-              <option *ngFor="let title of Titles" [value]="title.TitleDesc">
+              <option *ngFor="let title of Titles" [value]="title.TitleTypeId">
                 {{ title.TitleDesc }}
               </option>
             </select>
@@ -778,7 +775,8 @@
                 'Individual Controller'
             ">
             <label for="passportNum"> Passport Number </label>
-            <input [(ngModel)]="CreatecontrollerDetails.PassportNum" name="passportNum" id="passportNum" type="text" />
+            <input [(ngModel)]="CreatecontrollerDetails.PassportNum" name="passportNum" id="passportNum"
+              type="text" />
           </div>
           <!---->
           <div class="input-field" *ngIf="
@@ -863,7 +861,7 @@
               Type of Control <span style="color: red">*</span>
             </label>
             <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeID" name="typeOfControl"
-              id="typeOfControl" (ngModelChange)="CreateControlTypeDesc($event)">
+              id="typeOfControl">
               <option *ngFor="let ControlType of controlTypeOptionsCreate"
                 [value]="ControlType.ControllerControlTypeID">
                 {{ ControlType.ControllerControlTypeDesc }}
@@ -875,8 +873,8 @@
           <ng-container *ngIf="CreatecontrollerDetails.ControllerControlTypeID == 1">
             <div class="input-field">
               <label for="holdingsPercentage"> % of Holding </label>
-              <input [(ngModel)]="CreatecontrollerDetails.PctOfShares" name="holdingsPercentage" id="holdingsPercentage"
-                type="text" />
+              <input [(ngModel)]="CreatecontrollerDetails.PctOfShares" name="holdingsPercentage"
+                id="holdingsPercentage" type="text" />
             </div>
           </ng-container>
 
@@ -889,8 +887,8 @@
           <!---->
           <div class="input-field">
             <label for="cessationDate"> Cessation Date </label>
-            <input [(ngModel)]="CreatecontrollerDetails.AssnDateTo" name="cessationDate" id="cessationDate" #dateInputs
-              placeholder type="text" />
+            <input [(ngModel)]="CreatecontrollerDetails.AssnDateTo" name="cessationDate" id="cessationDate"
+              #dateInputs placeholder type="text" />
           </div>
           <!---->
           <div class="input-field" *ngIf="
