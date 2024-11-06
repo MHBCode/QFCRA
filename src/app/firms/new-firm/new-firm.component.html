@@ -279,7 +279,7 @@
                         Address Type
                     </label>
                     <select [(ngModel)]="address.AddressTypeID" [ngClass]="{
-                  'error-border': errorMessages['AddressTypeID']}" [disabled]="address.isAddressTypeSelected"
+                        'error-border': address === invalidAddress}" [disabled]="address.isAddressTypeSelected && addedAddresses.length > 1"
                         (change)="onAddressTypeChange($event,i)">
                         <option value="0">Select</option>
                         <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">

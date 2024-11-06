@@ -438,30 +438,34 @@
         </div>
       </div>
       <!-- Addresses Section -->
-      <div *ngIf="ControllerfirmAddresses && ControllerfirmAddresses.length > 0" class="addresses">
+      <div *ngIf="existingControllerCorporateAddresses.length > 0 || isEditable" class="addresses">
         <div class="popup-header">
           <h3>Addresses</h3>
         </div>
-        <button (click)="addNewAddressOnEditMode()" *ngIf="isEditable && canAddNewAddressOnEdit" style="
-            background-color: green;
-            color: white;
-            border: none;
-            padding: 5px;
-            cursor: pointer;
-            border-radius: 5px;
-            float: right;
-          ">
-          <i style="size: 7px" class="bi bi-plus-lg"></i>
-        </button>
+        <!--Error messages for addresses-->
+        <div class="error-messages">
+          <p *ngIf="errorMessages['AddressTypeID']">
+            {{ errorMessages['AddressTypeID'] }}
+          </p>
+          <p *ngIf="errorMessages['DuplicatedAddressTypeID']">
+            {{ errorMessages['DuplicatedAddressTypeID'] }}
+          </p>
+        </div>
+        <div class="add-address-btn-container">
+          <button class="addAddressBtn" (click)="addNewAddressOnEditMode()"
+            *ngIf="isEditable && canAddNewAddressOnEdit">
+            Add Address
+          </button>
+        </div>
         <!--Address Details-->
         <div class="inputs-row">
-          <ng-container *ngFor="let address of filteredControllerfirmAddresses; let i = index">
+          <ng-container *ngFor="let address of filteredControllerCorporateAddresses; let i = index">
             <ng-container *ngIf="address.Valid === true">
               <div class="input-field" *ngIf="!isEditable">
                 <label for="addressType" class="history-row">
                   Address Type
                   <button *ngIf="address.PreviousRecords != 0" class="subbutton-open-history"
-                  (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID)">
+                    (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID)">
                     <i class="bi bi-clock-history"></i><span> Open History</span>
                   </button>
                 </label>
@@ -475,17 +479,15 @@
               <div class="input-field" *ngIf="isEditable">
                 <label for="addressType" class="history-row">
                   Address Type
-                  <button *ngIf="address.PreviousRecords !== 0 && address.AddressID" class="subbutton-open-history">
+                  <button *ngIf="address.PreviousRecords !== 0 && address.AddressID" class="subbutton-open-history"
+                  (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID)">
                     <i class="bi bi-clock-history"></i> <span>Open History</span>
                   </button>
 
                 </label>
                 <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID"
                   (change)="onAddressTypeChangeOnEditMode($event, address)" [ngClass]="{
-          'error-border':
-            !address.AddressID && errorMessages['AddressTypeID'],
-          
-        }">
+                        'error-border': address === invalidAddress}">
                   <option value="0">Select</option>
                   <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
                     {{ option.AddressTypeDesc }}
@@ -498,10 +500,10 @@
         (!address.AddressID || address.AddressID === '')
       ">
                 <label for="sameAsType"> Same As Type </label>
-                <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChangeOnEditMode($event)"
+                <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChangeOnEditMode($event,i)"
                   name="sameAsType" id="sameAsType">
                   <option value="0">Select</option>
-                  <option *ngFor="let type of existingControllerAddresses" [value]="type.AddressTypeID">
+                  <option *ngFor="let type of getFilteredAddressTypes()" [value]="type.AddressTypeID">
                     {{ type.AddressTypeDesc }}
                   </option>
                 </select>
@@ -511,42 +513,42 @@
                 <label for="addressLine1"> Address Line 1 </label>
                 <input type="text" [disabled]="
           !isEditable ||
-          (disableAddressFieldsOnEdit && !address.AddressID)
+          (address.isFieldsDisabled && !address.AddressID)
         " name="addressLine1" id="addressLine1" [(ngModel)]="address.AddressLine1" />
               </div>
               <div class="input-field">
                 <label for="addressLine2"> Address Line 2 </label>
                 <input [disabled]="
           !isEditable ||
-          (disableAddressFieldsOnEdit && !address.AddressID)
+          (address.isFieldsDisabled && !address.AddressID)
         " name="addressLine2" id="addressLine2" type="text" [(ngModel)]="address.AddressLine2" />
               </div>
               <div class="input-field">
                 <label for="addressLine3"> Address Line 3 </label>
                 <input [disabled]="
           !isEditable ||
-          (disableAddressFieldsOnEdit && !address.AddressID)
+          (address.isFieldsDisabled && !address.AddressID)
         " name="addressLine3" id="addressLine3" type="text" [(ngModel)]="address.AddressLine3" />
               </div>
               <div class="input-field">
                 <label for="addressLine4"> Address Line 4 </label>
                 <input [disabled]="
           !isEditable ||
-          (disableAddressFieldsOnEdit && !address.AddressID)
+          (address.isFieldsDisabled && !address.AddressID)
         " name="addressLine4" id="addressLine4" type="text" [(ngModel)]="address.AddressLine4" />
               </div>
               <div class="input-field">
                 <label for="city"> City </label>
                 <input [disabled]="
           !isEditable ||
-          (disableAddressFieldsOnEdit && !address.AddressID)
+          (address.isFieldsDisabled && !address.AddressID)
         " name="city" id="city" type="text" [(ngModel)]="address.City" />
               </div>
               <div class="input-field">
                 <label for="state"> state/province </label>
                 <input [disabled]="
           !isEditable ||
-          (disableAddressFieldsOnEdit && !address.AddressID)
+          (address.isFieldsDisabled && !address.AddressID)
         " name="state" id="state" type="text" [(ngModel)]="address.Province" />
               </div>
               <div class="input-field" *ngIf="!isEditable">
@@ -558,7 +560,7 @@
                 <label for="country"> Country </label>
                 <select [disabled]="
           !isEditable ||
-          (disableAddressFieldsOnEdit && !address.AddressID)
+          (address.isFieldsDisabled && !address.AddressID)
         " [(ngModel)]="address.CountryID">
                   <option *ngFor="let option of allCountries" [value]="option.CountryID">
                     {{ option?.CountryName }}
@@ -569,7 +571,7 @@
                 <label for="zip"> Zip/Postal Code </label>
                 <input [disabled]="
           !isEditable ||
-          (disableAddressFieldsOnEdit && !address.AddressID)
+          (address.isFieldsDisabled && !address.AddressID)
         " name="zip" id="zip" type="text" [(ngModel)]="address.PostalCode" />
               </div>
               <hr *ngIf="i < ControllerfirmAddresses.length - 1" />
@@ -619,7 +621,7 @@
         <button (click)="confarmDeleteControllerDetials()">
           <i class="bi bi-trash"></i> Delete
         </button>
-      </div> 
+      </div>
 
     </div>
   </div>
@@ -775,8 +777,7 @@
                 'Individual Controller'
             ">
             <label for="passportNum"> Passport Number </label>
-            <input [(ngModel)]="CreatecontrollerDetails.PassportNum" name="passportNum" id="passportNum"
-              type="text" />
+            <input [(ngModel)]="CreatecontrollerDetails.PassportNum" name="passportNum" id="passportNum" type="text" />
           </div>
           <!---->
           <div class="input-field" *ngIf="
@@ -873,8 +874,8 @@
           <ng-container *ngIf="CreatecontrollerDetails.ControllerControlTypeID == 1">
             <div class="input-field">
               <label for="holdingsPercentage"> % of Holding </label>
-              <input [(ngModel)]="CreatecontrollerDetails.PctOfShares" name="holdingsPercentage"
-                id="holdingsPercentage" type="text" />
+              <input [(ngModel)]="CreatecontrollerDetails.PctOfShares" name="holdingsPercentage" id="holdingsPercentage"
+                type="text" />
             </div>
           </ng-container>
 
@@ -887,8 +888,8 @@
           <!---->
           <div class="input-field">
             <label for="cessationDate"> Cessation Date </label>
-            <input [(ngModel)]="CreatecontrollerDetails.AssnDateTo" name="cessationDate" id="cessationDate"
-              #dateInputs placeholder type="text" />
+            <input [(ngModel)]="CreatecontrollerDetails.AssnDateTo" name="cessationDate" id="cessationDate" #dateInputs
+              placeholder type="text" />
           </div>
           <!---->
           <div class="input-field" *ngIf="
@@ -968,18 +969,12 @@
       <div *ngIf="!hideForms" class="addresses create-inputs-field-set">
         <div class="popup-header">
           <h3>Addresses</h3>
-          <button [disabled]="!canAddNewAddressOnCreate" *ngIf="!isAllAddressesAddedOnCreate"
-            (click)="addNewAddressOnCreateMode()" style="
-              background-color: green;
-              color: white;
-              border: none;
-              padding: 5px;
-              cursor: pointer;
-              border-radius: 5px;
-              float: right;
-            ">
-            <i style="size: 7px" class="bi bi-plus-lg"></i>
-          </button>
+          <div class="add-address-btn-container">
+            <button class="addAddressBtn" [disabled]="!canAddNewAddressOnCreate" *ngIf="!isAllAddressesAddedOnCreate"
+              (click)="addNewAddressOnCreateMode()">
+              Add Address
+            </button>
+          </div>
         </div>
         <ng-container *ngFor="let address of addedAddresses; let i = index">
           <div class="inputs-row">

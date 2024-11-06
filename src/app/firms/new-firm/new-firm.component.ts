@@ -603,20 +603,26 @@ export class NewFirmComponent implements OnInit {
 
   removeAddress(index: number) {
     if (this.addedAddresses.length > 1) {
-      Swal.fire({
-        text: 'Are you sure you want to delete this record?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Ok',
-        cancelButtonText: 'Cancel',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.addedAddresses.splice(index, 1);
-          this.checkCanAddNewAddress();
-        }
-      });
+       Swal.fire({
+          text: 'Are you sure you want to delete this record?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Ok',
+          cancelButtonText: 'Cancel',
+       }).then((result) => {
+          if (result.isConfirmed) {
+             this.addedAddresses.splice(index, 1);
+             this.checkCanAddNewAddress();
+ 
+             // Explicitly enable address type selection if only one address is left
+             if (this.addedAddresses.length === 1) {
+                this.addedAddresses[0].isAddressTypeSelected = false;
+             }
+          }
+       });
     }
-  }
+ }
+ 
 
   onSameAsTypeChange(selectedTypeID: any, index: number) {
     const numericTypeID = Number(selectedTypeID); // Convert the selected value to a number

@@ -634,7 +634,7 @@ export class NewFirmComponent implements OnInit {
         showCancelButton: true,
         confirmButtonText: 'Ok',
         cancelButtonText: 'Cancel',
-        reverseButtons: true
+        reverseButtons: false
       }).then((result) => {
         if (result.isConfirmed) {
           this.addedAddresses.splice(index, 1);

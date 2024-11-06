@@ -23,12 +23,12 @@ export class CoreDetailsComponent implements OnInit {
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   errorMessages: { [key: string]: string } = {};
-  activity: any = { errorMessages: {} };
   controlsPermissions: any = [];
   firmId: number = 0;
   isLoading: boolean = false;
   firmAddresses: any = [];
   existingAddresses: any = [];
+  removedAddresses = [];
   isEditModeCore: boolean = false;
   objectOpType = constants.ObjectOpType.View;
   hideEditBtn: boolean = false;
@@ -39,12 +39,6 @@ export class CoreDetailsComponent implements OnInit {
   hideDeleteBtn: boolean = false;
   isFirmLicensed: boolean;
   isFirmAuthorised: boolean;
-  ActivityLicensed: any = [{}];
-  activeSection: string = 'Licensed';
-  tabIndex: number = 0; // 0 for Licensed, 1 for Authorized
-  isEditModeLicense: boolean = false;
-  isEditModeAuth: boolean = false;
-  ActivityAuth: any = [{}];
   firmDetails: any;
   hasValidationErrors: boolean = false;
   invalidAddress: boolean;
@@ -169,6 +163,8 @@ export class CoreDetailsComponent implements OnInit {
     this.firmDetailsService.loadFirmAddresses(firmId).subscribe(
       data => {
         this.firmAddresses = data.firmAddresses;
+        this.existingAddresses = this.firmAddresses.filter(addr => addr.Valid);
+        console.log('Existing Firm Addresses',this.existingAddresses)
         console.log('Firm Addresses:', this.firmAddresses);
       },
       error => {
@@ -208,7 +204,6 @@ export class CoreDetailsComponent implements OnInit {
 
   editFirm() {
     this.isLoading = true;
-    this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
 
     // If form is not in edit mode, toggle it to edit mode
     if (!this.isEditModeCore) {
@@ -224,7 +219,6 @@ export class CoreDetailsComponent implements OnInit {
     this.isLoading = true;
     // Start validations
     this.hasValidationErrors = false;
-    this.existingAddresses = this.firmAddresses.filter(address => address.Valid);
     // Synchronous firm-level validation checks
     this.validateFirmDetails(); // Perform existing validation logic synchronously
 
@@ -290,7 +284,7 @@ export class CoreDetailsComponent implements OnInit {
 
     // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
     this.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
-      let firmType = this.firmDetails.FirmTypeID;
+      let firmType = this.firmDetails?.FirmTypeID;
 
 
       if (this.assignedUserRoles) {
@@ -477,7 +471,7 @@ export class CoreDetailsComponent implements OnInit {
     }
 
     // ADDRESS TYPE VALIDATION
-    this.invalidAddress = this.firmAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
+    this.invalidAddress = this.existingAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
     if (this.invalidAddress) {
       this.loadErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
       this.hasValidationErrors = true;
@@ -697,7 +691,7 @@ export class CoreDetailsComponent implements OnInit {
         requiresCoOp: this.firmDetails.RequiresCoOp || '',
         prComments: this.firmDetails.PublicRegisterComments || ''
       },
-      addressList: this.existingAddresses.map(address => {
+      addressList: [...this.existingAddresses, ...this.removedAddresses].map(address => {
         let addressState: number;
 
         if (address.isRemoved) {
@@ -705,7 +699,7 @@ export class CoreDetailsComponent implements OnInit {
         } else if (address.AddressID === null) {
           addressState = 2; // New address
         } else {
-          addressState = 6; // Modified address
+          addressState = 3; // Modified address
         }
 
         return {
@@ -839,7 +833,7 @@ export class CoreDetailsComponent implements OnInit {
     return new Promise((resolve, reject) => {
       this.logForm.errorMessages(messageKey).subscribe(
         (response) => {
-          const messageWithPlaceholder = response.response.replace("{0}", placeholder);
+          const messageWithPlaceholder = response.response.replace("{0}", placeholder).replace("{1}", );
           this.isLoading = false;
           // Display the popup
           Swal.fire({
@@ -919,7 +913,7 @@ export class CoreDetailsComponent implements OnInit {
     }
 
     // Get all valid addresses
-    const validAddresses = this.firmAddresses.filter(addr => addr.Valid);
+    const validAddresses = this.existingAddresses;
 
     // Check if the selected address type already exists in valid addresses
     const isDuplicate = validAddresses.some(addr => addr.AddressTypeID === selectedAddressTypeId);
@@ -944,6 +938,19 @@ export class CoreDetailsComponent implements OnInit {
       address.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
     }
   }
+
+  getFilteredAddressTypes() {
+    return this.existingAddresses
+       .filter(address => address.AddressTypeID && address.AddressTypeID !== 0) // Exclude blank and '0' entries
+       .map(address => ({
+          AddressTypeID: address.AddressTypeID,
+          AddressTypeDesc: address.AddressTypeDesc
+       }))
+       .filter((value, index, self) =>
+          index === self.findIndex((t) => t.AddressTypeID === value.AddressTypeID)
+       ); // Remove duplicates
+ }
+ 
 
 
   getAddressTypeHistory(addressTypeId: number) {
@@ -976,105 +983,35 @@ export class CoreDetailsComponent implements OnInit {
 
 
   get filteredFirmAddresses() {
-    return this.firmAddresses.filter(addr => !addr.isRemoved);
+    return this.existingAddresses.filter(addr => !addr.isRemoved);
   }
 
 
-  //   addNewAddress(targetArray: any[]): void {
-  //     const totalAddressTypes = this.allAddressTypes.length;
-  //     const validAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
-
-  //     // Check if the number of valid addresses has reached the total number of address types
-  //     if (validAddressCount >= totalAddressTypes) {
-  //       this.canAddNewAddress = false;
-  //       return;
-  //     }
-
-  //    this.newAddress = {
-  //       AddressID: null,
-  //       AddressTypeID: 0,
-  //       AddressTypeDesc: '',
-  //       AddressLine1: '',
-  //       AddressLine2: '',
-  //       AddressLine3: '',
-  //       AddressLine4: '',
-  //       City: '',
-  //       Province: '',
-  //       CountryID: 0,
-  //       CountryName: '',
-  //       PostalCode: '',
-  //       PhoneNumber: '',
-  //       FaxNumber: '',
-  //       LastModifiedBy: 0,
-  //       LastModifiedDate: this.currentDate,
-  //       addressState: 2, // New entry state
-  //       FromDate: null,
-  //       ToDate: null,
-  //       Valid: true,
-  //     };
-
-  //     targetArray.unshift(this.newAddress);
-
-  //     // Update the count of valid addresses in the target array
-  //     const updatedValidAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
-
-  //     // Set whether the button should be disabled based on the new count
-  //     this.canAddNewAddress = updatedValidAddressCount < totalAddressTypes;
-  //   }
-
-  //   onSameAsTypeChange(selectedTypeID: number, targetArray: any[]) {
-  //     const numericTypeID = Number(selectedTypeID);
-  //     if (selectedTypeID && selectedTypeID != 0) {
-  //         this.disableAddressFields = true;
-  //         const selectedAddress = targetArray.find(address => address.AddressTypeID === numericTypeID);
-  //         if (selectedAddress) {
-  //             this.populateNewAddressFields(selectedAddress);
-  //         }
-  //     } else {
-  //         this.disableAddressFields = false;
-  //     }
-  // }
-
-
-  //   populateNewAddressFields(address: any) {
-  //     this.newAddress.AddressLine1 = address.AddressLine1;
-  //     this.newAddress.AddressLine2 = address.AddressLine2;
-  //     this.newAddress.AddressLine3 = address.AddressLine2;
-  //     this.newAddress.AddressLine4 = address.AddressLine2;
-  //     this.newAddress.City = address.City;
-  //     this.newAddress.CountryID = address.CountryID;
-  //     this.newAddress.State = address.State;
-  //     this.newAddress.ZipCode = address.ZipCode;
-  //     this.newAddress.Province = address.Province;
-  //     this.newAddress.PostalCode = address.PostalCode;
-  //     this.newAddress.PhoneNumber = address.PhoneNumber;
-  //     this.newAddress.FaxNumber = address.FaxNumber;
-  //   }
-
-
   addNewAddressOnEditMode() {
-    const { canAddNewAddress, newAddress } = this.firmDetailsService.addNewAddressOnEditMode(this.firmAddresses, this.allAddressTypes, this.currentDate);
+    const { canAddNewAddress, newAddress } = this.firmDetailsService.addNewAddressOnEditMode(this.existingAddresses, this.allAddressTypes, this.currentDate);
     if (newAddress) {
       this.newAddress = newAddress;
       this.canAddNewAddress = canAddNewAddress;
+      this.disableAddressFields = false;
     }
   }
 
   removeAddressOnEditMode(index: number) {
     this.firmDetailsService.removeAddressOnEditMode(
       index,
-      this.firmAddresses,
+      this.existingAddresses,
+      this.removedAddresses,
       this.allAddressTypes.length,
-      this.errorMessages
+      this.errorMessages,
     ).then(({ canAddNewAddress, updatedArray }) => {
       this.canAddNewAddress = canAddNewAddress;
-      this.firmAddresses = updatedArray;
+      this.existingAddresses = updatedArray;
     });
   }
 
-  onSameAsTypeChangeOnEditMode(selectedTypeID: number) {
+  onSameAsTypeChangeOnEditMode(selectedTypeID: number, index: number) {
     this.disableAddressFields = selectedTypeID && selectedTypeID != 0; // Set disableAddressFields here
-    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, this.existingAddresses, this.newAddress);
+    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, index ,this.existingAddresses, this.newAddress);
   }
 
 

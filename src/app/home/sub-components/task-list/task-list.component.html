@@ -145,7 +145,7 @@
               </span>
             </td>
             <td *ngIf="isMainView" style="text-align: center;">
-              <a [href]="item.Link" target="_blank" style="text-decoration: none;">View</a>
+              <a (click)="$event.stopPropagation()" [href]="item.Link" target="_blank" style="text-decoration: none;">{{item.ObjectInstanceNum}}</a>
             </td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">
               <div *ngIf="!isMainView else expandFirmName" class="expandable-text-container">

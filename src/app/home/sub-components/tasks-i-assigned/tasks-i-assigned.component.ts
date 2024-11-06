@@ -68,7 +68,7 @@ export class TasksIAssignedComponent implements OnInit {
       console.log('ShowExportButton value in TasksIAssignedComponent:', this.ShowExportButton);
     });
   }
-  
+
   loadTasksUserAssignedTo(): void {
     this.isLoading = true;
     this.TaskService.getMyTasksAssignedByUser(this.userId).subscribe(
@@ -233,11 +233,11 @@ export class TasksIAssignedComponent implements OnInit {
 
   prepareNoteObject() {
     return {
-        objectID: this.selectedTask[0].ObjectID,
-        objectInstanceID: parseInt(this.selectedTask[0].ObjectInstanceID, 10),
-        objectInstanceRevNum: this.selectedTask[0].ObjectInstanceRevNum,
-        notes: this.noteText,
-        createdBy: this.userId,
+      objectID: this.selectedTask[0].ObjectID,
+      objectInstanceID: parseInt(this.selectedTask[0].ObjectInstanceID, 10),
+      objectInstanceRevNum: this.selectedTask[0].ObjectInstanceRevNum,
+      notes: this.noteText,
+      createdBy: this.userId,
     };
   }
 
@@ -260,22 +260,22 @@ export class TasksIAssignedComponent implements OnInit {
       this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       return; // Prevent further action if validation fails
     }
-  
+
     // Start the note save and task reload in parallel
     const saveNotePromise = this.TaskService.saveReminderNote(note).toPromise();
     const loadTasksPromise = this.TaskService.getMyTasksAssignedByUser(this.userId).toPromise();
-  
+
     Promise.all([saveNotePromise, loadTasksPromise])
       .then(([saveNoteResponse, loadTasksResponse]) => {
         console.log('Note updated successfully:', saveNoteResponse);
-        
+
         // Update the task list after saving the note
         this.TaskUserHaveAssignedTasksTo = loadTasksResponse.response;
         this.filteredTasks = [...this.TaskUserHaveAssignedTasksTo];
         this.totalRows = this.TaskUserHaveAssignedTasksTo.length;
         this.totalPages = Math.ceil(this.totalRows / this.pageSize);
         this.updatePagination();
-  
+
         this.showTaskPopup = false;
         this.isLoading = false;
         this.noteText = '';
@@ -356,7 +356,25 @@ export class TasksIAssignedComponent implements OnInit {
   getErrorMessages(fieldName: string) {
     let errorMessage = 'Please Enter The Note';
     this.errorMessages[fieldName] = errorMessage;
-}
+  }
+
+  redirectBasedOnLink(item: any, event: Event): void {
+    event.preventDefault();
+  
+    const objActItmIdInLink = item.Link.includes('ObjActItmID');
+    if (objActItmIdInLink) {
+      const urlParams = new URLSearchParams(item.Link.split('?')[1]);
+      const objectActItmID = urlParams.get('ObjActItmID');
+  
+      this.router.navigate(['/home/tasks-page/create-reminder'], {
+        state: { objectActItmID }
+      });
+    } else {
+      window.open(item.Link, '_blank');
+    }
+  }
+  
+
 
   exportRowToExcel(event: Event) {
     event.stopPropagation();
@@ -370,7 +388,7 @@ export class TasksIAssignedComponent implements OnInit {
         'Due Date': item.TaskDueDate,
         'Days Over Due': item.DaysOverDue > 0 ? item.DaysOverDue : '',
         'Comments': item.Comments,
-        'Task Assigned To':item.TaskAssignedToUserName,
+        'Task Assigned To': item.TaskAssignedToUserName,
       };
     });
 
@@ -382,6 +400,6 @@ export class TasksIAssignedComponent implements OnInit {
 
     // Export the file and trigger a download
     XLSX.writeFile(workbook, 'Tasks_I_Assigned_table.xlsx');
- }
- 
+  }
+
 }

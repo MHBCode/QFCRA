@@ -42,8 +42,14 @@ export class TaskServiceService {
   }
   getMyTeamsTasks(userId: number, teamUsersID: string, fromDate: string, toDate: string): Observable<any> {
     const url = `${this.baseUrl}get_my_teams_task?userId=${userId}&teamUsersID=${teamUsersID}&fromDate=${fromDate}&toDate=${toDate}`;
-    return this.http.get(url);
+    return this.http.get<any>(url);
   }
+
+  getPersonalRemiderByobjectItm(objActItmID: string): Observable<any> {
+    const url = `${this.baseUrl}get_personal_remider_by_objectItm?ObjectActItmID=${objActItmID}`;
+    return this.http.get<any>(url);
+  }
+
   private showExportButtonSubject = new BehaviorSubject<boolean>(false);
   showExportButton$ = this.showExportButtonSubject.asObservable();
 

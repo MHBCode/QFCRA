@@ -263,7 +263,7 @@
             </td>
 
             <td style="text-align: center;">
-              <a [href]="item.Link" target="_blank" style="text-decoration: none;">View</a>
+              <a (click)="$event.stopPropagation()" [href]="item.Link" target="_blank" style="text-decoration: none;">{{item.ObjectInstanceNum}}</a>
             </td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.FirmName}}</td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{item.ShortDescription}}</td>

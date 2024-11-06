@@ -4,7 +4,7 @@ import { FirmService } from 'src/app/ngServices/firm.service';
 import { TaskServiceService } from 'src/app/ngServices/task-service.service';
 import * as constants from 'src/app/app-constants';
 import Swal from 'sweetalert2';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LogformService } from 'src/app/ngServices/logform.service';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 
@@ -18,6 +18,7 @@ export class CreateReminderComponent implements OnInit {
   @ViewChildren('dateInputs') dateInputs: QueryList<ElementRef<HTMLInputElement>>;
   userId = 30;
   hasValidationErrors: boolean = false;
+  objectActItmID: string;
   /* error messages */
   errorMessages: { [key: string]: string } = {};
 
@@ -29,15 +30,22 @@ export class CreateReminderComponent implements OnInit {
     dueDate: null,
     status: 1,
   }
-  
+
   constructor(
     private TaskService: TaskServiceService,
     private firmDetailsService: FirmDetailsService,
     private logForm: LogformService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
+    const state = history.state;
+    this.objectActItmID = state.objectActItmID;
+
+    if (this.objectActItmID) {
+      this.loadReminderData(this.objectActItmID);
+    }
     this.populateAllFirms();
   }
 
@@ -78,7 +86,7 @@ export class CreateReminderComponent implements OnInit {
       notes: this.createReminder.Notes,
       dueDate: this.convertDateToYYYYMMDD(this.createReminder.dueDate),
       status: this.createReminder.status,
-      objectActItmID: 0,
+      objectActItmID: this.objectActItmID || 0, // If it exists (update existing reminder) then take it else it will take 0 (insert new reminder)
       outparam: 0,
     }
     return personalReminder;
@@ -110,7 +118,11 @@ export class CreateReminderComponent implements OnInit {
 
     const reminder = this.prepareReminderObject();
     this.TaskService.createReminder(reminder).subscribe((data => {
-      this.firmDetailsService.showSaveSuccessAlert(constants.Firm_CoreDetails_Messages.PERSONAL_REMINDER_CREATED);
+      if (this.objectActItmID) {
+        this.firmDetailsService.showSaveSuccessAlert(constants.Firm_CoreDetails_Messages.PERSONAL_REMINDER_UPDATED);
+      } else {
+        this.firmDetailsService.showSaveSuccessAlert(constants.Firm_CoreDetails_Messages.PERSONAL_REMINDER_CREATED);
+      }
       console.log('Reminder Created Successfully: ', data.response);
     }), error => {
       console.error('Faile to create: ', error);
@@ -119,7 +131,7 @@ export class CreateReminderComponent implements OnInit {
 
   cancelReminder() {
     this.router.navigate(['home/tasks-page/assigned-tasks']);
-}
+  }
 
 
   convertDateToYYYYMMDD(dateStr: string | Date): string | null {
@@ -157,5 +169,23 @@ export class CreateReminderComponent implements OnInit {
 
   isNullOrEmpty(value: any): boolean {
     return value === null || value === '';
+  }
+
+  loadReminderData(objectActItmID: string): void {
+    this.TaskService.getPersonalRemiderByobjectItm(objectActItmID).subscribe(
+      (data: any) => {
+        if (data.isSuccess && data.response.length > 0) {
+          const reminderData = data.response[0];
+          this.createReminder.summary = reminderData.ActionItemDesc;
+          this.createReminder.FirmID = reminderData.FirmID;
+          this.createReminder.Notes = reminderData.ActionItemNotes;
+          this.createReminder.dueDate = reminderData.Column1; // date
+          this.createReminder.status = reminderData.ActionItemStatusTypeID;
+        }
+      },
+      error => {
+        console.error('Error fetching reminder data:', error);
+      }
+    );
   }
 } 

@@ -2460,7 +2460,7 @@
         (!address.AddressID || address.AddressID === '')
       ">
                   <label for="sameAsType"> Same As Type </label>
-                  <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChangeOnEditMode($event)"
+                  <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChangeOnEditMode($event,i)"
                     name="sameAsType" id="sameAsType">
                     <option value="0">Select</option>
                     <option *ngFor="let type of existingControllerAddresses" [value]="type.AddressTypeID">

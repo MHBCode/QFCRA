@@ -40,13 +40,9 @@ export class ControllersComponent implements OnInit {
   AllRegulater: any = [];
   Address: any = {};
   allCountries: any = [];
-  allAddressTypes: any = [];
   hideForms: boolean = true;
   selectedController: any;
   isPopupOpen = false;
-  callAddressType: boolean = false;
-  ControllerfirmAddresses: any = [];
-  existingControllerAddresses: any = [];
   showCreateControllerSection: boolean = false;
   CorporateControllerEdit: any[] = [];
   legalStatusOptionsEdit: any[] = [];
@@ -61,7 +57,14 @@ export class ControllersComponent implements OnInit {
 
 
   // Addresses
+  callAddressType: boolean = false;
+  invalidAddress: boolean;
+  ControllerfirmAddresses: any = [];
+  existingControllerCorporateAddresses: any = [];
   controllerFirmAddressesTypeHistory: any = [];
+  allAddressTypes: any = [];
+  removedAddresses = [];
+  defaultAddress = this.createDefaultAddress();
   // used variables on edit mode
   newAddressOnEdit: any = {};
   canAddNewAddressOnEdit: boolean = true;
@@ -222,7 +225,7 @@ export class ControllersComponent implements OnInit {
           LastModifiedByOfOtherEntity: 30,
           isPEP: this.CreatecontrollerDetails.isPEP,
         },
-        addressList: this.existingControllerAddresses.map(address => ({
+        addressList: this.addedAddresses.map(address => ({
           firmID: this.firmId,
           countryID: 16,
           addressTypeID: 2,
@@ -362,7 +365,7 @@ export class ControllersComponent implements OnInit {
           },
           lstContactFunctions: null,
         },
-        Addresses: this.existingControllerAddresses.map(address => ({
+        Addresses: this.existingControllerCorporateAddresses.map(address => ({
           firmID: this.firmId,
           countryID: address.CountryID,
           AddressTypeID: address.AddressTypeID,
@@ -793,7 +796,6 @@ export class ControllersComponent implements OnInit {
 
 
   editController(): void {
-    this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
     this.isEditable = true;
   }
 
@@ -857,7 +859,7 @@ export class ControllersComponent implements OnInit {
       data => {
         if (data.response) {
           this.ControllerfirmAddresses = data.response;
-        
+          this.existingControllerCorporateAddresses = this.ControllerfirmAddresses.filter(addr => addr.Valid);
           console.log('Controller Corporate Firm Addresses:', this.ControllerfirmAddresses);
         } else {
           console.warn('No addresses found for this firm');
@@ -900,6 +902,21 @@ export class ControllersComponent implements OnInit {
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  get filteredControllerCorporateAddresses() {
+    return this.existingControllerCorporateAddresses.filter(addr => !addr.isRemoved);
+  }
+
+  getFilteredAddressTypes() {
+    return this.existingControllerCorporateAddresses
+      .filter(address => address.AddressTypeID && address.AddressTypeID !== 0) // Exclude blank and '0' entries
+      .map(address => ({
+        AddressTypeID: address.AddressTypeID,
+        AddressTypeDesc: address.AddressTypeDesc
+      }))
+      .filter((value, index, self) =>
+        index === self.findIndex((t) => t.AddressTypeID === value.AddressTypeID)
+      ); // Remove duplicates
+  }
 
   onAddressTypeChangeOnEditMode(event: any, address: any) {
     const selectedAddressTypeId = Number(event.target.value);
@@ -912,7 +929,7 @@ export class ControllersComponent implements OnInit {
     }
 
     // Get all valid addresses
-    const validAddresses = this.ControllerfirmAddresses.filter(addr => addr.Valid);
+    const validAddresses = this.existingControllerCorporateAddresses;
 
     // Check if the selected address type already exists in valid addresses
     const isDuplicate = validAddresses.some(addr => addr.AddressTypeID === selectedAddressTypeId);
@@ -941,28 +958,30 @@ export class ControllersComponent implements OnInit {
 
 
   addNewAddressOnEditMode() {
-    const { canAddNewAddress, newAddress } = this.firmDetailsService.addNewAddressOnEditMode(this.ControllerfirmAddresses, this.allAddressTypes, this.currentDate);
+    const { canAddNewAddress, newAddress } = this.firmDetailsService.addNewAddressOnEditMode(this.existingControllerCorporateAddresses, this.allAddressTypes, this.currentDate);
     if (newAddress) {
       this.newAddressOnEdit = newAddress;
       this.canAddNewAddressOnEdit = canAddNewAddress;
+      this.disableAddressFieldsOnEdit = false;
     }
   }
 
   removeAddressOnEditMode(index: number) {
     this.firmDetailsService.removeAddressOnEditMode(
       index,
-      this.ControllerfirmAddresses,
+      this.existingControllerCorporateAddresses,
+      this.removedAddresses,
       this.allAddressTypes.length,
       this.errorMessages
     ).then(({ canAddNewAddress, updatedArray }) => {
       this.canAddNewAddressOnEdit = canAddNewAddress;
-      this.ControllerfirmAddresses = updatedArray;
+      this.existingControllerCorporateAddresses = updatedArray;
     });
   }
 
-  onSameAsTypeChangeOnEditMode(selectedTypeID: number) {
+  onSameAsTypeChangeOnEditMode(selectedTypeID: number, index: number) {
     this.disableAddressFieldsOnEdit = selectedTypeID && selectedTypeID != 0; // Set disableAddressFields here
-    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, this.existingControllerAddresses, this.newAddressOnEdit);
+    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, index, this.existingControllerCorporateAddresses, this.newAddressOnEdit);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1060,9 +1079,9 @@ export class ControllersComponent implements OnInit {
     this.checkCanAddNewAddressOnCreateMode();
   }
 
-  getAddressTypeHistory(addressTypeId: number,entityTypeId: number,entityId: number) {
+  getAddressTypeHistory(addressTypeId: number, entityTypeId: number, entityId: number) {
     this.callAddressType = true;
-    this.addressService.getAddressesTypeHistory(null, addressTypeId,entityTypeId,entityId).subscribe(
+    this.addressService.getAddressesTypeHistory(null, addressTypeId, entityTypeId, entityId).subscribe(
       data => {
         this.controllerFirmAddressesTypeHistory = data.response;
       }, error => {
@@ -1136,7 +1155,6 @@ export class ControllersComponent implements OnInit {
 
       this.loadControllerIndividualDetails(firmId, functionTypeId, contactId, contactAssId);
     }
-    this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
     this.parentEntity.getRegulatorDetails(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID).subscribe(
       data => {
         if (data.response && data.response.length > 0) {
@@ -1175,15 +1193,16 @@ export class ControllersComponent implements OnInit {
     this.isEditable = false;
     this.errorMessages = {}; // Clear previous error messages
     this.hasValidationErrors = false;
-    this.ControllerfirmAddresses = [this.createDefaultAddress()];
+    this.existingControllerCorporateAddresses.push(this.defaultAddress);
   }
+
   closeCreateControllerPopup(): void {
     this.isEditable = false;
     this.showCreateControllerSection = false; // Close the popup
     this.errorMessages = {}; // Clear previous error messages
     this.hasValidationErrors = false;
     this.hideForms = true;
-    this.addedAddresses = [this.createDefaultAddress()];
+    this.addedAddresses.push(this.defaultAddress);
     this.CreatecontrollerDetails = this.createDefaultControllerDetails();
   }
 
@@ -1348,8 +1367,7 @@ export class ControllersComponent implements OnInit {
   }
 
   saveControllerPopupChanges(): void {
-
-    this.existingControllerAddresses = this.ControllerfirmAddresses.filter(address => address.Valid);
+    this.isLoading = true;
     this.EditControllerValidateForm();
     if (this.hasValidationErrors) {
       this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
@@ -1403,7 +1421,7 @@ export class ControllersComponent implements OnInit {
           AssnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
           LastModifiedByOfOtherEntity: this.userId,
         },
-        addressList: this.existingControllerAddresses.map(address => {
+        addressList: [...this.existingControllerCorporateAddresses, ...this.removedAddresses].map(address => {
           let addressState: number;
 
           if (address.isRemoved) {
@@ -1411,7 +1429,7 @@ export class ControllersComponent implements OnInit {
           } else if (address.AddressID === null) {
             addressState = 2; // New address
           } else {
-            addressState = 6; // Modified address
+            addressState = 3; // Modified address
           }
 
           return {
@@ -1488,11 +1506,14 @@ export class ControllersComponent implements OnInit {
       this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
         response => {
           console.log("Save successful:", response);
+          this.isLoading = false;
           this.isEditable = false;
+          this.closeControllerPopup();
           this.getPlaceOfEstablishmentName();
           this.firmDetailsService.showSaveSuccessAlert(constants.ControllerMessages.RECORD_MODIFIED);
         },
         error => {
+          this.isLoading = false;
           console.error("Error saving changes:", error);
         }
       );
@@ -1579,46 +1600,16 @@ export class ControllersComponent implements OnInit {
         response => {
           console.log("Contact save successful:", response);
           this.isEditable = false;
+          this.isLoading = false;
         },
         error => {
           console.error("Error saving contact:", error);
+          this.isLoading = false;
         }
       );
     }
   }
 
-  // removeControllerAddress(index: number) {
-  //   Swal.fire({
-  //     text: 'Are you sure you want to delete this record?',
-  //     icon: 'warning',
-  //     showCancelButton: true,
-  //     confirmButtonText: 'Ok',
-  //     cancelButtonText: 'Cancel',
-  //     reverseButtons: false
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       this.errorMessages = {};
-  //       if (index > -1 && index < this.ControllerfirmAddresses.length) {
-  //         const address = this.ControllerfirmAddresses[index];
-  //         if (!address.AddressID) { // means newly added address
-  //           // If the address doesn't have an AddressID, completely remove it from the array
-  //           this.ControllerfirmAddresses.splice(index, 1);
-  //         } else {
-  //           // Otherwise, just mark it as removed
-  //           address.isRemoved = true;
-  //         }
-  //         // Re-check if all address types have been added after removal
-  //         const validAddressCount = this.ControllerfirmAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
-  //         this.canAddNewAddress = validAddressCount < this.allAddressTypes.length;
-  //       }
-  //     }
-  //     // No action needed if the user cancels
-  //   });
-  // }
-
-  get filteredControllerfirmAddresses() {
-    return this.ControllerfirmAddresses.filter(addr => !addr.isRemoved);
-  }
 
   getPlaceOfEstablishmentName(): string {
     const place = this.allCountries.find(option => option.CountryID === parseInt(this.selectedController.CountryOfIncorporation));
@@ -1687,6 +1678,15 @@ export class ControllersComponent implements OnInit {
             this.loadErrorMessages('PctOfShares', constants.ControllerMessages.ENTER_VALID_PERCENTAGE);
             this.hasValidationErrors = true;
           }
+        }
+
+        // ADDRESS TYPE VALIDATION
+        this.invalidAddress = this.existingControllerCorporateAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
+        if (this.invalidAddress) {
+          this.loadErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
+          this.hasValidationErrors = true;
+        } else {
+          delete this.errorMessages['AddressTypeID'];
         }
 
         // Check if there are any validation errors

@@ -21,6 +21,11 @@ export class AddressesService {
     return this.http.get<any>(url);
   }
 
+  getContactFirmAddresses(contactAssId: number,userId: number,opTypeId: number,): Observable<any> {
+    const url = `${this.baseUrlAddress}get_address_list?contactAssnId=${contactAssId}&userId=${userId}&opTypeId=${opTypeId}`;
+    return this.http.get<any>(url);
+  }
+
   getAddressesTypeHistory(firmId: number | null, addressTypeId: number, entityTypeId: number | null, entityId: number | null) {
     let url = `${this.baseUrlAddress}get_address_type_history?addressTypeId=${addressTypeId}&valId=false`;
     

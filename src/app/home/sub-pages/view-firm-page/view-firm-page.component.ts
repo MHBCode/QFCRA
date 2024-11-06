@@ -107,6 +107,7 @@ export class ViewFirmPageComponent implements OnInit {
   LicenseStatusTypeLabelDescFormatted: any;
   existingAddresses: any = [];
   existingControllerAddresses: any = [];
+  removedAddresses: any[];
   firmApp: any = {};
   firmOPDetails: any;
   prudReturnTypesDropdown: any = [];
@@ -3472,6 +3473,7 @@ export class ViewFirmPageComponent implements OnInit {
     this.firmDetailsService.removeAddressOnEditMode(
       index,
       this.ControllerfirmAddresses,
+      this.removedAddresses,
       this.allAddressTypes.length,
       this.errorMessages
     ).then(({ canAddNewAddress, updatedArray }) => {
@@ -3516,9 +3518,9 @@ export class ViewFirmPageComponent implements OnInit {
       address.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
     }
   }
-  onSameAsTypeChangeOnEditMode(selectedTypeID: number) {
+  onSameAsTypeChangeOnEditMode(selectedTypeID: number, index: number) {
     this.disableAddressFieldsOnEdit = selectedTypeID && selectedTypeID != 0; // Set disableAddressFields here
-    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, this.existingControllerAddresses, this.newAddressOnEdit);
+    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, index ,this.existingControllerAddresses, this.newAddressOnEdit);
   }
   addAddressForm(): void {
     if (this.addressForms.length === 0) {

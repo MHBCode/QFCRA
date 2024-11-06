@@ -464,7 +464,7 @@
     </div>
 
     <!---->
-    <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['addressesSection'] }">
+    <div *ngIf="existingAddresses.length > 0 || isEditModeCore" class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['addressesSection'] }">
         <!--Error messages for addresses-->
         <div class="error-messages">
             <p *ngIf="errorMessages['AddressTypeID']">
@@ -533,10 +533,10 @@
               (!address.AddressID || address.AddressID === '')
             ">
                         <label for="sameAsType"> Same As Type </label>
-                        <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChangeOnEditMode($event)"
+                        <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChangeOnEditMode($event,i)"
                             name="sameAsType" id="sameAsType">
                             <option value="0">Select</option>
-                            <option *ngFor="let type of existingAddresses" [value]="type.AddressTypeID">
+                            <option *ngFor="let type of getFilteredAddressTypes()" [value]="type.AddressTypeID">
                                 {{ type.AddressTypeDesc }}
                             </option>
                         </select>
@@ -546,42 +546,42 @@
                         <label for="addressLine1"> Address Line 1 </label>
                         <input type="text" [disabled]="
                 !isEditModeCore ||
-                (disableAddressFields && !address.AddressID)
+                (address.isFieldsDisabled && !address.AddressID)
               " name="addressLine1" id="addressLine1" [(ngModel)]="address.AddressLine1" />
                     </div>
                     <div class="input-field">
                         <label for="addressLine2"> Address Line 2 </label>
                         <input [disabled]="
                 !isEditModeCore ||
-                (disableAddressFields && !address.AddressID)
+                (address.isFieldsDisabled && !address.AddressID)
               " name="addressLine2" id="addressLine2" type="text" [(ngModel)]="address.AddressLine2" />
                     </div>
                     <div class="input-field">
                         <label for="addressLine3"> Address Line 3 </label>
                         <input [disabled]="
                 !isEditModeCore ||
-                (disableAddressFields && !address.AddressID)
+                (address.isFieldsDisabled && !address.AddressID)
               " name="addressLine3" id="addressLine3" type="text" [(ngModel)]="address.AddressLine3" />
                     </div>
                     <div class="input-field">
                         <label for="addressLine4"> Address Line 4 </label>
                         <input [disabled]="
                 !isEditModeCore ||
-                (disableAddressFields && !address.AddressID)
+                (address.isFieldsDisabled && !address.AddressID)
               " name="addressLine4" id="addressLine4" type="text" [(ngModel)]="address.AddressLine4" />
                     </div>
                     <div class="input-field">
                         <label for="city"> City </label>
                         <input [disabled]="
                 !isEditModeCore ||
-                (disableAddressFields && !address.AddressID)
+                (address.isFieldsDisabled && !address.AddressID)
               " name="city" id="city" type="text" [(ngModel)]="address.City" />
                     </div>
                     <div class="input-field">
                         <label for="state"> state/province </label>
                         <input [disabled]="
                 !isEditModeCore ||
-                (disableAddressFields && !address.AddressID)
+                (address.isFieldsDisabled && !address.AddressID)
               " name="state" id="state" type="text" [(ngModel)]="address.Province" />
                     </div>
                     <div class="input-field" *ngIf="!isEditModeCore">
@@ -593,7 +593,7 @@
                         <label for="country"> Country </label>
                         <select [disabled]="
                 !isEditModeCore ||
-                (disableAddressFields && !address.AddressID)
+                (address.isFieldsDisabled && !address.AddressID)
               " [(ngModel)]="address.CountryID">
                             <option *ngFor="let option of allCountries" [value]="option.CountryID">
                                 {{ option?.CountryName }}
@@ -604,21 +604,21 @@
                         <label for="zip"> Zip/Postal Code </label>
                         <input [disabled]="
                 !isEditModeCore ||
-                (disableAddressFields && !address.AddressID)
+                (address.isFieldsDisabled && !address.AddressID)
               " name="zip" id="zip" type="text" [(ngModel)]="address.PostalCode" />
                     </div>
                     <div class="input-field">
                         <label for="phone"> Phone </label>
                         <input [disabled]="
                 !isEditModeCore ||
-                (disableAddressFields && !address.AddressID)
+                (address.isFieldsDisabled && !address.AddressID)
               " name="phone" id="phone" type="text" [(ngModel)]="address.PhoneNumber" />
                     </div>
                     <div class="input-field">
                         <label for="fax"> Fax </label>
                         <input [disabled]="
                 !isEditModeCore ||
-                (disableAddressFields && !address.AddressID)
+                (address.isFieldsDisabled && !address.AddressID)
               " name="fax" id="fax" type="text" [(ngModel)]="address.FaxNumber" />
                     </div>
                     <hr *ngIf="i < firmAddresses.length - 1" />
