@@ -13,26 +13,44 @@
             </div>
             <table>
                 <thead>
-                    <tr>
-                        <th>Ver</th>
-                        <th>Report</th>
-                        <th>Report Period Start Date</th>
-                        <th>Report Period End Date</th>
-                        <th>Received Date</th>
-                        <th>Review Status Date</th>
-                    </tr>
+                  <tr>
+                    <th>Ver</th>
+                    <th>Report</th>
+                    <th>Report Period Start Date</th>
+                    <th>Report Period End Date</th>
+                    <th>Received Date</th>
+                    <th>Review Status</th>
+                    <th>Review Status Date</th>
+                  </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Ver</td>
-                        <td>Report</td>
-                        <td>Report Period Start Date</td>
-                        <td>Report Period End Date</td>
-                        <td>Received Date</td>
-                        <td>Review Status Date</td>
-                    </tr>
+                  <tr *ngFor="let ReturnreView of paginatedFirms">
+                    <td>{{ReturnreView.RptReviewRevNum}}</td>
+                    <td>{{ReturnreView.ReportName}}</td>
+                    <td>{{ReturnreView.PeriodFrom}}</td>
+                    <td>{{ReturnreView.PeriodTo}}</td>
+                    <td>{{ReturnreView.ReceivedDate}}</td>
+                    <td>{{ReturnreView.ReviewStatus}}</td>
+                    <td>{{ReturnreView.ReviewStatusDate}}</td>
+                  </tr>
                 </tbody>
-            </table>
+                <tfoot>
+                  <tr>
+                    <td [attr.colspan]="7">
+                      <div class="pagination">
+                        <button (click)="previousPage()" [disabled]="currentPage === 1">
+                          <span>&lt;</span>
+                        </button>
+                        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                        <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+                          <span>&gt;</span>
+                        </button>
+                        <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
         </div>
     </div>
 </div>

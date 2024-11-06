@@ -9,7 +9,9 @@ import { environment } from 'src/environments/environment';
 export class FirmService {
 
   private baseUrlFirms = environment.API_URL + '/api/Firms/';  // Base URL
- 
+  private returnViewUrl = environment.API_URL + '/api/ReturnView/';  
+
+
   constructor(private http: HttpClient) { }
 
   getFIRMOPData(firmId: number): Observable<any> {
@@ -182,5 +184,10 @@ export class FirmService {
     const url = `${this.baseUrlFirms}is_firm_authorised?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
-
+  
+  // Return Review > supervision
+  getReturnReviewList(firmId: number): Observable<any> {
+    const url = `${this.returnViewUrl}get_report_reviewed_list?firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
 }
