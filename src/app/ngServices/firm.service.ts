@@ -157,24 +157,30 @@ export class FirmService {
   }
 
   // supervision pages
-  
+
   getClientClassification(firmId: number): Observable<any> {
-    const url = `${this.baseUrlFirms}get_client_classification?firmId=${firmId}`;  //https://localhost:7091/api/Firms/get_admin_fee_list?firmId=66
+    const url = `${this.baseUrlFirms}get_client_classification?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
 
   getOperationalData(firmId: number): Observable<any> {
-    const url = `${this.baseUrlFirms}get_operational_data?firmId=${firmId}`;  //https://localhost:7091/api/Firms/get_admin_fee_list?firmId=66
+    const url = `${this.baseUrlFirms}get_operational_data?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
 
   getRPTBasis(firmId: number): Observable<any> {
-    const url = `${this.baseUrlFirms}get_firm_prt_basis?firmId=${firmId}`;  //https://localhost:7091/api/Firms/get_admin_fee_list?firmId=66
+    const url = `${this.baseUrlFirms}get_firm_prt_basis?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
 
   getSupervisionCategory(firmId: number): Observable<any> {
-    const url = `${this.baseUrlFirms}get_sup_category_details?firmId=${firmId}`;  //https://localhost:7091/api/Firms/get_admin_fee_list?firmId=66
+    const url = `${this.baseUrlFirms}get_sup_category_details?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
+
+  checkisFirmAuthorised(firmId: number): Observable<any> {
+    const url = `${this.baseUrlFirms}is_firm_authorised?firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
+
 }

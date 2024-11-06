@@ -1,6 +1,6 @@
-<!-- <div *ngIf="isLoading" class="loader-overlay">
+<div *ngIf="isLoading" class="loader-overlay">
     <div class="loader"></div>
-  </div> -->
+  </div>
 
 <div class="form-section">
     <div class="inputs-field-set">
@@ -19,9 +19,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>01/Jan/2023</td>
-                        <td>05/Jan/2023</td>
+                    <tr *ngFor="let rpt of rptSchedule">
+                        <td>{{rpt.FirmRptFrom}}</td>
+                        <td>{{rpt.FirmRptTo}}</td>
                     </tr>
                 </tbody>
             </table>
