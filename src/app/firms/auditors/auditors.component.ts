@@ -133,6 +133,7 @@ export class AuditorsComponent {
   }
   viewAuditor(auditor: any) {
     this.selectedAuditor = auditor; // Set the selected auditor
+    console.log("selectedAuditor",this.selectedAuditor)
     this.IsViewAuditorVisible = true; // Show view section
     this.IsEditAuditorVisible = false; // Hide edit section
     this.IsCreateAuditorVisible = false; // Hide create section
@@ -199,7 +200,7 @@ export class AuditorsComponent {
       RelatedEntityID: this.selectedAuditor.RelatedEntityID, // Yazan ?? 
       EntitySubTypeID: this.selectedAuditor.EntitySubTypeID || 0,
       EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeDesc,
-      // erorr
+      EntityTypeID: 1,
       RelatedEntityTypeID: 3, // Yazan ??
       RelatedEntityEntityID: this.selectedAuditor.OtherEntityID, // Yazan ?? 
       MyState: 2,
@@ -259,52 +260,148 @@ export class AuditorsComponent {
     const selectedAuditorID = event.target.value;
 
     if (selectedAuditorID === 'other') {
-      this.selectedAuditor.OtherEntityID = 'other';
-      this.selectedAuditor.customAuditorName = ''; // Reset the custom name input
+      this.CreateAuditorObj.OtherEntityName = 'other';
+      this.CreateAuditorObj.customAuditorName = ''; // Reset the custom name input
     } else {
-      const selectedAuditor = this.firmAuditorName.find(name => name.OtherEntityID === selectedAuditorID);
-      this.selectedAuditor.OtherEntityID = selectedAuditorID;
-      this.selectedAuditor.OtherEntityName = selectedAuditor?.OtherEntityName;
-      this.selectedAuditor.customAuditorName = null; // Clear custom auditor name if not 'other'
+      const selectedAuditor = this.firmAuditorName.find(name => name.OtherEntityName === selectedAuditorID);
+      this.CreateAuditorObj.OtherEntityName = selectedAuditorID;
+      this.CreateAuditorObj.OtherEntityName = selectedAuditor?.OtherEntityName;
+      this.CreateAuditorObj.customAuditorName = null; // Clear custom auditor name if not 'other'
     }
   }
   CreateAuditorValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.errorMessages = {};
       this.hasValidationErrors = false;
-
-      if (this.selectedAuditor.OtherEntityID === 'other') {
-        if (!this.selectedAuditor.customAuditorName || this.selectedAuditor.customAuditorName.trim() === '') {
+  
+      // Map existing auditor names to a lowercase array for case-insensitive comparison
+      const existingAuditorNames = this.filteredAuditors
+        .map(auditor => auditor.OtherEntityName?.toLowerCase())
+        .filter(name => name); // Remove any undefined names
+  
+      // Validate dropdown selection or custom auditor name
+      if (this.CreateAuditorObj.OtherEntityName === 'other') {
+        // Custom auditor name validation
+        if (!this.CreateAuditorObj.customAuditorName || this.CreateAuditorObj.customAuditorName.trim() === '') {
           this.loadErrorMessages('customAuditorName', constants.AuditorsMessages.Select_Auditor_Name);
           this.hasValidationErrors = true;
-        } else if (
-          this.FIRMAuditors.some(
-            auditor => auditor.OtherEntityName?.toLowerCase() === this.selectedAuditor.customAuditorName?.toLowerCase()
-          )
-        ) {
+        } else if (existingAuditorNames.includes(this.CreateAuditorObj.customAuditorName.toLowerCase())) {
           this.loadErrorMessages('customAuditorName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
           this.hasValidationErrors = true;
         }
       } else {
-        if (!this.selectedAuditor.OtherEntityID) {
-          this.loadErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
+        // Directly validate selected auditor name to prevent duplicates
+        const selectedAuditorName = this.CreateAuditorObj.OtherEntityName?.toLowerCase();
+        
+        if (!selectedAuditorName) {
+          this.loadErrorMessages('auditorName', constants.AuditorsMessages.Select_Auditor_Name);
+          this.hasValidationErrors = true;
+        } else if (existingAuditorNames.includes(selectedAuditorName)) {
+          this.loadErrorMessages('auditorName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
           this.hasValidationErrors = true;
         }
       }
-      // Validate 'EntitySubTypeID'
-      if (!this.selectedAuditor.EntitySubTypeID && this.selectedAuditor.EntitySubTypeID === undefined) {
+  
+      // Additional validations (same as before)
+      if (!this.CreateAuditorObj.EntitySubTypeID) {
         this.loadErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
         this.hasValidationErrors = true;
       }
-      if ( this.firmService.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined) {
+  
+      if (this.firmService.isNullOrEmpty(this.CreateAuditorObj.AssnDateFrom)) {
         this.loadErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
         this.hasValidationErrors = true;
       }
-      if (this.dateUtilService.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.dateUtilService.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)) {
+  
+      if (this.CreateAuditorObj.AssnDateTo && 
+          this.dateUtilService.convertDateToYYYYMMDD(this.CreateAuditorObj.AssnDateFrom) >= this.dateUtilService.convertDateToYYYYMMDD(this.CreateAuditorObj.AssnDateTo)) {
         this.loadErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
         this.hasValidationErrors = true;
       }
+  
+      // Resolve or reject the promise based on validation results
+      if (this.hasValidationErrors) {
+        reject();
+      } else {
+        resolve();
+      }
     });
+  }
+  
+  // CreateAuditorValidateForm(): Promise<void> {
+  //   return new Promise<void>((resolve, reject) => {
+  //     this.errorMessages = {};
+  //     this.hasValidationErrors = false; 
+
+  //     if (this.selectedAuditor.OtherEntityID === 'other') {
+  //       if (!this.selectedAuditor.customAuditorName || this.selectedAuditor.customAuditorName.trim() === '') {
+  //         this.loadErrorMessages('customAuditorName', constants.AuditorsMessages.Select_Auditor_Name);
+  //         this.hasValidationErrors = true;
+  //       } else if (
+  //         this.FIRMAuditors.some(
+  //           auditor => auditor.OtherEntityName?.toLowerCase() === this.selectedAuditor.customAuditorName?.toLowerCase()
+  //         )
+  //       ) {
+  //         this.loadErrorMessages('customAuditorName', constants.AuditorsMessages.Selected_Auditor_Name_already_Exsists);
+  //         this.hasValidationErrors = true;
+  //       }
+  //     } else {
+  //       if (!this.selectedAuditor.OtherEntityID) {
+  //         this.loadErrorMessages('OtherEntityName', constants.AuditorsMessages.Select_Auditor_Name);
+  //         this.hasValidationErrors = true;
+  //       }
+  //     }
+  //     // Validate 'EntitySubTypeID'
+  //     if (!this.selectedAuditor.EntitySubTypeID && this.selectedAuditor.EntitySubTypeID === undefined) {
+  //       this.loadErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
+  //       this.hasValidationErrors = true;
+  //     }
+  //     if ( this.firmService.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined) {
+  //       this.loadErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
+  //       this.hasValidationErrors = true;
+  //     }
+  //     if (this.dateUtilService.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom) >= this.dateUtilService.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo)) {
+  //       this.loadErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
+  //       this.hasValidationErrors = true;
+  //     }
+  //   });
+  // }
+  CreateAuditorObj = {
+    CreatedBy: this.userId,
+    EntitySubTypeID: 0,
+    EntitySubTypeDesc: "",
+    RelatedEntityEntityID: null,
+    MyState: 2,
+    LastModifiedByOfOtherEntity: this.userId,
+    OtherEntityName: "",
+    DateOfIncorporation: null,
+    LegalStatusTypeID: null,
+    PlaceOfIncorporation: null,
+    CountryOfIncorporation: null,
+    RegisteredNumber: null,
+    ZebSiteAddress: null,
+    LastModifiedDate: this.currentDate,
+    lastModifiedBy: this.userId,
+    relatedEntityTypeID: 3,
+    IsAuditor: 2,
+    isCompanyRegulated: true,
+    additionalDetails: null,
+    isParentController: true,
+    isPublicallyTraded: true,
+    areAnyUBOs: true,
+    controllerInfo: null,
+    output: 0,
+    firmId: this.firmId,
+    EntityTypeID: 1,
+    entityID: this.firmId,
+    controllerControlTypeID: null,
+    customAuditorName:'',
+    numOfShares: 0,
+    pctOfShares: 0,
+    majorityStockHolder: true,
+    AssnDateFrom: "",
+    AssnDateTo:"",
+    LastModifiedByOfRelatedEntity: this.userId,
   }
   saveCreateAuditor() {
     try {
@@ -322,12 +419,12 @@ export class AuditorsComponent {
         OtherEntityID: null,
         CreatedBy: this.userId,
         RelatedEntityID: null,
-        EntitySubTypeID: this.selectedAuditor.EntitySubTypeID,
-        EntitySubTypeDesc: this.selectedAuditor.EntitySubTypeDesc,
+        EntitySubTypeID: this.CreateAuditorObj.EntitySubTypeID,
+        EntitySubTypeDesc: this.CreateAuditorObj.EntitySubTypeDesc,
         RelatedEntityEntityID: null,
         MyState: 2,
         LastModifiedByOfOtherEntity: 30,
-        OtherEntityName: this.selectedAuditor.OtherEntityID === 'other' ? this.selectedAuditor.customAuditorName : this.selectedAuditor.OtherEntityID,
+        OtherEntityName: this.CreateAuditorObj.OtherEntityName === 'other' ? this.CreateAuditorObj.customAuditorName : this.CreateAuditorObj.OtherEntityName,
         DateOfIncorporation: null,
         LegalStatusTypeID: null,
         PlaceOfIncorporation: null,
@@ -352,8 +449,8 @@ export class AuditorsComponent {
         numOfShares: 0,
         pctOfShares: 0,
         majorityStockHolder: true,
-        assnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateFrom),
-        assnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.selectedAuditor.AssnDateTo),
+        assnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.CreateAuditorObj.AssnDateFrom),
+        assnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.CreateAuditorObj.AssnDateTo),
         LastModifiedByOfRelatedEntity: 30,
       };
       console.log("selectedAuditor.OtherEntityName:", this.selectedAuditor.OtherEntityName, this.selectedAuditor.customAuditorName)

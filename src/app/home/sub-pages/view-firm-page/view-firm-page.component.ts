@@ -3437,7 +3437,7 @@ export class ViewFirmPageComponent implements OnInit {
     const selectedControllerType = this.controllerTypeOption.find(
       controllerType => controllerType.EntityTypeDesc === selectedEntityTypeDesc
     );
-
+ 
     if (selectedControllerType) {
       this.CreatecontrollerDetails.EntityTypeID = selectedControllerType.EntityTypeID;
     }

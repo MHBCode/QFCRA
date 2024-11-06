@@ -45,7 +45,7 @@ export enum FirmAuthorizationApplStatusType {
     Authorised = 13,
     AuthorisedWithdrawnVoluntary = 14,
     AuthorisedWithdrawnInvoluntary = 15
-}
+} 
 export enum AuditorsMessages {
     Select_Auditor_Name = 3901,
     Selected_Auditor_Name_already_Exsists = 3903,

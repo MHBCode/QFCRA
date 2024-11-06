@@ -167,8 +167,11 @@
       </div>
       <div class="error-messages">
         <!-- Auditor Name Error -->
-        <p *ngIf="errorMessages['OtherEntityName']">
-          {{ errorMessages['OtherEntityName'] }}
+        <p *ngIf="errorMessages['auditorName']">
+          {{ errorMessages['auditorName'] }}
+        </p>
+        <p *ngIf="errorMessages['customAuditorName']">
+          {{ errorMessages['customAuditorName'] }}
         </p>
         <!-- Auditor Type Error -->
         <p *ngIf="errorMessages['EntitySubTypeID']">
@@ -187,28 +190,28 @@
             <label for="auditorName">
               Auditor Name <span style="color: red">*</span>
             </label>
-            <select name="auditorName" id="auditorName" [(ngModel)]="selectedAuditor.OtherEntityID"
+            <select name="auditorName" id="auditorName" [(ngModel)]="CreateAuditorObj.OtherEntityName"
               (change)="onAuditorChange($event)">
-              <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityID">
+              <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityName">
                 {{ name.OtherEntityName }}
               </option>
               <option value="other">Other</option>
             </select>
           </div>
 
-          <div class="input-field" *ngIf="selectedAuditor.OtherEntityID === 'other'">
+          <div class="input-field" *ngIf="CreateAuditorObj.OtherEntityName === 'other'">
             <label for="customAuditorName">
               Custom Auditor Name <span style="color: red">*</span>
             </label>
             <input id="customAuditorName" name="customAuditorName" type="text"
-              [(ngModel)]="selectedAuditor.customAuditorName" placeholder="Enter Custom Auditor Name" />
+              [(ngModel)]="CreateAuditorObj.customAuditorName" placeholder="Enter Custom Auditor Name" />
           </div>
 
           <div class="input-field">
             <label for="auditorType">
               Auditor Type <span style="color: red">*</span>
             </label>
-            <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID">
+            <select name="auditorType" id="auditorType" [(ngModel)]="CreateAuditorObj.EntitySubTypeID">
               <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">
                 {{ type.EntitySubTypeDesc }}
               </option>
@@ -218,12 +221,12 @@
             <label for="address2">
               Effective From Date <span style="color: red">*</span>
             </label>
-            <input name="effectiveFromDate" [(ngModel)]="selectedAuditor.AssnDateFrom" id="effectiveFromDate"
+            <input name="effectiveFromDate" [(ngModel)]="CreateAuditorObj.AssnDateFrom" id="effectiveFromDate"
               type="text" #dateInputs placeholder/>
           </div>
           <div class="input-field">
             <label for="effectiveToDate"> Effective To Date </label>
-            <input name="effectiveToDate" [(ngModel)]="selectedAuditor.AssnDateTo" id="effectiveToDate" type="text"
+            <input name="effectiveToDate" [(ngModel)]="CreateAuditorObj.AssnDateTo" id="effectiveToDate" type="text"
               #dateInputs placeholder/>
           </div>
         </div>
