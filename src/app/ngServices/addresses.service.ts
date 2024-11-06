@@ -11,10 +11,15 @@ export class AddressesService {
 
   constructor(private http: HttpClient) { }
 
-  getControllerFirmAddresses(entityID: number, entityTypeID: number, userId: number, opTypeId: number): Observable<any> {
+  getControllerCorporateFirmAddresses(entityID: number, entityTypeID: number, userId: number, opTypeId: number): Observable<any> {
     const url = `${this.baseUrlAddress}get_address_list?entityTypeId=${entityTypeID}&entityId=${entityID}&userId=${userId}&opTypeId=${opTypeId}`;
     return this.http.get<any>(url);
   }
+
+  // getControllerIndividualFirmAddresses(entityID: number, entityTypeID: number, userId: number, opTypeId: number): Observable<any> {
+  //   const url = `${this.baseUrlAddress}get_address_list?entityTypeId=${entityTypeID}&entityId=${entityID}&userId=${userId}&opTypeId=${opTypeId}`;
+  //   return this.http.get<any>(url);
+  // }
 
   getCoreFirmAddresses(firmId: number): Observable<any> {
     const url = `${this.baseUrlAddress}get_address_list?objectId=521&objectInstanceId=${firmId}&objectInstanceRevNum=1&sourceObjectID=521&sourceObjectInstanceId=${firmId}&sourceObjectInstanceRevNum=1`

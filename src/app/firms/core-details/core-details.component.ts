@@ -134,6 +134,7 @@ export class CoreDetailsComponent implements OnInit {
       this.loadCurrentAppDetails();
       this.loadAssignedUserRoles(this.userId);
       this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
+      
       this.firmDetailsService.isFirmLicensed$.subscribe(
         (value) => (this.isFirmLicensed = value)
       );
@@ -1469,7 +1470,7 @@ export class CoreDetailsComponent implements OnInit {
   uploadDocument() {
     if (!this.selectedFile) {
       this.showError(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
-      this.firmDetailsService.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
+      this.loadErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
     } else {
       delete this.errorMessages['uploadDocument'];
     }

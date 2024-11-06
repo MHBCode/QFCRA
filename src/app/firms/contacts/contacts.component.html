@@ -1,6 +1,4 @@
-<div *ngIf="isLoading" class="loader-overlay">
-  <div class="loader"></div>
-</div>
+<app-loader *ngIf="isLoading"></app-loader>
 
 <div class="form-section">
   <div class="inputs-field-set">
@@ -537,7 +535,7 @@
         </button>
         <!--Address Details-->
         <div class="inputs-row">
-          <ng-container *ngFor="let address of filteredContactFirmAddresses; let i = index">
+          <ng-container *ngFor="let address of filteredContactAddresses; let i = index">
             <ng-container *ngIf="address.Valid === true">
               <div class="input-field" *ngIf="!isEditContact">
                 <label for="addressType" class="history-row">

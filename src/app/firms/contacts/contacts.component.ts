@@ -1282,11 +1282,10 @@ export class ContactsComponent {
     return place ? place.CountryName : '';
   }
 
-  get filteredContactFirmAddresses() {
-    return this.contactFirmAddresses.filter(addr => !addr.isRemoved);
-  }
-
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  get filteredContactAddresses() {
+    return this.existingContactAddresses.filter(addr => !addr.isRemoved);
+  }
 
   onAddressTypeChangeOnEditMode(event: any, address: any) {
     const selectedAddressTypeId = Number(event.target.value);

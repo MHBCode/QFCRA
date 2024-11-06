@@ -164,28 +164,28 @@ export class FirmDetailsService {
     });
   }
 
-  onSameAsTypeChangeOnEditMode(selectedTypeID: number, index: number ,targetArray: any[], newAddress: any): void {
+  onSameAsTypeChangeOnEditMode(selectedTypeID: number, index: number, targetArray: any[], newAddress: any): void {
     const numericTypeID = Number(selectedTypeID);
- 
+
     if (numericTypeID && numericTypeID !== 0) {
-       const targetAddress = targetArray[index];
- 
-       // Find the selected address by its type ID
-       const selectedAddress = targetArray.find(address => address.AddressTypeID === numericTypeID);
-       
-       if (selectedAddress) {
-          // Populate fields in the target address (newAddress) based on the selected address
-          this.populateNewAddressFieldsOnEditMode(selectedAddress, targetAddress);
-          
-          // Set disable flag for specific fields in the target address
-          targetAddress.isFieldsDisabled = true;
-       }
+      const targetAddress = targetArray[index];
+
+      // Find the selected address by its type ID
+      const selectedAddress = targetArray.find(address => address.AddressTypeID === numericTypeID);
+
+      if (selectedAddress) {
+        // Populate fields in the target address (newAddress) based on the selected address
+        this.populateNewAddressFieldsOnEditMode(selectedAddress, targetAddress);
+
+        // Set disable flag for specific fields in the target address
+        targetAddress.isFieldsDisabled = true;
+      }
     } else {
-       // If 'Select' option is chosen, enable the fields for the specific address
-       targetArray[index].isFieldsDisabled = false;
+      // If 'Select' option is chosen, enable the fields for the specific address
+      targetArray[index].isFieldsDisabled = false;
     }
- }
- 
+  }
+
 
   // onSameAsTypeChangeOnEditMode(selectedTypeID: number, targetArray: any[], newAddress: any, index): void {
   //   const numericTypeID = Number(selectedTypeID);
@@ -290,7 +290,7 @@ export class FirmDetailsService {
 
             if (targetArray.length === 1) {
               targetArray[0].isAddressTypeSelected = false;
-           }
+            }
             resolve();
           } else {
             reject('Operation canceled by user');
@@ -472,6 +472,19 @@ export class FirmDetailsService {
           observer.error(error);
         }
       );
+    });
+  }
+
+  getContactAddressTypes(): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(constants.contactAddressTypes)
+        .subscribe(data => {
+          observer.next(data.response);
+        }, error => {
+          console.error('Error Fetching Contact Address Types dropdown:', error);
+          observer.error(error);
+        }
+        );
     });
   }
 

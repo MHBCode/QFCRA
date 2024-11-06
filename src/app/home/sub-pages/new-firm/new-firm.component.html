@@ -6,10 +6,10 @@
 
     </div>
 </div>
-<section class="edit-firm-section">
-    <!--Firm Details Section-->
+<!-- <section class="edit-firm-section">
+    <!--Firm Details Section
     <div class="inputs-field-set">
-        <!--Error messages for firm details-->
+        <!--Error messages for firm details
         <div class="error-messages" style="color: red">
             <p *ngIf="errorMessages['FirmName']">{{ errorMessages['FirmName'] }}</p>
             <p *ngIf="errorMessages['QFCNum']">{{ errorMessages['QFCNum'] }}</p>
@@ -158,7 +158,7 @@
         </div>
 
     </div>
-    <!--Application Details Section-->
+    <!--Application Details Section
     <div class="inputs-field-set">
         <div class="edit-firm-actions">
             <h2 class="edit-firm-header">
@@ -225,7 +225,7 @@
             </div>
         </div>
     </div>
-    <!--Comments Section-->
+    <!--Comments Section
     <div class="inputs-field-set comments" [ngClass]="{ collapsed: isCollapsed['commentsSection'] }">
         <div class="edit-firm-actions collapse-container">
             <h2 class="edit-firm-header">Comments</h2>
@@ -250,9 +250,9 @@
             </div>
         </div>
     </div>
-    <!--Addresses Section-->
+    <!--Addresses Section
     <div class="inputs-field-set" [ngClass]="{collapsed: isCollapsed['addressesSection']}">
-        <!--Error messages for addresses-->
+        <!--Error messages for addresses
         <div class="error-messages" style="color: red">
             <p *ngIf="errorMessages['AddressTypeID']">{{ errorMessages['AddressTypeID'] }}</p>
         </div>
@@ -355,4 +355,4 @@
             <hr *ngIf="i < addedAddresses.length - 1 && !isCollapsed['addressesSection']">
         </ng-container>
     </div>
-</section>
+</section> -->

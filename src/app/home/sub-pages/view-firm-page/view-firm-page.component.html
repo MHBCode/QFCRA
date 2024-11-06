@@ -1,6 +1,4 @@
-<div *ngIf="isLoading" class="loader-overlay">
-  <div class="loader"></div>
-</div>
+<app-loader *ngIf="isLoading"></app-loader>
 <div *ngIf="isUserAllowed" class="brid-crump">
   <div class="text"><span> Home > All Firms > </span> {{ titleSection }}</div>
 </div>
@@ -2639,7 +2637,7 @@
             </label>
             <select name="controllerType" id="controllerType" [(ngModel)]="CreatecontrollerDetails"
               (change)="changeControlType()">
-              <option value="select" selected>Select</option>
+              <option value="select">Select</option>
               <option *ngFor="let controllerType of controllerTypeOption" [ngValue]="controllerType">
                 {{ controllerType.EntityTypeDesc }}
               </option>

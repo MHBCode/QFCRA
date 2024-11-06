@@ -1,6 +1,4 @@
-<div *ngIf="isLoading" class="loader-overlay">
-  <div class="loader"></div>
-</div>
+<app-loader *ngIf="isLoading"></app-loader>
 
 <div class="form-section">
   <div class="inputs-field-set">
@@ -489,7 +487,7 @@
                   (change)="onAddressTypeChangeOnEditMode($event, address)" [ngClass]="{
                         'error-border': address === invalidAddress}">
                   <option value="0">Select</option>
-                  <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
+                  <option *ngFor="let option of currentAddressTypes" [value]="option.AddressTypeID">
                     {{ option.AddressTypeDesc }}
                   </option>
                 </select>
@@ -574,7 +572,7 @@
           (address.isFieldsDisabled && !address.AddressID)
         " name="zip" id="zip" type="text" [(ngModel)]="address.PostalCode" />
               </div>
-              <hr *ngIf="i < ControllerfirmAddresses.length - 1" />
+              <hr *ngIf="i < ControllerCorporateAddresses.length - 1" />
             </ng-container>
           </ng-container>
         </div>
@@ -639,6 +637,9 @@
       </div>
 
       <div class="error-messages">
+        <p *ngIf="errorMessages['EntityTypeName']">
+          {{ errorMessages['EntityTypeName'] }}
+        </p>
         <p *ngIf="errorMessages['OtherEntityName']">
           {{ errorMessages['OtherEntityName'] }}
         </p>
@@ -651,7 +652,7 @@
         <p *ngIf="errorMessages['PctOfShares']">
           {{ errorMessages['PctOfShares'] }}
         </p>
-        <!--Ibdevidual-->
+        <!--Individual-->
         <p *ngIf="errorMessages['firstName']">
           {{ errorMessages['firstName'] }}
         </p>
@@ -678,7 +679,7 @@
           </label>
           <select name="controllerType" id="controllerType" [(ngModel)]="CreatecontrollerDetails"
             (change)="changeControlType()">
-            <option value="select" selected>Select</option>
+            <option [ngValue]="{ EntityTypeDesc: 'select' }">Select</option>
             <option *ngFor="let controllerType of controllerTypeOption" [ngValue]="controllerType">
               {{ controllerType.EntityTypeDesc }}
             </option>
@@ -969,6 +970,11 @@
       <div *ngIf="!hideForms" class="addresses create-inputs-field-set">
         <div class="popup-header">
           <h3>Addresses</h3>
+          <div class="error-messages">
+            <p *ngIf="errorMessages['AddressTypeID']">
+              {{ errorMessages['AddressTypeID'] }}
+            </p>
+          </div>
           <div class="add-address-btn-container">
             <button class="addAddressBtn" [disabled]="!canAddNewAddressOnCreate" *ngIf="!isAllAddressesAddedOnCreate"
               (click)="addNewAddressOnCreateMode()">
@@ -990,7 +996,7 @@
                   'error-border': errorMessages['AddressTypeID']}" [disabled]="address.isAddressTypeSelected"
                 (change)="onAddressTypeChangeOnCreateMode($event,i)">
                 <option value="0">Select</option>
-                <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
+                <option *ngFor="let option of currentAddressTypes" [value]="option.AddressTypeID">
                   {{option.AddressTypeDesc}}</option>
               </select>
             </div>
@@ -1047,16 +1053,6 @@
             <div class="input-field">
               <label for="zip"> Zip/Postal Code </label>
               <input name="zip" id="zip" type="text" [(ngModel)]="address.PostalCode"
-                [disabled]="address.isFieldsDisabled" />
-            </div>
-            <div class="input-field">
-              <label for="phone"> Phone </label>
-              <input name="phone" id="phone" type="text" [(ngModel)]="address.PhoneNum"
-                [disabled]="address.isFieldsDisabled" />
-            </div>
-            <div class="input-field">
-              <label for="fax"> Fax </label>
-              <input name="fax" id="fax" type="text" [(ngModel)]="address.FaxNum"
                 [disabled]="address.isFieldsDisabled" />
             </div>
           </div>

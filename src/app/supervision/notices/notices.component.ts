@@ -10,6 +10,7 @@ import { NoticeService } from 'src/app/ngServices/notice.service';
 export class NoticesComponent implements OnInit{
   FIRMNotices: any;
   firmId: number = 0;
+  isLoading: boolean = false;
   constructor(
     private router: Router,
     private route: ActivatedRoute,

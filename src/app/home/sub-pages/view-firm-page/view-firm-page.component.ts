@@ -3727,7 +3727,7 @@ export class ViewFirmPageComponent implements OnInit {
     console.log("Sending Firm Addresses request with parameters:", { entityID, entityTypeID, userId, opTypeId });
 
     // Fetch firm addresses from the service
-    this.addressService.getControllerFirmAddresses(entityID, entityTypeID, userId, opTypeId).subscribe(
+    this.addressService.getControllerCorporateFirmAddresses(entityID, entityTypeID, userId, opTypeId).subscribe(
       data => {
         if (data.response) {
           this.ControllerfirmAddresses = data.response;
