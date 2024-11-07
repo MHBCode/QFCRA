@@ -956,7 +956,7 @@ export class CoreDetailsComponent implements OnInit {
 
   getAddressTypeHistory(addressTypeId: number) {
     this.callAddressType = true;
-    this.addressService.getAddressesTypeHistory(this.firmId, addressTypeId,null,null).subscribe(
+    this.addressService.getAddressesTypeHistory(this.firmId, addressTypeId,null,null,null).subscribe(
       data => {
         this.firmAddressesTypeHistory = data.response;
       }, error => {

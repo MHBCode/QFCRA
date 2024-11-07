@@ -42,6 +42,7 @@ export class ControllersComponent implements OnInit {
   allCountries: any = [];
   hideForms: boolean = true;
   selectedController: any;
+  selectedIndividualController: any = [];
   isPopupOpen = false;
   showCreateControllerSection: boolean = false;
   CorporateControllerEdit: any[] = [];
@@ -82,6 +83,11 @@ export class ControllersComponent implements OnInit {
   canAddNewAddressOnCreate: boolean = true;
   isAllAddressesAddedOnCreate: boolean;
 
+  // regulator
+  regulatorList: any = [];
+  newRegulator: any = {};
+  existingRegulaterList: any = [];
+
 
 
   constructor(
@@ -111,7 +117,6 @@ export class ControllersComponent implements OnInit {
         this.loadControllers();
         this.loadControllersIndividual();
       }
-      this.getAllRegulater(this.Address.countryID, this.firmId);
       this.populateCountries();
       this.getlegalStatusController();
       this.getlegalStatusControllerCreate()
@@ -142,30 +147,143 @@ export class ControllersComponent implements OnInit {
     );
   }
 
-  removeRegulator(index: number) {
-    this.regulatorList.splice(index, 1);
-  }
-  getAllRegulater(countryID: number, firmId: number): void {
-    if (!countryID) {
-      // If no country is selected, get general regulators
-      this.securityService.getObjectTypeTable(constants.Regulaters)
-        .subscribe(data => {
-          this.AllRegulater = data.response;
-          console.log("General Regulators fetched:", data);
-        }, error => {
-          console.error("Error fetching Regulators:", error);
-        });
+
+  getAllRegulater(firmId: number, countryID: number, regulatorArray: any[], callback?: () => void): void {
+    if (countryID === 0) {
+        this.securityService.getObjectTypeTable(constants.Regulaters)
+            .subscribe(data => {
+                this.AllRegulater = data.response;  // Store dropdown options separately
+                console.log("General Regulators fetched:", data);
+
+                // Reset selected regulator if it no longer exists in AllRegulater
+                this.resetSelectedRegulatorIfNotFound(regulatorArray);
+
+                if (callback) callback();
+            }, error => {
+                console.error("Error fetching Regulators:", error);
+            });
     } else {
-      // If a country is selected, get regulators specific to the country
-      this.parentEntity.getRegulatorsByCountry(firmId, countryID)
-        .subscribe(data => {
-          this.AllRegulater = data.response;
-          console.log("Country-specific Regulators fetched for CountryID:", countryID, data);
-        }, error => {
-          console.error("Error fetching Country-specific Regulators:", error);
-        });
+        this.parentEntity.getRegulatorsByCountry(firmId, countryID)
+            .subscribe(data => {
+                this.AllRegulater = data.response;  // Store dropdown options separately
+                console.log("Country-specific Regulators fetched:", data);
+
+                // Reset selected regulator if it no longer exists in AllRegulater
+                this.resetSelectedRegulatorIfNotFound(regulatorArray);
+
+                if (callback) callback();
+            }, error => {
+                console.error("Error fetching Country-specific Regulators:", error);
+            });
+    }
+}
+
+
+
+
+  resetSelectedRegulatorIfNotFound(targetArray: any[]): void {
+    targetArray.forEach(regulator => {
+      const selectedRegulatorID = regulator.RegulatorID;
+
+      // Check if the current RegulatorID exists in the new AllRegulater list
+      const regulatorExists = this.AllRegulater.some(r => r.RegulatorID === selectedRegulatorID);
+
+      if (!regulatorExists) {
+        // Reset to default "Select" option by setting RegulatorID to 0
+        regulator.RegulatorID = 0;
+      }
+    });
+  }
+
+
+
+
+  createDefaultRegulator() {
+    return {
+      RegulatorID: 0,
+      RegulatorName: '',
+      RegulatorContact: '',
     }
   }
+
+  addRegulator(regulatorArray: any[]): void {
+    const newRegulator = {
+      RegulatorID: 0,
+      RegulatorName: '',
+      RegulatorContact: '',
+    };
+
+    regulatorArray.unshift(newRegulator); // Add new regulator at the beginning
+  }
+
+  removeRegulator(regulatorArray: any[], index: number): void {
+    regulatorArray.splice(index, 1);
+  }
+
+  updateRegulators(countryID: number, regulatorArray: any[], isRegulated: boolean): void {
+    if (isRegulated) {
+      // Fetch regulators based on the country and add a default regulator if needed
+      this.getAllRegulater(this.firmId, countryID, regulatorArray, () => {
+        if (regulatorArray.length === 0) {
+          this.addRegulator(regulatorArray);
+        }
+      });
+    } else {
+      // Clear the list if regulation is set to "No"
+      regulatorArray.length = 0;
+    }
+  }
+
+
+
+
+  onRegulationChange(regulatorArray: any[], isEditMode: boolean): void {
+    const details = isEditMode ? this.selectedController : this.CreatecontrollerDetails;
+
+    this.updateRegulators(
+      details.CountryOfIncorporation,
+      regulatorArray,
+      details.IsCompanyRegulated
+    );
+
+    // Add a regulator if required
+    if (details.IsCompanyRegulated && regulatorArray.length === 0) {
+      this.addRegulator(regulatorArray);
+    }
+  }
+
+  onCountryChange(countryID: number, regulatorArray: any[], isEditMode: boolean): void {
+    const details = isEditMode ? this.selectedController : this.CreatecontrollerDetails;
+
+    this.updateRegulators(
+      countryID,
+      regulatorArray,
+      details.IsCompanyRegulated
+    );
+
+    // Reset selected regulator to "Select" on country change
+    regulatorArray.forEach(reg => reg.RegulatorID = 0);
+  }
+
+
+
+  // onRegulationChange() {
+  //   if (this.CreatecontrollerDetails.IsCompanyRegulated) {
+  //     this.getAllRegulater(this.firmId, this.CreatecontrollerDetails.CountryOfIncorporation,this.regulatorList);
+  //     // Check if there's at least one regulator, add one if not
+  //     if (!this.regulatorList || this.regulatorList.length === 0) {
+  //       this.addRegulatorOnCreate();
+  //     }
+  //   } else {
+  //     // Optionally, clear the regulator list if "No" is selected
+  //     this.regulatorList = [];
+  //   }
+  // }
+
+  // onCountryChange(countryID: number) {
+  //   this.getAllRegulater(this.firmId, countryID,this.regulatorList);
+  //   this.regulatorList.RegulatorID = 0;
+  // }
 
   createControllerPopupChanges(): void {
     this.isLoading = true;
@@ -216,50 +334,6 @@ export class ControllersComponent implements OnInit {
           majorityStockHolder: false, // not integrated in the form
           assnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
           assnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo)
-
-          // UserID: 30,
-          // UserName: null,
-          // OtherEntityName: this.CreatecontrollerDetails.OtherEntityName,
-          // OtherEntityID: null,
-          // ControllerControlTypeDesc: this.CreatecontrollerDetails.ControllerControlTypeDesc,
-          // EntityTypeDesc: this.CreatecontrollerDetails.EntityTypeDesc,
-          // DateOfIncorporation: this.dateUtilService.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
-          // createdBy: this.userId,
-          // CessationDate: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.CessationDate),
-          // EffectiveDate: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.EffectiveDate),
-          // CreatedDate: null,
-          // ControllerControlTypeID: this.CreatecontrollerDetails.ControllerControlTypeID,
-          // RelatedEntityID: null,
-          // EntitySubTypeID: null,
-          // EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-          // RelatedEntityTypeID: this.CreatecontrollerDetails.EntityTypeID, /// yazan
-          // relatedEntityEntityID: null,
-          // MyState: 0,
-          // LegalStatusTypeID: this.CreatecontrollerDetails.LegalStatusTypeID,
-          // LegalStatusTypeDesc: this.CreatecontrollerDetails.LegalStatusTypeDesc,
-          // placeOfIncorporation: this.CreatecontrollerDetails.PlaceOfIncorporation,
-          // countryOfIncorporation: this.CreatecontrollerDetails.CountryOfIncorporation,
-          // PctOfShares: this.CreatecontrollerDetails.PctOfShares || null,
-          // addressState: 2,
-          // registeredNumber: this.CreatecontrollerDetails.RegisteredNum,
-          // zebSiteAddress: this.CreatecontrollerDetails.zebSiteAddress,
-          // lastModifiedBy: 30,
-          // //LastModifiedDate : "2024-10-01T13:55:58.178Z",
-          // isAuditor: this.CreatecontrollerDetails.IsAuditor,
-          // isCompanyRegulated: this.CreatecontrollerDetails.IsCompanyRegulated,
-          // additionalDetails: this.CreatecontrollerDetails.AdditionalDetails,
-          // isParentController: this.CreatecontrollerDetails.IsParentController,
-          // isPublicallyTraded: this.CreatecontrollerDetails.IsPublicallyTraded,
-          // areAnyUBOs: this.CreatecontrollerDetails.More10UBOs,
-          // controllerInfo: this.CreatecontrollerDetails.ControllerInfo,
-          // Output: 0,
-          // FirmID: this.firmId,
-          // EntityID: this.firmId,
-          // numOfShares: this.CreatecontrollerDetails.NumOfShares,
-          // MajorityStockHolder: false,
-          // AssnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
-          // AssnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
-          // LastModifiedByOfOtherEntity: 30,
         },
         addressList: this.addedAddresses.map(address => ({
           firmID: this.firmId,
@@ -283,7 +357,7 @@ export class ControllersComponent implements OnInit {
           phoneNumber: address.PhoneNumber || '',
           phoneExt: address.PhoneExt || '',
           faxNumber: address.FaxNumber || '',
-          lastModifiedDate: address.LastModifiedDate || this.currentDate, // Default to current date
+          lastModifiedDate: this.currentDate,
           addressState: 2, // New address state is 2, existing modified or unchanged is 6, 4 is delete
           fromDate: address.FromDate || null,
           toDate: address.ToDate || null,
@@ -299,43 +373,11 @@ export class ControllersComponent implements OnInit {
         regulatorList: this.regulatorList.map(regulator => ({
           regulatorState: 2, // add new regulator
           regulatorID: regulator.RegulatorID,
-          entityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+          entityTypeID: 0,
           entityID: this.firmId,
-          relatedEntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
+          relatedEntityTypeID: 0,
           relatedEntityID: null,
           contactAssnID: 0
-          // EntityTypeID: regulator.EntityTypeID,
-          // EntityID: regulator.EntityID,
-          // UserID: regulator.UserID,
-          // FirmID: regulator.FirmID,
-          // RelatedEntityTypeID: regulator.RelatedEntityTypeID,
-          // relatedEntityID: regulator.relatedEntityID,
-          // Output: regulator.Output,
-          // regulatorState: regulator.regulatorState,
-          // RegulatorID: regulator.RegulatorID,
-          // RegulatorName: regulator.RegulatorName,
-          // RegulatorContacts: regulator.RegulatorContacts,
-          // RelatedEntityID: regulator.RelatedEntityID,
-          // ContactID: regulator.ContactID,
-          // Title: regulator.Title,
-          // FullName: regulator.FullName,
-          // BussinessEmail: regulator.BussinessEmail,
-          // AddressLine1: regulator.AddressLine1,
-          // AddressLine2: regulator.AddressLine2,
-          // AddressLine3: regulator.AddressLine3,
-          // AddressLine4: regulator.AddressLine4,
-          // City: regulator.City,
-          // Province: regulator.Province,
-          // CountryID: regulator.CountryID,
-          // CountryName: regulator.CountryName,
-          // PostalCode: regulator.PostalCode,
-          // PhoneNumber: regulator.PhoneNumber,
-          // PhoneExt: regulator.PhoneExt,
-          // FaxNumber: regulator.FaxNumber,
-          // EntityRegulators: regulator.EntityRegulators,
-          // ShowReadOnly: regulator.ShowReadOnly,
-          // ShowEnabled: regulator.ShowEnabled,
-          // ContactAssnID: regulator.ContactAssnID
         }))
       }
       console.log("Controller to be saved", saveControllerPopupChangesObj)
@@ -475,7 +517,6 @@ export class ControllersComponent implements OnInit {
     OtherEntityName: '',
     LegalStatusTypeID: 0,
     PctOfShares: '',
-    PlaceOfEstablishment: '',
     Title: '',
     FirstName: '',
     SecondName: '',
@@ -558,7 +599,6 @@ export class ControllersComponent implements OnInit {
       OtherEntityName: '',
       LegalStatusTypeID: 0,
       PctOfShares: '',
-      PlaceOfEstablishment: '',
       Title: '',
       FirstName: '',
       SecondName: '',
@@ -633,81 +673,6 @@ export class ControllersComponent implements OnInit {
     };
   }
 
-
-
-  regulatorList: Array<any> = [
-    {
-      EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-      EntityID: null,
-      UserID: null,
-      FirmID: null,
-      RelatedEntityTypeID: this.CreatecontrollerDetails.RelatedEntityTypeID,
-      relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
-      Output: 0,
-      regulatorState: 2,
-      RegulatorID: 0,
-      RegulatorName: '',
-      RegulatorContacts: "",
-      RelatedEntityID: null,
-      ContactID: null,
-      Title: null,
-      FullName: null,
-      BussinessEmail: null,
-      AddressLine1: null,
-      AddressLine2: null,
-      AddressLine3: null,
-      AddressLine4: null,
-      City: null,
-      Province: null,
-      CountryID: 0,
-      CountryName: null,
-      PostalCode: null,
-      PhoneNumber: null,
-      PhoneExt: null,
-      FaxNumber: null,
-      EntityRegulators: null,
-      ShowReadOnly: false,
-      ShowEnabled: true,
-      ContactAssnID: null
-    }
-  ];
-  addRegulator() {
-    this.regulatorList.push({
-      EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-      EntityID: null,
-      UserID: null,
-      FirmID: null,
-      RelatedEntityTypeID: this.CreatecontrollerDetails.RelatedEntityTypeID,
-      relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
-      Output: 0,
-      regulatorState: 2,
-      RegulatorID: null,
-      RegulatorName: '',
-      RegulatorContacts: '',
-      RelatedEntityID: null,
-      ContactID: null,
-      Title: null,
-      FullName: null,
-      BussinessEmail: null,
-      AddressLine1: null,
-      AddressLine2: null,
-      AddressLine3: null,
-      AddressLine4: null,
-      City: null,
-      Province: null,
-      CountryID: 0,
-      CountryName: null,
-      PostalCode: null,
-      PhoneNumber: null,
-      PhoneExt: null,
-      FaxNumber: null,
-      EntityRegulators: null,
-      ShowReadOnly: false,
-      ShowEnabled: true,
-      ContactAssnID: null
-    });
-  }
-
   CreateControllerValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.errorMessages = {}; // Clear previous error messages
@@ -758,7 +723,7 @@ export class ControllersComponent implements OnInit {
         }
 
         // Validate Type of Control
-        if (!this.CreatecontrollerDetails.ControllerControlTypeID) {
+        if (this.CreatecontrollerDetails.ControllerControlTypeID == 0) {
           this.loadErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
           this.hasValidationErrors = true;
         }
@@ -829,6 +794,7 @@ export class ControllersComponent implements OnInit {
   editController(): void {
     this.isEditable = true;
     this.initializeAddressTypes();
+    this.getAllRegulater(this.firmId,this.selectedController.CountryOfIncorporation,this.existingRegulaterList)
   }
 
   loadControllers(): void {
@@ -907,28 +873,28 @@ export class ControllersComponent implements OnInit {
   }
 
 
-  // loadControllerIndividualFirmAdresses(): void {
-  //   this.isLoading = true;
+  loadControllerIndividualAdresses(contactAssId: number, userId: number, opTypeId: number): void {
+    this.isLoading = true;
 
-  //   // Fetch firm addresses from the service
-  //   this.addressService.getControllerIndividualFirmAddresses().subscribe(
-  //     data => {
-  //       if (data.response) {
-  //         this.ControllerIndividualAddresses = data.response;
-  //         this.existingControllerIndividualAddresses = this.ControllerIndividualAddresses.filter(addr => addr.Valid);
-  //         console.log('Controller Individual Firm Addresses:', this.ControllerIndividualAddresses);
-  //       } else {
-  //         console.warn('No addresses found for this firm');
-  //       }
-  //       this.isLoading = false;
-  //     },
-  //     error => {
-  //       console.error('Error Fetching Firm Addresses', error);
-  //       this.existingControllerIndividualAddresses = [];
-  //       this.isLoading = false;
-  //     }
-  //   );
-  // }
+    // Fetch firm addresses from the service
+    this.addressService.getControllerIndividualAddresses(contactAssId, userId, opTypeId).subscribe(
+      data => {
+        if (data.response) {
+          this.ControllerIndividualAddresses = data.response;
+          this.existingControllerIndividualAddresses = this.ControllerIndividualAddresses.filter(addr => addr.Valid);
+          console.log('Controller Individual Firm Addresses:', this.ControllerIndividualAddresses);
+        } else {
+          console.warn('No addresses found for this firm');
+        }
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Error Fetching Firm Addresses', error);
+        this.existingControllerIndividualAddresses = [];
+        this.isLoading = false;
+      }
+    );
+  }
 
 
   populateCountries() {
@@ -967,11 +933,16 @@ export class ControllersComponent implements OnInit {
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  get filteredControllerCorporateAddresses() {
-    return this.existingControllerCorporateAddresses.filter(addr => !addr.isRemoved);
+  get filteredControllerAddresses() {
+    if (this.selectedController.EntityTypeID === 11 || this.selectedController.EntityTypeID === 9) {
+      return this.existingControllerIndividualAddresses.filter(addr => !addr.isRemoved);
+    } else {
+      return this.existingControllerCorporateAddresses.filter(addr => !addr.isRemoved);
+    }
+
   }
 
-  
+
   initializeAddressTypes() {
     if (this.selectedController.EntityTypeDesc === 'UBO - Individual' ||
       this.selectedController.EntityTypeDesc === 'Individual Controller') {
@@ -1154,9 +1125,9 @@ export class ControllersComponent implements OnInit {
     this.checkCanAddNewAddressOnCreateMode();
   }
 
-  getAddressTypeHistory(addressTypeId: number, entityTypeId: number, entityId: number) {
+  getAddressTypeHistory(addressTypeId: number, entityTypeId: number, entityId: number, contactAssnID: number) {
     this.callAddressType = true;
-    this.addressService.getAddressesTypeHistory(null, addressTypeId, entityTypeId, entityId).subscribe(
+    this.addressService.getAddressesTypeHistory(null, addressTypeId, entityTypeId, entityId, contactAssnID).subscribe(
       data => {
         this.controllerFirmAddressesTypeHistory = data.response;
       }, error => {
@@ -1208,41 +1179,40 @@ export class ControllersComponent implements OnInit {
     regulator: '',
     regulatorContact: ''
   };
-  homeRegulater: any = [];
 
   openControllerPopup(controller: any): void {
-    this.selectedController = controller; // Set the firm name
-    this.controllerDetails = { ...controller }; // Populate the controller details
-    this.isPopupOpen = true; // Open the popup
-    console.log('SSSSSSSSSSSSSSSSSSSSSSSdfgdfgdfhfgjfhjdhdj', this.selectedController.OtherEntityID, this.selectedController.EntityTypeID);
+    this.selectedController = JSON.parse(JSON.stringify(controller)); // Deep copy of controller
+    this.controllerDetails = { ...this.selectedController }; // Populate the controller details if needed
+    this.isPopupOpen = true;
+
     this.loadControllerCorporateFirmAdresses(
       this.selectedController.OtherEntityID,
       this.selectedController.EntityTypeID,
       this.userId,
       44 // Static opTypeId
     );
-    if (this.selectedController.EntityTypeID === 8 || this.selectedController.EntityTypeID === 9) {
-      // For individual controller types (EntityTypeID 8 or 9)
+
+    this.parentEntity.getRegulatorDetails(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID)
+      .subscribe(data => {
+        if (data.response && data.response.length > 0) {
+          this.existingRegulaterList = data.response;
+        }
+      });
+
+    this.getAllRegulater(this.selectedController.CountryOfIncorporation, this.firmId, this.existingRegulaterList);
+
+    if (this.selectedController.EntityTypeID === 11 || this.selectedController.EntityTypeID === 9) {
       const firmId = this.firmId;
       const functionTypeId = 25;
-      const contactId = this.selectedController.OtherEntityID; // Use OtherEntityID as contactId
-      const contactAssId = this.selectedController.RelatedEntityID; // Use RelatedEntityID as contactAssId
+      const contactId = this.selectedController.OtherEntityID;
+      const contactAssId = this.selectedController.RelatedEntityID;
 
+      this.loadControllerIndividualAdresses(contactAssId, this.userId, constants.ObjectOpType.View);
       this.loadControllerIndividualDetails(firmId, functionTypeId, contactId, contactAssId);
     }
-    this.parentEntity.getRegulatorDetails(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID).subscribe(
-      data => {
-        if (data.response && data.response.length > 0) {
-          this.homeRegulater = data.response[0]; // Assuming it's an array and taking the first element
-        }
-      },
-    );
-
-    console.log("controllerDetails", this.controllerDetails)
-    console.log("selectedController", this.selectedController)
-
   }
-  selectedIndividualController: any = [];
+
+
 
   loadControllerIndividualDetails(firmId: number, functionTypeId: number, contactId: number, contactAssId: number): void {
     this.controllerService.loadControllerIndividualDetails(firmId, functionTypeId, contactId, contactAssId).subscribe(
@@ -1269,6 +1239,9 @@ export class ControllersComponent implements OnInit {
     this.errorMessages = {}; // Clear previous error messages
     this.hasValidationErrors = false;
     this.existingControllerCorporateAddresses.push(this.defaultAddress);
+    this.existingRegulaterList = [];
+    this.selectedController = [];
+    this.controllerDetails = this.selectedController;
   }
 
   closeCreateControllerPopup(): void {
@@ -1279,6 +1252,7 @@ export class ControllersComponent implements OnInit {
     this.hideForms = true;
     this.addedAddresses.push(this.defaultAddress);
     this.CreatecontrollerDetails = this.createDefaultControllerDetails();
+    this.CreatecontrollerDetails.IsCompanyRegulated = null;
   }
 
 
@@ -1415,7 +1389,12 @@ export class ControllersComponent implements OnInit {
     this.hideForms = this.CreatecontrollerDetails.EntityTypeDesc === 'select';
     this.isAllAddressesAddedOnCreate = false;
     this.addedAddresses = [this.createDefaultAddress()];
-
+    this.regulatorList = [this.createDefaultRegulator()];
+    this.CreatecontrollerDetails.CountryOfIncorporation = 0;
+    this.CreatecontrollerDetails.LegalStatusTypeID = 0;
+    this.CreatecontrollerDetails.ControllerControlTypeID = 0;
+    this.CreatecontrollerDetails.IsCompanyRegulated = null;
+    this.errorMessages = {};
     if (this.CreatecontrollerDetails.EntityTypeDesc === 'UBO - Individual' || this.CreatecontrollerDetails.EntityTypeDesc === 'Individual Controller') {
       this.populateContactAddressTypes();
     } else {
@@ -1525,7 +1504,7 @@ export class ControllersComponent implements OnInit {
             phoneNumber: address.PhoneNumber || '',
             phoneExt: address.PhoneExt || '',
             faxNumber: address.FaxNumber || '',
-            lastModifiedDate: address.LastModifiedDate || this.currentDate, // Default to current date
+            lastModifiedDate: this.currentDate, // Default to current date
             addressState: addressState, // New address state is 2, existing modified or unchanged is 6, 4 is delete
             fromDate: address.FromDate || null,
             toDate: address.ToDate || null,
@@ -1539,40 +1518,15 @@ export class ControllersComponent implements OnInit {
           };
         }),
 
-        regulatorList: this.regulatorList.map(regulator => ({
-          EntityTypeID: regulator.EntityTypeID,
-          EntityID: regulator.EntityID,
-          UserID: regulator.UserID,
-          FirmID: regulator.FirmID,
-          RelatedEntityTypeID: regulator.RelatedEntityTypeID,
-          relatedEntityID: regulator.relatedEntityID,
-          Output: regulator.Output,
-          regulatorState: 6,
-          RegulatorID: regulator.RegulatorID,
-          RegulatorName: regulator.RegulatorName,
-          RegulatorContacts: regulator.RegulatorContacts,
-          RelatedEntityID: regulator.RelatedEntityID,
-          ContactID: regulator.ContactID,
-          Title: regulator.Title,
-          FullName: regulator.FullName,
-          BussinessEmail: regulator.BussinessEmail,
-          AddressLine1: regulator.AddressLine1,
-          AddressLine2: regulator.AddressLine2,
-          AddressLine3: regulator.AddressLine3,
-          AddressLine4: regulator.AddressLine4,
-          City: regulator.City,
-          Province: regulator.Province,
-          CountryID: regulator.CountryID,
-          CountryName: regulator.CountryName,
-          PostalCode: regulator.PostalCode,
-          PhoneNumber: regulator.PhoneNumber,
-          PhoneExt: regulator.PhoneExt,
-          FaxNumber: regulator.FaxNumber,
-          EntityRegulators: regulator.EntityRegulators,
-          ShowReadOnly: regulator.ShowReadOnly,
-          ShowEnabled: regulator.ShowEnabled,
-          ContactAssnID: regulator.ContactAssnID
-        }))
+        regulatorList: this.selectedController.IsCompanyRegulated ? this.existingRegulaterList.map(regulator => ({
+          regulatorState: 0, // needs to be changed
+          regulatorID: regulator.RegulatorID,
+          entityTypeID: this.selectedController.EntityTypeID,
+          entityID: this.firmId,
+          relatedEntityTypeID: this.selectedController.EntityTypeID,
+          relatedEntityID: null,
+          contactAssnID: 0
+        })) : []
       };
 
       // Call the insert/update endpoint
@@ -1583,6 +1537,7 @@ export class ControllersComponent implements OnInit {
           this.isEditable = false;
           this.closeControllerPopup();
           this.getPlaceOfEstablishmentName();
+          this.loadControllers();
           this.firmDetailsService.showSaveSuccessAlert(constants.ControllerMessages.RECORD_MODIFIED);
         },
         error => {
@@ -1638,34 +1593,52 @@ export class ControllersComponent implements OnInit {
           },
           lstContactFunctions: null,
         },
-        Addresses: (Array.isArray(this.newAddressOnEdit) ? this.newAddressOnEdit : []).map(address => ({
-          firmID: this.firmId,
-          countryID: address.CountryID,
-          addressTypeID: address.AddressTypeID,
-          LastModifiedBy: this.userId,
-          entityTypeID: this.selectedController.EntityTypeID,
-          entityID: this.firmId,
-          contactID: address.contactID,
-          addressID: null,
-          addressLine1: "",
-          addressLine2: "",
-          addressLine3: "",
-          addressLine4: "",
-          city: address.city,
-          stateProvince: address.stateProvince,
-          createdBy: 0,
-          addressAssnID: null,
-          CreatedDate: address.CreatedDate,
-          LastModifiedDate: address.LastModifiedDate,
-          addressState: 3,
-          fromDate: "2024-10-01T14:38:59.118Z",
-          toDate: "2024-10-01T14:38:59.118Z",
-          Output: address.Output,
-          objectID: 0,
-          objectInstanceID: 0,
-          zipPostalCode: "",
-          objAis: null
-        }))
+        Addresses: [...this.existingControllerIndividualAddresses, ...this.removedAddresses].map(address => {
+          let addressState: number;
+
+          if (address.isRemoved) {
+            addressState = 4; // Deleted address
+          } else if (address.AddressID === null) {
+            addressState = 2; // New address
+          } else {
+            addressState = 3; // Modified address
+          }
+
+          return {
+            firmID: this.firmId,
+            countryID: Number(address.CountryID) || 0,
+            addressTypeID: address.AddressTypeID || 0,
+            sameAsTypeID: address.SameAsTypeID || null,
+            lastModifiedBy: this.userId, // must be dynamic
+            addressAssnID: address.AddressAssnID || null,
+            entityTypeID: address.EntityTypeID || 1,
+            entityID: address.EntityID || this.firmId,
+            contactAssnID: this.selectedController.RelatedEntityID,
+            contactID: this.selectedController.OtherEntityID,
+            addressID: address.AddressID?.toString() || '',
+            addressLine1: address.AddressLine1 || '',
+            addressLine2: address.AddressLine2 || '',
+            addressLine3: address.AddressLine3 || '',
+            addressLine4: address.AddressLine4 || '',
+            city: address.City || '',
+            province: address.Province || '',
+            postalCode: address.PostalCode || '',
+            phoneNumber: address.PhoneNumber || '',
+            phoneExt: address.PhoneExt || '',
+            faxNumber: address.FaxNumber || '',
+            lastModifiedDate: this.currentDate,
+            addressState: addressState, // New address state is 2, existing modified or unchanged is 6, 4 is delete
+            fromDate: address.FromDate || null,
+            toDate: address.ToDate || null,
+            objectID: address.ObjectID || this.Page.Controller,
+            objectInstanceID: address.ObjectInstanceID || this.firmId,
+            objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
+            sourceObjectID: address.SourceObjectID || this.Page.Controller,
+            sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
+            sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
+            objAis: null,
+          }
+        })
       };
 
       // Call the save/update contact form endpoint
