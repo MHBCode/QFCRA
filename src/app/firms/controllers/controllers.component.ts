@@ -234,9 +234,6 @@ export class ControllersComponent implements OnInit {
     }
   }
 
-
-
-
   onRegulationChange(regulatorArray: any[], isEditMode: boolean): void {
     const details = isEditMode ? this.selectedController : this.CreatecontrollerDetails;
 
@@ -265,25 +262,6 @@ export class ControllersComponent implements OnInit {
     regulatorArray.forEach(reg => reg.RegulatorID = 0);
   }
 
-
-
-  // onRegulationChange() {
-  //   if (this.CreatecontrollerDetails.IsCompanyRegulated) {
-  //     this.getAllRegulater(this.firmId, this.CreatecontrollerDetails.CountryOfIncorporation,this.regulatorList);
-  //     // Check if there's at least one regulator, add one if not
-  //     if (!this.regulatorList || this.regulatorList.length === 0) {
-  //       this.addRegulatorOnCreate();
-  //     }
-  //   } else {
-  //     // Optionally, clear the regulator list if "No" is selected
-  //     this.regulatorList = [];
-  //   }
-  // }
-
-  // onCountryChange(countryID: number) {
-  //   this.getAllRegulater(this.firmId, countryID,this.regulatorList);
-  //   this.regulatorList.RegulatorID = 0;
-  // }
 
   createControllerPopupChanges(): void {
     this.isLoading = true;
