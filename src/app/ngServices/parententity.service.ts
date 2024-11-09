@@ -16,8 +16,8 @@ export class ParententityService {
     const url = `${this.baseUrlParentEntity}get_regulator_details?otherEntityID=${otherEntityID}&entityTypeId=${entityTypeId}`; 
     return this.http.get<any>(url);
   }
-  getRegulatorsByCountry(firmsId : number, countryID : number) : Observable<any> {
-    const url = `${this.baseUrlParentEntity}get_regulators_by_country?firmsId=${firmsId}&countryID=${countryID}`;
+  getRegulatorsByCountry(firmId : number, countryID : number) : Observable<any> {
+    const url = `${this.baseUrlParentEntity}get_regulators_by_country?countryId=${countryID}&firmId=${firmId}`;
     return this.http.get<any>(url);
   }
 }

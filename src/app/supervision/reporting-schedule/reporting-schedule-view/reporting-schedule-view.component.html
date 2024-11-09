@@ -1,1 +1,180 @@
-<p>reporting-schedule-view works!</p>
+<div class="overlay">
+    <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+        <!-- <div class="error-messages">
+        <p *ngIf="errorMessages['OtherEntityName']">
+          {{ errorMessages['OtherEntityName'] }}
+        </p>
+      </div> -->
+        <!-- Title -->
+        <div class="popup-title-btn-row">
+            <div class="popup-header">
+                <h3>
+                    <!-- Reporting Schedule For {{ firmDetails?.FirmName }} -->
+                    Reporting Schedule For AI
+                </h3>
+            </div>
+            <!-- Save and Cancel Buttons -->
+
+            <button class="close-button  close-icon" (click)="onClose()">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+
+
+        <div class="reporting-schedule-form">
+            <div class="inputs-row">
+                <div class="input-field">
+                    <label for="financialYearEnd">Financial year end selected to generate this reporting
+                        schedule</label>
+                    <input type="text" id="financialYearEnd" name="financialYearEnd"
+                        [(ngModel)]="financialReportingPeriod.FirmFinYearEndTypeDesc" [disabled]="!isEditable" />
+                </div>
+                <div class="input-field">
+                    <label for="reportingScheduleFrom">Reporting Schedule From</label>
+                    <input type="text" id="reportingScheduleFrom" name="reportingScheduleFrom"
+                        [(ngModel)]="financialReportingPeriod.FirmRptFrom" [disabled]="!isEditable" />
+                </div>
+                <div class="input-field">
+                    <label for="reportingScheduleTo">Reporting Schedule To</label>
+                    <input type="text" id="reportingScheduleTo" name="reportingScheduleTo"
+                        [(ngModel)]="financialReportingPeriod.FirmRptTo" [disabled]="!isEditable" />
+                </div>
+                <div class="input-field">
+                    <label for="reportType">Report Type</label>
+                    <select [disabled]="!isEditable" id="reportType"
+                        [(ngModel)]="financialReportingPeriod.FirmFinYearEndTypeID">
+                        <option *ngFor="let option of reportPeriodTypes" [value]="option.RptPeriodTypeID">
+                            {{ option?.RptPeriodShortDesc }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="rpt-list margin-top-10">
+                <div class="popup-header">
+                    <h3>Reports List</h3>
+                </div>
+
+                <ng-container *ngFor="let rpt of firmRptDetails ; let i = index">
+                    <div class="inputs-row report-entry" [ngClass]="{ 'border-style': i !== 0 }">
+                        <div class="input-field">
+                            <label for="reportTypeEntry">Report Type</label>
+                            <input type="text" id="reportTypeEntry" name="reportTypeEntry" [(ngModel)]="rpt.DocTypeDesc"
+                                [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label for="submissionType">Submission Type</label>
+                            <input type="text" id="submissionType" name="submissionType"
+                                [(ngModel)]="rpt.SubmissionTypeDesc" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label for="reportingPeriodType">Reporting Period Type</label>
+                            <input type="text" id="reportingPeriodType" name="reportingPeriodType"
+                                [(ngModel)]="rpt.RptPeriodTypeDesc" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label for="reportingPeriodStartDate">Reporting Period Start Date</label>
+                            <input type="text" id="reportingPeriodStartDate" name="reportingPeriodStartDate"
+                                [(ngModel)]="rpt.RptPeriodFromDate" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label for="reportingPeriodEndDate">Reporting Period End Date</label>
+                            <input type="text" id="reportingPeriodEndDate" name="reportingPeriodEndDate"
+                                [(ngModel)]="rpt.RptPeriodToDate" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label for="reportName">Report Name</label>
+                            <input type="text" id="reportName" name="reportName" [(ngModel)]="rpt.RptName"
+                                [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label for="dueDate">Due Date</label>
+                            <input type="text" id="dueDate" name="dueDate" [(ngModel)]="rpt.FirmRptDueDate"
+                                [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label for="required">Required</label>
+                            <ng-container *ngIf="isEditable; else FirmRptReqdBitValue">
+                                <div style="display: flex; align-items: center">
+                                    <input type="radio" id="isRequiredYes" [(ngModel)]="rpt.FirmRptReqdBit"
+                                        name="IsRequired" [value]="true" style="margin-right: 10px; cursor: pointer" />
+                                    <label for="isRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
+
+                                    <input type="radio" id="isRequiredNo" [(ngModel)]="rpt.FirmRptReqdBit"
+                                        name="IsRequired" [value]="false" style="
+                                        margin-left: 20px;
+                                        margin-right: 10px;
+                                        cursor: pointer;
+                                      " />
+                                    <label for="isRequiredNo" style="margin-left: 5px; color: #413b3c">No</label>
+                                </div>
+                            </ng-container>
+                            <ng-template #FirmRptReqdBitValue>
+                                <span style="margin-left: 10px; color: #413b3c">
+                                    {{ rpt.FirmRptReqdBit ? 'Yes' : 'No' }}
+                                </span>
+                            </ng-template>
+                        </div>
+                        <div class="input-field">
+                            <label for="reportLink">Link to Report</label>
+                            <input *ngIf="isEditable" type="text" value="" [(ngModel)]="rpt.FileLoc" id="reportLink" />
+                            <a id="websiteLink" *ngIf="!isEditable"  href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{rpt.documentDetails.Column3}}"
+                            target="_blank" rel="noopener noreferrer">
+                            {{rpt.documentDetails?.FileName}}
+                          </a>
+
+                        </div>
+
+                        <div class="input-field">
+                            <label for="reportGivenBy">Report Given By</label>
+                            <input type="text" id="reportGivenBy" name="reportGivenBy" [(ngModel)]="rpt.WPublishedByUserName"
+                                [disabled]="!isEditable" />
+                        </div>
+
+                        <div class="input-field">
+                            <label for="receivedDate">Received Date</label>
+                            <input type="text" id="receivedDate" name="receivedDate" [(ngModel)]="rpt.ReceivedDate"
+                                [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label for="submissionStatus">Submission Status</label>
+                            <input type="text" id="submissionStatus" name="submissionStatus"
+                                [(ngModel)]="rpt.ObjectStatusTypeDesc" [disabled]="!isEditable" />
+                        </div>
+
+                        <div class="input-field">
+                            <label for="linkToReview">Link to Review</label>
+                            <input type="text" id="linkToReview" name="linkToReview" [(ngModel)]="rpt.linkToReview"
+                                [disabled]="!isEditable" />
+                        </div>
+
+
+                        <div class="input-field">
+                            <label for="returnReviewStatus">Return Review Status</label>
+                            <input type="text" id="returnReviewStatus" name="returnReviewStatus"
+                                [(ngModel)]="rpt.ObjectWFStatusTypeDesc" [disabled]="!isEditable" />
+                        </div>
+
+                        <div class="input-field fullwidth">
+                            <label for="notes">Notes</label>
+                            <textarea [(ngModel)]="rpt.FirmRptNotes" name="notes" id="notes"
+                                [disabled]="!isEditable"></textarea>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+
+            <!-- Action Buttons -->
+            <!-- <div class="btn justify-content-end">
+                <button *ngIf="!isEditable" (click)="editRpt()">
+                    <i class="bi bi-pen"></i> Edit
+                </button>
+                <button *ngIf="isEditable" (click)="saveRptPopupChanges()">
+                    <i></i> Save
+                </button>
+                <button (click)="confirmDeleteRptDetials()">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div> -->
+        </div>
+    </div>
+</div>

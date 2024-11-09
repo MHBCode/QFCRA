@@ -3,7 +3,7 @@
 <div class="form-section">
   <div class="inputs-field-set">
     <div class="section">
-      <div class="form-section-title">
+      <div class="controller-header">
         <h2 class="edit-firm-header">
           Controllers > <span>{{ firmDetails?.FirmName }}</span>
         </h2>
@@ -293,7 +293,7 @@
         <div class="input-field">
           <label>Place of Establishment</label>
           <ng-container *ngIf="isEditable; else placeOfEstablishmentDisplay">
-            <select required [(ngModel)]="selectedController.CountryOfIncorporation" name="placeOfEstablishment">
+            <select [(ngModel)]="selectedController.CountryOfIncorporation" (change)="onCountryChange(selectedController.CountryOfIncorporation,existingRegulaterList, true)" name="placeOfEstablishment">
               <option *ngFor="let place of allCountries" [value]="place.CountryID">
                 {{ place.CountryName }}
               </option>
@@ -436,7 +436,7 @@
         </div>
       </div>
       <!-- Addresses Section -->
-      <div *ngIf="existingControllerCorporateAddresses.length > 0 || isEditable" class="addresses">
+      <div *ngIf="filteredControllerAddresses.length > 0 || isEditable" class="addresses">
         <div class="popup-header">
           <h3>Addresses</h3>
         </div>
@@ -457,13 +457,14 @@
         </div>
         <!--Address Details-->
         <div class="inputs-row">
-          <ng-container *ngFor="let address of filteredControllerCorporateAddresses; let i = index">
+          <ng-container *ngFor="let address of filteredControllerAddresses; let i = index">
             <ng-container *ngIf="address.Valid === true">
               <div class="input-field" *ngIf="!isEditable">
                 <label for="addressType" class="history-row">
                   Address Type
                   <button *ngIf="address.PreviousRecords != 0" class="subbutton-open-history"
-                    (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID)">
+                    (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID,
+                      (selectedController.EntityTypeID === 11 || selectedController.EntityTypeID === 9) ? selectedController.RelatedEntityID : null)">
                     <i class="bi bi-clock-history"></i><span> Open History</span>
                   </button>
                 </label>
@@ -478,7 +479,8 @@
                 <label for="addressType" class="history-row">
                   Address Type
                   <button *ngIf="address.PreviousRecords !== 0 && address.AddressID" class="subbutton-open-history"
-                  (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID)">
+                    (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID,
+                      (selectedController.EntityTypeID === 11 || selectedController.EntityTypeID === 9) ? selectedController.RelatedEntityID : null)">
                     <i class="bi bi-clock-history"></i> <span>Open History</span>
                   </button>
 
@@ -577,37 +579,62 @@
           </ng-container>
         </div>
       </div>
-      <ng-container *ngIf="
-            !isEditable ||
-            (isEditable && selectedController.IsCompanyRegulated)
-          ">
+      <ng-container *ngIf="selectedController.IsCompanyRegulated">
         <div class="popup-header">
           <h3>Home State Regulators</h3>
         </div>
 
-        <div *ngFor="let regulator of regulatorList; let i = index">
+   
+        <button *ngIf="isEditable" (click)="addRegulator(existingRegulaterList)" style="
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            float: right;
+            margin: 5px 0px;
+          ">
+          <i style="size: 7px" class="bi bi-plus-lg"></i>
+        </button>
+
+        <div *ngFor="let regulator of existingRegulaterList; let i = index">
+          <hr>
+          <div *ngIf="isEditable" style="width: 100%">
+            <button (click)="removeRegulator(existingRegulaterList,i)" style="
+                float: right;
+                background-color: red;
+                color: white;
+                border: none;
+                padding: 5px;
+                cursor: pointer;
+                border-radius: 5px;
+              ">
+              <i style="size: 5px" class="bi bi-x-lg"></i>
+            </button>
+          </div>
           <div class="inputs-row">
             <div class="input-field">
               <label for="regulators">Regulator <span style="color: red">*</span></label>
               <ng-container *ngIf="isEditable; else regulatorinput">
-                <select required [(ngModel)]="regulator.RegulatorID" name="regulators" id="regulators">
-                  <option *ngFor="let Regulater of AllRegulater" [value]="Regulater.RegulatorID">
-                    {{ Regulater.RegulatorName }}
+                <select [(ngModel)]="regulator.RegulatorID" name="regulators" id="regulators">
+                  <option value="0">Select</option>
+                  <option *ngFor="let option of AllRegulater" [value]="option.RegulatorID">
+                    {{ option.RegulatorName }}
                   </option>
                 </select>
               </ng-container>
               <ng-template #regulatorinput>
-                <input type="text" name="regulators" id="regulators" [disabled]="!isEditable"
-                  value="{{regulator.RegulatorName}}" />
+                <input type="text" name="regulators" id="regulators"  value="{{regulator.RegulatorName}}" disabled/>
               </ng-template>
             </div>
             <div class="input-field">
               <label>Regulator Contact</label>
-              <input [(ngModel)]="selectedController.RegulatorContact" name="regulatorContact"
-                [disabled]="!isEditable" />
+              <input [(ngModel)]="selectedController.RegulatorContact" name="regulatorContact" disabled />
             </div>
           </div>
         </div>
+
       </ng-container>
       <div class="btn justify-content-end">
         <button *ngIf="!isEditable" (click)="editController()">
@@ -819,6 +846,7 @@
             ">
             <label for="legalStatus"> Legal Status </label>
             <select [(ngModel)]="CreatecontrollerDetails.LegalStatusTypeID" name="legalStatus">
+              <option value="0">Select</option>
               <option *ngFor="let status of legalStatusOptionsEdit" [value]="status.LegalStatusTypeID">
                 {{ status.LegalStatusTypeDesc }}
               </option>
@@ -849,7 +877,9 @@
             <label for="establishmentPlace">
               Place of Establishment <span style="color: red">*</span>
             </label>
-            <select required [(ngModel)]="CreatecontrollerDetails.CountryOfIncorporation" name="placeOfEstablishment">
+            <select [(ngModel)]="CreatecontrollerDetails.CountryOfIncorporation" name="placeOfEstablishment"
+              (change)="onCountryChange(CreatecontrollerDetails.CountryOfIncorporation,regulatorList, false)">
+              <option value="0">Select</option>
               <option *ngFor="let place of allCountries" [value]="place.CountryID">
                 {{ place.CountryName }}
               </option>
@@ -864,6 +894,7 @@
             </label>
             <select required [(ngModel)]="CreatecontrollerDetails.ControllerControlTypeID" name="typeOfControl"
               id="typeOfControl">
+              <option value="0">Select</option>
               <option *ngFor="let ControlType of controlTypeOptionsCreate"
                 [value]="ControlType.ControllerControlTypeID">
                 {{ ControlType.ControllerControlTypeDesc }}
@@ -903,11 +934,11 @@
             ">
             <label for="isRegulated"> Is the company regulated : </label>
             <div class="radio-wrapper">
-              <input name="isRegulated" id="yes" type="radio" [(ngModel)]="CreatecontrollerDetails.IsCompanyRegulated"
-                [value]="true" />
+              <input name="isRegulated" id="yes" type="radio" (change)="onRegulationChange(regulatorList, false)"
+                [(ngModel)]="CreatecontrollerDetails.IsCompanyRegulated" [value]="true" />
               Yes
-              <input name="isRegulated" id="no" type="radio" [(ngModel)]="CreatecontrollerDetails.IsCompanyRegulated"
-                [value]="false" />
+              <input name="isRegulated" id="no" type="radio" (change)="onRegulationChange(regulatorList, false)"
+                [(ngModel)]="CreatecontrollerDetails.IsCompanyRegulated" [value]="false" />
               No
             </div>
           </div>
@@ -1067,7 +1098,7 @@
 
         <!-- Add regulator button -->
 
-        <button (click)="addRegulator()" style="
+        <button (click)="addRegulator(regulatorList)" style="
             background-color: green;
             color: white;
             border: none;
@@ -1075,6 +1106,7 @@
             cursor: pointer;
             border-radius: 5px;
             float: right;
+            margin: 5px 0px;
           ">
           <i style="size: 7px" class="bi bi-plus-lg"></i>
         </button>
@@ -1083,7 +1115,7 @@
         <div *ngFor="let regulator of regulatorList; let i = index" class="create-controller-inputs">
           <hr />
           <div style="width: 100%">
-            <button (click)="removeRegulator(i)" style="
+            <button (click)="removeRegulator(regulatorList,i)" style="
                 float: right;
                 background-color: red;
                 color: white;
@@ -1098,21 +1130,20 @@
           <div class="inputs-row">
             <div class="input-field home-state-regulators-container">
               <!-- Regulator Name input -->
-              <div class="regulator-select-container">
-                <label for="regulators">Regulator <span style="color: red">*</span></label>
-                <select required [(ngModel)]="regulator.RegulatorName" name="regulators" id="regulators">
-                  <option *ngFor="let Regulater of AllRegulater" [value]="Regulater.RegulatorID">
-                    {{ Regulater.RegulatorName }}
-                  </option>
-                </select>
-              </div>
+              <label for="regulators">Regulator <span style="color: red">*</span></label>
+              <select [(ngModel)]="regulator.RegulatorID" name="regulators" id="regulators">
+                <option value="0">Select</option>
+                <option *ngFor="let option of AllRegulater" [value]="option.RegulatorID">
+                  {{ option.RegulatorName }}
+                </option>
+              </select>
               <!-- Remove button for each regulator -->
             </div>
 
             <!-- Regulator Contact input (disabled as per your code) -->
             <div class="input-field regulator-contact-container">
               <label for="regulatorContact-{{ i }}">Regulator Contact</label>
-              <input disabled type="text" [(ngModel)]="regulator.RegulatorContacts" name="regulatorContact-{{ i }}"
+              <input disabled type="text" [(ngModel)]="regulator.RegulatorContact" name="regulatorContact-{{ i }}"
                 id="regulatorContact-{{ i }}" />
             </div>
           </div>

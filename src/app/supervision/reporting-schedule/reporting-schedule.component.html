@@ -17,7 +17,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let rpt of rptSchedule">
+                    <tr *ngFor="let rpt of rptSchedule" (click)="openReportSchedulePopup(rpt)">
                         <td>{{rpt.FirmRptFrom}}</td>
                         <td>{{rpt.FirmRptTo}}</td>
                     </tr>
@@ -26,3 +26,9 @@
         </div>
     </div>
 </div>
+
+<app-reporting-schedule-view
+  *ngIf="showPopup"
+  [report]="selectedReport" [firmId]="firmId"
+  (closeRptPopup)="closePopup()">
+</app-reporting-schedule-view>

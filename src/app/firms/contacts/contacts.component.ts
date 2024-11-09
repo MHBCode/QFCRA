@@ -1447,9 +1447,9 @@ export class ContactsComponent {
     this.checkCanAddNewAddressOnCreateMode();
   }
 
-  getAddressTypeHistory(addressTypeId: number, entityTypeId: number, entityId: number) {
+  getAddressTypeHistory(addressTypeId: number, entityTypeId: number, entityId: number,contactAssnID: number) {
     this.callAddressType = true;
-    this.addressService.getAddressesTypeHistory(null, addressTypeId, entityTypeId, entityId).subscribe(
+    this.addressService.getAddressesTypeHistory(null, addressTypeId, entityTypeId, entityId,contactAssnID).subscribe(
       data => {
         this.contactFirmAddressesTypeHistory = data.response;
       }, error => {
