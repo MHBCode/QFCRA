@@ -293,7 +293,7 @@
         <div class="input-field">
           <label>Place of Establishment</label>
           <ng-container *ngIf="isEditable; else placeOfEstablishmentDisplay">
-            <select [(ngModel)]="selectedController.CountryOfIncorporation" (change)="onCountryChange(selectedController.CountryOfIncorporation,existingRegulaterList, true)" name="placeOfEstablishment">
+            <select [(ngModel)]="selectedController.CountryOfIncorporation" (change)="onCountryChange(selectedController.CountryOfIncorporation,existingRegulatorList, true)" name="placeOfEstablishment">
               <option *ngFor="let place of allCountries" [value]="place.CountryID">
                 {{ place.CountryName }}
               </option>
@@ -584,8 +584,8 @@
           <h3>Home State Regulators</h3>
         </div>
 
-   
-        <button *ngIf="isEditable" (click)="addRegulator(existingRegulaterList)" style="
+        <div>
+          <button *ngIf="isEditable" (click)="addRegulator(existingRegulatorList)" style="
             background-color: green;
             color: white;
             border: none;
@@ -597,11 +597,13 @@
           ">
           <i style="size: 7px" class="bi bi-plus-lg"></i>
         </button>
+        </div>
+        
 
-        <div *ngFor="let regulator of existingRegulaterList; let i = index">
+        <div *ngFor="let regulator of existingRegulatorList; let i = index">
           <hr>
           <div *ngIf="isEditable" style="width: 100%">
-            <button (click)="removeRegulator(existingRegulaterList,i)" style="
+            <button (click)="removeRegulator(existingRegulatorList,i,true)" style="
                 float: right;
                 background-color: red;
                 color: white;
@@ -1098,7 +1100,8 @@
 
         <!-- Add regulator button -->
 
-        <button (click)="addRegulator(regulatorList)" style="
+        <div>
+          <button (click)="addRegulator(regulatorList)" style="
             background-color: green;
             color: white;
             border: none;
@@ -1110,12 +1113,18 @@
           ">
           <i style="size: 7px" class="bi bi-plus-lg"></i>
         </button>
-
+        </div>
+        
+        <div class="error-messages">
+          <p *ngIf="errorMessages['RegulatorID']">
+            {{ errorMessages['RegulatorID'] }}
+          </p>
+        </div>
         <!-- Dynamically generate form inputs for each regulator in regulatorList -->
         <div *ngFor="let regulator of regulatorList; let i = index" class="create-controller-inputs">
           <hr />
           <div style="width: 100%">
-            <button (click)="removeRegulator(regulatorList,i)" style="
+            <button (click)="removeRegulator(regulatorList,i,false)" style="
                 float: right;
                 background-color: red;
                 color: white;

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
 import { FirmService } from './firm.service'; // Assuming FirmService makes the HTTP call
 import { DateUtilService } from '../shared/date-util/date-util.service';
 import { LogformService } from '../ngServices/logform.service';
@@ -20,10 +20,16 @@ export class FirmDetailsService {
   isFirmLicensed$ = this.isFirmLicensedSubject.asObservable();
   isFirmAuthorised$ = this.isFirmAuthorisedSubject.asObservable();
 
+  //error
   errorMessages: { [key: string]: string } = {};
 
+  //address
   newAddress: any = {};
 
+  //security
+  controlsPermissions: any = [];
+  assignedUserRoles: any[] = [];
+  assignedLevelUsers: any[] = [];
   currentDate = new Date();
 
   constructor(
@@ -67,19 +73,35 @@ export class FirmDetailsService {
     });
   }
 
+
   loadAssignedUserRoles(userId: number): Observable<any> {
-    return new Observable(observer => {
-      this.securityService.getUserRoles(userId).subscribe(
-        data => {
-          const assignedUserRoles = data.response;  // Process data if needed
-          observer.next({ assignedUserRoles });
-        },
-        error => {
-          observer.error('Error fetching assigned user roles: ' + error);
-        }
-      );
-    });
+    return this.securityService.getUserRoles(userId).pipe(
+      map(data => {
+        this.assignedUserRoles = data.response || [];  // Default to an empty array if response is undefined
+        return this.assignedUserRoles;
+      }),
+      catchError(error => {
+        console.error('Error fetching assigned user roles:', error);
+        return of([]); // Emit an empty array if there's an error
+      })
+    );
   }
+
+
+  loadAssignedLevelUsers(): Observable<any> {
+    return this.firmService.getAssignLevelUsers().pipe(
+      map(response => {
+        this.assignedLevelUsers = response.response || [];  // Default to an empty array if response is undefined
+        return this.assignedLevelUsers;
+      }),
+      catchError(error => {
+        console.error('Error fetching assigned level users:', error);
+        return of([]); // Emit an empty array if there's an error
+      })
+    );
+  }
+
+
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -389,8 +411,118 @@ export class FirmDetailsService {
     );
   }
 
+  // Security
+  applyAppSecurity(userId: number, objectId: number, OpType: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.securityService.getAppRoleAccess(userId, objectId, OpType).subscribe(
+        (response) => {
+          this.controlsPermissions = response.response;
+          resolve(); // Resolve the promise after fetching data
+        },
+        (error) => {
+          console.error('Error fetching app role access: ', error);
+          reject(error); // Reject the promise if there's an error
+        }
+      );
+    });
+  }
 
 
+
+  isValidFirmSupervisor(firmId: number, userId: number): Observable<boolean> {
+    return this.securityService.isValidFirmSupervisor(firmId, userId).pipe(
+      map(response => response.response)
+    );
+  }
+
+  isValidFirmAMLSupervisor(firmId: number, userId: number): Observable<boolean> {
+    return this.securityService.isValidFirmAMLSupervisor(firmId, userId).pipe(
+      map(response => response.response)
+    );
+  }
+
+  isValidAMLDirector(): boolean {
+    if (this.assignedUserRoles) {
+      return this.assignedUserRoles.some(role => role.AppRoleId === 2007);
+    }
+    return false;
+  }
+
+  isValidAMLSupervisor(): boolean {
+    if (this.assignedUserRoles) {
+      return this.assignedUserRoles.some(role => role.AppRoleId === 3009);
+    }
+    return false;
+  }
+
+  isValidRSGMember(): boolean {
+    if (this.assignedUserRoles) {
+      return this.assignedUserRoles.some(role => role.AppRoleId === 5001);
+    }
+    return false;
+  }
+
+  isAMLSupervisorAssignedToFirm(FIRMRA: any[], assignedUsers: any[] = this.assignedLevelUsers): boolean {
+    if (assignedUsers && FIRMRA.length > 0) {
+      return assignedUsers.some(user =>
+        [7, 8, 9].includes(user.FirmUserAssnTypeID)
+      );
+    }
+    return false;
+  }
+
+
+  // isValidFirmSupervisor(firmId: number, userId: number): void {
+  //   this.securityService.isValidFirmSupervisor(firmId, userId).subscribe((response) => {
+  //     this.isFirmSupervisor = response.response;
+  //   });
+  // }
+
+  // IsValidRSGMember(): boolean {
+  //   if (this.assignedUserRoles) {
+  //     return this.assignedUserRoles.some(role => role.AppRoleId === 5001);
+  //   }
+  //   return false;
+  // }
+
+  // isValidFirmAMLSupervisor(firmId: number, userId: number): void {
+  //   this.securityService.isValidFirmAMLSupervisor(firmId, userId).subscribe((response) => {
+  //     this.isFirmAMLSupervisor = response.response;
+  //   });
+  // }
+
+  // IsValidAMLDirector(): boolean {
+  //   if (this.assignedUserRoles) {
+  //     return this.assignedUserRoles.some(role => role.AppRoleId === 2007);
+  //   }
+  //   return false;
+  // }
+
+  // IsValidAMLSupervisor(): boolean {
+  //   if (this.assignedUserRoles) {
+  //     return this.assignedUserRoles.some(role => role.AppRoleId === 3009);
+  //   }
+  //   return false;
+  // }
+
+  // IsAMLSupervisorAssignedToFirm(FIRMRA: any[]): boolean {
+  //   if (this.assignedLevelUsers) {
+  //     if (FIRMRA.length > 0) {
+  //       return this.assignedLevelUsers.some(levelUser => levelUser.FirmUserAssnTypeID === 7 || levelUser.FirmUserAssnTypeID === 8 || levelUser.FirmUserAssnTypeID === 9)
+  //     }
+  //   }
+  //   return false;
+  // }
+
+  getControlVisibility(controlName: string): boolean {
+    const control = this.controlsPermissions.find(c => c.ControlName === controlName);
+    return control ? control.ShowProperty === 1 : false;
+  }
+
+  getControlEnablement(controlName: string): boolean {
+    const control = this.controlsPermissions.find(c => c.ControlName === controlName);
+    return control ? control.EnableProperty === 1 : false;
+  }
 
 
   getErrorMessages(fieldName: string, msgKey: number, activity?: any, customMessage?: string, placeholderValue?: string): Observable<void> {

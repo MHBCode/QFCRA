@@ -86,7 +86,9 @@ export class ControllersComponent implements OnInit {
   // regulator
   regulatorList: any = [];
   newRegulator: any = {};
-  existingRegulaterList: any = [];
+  existingRegulatorList: any = [];
+  removedRegulators: any = [];
+  invalidRegulator: boolean;
 
 
 
@@ -150,33 +152,33 @@ export class ControllersComponent implements OnInit {
 
   getAllRegulater(firmId: number, countryID: number, regulatorArray: any[], callback?: () => void): void {
     if (countryID === 0) {
-        this.securityService.getObjectTypeTable(constants.Regulaters)
-            .subscribe(data => {
-                this.AllRegulater = data.response;  // Store dropdown options separately
-                console.log("General Regulators fetched:", data);
+      this.securityService.getObjectTypeTable(constants.Regulaters)
+        .subscribe(data => {
+          this.AllRegulater = data.response;  // Store dropdown options separately
+          console.log("General Regulators fetched:", data);
 
-                // Reset selected regulator if it no longer exists in AllRegulater
-                this.resetSelectedRegulatorIfNotFound(regulatorArray);
+          // Reset selected regulator if it no longer exists in AllRegulater
+          this.resetSelectedRegulatorIfNotFound(regulatorArray);
 
-                if (callback) callback();
-            }, error => {
-                console.error("Error fetching Regulators:", error);
-            });
+          if (callback) callback();
+        }, error => {
+          console.error("Error fetching Regulators:", error);
+        });
     } else {
-        this.parentEntity.getRegulatorsByCountry(firmId, countryID)
-            .subscribe(data => {
-                this.AllRegulater = data.response;  // Store dropdown options separately
-                console.log("Country-specific Regulators fetched:", data);
+      this.parentEntity.getRegulatorsByCountry(firmId, countryID)
+        .subscribe(data => {
+          this.AllRegulater = data.response;  // Store dropdown options separately
+          console.log("Country-specific Regulators fetched:", data);
 
-                // Reset selected regulator if it no longer exists in AllRegulater
-                this.resetSelectedRegulatorIfNotFound(regulatorArray);
+          // Reset selected regulator if it no longer exists in AllRegulater
+          this.resetSelectedRegulatorIfNotFound(regulatorArray);
 
-                if (callback) callback();
-            }, error => {
-                console.error("Error fetching Country-specific Regulators:", error);
-            });
+          if (callback) callback();
+        }, error => {
+          console.error("Error fetching Country-specific Regulators:", error);
+        });
     }
-}
+  }
 
 
 
@@ -216,9 +218,19 @@ export class ControllersComponent implements OnInit {
     regulatorArray.unshift(newRegulator); // Add new regulator at the beginning
   }
 
-  removeRegulator(regulatorArray: any[], index: number): void {
-    regulatorArray.splice(index, 1);
+  removeRegulator(regulatorArray: any[], index: number, isEditMode: boolean): void {
+    if (isEditMode && regulatorArray[index].RegulatorID) {
+      // Mark as removed if in edit mode
+      const regulator = regulatorArray[index];
+      regulator.isRemoved = true;
+      this.removedRegulators.push(regulator);
+      regulatorArray.splice(index, 1);
+    } else {
+      // Remove regulator from array if in create mode or if it's a new regulator in edit mode
+      regulatorArray.splice(index, 1);
+    }
   }
+
 
   updateRegulators(countryID: number, regulatorArray: any[], isRegulated: boolean): void {
     if (isRegulated) {
@@ -308,7 +320,7 @@ export class ControllersComponent implements OnInit {
           entityID: this.firmId, // not integrated in the form
           controllerControlTypeID: this.CreatecontrollerDetails.ControllerControlTypeID,
           numOfShares: this.CreatecontrollerDetails.NumOfShares,
-          pctOfShares: this.CreatecontrollerDetails.PctOfShares || null,
+          pctOfShares: this.CreatecontrollerDetails.ControllerControlTypeID === 1 ? this.CreatecontrollerDetails.PctOfShares : null,
           majorityStockHolder: false, // not integrated in the form
           assnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
           assnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo)
@@ -348,16 +360,16 @@ export class ControllersComponent implements OnInit {
           objAis: null,
         })),
 
-        regulatorList: this.regulatorList.map(regulator => ({
+        regulatorList: this.CreatecontrollerDetails.IsCompanyRegulated ? this.regulatorList.map(regulator => ({
           regulatorState: 2, // add new regulator
           regulatorID: regulator.RegulatorID,
-          entityTypeID: 0,
-          entityID: this.firmId,
-          relatedEntityTypeID: 0,
+          entityTypeID: this.CreatecontrollerDetails.EntityTypeID, // controller type
+          entityID: null,
+          relatedEntityTypeID: 5, // constant
           relatedEntityID: null,
-          contactAssnID: 0
-        }))
-      }
+          contactAssnID: null
+        })) : []
+      };
       console.log("Controller to be saved", saveControllerPopupChangesObj)
       // Call the insert/update endpoint
       this.controllerService.insertupdateotherentitydetails(saveControllerPopupChangesObj).subscribe(
@@ -401,7 +413,7 @@ export class ControllersComponent implements OnInit {
             secondName: this.CreatecontrollerDetails.SecondName,
             thirdName: this.CreatecontrollerDetails.ThirdName,
             familyName: this.CreatecontrollerDetails.FamilyName,
-            PctOfShares: this.CreatecontrollerDetails.PctOfShares,
+            PctOfShares: this.CreatecontrollerDetails.ControllerControlTypeID === 1 ? this.CreatecontrollerDetails.PctOfShares : null,
             tempContactID: 0,
             countryOfResidence: null,
             ControllerControlTypeID: this.CreatecontrollerDetails.ControllerControlTypeID,
@@ -715,6 +727,15 @@ export class ControllersComponent implements OnInit {
           }
         }
 
+        this.invalidRegulator = this.regulatorList.find(regulator => !regulator.RegulatorID || regulator.RegulatorID === 0);
+        if (this.invalidRegulator) {
+          // this.loadErrorMessages('RegulatorID',);
+          this.errorMessages['RegulatorID'] = 'Please select a value for the "Regulator" field.';
+          this.hasValidationErrors = true;
+        } else {
+          delete this.errorMessages['RegulatorID'];
+        }
+
       } else {
         // Additional validations for other entities
         if (!this.CreatecontrollerDetails.FirstName || this.CreatecontrollerDetails.FirstName.trim().length === 0) {
@@ -772,7 +793,7 @@ export class ControllersComponent implements OnInit {
   editController(): void {
     this.isEditable = true;
     this.initializeAddressTypes();
-    this.getAllRegulater(this.firmId,this.selectedController.CountryOfIncorporation,this.existingRegulaterList)
+    this.getAllRegulater(this.firmId, this.selectedController.CountryOfIncorporation, this.existingRegulatorList)
   }
 
   loadControllers(): void {
@@ -1173,11 +1194,11 @@ export class ControllersComponent implements OnInit {
     this.parentEntity.getRegulatorDetails(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID)
       .subscribe(data => {
         if (data.response && data.response.length > 0) {
-          this.existingRegulaterList = data.response;
+          this.existingRegulatorList = data.response;
         }
       });
 
-    this.getAllRegulater(this.selectedController.CountryOfIncorporation, this.firmId, this.existingRegulaterList);
+    this.getAllRegulater(this.selectedController.CountryOfIncorporation, this.firmId, this.existingRegulatorList);
 
     if (this.selectedController.EntityTypeID === 11 || this.selectedController.EntityTypeID === 9) {
       const firmId = this.firmId;
@@ -1188,6 +1209,8 @@ export class ControllersComponent implements OnInit {
       this.loadControllerIndividualAdresses(contactAssId, this.userId, constants.ObjectOpType.View);
       this.loadControllerIndividualDetails(firmId, functionTypeId, contactId, contactAssId);
     }
+
+    console.log("Selected view controller details: ", this.controllerDetails);
   }
 
 
@@ -1197,7 +1220,7 @@ export class ControllersComponent implements OnInit {
       data => {
         if (data.response) {
           this.selectedIndividualController = data.response[0]; // Assign the response to selectedController
-          console.log('Updated Selected Controller:', this.selectedIndividualController);
+          console.log('Individual Selected Controller:', this.selectedIndividualController);
         }
       },
       error => {
@@ -1217,7 +1240,7 @@ export class ControllersComponent implements OnInit {
     this.errorMessages = {}; // Clear previous error messages
     this.hasValidationErrors = false;
     this.existingControllerCorporateAddresses.push(this.defaultAddress);
-    this.existingRegulaterList = [];
+    this.existingRegulatorList = [];
     this.selectedController = [];
     this.controllerDetails = this.selectedController;
   }
@@ -1415,7 +1438,7 @@ export class ControllersComponent implements OnInit {
           OtherEntityName: this.selectedController.OtherEntityName,
           otherEntityID: this.selectedController.OtherEntityID,
           DateOfIncorporation: this.dateUtilService.convertDateToYYYYMMDD(this.firmDetails.DateOfIncorporation),
-          createdBy: this.selectedController.CreatedBy,
+          createdBy: this.userId,
           CreatedDate: null,
           relatedEntityID: this.selectedController.RelatedEntityID,
           entitySubTypeID: this.selectedController.EntitySubTypeID,
@@ -1443,7 +1466,7 @@ export class ControllersComponent implements OnInit {
           EntityID: this.selectedController.FirmID,
           controllerControlTypeID: this.selectedController.ControllerControlTypeID,
           numOfShares: this.selectedController.numOfShares,
-          PctOfShares: this.selectedController.PctOfShares,
+          PctOfShares: this.selectedController.ControllerControlTypeID === 1 ? this.selectedController.PctOfShares : null,
           MajorityStockHolder: false,
           AssnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
           AssnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
@@ -1496,15 +1519,28 @@ export class ControllersComponent implements OnInit {
           };
         }),
 
-        regulatorList: this.selectedController.IsCompanyRegulated ? this.existingRegulaterList.map(regulator => ({
-          regulatorState: 0, // needs to be changed
-          regulatorID: regulator.RegulatorID,
-          entityTypeID: this.selectedController.EntityTypeID,
-          entityID: this.firmId,
-          relatedEntityTypeID: this.selectedController.EntityTypeID,
-          relatedEntityID: null,
-          contactAssnID: 0
-        })) : []
+        regulatorList: this.selectedController.IsCompanyRegulated ? [...this.existingRegulatorList, ...this.removedRegulators].map(regulator => {
+          let regulatorState: number;
+
+          if (regulator.isRemoved) {
+            regulatorState = 4; // Deleted address
+          } else if (regulator.RegulatorName === "") {
+            regulatorState = 2; // New address
+          } else {
+            regulatorState = 3; // Modified address
+          }
+
+          return {
+            regulatorState: regulatorState,
+            regulatorID: regulator.RegulatorID,
+            entityTypeID: this.selectedController.EntityTypeID,
+            entityID: null,
+            relatedEntityTypeID: 5, // constant
+            relatedEntityID: regulator.RelatedEntityID,
+            contactAssnID: null
+          };
+        }) : []
+
       };
 
       // Call the insert/update endpoint
@@ -1540,7 +1576,7 @@ export class ControllersComponent implements OnInit {
             secondName: this.selectedIndividualController.SecondName,
             thirdName: this.selectedIndividualController.ThirdName,
             familyName: this.selectedIndividualController.FamilyName,
-            PctOfShares: this.selectedController.PctOfShares,
+            PctOfShares: this.selectedController.ControllerControlTypeID === 1 ? this.selectedController.PctOfShares : null,
             tempContactID: 0,
             countryOfResidence: null,
             ControllerControlTypeID: this.selectedController.ControllerControlTypeID,
@@ -1660,6 +1696,27 @@ export class ControllersComponent implements OnInit {
   showError(messageKey: number) {
     this.firmDetailsService.showErrorAlert(messageKey, this.isLoading);
   }
+
+  validateTotalPercentage(newPctOfShares: number): boolean {
+    // Calculate the current total of percentages in selectedController
+    const currentTotal = this.FIRMControllers.reduce((total, controller) => {
+      const pct = parseFloat(controller.PctOfShares) || 0; 
+      return total + pct;
+    }, 0);
+
+    // Check if adding the new percentage would exceed 100%
+    if (currentTotal + newPctOfShares > 100) {
+      this.loadErrorMessages('PctOfShares', constants.ControllerMessages.ENTER_PERCENTAGE_NOTEXCEED);
+      this.hasValidationErrors = true;
+      return false;
+    } else {
+      delete this.errorMessages['PCTOFSHARESLESSTHAN100'];
+    }
+    return true; 
+  }
+
+
+
   EditControllerValidateForm(): Promise<void> {
     if (
       ["Parent Entity", "Corporate Controller", "Head Office of a Branch", "UBO – Corporate"].includes(this.selectedController.EntityTypeDesc)
@@ -1706,12 +1763,18 @@ export class ControllersComponent implements OnInit {
 
         // Validate Percentage of Holding
         if (this.selectedController.PctOfShares) {
-          const pct = parseFloat(this.selectedController.PctOfShares);
-          if (isNaN(pct) || pct < 0 || pct > 100) {
+          const newPct = parseFloat(this.selectedController.PctOfShares);
+
+          // Check if the newPct is a valid percentage (0–100)
+          if (isNaN(newPct) || newPct < 0 || newPct >= 100) {
             this.loadErrorMessages('PctOfShares', constants.ControllerMessages.ENTER_VALID_PERCENTAGE);
             this.hasValidationErrors = true;
           }
+          // If valid, then proceed to check total percentage
+          else if (!this.validateTotalPercentage(newPct)) {
+          }
         }
+
 
         // Check if there are any validation errors
         if (Object.keys(this.errorMessages).length > 0) {
