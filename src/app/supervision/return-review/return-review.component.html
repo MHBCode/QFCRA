@@ -1,54 +1,67 @@
 <app-loader *ngIf="isLoading"></app-loader>
 
 <div class="form-section">
-    <div class="inputs-field-set">
-        <div class="section">
-            <div class="form-section-title">
-                <h2 class="edit-firm-header">
-                    <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
-                    Return Review > <span>Al Rayyan </span>
-                </h2>
-            </div>
-            <table>
-                <thead>
-                  <tr>
-                    <th>Ver</th>
-                    <th>Report</th>
-                    <th>Report Period Start Date</th>
-                    <th>Report Period End Date</th>
-                    <th>Received Date</th>
-                    <th>Review Status</th>
-                    <th>Review Status Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let ReturnreView of paginatedFirms">
-                    <td>{{ReturnreView.RptReviewRevNum}}</td>
-                    <td>{{ReturnreView.ReportName}}</td>
-                    <td>{{ReturnreView.PeriodFrom}}</td>
-                    <td>{{ReturnreView.PeriodTo}}</td>
-                    <td>{{ReturnreView.ReceivedDate}}</td>
-                    <td>{{ReturnreView.ReviewStatus}}</td>
-                    <td>{{ReturnreView.ReviewStatusDate}}</td>
-                  </tr>
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td [attr.colspan]="7">
-                      <div class="pagination">
-                        <button (click)="previousPage()" [disabled]="currentPage === 1">
-                          <span>&lt;</span>
-                        </button>
-                        <span>Page {{ currentPage }} of {{ totalPages }}</span>
-                        <button (click)="nextPage()" [disabled]="currentPage === totalPages">
-                          <span>&gt;</span>
-                        </button>
-                        <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
-                      </div>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-        </div>
+  <div class="inputs-field-set">
+    <div class="section">
+      <div class="form-section-title">
+        <h2 class="edit-firm-header">
+          <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
+          Return Review > <span>{{ firmDetails?.FirmName }} </span>
+        </h2>
+      </div>
+      <!-- Filter Dropdown -->
+      <div style="margin-bottom: 1rem;">
+        <label for="reportFilter">Filter Reports: </label>
+        <select id="reportFilter" (change)="filterReports($event)" style="padding: 5px;">
+          <option selected="selected" value="1">All</option>
+          <option value="2">Non - AML Reports</option>
+          <option value="3">AML Reports</option>
+        </select>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Ver</th>
+            <th>Report</th>
+            <th>Report Period Start Date</th>
+            <th>Report Period End Date</th>
+            <th>Received Date</th>
+            <th>Review Status</th>
+            <th>Review Status Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ReturnreView of paginatedFirms">
+            <td>{{ReturnreView.RptReviewRevNum}}</td>
+            <td>{{ReturnreView.ReportName}}</td>
+            <td>{{ReturnreView.PeriodFrom}}</td>
+            <td>{{ReturnreView.PeriodTo}}</td>
+            <td>{{ReturnreView.ReceivedDate}}</td>
+            <td>{{ReturnreView.ReviewStatus}}</td>
+            <td>{{ReturnreView.ReviewStatusDate}}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td [attr.colspan]="10">
+              <div class="pagination"
+                style="display: flex; align-items: center; justify-content: center; gap: 15px; padding: 10px 0;">
+                <button (click)="previousPage()" [disabled]="currentPage === 1"
+                  style="background-color: #f1f1f1; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; border-radius: 4px; color: #333;">
+                  <span>&lt;</span>
+                </button>
+                <span style="font-weight: 500; color: #333;">Page {{ currentPage }} of {{ totalPages }}</span>
+                <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+                  style="background-color: #f1f1f1; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; border-radius: 4px; color: #333;">
+                  <span>&gt;</span>
+                </button>
+                <span style="color: #555; font-size: 14px;">Showing {{ startRow }} to {{ endRow }} of {{ totalRows }}
+                  rows</span>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
+  </div>
 </div>
