@@ -198,6 +198,10 @@
     margin-right: 10px;
 }
 
+.addressHistoryPopup {
+    width: 50vw;
+}
+
 .addressHistoryPopup .address-type-info {
     display: flex;
     align-items: center;
@@ -422,6 +426,13 @@ hr {
 
 .controller-tables td, .auditor-table td, .contacts-table td {
     cursor: pointer;
+}
+
+.controller-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .add-address-btn-container {

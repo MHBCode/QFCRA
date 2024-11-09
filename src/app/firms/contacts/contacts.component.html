@@ -541,7 +541,7 @@
                 <label for="addressType" class="history-row">
                   Address Type
                   <button *ngIf="address.PreviousRecords != 0" class="subbutton-open-history"
-                  (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID)">
+                  (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID,selectedContact.ContactAssnID)">
                     <i class="bi bi-clock-history"></i><span> Open History</span>
                   </button>
                 </label>

@@ -4,6 +4,7 @@
       {{ errorMessages['uploadDocument'] }}
   </p>
 </div>
+<div class="inputs-row">
 <div class="file-container">
   <div class="input-field">
     <label for="documentType"> Document Type </label>
@@ -49,7 +50,7 @@
     </tbody>
   </table>
 </div>
-
+</div>
 <!--Select Document PopUp-->
 <div *ngIf="callUploadDoc" class="overlay show"></div>
 <div *ngIf="callUploadDoc" class="selectDocumentPopUp">
