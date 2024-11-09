@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
 import { LogformService } from 'src/app/ngServices/logform.service';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-core-details',
@@ -61,6 +62,7 @@ export class CoreDetailsComponent implements OnInit {
   isFirmSupervisor: boolean = false;
   assignedLevelUsers: any = [];
   FIRMRA: any[] = [];
+  ASSILevel: number = 4;
   dateOfApplication: any;
   isCollapsed: { [key: string]: boolean } = {};
   disableAddressFields: boolean = false;
@@ -97,8 +99,8 @@ export class CoreDetailsComponent implements OnInit {
   callUploadDoc: boolean = false;
   fileError: string = '';
   documentObj: any;
-  fetchedCoreDetailDocSubTypeID:any;
-  CoreDetailDocSubTypeID:any;
+  fetchedCoreDetailDocSubTypeID: any;
+  CoreDetailDocSubTypeID: any;
 
   constructor(
     private securityService: SecurityService,
@@ -123,6 +125,7 @@ export class CoreDetailsComponent implements OnInit {
       this.firmId = +params['id'];
       this.loadFirmDetails(this.firmId);
       this.loadFirmAddresses(this.firmId);
+      this.loadAssiRA();
       this.populateCountries();
       this.populateAddressTypes();
       this.populateQFCLicenseStatus();
@@ -132,9 +135,24 @@ export class CoreDetailsComponent implements OnInit {
       this.populateFinYearEnd();
       this.populateLegalStatus();
       this.loadCurrentAppDetails();
-      this.loadAssignedUserRoles(this.userId);
-      this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
       
+      forkJoin([
+        this.firmDetailsService.loadAssignedUserRoles(this.userId),
+        this.firmDetailsService.loadAssignedLevelUsers()
+    ]).subscribe({
+        next: ([userRoles, levelUsers]) => {
+            // Assign the results to component properties
+            this.assignedUserRoles = userRoles;
+            this.assignedLevelUsers = levelUsers;
+
+            // Now apply security on the page
+            this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
+        },
+        error: (err) => {
+            console.error('Error loading user roles or level users:', err);
+        }
+    });
+
       this.firmDetailsService.isFirmLicensed$.subscribe(
         (value) => (this.isFirmLicensed = value)
       );
@@ -146,9 +164,9 @@ export class CoreDetailsComponent implements OnInit {
       this.firmDetailsService.checkFirmAuthorisation(this.firmId);
 
 
-       // functions for documents
-       this.fetchSubTypeDocIDs();
-       this.getNewFileNumber();
+      // functions for documents
+      this.fetchSubTypeDocIDs();
+      this.getNewFileNumber();
 
     })
   }
@@ -165,7 +183,7 @@ export class CoreDetailsComponent implements OnInit {
       data => {
         this.firmAddresses = data.firmAddresses;
         this.existingAddresses = this.firmAddresses.filter(addr => addr.Valid);
-        console.log('Existing Firm Addresses',this.existingAddresses)
+        console.log('Existing Firm Addresses', this.existingAddresses)
         console.log('Firm Addresses:', this.firmAddresses);
       },
       error => {
@@ -191,14 +209,17 @@ export class CoreDetailsComponent implements OnInit {
     );
   }
 
-  loadAssignedUserRoles(userId: number): void {
-    this.firmDetailsService.loadAssignedUserRoles(userId).subscribe(
+  loadAssiRA() {
+    this.isLoading = true;
+    this.firmService.getFIRMUsersRAFunctions(this.firmId, this.ASSILevel).subscribe(
       data => {
-        this.assignedUserRoles = data.assignedUserRoles;
-        console.log('Roles successfully fetched:', this.assignedUserRoles);
+        this.FIRMRA = data.response;
+        console.log('Firm RA Functions details:', this.FIRMRA);
+        this.isLoading = false;
       },
       error => {
-        console.error(error);
+        console.error('Error get Firm RA Functionsdetails', error);
+        this.isLoading = false;
       }
     );
   }
@@ -268,15 +289,12 @@ export class CoreDetailsComponent implements OnInit {
     }
   }
 
-
   getControlVisibility(controlName: string): boolean {
-    const control = this.controlsPermissions.find(c => c.ControlName === controlName);
-    return control ? control.ShowProperty === 1 : false;
+    return this.firmDetailsService.getControlVisibility(controlName);
   }
 
   getControlEnablement(controlName: string): boolean {
-    const control = this.controlsPermissions.find(c => c.ControlName === controlName);
-    return control ? control.EnableProperty === 1 : false;
+    return this.firmDetailsService.getControlEnablement(controlName);
   }
 
   applySecurityOnPage(objectId: FrimsObject, Mode: boolean) {
@@ -284,7 +302,7 @@ export class CoreDetailsComponent implements OnInit {
     const currentOpType = Mode ? ObjectOpType.Edit : ObjectOpType.View;
 
     // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
-    this.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
       let firmType = this.firmDetails?.FirmTypeID;
 
 
@@ -299,14 +317,14 @@ export class CoreDetailsComponent implements OnInit {
       if (this.isFirmSupervisor) {
         this.loading = false;
         return; // No need to hide the button for Firm supervisor
-      } else if (this.IsValidRSGMember()) {
+      } else if (this.firmDetailsService.isValidRSGMember()) {
         this.loading = false;
         return; // No need to hide the button for RSG Member
-      } else if (this.isFirmAMLSupervisor || this.IsValidAMLDirector()) {
+      } else if (this.isFirmAMLSupervisor || this.firmDetailsService.isValidAMLDirector()) {
         if (firmType === 1) {
           this.hideActionButton(); // Hide button for AML Team
         }
-      } else if (this.IsValidAMLSupervisor() && !this.IsAMLSupervisorAssignedToFirm()) {
+      } else if (this.firmDetailsService.isValidAMLSupervisor() && !this.firmDetailsService.isAMLSupervisorAssignedToFirm(this.FIRMRA, this.assignedLevelUsers)) {
         if (firmType === 1) {
           this.hideActionButton(); // Hide button if no AML supervisor is assigned
         }
@@ -317,56 +335,6 @@ export class CoreDetailsComponent implements OnInit {
     });
   }
 
-  applyAppSecurity(userId: number, objectId: number, OpType: number): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.securityService.getAppRoleAccess(userId, objectId, OpType).subscribe(
-        (response) => {
-          this.controlsPermissions = response.response;
-          resolve(); // Resolve the promise after fetching data
-        },
-        (error) => {
-          console.error('Error fetching app role access: ', error);
-          reject(error); // Reject the promise if there's an error
-        }
-      );
-    });
-  }
-
-  IsValidRSGMember(): boolean {
-    if (this.assignedUserRoles) {
-      return this.assignedUserRoles.some(role => role.AppRoleId === 5001);
-    }
-    return false;
-  }
-
-  isValidFirmAMLSupervisor(firmId: number, userId: number): void {
-    this.securityService.isValidFirmAMLSupervisor(firmId, userId).subscribe((response) => {
-      this.isFirmAMLSupervisor = response.response;
-    });
-  }
-
-  IsValidAMLDirector(): boolean {
-    if (this.assignedUserRoles) {
-      return this.assignedUserRoles.some(role => role.AppRoleId === 2007);
-    }
-    return false;
-  }
-
-  IsValidAMLSupervisor(): boolean {
-    if (this.assignedUserRoles) {
-      return this.assignedUserRoles.some(role => role.AppRoleId === 3009);
-    }
-    return false;
-  }
-
-  IsAMLSupervisorAssignedToFirm(): boolean {
-    if (this.assignedLevelUsers) {
-      if (this.FIRMRA.length > 0) {
-        return this.assignedLevelUsers.some(levelUser => levelUser.FirmUserAssnTypeID === 7 || levelUser.FirmUserAssnTypeID === 8 || levelUser.FirmUserAssnTypeID === 9)
-      }
-    }
-    return false;
-  }
 
   isNullOrEmpty(value) {
     return this.firmService.isNullOrEmpty(value);
@@ -834,7 +802,7 @@ export class CoreDetailsComponent implements OnInit {
     return new Promise((resolve, reject) => {
       this.logForm.errorMessages(messageKey).subscribe(
         (response) => {
-          const messageWithPlaceholder = response.response.replace("{0}", placeholder).replace("{1}", );
+          const messageWithPlaceholder = response.response.replace("{0}", placeholder).replace("{1}",);
           this.isLoading = false;
           // Display the popup
           Swal.fire({
@@ -942,21 +910,21 @@ export class CoreDetailsComponent implements OnInit {
 
   getFilteredAddressTypes() {
     return this.existingAddresses
-       .filter(address => address.AddressTypeID && address.AddressTypeID !== 0) // Exclude blank and '0' entries
-       .map(address => ({
-          AddressTypeID: address.AddressTypeID,
-          AddressTypeDesc: address.AddressTypeDesc
-       }))
-       .filter((value, index, self) =>
-          index === self.findIndex((t) => t.AddressTypeID === value.AddressTypeID)
-       ); // Remove duplicates
- }
- 
+      .filter(address => address.AddressTypeID && address.AddressTypeID !== 0) // Exclude blank and '0' entries
+      .map(address => ({
+        AddressTypeID: address.AddressTypeID,
+        AddressTypeDesc: address.AddressTypeDesc
+      }))
+      .filter((value, index, self) =>
+        index === self.findIndex((t) => t.AddressTypeID === value.AddressTypeID)
+      ); // Remove duplicates
+  }
+
 
 
   getAddressTypeHistory(addressTypeId: number) {
     this.callAddressType = true;
-    this.addressService.getAddressesTypeHistory(this.firmId, addressTypeId,null,null,null).subscribe(
+    this.addressService.getAddressesTypeHistory(this.firmId, addressTypeId, null, null, null).subscribe(
       data => {
         this.firmAddressesTypeHistory = data.response;
       }, error => {
@@ -1012,7 +980,7 @@ export class CoreDetailsComponent implements OnInit {
 
   onSameAsTypeChangeOnEditMode(selectedTypeID: number, index: number) {
     this.disableAddressFields = selectedTypeID && selectedTypeID != 0; // Set disableAddressFields here
-    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, index ,this.existingAddresses, this.newAddress);
+    this.firmDetailsService.onSameAsTypeChangeOnEditMode(selectedTypeID, index, this.existingAddresses, this.newAddress);
   }
 
 
@@ -1535,7 +1503,7 @@ export class CoreDetailsComponent implements OnInit {
 
 
   onDocumentUploaded(uploadedDocument: any) {
-    const { fileLocation, intranetGuid } = uploadedDocument;    
+    const { fileLocation, intranetGuid } = uploadedDocument;
     this.documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid, constants.DocType.FIRM_DOCS, this.Page.CoreDetail, this.fetchedCoreDetailDocSubTypeID.DocSubTypeID, this.firmAppDetailsCurrentAuthorized.FirmApplStatusID, 1);
     this.isLoading = true;
     this.objectWF.insertDocument(this.documentObj).subscribe(
