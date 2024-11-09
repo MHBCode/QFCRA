@@ -17,7 +17,9 @@ export class ReportingScheduleComponent {
   isLoading: boolean = false;
   firmId: number = 0;
   isAuthorise : boolean = true;
-  
+  selectedReport: any = null;
+  showPopup: boolean = false;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -63,5 +65,14 @@ export class ReportingScheduleComponent {
     );
   }
   
+
+  openReportSchedulePopup(rpt: any): void {
+    this.selectedReport = rpt;
+    this.showPopup = true;
+  }
+
+  closePopup(): void {
+    this.showPopup = false;
+  }
 }
 
