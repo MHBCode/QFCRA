@@ -502,3 +502,17 @@ export enum DocType {
     SCOPE = 209,
     FIRM_DOCS = 210
 }
+
+export enum FunctionType
+{
+    IndividualController = 11,
+    Director = 12,
+    Secretary = 13,
+    PrincipalRepresentative = 14,
+    DirectorMember_NonQFC = 15,
+    SEF = 1,
+    MLRO = 7,
+    CustomerFacing = 10,
+    SigShareholder = 19,
+    UBO_IndividualController=25
+}

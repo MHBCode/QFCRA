@@ -105,6 +105,19 @@ export class FirmDetailsService {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  checkCanAddNewAddressOnEditMode(targetArray: any[], allAddressTypes: any[]): { canAddNewAddressOnEdit: boolean, isAllAddressesAddedOnEdit: boolean } {
+    const totalAddressTypes = allAddressTypes.length;
+
+    // Check if all addresses have a selected AddressTypeID
+    const allTypesSelected = targetArray.every(address => address.AddressTypeID !== 0);
+
+    // Calculate flags based on conditions
+    const canAddNewAddressOnEdit = allTypesSelected && targetArray.length < totalAddressTypes;
+    const isAllAddressesAddedOnEdit = targetArray.length >= totalAddressTypes;
+
+    return { canAddNewAddressOnEdit, isAllAddressesAddedOnEdit };
+  }
+
   addNewAddressOnEditMode(targetArray: any[], allAddressTypes: any[], currentDate: string): { canAddNewAddress: boolean, newAddress: any } {
     const totalAddressTypes = allAddressTypes.length;
     const validAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
@@ -236,6 +249,7 @@ export class FirmDetailsService {
       FaxNumber: sourceAddress.FaxNumber
     });
   }
+  
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
