@@ -111,10 +111,10 @@ export class HeaderComponent implements OnInit {
       this.router.navigate(['home/tasks-page/assigned-tasks'])
     }
     if(where == 3){
-      this.router.navigate(['home/firms-page'])
+      this.router.navigate(['/firms'])
     }
     if(where == 4){
-      this.router.navigate(['home/new-firm'])
+      this.router.navigate(['/firms/new-firm'])
     }
     if(where == 5){
       this.router.navigate(['home/co-supervisors'])

@@ -22,7 +22,7 @@
 
 
         <div class="reporting-schedule-form">
-            <div class="inputs-row">
+            <div class="inputs-row" *ngIf="financialReportingPeriod">
                 <div class="input-field">
                     <label for="financialYearEnd">Financial year end selected to generate this reporting
                         schedule</label>
@@ -41,8 +41,7 @@
                 </div>
                 <div class="input-field">
                     <label for="reportType">Report Type</label>
-                    <select [disabled]="!isEditable" id="reportType"
-                        [(ngModel)]="financialReportingPeriod.FirmFinYearEndTypeID">
+                    <select id="reportType" [(ngModel)]="financialReportingPeriod.FirmFinYearEndTypeID">
                         <option *ngFor="let option of reportPeriodTypes" [value]="option.RptPeriodTypeID">
                             {{ option?.RptPeriodShortDesc }}
                         </option>
@@ -61,6 +60,7 @@
                             <input type="text" id="reportTypeEntry" name="reportTypeEntry" [(ngModel)]="rpt.DocTypeDesc"
                                 [disabled]="!isEditable" />
                         </div>
+
                         <div class="input-field">
                             <label for="submissionType">Submission Type</label>
                             <input type="text" id="submissionType" name="submissionType"
@@ -68,8 +68,11 @@
                         </div>
                         <div class="input-field">
                             <label for="reportingPeriodType">Reporting Period Type</label>
-                            <input type="text" id="reportingPeriodType" name="reportingPeriodType"
-                                [(ngModel)]="rpt.RptPeriodTypeDesc" [disabled]="!isEditable" />
+                            <select id="reportingPeriodType" [disabled]="!isEditable" [(ngModel)]="rpt.RptPeriodTypeID">
+                                <option *ngFor="let option of reportPeriodTypes" [value]="option.RptPeriodTypeID">
+                                    {{ option?.RptPeriodShortDesc }}
+                                </option>
+                            </select>
                         </div>
                         <div class="input-field">
                             <label for="reportingPeriodStartDate">Reporting Period Start Date</label>
@@ -117,17 +120,18 @@
                         <div class="input-field">
                             <label for="reportLink">Link to Report</label>
                             <input *ngIf="isEditable" type="text" value="" [(ngModel)]="rpt.FileLoc" id="reportLink" />
-                            <a id="websiteLink" *ngIf="!isEditable"  href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{rpt.documentDetails.Column3}}"
-                            target="_blank" rel="noopener noreferrer">
-                            {{rpt.documentDetails?.FileName}}
-                          </a>
+                            <a id="websiteLink" *ngIf="!isEditable"
+                                href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{rpt.documentDetails?.Column3}}"
+                                target="_blank" rel="noopener noreferrer">
+                                {{rpt.documentDetails?.FileName}}
+                            </a>
 
                         </div>
 
                         <div class="input-field">
                             <label for="reportGivenBy">Report Given By</label>
-                            <input type="text" id="reportGivenBy" name="reportGivenBy" [(ngModel)]="rpt.WPublishedByUserName"
-                                [disabled]="!isEditable" />
+                            <input type="text" id="reportGivenBy" name="reportGivenBy"
+                                [(ngModel)]="rpt.WPublishedByUserName" [disabled]="!isEditable" />
                         </div>
 
                         <div class="input-field">
