@@ -12,6 +12,8 @@ import { AddressesService } from 'src/app/ngServices/addresses.service';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 import { LogformService } from 'src/app/ngServices/logform.service';
 import { FrimsObject } from 'src/app/app-constants';
+import { AiElectronicswfService } from 'src/app/ngServices/ai-electronicswf.service';
+
 @Component({
   selector: 'app-contacts',
   templateUrl: './contacts.component.html',
@@ -91,6 +93,7 @@ export class ContactsComponent {
     private addressService: AddressesService,
     private flatpickrService: FlatpickrService,
     private logForm: LogformService,
+    private aiElectronicswfService:AiElectronicswfService,
   ) {
 
   }
@@ -115,6 +118,8 @@ export class ContactsComponent {
       this.getTitleCreate();
       this.getAddressTypesContact();
       this.getContactFunctionType();
+      this.fetchResidencyStatus();
+      this.convertFunctionsToArray();
     })
   }
 
@@ -194,36 +199,70 @@ export class ContactsComponent {
       }
     });
   }
-
   onRowClick(contact: any): void {
     // Reset the selected contact and hide the popup until data is loaded
     this.selectedContact = {};
     this.isPopupVisible = false;
 
-    // Fetch contact details based on selected row
+    // Fetch contact details based on the selected row
     this.contactService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
-      data => {
+      (data) => {
         if (data && data.response) {
           this.selectedContact = data.response; // Assign the received data to selectedContact
           console.log("Selected contact: ", this.selectedContact); // Log to check data
-          this.isPopupVisible = true; // Show the popup after data is loaded
-          this.cdr.detectChanges(); // Trigger change detection to update the view
-          this.loadContactFirmAdresses(
-            this.selectedContact.contactAssnID,
-            this.userId,
-            this.Page.Contatcs // Static opTypeId
-          );
+
+          // Convert lstContactFunctions to an array if needed
+          this.convertFunctionsToArray();
+
+          // Fetch additional data after the contact details are set
+          this.fetchResidencyStatus();
+
+          // Trigger change detection to update the view
+          this.cdr.detectChanges();
+
+          // Show the popup after data is loaded and processed
+          this.isPopupVisible = true;
         } else {
           console.error('No contact data received:', data);
           this.isPopupVisible = false; // Hide popup if no data is received
         }
       },
-      error => {
+      (error) => {
         console.error('Error fetching contact details', error);
         this.isPopupVisible = false; // Hide popup if there's an error
       }
     );
   }
+  // onRowClick(contact: any): void {
+  //   // Reset the selected contact and hide the popup until data is loaded
+  //   this.selectedContact = {};
+  //   this.isPopupVisible = false;
+
+  //   // Fetch contact details based on selected row
+  //   this.contactService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
+  //     data => {
+  //       if (data && data.response) {
+  //         this.selectedContact = data.response; // Assign the received data to selectedContact
+  //         console.log("Selected contact: ", this.selectedContact); // Log to check data
+  //         this.isPopupVisible = true; // Show the popup after data is loaded
+  //         //this.cdr.detectChanges(); // Trigger change detection to update the view
+  //         this.loadContactFirmAdresses(
+  //           this.selectedContact.contactAssnID,
+  //           this.userId,
+  //           this.Page.Contatcs // Static opTypeId
+  //         );
+  //         this.fetchResidencyStatus();
+  //       } else {
+  //         console.error('No contact data received:', data);
+  //         this.isPopupVisible = false; // Hide popup if no data is received
+  //       }
+  //     },
+  //     error => {
+  //       console.error('Error fetching contact details', error);
+  //       this.isPopupVisible = false; // Hide popup if there's an error
+  //     }
+  //   );
+  // }
 
   get filteredContacts() {
     if (this.displayInactiveContacts) {
@@ -955,7 +994,7 @@ export class ContactsComponent {
           previousName: null,
           isExists: false,
           FunctionTypeId: null,
-          strContactAddnlInfoTypeID: this.createContactObj.strContactAddnlInfoTypeID,
+          ContactAddnlInfoTypeID: this.createContactObj.strContactAddnlInfoTypeID,
           strContactAddnInfoType: this.createContactObj.strContactAddnInfoTypes,
           // ContactAddnlInfoTypeID: this.createContactObj.strContactAddnlInfoTypeID,
           // strContactAddnInfoTypes: this.createContactObj.strContactAddnInfoTypes,
@@ -964,6 +1003,7 @@ export class ContactsComponent {
           strContactFunctionType: null,
           isFromContact: null,
           countryofBirth: null,
+          isFunctionActive : this.firmDetails?.FirmTypeID === 2,
           juridictionID: null,
           objectID: 523,
           isPEP: this.createContactObj.isPeP,
@@ -1503,7 +1543,7 @@ export class ContactsComponent {
       console.error('Element with class .addressHistoryPopup not found');
     }
   }
-
+///////////// function section 
   getContactFunctionType() {
     this.contactService.getContactFunctionType().subscribe(
       data => {
@@ -1583,6 +1623,57 @@ export class ContactsComponent {
     });
   }
 }
+ResidencyStatusCheck: any = [];
+
+// Function to fetch Residency Status from the backend
+fetchResidencyStatus(): void {
+  const ObjectID = 523;
+  const ObjectInstanceID = this.selectedContact.contactID;
+  const ObjectInstanceRevNum = 1;
+  const SourceObjectID = 523;
+  const SourceObjectInstanceID = this.selectedContact.contactAssnID;
+  const SourceObjectInstanceRevNum = 1;
+  const ActiveFlag = true;
+
+  this.aiElectronicswfService.getListObjectAttribute(
+    ObjectID,
+    ObjectInstanceID,
+    ObjectInstanceRevNum,
+    ActiveFlag,
+    SourceObjectID,
+    SourceObjectInstanceID,
+    SourceObjectInstanceRevNum
+  ).subscribe(
+    (data) => {
+      if (data.isSuccess && data.response?.length > 0) {
+        this.ResidencyStatusCheck = data.response[0];
+      } else {
+        this.ResidencyStatusCheck = { AttributeValue: 'Select' };
+      }
+      this.cdr.detectChanges(); // Trigger change detection
+    },
+    (error) => {
+      console.error("Error fetching Residency Status:", error);
+      this.ResidencyStatusCheck = { AttributeValue: 'Select' };
+    }
+  );
+}
+
+convertFunctionsToArray(): void {
+  if (this.selectedContact && this.selectedContact.lstContactFunctions) {
+    if (!Array.isArray(this.selectedContact.lstContactFunctions)) {
+      // Convert to an array if it's a single object
+      this.selectedContact.lstContactFunctions = [this.selectedContact.lstContactFunctions];
+    }
+  } else {
+    // Initialize as an empty array if it doesn't exist
+    this.selectedContact.lstContactFunctions = [];
+  }
+  console.log("Converted lstContactFunctions:", this.selectedContact.lstContactFunctions);
+}
+
+
+////////////////////
   isMobileNumExsits: boolean = false;
   getSearchMobileNumber(mobileNum: string): void {
     this.contactService.getSearchMobileNumber(mobileNum).subscribe(

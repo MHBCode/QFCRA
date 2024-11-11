@@ -502,3 +502,12 @@ export enum DocType {
     SCOPE = 209,
     FIRM_DOCS = 210
 }
+export enum DocType_DocCategory
+{
+    LogForm = 1,
+    RptSchedule = 4,
+    CRORptSchedule=5,
+    PrudReturn = 6,
+    AMLMLROReports = 7,
+    XBRLTYPES=10
+}

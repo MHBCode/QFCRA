@@ -487,17 +487,7 @@
       <div class="inputs-row">
         <div class="input-field">
           <label for="contactFrom">Contact Form</label>
-          <ng-container *ngIf="isEditContact; else typeOfControlDisplay">
-            <select required [(ngModel)]="selectedContact.entityName" (ngModelChange)="onContactFromChange($event)"
-              name="contactFrom" id="contactFrom">
-              <option *ngFor="let ContactFrom of AllContactFrom" [value]="ContactFrom.EntityTypeID">
-                {{ ContactFrom.EntityTypeName }}
-              </option>
-            </select>
-          </ng-container>
-          <ng-template #typeOfControlDisplay>
             <input [value]="selectedContact.entityName" name="contactFrom" readonly />
-          </ng-template>
         </div>
         <!-- <div class="input-field">
                 <label for="contactFrom">
@@ -509,7 +499,7 @@
                   </option>
                 </select>
               </div> -->
-        <div class="input-field" style="width: 100%" *ngIf="isFirmSelected()">
+        <!-- <div class="input-field" style="width: 100%" *ngIf="isFirmSelected()">
           <label for="aIsContactTypeID">
             Is contact information being provided for an approved individual or an individual who has applied for
             approval of controlled functions?
@@ -521,8 +511,8 @@
             <input type="radio" id="false" name="aIsContactTypeID" [(ngModel)]="selectedContact.aIsContactTypeID"
               [value]="false" /> No
           </div>
-        </div>
-        <div class="input-field" *ngIf="isFirmSelected()">
+        </div> -->
+        <!-- <div class="input-field" *ngIf="isFirmSelected()">
           <label for="contactType">
             Available Contacts
           </label>
@@ -534,7 +524,7 @@
               {{ AvilabilContact.Column2 }}
             </option>
           </select>
-        </div>
+        </div> -->
         <div class="input-field">
           <label for="contactType">
             Contact Type<span style="color: red">*</span>
@@ -628,7 +618,89 @@
           </select>
         </div>
       </div>
-
+      <div class="addresses create-inputs-field-set" *ngIf="firmDetails.FirmTypeID === 2">
+        <div class="popup-header">
+          <h3>DNFBP Functions</h3>
+        </div>
+        <div *ngIf="!isEditContact" class="functions-table">
+          <div class="functions-row header">
+            <div style="width: 20%;" class="input-field"><strong>Function</strong></div>
+            <div style="width: 20%;" class="input-field"><strong>Effective Date</strong></div>
+            <div style="width: 20%;" class="input-field"><strong>End Date</strong></div>
+            <div style="width: 20%;" class="input-field"><strong>Review Status</strong></div>
+          </div>
+          <div *ngFor="let func of selectedContact.lstContactFunctions" class="functions-row">
+            <div style="width: 20%;" class="input-field">{{ func.functionTypeDesc }}</div>
+            <div style="width: 20%;" class="input-field">{{ func.effectiveDate || 'N/A' }}</div>
+            <div style="width: 20%;" class="input-field">{{ func.endDate || 'N/A' }}</div>
+            <div style="width: 20%;" class="input-field">{{ func.reviewStatus || 'Pending' }}</div>
+          </div>
+        </div>  
+        <!-- Edit Mode: Allow editing of functions -->
+        <div class="functions-table" *ngIf="isEditContact">
+          <div class="functions-row header">
+            <div style="width: 20%;" class="input-field"><strong>Function</strong></div>
+            <div style="width: 20%;" class="input-field"><strong>Effective Date</strong></div>
+            <div style="width: 20%;" class="input-field"><strong>End Date</strong></div>
+            <div style="width: 20%;" class="input-field"><strong>Review Status</strong></div>
+          </div>     
+          <div *ngFor="let ContactFunctionType of ContactFunctionTypeList; let i = index" class="functions-row">
+            <!-- Checkbox to select function -->
+            <div style="width: 20%;" class="input-field">
+              <label>
+                <input type="checkbox" [(ngModel)]="ContactFunctionType.isSelected" />
+                {{ ContactFunctionType.contactFunctionTypeDesc }}
+              </label>
+            </div>    
+            <!-- Effective Date Input -->
+            <div style="width: 20%;" class="input-field">
+              <input
+                type="text"
+                placeholder="Effective Date"
+                [(ngModel)]="ContactFunctionType.effectiveDate"
+                [disabled]="!ContactFunctionType.isSelected"
+              />
+            </div>     
+            <!-- End Date Input -->
+            <div style="width: 20%;" class="input-field">
+              <input
+                type="text"
+                placeholder="End Date"
+                [(ngModel)]="ContactFunctionType.endDate"
+                [disabled]="!ContactFunctionType.isSelected"
+              />
+            </div>     
+            <!-- Review Status Display -->
+            <div style="width: 20%;" class="input-field">
+              <input type="text" [(ngModel)]="ContactFunctionType.reviewStatus" disabled placeholder="Review Status" />
+            </div>
+          </div>
+        </div>      
+        <!-- Additional Section for DNFBP MLRO Residency Status -->
+        <div class="functions-row">
+          <!-- Edit Mode: Residency Status Dropdown -->
+          <ng-container *ngIf="isEditContact; else readOnlyView">
+            <div class="input-field" *ngIf="showMLROSection">
+              <label for="residencyStatus">Is the individual a Resident or Non-Resident of Qatar?</label>
+              <select
+                id="residencyStatus"
+                [(ngModel)]="ResidencyStatusCheck.AttributeValue"
+              >
+                <option value="">Select</option>
+                <option value="Resident">Resident</option>
+                <option value="Non-Resident">Non-Resident</option>
+              </select>
+            </div>
+          </ng-container>     
+          <!-- View Mode: Display Residency Status -->
+          <ng-template #readOnlyView>
+            <div class="input-field">
+              <label>Is the individual a Resident or Non-Resident of Qatar?</label>
+              <span>{{ ResidencyStatusCheck.AttributeValue || 'Not Specified' }}</span>
+            </div>
+          </ng-template>
+        </div>        
+      </div>
       <!-- Addresses Section -->
       <div *ngIf="(contactFirmAddresses && contactFirmAddresses.length > 0) || isEditContact" class="addresses">
         <div class="popup-header">

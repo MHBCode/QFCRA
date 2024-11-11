@@ -2,6 +2,8 @@ import { Component, Input, SimpleChanges, OnInit, OnChanges } from '@angular/cor
 import { FirmService } from 'src/app/ngServices/firm.service';
 import { ActivatedRoute } from '@angular/router';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
+import { LogformService } from 'src/app/ngServices/logform.service'; 
+
 
 @Component({
   selector: 'app-return-review',
@@ -26,6 +28,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     private firmService: FirmService,
     private route: ActivatedRoute,
     private firmDetailsService: FirmDetailsService,
+    private logformService: LogformService
   ) {}
 
   ngOnInit(): void {
@@ -138,4 +141,17 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
       }
     );
   }
+
+  documentTypeList:any = [];
+  getDocumentType(docCategoryTypeID:number){
+    this.logformService.getDocumentType(docCategoryTypeID).subscribe(
+      data => {
+        this.documentTypeList = data.response;
+      },
+      error => {
+        console.error(error);
+      }
+    )
+  }
+  
 }

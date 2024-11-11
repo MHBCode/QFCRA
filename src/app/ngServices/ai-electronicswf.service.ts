@@ -22,4 +22,8 @@ export class AiElectronicswfService {
     const url = `${this.aiElectronicsWFUrl}get_approved_individuals?firmId=${firmId}&status=${"Applied"}`;  
     return this.http.get<any>(url);
   }
+  getListObjectAttribute(ObjectID:number,ObjectInstanceID:number,ObjectInstanceRevNum:number,ActiveFlag:boolean,SourceObjectID:number,SourceObjectInstanceID:number,SourceObjectInstanceRevNum:number): Observable<any>{
+    const url = `${this.aiElectronicsWFUrl}get_list_object_attribute?ObjectID=${ObjectID}&ObjectInstanceID=${ObjectInstanceID}&ObjectInstanceRevNum=${ObjectInstanceRevNum}&ActiveFlag=${ActiveFlag}&SourceObjectID=${SourceObjectID}&SourceObjectInstanceID=${SourceObjectInstanceID}&SourceObjectInstanceRevNum=${SourceObjectInstanceRevNum}`;  
+    return this.http.get<any>(url);
+  }
 }
