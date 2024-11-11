@@ -5,6 +5,7 @@ import { ReportScheduleService } from 'src/app/ngServices/report-schedule.servic
 import Swal from 'sweetalert2';
 import * as constants from 'src/app/app-constants';
 import { SupervisionService } from '../supervision.service';
+import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 
 @Component({
   selector: 'app-reporting-schedule',
@@ -17,6 +18,7 @@ export class ReportingScheduleComponent {
   isLoading: boolean = false;
   firmId: number = 0;
   isAuthorise : boolean = true;
+  firmDetails:any;
   selectedReport: any = null;
   showPopup: boolean = false;
 
@@ -25,7 +27,8 @@ export class ReportingScheduleComponent {
     private route: ActivatedRoute,
     private firmService: FirmService,
     private reportScheduleService : ReportScheduleService,
-    private supervisionService : SupervisionService
+    private supervisionService : SupervisionService,
+    private firmDetailsService: FirmDetailsService,
   ) {
 
   }
@@ -35,6 +38,7 @@ export class ReportingScheduleComponent {
       this.firmId = +params['id'];
       this.isFirmAuthorised();
     })
+    this.loadFirmDetails(this.firmId);
   }
 
   isFirmAuthorised() {
@@ -64,8 +68,17 @@ export class ReportingScheduleComponent {
       }
     );
   }
+  loadFirmDetails(firmId: number) {
+    this.firmDetailsService.loadFirmDetails(firmId).subscribe(
+      data => {
+        this.firmDetails = data.firmDetails;
+      },
+      error => {
+        console.error(error);
+      }
+    );
   
-
+  }
   openReportSchedulePopup(rpt: any): void {
     this.selectedReport = rpt;
     this.showPopup = true;

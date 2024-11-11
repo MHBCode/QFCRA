@@ -53,4 +53,16 @@ export class ContactService {
     const url = `${this.baseUrlContact}is_contact_type_exists?firmId=${firmId}&EntityTypeId=${entityTypeID}&EntityId=${entityId}&ContactID=${contactID}&ContactAssnID=${contactAssnID}`;
     return this.http.get<number>(url); 
   }
+  getContactFunctionType(): Observable<any> {
+    const url = `${this.baseUrlContact}get_contact_function_types`;
+    return this.http.get<any>(url); 
+  }
+  getSearchMobileNumber(mobileNum: string): Observable<any> {
+    const url = `${this.baseUrlContact}get_search_mobile_number?mobileNum=${mobileNum}`;
+    return this.http.get<any>(url);
+  }
+  SearchContactDetailsByPassingParam(firstName: string, familyName: string,firmId:number): Observable<any> {
+    const url = `${this.baseUrlContact}search_contact_details_by_passing_param?firstName=${firstName}&familyNam=${familyName}&firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
 }

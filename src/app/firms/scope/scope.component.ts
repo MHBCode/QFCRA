@@ -136,7 +136,22 @@ export class ScopeComponent implements OnInit {
       this.populateAuthorisationCategoryTypes();
       this.populatePrudentialCategoryTypes();
       this.populateFirmScopeTypes();
-      this.loadAssignedUserRoles(this.userId);
+
+      // Security
+      forkJoin([
+        this.firmDetailsService.loadAssignedUserRoles(this.userId),
+        this.firmDetailsService.loadAssignedLevelUsers()
+      ]).subscribe({
+        next: ([userRoles, levelUsers]) => {
+          // Assign the results to component properties
+          this.assignedUserRoles = userRoles;
+          this.assignedLevelUsers = levelUsers;
+        },
+        error: (err) => {
+          console.error('Error loading user roles or level users:', err);
+        }
+      });
+
       this.switchScopeTab('Licensed');
 
       this.firmDetailsService.isFirmLicensed$.subscribe(
@@ -162,18 +177,6 @@ export class ScopeComponent implements OnInit {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
       data => {
         this.firmDetails = data.firmDetails;
-      },
-      error => {
-        console.error(error);
-      }
-    );
-  }
-
-  loadAssignedUserRoles(userId: number): void {
-    this.firmDetailsService.loadAssignedUserRoles(userId).subscribe(
-      data => {
-        this.assignedUserRoles = data.assignedUserRoles;
-        console.log('Roles successfully fetched:', this.assignedUserRoles);
       },
       error => {
         console.error(error);
@@ -228,14 +231,14 @@ export class ScopeComponent implements OnInit {
       if (this.isFirmSupervisor) {
         this.loading = false;
         return; // No need to hide the button for Firm supervisor
-      } else if (this.IsValidRSGMember()) {
+      } else if (this.firmDetailsService.isValidRSGMember()) {
         this.loading = false;
         return; // No need to hide the button for RSG Member
-      } else if (this.isFirmAMLSupervisor || this.IsValidAMLDirector()) {
+      } else if (this.isFirmAMLSupervisor || this.firmDetailsService.isValidAMLDirector()) {
         if (firmType === 1) {
           this.hideActionButton(); // Hide button for AML Team
         }
-      } else if (this.IsValidAMLSupervisor() && !this.IsAMLSupervisorAssignedToFirm()) {
+      } else if (this.firmDetailsService.isValidAMLSupervisor() && !this.firmDetailsService.isAMLSupervisorAssignedToFirm(this.FIRMRA, this.assignedLevelUsers)) {
         if (firmType === 1) {
           this.hideActionButton(); // Hide button if no AML supervisor is assigned
         }
@@ -301,43 +304,6 @@ export class ScopeComponent implements OnInit {
       this.hideDeleteBtn = true;
       this.hideReviseBtn = true;
     }
-  }
-
-
-  IsValidRSGMember(): boolean {
-    if (this.assignedUserRoles) {
-      return this.assignedUserRoles.some(role => role.AppRoleId === 5001);
-    }
-    return false;
-  }
-
-  isValidFirmAMLSupervisor(firmId: number, userId: number): void {
-    this.securityService.isValidFirmAMLSupervisor(firmId, userId).subscribe((response) => {
-      this.isFirmAMLSupervisor = response.response;
-    });
-  }
-
-  IsValidAMLDirector(): boolean {
-    if (this.assignedUserRoles) {
-      return this.assignedUserRoles.some(role => role.AppRoleId === 2007);
-    }
-    return false;
-  }
-
-  IsValidAMLSupervisor(): boolean {
-    if (this.assignedUserRoles) {
-      return this.assignedUserRoles.some(role => role.AppRoleId === 3009);
-    }
-    return false;
-  }
-
-  IsAMLSupervisorAssignedToFirm(): boolean {
-    if (this.assignedLevelUsers) {
-      if (this.FIRMRA.length > 0) {
-        return this.assignedLevelUsers.some(levelUser => levelUser.FirmUserAssnTypeID === 7 || levelUser.FirmUserAssnTypeID === 8 || levelUser.FirmUserAssnTypeID === 9)
-      }
-    }
-    return false;
   }
 
 
@@ -2257,13 +2223,13 @@ export class ScopeComponent implements OnInit {
   confirmSelection(activity: any) {
     const selectedSubActivity = this.subActivities.find(sub => sub.isSelected);
     if (selectedSubActivity) {
-        activity.selectedSubActivity = selectedSubActivity; // Attach directly to the activity
-        console.log("Selected Sub-Activity:", selectedSubActivity);
-        // Fetch products for this specific sub-activity and save to this activity
-        this.fetchAndCategorizeProducts(selectedSubActivity.ActivityTypeID, activity);
+      activity.selectedSubActivity = selectedSubActivity; // Attach directly to the activity
+      console.log("Selected Sub-Activity:", selectedSubActivity);
+      // Fetch products for this specific sub-activity and save to this activity
+      this.fetchAndCategorizeProducts(selectedSubActivity.ActivityTypeID, activity);
     }
     this.closeSubActivity();
-}
+  }
 
 
   toggleExpand(activityTypeID: number) {

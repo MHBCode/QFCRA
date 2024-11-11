@@ -104,9 +104,9 @@
 
         <!-- Contact Type Section -->
         <div class="input-field">
-          <label for="contactType">Contact Type<span style="color: red">*</span></label>
+          <label for="contactType">Contact Type<span style="color: red">&nbsp;*</span></label>
           <select name="contactType" id="contactType"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
+            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true &&  !selectedAvilableContact"
             [(ngModel)]="createContactObj.contactType">
             <option value="select" selected>Select</option>
             <option *ngFor="let contactType of contactTypeOption" [ngValue]="contactType.ContactTypeID">
@@ -117,10 +117,10 @@
 
         <!-- PEP Section -->
         <div class="input-field">
-          <label for="isPEP">Is Politically Exposed Person (PEP)?<span style="color: red">*</span></label>
+          <label for="isPEP">Is Politically Exposed Person (PEP)?<span style="color: red">&nbsp;*</span></label>
           <div class="radio-wrapper">
             <input name="isPEP" id="yes" type="radio" [value]="true"
-              [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
+              [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true &&  !selectedAvilableContact"
               [(ngModel)]="createContactObj.isPeP" />
             Yes
             <input name="isPEP" id="no" type="radio" [value]="false"
@@ -134,14 +134,15 @@
         <div class="input-field">
           <label for="position/JobTitle">Position/Job Title</label>
           <input name="position/JobTitle" id="position/JobTitle" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
+            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true &&  !selectedAvilableContact"
             [(ngModel)]="createContactObj.jobTitle" />
         </div>
 
         <!-- Title Section -->
         <div class="input-field">
           <label for="Title">Title</label>
-          <select name="Title" id="Title" [disabled]="createContactObj.aIsContactTypeID === null"
+          <select name="Title" id="Title"
+            [disabled]="createContactObj.aIsContactTypeID === null && !selectedAvilableContact"
             [(ngModel)]="createContactObj.title">
             <option *ngFor="let title of Titles" [value]="title.TitleDesc">
               {{ title.TitleDesc }}
@@ -151,16 +152,16 @@
 
         <!-- First Name Section -->
         <div class="input-field">
-          <label for="firstName">First Name</label>
+          <label for="firstName">First Name<span style="color: red">&nbsp;*</span></label>
           <input name="firstName" id="firstName" type="text" [disabled]="createContactObj.aIsContactTypeID === null"
-            [(ngModel)]="createContactObj.firstName" />
+            [(ngModel)]="createContactObj.firstName" (blur)="onNameBlur()"/>
         </div>
 
         <!-- Second Name Section -->
         <div class="input-field">
           <label for="SecondName">Second Name</label>
           <input name="SecondName" id="SecondName" type="text" [disabled]="createContactObj.aIsContactTypeID === null"
-            [(ngModel)]="createContactObj.secondName" />
+            [(ngModel)]="createContactObj.secondName" (blur)="onNameBlur()"/>
         </div>
 
         <!-- Family Name Section -->
@@ -173,16 +174,21 @@
         <!-- Mobile Phone Section -->
         <div class="input-field">
           <label for="MobilePhone">Mobile Phone</label>
-          <input name="MobilePhone" id="MobilePhone" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
-            [(ngModel)]="createContactObj.mobileNum" />
+          <input 
+            name="MobilePhone" 
+            id="MobilePhone" 
+            type="text"
+            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
+            [(ngModel)]="createContactObj.mobileNum" 
+            (blur)="checkMobileNumberExists(createContactObj.mobileNum)" 
+          />
         </div>
 
         <!-- Fax Section -->
         <div class="input-field">
           <label for="Fax">Fax</label>
           <input name="Fax" id="Fax" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
+            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
             [(ngModel)]="createContactObj.fax" />
         </div>
 
@@ -190,7 +196,7 @@
         <div class="input-field">
           <label for="BusinessPhone">Business Phone</label>
           <input name="BusinessPhone" id="BusinessPhone" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
+            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
             [(ngModel)]="createContactObj.busPhone" />
         </div>
 
@@ -198,7 +204,7 @@
         <div class="input-field">
           <label for="BusinessEmail">Business Email</label>
           <input name="BusinessEmail" id="BusinessEmail" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
+            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
             [(ngModel)]="createContactObj.busEmail" />
         </div>
 
@@ -206,7 +212,7 @@
         <div class="input-field">
           <label for="OtherEmail">Other Email</label>
           <input name="OtherEmail" id="OtherEmail" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
+            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
             [(ngModel)]="createContactObj.otherEmail" />
         </div>
 
@@ -214,7 +220,7 @@
         <div class="input-field">
           <label for="MethodofContact">Preferred Method of Contact</label>
           <select name="MethodofContact" id="MethodofContact"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
+            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
             [(ngModel)]="createContactObj.ContactMethodTypeID">
             <option *ngFor="let MethodofContact of MethodofContactOption" [value]="MethodofContact.ContactMethodTypeID">
               {{ MethodofContact.ContactMethodTypeDesc }}
@@ -223,7 +229,108 @@
         </div>
       </div>
 
+      <div class="addresses create-inputs-field-set" *ngIf="firmDetails.FirmTypeID === 2">
+        <div class="popup-header">
+          <h3>DNFBP Functions</h3>
+        </div>
+        <div class="functions-table">
+          <div class="functions-row">
+            <div style="width: 20%;" class="input-field">
+              <label>Function(s)</label>
+            </div>
+            <div style="width: 20%;" class="input-field">
+              <label>Effective Date</label>
+            </div>
+            <div style="width: 20%;" class="input-field">
+              <label>End Date</label>
+            </div>
+            <div style="width: 20%;" class="input-field">
+              <label>Review Status</label>
+            </div>
+          </div>
+          <!-- DNFBP Functions Section -->
+          <div class="functions-row" *ngFor="let ContactFunctionType of ContactFunctionTypeList; let i = index">
+            <!-- Checkbox for selecting contact function -->
+            <div style="width: 20%;" class="input-field">
+              <label>
+                <input type="checkbox" [(ngModel)]="ContactFunctionType.isSelected"
+                  (change)="onFunctionCheckboxChange(ContactFunctionType, i)" />
+                {{ ContactFunctionType.FunctionTypeDesc }}
+              </label>
+            </div>
 
+            <!-- Effective Date Input -->
+            <div style="width: 20%;" class="input-field">
+              <input type="text"  #dateInputs placeholder [(ngModel)]="ContactFunctionType.effectiveDate"
+                [disabled]="!ContactFunctionType.isSelected" placeholder="Effective Date" />
+            </div>
+
+            <!-- End Date Input -->
+            <div style="width: 20%;" class="input-field">
+              <input type="text" #dateInputs placeholder  [(ngModel)]="ContactFunctionType.endDate" [disabled]="!ContactFunctionType.isSelected"
+                placeholder="End Date" />
+            </div>
+
+            <!-- Review Status Input -->
+            <div style="width: 20%;" class="input-field">
+              <input type="text"  [(ngModel)]="ContactFunctionType.reviewStatus"
+                disabled placeholder="Review Status" />
+            </div>
+          </div>
+          <!-- Additional Section for DNFBP MLRO -->
+          <div class="functions-row" *ngIf="showMLROSection">           
+            <div class="input-field">
+              <label for="sameAsType">
+                Is the individual a Resident or Non-Resident of Qatar?
+              </label>
+              <select name="sameAsType" id="sameAsType" >
+                <option value="0">Select</option>
+                <option value="1">Resident</option>
+                <option value="2">Non-Resident</option>
+              </select>
+            </div>
+          </div>
+          <!-- <div class="functions-row">
+            <div style="width: 20%;" class="input-field">
+              <label><input type="checkbox" [(ngModel)]="ContactFunctionsObject.functionTypeDesc" /> DNFBP MLRO</label>
+            </div>
+            <div style="width: 20%;" class="input-field">
+              <input type="input" #dateInputs placeholder [(ngModel)]="ContactFunctionsObject.effectiveDate"
+                placeholder="Effective Date" />
+            </div>
+            <div style="width: 20%;" class="input-field">
+              <input type="input" #dateInputs placeholder [(ngModel)]="ContactFunctionsObject.endDate"
+                placeholder="End Date" />
+            </div>
+            <div style="width: 20%;" class="input-field">
+              <select>
+                <option value="">Select Status</option>
+                <option></option>
+              </select>
+            </div>
+          </div> -->
+          <!-- <div class="functions-row">
+            <div style="width: 20%;" class="input-field">
+              <label><input type="checkbox" [(ngModel)]="ContactFunctionsObject.functionTypeDesc" /> DNFBP Deputy
+                MLRO</label>
+            </div>
+            <div style="width: 20%;" class="input-field">
+              <input type="input" #dateInputs placeholder [(ngModel)]="ContactFunctionsObject.effectiveDate"
+                placeholder="Effective Date" />
+            </div>
+            <div style="width: 20%;" class="input-field">
+              <input type="input" #dateInputs placeholder [(ngModel)]="ContactFunctionsObject.endDate"
+                placeholder="End Date" />
+            </div>
+            <div style="width: 20%;" class="input-field">
+              <select>
+                <option value="">Select Status</option>
+                <option></option>
+              </select>
+            </div>
+          </div> -->
+        </div>
+      </div>
       <div class="addresses create-inputs-field-set">
         <div class="popup-header">
           <h3>Addresses</h3>
@@ -336,7 +443,7 @@
           <label><input type="checkbox" name="VIP" /> VIP</label>
           <label><input type="checkbox" name="AnnualReport" /> Annual Report</label>
           <label><input type="checkbox" name="ChristmasNewYear" /> Christmas/New Year</label>
-          <label><input type="checkbox" name="EdCards" /> Ed Cards</label>
+          <label><input type="checkbox" name="EidCards" /> Eid Cards</label>
           <label><input type="checkbox" name="Publications" /> Publications</label>
         </div>
       </div>
@@ -541,7 +648,7 @@
                 <label for="addressType" class="history-row">
                   Address Type
                   <button *ngIf="address.PreviousRecords != 0" class="subbutton-open-history"
-                  (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID,selectedContact.ContactAssnID)">
+                    (click)="getAddressTypeHistory(address.AddressTypeID,address.EntityTypeID,address.EntityID,selectedContact.ContactAssnID)">
                     <i class="bi bi-clock-history"></i><span> Open History</span>
                   </button>
                 </label>
@@ -666,7 +773,7 @@
           <label><input type="checkbox" name="VIP" /> VIP</label>
           <label><input type="checkbox" name="AnnualReport" /> Annual Report</label>
           <label><input type="checkbox" name="ChristmasNewYear" /> Christmas/New Year</label>
-          <label><input type="checkbox" name="EdCards" /> Ed Cards</label>
+          <label><input type="checkbox" name="EidCards" /> Eid Cards</label>
           <label><input type="checkbox" name="Publications" /> Publications</label>
         </div>
       </div>
@@ -722,5 +829,42 @@
   </div>
   <div class="popup-operations-place">
     <button class="subbutton" (click)="closeAddressTypeHistory()">Close</button>
+  </div>
+</div>
+<!-- Modal Popup for Showing Search Results -->
+<div *ngIf="showContactModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Contact Search Results</h3>
+      <button class="close-button" (click)="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="contact-table">
+        <thead>
+          <tr>
+            <th>Select</th>
+            <th>Full Name</th>
+            <th>Mobile Number</th>
+            <th>Email</th>
+            <th>Country</th>
+            <th>Passport Number</th>
+            <th>Date of Birth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let contact of ContactDetailsByPassingParam">
+            <td>
+              <button style="color: #a41e36; text-decoration: none;" (click)="ShowselectContact(contact)">Select</button>
+            </td>
+            <td>{{ contact.FullName }}</td>
+            <td>{{ contact.MobileNum || 'N/A' }}</td>
+            <td>{{ contact.BusEmail || 'N/A' }}</td>
+            <td>{{ contact.CountryName || 'N/A' }}</td>
+            <td>{{ contact.PassportNum || 'N/A' }}</td>
+            <td>{{ contact.DateOfBirth || 'N/A' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

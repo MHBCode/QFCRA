@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FirmService } from 'src/app/ngServices/firm.service';
 import { RiskService } from 'src/app/ngServices/risk.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
-
+import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 
 interface CreditRating {
   CreditRatingTypeID: number;
@@ -43,13 +43,14 @@ export class SupervisionViewComponent {
   SupervisionCategories: any;
   HistoryCreditRatingGrouped: CreditRatingsGrouped = {};
   HistoryCreditRatingCountryGrouped: CreditRatingsGrouped = {};
-
+  firmDetails:any;
   constructor(private router: Router,
     private route: ActivatedRoute,
     private firmsService: FirmService,
     private riskService: RiskService,
+    private firmDetailsService: FirmDetailsService,
     private dateUtilService: DateUtilService) {
-
+      
   }
 
   ngOnInit(): void {
@@ -64,6 +65,7 @@ export class SupervisionViewComponent {
       // Credit Ratings - Sovereign ( Home Country - Qatar )
       this.getCreditRatingsData(false, false);
     })
+    this.loadFirmDetails(this.firmId);
   }
 
 
@@ -307,5 +309,14 @@ export class SupervisionViewComponent {
       }
     );
   }
-  
+  loadFirmDetails(firmId: number) {
+    this.firmDetailsService.loadFirmDetails(firmId).subscribe(
+      data => {
+        this.firmDetails = data.firmDetails;
+      },
+      error => {
+        console.error(error);
+      }
+    );
+  }
 }
