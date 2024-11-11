@@ -809,6 +809,8 @@ export class ContactsComponent {
     nameAsInPassport: "",
     busPhone: "",
     residencePhone: "",
+    strContactAddnlInfoTypeID:"",
+    strContactAddnInfoTypes:"",
     fax: "",
     qfcNumber: "",
     isContactSelected: true,
@@ -953,8 +955,13 @@ export class ContactsComponent {
           previousName: null,
           isExists: false,
           FunctionTypeId: null,
+          strContactAddnlInfoTypeID: this.createContactObj.strContactAddnlInfoTypeID,
+          strContactAddnInfoType: this.createContactObj.strContactAddnInfoTypes,
+          // ContactAddnlInfoTypeID: this.createContactObj.strContactAddnlInfoTypeID,
+          // strContactAddnInfoTypes: this.createContactObj.strContactAddnInfoTypes,
+          // ContactAddnInfoType:this.createContactObj.strContactAddnInfoTypes,
           nameInPassport: null,
-          contactAddnlInfoTypeID: null,
+          strContactFunctionType: null,
           isFromContact: null,
           countryofBirth: null,
           juridictionID: null,
@@ -1000,13 +1007,12 @@ export class ContactsComponent {
     if (this.createContactObj.contactType !== 1 || !this.createContactObj.contactType) {
       this.saveContactForm(saveCreateContactObj);
       this.closeContactPopup();
-      this.loadContacts();
       Swal.fire(
         'Created!',
         'The contact has been Created successfully.',
         'success'
       );
-
+      this.loadContacts();
     } else {
       this.contactService.IsMainContact(this.firmId, this.createContactObj.entityId, this.createContactObj.contactType)
         .subscribe(response => {
@@ -1155,6 +1161,9 @@ export class ContactsComponent {
           isExists: false,
           FunctionTypeId: null,
           nameInPassport: null,
+
+          strContactAddnlInfoTypeID: this.selectedContact.strContactAddnlInfoTypeID,
+          strContactAddnInfoTypes: this.selectedContact.strContactAddnInfoTypes,
           contactAddnlInfoTypeID: null,
           isFromContact: null,
           countryofBirth: null,
@@ -1498,65 +1507,82 @@ export class ContactsComponent {
   getContactFunctionType() {
     this.contactService.getContactFunctionType().subscribe(
       data => {
-        this.ContactFunctionTypeList = data.response.map(item => ({
-          ...item,
-          isSelected: false,
-          effectiveDate: '',
-          endDate: '',
-          reviewStatus: ''
-        }));
+        if (data.isSuccess) {
+          this.ContactFunctionTypeList = data.response.map(item => ({
+            ContactFunctionTypeID: item.FunctionTypeID,
+            contactFunctionTypeDesc: item.FunctionTypeDesc,
+            isSelected: false,
+            effectiveDate: '',
+            endDate: '',
+            reviewStatus: ''
+          }));
+        }
       },
       error => {
         console.error('Error Fetching Contact Function Types', error);
       }
     );
   }
+  updateFunctionDates(index: number, field: string, value: string) {
+    const contactFunction = this.ContactFunctionTypeList[index];
+    const selectedFunctionIndex = this.selectedContactFunctions.findIndex(
+      func => func.ContactFunctionTypeID === contactFunction.ContactFunctionTypeID
+    );
+  
+    if (selectedFunctionIndex !== -1) {
+      // Update the field in the selectedContactFunctions list
+      this.selectedContactFunctions[selectedFunctionIndex][field] = value;
+    }
+  }
 
-  onFunctionCheckboxChange(contactFunction: any, index: number) {
-    if (contactFunction.isSelected) {
-      // Add to the selected list if checked
+ onFunctionCheckboxChange(contactFunction: any, index: number) {
+  if (contactFunction.isSelected) {
+    const existingFunctionIndex = this.selectedContactFunctions.findIndex(
+      func => func.ContactFunctionTypeID === contactFunction.ContactFunctionTypeID
+    );
+
+    if (existingFunctionIndex === -1) {
+      // Add to the selected list if not already present
       this.selectedContactFunctions.push({
         contactFunctionID: null,
         contactID: null,
         contactAssnID: null,
-        functionTypeID: contactFunction.FunctionTypeID,
-        functionTypeDesc: contactFunction.FunctionTypeDesc,
-        effectiveDate: contactFunction.effectiveDate,
-        endDate: contactFunction.endDate,
-        reviewStatus: contactFunction.reviewStatus,
-        isFunctionActive: 1,
+        ContactFunctionTypeID: contactFunction.ContactFunctionTypeID,
+        ContactFunctionTypeDesc: contactFunction.ContactFunctionTypeDesc,
+        effectiveDate: contactFunction.effectiveDate || '',
+        endDate: contactFunction.endDate || '',
+        reviewStatus: contactFunction.reviewStatus || '',
+        isFunctionActive: false,
         isRecordEditable: 1,
+        CreatedBy: this.userId,
       });
-  
+
       // Show additional section if "DNFBP MLRO" is selected
-      if (contactFunction.FunctionTypeDesc === 'DNFBP MLRO') {
+      if (contactFunction.ContactFunctionTypeID === 17) {
         this.showMLROSection = true;
       }
-    } else {
-      // Show SweetAlert confirmation before de-selecting
-      Swal.fire({
-        text: 'De-selecting this function will cause this record to be deleted from the system permanently.',
-        showCancelButton: true,
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // User confirmed, proceed with removing the function
-          this.selectedContactFunctions = this.selectedContactFunctions.filter(
-            func => func.functionTypeID !== contactFunction.FunctionTypeID
-          );
-  
-          // Hide additional section if "DNFBP MLRO" is deselected
-          if (contactFunction.FunctionTypeDesc === 'DNFBP MLRO') {
-            this.showMLROSection = false;
-          }
-        } else {
-          // User canceled, re-check the checkbox
-          contactFunction.isSelected = true;
-        }
-      });
     }
+  } else {
+    Swal.fire({
+      text: 'De-selecting this function will cause this record to be deleted from the system permanently.',
+      showCancelButton: true,
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.selectedContactFunctions = this.selectedContactFunctions.filter(
+          func => func.ContactFunctionTypeID !== contactFunction.ContactFunctionTypeID
+        );
+
+        if (contactFunction.ContactFunctionTypeID === 17) {
+          this.showMLROSection = false;
+        }
+      } else {
+        contactFunction.isSelected = true;
+      }
+    });
   }
+}
   isMobileNumExsits: boolean = false;
   getSearchMobileNumber(mobileNum: string): void {
     this.contactService.getSearchMobileNumber(mobileNum).subscribe(
@@ -1636,9 +1662,36 @@ export class ContactsComponent {
     this.closeModal();
 
   }
-
   // Close the modal
   closeModal() {
     this.showContactModal = false;
+  }
+  //////////////////////// for additional details Checkboxes 
+
+  selectedAdditionalInfo: Set<number> = new Set<number>();
+  selectedAdditionalInfoLabels: Set<string> = new Set<string>();
+  
+  // Method to update selected checkboxes
+  updateAdditionalInfo(event: any, label: string): void {
+    const value = Number(event.target.value);
+  
+    if (event.target.checked) {
+      // Add value and label if checked
+      this.selectedAdditionalInfo.add(value);
+      this.selectedAdditionalInfoLabels.add(label);
+    } else {
+      // Remove value and label if unchecked
+      this.selectedAdditionalInfo.delete(value);
+      this.selectedAdditionalInfoLabels.delete(label);
+    }
+  
+    // Update the strContactAddnlInfoTypeID field (comma-separated values)
+    this.createContactObj.strContactAddnlInfoTypeID = Array.from(this.selectedAdditionalInfo).join(',');
+  
+    // Update the strContactAddnInfoTypes field (comma-separated labels)
+    this.createContactObj.strContactAddnInfoTypes = Array.from(this.selectedAdditionalInfoLabels).join(', ');
+  
+    console.log('Selected IDs:', this.createContactObj.strContactAddnlInfoTypeID);
+    console.log('Selected Labels:', this.createContactObj.strContactAddnInfoTypes);
   }
 }

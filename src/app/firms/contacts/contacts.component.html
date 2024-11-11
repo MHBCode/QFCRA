@@ -154,14 +154,14 @@
         <div class="input-field">
           <label for="firstName">First Name<span style="color: red">&nbsp;*</span></label>
           <input name="firstName" id="firstName" type="text" [disabled]="createContactObj.aIsContactTypeID === null"
-            [(ngModel)]="createContactObj.firstName" (blur)="onNameBlur()"/>
+            [(ngModel)]="createContactObj.firstName" (blur)="onNameBlur()" />
         </div>
 
         <!-- Second Name Section -->
         <div class="input-field">
           <label for="SecondName">Second Name</label>
           <input name="SecondName" id="SecondName" type="text" [disabled]="createContactObj.aIsContactTypeID === null"
-            [(ngModel)]="createContactObj.secondName" (blur)="onNameBlur()"/>
+            [(ngModel)]="createContactObj.secondName" (blur)="onNameBlur()" />
         </div>
 
         <!-- Family Name Section -->
@@ -174,14 +174,9 @@
         <!-- Mobile Phone Section -->
         <div class="input-field">
           <label for="MobilePhone">Mobile Phone</label>
-          <input 
-            name="MobilePhone" 
-            id="MobilePhone" 
-            type="text"
+          <input name="MobilePhone" id="MobilePhone" type="text"
             [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
-            [(ngModel)]="createContactObj.mobileNum" 
-            (blur)="checkMobileNumberExists(createContactObj.mobileNum)" 
-          />
+            [(ngModel)]="createContactObj.mobileNum" (blur)="checkMobileNumberExists(createContactObj.mobileNum)" />
         </div>
 
         <!-- Fax Section -->
@@ -255,35 +250,35 @@
               <label>
                 <input type="checkbox" [(ngModel)]="ContactFunctionType.isSelected"
                   (change)="onFunctionCheckboxChange(ContactFunctionType, i)" />
-                {{ ContactFunctionType.FunctionTypeDesc }}
+                {{ ContactFunctionType.contactFunctionTypeDesc }}
               </label>
             </div>
 
             <!-- Effective Date Input -->
             <div style="width: 20%;" class="input-field">
-              <input type="text"  #dateInputs placeholder [(ngModel)]="ContactFunctionType.effectiveDate"
-                [disabled]="!ContactFunctionType.isSelected" placeholder="Effective Date" />
+              <input  type="text" #dateInputs placeholder #date placeholder="Effective Date" [(ngModel)]="ContactFunctionType.effectiveDate"
+                [disabled]="!ContactFunctionType.isSelected"
+                (blur)="updateFunctionDates(i, 'effectiveDate', ContactFunctionType.effectiveDate)" />
             </div>
-
             <!-- End Date Input -->
             <div style="width: 20%;" class="input-field">
-              <input type="text" #dateInputs placeholder  [(ngModel)]="ContactFunctionType.endDate" [disabled]="!ContactFunctionType.isSelected"
-                placeholder="End Date" />
+              <input  type="text" #dateInputs placeholder placeholder="End Date" [(ngModel)]="ContactFunctionType.endDate"
+                [disabled]="!ContactFunctionType.isSelected"
+                (blur)="updateFunctionDates(i, 'endDate', ContactFunctionType.endDate)" />
             </div>
 
             <!-- Review Status Input -->
             <div style="width: 20%;" class="input-field">
-              <input type="text"  [(ngModel)]="ContactFunctionType.reviewStatus"
-                disabled placeholder="Review Status" />
+              <input type="text" [(ngModel)]="ContactFunctionType.reviewStatus" disabled placeholder="Review Status" />
             </div>
           </div>
           <!-- Additional Section for DNFBP MLRO -->
-          <div class="functions-row" *ngIf="showMLROSection">           
+          <div class="functions-row" *ngIf="showMLROSection">
             <div class="input-field">
               <label for="sameAsType">
                 Is the individual a Resident or Non-Resident of Qatar?
               </label>
-              <select name="sameAsType" id="sameAsType" >
+              <select name="sameAsType" id="sameAsType">
                 <option value="0">Select</option>
                 <option value="1">Resident</option>
                 <option value="2">Non-Resident</option>
@@ -439,12 +434,22 @@
         <div class="popup-header">
           <h3>Additional Informations</h3>
         </div>
-        <div style=" display: flex; flex-wrap: wrap;gap: 15px;">
-          <label><input type="checkbox" name="VIP" /> VIP</label>
-          <label><input type="checkbox" name="AnnualReport" /> Annual Report</label>
-          <label><input type="checkbox" name="ChristmasNewYear" /> Christmas/New Year</label>
-          <label><input type="checkbox" name="EidCards" /> Eid Cards</label>
-          <label><input type="checkbox" name="Publications" /> Publications</label>
+        <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+          <label>
+            <input type="checkbox" name="VIP" [value]="1" (change)="updateAdditionalInfo($event, 'VIP')" /> VIP
+          </label>
+          <label>
+            <input type="checkbox" name="AnnualReport" [value]="2" (change)="updateAdditionalInfo($event, 'Annual Report')" /> Annual Report
+          </label>
+          <label>
+            <input type="checkbox" name="ChristmasNewYear" [value]="3" (change)="updateAdditionalInfo($event, 'Christmas/New Year')" /> Christmas/New Year
+          </label>
+          <label>
+            <input type="checkbox" name="EidCards" [value]="4" (change)="updateAdditionalInfo($event, 'Eid Cards')" /> Eid Cards
+          </label>
+          <label>
+            <input type="checkbox" name="Publications" [value]="5" (change)="updateAdditionalInfo($event, 'Publications')" /> Publications
+          </label>
         </div>
       </div>
       <div class="btn justify-content-end">
@@ -854,7 +859,8 @@
         <tbody>
           <tr *ngFor="let contact of ContactDetailsByPassingParam">
             <td>
-              <button style="color: #a41e36; text-decoration: none;" (click)="ShowselectContact(contact)">Select</button>
+              <button style="color: #a41e36; text-decoration: none;"
+                (click)="ShowselectContact(contact)">Select</button>
             </td>
             <td>{{ contact.FullName }}</td>
             <td>{{ contact.MobileNum || 'N/A' }}</td>
