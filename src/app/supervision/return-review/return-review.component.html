@@ -18,6 +18,9 @@
           <option value="3">AML Reports</option>
         </select>
       </div>
+      <div class="error-messages" *ngIf="errorMessages['ReturnreViewList']">
+        <p>{{ errorMessages['ReturnreViewList'] }}</p>
+      </div>
       <table>
         <thead>
           <tr>
@@ -56,7 +59,7 @@
                   <span>&gt;</span>
                 </button>
                 <span style="color: #555; font-size: 14px;">Showing {{ startRow }} to {{ endRow }} of {{ totalRows }}
-                  rows</span>
+                  rows</span> 
               </div>
             </td>
           </tr>

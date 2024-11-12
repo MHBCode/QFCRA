@@ -856,6 +856,7 @@ export class ContactsComponent {
       this.selectedAvilableContact = true;
       // Call the method to fetch contact details
       this.fitchContactDetailsCreateContact(contactId, contactAssnID);
+      this.loadContactFirmAdresses(contactAssnID,this.userId,constants.ObjectOpType.Create)
     }else{
       this.selectedAvilableContact = false;
     }
