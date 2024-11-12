@@ -1332,34 +1332,8 @@ export class ContactsComponent {
         },
         lstContactFunctions: this.selectedContactFunctions,
       },
-      Addresses: this.existingContactAddresses.map(address => ({
-        firmID: this.firmId,
-        countryID: address.CountryID,
-        addressTypeID: address.AddressTypeID,
-        LastModifiedBy: this.userId,
-        entityTypeID: this.createContactObj.EntityTypeID,
-        entityID: this.firmId,
-        contactID: address.contactID,
-        addressID: null,
-        addressLine1: "",
-        addressLine2: "",
-        addressLine3: "",
-        addressLine4: "",
-        city: address.city,
-        stateProvince: address.stateProvince,
-        createdBy: 0,
-        addressAssnID: null,
-        CreatedDate: address.CreatedDate,
-        LastModifiedDate: address.LastModifiedDate,
-        addressState: 2,
-        fromDate: "2024-10-01T14:38:59.118Z",
-        toDate: "2024-10-01T14:38:59.118Z",
-        Output: address.Output,
-        objectID: 0,
-        objectInstanceID: 0,
-        zipPostalCode: "",
-        objAis: null
-      }))
+      Addresses: null
+
     };
     console.log("saveEditContactObj", saveEditContactObj)
     if (this.selectedContact.contactTypeID !== 1 || !this.selectedContact.contactTypeID) {
