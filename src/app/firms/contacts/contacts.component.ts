@@ -117,10 +117,13 @@ export class ContactsComponent {
       this.getAvilabilContact();
       this.getTitleCreate();
       this.getAddressTypesContact();
-      this.getContactFunctionType();
-      this.fetchResidencyStatus();
-      this.convertFunctionsToArray();
+       this.getContactFunctionType();
+       this.fetchResidencyStatus();
+       this.convertFunctionsToArray();
+       this.initializeSelectedFunctions();
+       this.initializeCheckboxes();
     })
+
   }
 
   ngAfterViewInit() {
@@ -212,11 +215,13 @@ export class ContactsComponent {
           console.log("Selected contact: ", this.selectedContact); // Log to check data
 
           // Convert lstContactFunctions to an array if needed
+          
           this.convertFunctionsToArray();
-
           // Fetch additional data after the contact details are set
           this.fetchResidencyStatus();
-
+          this.initializeSelectedFunctions();
+          
+          this.initializeCheckboxes();
           // Trigger change detection to update the view
           this.cdr.detectChanges();
 
@@ -281,6 +286,15 @@ export class ContactsComponent {
     this.isEditContact = false;
     this.errorMessages = {}; // Clear previous error messages
     this.hasValidationErrors = false;
+    this.selectedContact = {};
+    this.ContactFunctionTypeList.forEach(contactFunction => {
+      contactFunction.isSelected = false;
+      contactFunction.effectiveDate = '';
+      contactFunction.endDate = '';
+      contactFunction.reviewStatus = '';
+    });
+    this.selectedContactFunctions = [];
+  this.ResidencyStatusCheck = { AttributeValue: '' };
     // this.contactFirmAddresses.push(this.defaultAddress);
     // this.existingContactAddresses.push(this.defaultAddress);
   }
@@ -358,8 +372,147 @@ export class ContactsComponent {
     this.addedAddresses = [this.createDefaultAddress()];
     this.showCreateContactSection = false;
     this.CreatecontrollerDetails = this.CreatecontrollerDetailsDefualt();
+    this.createContactObj = this.initializeCreateContactObj();
+    this.ContactFunctionTypeList.forEach(contactFunction => {
+      contactFunction.isSelected = false;
+      contactFunction.effectiveDate = '';
+      contactFunction.endDate = '';
+      contactFunction.reviewStatus = '';
+    });
   }
-
+  initializeCreateContactObj(): any {
+    return {
+      firmID: 0,
+      contactID: 0,
+      contactAssnID: 0,
+      title: "",
+      contactType: 0,
+      firstName: "",
+      secondName: "",
+      thirdName: "",
+      familyName: "",
+      countryOfResidence: 0,
+      ContactMethodTypeID: 0,
+      aIsContactTypeID: null,
+      createdBy: 0,
+      dateOfBirth: "",
+      fullName: "",
+      lastModifiedBy: 0,
+      ContactFrom: '',
+      nationalID: "",
+      nationality: 0,
+      passportNum: "",
+      placeOfBirth: "",
+      previousName: "",
+      isExists: true,
+      nameInPassport: "",
+      contactAddnlInfoTypeID: 0,
+      isFromContact: true,
+      countryofBirth: 0,
+      juridictionID: 0,
+      objectID: 0,
+      isPeP: null,
+      EntityTypeID: 0,
+      contactTypeId: 0,
+      functionTypeId: 0,
+      mobileNum: "",
+      busEmail: "",
+      otherEmail: "",
+      contactMethodTypeID: 0,
+      entitySubTypeID: 0,
+      numOfShares: 0,
+      pctOfShares: 0,
+      majorityStockHolder: true,
+      assnDateFrom: "",
+      assnDateTo: "",
+      controllerControlTypeID: 0,
+      jobTitle: "",
+      nameAsInPassport: "",
+      busPhone: "",
+      residencePhone: "",
+      strContactAddnlInfoTypeID:"",
+      strContactAddnInfoTypes:"",
+      fax: "",
+      qfcNumber: "",
+      isContactSelected: true,
+      isIndividualRegulated: true,
+      additionalDetails: "",
+      ipAddress: "",
+      ainId: 0,
+      ainNumber: 0,
+      applicationID: 0,
+      docID: 0,
+      dateRecieved: "",
+      formProcessor: 0,
+      comment: "",
+      condApprovalReasonTypeID: 0,
+      reasonForDelayInFiling: "",
+      residentStatus: "",
+      isOrdinarilyResident: true,
+      applFeeReceived: "",
+      applFeeComment: "",
+      wcfAddnlInfo: "",
+      placeOfBirthCountryID: 0,
+      jurisdictionId: 0,
+      totalIndiustryExperenceYear: 0,
+      totalIndustryExperenceMonth: 0,
+      roleExperenceMonth: 0,
+      roleExperenceYear: 0,
+      pastPositionFlag: 0,
+      experience: "",
+      appIndividualArrangementTypeID: 0,
+      otherArrangementTypeDesc: "",
+      appIndividualDataID: 0,
+      pastPositionDesc: "",
+      fandPAddnlInfo: "",
+      poposedJobTitle: "",
+      jobDescription: "",
+      cfExercise: "",
+      withdrawlReasonDesc: "",
+      altArrangementDesc: "",
+      competenciesAndExp: "",
+      createdDate: "",
+      lastModifedDate: "",
+      proposedToQatarDateDays: "",
+      proposedToQatarDateMonth: "",
+      proposedToQatarDateYear: "",
+      contactFunctionID: 0,
+      contactFunctionTypeID: 0,
+      contactFunctionTypeDesc: "",
+      effectiveDate: "",
+      endDate: "",
+      lastModifiedDate: "",
+      reviewStatus: "",
+      selected: true,
+      isFunctionActive: true,
+      isRecordEditable: 0,
+      countryID: 0,
+      addressTypeID: 0,
+      sameAsTypeID: 0,
+      addressAssnID: 0,
+      addressID: "",
+      addressLine1: "",
+      addressLine2: "",
+      addressLine3: "",
+      addressLine4: "",
+      city: "",
+      province: "",
+      postalCode: "",
+      entityId: this.firmId,
+      phoneNumber: "",
+      phoneExt: "",
+      faxNumber: "",
+      addressState: 0,
+      fromDate: "",
+      toDate: "",
+      objectInstanceID: 0,
+      objectInstanceRevNumber: 0,
+      sourceObjectID: 0,
+      sourceObjectInstanceID: 0,
+      sourceObjectInstanceRevNumber: 0,
+      selectedContactFrom: '',
+    }
+  }
   CreatecontrollerDetailsDefualt() {
     return {
       SelectedControlType: '',
@@ -592,42 +745,7 @@ export class ContactsComponent {
   removeRegulator(index: number) {
     this.regulatorList.splice(index, 1);
   }
-  addRegulator() {
-    this.regulatorList.push({
-      EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-      EntityID: null,
-      UserID: null,
-      FirmID: null,
-      RelatedEntityTypeID: this.CreatecontrollerDetails.RelatedEntityTypeID,
-      relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
-      Output: 0,
-      regulatorState: 2,
-      RegulatorID: null,
-      RegulatorName: '',
-      RegulatorContacts: '',
-      RelatedEntityID: null,
-      ContactID: null,
-      Title: null,
-      FullName: null,
-      BussinessEmail: null,
-      AddressLine1: null,
-      AddressLine2: null,
-      AddressLine3: null,
-      AddressLine4: null,
-      City: null,
-      Province: null,
-      CountryID: 0,
-      CountryName: null,
-      PostalCode: null,
-      PhoneNumber: null,
-      PhoneExt: null,
-      FaxNumber: null,
-      EntityRegulators: null,
-      ShowReadOnly: false,
-      ShowEnabled: true,
-      ContactAssnID: null
-    });
-  }
+
 
 
   populateCountries() {
@@ -1001,7 +1119,7 @@ export class ContactsComponent {
           // ContactAddnInfoType:this.createContactObj.strContactAddnInfoTypes,
           nameInPassport: null,
           strContactFunctionType: null,
-          isFromContact: null,
+          isFromContact: true,
           countryofBirth: null,
           isFunctionActive : this.firmDetails?.FirmTypeID === 2,
           juridictionID: null,
@@ -1191,21 +1309,18 @@ export class ContactsComponent {
           dateOfBirth: this.dateUtilService.convertDateToYYYYMMDD(this.selectedContact.dateOfBirth),
           fullName: null,
           lastModifiedBy: this.userId,
-          MyState: 0,
+          MyState: 3,
           nationalID: null,
           nationality: null,
           EntityID: this.firmId,
           passportNum: this.selectedContact.passportNum,
           placeOfBirth: this.selectedContact.placeOfBirth,
           previousName: null,
-          isExists: false,
+          isExists: true,
           FunctionTypeId: null,
           nameInPassport: null,
-
-          strContactAddnlInfoTypeID: this.selectedContact.strContactAddnlInfoTypeID,
-          strContactAddnInfoTypes: this.selectedContact.strContactAddnInfoTypes,
-          contactAddnlInfoTypeID: null,
-          isFromContact: null,
+          contactAddnlInfoTypeID: this.createContactObj.strContactAddnlInfoTypeID,
+          isFromContact: true,
           countryofBirth: null,
           juridictionID: null,
           objectID: 523,
@@ -1215,7 +1330,7 @@ export class ContactsComponent {
           LastModifiedByOfOtherEntity: 30,
           JurisdictionId: 3,
         },
-        lstContactFunctions: null,
+        lstContactFunctions: this.selectedContactFunctions,
       },
       Addresses: this.existingContactAddresses.map(address => ({
         firmID: this.firmId,
@@ -1623,9 +1738,8 @@ export class ContactsComponent {
     });
   }
 }
-ResidencyStatusCheck: any = [];
+ResidencyStatusCheck: any = { AttributeValue: '' };
 
-// Function to fetch Residency Status from the backend
 fetchResidencyStatus(): void {
   const ObjectID = 523;
   const ObjectInstanceID = this.selectedContact.contactID;
@@ -1648,13 +1762,13 @@ fetchResidencyStatus(): void {
       if (data.isSuccess && data.response?.length > 0) {
         this.ResidencyStatusCheck = data.response[0];
       } else {
-        this.ResidencyStatusCheck = { AttributeValue: 'Select' };
+        this.ResidencyStatusCheck = { AttributeValue: '' };
       }
       this.cdr.detectChanges(); // Trigger change detection
     },
     (error) => {
       console.error("Error fetching Residency Status:", error);
-      this.ResidencyStatusCheck = { AttributeValue: 'Select' };
+      this.ResidencyStatusCheck = { AttributeValue: '' };
     }
   );
 }
@@ -1672,7 +1786,42 @@ convertFunctionsToArray(): void {
   console.log("Converted lstContactFunctions:", this.selectedContact.lstContactFunctions);
 }
 
+initializeSelectedFunctions(): void {
+  if (this.selectedContact?.lstContactFunctions) {
+    this.selectedContact.lstContactFunctions.forEach(contactFunction => {
+      const matchingFunction = this.ContactFunctionTypeList.find(
+        functionType => functionType.ContactFunctionTypeID === contactFunction.functionTypeID
+      );
 
+      if (matchingFunction) {
+        matchingFunction.isSelected = true;
+        matchingFunction.effectiveDate = contactFunction.effectiveDate;
+        matchingFunction.endDate = contactFunction.endDate;
+        matchingFunction.reviewStatus = contactFunction.reviewStatus;
+        matchingFunction.isFunctionActive = true
+        // Add to selectedContactFunctions if not already there
+        const existsInSelected = this.selectedContactFunctions.find(
+          func => func.ContactFunctionTypeID === matchingFunction.ContactFunctionTypeID
+        );
+        if (!existsInSelected) {
+          this.selectedContactFunctions.push({
+            contactFunctionID: contactFunction.contactFunctionID,
+            contactID: contactFunction.contactID,
+            contactAssnID: contactFunction.contactAssnID,
+            ContactFunctionTypeID: contactFunction.functionTypeID,
+            ContactFunctionTypeDesc: contactFunction.functionTypeDesc,
+            effectiveDate: contactFunction.effectiveDate,
+            endDate: contactFunction.endDate,
+            reviewStatus: contactFunction.reviewStatus,
+            isFunctionActive: true,
+            isRecordEditable: contactFunction.isRecordEditable,
+            CreatedBy: this.userId
+          });
+        }
+      }
+    });
+  }
+}
 ////////////////////
   isMobileNumExsits: boolean = false;
   getSearchMobileNumber(mobileNum: string): void {
@@ -1784,5 +1933,40 @@ convertFunctionsToArray(): void {
   
     console.log('Selected IDs:', this.createContactObj.strContactAddnlInfoTypeID);
     console.log('Selected Labels:', this.createContactObj.strContactAddnInfoTypes);
+  }
+  selectedInfoTypes: { [key: string]: boolean } = {
+    '1': false,  // VIP
+    '3': false,  // Annual Report
+    '4': false,  // Christmas/New Year
+    '5': false,  // Eid Cards
+    '6': false   // Publications
+  };
+  
+  initializeCheckboxes(): void {
+    if (this.selectedContact?.strContactAddnInfoTypes) {
+      const infoTypesArray = this.selectedContact.strContactAddnInfoTypes.split(',').map(item => item.trim());
+  
+      // Map the stored names to IDs
+      this.selectedInfoTypes['1'] = infoTypesArray.includes('VIP');
+      this.selectedInfoTypes['3'] = infoTypesArray.includes('Annual Report');
+      this.selectedInfoTypes['4'] = infoTypesArray.includes('Christmas/New Year');
+      this.selectedInfoTypes['5'] = infoTypesArray.includes('Eid Cards');
+      this.selectedInfoTypes['6'] = infoTypesArray.includes('Publications');
+    }
+  }
+  
+  updateContactInfoTypes(): void {
+    const selectedTypeIds: number[] = [];
+  
+    if (this.selectedInfoTypes['1']) selectedTypeIds.push(1);
+    if (this.selectedInfoTypes['3']) selectedTypeIds.push(3);
+    if (this.selectedInfoTypes['4']) selectedTypeIds.push(4);
+    if (this.selectedInfoTypes['5']) selectedTypeIds.push(5);
+    if (this.selectedInfoTypes['6']) selectedTypeIds.push(6);
+  
+    // Join the selected IDs into a string and update the selectedContact object
+    this.selectedContact.strContactAddnInfoTypeId = selectedTypeIds.join(', ');
+  
+    console.log('Updated Info Type IDs:', this.selectedContact.strContactAddnInfoTypeId);
   }
 }

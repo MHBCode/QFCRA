@@ -256,7 +256,7 @@
 
             <!-- Effective Date Input -->
             <div style="width: 20%;" class="input-field">
-              <input  type="text" #dateInputs placeholder #date placeholder="Effective Date" [(ngModel)]="ContactFunctionType.effectiveDate"
+              <input  type="text" #dateInputs placeholder  placeholder="Effective Date" [(ngModel)]="ContactFunctionType.effectiveDate"
                 [disabled]="!ContactFunctionType.isSelected"
                 (blur)="updateFunctionDates(i, 'effectiveDate', ContactFunctionType.effectiveDate)" />
             </div>
@@ -439,16 +439,16 @@
             <input type="checkbox" name="VIP" [value]="1" (change)="updateAdditionalInfo($event, 'VIP')" /> VIP
           </label>
           <label>
-            <input type="checkbox" name="AnnualReport" [value]="2" (change)="updateAdditionalInfo($event, 'Annual Report')" /> Annual Report
+            <input type="checkbox" name="AnnualReport" [value]="3" (change)="updateAdditionalInfo($event, 'Annual Report')" /> Annual Report
           </label>
           <label>
-            <input type="checkbox" name="ChristmasNewYear" [value]="3" (change)="updateAdditionalInfo($event, 'Christmas/New Year')" /> Christmas/New Year
+            <input type="checkbox" name="ChristmasNewYear" [value]="4" (change)="updateAdditionalInfo($event, 'Christmas/New Year')" /> Christmas/New Year
           </label>
           <label>
-            <input type="checkbox" name="EidCards" [value]="4" (change)="updateAdditionalInfo($event, 'Eid Cards')" /> Eid Cards
+            <input type="checkbox" name="EidCards" [value]="5" (change)="updateAdditionalInfo($event, 'Eid Cards')" /> Eid Cards
           </label>
           <label>
-            <input type="checkbox" name="Publications" [value]="5" (change)="updateAdditionalInfo($event, 'Publications')" /> Publications
+            <input type="checkbox" name="Publications" [value]="6" (change)="updateAdditionalInfo($event, 'Publications')" /> Publications
           </label>
         </div>
       </div>
@@ -530,7 +530,7 @@
             Contact Type<span style="color: red">*</span>
           </label>
           <select name="contactType" id="contactType" [(ngModel)]="selectedContact.contactTypeID"
-            [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !isEditContact">
+            [disabled]="!isEditContact">
             <option value="select" selected>Select</option>
             <option *ngFor="let contactType of contactTypeOption" [ngValue]="contactType.ContactTypeID">
               {{ contactType.ContactTypeDesc }}
@@ -544,22 +544,22 @@
           </label>
           <div class="radio-wrapper">
             <input name="isPEP" id="yes" type="radio" [value]="true" [(ngModel)]="selectedContact.isPEP"
-              [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !isEditContact" />
+              [disabled]="!isEditContact" />
             Yes
             <input name="isPEP" id="no" type="radio" [value]="false" [(ngModel)]="selectedContact.isPEP"
-              [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !isEditContact" />
+              [disabled]="!isEditContact" />
             No
           </div>
         </div>
         <div class="input-field">
           <label for="position/JobTitle"> Position/Job Title</label>
           <input name="position/JobTitle" id="position/JobTitle" type="text" [(ngModel)]="selectedContact.jobTitle"
-            [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !isEditContact" />
+            [disabled]="!isEditContact" />
         </div>
         <div class="input-field">
           <label for="Title"> Title </label>
           <select name="Title" id="Title" [(ngModel)]="selectedContact.title"
-            [disabled]="selectedContact.aIsContactTypeID === null || !isEditContact">
+            [disabled]="!isEditContact">
             <option *ngFor="let title of Titles" [value]="title.TitleDesc">
               {{ title.TitleDesc }}
             </option>
@@ -568,50 +568,50 @@
         <div class="input-field">
           <label for="firstName"> First Name</label>
           <input name="firstName" id="firstName" type="text" [(ngModel)]="selectedContact.firstName"
-            [disabled]="selectedContact.aIsContactTypeID === null || !isEditContact" />
+            [disabled]="!isEditContact" />
         </div>
         <div class="input-field">
           <label for="SecondName"> Second Name</label>
           <input name="SecondName" id="SecondName" type="text" [(ngModel)]="selectedContact.secondName"
-            [disabled]="selectedContact.aIsContactTypeID === null || !isEditContact" />
+            [disabled]="!isEditContact" />
         </div>
         <div class="input-field">
           <label for="FamilyName"> Family Name</label>
           <input name="FamilyName" id="FamilyName" type="text" [(ngModel)]="selectedContact.familyName"
-            [disabled]="selectedContact.aIsContactTypeID === null || !isEditContact" />
+            [disabled]="!isEditContact" />
         </div>
         <div class="input-field">
           <label for="MobilePhone">Mobile Phone</label>
           <input name="MobilePhone" id="MobilePhone" type="text" [(ngModel)]="selectedContact.mobileNum"
-            [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !isEditContact" />
+            [disabled]="!isEditContact" />
         </div>
 
         <div class="input-field">
           <label for="Fax">Fax</label>
           <input name="Fax" id="Fax" type="text" [(ngModel)]="selectedContact.fax"
-            [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !isEditContact" />
+            [disabled]="!isEditContact" />
         </div>
 
         <div class="input-field">
           <label for="BusinessPhone">Business Phone</label>
           <input name="BusinessPhone" id="BusinessPhone" type="text" [(ngModel)]="selectedContact.busPhone"
-            [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !isEditContact" />
+            [disabled]="!isEditContact" />
         </div>
 
         <div class="input-field">
           <label for="BusinessEmail">Business Email</label>
           <input name="BusinessEmail" id="BusinessEmail" type="text" [(ngModel)]="selectedContact.busEmail"
-            [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !isEditContact" />
+            [disabled]="!isEditContact" />
         </div>
         <div class="input-field">
           <label for="OtherEmail">Other Email</label>
           <input name="OtherEmail" id="OtherEmail" type="text" [(ngModel)]="selectedContact.otherEmail"
-            [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !isEditContact" />
+            [disabled]="!isEditContact" />
         </div>
         <div class="input-field">
           <label for="MethodofContact"> Preferred Method of Contact </label>
           <select name="MethodofContact" id="MethodofContact" [(ngModel)]="selectedContact.contactMethodTypeID"
-            [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === true || !isEditContact">
+            [disabled]="!isEditContact">
             <option *ngFor="let MethodofContact of MethodofContactOption" [value]="MethodofContact.ContactMethodTypeID">
               {{ MethodofContact.ContactMethodTypeDesc }}
             </option>
@@ -648,14 +648,18 @@
             <!-- Checkbox to select function -->
             <div style="width: 20%;" class="input-field">
               <label>
-                <input type="checkbox" [(ngModel)]="ContactFunctionType.isSelected" />
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="ContactFunctionType.isSelected" 
+                  (change)="onFunctionCheckboxChange(ContactFunctionType,i)"
+                />
                 {{ ContactFunctionType.contactFunctionTypeDesc }}
               </label>
             </div>    
             <!-- Effective Date Input -->
             <div style="width: 20%;" class="input-field">
               <input
-                type="text"
+                type="text" #dateInputs placeholder
                 placeholder="Effective Date"
                 [(ngModel)]="ContactFunctionType.effectiveDate"
                 [disabled]="!ContactFunctionType.isSelected"
@@ -664,7 +668,7 @@
             <!-- End Date Input -->
             <div style="width: 20%;" class="input-field">
               <input
-                type="text"
+                type="text" #dateInputs placeholder
                 placeholder="End Date"
                 [(ngModel)]="ContactFunctionType.endDate"
                 [disabled]="!ContactFunctionType.isSelected"
@@ -694,9 +698,9 @@
           </ng-container>     
           <!-- View Mode: Display Residency Status -->
           <ng-template #readOnlyView>
-            <div class="input-field">
+            <div class="input-field" *ngIf="ResidencyStatusCheck?.AttributeValue" >
               <label>Is the individual a Resident or Non-Resident of Qatar?</label>
-              <span>{{ ResidencyStatusCheck.AttributeValue || 'Not Specified' }}</span>
+              <span>{{ ResidencyStatusCheck.AttributeValue }}</span>
             </div>
           </ng-template>
         </div>        
@@ -846,12 +850,64 @@
         <div class="popup-header">
           <h3>Additional Informations</h3>
         </div>
-        <div style=" display: flex; flex-wrap: wrap;gap: 15px;">
-          <label><input type="checkbox" name="VIP" /> VIP</label>
-          <label><input type="checkbox" name="AnnualReport" /> Annual Report</label>
-          <label><input type="checkbox" name="ChristmasNewYear" /> Christmas/New Year</label>
-          <label><input type="checkbox" name="EidCards" /> Eid Cards</label>
-          <label><input type="checkbox" name="Publications" /> Publications</label>
+        <!-- <div style="display: flex; flex-wrap: wrap; gap: 15px;" *ngIf="isEditContact">
+          <label>
+            <input type="checkbox" name="VIP" [value]="1" (change)="updateAdditionalInfo($event, 'VIP')" /> VIP
+          </label>
+          <label>
+            <input type="checkbox" name="AnnualReport" [value]="3" (change)="updateAdditionalInfo($event, 'Annual Report')" /> Annual Report
+          </label>
+          <label>
+            <input type="checkbox" name="ChristmasNewYear" [value]="4" (change)="updateAdditionalInfo($event, 'Christmas/New Year')" /> Christmas/New Year
+          </label>
+          <label>
+            <input type="checkbox" name="EidCards" [value]="5" (change)="updateAdditionalInfo($event, 'Eid Cards')" /> Eid Cards
+          </label>
+          <label>
+            <input type="checkbox" name="Publications" [value]="6" (change)="updateAdditionalInfo($event, 'Publications')" /> Publications
+          </label>
+        </div> -->
+        <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+          <label>
+            <input [disabled]="!isEditContact"
+                   type="checkbox"
+                   [value]="1"
+                   [(ngModel)]="selectedInfoTypes['1']"
+                   (change)="updateAdditionalInfo($event, 'VIP')"
+            /> VIP
+          </label>
+          <label>
+            <input [disabled]="!isEditContact"
+                   type="checkbox"
+                   [value]="3"
+                   [(ngModel)]="selectedInfoTypes['3']"
+                   (change)="updateAdditionalInfo($event, 'Annual Report')"
+            /> Annual Report
+          </label>
+          <label>
+            <input [disabled]="!isEditContact"
+                   type="checkbox"
+                   [value]="4"
+                   [(ngModel)]="selectedInfoTypes['4']"
+                   (change)="updateAdditionalInfo($event, 'Christmas/New Year')"
+            /> Christmas/New Year
+          </label>
+          <label>
+            <input [disabled]="!isEditContact"
+                   type="checkbox"
+                   [value]="5"
+                   [(ngModel)]="selectedInfoTypes['5']"
+                   (change)="updateAdditionalInfo($event, 'Eid Cards')"
+            /> Eid Cards
+          </label>
+          <label>
+            <input [disabled]="!isEditContact"
+                   type="checkbox"
+                   [value]="6"
+                   [(ngModel)]="selectedInfoTypes['6']"
+                   (change)="updateAdditionalInfo($event, 'Publications')"
+            /> Publications
+          </label>
         </div>
       </div>
       <div class="btn justify-content-end">
