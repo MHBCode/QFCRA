@@ -75,10 +75,23 @@
     padding: 0px;
 }
 
+.form-section-title {
+    padding: 0px;
+    justify-content: left;
+}
+
+.subbutton-open-history-container {
+    margin-left: 10px;
+}
+
 .enhanced-checkbox {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.popup-header {
+    width: 100%;
 }
 
 .popup-header h3{
