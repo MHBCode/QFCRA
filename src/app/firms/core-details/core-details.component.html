@@ -419,15 +419,13 @@
             </button>
         </div>
         <!-- Aicha : This should be a component -->
-       
-            <app-attachment 
-            [documentObj]="documentObj" 
-            [isEditModeCore]="isEditModeCore"
-            [DocSubTypeID]="fetchedCoreDetailDocSubTypeID"
-            [loadDocuments]="loadDocuments.bind(this)"
-            (documentUploaded)="onDocumentUploaded($event)">
-          </app-attachment>
-     
+        <div class="inputs-row">
+            <app-attachment [documentObj]="documentObj" [isEditModeCore]="isEditModeCore"
+                [DocSubTypeID]="fetchedCoreDetailDocSubTypeID" [loadDocuments]="loadDocuments.bind(this)"
+                (documentUploaded)="onDocumentUploaded($event)">
+            </app-attachment>
+        </div> 
+            
     </div>
 
     <!---->
@@ -457,14 +455,12 @@
     </div>
 
     <!---->
-    <div *ngIf="existingAddresses.length > 0 || isEditModeCore" class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['addressesSection'] }">
+    <div *ngIf="existingAddresses.length > 0 || isEditModeCore" class="inputs-field-set"
+        [ngClass]="{ collapsed: isCollapsed['addressesSection'] }">
         <!--Error messages for addresses-->
         <div class="error-messages">
             <p *ngIf="errorMessages['AddressTypeID']">
                 {{ errorMessages['AddressTypeID'] }}
-            </p>
-            <p *ngIf="errorMessages['DuplicatedAddressTypeID']">
-                {{ errorMessages['DuplicatedAddressTypeID'] }}
             </p>
         </div>
         <div class="display-flex space-between align-center border-bottom">
@@ -526,8 +522,8 @@
               (!address.AddressID || address.AddressID === '')
             ">
                         <label for="sameAsType"> Same As Type </label>
-                        <select [(ngModel)]="address.SameAsTypeID" (ngModelChange)="onSameAsTypeChangeOnEditMode($event,i)"
-                            name="sameAsType" id="sameAsType">
+                        <select [(ngModel)]="address.SameAsTypeID"
+                            (ngModelChange)="onSameAsTypeChangeOnEditMode($event,i)" name="sameAsType" id="sameAsType">
                             <option value="0">Select</option>
                             <option *ngFor="let type of getFilteredAddressTypes()" [value]="type.AddressTypeID">
                                 {{ type.AddressTypeDesc }}
@@ -768,64 +764,64 @@
 <!--Address Type History-->
 <div *ngIf="callAddressType" class="overlay show"></div>
 <div *ngIf="callAddressType" class="addressHistoryPopup popupcontainer">
-  <i class="bi bi-x-circle close-icon" (click)="closeAddressTypeHistory()"></i>
-  <div class="popup-info-place">
-    <div class="popup-header">
-      <h3>Address History</h3>
+    <i class="bi bi-x-circle close-icon" (click)="closeAddressTypeHistory()"></i>
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Address History</h3>
+        </div>
+        <br />
+        <div class="address-type-info">
+            <span style="text-decoration: underline">{{
+                firmAddressesTypeHistory[0]?.AddressTypeDesc
+                }}</span>
+            &nbsp; (<span style="color: red">history includes the deleted record for this address type.</span>)
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Address</th>
+                    <th class="text-center">Created Date</th>
+                    <th class="text-center">Modified Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let addressHistory of firmAddressesTypeHistory">
+                    <td>{{ addressHistory?.ShortAddress }}</td>
+                    <td class="text-center">{{ addressHistory?.CreatedDate }}</td>
+                    <td class="text-center">
+                        {{ addressHistory?.LastModifiedDate }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-    <br />
-    <div class="address-type-info">
-      <span style="text-decoration: underline">{{
-        firmAddressesTypeHistory[0]?.AddressTypeDesc
-        }}</span>
-      &nbsp; (<span style="color: red">history includes the deleted record for this address type.</span>)
+    <div class="popup-operations-place">
+        <button class="subbutton" (click)="closeAddressTypeHistory()">Close</button>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Address</th>
-          <th class="text-center">Created Date</th>
-          <th class="text-center">Modified Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let addressHistory of firmAddressesTypeHistory">
-          <td>{{ addressHistory?.ShortAddress }}</td>
-          <td class="text-center">{{ addressHistory?.CreatedDate }}</td>
-          <td class="text-center">
-            {{ addressHistory?.LastModifiedDate }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="popup-operations-place">
-    <button class="subbutton" (click)="closeAddressTypeHistory()">Close</button>
-  </div>
 </div>
 
 
 <!--[Aicha] : Select Document PopUp-->
 <div *ngIf="callUploadDoc" class="overlay show"></div>
 <div *ngIf="callUploadDoc" class="selectDocumentPopUp popupcontainer">
-  <button type="button" (click)="closeSelectDocument()">
-    <i class="bi bi-x-circle close-icon"></i>
-  </button>
-  <i class="bi bi-x-circle close-icon" (click)="closeSelectDocument()"></i>
-  <div class="popup-info-place upload-container">
-    <div class="popup-header">
-      <h3>Upload Document</h3>
-    </div>
-    <div class="upload-document-body">
-      <p>Please browse and upload/attach document:</p>
-      <input type="file" accept=".pdf" #fileInput (change)="onFileSelected($event)" />
-    </div>
-    <small style="color: red" *ngIf="fileError">{{ fileError }}</small>
-  </div>
-  <div class="popup-operations-place">
-    <button style="margin-right: 5px" class="subbutton" (click)="confirmUpload()">
-      Ok
+    <button type="button" (click)="closeSelectDocument()">
+        <i class="bi bi-x-circle close-icon"></i>
     </button>
-    <button class="subbutton" (click)="closeSelectDocument()">Close</button>
-  </div>
+    <i class="bi bi-x-circle close-icon" (click)="closeSelectDocument()"></i>
+    <div class="popup-info-place upload-container">
+        <div class="popup-header">
+            <h3>Upload Document</h3>
+        </div>
+        <div class="upload-document-body">
+            <p>Please browse and upload/attach document:</p>
+            <input type="file" accept=".pdf" #fileInput (change)="onFileSelected($event)" />
+        </div>
+        <small style="color: red" *ngIf="fileError">{{ fileError }}</small>
+    </div>
+    <div class="popup-operations-place">
+        <button style="margin-right: 5px" class="subbutton" (click)="confirmUpload()">
+            Ok
+        </button>
+        <button class="subbutton" (click)="closeSelectDocument()">Close</button>
+    </div>
 </div>

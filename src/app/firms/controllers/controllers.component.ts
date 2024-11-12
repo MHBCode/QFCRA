@@ -1233,7 +1233,7 @@ export class ControllersComponent implements OnInit {
         this.selectedController.OtherEntityID,
         this.selectedController.EntityTypeID,
         this.userId,
-        44 // Static opTypeId
+        constants.ObjectOpType.View // Static opTypeId
       );
 
       this.parentEntity.getRegulatorDetails(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID)
