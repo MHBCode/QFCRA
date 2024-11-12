@@ -171,10 +171,12 @@ export class ContactsComponent {
       data => {
         if (data.response) {
           this.contactFirmAddresses = data.response;
-          this.existingContactAddresses = this.contactFirmAddresses.filter(addr => addr.Valid);
+          if(this.showCreateContactSection){
+            this.addedAddresses = this.contactFirmAddresses.filter(addr => addr.Valid);
+          }else{
+            this.existingContactAddresses = this.contactFirmAddresses.filter(addr => addr.Valid);          
+          }
           console.log('Contact Firm Addresses:', this.contactFirmAddresses);
-        } else {
-          console.warn('No addresses found for this firm');
         }
         this.isLoading = false;
       },
