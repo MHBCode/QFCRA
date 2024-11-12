@@ -80,6 +80,7 @@ export class ContactsComponent {
   addedAddressesOnCreate: any = [];
   canAddNewAddressOnCreate: boolean = true;
   isAllAddressesAddedOnCreate: boolean;
+  disableAddressFieldOnCreate = true;
 
   constructor(
     private securityService: SecurityService,
@@ -163,16 +164,24 @@ export class ContactsComponent {
     );
   }
 
-  loadContactFirmAdresses(contactAssId: number, userId: number, opTypeId: number): void {
+  loadContactFirmAdresses(contactAssId: number, userId: number): void {
     this.isLoading = true;
 
     // Fetch firm addresses from the service
-    this.addressService.getContactFirmAddresses(contactAssId, userId, opTypeId).subscribe(
+    this.addressService.getContactFirmAddresses(contactAssId, userId).subscribe(
       data => {
         if (data.response) {
           this.contactFirmAddresses = data.response;
+
           if(this.showCreateContactSection){
             this.addedAddresses = this.contactFirmAddresses.filter(addr => addr.Valid);
+            this.addedAddresses.forEach((address) => {
+              if (address.AddressTypeID) {
+                this.disableAddressFieldOnCreate = true;
+              } else {
+                this.disableAddressFieldOnCreate = false;
+              }
+            })
           }else{
             this.existingContactAddresses = this.contactFirmAddresses.filter(addr => addr.Valid);          
           }
@@ -218,7 +227,7 @@ export class ContactsComponent {
           console.log("Selected contact: ", this.selectedContact); // Log to check data
 
           // Convert lstContactFunctions to an array if needed
-          this.loadContactFirmAdresses(this.selectedContact.contactAssnID, this.userId, constants.ObjectOpType.View);
+          this.loadContactFirmAdresses(this.selectedContact.contactAssnID, this.userId);
           this.convertFunctionsToArray();
           // Fetch additional data after the contact details are set
           this.fetchResidencyStatus();
@@ -850,6 +859,7 @@ export class ContactsComponent {
     const selectedEntity = this.AllContactFrom.find(contact => contact.EntityTypeID === this.selectedContactFrom);
     return selectedEntity ? selectedEntity.EntityTypeName.includes('Firm') : false;
   }
+
   selectedAvilableContact: boolean = false;
   onContactChange(selectedValue: string) {
     if (selectedValue !== "select") {
@@ -858,7 +868,7 @@ export class ContactsComponent {
       this.selectedAvilableContact = true;
       // Call the method to fetch contact details
       this.fitchContactDetailsCreateContact(contactId, contactAssnID);
-      this.loadContactFirmAdresses(contactAssnID,this.userId,constants.ObjectOpType.Create)
+      this.loadContactFirmAdresses(contactAssnID,this.userId);
     }else{
       this.selectedAvilableContact = false;
     }
@@ -1064,6 +1074,7 @@ export class ContactsComponent {
     isFunctionActive: 0,
     isRecordEditable: 0,
   }
+
   createContactPopup(): void {
     this.CreateContactValidateForm();
 
@@ -1167,12 +1178,6 @@ export class ContactsComponent {
     console.log("Contact Object to be creted", saveCreateContactObj)
     if (this.createContactObj.contactType !== 1 || !this.createContactObj.contactType) {
       this.saveContactForm(saveCreateContactObj);
-      this.closeContactPopup();
-      Swal.fire(
-        'Created!',
-        'The contact has been Created successfully.',
-        'success'
-      );
       this.loadContacts();
     } else {
       this.contactService.IsMainContact(this.firmId, this.createContactObj.entityId, this.createContactObj.contactType)
@@ -1187,21 +1192,23 @@ export class ContactsComponent {
         });
     }
   }
+
   private saveContactForm(data: any): void {
     this.contactService.saveupdatecontactform(data).subscribe(
       response => {
         console.log("Contact save successful:", response);
         this.isEditContact = false;
-        this.getPlaceOfEstablishmentName();
-        this.firmDetailsService.showSaveSuccessAlert(constants.ContactMessage.UPDATECONTACT);
         this.loadContacts();
         this.closeContactPopup();
+        this.closeCreateContactPopup();
+        this.firmDetailsService.showSaveSuccessAlert(constants.ContactMessage.UPDATECONTACT);
       },
       error => {
         console.error("Error saving contact:", error);
       }
     );
   }
+
   showErrorAlert(messageKey: number) {
     this.logForm.errorMessages(messageKey).subscribe(
       (response) => {
@@ -1373,7 +1380,7 @@ export class ContactsComponent {
           fromDate: '1970-01-01',
           toDate: '1970-01-01',
           objectID: address.ObjectID || this.Page.Contatcs,
-          objectInstanceID: address.ObjectInstanceID || this.firmId,
+          objectInstanceID: this.firmId,
           objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
           sourceObjectID: address.SourceObjectID || this.Page.Contatcs,
           sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
@@ -1484,10 +1491,7 @@ export class ContactsComponent {
       }
     );
   }
-  getPlaceOfEstablishmentName(): string {
-    const place = this.allCountries.find(option => option.CountryID === parseInt(this.selectedContact.CountryOfIncorporation));
-    return place ? place.CountryName : '';
-  }
+
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   get filteredContactAddresses() {
@@ -1577,7 +1581,8 @@ export class ContactsComponent {
     this.firmDetailsService.addNewAddressOnCreateMode(this.addedAddresses, this.allAddressTypes, this.currentDate);
 
     // Now call checkCanAddNewAddressOnCreateMode to get the updated flags
-    this.checkCanAddNewAddressOnCreateMode()
+    this.checkCanAddNewAddressOnCreateMode();
+    this.disableAddressFieldOnCreate = false;
   }
 
   createDefaultAddress(): any {

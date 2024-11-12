@@ -353,7 +353,7 @@
                 Address Type
               </label>
               <select [(ngModel)]="address.AddressTypeID" [ngClass]="{
-                        'error-border': address === invalidAddress}" [disabled]="address.isAddressTypeSelected"
+                        'error-border': address === invalidAddress}" [disabled]="address.isAddressTypeSelected || disableAddressFieldOnCreate"
                 (change)="onAddressTypeChangeOnCreateMode($event,i)">
                 <option value="0">Select</option>
                 <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
@@ -413,16 +413,6 @@
             <div class="input-field">
               <label for="zip"> Zip/Postal Code </label>
               <input name="zip" id="zip" type="text" [(ngModel)]="address.PostalCode"
-                [disabled]="address.isFieldsDisabled" />
-            </div>
-            <div class="input-field">
-              <label for="phone"> Phone </label>
-              <input name="phone" id="phone" type="text" [(ngModel)]="address.PhoneNum"
-                [disabled]="address.isFieldsDisabled" />
-            </div>
-            <div class="input-field">
-              <label for="fax"> Fax </label>
-              <input name="fax" id="fax" type="text" [(ngModel)]="address.FaxNum"
                 [disabled]="address.isFieldsDisabled" />
             </div>
           </div>
