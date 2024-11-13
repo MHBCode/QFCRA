@@ -108,12 +108,8 @@ export class ContactsComponent {
         this.loadContacts();
       }
       this.loadFirmDetails(this.firmId);
-      this.getAllRegulater(this.Address.countryID, this.firmId);
       this.populateCountries();
-      this.getlegalStatusController();
       this.getAllContactFromByFrimsId();
-      this.getControllerControlTypesCreat();
-      this.getlegalStatusController();
       this.getContactType();
       this.getPreferredMethodofContact();
       this.getAvilabilContact();
@@ -123,7 +119,8 @@ export class ContactsComponent {
       this.fetchResidencyStatus();
       this.convertFunctionsToArray();
       this.initializeSelectedFunctions();
-      this.initializeCheckboxes();
+      //this.initializeCheckboxes();
+      this.initializeEditInfoTypes();
     })
 
   }
@@ -145,7 +142,7 @@ export class ContactsComponent {
       error => {
         console.error(error);
       }
-    );
+    ); 
   }
 
 
@@ -233,7 +230,8 @@ export class ContactsComponent {
           this.fetchResidencyStatus();
           this.initializeSelectedFunctions();
 
-          this.initializeCheckboxes();
+          //this.initializeCheckboxes();
+          this.initializeEditInfoTypes();
           // Trigger change detection to update the view
           this.cdr.detectChanges();
 
@@ -250,36 +248,6 @@ export class ContactsComponent {
       }
     );
   }
-  // onRowClick(contact: any): void {
-  //   // Reset the selected contact and hide the popup until data is loaded
-  //   this.selectedContact = {};
-  //   this.isPopupVisible = false;
-
-  //   // Fetch contact details based on selected row
-  //   this.contactService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
-  //     data => {
-  //       if (data && data.response) {
-  //         this.selectedContact = data.response; // Assign the received data to selectedContact
-  //         console.log("Selected contact: ", this.selectedContact); // Log to check data
-  //         this.isPopupVisible = true; // Show the popup after data is loaded
-  //         //this.cdr.detectChanges(); // Trigger change detection to update the view
-  //         this.loadContactFirmAdresses(
-  //           this.selectedContact.contactAssnID,
-  //           this.userId,
-  //           this.Page.Contatcs // Static opTypeId
-  //         );
-  //         this.fetchResidencyStatus();
-  //       } else {
-  //         console.error('No contact data received:', data);
-  //         this.isPopupVisible = false; // Hide popup if no data is received
-  //       }
-  //     },
-  //     error => {
-  //       console.error('Error fetching contact details', error);
-  //       this.isPopupVisible = false; // Hide popup if there's an error
-  //     }
-  //   );
-  // }
 
   get filteredContacts() {
     if (this.displayInactiveContacts) {
@@ -382,7 +350,6 @@ export class ContactsComponent {
     this.hasValidationErrors = false;
     this.addedAddresses = [this.createDefaultAddress()];
     this.showCreateContactSection = false;
-    this.CreatecontrollerDetails = this.CreatecontrollerDetailsDefualt();
     this.createContactObj = this.initializeCreateContactObj();
     this.ContactFunctionTypeList.forEach(contactFunction => {
       contactFunction.isSelected = false;
@@ -524,240 +491,6 @@ export class ContactsComponent {
       selectedContactFrom: '',
     }
   }
-  CreatecontrollerDetailsDefualt() {
-    return {
-      SelectedControlType: '',
-      TypeOfControl: '',
-      EntityTypeDesc: '',
-      OtherEntityID: 0,
-      OtherEntityName: '',
-      LegalStatusTypeID: 0,
-      PctOfShares: '',
-      PlaceOfEstablishment: '',
-      aIsContactTypeID: '',
-      Title: '',
-      FirstName: '',
-      SecondName: '',
-      FamilyName: '',
-      PlaceOfBirth: '',
-      DateOfBirth: '',
-      PassportNum: '',
-      IsPEP: 0,
-      IsPublicallyTraded: false,
-      ControllerControlTypeID: 2,
-      RegisteredNum: '',
-      ControllerControlTypeDesc: '',
-      HoldingsPercentage: '',
-      EffectiveDate: '',
-      CessationDate: '',
-      More10UBOs: true,
-      IsParentController: true,
-      AssnDateFrom: '',
-      AssnDateTo: '',
-      IsCompanyRegulated: false,
-      LegalStatusTypeDesc: '',
-      CountryName: '',
-      AdditionalDetails: '',
-      LastModifiedByOfOtherEntities: '',
-      LastModifiedDate: '',
-      AddressType: '',
-      addressLine1: '',
-      addressLine2: '',
-      addressLine3: '',
-      addressLine4: '',
-      city: '',
-      stateProvince: '',
-      country: '',
-      zipPostalCode: '',
-      regulator: '',
-      RegulatorContact: '',
-      CreatedBy: 30,
-      RelatedEntityID: 0,
-      EntitySubTypeID: null,
-      EntityTypeID: 1,
-      RelatedEntityEntityID: 0,
-      MyState: 2,
-      PlaceOfIncorporation: '',
-      CountryOfIncorporation: 0,
-      zebSiteAddress: '',
-      IsAuditor: 0,
-      ControllerInfo: '',
-      FirmID: 0,
-      Output: 0,
-      NumOfShares: 0,
-      CountryID: 0,
-      AddressTypeID: 0,
-      CreatedDate: '',
-      EntityID: 0,
-      ContactID: 0,
-      AddressID: '',
-      AddressState: 0,
-      RelatedEntityTypeID: 6,
-      ObjectID: 0,
-      PrefferdMethod: '',
-      ContactId: 0,
-      ThirdName: '',
-      ObjectInstanceID: 0,
-      AddressTypeDesc: '',
-      StatusDate: '',
-      MobilePhone: '',
-      businessEmail: '',
-      OtherEmail: '',
-      RegulatorID: 0,
-      PreferredMethodType: '',
-      RegulatorName: '',
-    }
-  }
-  CreatecontrollerDetails = {
-    SelectedControlType: '',
-    TypeOfControl: '',
-    EntityTypeDesc: '',
-    OtherEntityID: 0,
-    OtherEntityName: '',
-    LegalStatusTypeID: 0,
-    PctOfShares: '',
-    PlaceOfEstablishment: '',
-    Title: '',
-    FirstName: '',
-    SecondName: '',
-    FamilyName: '',
-    aIsContactTypeID: '',
-    PlaceOfBirth: '',
-    DateOfBirth: '',
-    PassportNum: '',
-    IsPEP: 0,
-    IsPublicallyTraded: false,
-    ControllerControlTypeID: 2,
-    RegisteredNum: '',
-    ControllerControlTypeDesc: '',
-    HoldingsPercentage: '',
-    EffectiveDate: '',
-    CessationDate: '',
-    More10UBOs: true,
-    IsParentController: true,
-    AssnDateFrom: '',
-    AssnDateTo: '',
-    IsCompanyRegulated: false,
-    LegalStatusTypeDesc: '',
-    CountryName: '',
-    AdditionalDetails: '',
-    LastModifiedByOfOtherEntities: '',
-    LastModifiedDate: '',
-    AddressType: '',
-    addressLine1: '',
-    addressLine2: '',
-    addressLine3: '',
-    addressLine4: '',
-    city: '',
-    stateProvince: '',
-    country: '',
-    zipPostalCode: '',
-    regulator: '',
-    RegulatorContact: '',
-    CreatedBy: 30,
-    RelatedEntityID: 0,
-    EntitySubTypeID: null,
-    EntityTypeID: 1,
-    RelatedEntityEntityID: 0,
-    MyState: 2,
-    PlaceOfIncorporation: '',
-    CountryOfIncorporation: 0,
-    zebSiteAddress: '',
-    IsAuditor: 0,
-    ControllerInfo: '',
-    FirmID: 0,
-    Output: 0,
-    NumOfShares: 0,
-    CountryID: 0,
-    AddressTypeID: 0,
-    CreatedDate: '',
-    EntityID: 0,
-    ContactID: 0,
-    AddressID: '',
-    AddressState: 0,
-    RelatedEntityTypeID: 6,
-    ObjectID: 0,
-    PrefferdMethod: '',
-    ContactId: 0,
-    ThirdName: '',
-    ObjectInstanceID: 0,
-    AddressTypeDesc: '',
-    StatusDate: '',
-    MobilePhone: '',
-    businessEmail: '',
-    OtherEmail: '',
-    RegulatorID: 0,
-    PreferredMethodType: '',
-    RegulatorName: '',
-  };
-
-
-  regulatorList: Array<any> = [
-    {
-      EntityTypeID: this.CreatecontrollerDetails.EntityTypeID,
-      EntityID: null,
-      UserID: null,
-      FirmID: null,
-      RelatedEntityTypeID: this.CreatecontrollerDetails.RelatedEntityTypeID,
-      relatedEntityID: this.CreatecontrollerDetails.RelatedEntityID,
-      Output: 0,
-      regulatorState: 2,
-      RegulatorID: 39,
-      RegulatorName: "Bahrain Monetary Agency",
-      RegulatorContacts: "",
-      RelatedEntityID: null,
-      ContactID: null,
-      Title: null,
-      FullName: null,
-      BussinessEmail: null,
-      AddressLine1: null,
-      AddressLine2: null,
-      AddressLine3: null,
-      AddressLine4: null,
-      City: null,
-      Province: null,
-      CountryID: 0,
-      CountryName: null,
-      PostalCode: null,
-      PhoneNumber: null,
-      PhoneExt: null,
-      FaxNumber: null,
-      EntityRegulators: null,
-      ShowReadOnly: false,
-      ShowEnabled: true,
-      ContactAssnID: null
-    }
-  ];
-
-
-
-  getAllRegulater(countryID: number, firmId: number): void {
-    if (!countryID) {
-      // If no country is selected, get general regulators
-      this.securityService.getObjectTypeTable(constants.Regulaters)
-        .subscribe(data => {
-          this.AllRegulater = data.response;
-          console.log("General Regulators fetched:", data);
-        }, error => {
-          console.error("Error fetching Regulators:", error);
-        });
-    } else {
-      // If a country is selected, get regulators specific to the country
-      this.parentEntity.getRegulatorsByCountry(firmId, countryID)
-        .subscribe(data => {
-          this.AllRegulater = data.response;
-          console.log("Country-specific Regulators fetched for CountryID:", countryID, data);
-        }, error => {
-          console.error("Error fetching Country-specific Regulators:", error);
-        });
-    }
-  }
-
-  removeRegulator(index: number) {
-    this.regulatorList.splice(index, 1);
-  }
-
-
 
   populateCountries() {
     this.firmDetailsService.getCountries().subscribe(
@@ -770,39 +503,6 @@ export class ContactsComponent {
     );
   }
 
-
-
-  getControllerControlTypesCreat(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdCreate)
-      .subscribe(data => {
-        this.controlTypeOptionsCreate = data.response;
-        console.log("getControllerControlTypes", data)
-      }, error => {
-        console.error("Error fetching controller control types:", error);
-      });
-  }
-
-  CreateControlTypeDesc(selectedValue: any) {
-    const selectedEntityTypeDesc = this.CreatecontrollerDetails.EntityTypeDesc;
-    const selectedControllerType = this.controllerTypeOption.find(
-      controllerType => controllerType.EntityTypeDesc === selectedEntityTypeDesc
-    );
-
-    if (selectedControllerType) {
-      this.CreatecontrollerDetails.EntityTypeID = selectedControllerType.EntityTypeID;
-    }
-  }
-
-
-  getlegalStatusController(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdEdit)
-      .subscribe(data => {
-        this.legalStatusOptionsEdit = data.response;
-        console.log("getlegalStatusController", data)
-      }, error => {
-        console.error("Error fetching legalStatus", error);
-      });
-  }
 
   getAddressTypesContact(): void {
     this.securityService.getobjecttypetableEdit(this.userId, constants.contactAddressTypes, this.objectOpTypeIdEdit)
@@ -827,17 +527,41 @@ export class ContactsComponent {
     this.firmDetailsService.showErrorAlert(messageKey, this.isLoading);
   }
   selectedContactFrom: string = 'select';
+  // onContactFromChange(selectedValue: string): void {
+  //   //  this.addedAddresses.push(this.defaultAddress);
+  //   this.selectedContactFrom = selectedValue;
+  //   const selectedContact = this.AllContactFrom.find(item => item.EntityTypeID === selectedValue);
+    
+  //   if (selectedContact) {
+  //     const entityTypeIDParts = selectedContact.EntityTypeID.split(',');
+  //     this.createContactObj.ContactFrom = selectedContact.EntityTypeName;
+  //     this.createContactObj.EntityTypeID = entityTypeIDParts[0]; // Take the first part
+  //   }
+  // }
   onContactFromChange(selectedValue: string): void {
-    //  this.addedAddresses.push(this.defaultAddress);
-    this.selectedContactFrom = selectedValue;
-    const selectedContact = this.AllContactFrom.find(item => item.EntityTypeID === selectedValue);
-
-    if (selectedContact) {
-      const entityTypeIDParts = selectedContact.EntityTypeID.split(',');
-      this.createContactObj.ContactFrom = selectedContact.EntityTypeName;
-      this.createContactObj.EntityTypeID = entityTypeIDParts[0]; // Take the first part
+    // Ensure the value is defined and not "select"
+    if (selectedValue && selectedValue !== 'select') {
+      this.selectedContactFrom = selectedValue;
+  
+      // Find the selected entity from the list
+      const selectedContact = this.AllContactFrom.find(item => item.EntityTypeID === selectedValue);
+      
+      if (selectedContact) {
+        const entityTypeIDParts = selectedContact.EntityTypeID.split(',');
+        this.createContactObj.ContactFrom = selectedContact.EntityTypeName;
+        this.createContactObj.EntityTypeID = entityTypeIDParts[0]; // Take the first part if there are multiple IDs
+      } else {
+        // Reset if not found
+        this.createContactObj.ContactFrom = '';
+        this.createContactObj.EntityTypeID = null;
+      }
+    } else {
+      // Reset if "select" is chosen
+      this.createContactObj.ContactFrom = '';
+      this.createContactObj.EntityTypeID = null;
     }
   }
+  
   getAllContactFromByFrimsId() {
     this.contactService.getEntityTypesByFrimsId(this.firmId).subscribe(data => {
       this.AllContactFrom = data.response;
@@ -848,18 +572,30 @@ export class ContactsComponent {
 
     });
   }
+  // setDefaultContactFrom(): void {
+  //   const entity = this.AllContactFrom.find(contact => contact.EntityTypeID.startsWith('1'));
+  //   if (entity) {
+  //     this.selectedContactFrom = entity.EntityTypeID; // This will trigger the dropdown selection
+  //     this.onContactFromChange(this.selectedContactFrom); // Make sure to update createContactObj accordingly
+  //   }
+  // }
   setDefaultContactFrom(): void {
-    const entity = this.AllContactFrom.find(contact => contact.EntityTypeID.startsWith('1'));
-    if (entity) {
-      this.selectedContactFrom = entity.EntityTypeID; // This will trigger the dropdown selection
-      this.onContactFromChange(this.selectedContactFrom); // Make sure to update createContactObj accordingly
+    if (this.AllContactFrom && this.AllContactFrom.length > 0) {
+      const entity = this.AllContactFrom.find(contact => contact.EntityTypeID.startsWith('1'));
+      if (entity) {
+        this.selectedContactFrom = entity.EntityTypeID;
+        setTimeout(() => this.onContactFromChange(this.selectedContactFrom), 0);
+      }
     }
   }
+  // isFirmSelected(): boolean {
+  //   const selectedEntity = this.AllContactFrom.find(contact => contact.EntityTypeID === this.selectedContactFrom);
+  //   return selectedEntity ? selectedEntity.EntityTypeName.includes('Firm') : false;
+  // }
   isFirmSelected(): boolean {
     const selectedEntity = this.AllContactFrom.find(contact => contact.EntityTypeID === this.selectedContactFrom);
     return selectedEntity ? selectedEntity.EntityTypeName.includes('Firm') : false;
   }
-
   selectedAvilableContact: boolean = false;
   onContactChange(selectedValue: string) {
     if (selectedValue !== "select") {
@@ -1060,6 +796,7 @@ export class ContactsComponent {
     sourceObjectInstanceID: 0,
     sourceObjectInstanceRevNumber: 0,
     selectedContactFrom: '',
+    lstContactFunctions: []
   };
 
   ContactFunctionsObject = {
@@ -1331,7 +1068,7 @@ export class ContactsComponent {
           isExists: true,
           FunctionTypeId: null,
           nameInPassport: null,
-          contactAddnlInfoTypeID: this.createContactObj.strContactAddnlInfoTypeID,
+          contactAddnlInfoTypeID: this.selectedContact.strContactAddnlInfoTypeID,
           isFromContact: true,
           countryofBirth: null,
           juridictionID: null,
@@ -1698,10 +1435,32 @@ export class ContactsComponent {
       console.error('Element with class .addressHistoryPopup not found');
     }
   }
-  ///////////// function section 
+
+
+
+  ///////////// DNFBP Functions 
+  // getContactFunctionType() {
+  //   this.contactService.getContactFunctionType().subscribe(
+  //     data => {
+  //       if (data.isSuccess) {
+  //         this.ContactFunctionTypeList = data.response.map(item => ({
+  //           ContactFunctionTypeID: item.FunctionTypeID,
+  //           contactFunctionTypeDesc: item.FunctionTypeDesc,
+  //           isSelected: false,
+  //           effectiveDate: '',
+  //           endDate: '',
+  //           reviewStatus: ''
+  //         }));
+  //       }
+  //     },
+  //     error => {
+  //       console.error('Error Fetching Contact Function Types', error);
+  //     }
+  //   );
+  // }
   getContactFunctionType() {
     this.contactService.getContactFunctionType().subscribe(
-      data => {
+      (data) => {
         if (data.isSuccess) {
           this.ContactFunctionTypeList = data.response.map(item => ({
             ContactFunctionTypeID: item.FunctionTypeID,
@@ -1713,7 +1472,7 @@ export class ContactsComponent {
           }));
         }
       },
-      error => {
+      (error) => {
         console.error('Error Fetching Contact Function Types', error);
       }
     );
@@ -1729,7 +1488,30 @@ export class ContactsComponent {
       this.selectedContactFunctions[selectedFunctionIndex][field] = value;
     }
   }
-
+  onFunctionCheckboxChangeCreate(contactFunction: any) {
+    if (contactFunction.isSelected) {
+      this.selectedContactFunctions.push({
+        ContactFunctionTypeID: contactFunction.ContactFunctionTypeID,
+        ContactFunctionTypeDesc: contactFunction.contactFunctionTypeDesc,
+        effectiveDate: contactFunction.effectiveDate,
+        endDate: contactFunction.endDate,
+        reviewStatus: contactFunction.reviewStatus,
+        isFunctionActive: true,
+        CreatedBy: this.userId
+      });
+  
+      if (contactFunction.ContactFunctionTypeID === 17) {
+        this.showMLROSection = true;
+      }
+    } else {
+      this.selectedContactFunctions = this.selectedContactFunctions.filter(
+        func => func.ContactFunctionTypeID !== contactFunction.ContactFunctionTypeID
+      );
+      if (contactFunction.ContactFunctionTypeID === 17) {
+        this.showMLROSection = false;
+      }
+    }
+  }
   onFunctionCheckboxChange(contactFunction: any, index: number) {
     if (contactFunction.isSelected) {
       const existingFunctionIndex = this.selectedContactFunctions.findIndex(
@@ -1825,44 +1607,163 @@ export class ContactsComponent {
     }
     console.log("Converted lstContactFunctions:", this.selectedContact.lstContactFunctions);
   }
-
-  initializeSelectedFunctions(): void {
-    if (this.selectedContact?.lstContactFunctions) {
-      this.selectedContact.lstContactFunctions.forEach(contactFunction => {
-        const matchingFunction = this.ContactFunctionTypeList.find(
-          functionType => functionType.ContactFunctionTypeID === contactFunction.functionTypeID
-        );
-
-        if (matchingFunction) {
-          matchingFunction.isSelected = true;
-          matchingFunction.effectiveDate = contactFunction.effectiveDate;
-          matchingFunction.endDate = contactFunction.endDate;
-          matchingFunction.reviewStatus = contactFunction.reviewStatus;
-          matchingFunction.isFunctionActive = true
-          // Add to selectedContactFunctions if not already there
-          const existsInSelected = this.selectedContactFunctions.find(
-            func => func.ContactFunctionTypeID === matchingFunction.ContactFunctionTypeID
+  onFunctionCheckboxChangeEdit(contactFunction: any): void {
+    if (contactFunction.isSelected) {
+      const existingFunctionIndex = this.selectedContactFunctions.findIndex(
+        (func) => func.ContactFunctionTypeID === contactFunction.ContactFunctionTypeID
+      );
+  
+      if (existingFunctionIndex === -1) {
+        // Add a new function to the list
+        this.selectedContactFunctions.push({
+          contactAssnID: this.selectedContact.contactAssnID,
+          contactFunctionID: null,
+          contactID: this.selectedContact.contactID,
+          ContactFunctionTypeID: contactFunction.ContactFunctionTypeID,
+          ContactFunctionTypeDesc: contactFunction.contactFunctionTypeDesc,
+          effectiveDate: contactFunction.effectiveDate || '',
+          endDate: contactFunction.endDate || '',
+          reviewStatus: contactFunction.reviewStatus || 'Pending',
+          isFunctionActive: true,
+          isRecordEditable: 1,
+          CreatedBy: this.userId
+        });
+      }
+    } else {
+      // Confirm before removing a function
+      Swal.fire({
+        text: 'De-selecting this function will cause this record to be deleted from the system permanently.',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.selectedContactFunctions = this.selectedContactFunctions.filter(
+            (func) => func.ContactFunctionTypeID !== contactFunction.ContactFunctionTypeID
           );
-          if (!existsInSelected) {
-            this.selectedContactFunctions.push({
-              contactFunctionID: contactFunction.contactFunctionID,
-              contactID: contactFunction.contactID,
-              contactAssnID: contactFunction.contactAssnID,
-              ContactFunctionTypeID: contactFunction.functionTypeID,
-              ContactFunctionTypeDesc: contactFunction.functionTypeDesc,
-              effectiveDate: contactFunction.effectiveDate,
-              endDate: contactFunction.endDate,
-              reviewStatus: contactFunction.reviewStatus,
-              isFunctionActive: true,
-              isRecordEditable: contactFunction.isRecordEditable,
-              CreatedBy: this.userId
-            });
-          }
+        } else {
+          contactFunction.isSelected = true;
         }
       });
     }
   }
-  ////////////////////
+  
+  // initializeSelectedFunctions(): void {
+  //   if (this.selectedContact?.lstContactFunctions) {
+  //     this.selectedContact.lstContactFunctions.forEach(contactFunction => {
+  //       const matchingFunction = this.ContactFunctionTypeList.find(
+  //         functionType => functionType.ContactFunctionTypeID === contactFunction.functionTypeID
+  //       );
+
+  //       if (matchingFunction) {
+  //         matchingFunction.isSelected = true;
+  //         matchingFunction.effectiveDate = contactFunction.effectiveDate;
+  //         matchingFunction.endDate = contactFunction.endDate;
+  //         matchingFunction.reviewStatus = contactFunction.reviewStatus;
+  //         matchingFunction.isFunctionActive = true
+  //         // Add to selectedContactFunctions if not already there
+  //         const existsInSelected = this.selectedContactFunctions.find(
+  //           func => func.ContactFunctionTypeID === matchingFunction.ContactFunctionTypeID
+  //         );
+  //         if (!existsInSelected) {
+  //           this.selectedContactFunctions.push({
+  //             contactFunctionID: contactFunction.contactFunctionID,
+  //             contactID: contactFunction.contactID,
+  //             contactAssnID: contactFunction.contactAssnID,
+  //             ContactFunctionTypeID: contactFunction.functionTypeID,
+  //             ContactFunctionTypeDesc: contactFunction.functionTypeDesc,
+  //             effectiveDate: contactFunction.effectiveDate,
+  //             endDate: contactFunction.endDate,
+  //             reviewStatus: contactFunction.reviewStatus,
+  //             isFunctionActive: true,
+  //             isRecordEditable: contactFunction.isRecordEditable,
+  //             CreatedBy: this.userId
+  //           });
+  //         }
+  //       }
+  //     });
+  //   }
+  // }
+  initializeSelectedFunctions(): void {
+    // Clear previous selections
+    this.selectedContactFunctions = [];
+  
+    if (this.selectedContact?.lstContactFunctions) {
+      this.selectedContact.lstContactFunctions.forEach((contactFunction: any) => {
+        // Find the matching function type from ContactFunctionTypeList
+        const matchingFunction = this.ContactFunctionTypeList.find(
+          (functionType) => functionType.ContactFunctionTypeID === contactFunction.functionTypeID
+        );
+  
+        if (matchingFunction) {
+          // Mark the function as selected and populate its fields
+          matchingFunction.isSelected = true;
+          matchingFunction.effectiveDate = contactFunction.effectiveDate || '';
+          matchingFunction.endDate = contactFunction.endDate || '';
+          matchingFunction.reviewStatus = contactFunction.reviewStatus || 'Pending';
+  
+          const isFunctionActive = contactFunction.isFunctionActive === 1 || contactFunction.isFunctionActive === '1';
+
+          // Add to the selectedContactFunctions list
+          this.selectedContactFunctions.push({
+            contactAssnID: contactFunction.contactAssnID,
+            contactFunctionID: contactFunction.contactFunctionID,
+            contactID: contactFunction.contactID,
+            ContactFunctionTypeID: contactFunction.functionTypeID,
+            ContactFunctionTypeDesc: contactFunction.functionTypeDesc,
+            effectiveDate: contactFunction.effectiveDate,
+            endDate: contactFunction.endDate,
+            reviewStatus: contactFunction.reviewStatus,
+            isFunctionActive: isFunctionActive,
+            isRecordEditable: contactFunction.isRecordEditable,
+            CreatedBy: this.userId
+          });
+        }
+      });
+  
+      console.log("Initialized selectedContactFunctions:", this.selectedContactFunctions);
+    }
+  }
+  isHistoryPopupVisible: boolean = false;
+  isHistoryCheckboxChecked: boolean = false;
+  FunctionsHistoryList: any = [];
+  toggleFunctionsHistory(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.getContactFunctionsHistoryList();
+      this.isHistoryPopupVisible = true;
+    } else {
+      this.closeHistoryPopup();
+    }
+  }
+  getContactFunctionsHistoryList(): void {
+    const contactId = this.selectedContact.contactID;
+    const contactAssId = this.selectedContact.contactAssnID;
+  
+    this.contactService.getContactFunctionsList(contactId, contactAssId).subscribe(
+      (data) => {
+        if (data?.response) {
+          this.FunctionsHistoryList = data.response;
+          console.log("FunctionsHistoryList:", this.FunctionsHistoryList);
+        }
+      },
+      (error) => {
+        console.error("Error fetching Functions History:", error);
+      }
+    );
+  }
+  
+  // Method to close the History Popup
+  closeHistoryPopup(): void {
+    this.isHistoryPopupVisible = false;
+    this.isHistoryCheckboxChecked = false;
+  }
+  ////////////// end DNFBP Functions  
+
+
+
+
+
   isMobileNumExsits: boolean = false;
   getSearchMobileNumber(mobileNum: string): void {
     this.contactService.getSearchMobileNumber(mobileNum).subscribe(
@@ -1946,88 +1847,87 @@ export class ContactsComponent {
   closeModal() {
     this.showContactModal = false;
   }
-  //////////////////////// for additional details Checkboxes 
+
+
+
+
+  //////////////////////// for Additional Information Checkboxes 
 
   selectedAdditionalInfo: Set<number> = new Set<number>();
   selectedAdditionalInfoLabels: Set<string> = new Set<string>();
-  selectedInfoTypes: { [key: number]: boolean } = {
-    1: false,  // VIP
-    3: false,  // Annual Report
-    4: false,  // Christmas/New Year
-    5: false,  // Eid Cards
-    6: false   // Publications
-  };
 
-  // Method to update selected checkboxes
-  updateAdditionalInfo(event: any, label: string): void {
-    const value = Number(event.target.value);
-
-    if (this.selectedContact.strContactAddnInfoTypes !== '') {
-
-    }
-
-    if (event.target.checked) {
-      // Add value and label if checked
+  updateAdditionalInfoCreate(event: Event, label: string): void {
+    const target = event.target as HTMLInputElement;
+    const value = Number(target.value);
+  
+    if (target.checked) {
       this.selectedAdditionalInfo.add(value);
       this.selectedAdditionalInfoLabels.add(label);
     } else {
-      // Remove value and label if unchecked
       this.selectedAdditionalInfo.delete(value);
       this.selectedAdditionalInfoLabels.delete(label);
     }
-
-    // Update the strContactAddnlInfoTypeID field (comma-separated values)
+  
     this.createContactObj.strContactAddnlInfoTypeID = Array.from(this.selectedAdditionalInfo).join(',');
-
-    // Update the strContactAddnInfoTypes field (comma-separated labels)
     this.createContactObj.strContactAddnInfoTypes = Array.from(this.selectedAdditionalInfoLabels).join(', ');
-
-    console.log('Selected IDs:', this.createContactObj.strContactAddnlInfoTypeID);
-    console.log('Selected Labels:', this.createContactObj.strContactAddnInfoTypes);
+    
+    console.log('Create - Selected IDs:', this.createContactObj.strContactAddnlInfoTypeID);
+    console.log('Create - Selected Labels:', this.createContactObj.strContactAddnInfoTypes);
   }
-
-  initializeCheckboxes(): void {
-    if (this.selectedContact?.strContactAddnInfoTypes) {
-      const infoTypesArray = this.selectedContact.strContactAddnInfoTypes.split(',').map(item => item.trim());
-
-      // Update `selectedInfoTypes` flags based on preselected values
-      this.selectedInfoTypes['1'] = infoTypesArray.includes('VIP');
-      this.selectedInfoTypes['3'] = infoTypesArray.includes('Annual Report');
-      this.selectedInfoTypes['4'] = infoTypesArray.includes('Christmas/New Year');
-      this.selectedInfoTypes['5'] = infoTypesArray.includes('Eid Cards');
-      this.selectedInfoTypes['6'] = infoTypesArray.includes('Publications');
-
-      // Add the preselected values to `selectedAdditionalInfo` and `selectedAdditionalInfoLabels` sets
-      if (this.selectedInfoTypes['1']) this.selectedAdditionalInfo.add(1);
-      if (this.selectedInfoTypes['3']) this.selectedAdditionalInfo.add(3);
-      if (this.selectedInfoTypes['4']) this.selectedAdditionalInfo.add(4);
-      if (this.selectedInfoTypes['5']) this.selectedAdditionalInfo.add(5);
-      if (this.selectedInfoTypes['6']) this.selectedAdditionalInfo.add(6);
-
-      this.updateAdditionalInfoLabels();
+  updateAdditionalInfoEdit(event: Event, label: string): void {
+    const target = event.target as HTMLInputElement;
+    const value = Number(target.value);
+  
+    if (target.checked) {
+      this.selectedAdditionalInfo.add(value);
+      this.selectedAdditionalInfoLabels.add(label);
+    } else {
+      this.selectedAdditionalInfo.delete(value);
+      this.selectedAdditionalInfoLabels.delete(label);
     }
+  
+    this.selectedContact.strContactAddnlInfoTypeID = Array.from(this.selectedAdditionalInfo).join(',');
+    this.selectedContact.strContactAddnInfoTypes = Array.from(this.selectedAdditionalInfoLabels).join(', ');
+  
+    console.log('Edit - Selected IDs:', this.selectedContact.strContactAddnlInfoTypeID);
+    console.log('Edit - Selected Labels:', this.selectedContact.strContactAddnInfoTypes);
+  }
+  getInfoTypeID(label: string): string | null {
+    const mapping = {
+      'VIP': '1',
+      'Annual Report': '3',
+      'Christmas/New Year': '4',
+      'Eid Cards': '5',
+      'Publications': '6'
+    };
+    return mapping[label] || null;
+  }
+  selectedInfoTypes: { [key: string]: boolean } = {};
+
+  initializeEditInfoTypes(): void {
+
+    this.selectedInfoTypes = {};
+    this.selectedAdditionalInfo.clear();
+    this.selectedAdditionalInfoLabels.clear();
+  
+    if (this.selectedContact.strContactAddnInfoTypes) {
+      const selectedLabels = this.selectedContact.strContactAddnInfoTypes.split(', ').map(label => label.trim());
+  
+      selectedLabels.forEach(label => {
+        const value = this.getInfoTypeID(label);
+        if (value) {
+          this.selectedInfoTypes[value] = true;
+          this.selectedAdditionalInfo.add(Number(value));
+          this.selectedAdditionalInfoLabels.add(label);
+        }
+      });
+    }
+    console.log('Loaded from DB:', this.selectedInfoTypes);
   }
 
   updateAdditionalInfoLabels(): void {
-    // Update the strContactAddnlInfoTypeID field (comma-separated values)
     this.createContactObj.strContactAddnlInfoTypeID = Array.from(this.selectedAdditionalInfo).join(',');
-
-    // Update the strContactAddnInfoTypes field (comma-separated labels)
     this.createContactObj.strContactAddnInfoTypes = Array.from(this.selectedAdditionalInfoLabels).join(', ');
   }
 
-  // updateContactInfoTypes(): void {
-  //   const selectedTypeIds: number[] = [];
-
-  //   if (this.selectedInfoTypes['1']) selectedTypeIds.push(1);
-  //   if (this.selectedInfoTypes['3']) selectedTypeIds.push(3);
-  //   if (this.selectedInfoTypes['4']) selectedTypeIds.push(4);
-  //   if (this.selectedInfoTypes['5']) selectedTypeIds.push(5);
-  //   if (this.selectedInfoTypes['6']) selectedTypeIds.push(6);
-
-  //   // Join the selected IDs into a string and update the selectedContact object
-  //   this.selectedContact.strContactAddnInfoTypeId = selectedTypeIds.join(', ');
-
-  //   console.log('Updated Info Type IDs:', this.selectedContact.strContactAddnInfoTypeId);
-  // }
 }

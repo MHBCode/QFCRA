@@ -65,4 +65,8 @@ export class ContactService {
     const url = `${this.baseUrlContact}search_contact_details_by_passing_param?firstName=${firstName}&familyNam=${familyName}&firmId=${firmId}`;
     return this.http.get<any>(url);
   }
+  getContactFunctionsList(contactId: number, contactAssId: number): Observable<any> {
+    const url = `${this.baseUrlContact}get_contact_function_list?contactId=${contactId}&contactAssId=${contactAssId}`;
+    return this.http.get<any>(url);
+  }
 }
