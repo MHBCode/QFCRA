@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import Swal from 'sweetalert2';
 import * as constants from 'src/app/app-constants';
+import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import { SharepointDocumentsService } from 'src/app/ngServices/sharepoint-documents.service';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { LogformService } from 'src/app/ngServices/logform.service';
@@ -27,6 +28,7 @@ export class AttachmentComponent implements OnInit {
   @Input() param2;
   @Input() selectedFile: File | null = null;
 
+  Page = FrimsObject;
   fileError: string = '';
   callUploadDoc: boolean = false;
   hasValidationErrors: boolean = false;

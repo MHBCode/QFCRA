@@ -6,12 +6,20 @@
 </div>
 <div class="inputs-row">
 <div class="file-container" *ngIf="isEdit && !tableDoc?.DocSubTypeDesc">
-  <div class="input-field">
+  <div class="input-field" *ngIf="pageName == Page.CoreDetail">
     <label for="documentType"> Document Type </label>
     <select [disabled]="!isEdit" class="document-type-select" name="documentType" id="documentType">
       <option value="263">Press Releases</option>
     </select>
   </div>
+
+  <div class="input-field" *ngIf="pageName == Page.Scope">
+    <label>Document Type</label>
+    <select [(ngModel)]="DocSubTypeID.DocSubTypeID">
+      <option [value]="DocSubTypeID.DocSubTypeID">Scope of Authorisation</option>
+    </select>
+  </div>
+
   <div class="input-field" style="flex-direction: row;" *ngIf="!tableDoc?.DocSubTypeDesc">
     <label id="uploaded-documents"></label>
   </div>
