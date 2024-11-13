@@ -6,6 +6,8 @@
 </div>
 <div class="inputs-row">
 <div class="file-container" *ngIf="isEdit && !tableDoc?.DocSubTypeDesc">
+
+  <!-- Press Release -->
   <div class="input-field" *ngIf="pageName == Page.CoreDetail">
     <label for="documentType"> Document Type </label>
     <select [disabled]="!isEdit" class="document-type-select" name="documentType" id="documentType">
@@ -13,6 +15,7 @@
     </select>
   </div>
 
+  <!-- Scope of Authorisation -->
   <div class="input-field" *ngIf="pageName == Page.Scope">
     <label>Document Type</label>
     <select [(ngModel)]="DocSubTypeID.DocSubTypeID">

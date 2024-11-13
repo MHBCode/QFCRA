@@ -7,7 +7,7 @@ import { SecurityService } from 'src/app/ngServices/security.service';
 import { LogformService } from 'src/app/ngServices/logform.service';
 import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, Observable, tap } from 'rxjs';
+import { map, Observable, switchMap, tap } from 'rxjs';
 import { SharePointUploadResponse } from 'src/app/models/sharepoint-upload-response.interface';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 
@@ -19,7 +19,7 @@ import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 export class AttachmentComponent implements OnInit {
   @Input() loadDocuments: (documentObj?: any) => void;
   @Input() isEdit: boolean = false;
-  
+
   @Input() documentObj: any;
   @Input() DocSubTypeID: any = {};
   @Input() tableDoc;
@@ -27,6 +27,7 @@ export class AttachmentComponent implements OnInit {
   @Input() param1;
   @Input() param2;
   @Input() selectedFile: File | null = null;
+  @Input() newfileNum: number;
 
   Page = FrimsObject;
   fileError: string = '';
@@ -34,7 +35,6 @@ export class AttachmentComponent implements OnInit {
   hasValidationErrors: boolean = false;
   isLoading: boolean = false;
   errorMessages: { [key: string]: string } = {};
-  newfileNum: number;
   firmId: number = 0;
   now = new Date();
   currentDate = this.now.toISOString();
@@ -56,6 +56,7 @@ export class AttachmentComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
+      this.getNewFileNumber();
     });
   }
 
@@ -97,17 +98,26 @@ export class AttachmentComponent implements OnInit {
     }
 
     if (this.selectedFile) {
-      const intranetSitePath = 'https://ictmds.sharepoint.com/sites/QFCRA';
-      const filePathAfterDocLib = "";
-      const strfileName = this.selectedFile.name;
-      const strUserEmailAddress = 'k.thomas@ictmds.onmicrosoft.com';
+      this.getNewFileNumber().pipe(
+        switchMap(() => {
+          const intranetSitePath = 'https://ictmds.sharepoint.com/sites/QFCRA';
+          const filePathAfterDocLib = "";
+          const strfileName = this.selectedFile.name;
+          const strUserEmailAddress = 'k.thomas@ictmds.onmicrosoft.com';
 
-      this.sharepointService.uploadFileToSharepoint(this.selectedFile, intranetSitePath, filePathAfterDocLib, strfileName, strUserEmailAddress).subscribe({
+          return this.sharepointService.uploadFileToSharepoint(
+            this.selectedFile,
+            intranetSitePath,
+            filePathAfterDocLib,
+            strfileName,
+            strUserEmailAddress
+          );
+        })
+      ).subscribe({
         next: (response: SharePointUploadResponse) => {
           console.log('File uploaded successfully', response);
 
           const [fileLocation, intranetGuid] = response.result.split(';');
-
           this.documentUploaded.emit({ fileLocation, intranetGuid });
 
           const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
@@ -139,6 +149,7 @@ export class AttachmentComponent implements OnInit {
       this.isLoading = false;
     }
   }
+
 
   deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number) {
     this.objectWF.deleteDocument(docID, objectId, objectInstanceId, ObjectInstanceRevNum).subscribe({
@@ -185,12 +196,14 @@ export class AttachmentComponent implements OnInit {
   }
 
   getNewFileNumber() {
-    this.logForm.getNewFileNumber(this.firmId, this.currentDate).subscribe(data => {
-      this.newfileNum = data.response.Column1;
-    }, error => {
-      console.error(error);
-    })
-  }
+    return this.logForm.getNewFileNumber(this.firmId, this.currentDate).pipe(
+        tap(data => {
+            this.newfileNum = data.response.Column1;
+        })
+    );
+}
+
+
 
   getErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
     this.logForm.errorMessages(msgKey).subscribe(
@@ -239,17 +252,17 @@ export class AttachmentComponent implements OnInit {
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
-        const file = input.files[0];
-        if (file.type === 'application/pdf') {
-            this.selectedFile = file; // Update only if the file is valid
-            this.fileError = ''; // Clear any previous error message
-            this.selectedFileChange.emit(this.selectedFile);
-        } else {
-            this.fileError = 'Please select a valid PDF file.';
-            this.selectedFileChange.emit(null);
-        }
+      const file = input.files[0];
+      if (file.type === 'application/pdf') {
+        this.selectedFile = file; // Update only if the file is valid
+        this.fileError = ''; // Clear any previous error message
+        this.selectedFileChange.emit(this.selectedFile);
+      } else {
+        this.fileError = 'Please select a valid PDF file.';
+        this.selectedFileChange.emit(null);
+      }
     }
-}
+  }
 
 
   closeSelectDocument() {

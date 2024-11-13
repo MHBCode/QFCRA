@@ -67,8 +67,7 @@
             </div>
 
             <div class="btn" *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn">
-              <button [disabled]="!getControlEnablement('imgBtnCreate')"
-              (click)="createLicenseScope()">
+              <button [disabled]="!getControlEnablement('imgBtnCreate')" (click)="createLicenseScope()">
                 Create
               </button>
             </div>
@@ -125,13 +124,12 @@
                 ActivityLicensed[0]?.ScopeRevNum <= 1
               ">Application Date</label>
             <input [disabled]="disableApplicationDate" name="appDate" id="appDate" #dateInputs placeholder type="text"
-              [(ngModel)]="scopeAppliedDate"
-              [ngClass]="{'error-border': errorMessages['ScopeAppliedDate']}" />
+              [(ngModel)]="scopeAppliedDate" [ngClass]="{'error-border': errorMessages['ScopeAppliedDate']}" />
           </div>
           <div class="input-field">
             <label for="licenseDate"> Licensed Date </label>
             <input disabled name="licenseDate" id="licenseDate" type="text"
-            [value]="isCreateModeLicense ? firmDetails?.LicensedDate : ''" />
+              [value]="isCreateModeLicense ? firmDetails?.LicensedDate : ''" />
           </div>
           <div class="input-field" *ngIf="
               (ActivityLicensed[0].ScopeRevNum !== null ||
@@ -208,7 +206,8 @@
         </div>
         <!-- Edit Mode License -->
         <div class="add-activity-container">
-          <button *ngIf="isEditModeLicense || isCreateModeLicense" class="add-permitted-activity" (click)="addNewActivity()">
+          <button *ngIf="isEditModeLicense || isCreateModeLicense" class="add-permitted-activity"
+            (click)="addNewPermittedActivity()">
             Add Permitted Activity
           </button>
         </div>
@@ -224,11 +223,11 @@
               <tr>
                 <td>
                   <div class="input-field">
-                    <select name="activities" id="activities" [(ngModel)]="activityLic.ActivityTypeID"
-                    [ngClass]="{
+                    <select name="activities" id="activities" [(ngModel)]="activityLic.ActivityTypeID" [ngClass]="{
                       'error-border': (activityLic.ActivityTypeID == 0 && errorMessages['ActivityTypeID'])}">
                       <option value="0">Select</option>
-                      <option *ngFor="let licensedActivity of licensedActivities" [value]="licensedActivity.ActivityTypeID">
+                      <option *ngFor="let licensedActivity of licensedActivities"
+                        [value]="licensedActivity.ActivityTypeID">
                         {{ licensedActivity.ActivityTypeDesc }}
                       </option>
                     </select>
@@ -249,7 +248,7 @@
                   </div>
                 </td>
                 <td>
-                  <button class="rmvActivityLicBtn bi bi-trash" (click)="removeLicActivity(i)"></button>
+                  <button class="rmvActivityLicBtn bi bi-trash" (click)="removePermittedActivity(i)"></button>
                 </td>
               </tr>
               <tr class="error-messages">
@@ -266,21 +265,21 @@
             <div class="input-field fullwidth">
               <textarea [(ngModel)]="activityLic.FirmActivityDetails"></textarea>
             </div>
-            
+
             <strong>Specific Conditions and Restrictions:</strong>
             <div class="input-field fullwidth">
               <textarea [(ngModel)]="activityLic.Column1"></textarea>
-            </div> 
+            </div>
           </ng-container>
         </div>
         <div class="error-messages">
           <p *ngIf="
              errorMessages['DuplicateActivity']
            ">
-           {{ activityDescription + " " + errorMessages['DuplicateActivity'] }}
+            {{ activityDescription + " " + errorMessages['DuplicateActivity'] }}
           </p>
-       </div>
-        
+        </div>
+
 
         <div class="permitted-activity-container2">
           <div class="scope-permitted-activity-header">
@@ -314,6 +313,9 @@
           <p *ngIf="errorMessages['EffectiveDateLaterApplicationDate']">
             {{ errorMessages['EffectiveDateLaterApplicationDate'] }}
           </p>
+          <p *ngIf="errorMessages['AddActivity']">
+            {{ errorMessages['AddActivity'] }}
+          </p>
           <p *ngIf="errorMessages['PrudentialEffectiveDate']">
             {{ errorMessages['PrudentialEffectiveDate'] }}
           </p>
@@ -325,6 +327,9 @@
           </p>
           <p *ngIf="errorMessages[('islamicType')]">
             {{errorMessages[('islamicType')]}}
+          </p>
+          <p *ngIf="errorMessages[('authorisationCategoryTypeID')]">
+            {{errorMessages[('authorisationCategoryTypeID')]}}
           </p>
         </div>
         <div class="form-section-title">
@@ -352,8 +357,7 @@
             </div>
 
             <div class="btn" *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn">
-              <button [disabled]="!getControlEnablement('imgBtnCreate')"
-              (click)="createAuthorisedScope()">
+              <button [disabled]="!getControlEnablement('imgBtnCreate')" (click)="createAuthorisedScope()">
                 Create
               </button>
             </div>
@@ -405,14 +409,14 @@
                 !ActivityAuth[0]?.ScopeRevNum ||
                 ActivityAuth[0]?.ScopeRevNum <= 1
               ">Application Date</label>
-            <input [disabled]="disableApplicationDate" [(ngModel)]="ActivityAuth[0].ScopeApplicationDate" [ngClass]="{
+            <input [disabled]="disableApplicationDate" [(ngModel)]="scopeAppliedDate" [ngClass]="{
                 'error-border': errorMessages['ScopeAppliedDateAuth']
               }" name="q13AppDate" id="AppDate" type="text" #dateInputs placeholder />
           </div>
           <div class="input-field">
             <label for="incorporationDate"> Incorporation Date </label>
             <input disabled name="incorporationDate" id="incorporationDate" type="text"
-              value="{{ firmDetails?.DateOfIncorporation }}" />
+              [value]="isCreateModeAuth ? firmDetails?.DateOfIncorporation : '' "/>
           </div>
           <div class="input-field">
             <label for="authorisedDate"> Authorised Date </label>
@@ -454,7 +458,8 @@
       </div>
 
       <!--Scope of Authorization-->
-      <div *ngIf="ActivityAuth.ScopeRevNum" class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['scopeOfAuthorization'] }">
+      <div *ngIf="ActivityAuth[0].ScopeRevNum" class="inputs-field-set"
+        [ngClass]="{ collapsed: isCollapsed['scopeOfAuthorization'] }">
         <div class="section">
           <div *ngIf="errorMessages['uploadDocument']" class="error-messages" style="width:100%">
             <p *ngIf="errorMessages['uploadDocument']">
@@ -468,71 +473,12 @@
             </button>
           </div>
 
-          <app-attachment 
-          [documentObj]="documentObj"
-          [tableDoc]="scopeOfAuthTableDoc"
-          [pageName]="Page.Scope"
-          [param1]="ActivityAuth[0].FirmScopeID"
-          [param2]="ActivityAuth[0].ScopeRevNum"
-          [isEdit]="isEditModeAuth"
-          [DocSubTypeID]="fetchedScopeDocSubTypeID"
-          [loadDocuments]="loadDocuments.bind(this)"
-          (documentUploaded)="onDocumentUploaded($event)">
-        </app-attachment>
-
-          <!-- <div *ngIf="isEditModeAuth && !scopeOfAuthTableDoc?.DocSubTypeDesc" class="inputs-row document-container">
-            <div class="input-field">
-              <label>Document Type</label>
-              <select [(ngModel)]="fetchedScopeDocSubTypeID.DocSubTypeID">
-                <option [value]="fetchedScopeDocSubTypeID.DocSubTypeID">Scope of Authorisation</option>
-              </select>
-            </div>
-            <div *ngIf="!scopeOfAuthTableDoc?.DocSubTypeDesc" class="input-field">
-              <label id="uploaded-documents"></label>
-
-              <div class="btns-container">
-                <div class="upload-container">
-                  <button class="choose-document-btn" (click)="selectDocument()">
-                    Choose Document
-                  </button>
-                </div>
-                <button class="upload-document-btn">
-                  Upload the Document
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="inputs-row">
-            <table class="scope-of-auth">
-              <thead>
-                <tr>
-                  <th style="width: 60%">Document Type</th>
-                  <th style="width: 30%">File Name</th>
-                  <th *ngIf="isEditModeAuth">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="text-align: left">
-                    <span [style.color]="scopeOfAuthTableDoc?.DocSubTypeDesc ? 'inherit' : 'red'">
-                      {{ scopeOfAuthTableDoc?.DocSubTypeDesc || 'No documents attached' }}
-                    </span>
-                  </td>
-                  <td style="text-align: left">
-                    <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{
-                        scopeOfAuthTableDoc?.FileLoc
-                      }}" target="_blank">{{ scopeOfAuthTableDoc?.FileName }}</a>
-                  </td>
-                  <td *ngIf="isEditModeAuth" style="text-align: center">
-                    <button class="delete-action" *ngIf="scopeOfAuthTableDoc?.DocSubTypeDesc"
-                      (click)="showAlertDeleteFile()">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div> -->
+          <app-attachment [documentObj]="documentObj" [tableDoc]="scopeOfAuthTableDoc" [pageName]="Page.Scope"
+            [param1]="ActivityAuth[0].FirmScopeID" [param2]="ActivityAuth[0].ScopeRevNum" [isEdit]="isEditModeAuth"
+            [DocSubTypeID]="fetchedScopeDocSubTypeID" [loadDocuments]="loadDocuments.bind(this)"
+            (documentUploaded)="onDocumentUploaded($event)" [selectedFile]="selectedFile"
+            (selectedFileChange)="selectedFile = $event" [newfileNum]="newfileNum">
+          </app-attachment>
         </div>
       </div>
 
@@ -545,15 +491,16 @@
               {{ isCollapsed['regulatedActivitiesSection'] ? '▲' : '▼' }}
             </button>
           </div>
-          <div [hidden]="isCollapsed['regulatedActivitiesSection']" class="add-btn-container" *ngIf="isEditModeAuth">
-            <button class="add-permitted-btn" (click)="addNewPermittedActivity()">
+          <div [hidden]="isCollapsed['regulatedActivitiesSection']" class="add-btn-container" *ngIf="isEditModeAuth || isCreateModeAuth">
+            <button class="add-permitted-btn" (click)="addNewRegulatedActivity()">
               Add Regulated Activity
             </button>
           </div>
-          <!--on view mode-->
+          
           <div class="regulated-activities-container">
-            <div *ngFor="let activity of ActivityAuth; let i = index">
-              <div class="regulated-activities-header regulated-activity-view" *ngIf="!isEditModeAuth">
+            <!--on view mode-->
+            <div *ngFor="let activity of regulatedActivitiesList; let i = index">
+              <div class="regulated-activities-header regulated-activity-view" *ngIf="!isEditModeAuth && !isCreateModeAuth">
                 <p>
                   Category :
                   <strong>{{ activity?.CategoryDescription }}</strong>
@@ -563,12 +510,12 @@
                   <strong>{{ activity?.ActivityTypeDescription }}</strong>
                 </p>
               </div>
-              <div *ngIf="!isEditModeAuth" class="products-header">
+              <div *ngIf="!isEditModeAuth && !isCreateModeAuth" class="products-header">
                 <p>Product(s)</p>
               </div>
               <!---->
               <!--on edit mode-->
-              <div class="regulated-activities-header" *ngIf="isEditModeAuth">
+              <div class="regulated-activities-header" *ngIf="isEditModeAuth || isCreateModeAuth">
                 <div class="select-container">
                   <div class="category-select">
                     <label for="category" style="display: flex; gap: 5px">
@@ -606,7 +553,7 @@
                 </div>
 
                 <button class="removeRegulatedActivity bi bi-trash" style="margin-left: auto"
-                  (click)="removePermittedActivity(i)"></button>
+                  (click)="removeRegulatedActivity(i)"></button>
               </div>
 
               <!---->
@@ -614,7 +561,7 @@
               <!--on view mode-->
               <!-- Display categorized products -->
               <div *ngIf="
-                  activity?.categorizedProducts?.length > 0 && !isEditModeAuth
+                  activity?.categorizedProducts?.length > 0 && (!isEditModeAuth && !isCreateModeAuth)
                 ">
                 <div *ngFor="let category of activity.categorizedProducts">
                   <!-- Display Main Category -->
@@ -633,7 +580,7 @@
               </div>
 
               <!-- On Edit Mode Table -->
-              <table class="regulated-activity-table" *ngIf="isEditModeAuth">
+              <table class="regulated-activity-table" *ngIf="isEditModeAuth || isCreateModeAuth">
                 <thead>
                   <tr>
                     <th style="width: 60%">Product(s)</th>
@@ -688,7 +635,7 @@
                 </tbody>
               </table>
 
-              <div *ngIf="isEditModeAuth" class="error-messages">
+              <div *ngIf="isEditModeAuth || isCreateModeAuth" class="error-messages">
                 <p *ngIf="activity?.errorMessages?.['ActivityTypeID']">
                   {{ activity.errorMessages['ActivityTypeID'] }}
                 </p>
@@ -702,7 +649,7 @@
 
               <!-- on view mode -->
               <!--specific conditions and restrictions-->
-              <div *ngIf="!isEditModeAuth" class="specific-conditions-and-restrictions">
+              <div *ngIf="!isEditModeAuth && !isCreateModeAuth" class="specific-conditions-and-restrictions">
                 <div class="specific-conditions-and-restrictions-header">
                   <p>Specific Conditions and Restrictions</p>
                 </div>
@@ -715,12 +662,12 @@
               </div>
 
               <!-- on edit mode -->
-              <div *ngIf="isEditModeAuth" class="specific-conditions-and-restrictions">
+              <div *ngIf="isEditModeAuth || isCreateModeAuth" class="specific-conditions-and-restrictions">
                 <div class="specific-conditions-and-restrictions-header">
                   <p>Specific Conditions and Restrictions</p>
                 </div>
                 <div class="input-field fullwidth">
-                  <textarea [(ngModel)]="activity.FirmActivityConditions">
+                  <textarea [(ngModel)]="activity.firmActivityConditions" (focus)="setSelectedActivity(i)">
                   {{ activity?.FirmActivityConditions }}
                 </textarea>
                 </div>
@@ -734,19 +681,19 @@
 
               <p *ngIf="
                   ActivityAuth[0]?.ObjectFirmScopeCondition?.length > 0 ||
-                  isEditModeAuth
+                  isEditModeAuth || isCreateModeAuth
                 ">
                 <strong>Retail Restriction: </strong> &nbsp;
-                <span *ngIf="!isEditModeAuth">Yes</span>
-                <input *ngIf="isEditModeAuth" [(ngModel)]="isScopeConditionChecked" type="checkbox" />
+                <span *ngIf="!isEditModeAuth && !isCreateModeAuth">Yes</span>
+                <input *ngIf="isEditModeAuth || isCreateModeAuth" [(ngModel)]="isScopeConditionChecked" type="checkbox" />
               </p>
 
               <p>
                 <strong>General Authorisation Conditions or Restrictions</strong>
               </p>
               <div class="input-field fullwidth">
-                <textarea [disabled]="!isEditModeAuth"
-                  [(ngModel)]="ActivityAuth[0].GeneralCondition">{{ ActivityAuth[0]?.GeneralCondition }}</textarea>
+                <textarea [disabled]="!isEditModeAuth && !isCreateModeAuth"
+                  [(ngModel)]="generalCondition">{{ ActivityAuth[0]?.GeneralCondition }}</textarea>
               </div>
             </div>
           </div>
@@ -755,7 +702,7 @@
 
       <!-- Islamic Finance-->
       <div class="inputs-field-set" *ngIf="
-          isEditModeAuth ||
+          isEditModeAuth || isCreateModeAuth ||
           (!isEditModeAuth &&
             islamicFinance?.IFinTypeId > 0 &&
             !isIslamicFinanceDeleted)
@@ -768,13 +715,13 @@
         </div>
         <!--view mode-->
         <div class="inputs-row">
-          <div class="input-field" *ngIf="!isEditModeAuth">
+          <div class="input-field" *ngIf="(!isEditModeAuth && !isCreateModeAuth)">
             <label for="isIslamicFinanceExist"> Islamic Finance </label>
             <input disabled name="isIslamicFinanceExist" id="isIslamicFinanceExist" type="text"
               [value]="islamicFinance?.IFinTypeId !== null ? 'Yes' : 'No'" />
           </div>
           <!--(edit mode) -->
-          <div class="input-field" *ngIf="isEditModeAuth">
+          <div class="input-field" *ngIf="isEditModeAuth || isCreateModeAuth">
             <div style="display: flex; gap: 15px">
               <label for="isIslamicFinanceExist"> Islamic Finance </label>
               <input style="width: 15px" type="checkbox" name="isIslamicFinanceExist" id="isIslamicFinanceExist"
@@ -783,8 +730,8 @@
           </div>
           <div class="input-field">
             <label for="islamicFinanceType"> Type </label>
-            <select [disabled]="!isIslamicFinanceChecked || !isEditModeAuth" name="islamicFinanceType"
-              id="islamicFinanceType" [(ngModel)]="islamicFinance.IFinTypeId"
+            <select [disabled]="!isIslamicFinanceChecked || (!isEditModeAuth && !isCreateModeAuth)" name="islamicFinanceType"
+              id="islamicFinanceType" [(ngModel)]="iFinTypeId"
               [ngClass]="{'error-border': errorMessages['islamicType']}">
               <option value="0">Select</option>
               <option value="1">Islamic Institution</option>
@@ -794,8 +741,8 @@
 
           <div class="input-field endorsement">
             <label for="endorsement"> Endorsement </label>
-            <textarea [disabled]="!isIslamicFinanceChecked || !isEditModeAuth" name="islamicEndorsement"
-              id="endorsement" [(ngModel)]="islamicFinance.Endorsement"></textarea>
+            <textarea [disabled]="!isIslamicFinanceChecked || (!isEditModeAuth && !isCreateModeAuth)" name="islamicEndorsement"
+              id="endorsement" [(ngModel)]="endorsement"></textarea>
           </div>
           <div class="input-field">
             <label for="lastModifiedBy"> Last Modified By </label>
@@ -821,8 +768,8 @@
         <div class="inputs-row">
           <div class="input-field">
             <label for="prudentialCategory"> Prudential Category </label>
-            <select [disabled]="!isEditModeAuth" name="prudentialCategory" id="prudentialCategory"
-              [(ngModel)]="ActivityAuth[0].PrudentialCategoryTypeID"
+            <select [disabled]="!isEditModeAuth && !isCreateModeAuth" name="prudentialCategory" id="prudentialCategory"
+              [(ngModel)]="prudCategoryTypeID"
               (ngModelChange)="onPrudentialCategoryChange($event)"
               [ngClass]="{'error-border': errorMessages['SectorReturnType']}">
               <option value="0">Select</option>
@@ -835,8 +782,9 @@
             <label for="authorisationCategory">
               Authorisation Category
             </label>
-            <select [disabled]="!isEditModeAuth" name="prudentialCategory" id="prudentialCategory"
-              [(ngModel)]="ActivityAuth[0].AuthorisationCategoryTypeID">
+            <select [disabled]="!isEditModeAuth && !isCreateModeAuth" name="prudentialCategory" id="prudentialCategory"
+              [(ngModel)]="authorisationCategoryTypeID" [ngClass]="{'error-border': errorMessages['authorisationCategoryTypeID']}">
+              <option value="0">Select</option>
               <option *ngFor="let option of allAuthorisationCategoryTypes"
                 [value]="option?.AuthorisationCategoryTypeID">
                 {{ option?.AuthorisationCategoryTypeDesc }}
@@ -846,8 +794,8 @@
           <div class="input-field">
             <label for="effectiveDate">
               Effective Date
-              <span *ngIf="isEditModeAuth" style="color: red">*</span></label>
-            <input [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].PrudentialCategoryEffectiveDate" [ngClass]="{
+              <span *ngIf="isEditModeAuth || isCreateModeAuth" style="color: red">*</span></label>
+            <input [disabled]="!isEditModeAuth && !isCreateModeAuth" [(ngModel)]="getPrudCategoryEffectiveDate" [ngClass]="{
                 'error-border': errorMessages['PrudentialEffectiveDate']
               }" name="effectiveDate" id="effectiveDate" type="text" #dateInputs placeholder />
           </div>
@@ -863,7 +811,7 @@
               value="{{ ActivityAuth[0]?.LastModifiedDate }}" />
           </div>
 
-          <table class="prudentialTable" [hidden]="isEditModeAuth">
+          <table class="prudentialTable" [hidden]="(isEditModeAuth && isCreateModeAuth) || !(ActivityAuth[0].ScopeRevNum)">
             <thead>
               <tr>
                 <th>Prudential Category</th>
@@ -902,9 +850,9 @@
           <div class="input-field">
             <label for="prudentialReturnType">
               Prudential Return Type
-              <span *ngIf="isEditModeAuth" style="color: red">*</span></label>
-            <select (ngModelChange)="onSectorTypeChange($event)" [disabled]="!isEditModeAuth"
-              [(ngModel)]="ActivityAuth[0].SectorTypeID" name="prudentialReturnType" id="prudentialReturnType"
+              <span *ngIf="isEditModeAuth || isCreateModeAuth" style="color: red">*</span></label>
+            <select (ngModelChange)="onSectorTypeChange($event)" [disabled]="!isEditModeAuth && !isCreateModeAuth"
+              [(ngModel)]="sectorTypeID" name="prudentialReturnType" id="prudentialReturnType"
               [ngClass]="{'error-border': errorMessages['SectorReturnType']}">
               <option value="0">Select</option>
               <option *ngFor="let PrudReturnTypes of prudReturnTypesDropdown" [value]="PrudReturnTypes.SectorTypeID">
@@ -915,8 +863,8 @@
           <div class="input-field">
             <label for="effectiveDate">
               Effective Date
-              <span *ngIf="isEditModeAuth" style="color: red">*</span></label>
-            <input [disabled]="!isEditModeAuth" [(ngModel)]="ActivityAuth[0].SectorEffectiveDate" [ngClass]="{
+              <span *ngIf="isEditModeAuth || isCreateModeAuth" style="color: red">*</span></label>
+            <input [disabled]="!isEditModeAuth && !isCreateModeAuth" [(ngModel)]="getSectorEffectiveDate" [ngClass]="{
                 'error-border': errorMessages['SectorEffectiveDate']
               }" name="effectiveDate" id="effectiveDate" type="text" #dateInputs placeholder />
           </div>
@@ -931,7 +879,7 @@
               value="{{ ActivityAuth[0]?.SectorLastModifiedDate }}" />
           </div>
 
-          <table class="prudentialTable" [hidden]="isEditModeAuth">
+          <table class="prudentialTable" [hidden]="(isEditModeAuth && isCreateModeAuth) || !(ActivityAuth[0].ScopeRevNum)">
             <thead>
               <tr>
                 <th>Prudential Return Type</th>
