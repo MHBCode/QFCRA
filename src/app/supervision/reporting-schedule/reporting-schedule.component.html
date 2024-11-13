@@ -2,7 +2,7 @@
 
 <div class="form-section">
     <div class="inputs-field-set">
-        <div class="section">
+        <div class="section table">
             <div class="form-section-title">
                 <h2 class="edit-firm-header">
                     <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
@@ -17,11 +17,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let rpt of rptSchedule" (click)="openReportSchedulePopup(rpt)">
+                    <tr *ngFor="let rpt of paginatedItems" (click)="openReportSchedulePopup(rpt)">
                         <td>{{rpt.FirmRptFrom}}</td>
                         <td>{{rpt.FirmRptTo}}</td>
                     </tr>
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td  [attr.colspan]="12">
+                            <app-pagination [items]="rptSchedule" [pageSize]="pageSize" (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>   
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>

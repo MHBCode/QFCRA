@@ -206,7 +206,7 @@
     column-gap: 40px;
 }
 
-.input-field {
+.popup-content .input-field {
     flex: 1 1 45%;
     display: flex;
     flex-direction: column;
@@ -254,4 +254,13 @@
 .error-messages p {
     margin-bottom: 10px;
     color: red;
+}
+
+.form-section-title.space-between {
+    justify-content: space-between;
+}
+
+.no-data-message {
+    text-align: center;
+    font-weight: bold;
 }

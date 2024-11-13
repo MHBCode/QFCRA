@@ -9,13 +9,15 @@ import { SharedRoutingModule } from './shared-routing.module';
 import { DataPlaceComponent } from './data-place/data-place.component';
 import { AttachmentComponent } from './attachment/attachment.component';
 import { LoaderComponent } from './loader/loader.component';
+import { PaginationComponent } from './pagination/pagination.component';
 
 
 @NgModule({
   declarations: [
     DataPlaceComponent,
     AttachmentComponent,
-    LoaderComponent
+    LoaderComponent,
+    PaginationComponent
   ],
   imports: [
     CommonModule,
@@ -30,7 +32,8 @@ import { LoaderComponent } from './loader/loader.component';
     ReactiveFormsModule,
     HttpClientModule,
     AttachmentComponent,
-    LoaderComponent
+    LoaderComponent,
+    PaginationComponent
   ]
 })
 export class SharedModule { }

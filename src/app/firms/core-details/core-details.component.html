@@ -418,14 +418,16 @@
                 {{ isCollapsed['pressReleaseSection'] ? '▲' : '▼' }}
             </button>
         </div>
-        <!-- Aicha : This should be a component -->
+        <!-- Aicha -->
         <div class="inputs-row">
-            <app-attachment [documentObj]="documentObj" [isEditModeCore]="isEditModeCore"
+            <app-attachment [documentObj]="documentObj" [isEdit]="isEditModeCore"
                 [DocSubTypeID]="fetchedCoreDetailDocSubTypeID" [loadDocuments]="loadDocuments.bind(this)"
-                (documentUploaded)="onDocumentUploaded($event)">
+                (documentUploaded)="onDocumentUploaded($event)" [selectedFile]="selectedFile"
+                (selectedFileChange)="selectedFile = $event" [tableDoc]="pressReleaseTableDoc" [pageName]="Page.CoreDetail"
+                [param1]="firmAppDetailsCurrentAuthorized.FirmApplStatusID" [param2]="1">
             </app-attachment>
-        </div> 
-            
+        </div>
+
     </div>
 
     <!---->

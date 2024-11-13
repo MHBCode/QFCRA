@@ -90,7 +90,7 @@ export class ScopeComponent implements OnInit {
   activityCategories: any[] = [];
   activityTypes: any[] = [];
   subActivities: any[] = [];
-  existingPermittedActivites: any = [];
+  existingRegulatedActivites: any = [];
   callLicScopePrev: boolean = false;
   callAuthScopePrev: boolean = false;
   callSubActivity: boolean = false;
@@ -100,7 +100,7 @@ export class ScopeComponent implements OnInit {
   allAuthorisationCategoryTypes: any = [];
   allPrudentialCategoryTypes: any = [];
   allFirmScopeTypes: any = [];
-  newPermittedActivity: any = {};
+  newRegulatedActivity: any = {};
   selectedFile: File | null = null;
   fileError: string = '';
   callUploadDoc: boolean = false;
@@ -513,6 +513,7 @@ export class ScopeComponent implements OnInit {
       error => {
         console.error('Error fetching Islamic Finance', error);
         this.isIslamicFinanceDeleted = true; // Set flag to hide the section in view mode
+        this.isIslamicFinanceChecked = false;
         this.islamicFinance = { IFinTypeId: null };
       }
     );
@@ -543,6 +544,7 @@ export class ScopeComponent implements OnInit {
       );
     });
   }
+
 
   onDocumentUploaded(uploadedDocument: any) {
     const { fileLocation, intranetGuid } = uploadedDocument;
@@ -843,9 +845,9 @@ export class ScopeComponent implements OnInit {
         docReferenceID: isCreateMode ? null : this.ActivityLicensed[0]?.docReferenceID ?? null,
         firmApplTypeID: 2,
         docIDs: this.selectedDocId == null ? null : this.selectedDocId.toString(),
-        generalConditions: isCreateMode ? this.createLicenseScopeObj.GeneralConditions : this.ActivityLicensed[0]?.GeneralConditions,
+        generalConditions: isCreateMode ? this.createLicenseScopeObj.generalConditions : this.ActivityLicensed[0]?.GeneralConditions,
         effectiveDate: isCreateMode ? null : this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0]?.ScopeEffectiveDate),
-        scopeCertificateLink: isCreateMode ? this.createLicenseScopeObj.LinkToScope : this.ActivityLicensed[0]?.ScopeCertificateLink,
+        scopeCertificateLink: isCreateMode ? this.createLicenseScopeObj.linkToScope : this.ActivityLicensed[0]?.ScopeCertificateLink,
         applicationDate: isCreateMode ? this.dateUtilService.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate) : this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0]?.ScopeAppliedDate),
         licensedOrAuthorisedDate: isCreateMode ? null : this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0]?.ScopeLicensedDate),
       },
@@ -1038,7 +1040,7 @@ export class ScopeComponent implements OnInit {
         this.isEditModeLicense = false;
         this.isCreateModeLicense = false;
         this.disableApplicationDate = true;
-        this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
+        this.applySecurityOnPage(this.Page.Scope, false);
         this.errorMessages = {};
         this.loadActivitiesLicensed();
       }
@@ -1196,7 +1198,10 @@ export class ScopeComponent implements OnInit {
       return; // Prevent further action if validation fails
     }
 
-    this.existingPermittedActivites = this.ActivityAuth;
+    this.existingRegulatedActivites = this.ActivityAuth;
+    const activities = this.isCreateModeAuth ? this.createAuthorisedScopeObj.regulatedActivities : this.existingRegulatedActivites;
+
+
 
     if (!(this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeEffectiveDate)) && this.currentDateOnly > this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate || this.ActivityAuth[0].ScopeRevNum === 1)) {
       this.isLoading = false;
@@ -1218,6 +1223,7 @@ export class ScopeComponent implements OnInit {
 
         this.loadActivitiesAuthorized(); // Reload authorize scope details
         this.isEditModeAuth = false; // Toggle edit mode off
+        this.isCreateModeAuth = false;
         this.disableApplicationDate = true;
         this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
 
@@ -1302,35 +1308,38 @@ export class ScopeComponent implements OnInit {
   }
 
   prepareAuthoriseScopeObject(userId: number) {
+    const isCreateMode = this.isCreateModeAuth;
+    const activities = isCreateMode ? this.createAuthorisedScopeObj.regulatedActivities : this.existingRegulatedActivites;
+
     return {
       objFirmScope: {
-        firmScopeID: this.ActivityAuth[0].FirmScopeID,
-        scopeRevNum: this.ActivityAuth[0].ScopeRevNum,
-        firmID: this.ActivityAuth[0].FirmID,
+        firmScopeID: isCreateMode ? null : this.ActivityAuth[0]?.FirmScopeID,
+        scopeRevNum: isCreateMode ? null : this.ActivityAuth[0]?.ScopeRevNum,
+        firmID: isCreateMode ? this.firmId : this.ActivityAuth[0]?.FirmID,
         objectID: 524,
-        createdBy: userId, //recheck
-        docReferenceID: this.ActivityAuth[0].docReferenceID ?? null,
-        firmApplTypeID: 3, // Authorised
-        docIDs: this.selectedDocId == null ? null : this.selectedDocId.toString(),
-        generalConditions: this.ActivityAuth[0].GeneralCondition,
-        effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate),
+        createdBy: userId,
+        docReferenceID: isCreateMode ? null : this.ActivityAuth[0]?.docReferenceID ?? null,
+        firmApplTypeID: 3,
+        docIDs: this.selectedDocId ? this.selectedDocId.toString() : null,
+        generalConditions: isCreateMode ? this.createAuthorisedScopeObj.generalCondition : this.ActivityAuth[0]?.GeneralCondition,
+        effectiveDate: isCreateMode ? null : this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0]?.ScopeEffectiveDate),
         scopeCertificateLink: this.ActivityAuth[0]?.ScopeCertificateLink,
-        applicationDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeApplicationDate),
-        licensedOrAuthorisedDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate),
+        applicationDate: isCreateMode ? this.dateUtilService.convertDateToYYYYMMDD(this.firmDetails.FirmAuthApplDate) : this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0]?.ScopeApplicationDate),
+        licensedOrAuthorisedDate: isCreateMode ? null : this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0]?.ScopeLicensedOrAuthorisedDate),
       },
-      lstFirmActivities: this.existingPermittedActivites.map(activityAuth => ({
-        createdBy: userId, //recheck
-        firmScopeTypeID: null,
+      lstFirmActivities: activities.map(activityAuth => ({
+        createdBy: userId,
+        firmScopeTypeID: isCreateMode ? null : activityAuth.FirmScopeTypeID,
         activityTypeID: parseInt(activityAuth.ActivityTypeID),
         effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(activityAuth.ScopeEffectiveDate),
-        firmActivityConditions: activityAuth.FirmActivityConditions,
+        firmActivityConditions: activityAuth.firmActivityConditions,
         productTypeID: null,
         appliedDate: this.dateUtilService.convertDateToYYYYMMDD(activityAuth.ScopeAppliedDate),
         withDrawnDate: this.dateUtilService.convertDateToYYYYMMDD(activityAuth.ScopeEffectiveDate),
         objectProductActivity: activityAuth.categorizedProducts
           .flatMap(catProd =>
             catProd.subProducts
-              .filter(subProd => subProd.isChecked)  // Only include checked sub-products
+              .filter(subProd => subProd.isChecked)
               .map(subProd => ({
                 productTypeID: String(subProd.ID),
                 appliedDate: this.dateUtilService.convertDateToYYYYMMDD(activityAuth.appliedDate),
@@ -1342,87 +1351,56 @@ export class ScopeComponent implements OnInit {
         activityDetails: null
       })),
       objPrudentialCategory: {
-        firmPrudentialCategoryID: this.PrudentialCategoryIDChanged ? null : this.prudentialCategoryDetails[0].FirmPrudentialCategoryID,
+        firmPrudentialCategoryID: this.PrudentialCategoryIDChanged ? null : (this.prudentialCategoryDetails[0]?.FirmPrudentialCategoryID || null),
         firmId: this.firmId,
-        prudentialCategoryTypeID: this.ActivityAuth[0].PrudentialCategoryTypeID,
-        firmScopeID: this.ActivityAuth[0].FirmScopeID,
-        scopeRevNum: this.ActivityAuth[0].ScopeRevNum,
+        prudentialCategoryTypeID: isCreateMode ? this.createAuthorisedScopeObj.prudCategoryTypeID : this.ActivityAuth[0]?.PrudentialCategoryTypeID,
+        firmScopeID: isCreateMode ? null : this.ActivityAuth[0]?.FirmScopeID,
+        scopeRevNum: isCreateMode ? null : this.ActivityAuth[0]?.ScopeRevNum,
         lastModifiedByID: userId,
-        effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].PrudentialCategoryEffectiveDate),
-        expirationDate: null,
-        lastModifiedDate: null,
-        authorisationCategoryTypeID: this.ActivityAuth[0].AuthorisationCategoryTypeID
+        effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(isCreateMode ? this.createAuthorisedScopeObj.prudCategoryEffectiveDate : this.ActivityAuth[0]?.PrudentialCategoryEffectiveDate),
+        authorisationCategoryTypeID: isCreateMode ? this.createAuthorisedScopeObj.authorisationCategoryTypeID : this.ActivityAuth[0]?.AuthorisationCategoryTypeID
       },
       objSector: {
-        firmSectorID: this.SectorTypeIDChanged ? null : this.sectorDetails[0].FirmSectorID,
-        sectorTypeID: parseInt(this.ActivityAuth[0].SectorTypeID),
-        lastModifiedByID: userId, //recheck
-        effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].SectorEffectiveDate)
+        firmSectorID: this.SectorTypeIDChanged ? null : (this.sectorDetails[0]?.FirmSectorID || null),
+        sectorTypeID: isCreateMode ? this.createAuthorisedScopeObj.sectorTypeID : parseInt(this.ActivityAuth[0]?.SectorTypeID || '0'),
+        lastModifiedByID: userId,
+        effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(isCreateMode ? this.createAuthorisedScopeObj.sectorEffectiveDate : this.ActivityAuth[0]?.SectorEffectiveDate)
       },
-      lstFirmScopeCondition: this.isScopeConditionChecked
-        ? [
-          {
-            firmScopeID: this.ActivityAuth[0].FirmScopeID,
-            firmID: null,
-            objectID: null,
-            createdBy: null,
-            docReferenceID: null,
-            firmApplTypeID: null,
-            docIDs: null,
-            generalConditions: null,
-            effectiveDate: null,
-            scopeCertificateLink: null,
-            applicationDate: null,
-            licensedOrAuthorisedDate: null,
-            scopeConditionTypeId: 1,
-            lastModifiedBy: userId,
-            restriction: 1,
-            scopeConditionTypeDesc: "Retail Restriction"
-          }
-        ]
-        : [
-          {
-            firmScopeID: this.ActivityAuth[0].FirmScopeID,
-            firmID: null,
-            objectID: null,
-            createdBy: null,
-            docReferenceID: null,
-            firmApplTypeID: null,
-            docIDs: null,
-            generalConditions: null,
-            effectiveDate: null,
-            scopeCertificateLink: null,
-            applicationDate: null,
-            licensedOrAuthorisedDate: null,
-            scopeConditionTypeId: 1,
-            lastModifiedBy: userId,
-            restriction: 0,
-            scopeConditionTypeDesc: "Retail Restriction"
-          }
-        ], // Send an empty array if the checkbox is not checked
-      objFirmIslamicFinance: this.isIslamicFinanceChecked
-        ? {  // When checked, send the actual values
-          iFinFlag: this.isIslamicFinanceChecked,
-          iFinTypeId: this.islamicFinance.IFinTypeId,
-          iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
-          endorsement: this.islamicFinance.Endorsement,
-          savedIFinTypeID: this.islamicFinance.IFinTypeId,
-          scopeRevNum: this.ActivityAuth[0].ScopeRevNum,
-          lastModifiedBy: userId
-        }
-        : {  // When unchecked, send iFinFlag as false and everything else as null
-          iFinFlag: false,
-          iFinTypeId: null,
-          iFinTypeDesc: null,
-          endorsement: null,
-          savedIFinTypeID: null,
-          scopeRevNum: null,
-          lastModifiedBy: null
-        },
+      lstFirmScopeCondition: this.isScopeConditionChecked ? [{
+        firmScopeID: isCreateMode ? null : this.ActivityAuth[0]?.FirmScopeID,
+        scopeConditionTypeId: 1,
+        lastModifiedBy: userId,
+        restriction: 1,
+        scopeConditionTypeDesc: "Retail Restriction"
+      }] : [{
+        firmScopeID: isCreateMode ? null : this.ActivityAuth[0]?.FirmScopeID,
+        scopeConditionTypeId: 1,
+        lastModifiedBy: userId,
+        restriction: 0,
+        scopeConditionTypeDesc: "Retail Restriction"
+      }],
+      objFirmIslamicFinance: this.isIslamicFinanceChecked ? {
+        iFinFlag: this.isIslamicFinanceChecked,
+        iFinTypeId: isCreateMode ? this.createIslamicFinance.iFinTypeId : this.islamicFinance.IFinTypeId,
+        iFinTypeDesc: this.islamicFinance.IFinTypeDesc,
+        endorsement: isCreateMode ? this.createIslamicFinance.endorsement : this.islamicFinance.Endorsement,
+        savedIFinTypeID: isCreateMode ? this.createIslamicFinance.iFinTypeId : this.islamicFinance.IFinTypeId,
+        scopeRevNum: isCreateMode ? null : this.ActivityAuth[0].ScopeRevNum,
+        lastModifiedBy: userId
+      } : {
+        iFinFlag: false,
+        iFinTypeId: null,
+        iFinTypeDesc: null,
+        endorsement: null,
+        savedIFinTypeID: null,
+        scopeRevNum: null,
+        lastModifiedBy: null
+      },
       resetFirmSector: this.resetFirmSector,
       firmSectorID: null
-    }
+    };
   }
+
 
   onSectorTypeChange(sectorID: string) {
     console.log("Sector Type Changed:", sectorID);
@@ -1437,16 +1415,29 @@ export class ScopeComponent implements OnInit {
 
   validateAuthScope() {
     this.hasValidationErrors = false;
-    // Set to check if there are duplicates activity ids added
+
+    // Determine if we are in create mode
+    const isCreateMode = this.isCreateModeAuth;
+    const activities = isCreateMode ? this.createAuthorisedScopeObj.regulatedActivities : this.ActivityAuth;
+
+    // Set to check for duplicate activity IDs
     const activityIdsSet = new Set<number>();
 
+    if (activities.length === 0) {
+      this.loadErrorMessages('AddActivity', constants.FirmActivitiesEnum.ADD_REGULATEDACTIVITIES);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['AddActivity']
+    }
 
-    this.ActivityAuth.forEach(activity => {
+    activities.forEach(activity => {
       // Reset error messages for each activity
       activity.errorMessages = {};
       const activityTypeIdAsNumber = Number(activity.ActivityTypeID);
+
+
+      // Check for duplicate activity IDs
       if (activityIdsSet.has(activityTypeIdAsNumber)) {
-        // Flag duplicates and set a validation message
         this.loadErrorMessages('DuplicateActivity', constants.FirmActivitiesEnum.ACTIVITY_ALREADY_SELECTED, activity, activity.ActivityTypeDescription);
         this.loadErrorMessages('correctPermittedActivities', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
         this.hasValidationErrors = true;
@@ -1456,35 +1447,38 @@ export class ScopeComponent implements OnInit {
         delete activity.errorMessages['correctPermittedActivities'];
       }
 
-      // Validation for Application Date
+      // APPLICATION DATE VALIDATION
       if (this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeApplicationDate)) {
         this.loadErrorMessages('ScopeAppliedDateAuth', constants.FirmActivitiesEnum.ENTER_VALID_APPLICATIONDATE);
         this.hasValidationErrors = true;
       } else {
-        delete this.errorMessages[('ScopeAppliedDateAuth')];
+        delete this.errorMessages['ScopeAppliedDateAuth'];
       }
 
-      // Validation for Effective Date
-      if (!(this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate)) && !(this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeEffectiveDate)) && this.currentDate > this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate)) {
-        if (this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeEffectiveDate)) {
+      // Validate Effective Date
+      const effectiveDate = isCreateMode ? this.createAuthorisedScopeObj.prudCategoryEffectiveDate : this.ActivityAuth[0].ScopeEffectiveDate;
+      const licensedOrAuthorisedDate = isCreateMode ? null : activity.ScopeLicensedOrAuthorisedDate;
+      if (licensedOrAuthorisedDate && effectiveDate && this.currentDate > this.dateUtilService.convertDateToYYYYMMDD(licensedOrAuthorisedDate)) {
+        if (this.firmService.isNullOrEmpty(effectiveDate)) {
           this.loadErrorMessages('ScopeEffectiveDateAuth', constants.FirmActivitiesEnum.ENTER_VALID_SCOPEEFFECTIVEDATE);
           this.hasValidationErrors = true;
         } else {
-          delete this.errorMessages[('ScopeEffectiveDateAuth')];
+          delete this.errorMessages['ScopeEffectiveDateAuth'];
         }
       }
 
-      // Validation for Effective Date Later Application Date
-      if (!(this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeApplicationDate)) && !(this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeEffectiveDate))) {
-        if (this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeEffectiveDate) < this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeApplicationDate)) {
-          this.loadErrorMessages('EffectiveDateLaterApplicationDate', constants.FirmActivitiesEnum.ENTER_EFFECTIVEDATE_LATER_APPLICATIONDATE)
+      // Effective Date should be later than Application Date
+      if (!this.firmService.isNullOrEmpty(this.ActivityAuth[0].ScopeApplicationDate) && !this.firmService.isNullOrEmpty(effectiveDate)) {
+        if (this.dateUtilService.convertDateToYYYYMMDD(effectiveDate) < this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeApplicationDate)) {
+          this.loadErrorMessages('EffectiveDateLaterApplicationDate', constants.FirmActivitiesEnum.ENTER_EFFECTIVEDATE_LATER_APPLICATIONDATE);
+          this.hasValidationErrors = true;
         } else {
-          delete this.errorMessages[('EffectiveDateLaterApplicationDate')]
+          delete this.errorMessages['EffectiveDateLaterApplicationDate'];
         }
       }
 
-      // Check if the selected activity is valid (not "Select")
-      if (activity.ActivityTypeID == 0) {
+      // Ensure valid Activity Type (not "Select")
+      if (parseInt(activity.ActivityTypeID) === 0) {
         this.loadErrorMessages('ActivityTypeID', constants.FirmActivitiesEnum.SELECT_ACTIVITIES, activity);
         this.loadErrorMessages('correctPermittedActivities', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
         this.hasValidationErrors = true;
@@ -1493,18 +1487,13 @@ export class ScopeComponent implements OnInit {
         delete this.errorMessages['correctPermittedActivities'];
       }
 
-
-
-      // Check if categorizedProducts exists and is empty
-      const hasNoProducts = activity.categorizedProducts == null || activity.categorizedProducts.length == 0;
-
-      // Check if any product is selected (isChecked = true) in the current activity
+      // Check if categorized products exist and contain selected products
+      const hasNoProducts = !activity.categorizedProducts || activity.categorizedProducts.length === 0;
       const hasCheckedProducts = activity.categorizedProducts?.some(catProd =>
         catProd.subProducts.some(subProd => subProd.isChecked)
       );
 
-      // Validation for Activities
-      // If the activity has no products or has products but none are selected, display an error
+      // Validation for product selection
       if (hasNoProducts || (!hasNoProducts && !hasCheckedProducts)) {
         this.loadErrorMessages('Products', constants.FirmActivitiesEnum.SELECT_ATLEASTONE_PRODUCTS, activity);
         this.loadErrorMessages('correctPermittedActivities', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
@@ -1514,50 +1503,55 @@ export class ScopeComponent implements OnInit {
         delete this.errorMessages['correctPermittedActivities'];
       }
     });
-    // Validation for Prudential Effective Date
-    if (this.firmService.isNullOrEmpty(this.ActivityAuth[0].PrudentialCategoryEffectiveDate)) {
+
+    // Prudential Effective Date Validation
+    const prudentialEffectiveDate = isCreateMode ? this.createAuthorisedScopeObj.prudCategoryEffectiveDate : this.ActivityAuth[0]?.PrudentialCategoryEffectiveDate;
+    if (this.firmService.isNullOrEmpty(prudentialEffectiveDate)) {
       this.loadErrorMessages('PrudentialEffectiveDate', constants.FirmActivitiesEnum.ENTER_PRUDENTIAL_EFFECTIVEDATE);
       this.hasValidationErrors = true;
     } else {
-      delete this.errorMessages[('PrudentialEffectiveDate')]
+      delete this.errorMessages['PrudentialEffectiveDate'];
     }
 
-    // Validation for Sector Effective Date
-    if (this.firmService.isNullOrEmpty(this.ActivityAuth[0].SectorEffectiveDate)) {
+    // Sector Effective Date Validation
+    const sectorEffectiveDate = isCreateMode ? this.createAuthorisedScopeObj.sectorEffectiveDate : this.ActivityAuth[0]?.SectorEffectiveDate;
+    if (this.firmService.isNullOrEmpty(sectorEffectiveDate)) {
       this.loadErrorMessages('SectorEffectiveDate', constants.FirmActivitiesEnum.ENTER_SECTOR_EFFECTIVEDATE);
       this.hasValidationErrors = true;
     } else {
-      delete this.errorMessages[('SectorEffectiveDate')]
+      delete this.errorMessages['SectorEffectiveDate'];
     }
 
-    // Validation for Sector Effective Date
-    if (this.firmService.isNullOrEmpty(this.ActivityAuth[0].SectorEffectiveDate)) {
-      this.loadErrorMessages('SectorEffectiveDate', constants.FirmActivitiesEnum.ENTER_SECTOR_EFFECTIVEDATE);
-      this.hasValidationErrors = true;
-    } else {
-      delete this.errorMessages[('SectorEffectiveDate')]
-    }
-
-    // Validation for Sector Effective Date
-    if (parseInt(this.ActivityAuth[0].SectorTypeID) === 0) {
+    // Prudential Return Type Validation
+    const sectorTypeID = isCreateMode ? this.createAuthorisedScopeObj.sectorTypeID : this.ActivityAuth[0]?.SectorTypeID;
+    if (parseInt(sectorTypeID) === 0) {
       this.errorMessages['SectorReturnType'] = 'Please select valid "Prudential Return Type".';
       this.hasValidationErrors = true;
     } else {
-      delete this.errorMessages[('SectorReturnType')]
+      delete this.errorMessages['SectorReturnType'];
     }
 
-    if (parseInt(this.islamicFinance.IFinTypeId) === 0) {
+    // Islamic Finance Type Validation
+    const islamicFinanceTypeID = isCreateMode && this.isIslamicFinanceChecked ? this.createIslamicFinance.iFinTypeId : this.islamicFinance.IFinTypeId;
+    if (parseInt(islamicFinanceTypeID) === 0) {
       this.loadErrorMessages('islamicType', constants.FirmActivitiesEnum.SELECT_ISLAMICFINANCE_TYPE);
       this.hasValidationErrors = true;
     } else {
-      delete this.errorMessages[('islamicType')]
+      delete this.errorMessages['islamicType'];
     }
 
-
+    const authorisationCategoryTypeID = isCreateMode ? this.createAuthorisedScopeObj.authorisationCategoryTypeID : this.ActivityAuth[0].AuthorisationCategoryTypeID;
+    if (parseInt(authorisationCategoryTypeID) === 0) {
+      this.loadErrorMessages('authorisationCategoryTypeID', constants.FirmActivitiesEnum.AUTHORISATIONCATEGORYSELECT);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['authorisationCategoryTypeID'];
+    }
   }
 
+
   varyScopeAuthConfirm() {
-    this.existingPermittedActivites = this.ActivityAuth;
+    this.existingRegulatedActivites = this.ActivityAuth;
     const varyAuthoriseScope = this.prepareVaryScopeAuthoriseObject(this.userId);
     console.log("vary scope data to be sent" + varyAuthoriseScope);
     this.activityService.editAuthorizedScope(varyAuthoriseScope).subscribe((response) => {
@@ -1692,7 +1686,7 @@ export class ScopeComponent implements OnInit {
         applicationDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeApplicationDate),
         licensedOrAuthorisedDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate),
       },
-      lstFirmActivities: this.existingPermittedActivites.map(activityAuth => ({
+      lstFirmActivities: this.existingRegulatedActivites.map(activityAuth => ({
         createdBy: userId, //recheck
         firmScopeTypeID: parseInt(activityAuth.FirmScopeTypeID),
         activityTypeID: parseInt(activityAuth.ActivityTypeID),
@@ -1809,8 +1803,9 @@ export class ScopeComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isEditModeAuth = false;
+        this.isCreateModeAuth = false;
         this.disableApplicationDate = true;
-        this.applySecurityOnPage(this.Page.Scope, this.isEditModeAuth);
+        this.applySecurityOnPage(this.Page.Scope, false);
         this.errorMessages = {};
         this.loadActivitiesAuthorized();
         this.loadSectorDetails();
@@ -1875,7 +1870,7 @@ export class ScopeComponent implements OnInit {
     this.lastLicRevisionNumber = Math.max(...this.LicPrevRevNumbers.map(r => r.ScopeRevNum));
   }
 
-  addNewActivity() {
+  addNewPermittedActivity() {
     // Check if we are in edit mode and ActivityLicensed has at least one item
     const baseActivity = this.ActivityLicensed[0] || {};
 
@@ -1921,7 +1916,7 @@ export class ScopeComponent implements OnInit {
   }
 
 
-  removeLicActivity(index: number) {
+  removePermittedActivity(index: number) {
     Swal.fire({
       text: 'Are you sure you want to delete this activity?',
       icon: 'warning',
@@ -1991,6 +1986,13 @@ export class ScopeComponent implements OnInit {
 
 
   onPrudentialCategoryChange(prudCategID: string) {
+    // on create authorised
+    if (this.isCreateModeAuth) {
+      this.PrudentialCategoryIDChanged = false;
+      this.updateSectorAndLoadReturnTypes(prudCategID);
+      return;
+    }
+
     // Check if the new selection is the same as the previous one
     if (parseInt(prudCategID) === this.previousPrudentialCategoryID) {
       this.PrudentialCategoryIDChanged = false; // don't reset
@@ -2054,63 +2056,70 @@ export class ScopeComponent implements OnInit {
     });
   }
 
-  addNewPermittedActivity() {
-    this.newPermittedActivity = {
-      FirmScopeTypeID: null, // Set to null or default value
-      ActivityTypeID: null, // Set to null or default value
+  addNewRegulatedActivity() {
+    const baseActivity = this.ActivityAuth[0] || {};
+
+    this.newRegulatedActivity = {
+      FirmScopeTypeID: 1,
+      ActivityTypeID: 0,
       CategoryID: null,
-      activities: [], // Empty array for activity types to be loaded dynamically
+      activities: [], // Empty array for dynamically loaded activities
       categorizedProducts: [], // Empty array for categorized products
-      ObjectProductActivity: [], // Adjust as necessary for your product logic
-      FirmActivityConditions: null, // Empty or default condition
+      ObjectProductActivity: [], // Empty array for product activity
+      FirmActivityConditions: null,
       ActivityTypeDescription: null,
       CategoryDescription: null,
       FirmScopeTypeDescription: null,
 
-      FirmID: this.ActivityAuth[0].FirmID,
-      FirmScopeID: this.ActivityAuth[0].FirmScopeID,
-      ScopeRevNum: this.ActivityAuth[0].ScopeRevNum,
-      EffectiveDate: this.ActivityAuth[0].EffectiveDate,
-      GeneralCondition: this.ActivityAuth[0].GeneralCondition,
-      ScopeEffectiveDate: this.ActivityAuth[0].ScopeEffectiveDate,
-      LastModifiedDate: this.ActivityAuth[0].LastModifiedDate,
-      ModifiedByName: this.ActivityAuth[0].ModifiedByName,
-      DocID: this.ActivityAuth[0].DocID,
-      FormRefFileLocation: this.ActivityAuth[0].FormRefFileLocation,
-      AppliedDate: this.ActivityAuth[0].AppliedDate,
-      WithDrawnDate: this.ActivityAuth[0].WithDrawnDate,
-      ScopeCertificateLink: this.ActivityAuth[0].ScopeCertificateLink,
-      ActivityDetails: this.ActivityAuth[0].ActivityDetails,
-      FirmActivityID: this.ActivityAuth[0].FirmActivityID,
-      ScopeApplicationDate: this.ActivityAuth[0].ScopeApplicationDate,
-      ScopeLicensedOrAuthorisedDate: this.ActivityAuth[0].ScopeLicensedOrAuthorisedDate,
-      CreatedDate: this.ActivityAuth[0].CreatedDate,
-      CreatedByName: this.ActivityAuth[0].CreatedByName,
-      ActivityDisplayOrder: this.ActivityAuth[0].ActivityDisplayOrder,
+      FirmID: baseActivity.FirmID || null,
+      FirmScopeID: baseActivity.FirmScopeID || null,
+      ScopeRevNum: baseActivity.ScopeRevNum || null,
+      EffectiveDate: baseActivity.EffectiveDate || '',
+      GeneralCondition: baseActivity.GeneralCondition || '',
+      ScopeEffectiveDate: baseActivity.ScopeEffectiveDate || '',
+      LastModifiedDate: baseActivity.LastModifiedDate || '',
+      ModifiedByName: baseActivity.ModifiedByName || '',
+      DocID: baseActivity.DocID || null,
+      FormRefFileLocation: baseActivity.FormRefFileLocation || '',
+      AppliedDate: baseActivity.AppliedDate || '',
+      WithDrawnDate: baseActivity.WithDrawnDate || '',
+      ScopeCertificateLink: baseActivity.ScopeCertificateLink || '',
+      ActivityDetails: baseActivity.ActivityDetails || '',
+      FirmActivityID: baseActivity.FirmActivityID || null,
+      ScopeApplicationDate: baseActivity.ScopeApplicationDate || '',
+      ScopeLicensedOrAuthorisedDate: baseActivity.ScopeLicensedOrAuthorisedDate || '',
+      CreatedDate: baseActivity.CreatedDate || '',
+      CreatedByName: baseActivity.CreatedByName || '',
+      ActivityDisplayOrder: baseActivity.ActivityDisplayOrder || 0,
 
-      ObjectFirmScopeCondition: this.ActivityAuth[0]?.ObjectFirmScopeCondition || [],
+      ObjectFirmScopeCondition: baseActivity.ObjectFirmScopeCondition || [],
 
-      FirmPrudentialCategoryID: this.ActivityAuth[0].FirmPrudentialCategoryID,
-      PrudentialCategoryTypeID: this.ActivityAuth[0].PrudentialCategoryTypeID,
-      PrudentialCategoryTypeDesc: this.ActivityAuth[0].PrudentialCategoryTypeDesc,
-      PrudentialCategoryEffectiveDate: this.ActivityAuth[0].PrudentialCategoryEffectiveDate,
-      PrudentialCategoryLastModifiedDate: this.ActivityAuth[0].PrudentialCategoryLastModifiedDate,
-      FirmSectorID: this.ActivityAuth[0].FirmSectorID,
-      SectorTypeID: this.ActivityAuth[0].SectorTypeID,
-      SectorTypeDesc: this.ActivityAuth[0].SectorTypeDesc,
-      SectorEffectiveDate: this.ActivityAuth[0].SectorEffectiveDate,
-      SectorLastModifiedDate: this.ActivityAuth[0].SectorLastModifiedDate,
-      SectorLastModifiedByName: this.ActivityAuth[0].SectorLastModifiedByName,
-      ParentActivityTypeID: this.ActivityAuth[0].ParentActivityTypeID,
-      AuthorisationCategoryTypeID: this.ActivityAuth[0].AuthorisationCategoryTypeID,
-      AuthorisationCategoryTypeDesc: this.ActivityAuth[0].AuthorisationCategoryTypeDesc,
-      PrudentialCategoryLastModifiedByName: this.ActivityAuth[0].PrudentialCategoryLastModifiedByName
+      FirmPrudentialCategoryID: baseActivity.FirmPrudentialCategoryID || null,
+      PrudentialCategoryTypeID: baseActivity.PrudentialCategoryTypeID || null,
+      PrudentialCategoryTypeDesc: baseActivity.PrudentialCategoryTypeDesc || '',
+      PrudentialCategoryEffectiveDate: baseActivity.PrudentialCategoryEffectiveDate || '',
+      PrudentialCategoryLastModifiedDate: baseActivity.PrudentialCategoryLastModifiedDate || '',
+      FirmSectorID: baseActivity.FirmSectorID || null,
+      SectorTypeID: baseActivity.SectorTypeID || null,
+      SectorTypeDesc: baseActivity.SectorTypeDesc || '',
+      SectorEffectiveDate: baseActivity.SectorEffectiveDate || '',
+      SectorLastModifiedDate: baseActivity.SectorLastModifiedDate || '',
+      SectorLastModifiedByName: baseActivity.SectorLastModifiedByName || '',
+      ParentActivityTypeID: baseActivity.ParentActivityTypeID || null,
+      AuthorisationCategoryTypeID: baseActivity.AuthorisationCategoryTypeID || null,
+      AuthorisationCategoryTypeDesc: baseActivity.AuthorisationCategoryTypeDesc || '',
+      PrudentialCategoryLastModifiedByName: baseActivity.PrudentialCategoryLastModifiedByName || ''
     };
 
-    this.ActivityAuth.unshift(this.newPermittedActivity);
+    if (this.isCreateModeAuth) {
+      this.createAuthorisedScopeObj.regulatedActivities.unshift(this.newRegulatedActivity);
+    } else {
+      this.ActivityAuth.unshift(this.newRegulatedActivity);
+    }
   }
 
-  removePermittedActivity(index: number) {
+
+  removeRegulatedActivity(index: number) {
     Swal.fire({
       text: 'Are you sure you want to Remove this record?',
       icon: 'warning',
@@ -2120,7 +2129,8 @@ export class ScopeComponent implements OnInit {
       reverseButtons: false
     }).then((result) => {
       if (result.isConfirmed) {
-        this.ActivityAuth.splice(index, 1);
+        const activityList = this.isCreateModeAuth ? this.createAuthorisedScopeObj.regulatedActivities : this.ActivityAuth;
+        activityList.splice(index, 1);
       }
     });
   }
@@ -2538,20 +2548,23 @@ export class ScopeComponent implements OnInit {
   // create license
 
   createLicenseScopeObj = {
-    LinkToScope: '',
-    FirmLicApplDate: null,
+    linkToScope: '',
+    firmLicApplDate: null,
     permittedActivities: [] as any[],
-    GeneralConditions: '',
+    generalConditions: '',
   }
 
-  initializeCreateModeActivities() {
-    this.createLicenseScopeObj.permittedActivities = [];
-  }
 
   createLicenseScope() {
     // Set create mode to true
     this.isCreateModeLicense = true;
-    this.addNewActivity();
+    this.createLicenseScopeObj = {
+      linkToScope: '',
+      firmLicApplDate: null,
+      permittedActivities: [], // Empty array for permitted activities
+      generalConditions: ''
+    };
+    this.addNewPermittedActivity();
     // Set the operation type to Create
     const currentOpType = ObjectOpType.Create;
 
@@ -2568,25 +2581,44 @@ export class ScopeComponent implements OnInit {
   }
 
   get scopeAppliedDate() {
-    let formattedFirmLicApplDate = this.dateUtilService.formatDateToCustomFormat(this.firmDetails?.FirmLicApplDate);
-    return this.isCreateModeLicense ? formattedFirmLicApplDate : this.ActivityLicensed[0]?.ScopeAppliedDate;
+    let formattedApplicationDate;
+    if (this.tabIndex === 0) {
+      // Format date based on FirmLicApplDate for tab index 0
+      formattedApplicationDate = this.dateUtilService.formatDateToCustomFormat(this.firmDetails?.FirmLicApplDate);
+      return this.isCreateModeLicense ? formattedApplicationDate : this.ActivityLicensed[0]?.ScopeAppliedDate;
+    } else if (this.tabIndex === 1) {
+      // Format date based on FirmAuthApplDate for tab index 1
+      formattedApplicationDate = this.dateUtilService.formatDateToCustomFormat(this.firmDetails?.FirmAuthApplDate);
+      return this.isCreateModeAuth ? formattedApplicationDate : this.ActivityAuth[0]?.ScopeApplicationDate;
+    }
+    return null; // Default return if tabIndex does not match 0 or 1
   }
 
+
   set scopeAppliedDate(value: string) {
-    if (this.isCreateModeLicense) {
-      this.firmDetails.FirmLicApplDate = value;
-    } else {
-      this.ActivityLicensed[0].ScopeAppliedDate = value;
+    if (this.tabIndex === 0) {  // Licensing tab
+      if (this.isCreateModeLicense) {
+        this.firmDetails.FirmLicApplDate = value;
+      } else if (this.ActivityLicensed?.length) {  // Check if ActivityLicensed exists and is not empty
+        this.ActivityLicensed[0].ScopeAppliedDate = value;
+      }
+    } else if (this.tabIndex === 1) {  // Authorization tab
+      if (this.isCreateModeAuth) {
+        this.firmDetails.FirmAuthApplDate = value;
+      } else if (this.ActivityAuth?.length) {  // Check if ActivityAuth exists and is not empty
+        this.ActivityAuth[0].ScopeApplicationDate = value;
+      }
     }
   }
 
+
   get linkToScope() {
-    return this.isCreateModeLicense ? this.createLicenseScopeObj.LinkToScope : this.ActivityLicensed[0]?.ScopeCertificateLink;
+    return this.isCreateModeLicense ? this.createLicenseScopeObj.linkToScope : this.ActivityLicensed[0]?.ScopeCertificateLink;
   }
 
   set linkToScope(value: string) {
     if (this.isCreateModeLicense) {
-      this.createLicenseScopeObj.LinkToScope = value;
+      this.createLicenseScopeObj.linkToScope = value;
     } else {
       this.ActivityLicensed[0].ScopeCertificateLink = value;
     }
@@ -2595,10 +2627,188 @@ export class ScopeComponent implements OnInit {
   get permittedActivitiesList() {
     return this.isCreateModeLicense ? this.createLicenseScopeObj.permittedActivities : this.ActivityLicensed;
   }
+  /////////////////////////////////////////////////////////////////////////////////
+
+  get getSectorEffectiveDate() {
+    return this.isCreateModeAuth ? this.createAuthorisedScopeObj.sectorEffectiveDate : this.ActivityAuth[0].SectorEffectiveDate;
+  }
+
+  set getSectorEffectiveDate(value: string) {
+    if (this.isCreateModeAuth) {
+      this.createAuthorisedScopeObj.sectorEffectiveDate = value;
+    } else {
+      if (this.ActivityAuth?.length) {
+        this.ActivityAuth[0].SectorEffectiveDate = value;
+      }
+    }
+  }
+
+  get getPrudCategoryEffectiveDate() {
+    return this.isCreateModeAuth ? this.createAuthorisedScopeObj.prudCategoryEffectiveDate : this.ActivityAuth[0].PrudentialCategoryEffectiveDate;
+  }
+
+  set getPrudCategoryEffectiveDate(value: string) {
+    if (this.isCreateModeAuth) {
+      this.createAuthorisedScopeObj.prudCategoryEffectiveDate = value;
+    } else {
+      if (this.ActivityAuth?.length) {
+        this.ActivityAuth[0].PrudentialCategoryEffectiveDate = value;
+      }
+    }
+  }
+
+  get sectorTypeID(): number {
+    return this.isCreateModeAuth
+      ? this.createAuthorisedScopeObj.sectorTypeID
+      : this.ActivityAuth[0].SectorTypeID;
+  }
+
+  // Setter for SectorTypeID
+  set sectorTypeID(value: number) {
+    if (this.isCreateModeAuth) {
+      this.createAuthorisedScopeObj.sectorTypeID = value;
+    } else if (this.ActivityAuth?.length) {
+      this.ActivityAuth[0].SectorTypeID = value;
+    }
+  }
+
+  get prudCategoryTypeID(): number {
+    return this.isCreateModeAuth
+      ? this.createAuthorisedScopeObj.prudCategoryTypeID
+      : this.ActivityAuth[0].PrudentialCategoryTypeID;
+  }
+
+  // Setter for PrudCategoryTypeID
+  set prudCategoryTypeID(value: number) {
+    if (this.isCreateModeAuth) {
+      this.createAuthorisedScopeObj.prudCategoryTypeID = value;
+    } else if (this.ActivityAuth?.length) {
+      this.ActivityAuth[0].PrudentialCategoryTypeID = value;
+    }
+  }
+
+  get authorisationCategoryTypeID(): number {
+    return this.isCreateModeAuth
+      ? this.createAuthorisedScopeObj.authorisationCategoryTypeID
+      : this.ActivityAuth[0].AuthorisationCategoryTypeID;
+  }
+
+  // Setter for AuthorisationCategoryTypeID
+  set authorisationCategoryTypeID(value: number) {
+    if (this.isCreateModeAuth) {
+      this.createAuthorisedScopeObj.authorisationCategoryTypeID = value;
+    } else if (this.ActivityAuth?.length) {
+      this.ActivityAuth[0].AuthorisationCategoryTypeID = value;
+    }
+  }
+
+  get endorsement(): string {
+    return this.isCreateModeAuth ? this.createIslamicFinance.endorsement : this.islamicFinance.Endorsement
+  }
+
+  set endorsement(value: string) {
+    if (this.isCreateModeAuth) {
+      this.createIslamicFinance.endorsement = value;
+    } else if (this.islamicFinance) {
+      this.islamicFinance.Endorsement = value;
+    }
+  }
+
+  get iFinTypeId(): number {
+    return this.isCreateModeAuth ? this.createIslamicFinance.iFinTypeId : this.islamicFinance.IFinTypeId
+  }
+
+  set iFinTypeId(value: number) {
+    if (this.isCreateModeAuth) {
+      this.createIslamicFinance.iFinTypeId = value;
+    } else if (this.islamicFinance) {
+      this.islamicFinance.IFinTypeId = value;
+    }
+  }
+
+  get generalCondition(): string {
+    return this.isCreateModeAuth
+      ? this.createAuthorisedScopeObj.generalCondition
+      : this.ActivityAuth[0].GeneralCondition;
+  }
+
+  // Setter for AuthorisationCategoryTypeID
+  set generalCondition(value: string) {
+    if (this.isCreateModeAuth) {
+      this.createAuthorisedScopeObj.generalCondition = value;
+    } else if (this.ActivityAuth?.length) {
+      this.ActivityAuth[0].GeneralCondition = value;
+    }
+  }
+
+  selectedActivityIndex = 0;
+
+  get firmActivityConditions(): string {
+    return this.regulatedActivitiesList[this.selectedActivityIndex]?.firmActivityConditions || '';
+  }
+
+  set firmActivityConditions(value: string) {
+    if (this.regulatedActivitiesList[this.selectedActivityIndex]) {
+      this.regulatedActivitiesList[this.selectedActivityIndex].firmActivityConditions = value;
+    }
+  }
+
+  setSelectedActivity(index: number) {
+    this.selectedActivityIndex = index;
+  }
+
+  get regulatedActivitiesList() {
+    return this.isCreateModeAuth ? this.createAuthorisedScopeObj.regulatedActivities : this.ActivityAuth;
+  }
 
   // create authorised
   createAuthorisedScopeObj = {
-    
+    FirmAuthApplDate: null,
+    regulatedActivities: [] as any[],
+    firmActivityConditions: '',
+    generalCondition: '',
+
+    authorisationCategoryTypeID: 0,
+    prudCategoryTypeID: 0,
+    prudCategoryEffectiveDate: this.dateUtilService.formatDateToCustomFormat(this.currentDate),
+
+    sectorTypeID: 0,
+    sectorEffectiveDate: this.dateUtilService.formatDateToCustomFormat(this.currentDate)
+  }
+
+  createIslamicFinance = {
+    iFinTypeId: 0,
+    endorsement: '',
+  }
+
+  createAuthorisedScope() {
+    // Set create mode to true
+    this.isCreateModeAuth = true;
+    this.isIslamicFinanceChecked = false;
+    this.createAuthorisedScopeObj = {
+      FirmAuthApplDate: null,
+      regulatedActivities: [] as any[],
+      firmActivityConditions: '',
+      generalCondition: '',
+      authorisationCategoryTypeID: 0,
+      prudCategoryTypeID: 0,
+      prudCategoryEffectiveDate: this.dateUtilService.formatDateToCustomFormat(this.currentDate),
+      sectorTypeID: 0,
+      sectorEffectiveDate: this.dateUtilService.formatDateToCustomFormat(this.currentDate)
+    }
+    // Set the operation type to Create
+    const currentOpType = ObjectOpType.Create;
+    this.loadActivityCategories();
+    // Apply page security based on create mode
+    this.applySecurityOnPage(this.Page.Scope, true); // Pass true to indicate a writable mode (edit or create)
+
+    // Hide other buttons and show the Save and Cancel buttons
+    this.hideEditBtn = true;
+    this.hideDeleteBtn = true;
+    this.hideReviseBtn = true;
+    this.hideCreateBtn = true; // Hide create button once in create mode
+    this.hideSaveBtn = false;
+    this.hideCancelBtn = false;
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////

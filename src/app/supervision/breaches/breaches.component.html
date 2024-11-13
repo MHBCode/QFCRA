@@ -2,8 +2,8 @@
 
 <div class="form-section">
     <div class="inputs-field-set">
-        <div class="section">
-            <div class="form-section-title">
+        <div class="section table">
+            <div class="form-section-title space-between">
                 <h2 class="edit-firm-header">
                     Breaches> <span>{{ firmDetails?.FirmName }}</span>
                 </h2>
@@ -33,7 +33,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let breach of filteredBreaches">
+                    <tr *ngFor="let breach of paginatedItems">
                         <td>{{breach.Column1}}</td>
                         <td>{{breach.BreachRevNum}}</td>
                         <td>{{breach.BreachType}}</td>
@@ -45,6 +45,13 @@
                         <td>{{breach.LastUpdatedBy}}</td>
                     </tr>
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td  [attr.colspan]="12">
+                            <app-pagination [items]="filteredBreaches" [pageSize]="pageSize" (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>   
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
@@ -73,7 +80,7 @@
                         <div class="select-wrapper">
                             <select name="breachType" id="breachType" [(ngModel)]="breachType">
                                 <option value="">Select</option>
-                                <option *ngFor="let type of breachesTypes" [value]="type.BreachTypeID">
+                                <option *ngFor="let type of breachesTypes" [value]="type.BreachTypeDesc">
                                     {{ type.BreachTypeDesc }}
                                 </option>
                             </select>
@@ -95,7 +102,7 @@
                         <div class="select-wrapper">
                             <select name="breachLevel" id="breachLevel" [(ngModel)]="breachLevel">
                                 <option value="">Select</option>
-                                <option *ngFor="let level of breachLevels" [value]="level.BreachLevelTypeID">{{ level.BreachLevelTypeDesc }}</option>
+                                <option *ngFor="let level of breachLevels" [value]="level.BreachLevelTypeDesc">{{ level.BreachLevelTypeDesc }}</option>
                             </select>
                         </div>
                     </div>
@@ -105,7 +112,7 @@
                         <div class="select-wrapper">
                             <select name="breachStatus" id="breachStatus" [(ngModel)]="breachStatus">
                                 <option value="">Select</option>
-                                <option *ngFor="let status of breachAllStatus" [value]="status.BreachStatusTypeID">{{ status.BreachStatusTypeDesc }}</option>
+                                <option *ngFor="let status of breachAllStatus" [value]="status.BreachStatusTypeDesc">{{ status.BreachStatusTypeDesc }}</option>
                             </select>
                         </div>
                     </div>

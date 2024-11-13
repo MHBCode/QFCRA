@@ -166,8 +166,6 @@ export class CoreDetailsComponent implements OnInit {
 
       // functions for documents
       this.fetchSubTypeDocIDs();
-      this.getNewFileNumber();
-
     })
   }
 
@@ -1544,15 +1542,6 @@ export class CoreDetailsComponent implements OnInit {
       objectInstanceRevNum: objectInstanceRevNum,
       docSubType: docSubTypeID
     };
-  }
-
-
-  getNewFileNumber() {
-    this.logForm.getNewFileNumber(this.firmId, this.currentDate).subscribe(data => {
-      this.newfileNum = data.response.Column1;
-    }, error => {
-      console.error(error);
-    })
   }
 
   fetchSubTypeDocIDs() {
