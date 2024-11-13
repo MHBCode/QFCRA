@@ -28,6 +28,7 @@ export class ScopeComponent implements OnInit {
   isEditModeLicense: boolean = false;
   isEditModeAuth: boolean = false;
   isCreateModeLicense: boolean = false;
+  isCreateModeAuth: boolean = false;
   showPermittedActivitiesTable: string | boolean = false;
   isIslamicFinanceChecked: boolean = true;
   isIslamicFinanceDeleted: boolean = false;
@@ -65,6 +66,7 @@ export class ScopeComponent implements OnInit {
   currentActivity: any = null;
   scopeRevNum: number;
   licensedActivities: any = [];
+  activityDescription: any = '';
   documentDetails: any = {};
   now = new Date();
   currentDate = this.now.toISOString();
@@ -211,10 +213,15 @@ export class ScopeComponent implements OnInit {
     }, 0)
   }
 
-  applySecurityOnPage(objectId: FrimsObject, Mode: boolean) {
+  applySecurityOnPage(objectId: FrimsObject, isWritableMode: boolean) {
     this.maskCommandActionsControlsScope();
     this.loading = true;
-    const currentOpType = Mode ? ObjectOpType.Edit : ObjectOpType.View;
+    let currentOpType;
+    if (this.tabIndex === 0) {
+      currentOpType = isWritableMode ? (this.isCreateModeLicense ? ObjectOpType.Create : ObjectOpType.Edit) : ObjectOpType.View;
+    } else if (this.tabIndex === 1) {
+      currentOpType = isWritableMode ? (this.isCreateModeAuth ? ObjectOpType.Create : ObjectOpType.Edit) : ObjectOpType.View;
+    }
 
     // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
     this.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
@@ -694,6 +701,8 @@ export class ScopeComponent implements OnInit {
   }
 
   validateLicenseScope() {
+    const activities = this.isCreateModeLicense ? this.permittedActivitiesList : this.ActivityLicensed;
+
     // APPLICATION DATE VALIDATION
     if (this.firmService.isNullOrEmpty(this.ActivityLicensed[0].ScopeAppliedDate)) {
       this.loadErrorMessages('ScopeAppliedDate', constants.FirmActivitiesEnum.ENTER_VALID_APPLICATIONDATE);
@@ -726,7 +735,7 @@ export class ScopeComponent implements OnInit {
     }
 
     // ACTIVITY TYPE VALIDATION
-    this.invalidActivity = this.ActivityLicensed.find(activity => activity.ActivityTypeID == 0);
+    this.invalidActivity = activities.find(activity => activity.ActivityTypeID == 0);
     if (this.invalidActivity) {
       this.loadErrorMessages('ActivityTypeIDCORRECTION', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
       this.loadErrorMessages('ActivityTypeID', constants.FirmActivitiesEnum.SELECT_ACTIVITIES);
@@ -735,6 +744,29 @@ export class ScopeComponent implements OnInit {
       delete this.errorMessages['ActivityTypeID'];
       delete this.errorMessages['ActivityTypeIDCORRECTION'];
     }
+
+    // DUPLICATE ACTIVITY TYPE VALIDATION
+    const activityTypeIDs = activities.map(activity => parseInt(activity.ActivityTypeID, 10));
+    const duplicateActivityTypeID = activityTypeIDs.find((id, index) => activityTypeIDs.indexOf(id) !== index && id !== 0);
+
+    if (duplicateActivityTypeID) {
+      // Find the description of the duplicate activity by looking it up in licensedActivities
+      const duplicateActivityDesc = this.licensedActivities.find(
+        licensedActivity => licensedActivity.ActivityTypeID === duplicateActivityTypeID
+      )?.ActivityTypeDesc;
+
+      this.activityDescription = `"${duplicateActivityDesc}"`;
+
+      // Set the error message with the activity description
+      this.loadErrorMessages('ActivityTypeIDCORRECTION', constants.FirmActivitiesEnum.CORRECT_PERMITTEDACTIVITIES);
+      this.loadErrorMessages('DuplicateActivity', constants.FirmActivitiesEnum.ACTIVITY_ALREADY_SELECTED);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['DuplicateActivity'];
+      delete this.errorMessages['ActivityTypeIDCORRECTION'];
+    }
+
+
   }
 
   saveLicenseScope() {
@@ -752,14 +784,15 @@ export class ScopeComponent implements OnInit {
       return; // Prevent further action if validation fails
     }
 
-    this.ActivityLicensed.forEach(activityLic => {
+    const activities = this.isCreateModeLicense ? this.createLicenseScopeObj.permittedActivities : this.ActivityLicensed;
+
+    activities.forEach(activityLic => {
       const selectedActivity = this.licensedActivities.find(activity => activity.ActivityTypeID === +activityLic.ActivityTypeID);
       if (selectedActivity) {
         activityLic.ActivityTypeDesc = selectedActivity.ActivityTypeDesc;
       }
     });
 
-    this.existingActivities = this.ActivityLicensed;
 
     if (!(this.firmService.isNullOrEmpty(this.ActivityLicensed[0].ScopeEffectiveDate)) && this.currentDateOnly > this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeEffectiveDate) || this.ActivityLicensed[0].ScopeRevNum === 1) {
       this.isLoading = false;
@@ -778,7 +811,6 @@ export class ScopeComponent implements OnInit {
   executeSaveLicense() {
     const updatedLicenseScope = this.prepareLicenseScopeObject(this.userId);
     this.saveLicenseScopeDetails(updatedLicenseScope, this.userId);
-    this.firmDetailsService.showSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
   }
 
   // showFirmScopeLicSaveSuccessAlert(messageKey: number) {
@@ -798,36 +830,41 @@ export class ScopeComponent implements OnInit {
   // }
 
   prepareLicenseScopeObject(userId: number) {
+    const isCreateMode = this.isCreateModeLicense;
+    const activities = isCreateMode ? this.createLicenseScopeObj.permittedActivities : this.ActivityLicensed;
+
     return {
       objFirmScope: {
-        firmScopeID: this.ActivityLicensed[0].FirmScopeID,
-        scopeRevNum: this.ActivityLicensed[0].ScopeRevNum,
-        firmID: this.ActivityLicensed[0].FirmID,
+        firmScopeID: isCreateMode ? null : this.ActivityLicensed[0]?.FirmScopeID,
+        scopeRevNum: isCreateMode ? null : this.ActivityLicensed[0]?.ScopeRevNum,
+        firmID: this.firmId,
         objectID: 524,
-        createdBy: userId, //recheck
-        docReferenceID: this.ActivityLicensed[0].docReferenceID ?? null,
-        firmApplTypeID: 2, // licensed
+        createdBy: userId,
+        docReferenceID: isCreateMode ? null : this.ActivityLicensed[0]?.docReferenceID ?? null,
+        firmApplTypeID: 2,
         docIDs: this.selectedDocId == null ? null : this.selectedDocId.toString(),
-        generalConditions: this.ActivityLicensed[0].GeneralConditions,
-        effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeEffectiveDate),
-        scopeCertificateLink: this.ActivityLicensed[0].ScopeCertificateLink,
-        applicationDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeAppliedDate),
-        licensedOrAuthorisedDate: this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate),
+        generalConditions: isCreateMode ? this.createLicenseScopeObj.GeneralConditions : this.ActivityLicensed[0]?.GeneralConditions,
+        effectiveDate: isCreateMode ? null : this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0]?.ScopeEffectiveDate),
+        scopeCertificateLink: isCreateMode ? this.createLicenseScopeObj.LinkToScope : this.ActivityLicensed[0]?.ScopeCertificateLink,
+        applicationDate: isCreateMode ? this.dateUtilService.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate) : this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0]?.ScopeAppliedDate),
+        licensedOrAuthorisedDate: isCreateMode ? null : this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0]?.ScopeLicensedDate),
       },
-      lstFirmActivities: this.existingActivities.map(activityLic => ({
-        createdBy: userId, //recheck
-        firmScopeTypeID: activityLic.FirmScopeTypeID,
+      lstFirmActivities: activities.map(activityLic => ({
+        createdBy: userId,
+        firmScopeTypeID: isCreateMode ? 1 : activityLic.FirmScopeTypeID,
         activityTypeID: Number(activityLic.ActivityTypeID),
-        effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(activityLic.ScopeEffectiveDate),
-        firmActivityConditions: activityLic.Column1,
+        effectiveDate: isCreateMode ? null : this.dateUtilService.convertDateToYYYYMMDD(activityLic.ScopeEffectiveDate),
+        firmActivityConditions: activityLic.Column1 ?? '',
         productTypeID: null,
-        appliedDate: this.dateUtilService.convertDateToYYYYMMDD(activityLic.ScopeAppliedDate),
-        withDrawnDate: this.dateUtilService.convertDateToYYYYMMDD(activityLic.ScopeEffectiveDate),
+        appliedDate: isCreateMode ? this.dateUtilService.convertDateToYYYYMMDD(this.firmDetails.FirmLicApplDate) : this.dateUtilService.convertDateToYYYYMMDD(activityLic.ScopeAppliedDate),
+        withDrawnDate: isCreateMode ? null : this.dateUtilService.convertDateToYYYYMMDD(activityLic.ScopeEffectiveDate),
         objectProductActivity: null,
-        activityDetails: activityLic.FirmActivityDetails
+        activityDetails: activityLic.FirmActivityDetails ?? ''
       }))
     };
   }
+
+
 
   saveLicenseScopeDetails(updatedLicenseScope: any, userId: number) {
     this.isLoading = true;
@@ -836,11 +873,22 @@ export class ScopeComponent implements OnInit {
     this.activityService.editLicenseScope(updatedLicenseScope).subscribe(
       response => {
         console.log('License scope updated successfully:', response);
-        this.loadActivitiesLicensed(); // Reload license scope details
-        this.isEditModeLicense = false; // Toggle edit mode off
-        this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
-        this.disableApplicationDate = true;
-        this.isLoading = false;
+
+        // Reload license scope details and then apply security once it's loaded
+        this.loadActivitiesLicensed().then(() => {
+          this.isEditModeLicense = false; // Toggle edit mode off
+          this.isCreateModeLicense = false; // Ensure create mode is off
+          this.applySecurityOnPage(this.Page.Scope, false); // Apply security in view mode
+
+          this.disableApplicationDate = true;
+          this.isLoading = false;
+
+          // Show success alert after everything is complete
+          this.firmDetailsService.showSaveSuccessAlert(constants.FirmActivitiesEnum.ACTIVITIES_SAVED_SUCCESSFULLY);
+        }).catch(error => {
+          console.error('Error loading license scope:', error);
+          this.isLoading = false;
+        });
       },
       error => {
         console.error('Error updating license scope:', error);
@@ -848,6 +896,7 @@ export class ScopeComponent implements OnInit {
       }
     );
   }
+
 
   saveVaryLicenseScope(): void {
     this.logForm.errorMessages(constants.FirmActivitiesEnum.SCOPECHANGED_SAVEORREVISE).subscribe((response) => {
@@ -987,6 +1036,7 @@ export class ScopeComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isEditModeLicense = false;
+        this.isCreateModeLicense = false;
         this.disableApplicationDate = true;
         this.applySecurityOnPage(this.Page.Scope, this.isEditModeLicense);
         this.errorMessages = {};
@@ -1825,8 +1875,10 @@ export class ScopeComponent implements OnInit {
     this.lastLicRevisionNumber = Math.max(...this.LicPrevRevNumbers.map(r => r.ScopeRevNum));
   }
 
-
   addNewActivity() {
+    // Check if we are in edit mode and ActivityLicensed has at least one item
+    const baseActivity = this.ActivityLicensed[0] || {};
+
     this.newActivity = {
       ActivityTypeID: 0,
       ActivityDisplayOrder: 0,
@@ -1839,28 +1891,35 @@ export class ScopeComponent implements OnInit {
       Column1: '',
       WithdrawnDate: 0,
 
-      ApliedDate: this.ActivityLicensed[0].ApliedDate,
-      AuthorisationCategoryTypeDesc: this.ActivityLicensed[0].AuthorisationCategoryTypeDesc,
-      AuthorisationCategoryTypeID: this.ActivityLicensed[0].AuthorisationCategoryTypeID,
-      CreatedDate: this.ActivityLicensed[0].CreatedDate,
-      DocID: this.ActivityLicensed[0].DocID,
-      EffectiveDate: this.ActivityLicensed[0].EffectiveDate,
-      FileLoc: this.ActivityLicensed[0].FileLoc,
-      FirmID: this.ActivityLicensed[0].FirmID,
-      FirmScopeID: this.ActivityLicensed[0].FirmScopeID,
-      GeneralConditions: this.ActivityLicensed[0].GeneralConditions,
-      LastModifiedDate: this.ActivityLicensed[0].LastModifiedDate,
-      ModifiedBy: this.ActivityLicensed[0].ModifiedBy,
-      ScopeAppliedDate: this.ActivityLicensed[0].ScopeAppliedDate,
-      ScopeCertificateLink: this.ActivityLicensed[0].ScopeCertificateLink,
-      ScopeCreatedByName: this.ActivityLicensed[0].ScopeCreatedByName,
-      ScopeCreatedDate: this.ActivityLicensed[0].ScopeCreatedDate,
-      ScopeEffectiveDate: this.ActivityLicensed[0].ScopeEffectiveDate,
-      ScopeLicensedDate: this.ActivityLicensed[0].ScopeLicensedDate,
-      ScopeRevNum: this.ActivityLicensed[0].ScopeRevNum,
+      // Populate fields from baseActivity if available, otherwise leave them empty or defaulted
+      ApliedDate: baseActivity.ApliedDate || '',
+      AuthorisationCategoryTypeDesc: baseActivity.AuthorisationCategoryTypeDesc || '',
+      AuthorisationCategoryTypeID: baseActivity.AuthorisationCategoryTypeID || 0,
+      CreatedDate: baseActivity.CreatedDate || '',
+      DocID: baseActivity.DocID || null,
+      EffectiveDate: baseActivity.EffectiveDate || '',
+      FileLoc: baseActivity.FileLoc || '',
+      FirmID: baseActivity.FirmID || null,
+      FirmScopeID: baseActivity.FirmScopeID || null,
+      GeneralConditions: baseActivity.GeneralConditions || '',
+      LastModifiedDate: baseActivity.LastModifiedDate || '',
+      ModifiedBy: baseActivity.ModifiedBy || 0,
+      ScopeAppliedDate: baseActivity.ScopeAppliedDate || '',
+      ScopeCertificateLink: baseActivity.ScopeCertificateLink || '',
+      ScopeCreatedByName: baseActivity.ScopeCreatedByName || '',
+      ScopeCreatedDate: baseActivity.ScopeCreatedDate || '',
+      ScopeEffectiveDate: baseActivity.ScopeEffectiveDate || '',
+      ScopeLicensedDate: baseActivity.ScopeLicensedDate || '',
+      ScopeRevNum: baseActivity.ScopeRevNum || null,
     };
-    this.ActivityLicensed.unshift(this.newActivity);
+
+    if (this.isCreateModeLicense) {
+      this.createLicenseScopeObj.permittedActivities.unshift(this.newActivity);
+    } else {
+      this.ActivityLicensed.unshift(this.newActivity);
+    }
   }
+
 
   removeLicActivity(index: number) {
     Swal.fire({
@@ -1873,14 +1932,15 @@ export class ScopeComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.errorMessages = {};
-        const activity = this.ActivityLicensed[index];
+        const activityList = this.isCreateModeLicense ? this.createLicenseScopeObj.permittedActivities : this.ActivityLicensed;
+        const activity = activityList[index];
 
-        // Check for existing activity (with FirmActivityID)
-        if (activity.FirmActivityID) {
+        // Check for existing activity (with FirmActivityID) in edit mode
+        if (activity.FirmActivityID && !this.isCreateModeLicense) {
           if (this.dateUtilService.convertDateToYYYYMMDD(this.ActivityLicensed[0].ScopeLicensedDate) < this.currentDate) {
             this.showError(constants.FirmActivitiesEnum.LICENSEDDATEPASSED_CANNOTREMOVE);
-          } else if (this.ActivityLicensed.length > 1) {
-            this.ActivityLicensed.splice(index, 1);
+          } else if (activityList.length > 1) {
+            activityList.splice(index, 1);
           } else {
             Swal.fire({
               text: 'There has to be at least one permitted activity!',
@@ -1889,20 +1949,21 @@ export class ScopeComponent implements OnInit {
             });
           }
         } else {
-          // Check for new activity at index 0
-          if (index === 0 && this.ActivityLicensed.length === 1) {
+          // Handle deletion for create mode or newly added activity
+          if (index === 0 && activityList.length === 1) {
             Swal.fire({
               text: 'There has to be at least one permitted activity!',
               icon: 'error',
               confirmButtonText: 'Ok',
             });
           } else {
-            this.ActivityLicensed.splice(index, 1);
+            activityList.splice(index, 1);
           }
         }
       }
     });
   }
+
 
   populateAuthorisationCategoryTypes() {
     this.securityService.getObjectTypeTable(constants.authorisationCategoryTypes).subscribe(data => {
@@ -2471,6 +2532,78 @@ export class ScopeComponent implements OnInit {
       console.warn('No document is currently selected.');
     }
   }
+
+  // On Creation
+
+  // create license
+
+  createLicenseScopeObj = {
+    LinkToScope: '',
+    FirmLicApplDate: null,
+    permittedActivities: [] as any[],
+    GeneralConditions: '',
+  }
+
+  initializeCreateModeActivities() {
+    this.createLicenseScopeObj.permittedActivities = [];
+  }
+
+  createLicenseScope() {
+    // Set create mode to true
+    this.isCreateModeLicense = true;
+    this.addNewActivity();
+    // Set the operation type to Create
+    const currentOpType = ObjectOpType.Create;
+
+    // Apply page security based on create mode
+    this.applySecurityOnPage(this.Page.Scope, true); // Pass true to indicate a writable mode (edit or create)
+
+    // Hide other buttons and show the Save and Cancel buttons
+    this.hideEditBtn = true;
+    this.hideDeleteBtn = true;
+    this.hideReviseBtn = true;
+    this.hideCreateBtn = true; // Hide create button once in create mode
+    this.hideSaveBtn = false;
+    this.hideCancelBtn = false;
+  }
+
+  get scopeAppliedDate() {
+    let formattedFirmLicApplDate = this.dateUtilService.formatDateToCustomFormat(this.firmDetails?.FirmLicApplDate);
+    return this.isCreateModeLicense ? formattedFirmLicApplDate : this.ActivityLicensed[0]?.ScopeAppliedDate;
+  }
+
+  set scopeAppliedDate(value: string) {
+    if (this.isCreateModeLicense) {
+      this.firmDetails.FirmLicApplDate = value;
+    } else {
+      this.ActivityLicensed[0].ScopeAppliedDate = value;
+    }
+  }
+
+  get linkToScope() {
+    return this.isCreateModeLicense ? this.createLicenseScopeObj.LinkToScope : this.ActivityLicensed[0]?.ScopeCertificateLink;
+  }
+
+  set linkToScope(value: string) {
+    if (this.isCreateModeLicense) {
+      this.createLicenseScopeObj.LinkToScope = value;
+    } else {
+      this.ActivityLicensed[0].ScopeCertificateLink = value;
+    }
+  }
+
+  get permittedActivitiesList() {
+    return this.isCreateModeLicense ? this.createLicenseScopeObj.permittedActivities : this.ActivityLicensed;
+  }
+
+  // create authorised
+  createAuthorisedScopeObj = {
+    
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
 
   loadErrorMessages(fieldName: string, msgKey: number, activity?: any, customMessage?: string) {
     this.firmDetailsService.getErrorMessages(fieldName, msgKey, activity, customMessage).subscribe(

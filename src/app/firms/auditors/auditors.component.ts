@@ -505,6 +505,7 @@ export class AuditorsComponent {
     }).then((result) => {
       if (result.isConfirmed) {
         this.deleteAuditor(); // Call delete logic if OK is clicked
+        this.loadAuditors();
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         // Do something if Cancel is clicked, if needed
         console.log('Cancelled deletion');
@@ -581,14 +582,16 @@ export class AuditorsComponent {
     if (this.showInactiveAuditors) {
       return this.FIRMAuditors;
     } else {
-      // Ensure AssnDateTo is converted to a Date object before comparison
       return this.FIRMAuditors.filter(auditor => {
-        const assnDateTo = new Date(auditor.AssnDateTo); // Convert string to Date
-        const currentDate = new Date(this.currentDate); // Ensure current date is a Date object
-        return assnDateTo.getTime() >= currentDate.getTime(); // Compare dates
+        const assnDateTo = auditor.AssnDateTo ? new Date(auditor.AssnDateTo) : null;
+        const currentDate = new Date(this.currentDate);
+  
+        // Include active records if AssnDateTo is null or if it is in the future
+        return !assnDateTo || assnDateTo.getTime() >= currentDate.getTime();
       });
     }
   }
+  
   onInactiveAuditorsToggle(event: Event) {
     this.showInactiveAuditors = (event.target as HTMLInputElement).checked;
   }

@@ -310,14 +310,15 @@ input[type="radio"] {
     cursor: pointer;
 }
 
-.justify-content-end{
-    justify-content: flex-end;;
+.justify-content-end {
+    justify-content: flex-end;
 }
 
 input[type="checkbox"] {
     width: 15px;
     height: 15px;
 }
+
 input[type="checkbox"]:checked {
     accent-color: #a51e36;
 }
@@ -339,6 +340,10 @@ input[type="checkbox"]:checked {
     display: none !important;
 }
 
+app-attachment {
+    width: 100%;
+}
+
 /* custom date picker */
 ::ng-deep .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
     font-size: 13px !important;
@@ -349,8 +354,8 @@ input[type="checkbox"]:checked {
     margin-bottom: 10px;
     color: red;
 }
-  
-  .error-border {
+
+.error-border {
     border-color: red !important;
     outline: 0;
 }

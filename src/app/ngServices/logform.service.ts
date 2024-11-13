@@ -28,4 +28,8 @@ export class LogformService {
     const url = `${this.baseUrlLogForm}get_new_file_number?firmId=${firmId}&receivedDate=${receivedDate}`
     return this.http.get<any>(url);
   }
+  getDocumentType(docCategoryTypeID: number): Observable<any> {
+    const url = `${this.baseUrlLogForm}get_document_type?docCategoryTypeID=${docCategoryTypeID}`
+    return this.http.get<any>(url);
+  }
 }

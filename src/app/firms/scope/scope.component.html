@@ -67,7 +67,8 @@
             </div>
 
             <div class="btn" *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn">
-              <button [disabled]="!getControlEnablement('imgBtnCreate')">
+              <button [disabled]="!getControlEnablement('imgBtnCreate')"
+              (click)="createLicenseScope()">
                 Create
               </button>
             </div>
@@ -98,8 +99,8 @@
           </div>
           <div style="width: 100%" class="input-field">
             <label for="linkScope"> Link To Scope </label>
-            <input *ngIf="isEditModeLicense" name="linkScope" id="linkScope" type="text"
-              [(ngModel)]="ActivityLicensed[0].ScopeCertificateLink" />
+            <input *ngIf="isEditModeLicense || isCreateModeLicense" name="linkScope" id="linkScope" type="text"
+              [(ngModel)]="linkToScope" />
             <a *ngIf="!isEditModeLicense" id="websiteLink" [href]="ActivityLicensed[0].ScopeCertificateLink"
               target="_blank" rel="noopener noreferrer">
               {{ ActivityLicensed[0]?.ScopeCertificateLink }}
@@ -124,15 +125,13 @@
                 ActivityLicensed[0]?.ScopeRevNum <= 1
               ">Application Date</label>
             <input [disabled]="disableApplicationDate" name="appDate" id="appDate" #dateInputs placeholder type="text"
-              [(ngModel)]="ActivityLicensed[0].ScopeAppliedDate"
+              [(ngModel)]="scopeAppliedDate"
               [ngClass]="{'error-border': errorMessages['ScopeAppliedDate']}" />
           </div>
-          <!-- on creation mode -->
-          <!-- <input *ngIf="isCreateModeLicense" disabled type="text" #dateInputs placeholder [(ngModel)]="firmDetails.FirmLicApplDate"> -->
           <div class="input-field">
             <label for="licenseDate"> Licensed Date </label>
             <input disabled name="licenseDate" id="licenseDate" type="text"
-              value="{{ ActivityLicensed[0]?.ScopeLicensedDate }}" />
+            [value]="isCreateModeLicense ? firmDetails?.LicensedDate : ''" />
           </div>
           <div class="input-field" *ngIf="
               (ActivityLicensed[0].ScopeRevNum !== null ||
@@ -186,7 +185,7 @@
 
         <!-- View Mode License -->
         <div class="permitted-activity-body" *ngFor="let activityLic of ActivityLicensed">
-          <ng-container *ngIf="!isEditModeLicense && activityLic.FirmScopeTypeID === 1">
+          <ng-container *ngIf="!isEditModeLicense && !isCreateModeLicense && activityLic.FirmScopeTypeID === 1">
             <p *ngIf="!isEditModeLicense">
               {{ activityLic?.ActivityTypeDesc }}
             </p>
@@ -209,32 +208,27 @@
         </div>
         <!-- Edit Mode License -->
         <div class="add-activity-container">
-          <button *ngIf="isEditModeLicense" class="add-permitted-activity" (click)="addNewActivity()">
+          <button *ngIf="isEditModeLicense || isCreateModeLicense" class="add-permitted-activity" (click)="addNewActivity()">
             Add Permitted Activity
           </button>
         </div>
 
-        <div class="permitted-activity-body" *ngFor="let activityLic of ActivityLicensed; let i = index">
-          <ng-container *ngIf="isEditModeLicense">
-            <table *ngIf="isEditModeLicense">
+        <div class="permitted-activity-body" *ngFor="let activityLic of permittedActivitiesList; let i = index">
+          <ng-container *ngIf="isEditModeLicense || isCreateModeLicense">
+            <table>
               <tr>
                 <th style="width: 70%">Activity</th>
                 <th style="width: 30%">Action</th>
                 <th></th>
               </tr>
-
               <tr>
                 <td>
                   <div class="input-field">
-                    <select name="activities" id="activities" [ngClass]="{
-                        
-                        'error-border':
-                          activityLic.ActivityTypeID == 0 &&
-                          errorMessages['ActivityTypeID']
-                      }" [(ngModel)]="activityLic.ActivityTypeID">
+                    <select name="activities" id="activities" [(ngModel)]="activityLic.ActivityTypeID"
+                    [ngClass]="{
+                      'error-border': (activityLic.ActivityTypeID == 0 && errorMessages['ActivityTypeID'])}">
                       <option value="0">Select</option>
-                      <option [value]="licensedActivity.ActivityTypeID"
-                        *ngFor="let licensedActivity of licensedActivities">
+                      <option *ngFor="let licensedActivity of licensedActivities" [value]="licensedActivity.ActivityTypeID">
                         {{ licensedActivity.ActivityTypeDesc }}
                       </option>
                     </select>
@@ -267,21 +261,26 @@
                 </p>
               </tr>
             </table>
-
-            <strong>Activity Details: </strong>
+            <!-- Additional fields for activity details -->
+            <strong>Activity Details:</strong>
             <div class="input-field fullwidth">
-              <textarea [(ngModel)]="activityLic.FirmActivityDetails">
-            {{ activityLic?.FirmActivityDetails }}
-            </textarea>
+              <textarea [(ngModel)]="activityLic.FirmActivityDetails"></textarea>
             </div>
-            <strong>Specific Conditions and Restrictions: </strong>
+            
+            <strong>Specific Conditions and Restrictions:</strong>
             <div class="input-field fullwidth">
-              <textarea [(ngModel)]="activityLic.Column1">{{
-                activityLic?.Column1
-              }}</textarea>
-            </div>
+              <textarea [(ngModel)]="activityLic.Column1"></textarea>
+            </div> 
           </ng-container>
         </div>
+        <div class="error-messages">
+          <p *ngIf="
+             errorMessages['DuplicateActivity']
+           ">
+           {{ activityDescription + " " + errorMessages['DuplicateActivity'] }}
+          </p>
+       </div>
+        
 
         <div class="permitted-activity-container2">
           <div class="scope-permitted-activity-header">
@@ -290,7 +289,7 @@
 
           <div class="permitted-activity-body">
             <div class="input-field fullwidth">
-              <textarea [disabled]="!isEditModeLicense"
+              <textarea [disabled]="!isEditModeLicense && !isCreateModeLicense"
                 [(ngModel)]="ActivityLicensed[0].GeneralConditions">{{ ActivityLicensed?.GeneralConditions }}</textarea>
             </div>
           </div>
@@ -454,7 +453,7 @@
       </div>
 
       <!--Scope of Authorization-->
-      <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['scopeOfAuthorization'] }">
+      <div *ngIf="ActivityAuth.ScopeRevNum" class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['scopeOfAuthorization'] }">
         <div class="section">
           <div *ngIf="errorMessages['uploadDocument']" class="error-messages" style="width:100%">
             <p *ngIf="errorMessages['uploadDocument']">
@@ -619,7 +618,7 @@
                 ">
                 <div *ngFor="let category of activity.categorizedProducts">
                   <!-- Display Main Category -->
-                  <h4 *ngIf="category.hasVisibleProducts">
+                  <h4>
                     {{ category.mainCategory }}
                   </h4>
 
