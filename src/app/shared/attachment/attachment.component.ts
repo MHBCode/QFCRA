@@ -26,8 +26,8 @@ export class AttachmentComponent implements OnInit {
   @Input() pageName;
   @Input() param1;
   @Input() param2;
+  @Input() selectedFile: File | null = null;
 
-  selectedFile: File | null = null;
   fileError: string = '';
   callUploadDoc: boolean = false;
   hasValidationErrors: boolean = false;
@@ -39,6 +39,7 @@ export class AttachmentComponent implements OnInit {
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   @Output() documentUploaded = new EventEmitter<any>();
+  @Output() selectedFileChange = new EventEmitter<File | null>();
 
 
   constructor(
@@ -190,17 +191,11 @@ export class AttachmentComponent implements OnInit {
     })
   }
 
-  getErrorMessages(fieldName: string, msgKey: number, activity?: any, placeholderValue?: string) {
+  getErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
     this.logForm.errorMessages(msgKey).subscribe(
       (response) => {
         let errorMessage = response.response;
-        if (placeholderValue) {
-          errorMessage = errorMessage.replace("#Date#", placeholderValue).replace("##DateFieldLabel##", placeholderValue).replace("#ApplicationDate#", placeholderValue);
-        }
         this.errorMessages[fieldName] = errorMessage;
-        if (activity) {
-          activity.errorMessages[fieldName] = errorMessage;
-        }
       },
       (error) => {
         console.error(`Failed to load error message for ${fieldName}.`, error);
@@ -243,16 +238,18 @@ export class AttachmentComponent implements OnInit {
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
-      const file = input.files[0];
-      if (file.type === 'application/pdf') {
-        this.selectedFile = file;
-        this.fileError = ''; // Clear any previous error message
-      } else {
-        this.fileError = 'Please select a valid PDF file.';
-        this.selectedFile = null;
-      }
+        const file = input.files[0];
+        if (file.type === 'application/pdf') {
+            this.selectedFile = file; // Update only if the file is valid
+            this.fileError = ''; // Clear any previous error message
+            this.selectedFileChange.emit(this.selectedFile);
+        } else {
+            this.fileError = 'Please select a valid PDF file.';
+            this.selectedFileChange.emit(null);
+        }
     }
-  }
+}
+
 
   closeSelectDocument() {
     this.callUploadDoc = false;

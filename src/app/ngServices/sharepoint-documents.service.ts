@@ -14,32 +14,28 @@ export class SharepointDocumentsService {
 
   uploadFileToSharepoint(file: File, intranetSitePath: string, filePathAfterDocLib: string, strfileName: string, strUserEmailAddress: string) {
     const formData = new FormData();
-
-    // Append the file only to FormData
     formData.append('file', file);
 
-    const url = `${this.SharepointUrl}upload_file_to_spo?intranetSitePath=${encodeURIComponent(intranetSitePath)}&filePathAfterDocLib=${encodeURIComponent(filePathAfterDocLib)}&strfileName=${encodeURIComponent(strfileName)}&strUserEmailAddress=${encodeURIComponent(strUserEmailAddress)}`;
+    const encodedIntranetSitePath = encodeURIComponent(intranetSitePath);
+    const encodedFilePathAfterDocLib = encodeURIComponent(filePathAfterDocLib);
+    const encodedStrFileName = encodeURIComponent(strfileName);
+    const encodedStrUserEmailAddress = encodeURIComponent(strUserEmailAddress);
+
+    // Construct the URL with encoded parameters
+    const url = `${this.SharepointUrl}upload_file_to_spo?intranetSitePath=${encodedIntranetSitePath}&filePathAfterDocLib=${encodedFilePathAfterDocLib}&strfileName=${encodedStrFileName}&strUserEmailAddress=${encodedStrUserEmailAddress}`;
 
     return this.http.post(url, formData, {
-      headers: new HttpHeaders({
-        
-      }),
+      headers: new HttpHeaders(),
     });
   }
 
 
+  deleteFileFromSharepoint(intranetSitePath: string, fullFilePath: string) {
+    const encodedIntranetSitePath = encodeURIComponent(intranetSitePath);
+    const encodedFullFilePath = encodeURIComponent(fullFilePath);
+    const url = `${this.SharepointUrl}delete_file?intranetSitePath=${encodedIntranetSitePath}&fullFilePath=${encodedFullFilePath}`;
 
-  // uploadFileToSharepoint(file: File, intranetSitePath: string, filePathAfterDocLib: string, strfileName: string, strUserEmailAddress: string): Observable<any> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.delete(url);
+  }
 
-  //   // Create the payload with all necessary parameters
-  //   const payload = {
-  //     file,
-  //     intranetSitePath,
-  //     filePathAfterDocLib,
-  //     strfileName,
-  //     strUserEmailAddress
-  //   };
-  //   return this.http.post<any>(`${this.SharepointUrl}upload_file_to_spo`, payload, { headers });
-  // }
 }
