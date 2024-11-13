@@ -14,6 +14,8 @@ export class AdminFeeComponent {
   isLoading: boolean = false;
   firmId: number = 0;
   firmDetails:any;
+  pageSize: number = 10; // Define pageSize here
+  paginatedItems: any[] = []; 
 
   constructor(
     private router: Router,
@@ -51,6 +53,7 @@ export class AdminFeeComponent {
       data => {
         this.FirmAdminFees = data.response;
         this.isLoading = false;
+        this.applySearchAndPagination(); // Initialize pagination
       },
       error => {
         console.error('Error fetching firm Admin Fees', error);
@@ -58,4 +61,13 @@ export class AdminFeeComponent {
       }
     );
   }
+
+  applySearchAndPagination(): void {
+    this.paginatedItems = this.FirmAdminFees.slice(0, this.pageSize); // First page
+  }
+
+  updatePaginatedItems(paginatedItems: any[]): void {
+    this.paginatedItems = paginatedItems; // Update current page items
+  }
+
 }

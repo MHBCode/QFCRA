@@ -36,7 +36,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let notice of filteredNotices">
+                    <tr *ngFor="let notice of paginatedItems">
                         <td>{{ notice?.NoticeTypeDesc }}</td>
                         <td>{{ notice?.NoticeTemplateName }}</td>
                         <td>{{ notice?.InternalReferenceNumber }}</td>
@@ -54,16 +54,7 @@
                 <tfoot>
                     <tr>
                       <td  [attr.colspan]="12">
-                        <div class="pagination">
-                          <button (click)="previousPage()" [disabled]="currentPage === 1">
-                            <span>&lt;</span>
-                          </button>
-                          <span>Page {{ currentPage }} of {{ totalPages }}</span>
-                          <button (click)="nextPage()" [disabled]="currentPage === totalPages">
-                            <span>&gt;</span>
-                          </button>
-                          <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
-                        </div>        
+                        <app-pagination [items]="filteredNotices" [pageSize]="pageSize" (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>      
                       </td>          
                     </tr>
                   </tfoot>

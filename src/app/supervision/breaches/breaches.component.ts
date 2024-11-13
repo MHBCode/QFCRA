@@ -20,15 +20,13 @@ export class BreachesComponent {
   filteredBreaches: any;
   userId : number = 30;
   pageSize: number = 10;
-  currentPage: number = 1;
-  totalPages: number = 0;
-  totalRows: number = 0;
-  startRow: number = 0;
-  endRow: number = 0;
+  
   breachesTypes:any;
   breachCategories:any;
   breachLevels:any;
   breachAllStatus:any;
+  paginatedItems: any[] = []; 
+
 
   breachNumber: string | null = null;
   breachType: string | null = null;
@@ -80,13 +78,8 @@ export class BreachesComponent {
   loadBreaches() {
     this.breachesService.getBreachesList({ firmId: this.firmId }).subscribe(
       data => {
-        this.FIRMBreaches = data.response;
         this.filteredBreaches = data.response;
-        console.log('filteredBreaches',this.filteredBreaches);
-        this.totalRows = this.filteredBreaches.length;
-        this.totalPages = Math.ceil(this.totalRows / this.pageSize);
-        this.updatePagination();
-        this.isLoading = false;
+        this.applySearchAndPagination();
       },
       error => {
         console.error('Error fetching FIRMBreaches ', error);
@@ -96,7 +89,7 @@ export class BreachesComponent {
 
   resetFilters(): void {
     this.setDefaultFilters();
-    this.updatePagination();
+    this.loadBreaches();
   }
   // Set default filter values
   setDefaultFilters(): void {
@@ -124,6 +117,7 @@ export class BreachesComponent {
     this.breachesService.getBreachesList(params).subscribe(
       data => {
         this.filteredBreaches = data.response;
+        this.applySearchAndPagination();
         this.togglePopup();
       },
       error => {
@@ -134,36 +128,12 @@ export class BreachesComponent {
     );
   }
 
-
-  // Update pagination based on current page and page size
-  updatePagination(): void {
-    if (this.FIRMBreaches && this.FIRMBreaches.length > 0) {
-      this.totalRows = this.FIRMBreaches.length;
-      this.totalPages = Math.ceil(this.totalRows / this.pageSize);
-      const startIndex = (this.currentPage - 1) * this.pageSize;
-      const endIndex = Math.min(startIndex + this.pageSize, this.totalRows);
-      this.filteredBreaches = this.FIRMBreaches.slice(startIndex, endIndex); // Paginated data
-      this.startRow = startIndex + 1;
-      this.endRow = endIndex;
-    } else {
-      this.filteredBreaches = []; // Reset paginated firms if no data
-    }
+  applySearchAndPagination(): void {
+    this.paginatedItems = this.filteredBreaches.slice(0, this.pageSize); // First page
   }
 
-  // Navigate to the previous page
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagination();
-    }
-  }
-
-  // Navigate to the next page
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePagination();
-    }
+  updatePaginatedItems(paginatedItems: any[]): void {
+    this.paginatedItems = paginatedItems; // Update current page items
   }
 
   
