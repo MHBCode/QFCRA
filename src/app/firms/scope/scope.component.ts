@@ -2544,9 +2544,6 @@ export class ScopeComponent implements OnInit {
     GeneralConditions: '',
   }
 
-  initializeCreateModeActivities() {
-    this.createLicenseScopeObj.permittedActivities = [];
-  }
 
   createLicenseScope() {
     // Set create mode to true
@@ -2598,7 +2595,31 @@ export class ScopeComponent implements OnInit {
 
   // create authorised
   createAuthorisedScopeObj = {
-    
+    FirmLicApplDate: null,
+    regulatedActivities: [] as any[],
+    GeneralConditions: '',
+  }
+
+  initializeCreateModeRegulatedActivities() {
+    this.createAuthorisedScopeObj.regulatedActivities = [];
+  }
+
+  createAuthorisedScope() {
+    // Set create mode to true
+    this.isCreateModeAuth = true;
+    // Set the operation type to Create
+    const currentOpType = ObjectOpType.Create;
+
+    // Apply page security based on create mode
+    this.applySecurityOnPage(this.Page.Scope, true); // Pass true to indicate a writable mode (edit or create)
+
+    // Hide other buttons and show the Save and Cancel buttons
+    this.hideEditBtn = true;
+    this.hideDeleteBtn = true;
+    this.hideReviseBtn = true;
+    this.hideCreateBtn = true; // Hide create button once in create mode
+    this.hideSaveBtn = false;
+    this.hideCancelBtn = false;
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////
