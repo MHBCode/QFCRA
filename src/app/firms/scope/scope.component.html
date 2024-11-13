@@ -474,8 +474,7 @@
           [pageName]="Page.Scope"
           [param1]="ActivityAuth[0].FirmScopeID"
           [param2]="ActivityAuth[0].ScopeRevNum"
-          [isEditModeCore]="isEditModeCore"
-          [isEditModeAuth]="isEditModeAuth"
+          [isEdit]="isEditModeAuth"
           [DocSubTypeID]="fetchedScopeDocSubTypeID"
           [loadDocuments]="loadDocuments.bind(this)"
           (documentUploaded)="onDocumentUploaded($event)">

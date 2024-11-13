@@ -17,8 +17,7 @@ import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 })
 export class AttachmentComponent implements OnInit {
   @Input() loadDocuments: (documentObj?: any) => void;
-  @Input() isEditModeCore: boolean = false;
-  @Input() isEditModeAuth: boolean = false;
+  @Input() isEdit: boolean = false;
   
   @Input() documentObj: any;
   @Input() DocSubTypeID: any = {};
