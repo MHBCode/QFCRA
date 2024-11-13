@@ -1,10 +1,11 @@
-import { Component, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { NoticeService } from 'src/app/ngServices/notice.service';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import * as constants from 'src/app/app-constants';
+import { PaginationComponent } from 'src/app/shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-notices',
@@ -12,13 +13,12 @@ import * as constants from 'src/app/app-constants';
   styleUrls: ['./notices.component.scss', '../supervision.scss']
 })
 export class NoticesComponent implements OnInit {
+  @ViewChild(PaginationComponent) paginationComponent!: PaginationComponent;
   userId = 30;
-  pageSize: number = 10;
-  currentPage: number = 1;
-  totalPages: number = 0;
-  totalRows: number = 0;
-  startRow: number = 0;
-  endRow: number = 0;
+
+  pageSize: number = 10; // Define pageSize here
+  filteredNotices: any[] = []; // Full list of notices
+  paginatedItems: any[] = []; 
 
   firmDetails: any;
   FIRMNotices: any;
@@ -26,7 +26,6 @@ export class NoticesComponent implements OnInit {
   firmId: number = 0;
   showPopup: boolean = false;
   isLoading: boolean = false;
-  filteredNotices: any;
   notices: any;
   noticeTypes: any[] = [];
   noticeNames: any[] = [];
@@ -80,13 +79,6 @@ export class NoticesComponent implements OnInit {
     })
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['firms'] && changes['firms'].currentValue) {
-      this.updatePagination(); // Update pagination whenever firms input changes
-    }
-  }
-
-
   loadFirmDetails(firmId: number) {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
       data => {
@@ -103,22 +95,60 @@ export class NoticesComponent implements OnInit {
     this.showPopup = !this.showPopup;
   }
 
-  loadNotices() {
-    this.noticeService.getNoticesList(this.firmId).subscribe(
-      data => {
-        this.FIRMNotices = data.response;
-        this.filteredNotices = data.response;
-        this.totalRows = this.filteredNotices.length;
-        this.totalPages = Math.ceil(this.totalRows / this.pageSize);
-        this.updatePagination();
-        this.isLoading = false;
-      },
+  loadNotices(): void {
+    this.noticeService.getNoticesList(this.firmId).subscribe(data => {
+      this.filteredNotices = data.response; // Full data
+      this.applySearchAndPagination(); // Initialize pagination
+    });
+  }
+
+
+  searchNotices(): void {
+    const params = {
+      firmID: this.firmId,
+      NoticeID: this.NoticeID,
+      CSVFirmIDs: this.CSVFirmIDs,
+      CSVFirmTypeIDs: this.CSVFirmTypeIDs,
+      CSVFirmStatusTypeIDs: this.CSVFirmStatusTypeIDs,
+      NoticeTypeID: this.NoticeTypeID,
+      NoticeTemplateID: this.NoticeTemplateID,
+      NoticeIssuerID: this.NoticeIssuerID,
+      InternalReferenceNumber: this.InternalReferenceNumber,
+      CMSReferenceNumber: this.CMSReferenceNumber,
+      IssuersReferenceNumber: this.IssuersReferenceNumber,
+      NoticeIssuedDateFrom: this.NoticeIssuedDateFrom ? this.dateUtilService.formatDateToCustomFormat(this.NoticeIssuedDateFrom) : null,
+      NoticeIssuedDateTo: this.NoticeIssuedDateTo ? this.dateUtilService.formatDateToCustomFormat(this.NoticeIssuedDateTo) : null,
+      NoticeSentDateFrom: this.NoticeSentDateFrom ? this.dateUtilService.formatDateToCustomFormat(this.NoticeSentDateFrom) : null,
+      NoticeSentDateTo: this.NoticeSentDateTo ? this.dateUtilService.formatDateToCustomFormat(this.NoticeSentDateTo) : null,
+      ResponseDueDateFrom: this.ResponseDueDateFrom ? this.dateUtilService.formatDateToCustomFormat(this.ResponseDueDateFrom) : null,
+      ResponseDueDateTo: this.ResponseDueDateTo ? this.dateUtilService.formatDateToCustomFormat(this.ResponseDueDateTo) : null,
+      AppRptExecID: this.AppRptExecID,
+      AppRptID: this.AppRptID,
+      AppRptItemGrpID: this.AppRptItemGrpID,
+      AppRptExecName: this.AppRptExecName,
+      AppReportHeaderName: this.AppReportHeaderName
+    };
+
+    this.noticeService.getNoticesList(params).subscribe(data => {
+      this.filteredNotices = data.response; // Filtered data
+      this.applySearchAndPagination();
+      this.togglePopup();
+    },
       error => {
-        console.error('Error fetching FIRMNotices ', error);
+        this.filteredNotices = [];
+        this.togglePopup();
+        console.error('Error fetching filtered notices ', error);
       }
     );
   }
 
+  applySearchAndPagination(): void {
+    this.paginatedItems = this.filteredNotices.slice(0, this.pageSize); // First page
+  }
+
+  updatePaginatedItems(paginatedItems: any[]): void {
+    this.paginatedItems = paginatedItems; // Update current page items
+  }
 
   getNoticeTypes() {
     this.noticeService.getNoticeTypes().subscribe(
@@ -163,12 +193,11 @@ export class NoticesComponent implements OnInit {
 
   resetFilters(): void {
     this.setDefaultFilters();
-    // this.filteredNotices = [...this.FIRMNotices];
-    this.updatePagination();
+    this.loadNotices();
   }
   // Set default filter values
   setDefaultFilters(): void {
-      this.firmId = this.firmId,
+    this.firmId = this.firmId,
       this.NoticeID = null,
       this.CSVFirmIDs = null,
       this.CSVFirmTypeIDs = null,
@@ -192,74 +221,6 @@ export class NoticesComponent implements OnInit {
       this.AppReportHeaderName = null
   }
 
-  searchNotices(): void {
-    const params = {
-      firmID: this.firmId,
-      NoticeID: this.NoticeID,
-      CSVFirmIDs: this.CSVFirmIDs,
-      CSVFirmTypeIDs: this.CSVFirmTypeIDs,
-      CSVFirmStatusTypeIDs: this.CSVFirmStatusTypeIDs,
-      NoticeTypeID: this.NoticeTypeID,
-      NoticeTemplateID: this.NoticeTemplateID,
-      NoticeIssuerID: this.NoticeIssuerID,
-      InternalReferenceNumber: this.InternalReferenceNumber,
-      CMSReferenceNumber: this.CMSReferenceNumber,
-      IssuersReferenceNumber: this.IssuersReferenceNumber,
-      NoticeIssuedDateFrom: this.NoticeIssuedDateFrom ? this.dateUtilService.formatDateToCustomFormat(this.NoticeIssuedDateFrom) : null,
-      NoticeIssuedDateTo: this.NoticeIssuedDateTo ? this.dateUtilService.formatDateToCustomFormat(this.NoticeIssuedDateTo) : null,
-      NoticeSentDateFrom: this.NoticeSentDateFrom ? this.dateUtilService.formatDateToCustomFormat(this.NoticeSentDateFrom) : null,
-      NoticeSentDateTo: this.NoticeSentDateTo ? this.dateUtilService.formatDateToCustomFormat(this.NoticeSentDateTo) : null,
-      ResponseDueDateFrom: this.ResponseDueDateFrom ? this.dateUtilService.formatDateToCustomFormat(this.ResponseDueDateFrom) : null,
-      ResponseDueDateTo: this.ResponseDueDateTo ? this.dateUtilService.formatDateToCustomFormat(this.ResponseDueDateTo) : null,
-      AppRptExecID: this.AppRptExecID,
-      AppRptID: this.AppRptID,
-      AppRptItemGrpID: this.AppRptItemGrpID,
-      AppRptExecName: this.AppRptExecName,
-      AppReportHeaderName: this.AppReportHeaderName
-    };
-
-    this.noticeService.getNoticesList(params).subscribe(
-      data => {
-        this.filteredNotices = data.response;
-        this.togglePopup();
-      },
-      error => {
-        this.filteredNotices = [];
-        this.togglePopup();
-        console.error('Error fetching filtered notices ', error);
-      }
-    );
-  }
 
 
-  // Update pagination based on current page and page size
-  updatePagination(): void {
-    if (this.FIRMNotices && this.FIRMNotices.length > 0) {
-      this.totalRows = this.FIRMNotices.length;
-      this.totalPages = Math.ceil(this.totalRows / this.pageSize);
-      const startIndex = (this.currentPage - 1) * this.pageSize;
-      const endIndex = Math.min(startIndex + this.pageSize, this.totalRows);
-      this.filteredNotices = this.FIRMNotices.slice(startIndex, endIndex); // Paginated data
-      this.startRow = startIndex + 1;
-      this.endRow = endIndex;
-    } else {
-      this.filteredNotices = []; // Reset paginated firms if no data
-    }
-  }
-
-  // Navigate to the previous page
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagination();
-    }
-  }
-
-  // Navigate to the next page
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePagination();
-    }
-  }
 }

@@ -13,7 +13,9 @@ export class RmpsComponent {
   isLoading: boolean = false;
   firmId: number = 0;
   firmDetails:any;
-  
+  pageSize: number = 10; // Define pageSize here
+  paginatedItems: any[] = []; 
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -36,11 +38,20 @@ export class RmpsComponent {
       data => {
         this.FIRMRMP = data.response;
         console.log('Firm FIRM RRM details:', this.FIRMRMP);
+        this.applySearchAndPagination();
       },
       error => {
         console.error('Error fetching Firm Waivers ', error);
       }
     );
+  }
+
+  applySearchAndPagination(): void {
+    this.paginatedItems = this.FIRMRMP.slice(0, this.pageSize); // First page
+  }
+
+  updatePaginatedItems(paginatedItems: any[]): void {
+    this.paginatedItems = paginatedItems; // Update current page items
   }
 
   loadFirmDetails(firmId: number) {
