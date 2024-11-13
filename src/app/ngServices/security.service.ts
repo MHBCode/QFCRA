@@ -22,6 +22,10 @@ export class SecurityService {
     const url = `${this.baseUrlSecurity}is_firm_supervisor?FirmID=${firmId}&UserID=${userId}`
     return this.http.get<any>(url);
   }
+  isUserDirector(userId: number) {
+    const url = `${this.baseUrlSecurity}is_director_user?userID=${userId}`
+    return this.http.get<any>(url);
+  }
   getAppRoleAccess(userId: number,objectId: number,OpType: number) {
     const url = `${this.baseUrlSecurity}get_app_role_access?userId=${userId}&objectId=${objectId}&objectOpTypeId=${OpType}`;
     return this.http.get<any>(url);

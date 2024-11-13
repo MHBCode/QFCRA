@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import { LogformService } from 'src/app/ngServices/logform.service';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable, tap } from 'rxjs';
 
 @Component({
   selector: 'app-core-details',
@@ -56,11 +56,10 @@ export class CoreDetailsComponent implements OnInit {
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   Page = FrimsObject;
   userId = 30;
-  loading: boolean;
   assignedUserRoles: any = [];
-  isFirmAMLSupervisor: boolean = false;
-  isFirmSupervisor: boolean = false;
   assignedLevelUsers: any = [];
+  FirmAMLSupervisor: boolean = false;
+  ValidFirmSupervisor: boolean = false;
   FIRMRA: any[] = [];
   ASSILevel: number = 4;
   dateOfApplication: any;
@@ -125,7 +124,6 @@ export class CoreDetailsComponent implements OnInit {
       this.firmId = +params['id'];
       this.loadFirmDetails(this.firmId);
       this.loadFirmAddresses(this.firmId);
-      this.loadAssiRA();
       this.populateCountries();
       this.populateAddressTypes();
       this.populateQFCLicenseStatus();
@@ -137,6 +135,9 @@ export class CoreDetailsComponent implements OnInit {
       this.loadCurrentAppDetails();
       
       forkJoin([
+        this.isValidFirmSupervisor(),
+        this.isValidFirmAMLSupervisor(),
+        this.loadAssiRA(),
         this.firmDetailsService.loadAssignedUserRoles(this.userId),
         this.firmDetailsService.loadAssignedLevelUsers()
     ]).subscribe({
@@ -207,20 +208,17 @@ export class CoreDetailsComponent implements OnInit {
     );
   }
 
-  loadAssiRA() {
+  loadAssiRA(): Observable<any> {
     this.isLoading = true;
-    this.firmService.getFIRMUsersRAFunctions(this.firmId, this.ASSILevel).subscribe(
-      data => {
+    return this.firmService.getFIRMUsersRAFunctions(this.firmId, this.ASSILevel).pipe(
+      tap(data => {
         this.FIRMRA = data.response;
         console.log('Firm RA Functions details:', this.FIRMRA);
         this.isLoading = false;
-      },
-      error => {
-        console.error('Error get Firm RA Functionsdetails', error);
-        this.isLoading = false;
-      }
+      })
     );
   }
+  
 
   editFirm() {
     this.isLoading = true;
@@ -296,7 +294,7 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   applySecurityOnPage(objectId: FrimsObject, Mode: boolean) {
-    this.loading = true;
+    this.isLoading = true;
     const currentOpType = Mode ? ObjectOpType.Edit : ObjectOpType.View;
 
     // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
@@ -307,18 +305,18 @@ export class CoreDetailsComponent implements OnInit {
       if (this.assignedUserRoles) {
         const isMacroPrudentialGroup = this.assignedUserRoles.some(role => role.AppRoleId === 9013 || role.AppRoleId === 2005);
         if (isMacroPrudentialGroup) {
-          this.loading = false;
+          this.isLoading = false;
           return;
         }
       }
 
-      if (this.isFirmSupervisor) {
-        this.loading = false;
+      if (this.ValidFirmSupervisor) {
+        this.isLoading = false;
         return; // No need to hide the button for Firm supervisor
       } else if (this.firmDetailsService.isValidRSGMember()) {
-        this.loading = false;
+        this.isLoading = false;
         return; // No need to hide the button for RSG Member
-      } else if (this.isFirmAMLSupervisor || this.firmDetailsService.isValidAMLDirector()) {
+      } else if (this.FirmAMLSupervisor || this.firmDetailsService.isValidAMLDirector()) {
         if (firmType === 1) {
           this.hideActionButton(); // Hide button for AML Team
         }
@@ -329,7 +327,7 @@ export class CoreDetailsComponent implements OnInit {
       } else {
         this.hideActionButton(); // Default: hide the button
       }
-      this.loading = false;
+      this.isLoading = false;
     });
   }
 
@@ -337,6 +335,7 @@ export class CoreDetailsComponent implements OnInit {
   isNullOrEmpty(value) {
     return this.firmService.isNullOrEmpty(value);
   }
+  
   hideActionButton() {
     this.hideEditBtn = true;
     this.hideSaveBtn = true;
@@ -344,6 +343,18 @@ export class CoreDetailsComponent implements OnInit {
     this.hideCreateBtn = true;
     this.hideDeleteBtn = true;
     this.hideReviseBtn = true;
+  }
+
+  isValidFirmSupervisor() {
+    return this.firmDetailsService.isValidFirmSupervisor(this.firmId, this.userId).pipe(
+      tap(response => this.ValidFirmSupervisor = response)
+    );
+  }
+
+  isValidFirmAMLSupervisor() {
+    return this.firmDetailsService.isValidFirmAMLSupervisor(this.firmId, this.userId).pipe(
+      tap(response => this.FirmAMLSupervisor = response)
+    );
   }
 
   validateFirmDetails() {

@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { EntityType, FrimsObject, FunctionType } from 'src/app/app-constants';
+import { EntityType, FrimsObject, FunctionType, ObjectOpType } from 'src/app/app-constants';
 import { FirmService } from '../firm.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SecurityService } from 'src/app/ngServices/security.service';
@@ -12,6 +12,7 @@ import { ParententityService } from 'src/app/ngServices/parententity.service';
 import { AddressesService } from 'src/app/ngServices/addresses.service';
 import Swal from 'sweetalert2';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
+import { forkJoin, tap } from 'rxjs';
 
 @Component({
   selector: 'app-controllers',
@@ -27,7 +28,6 @@ export class ControllersComponent implements OnInit {
   // FunctionType = FunctionType;
   firmDetails: any;
   userId = 30;
-  loading: boolean;
   isLoading: boolean = false;
   firmId: number = 0;
   FIRMControllers: any[] = [];
@@ -38,7 +38,7 @@ export class ControllersComponent implements OnInit {
   now = new Date();
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
-  isEditable: boolean = false;
+  isEditModeController: boolean = false;
   AllRegulater: any = [];
   Address: any = {};
   allCountries: any = [];
@@ -96,6 +96,17 @@ export class ControllersComponent implements OnInit {
   objectOpTypeIdEdit = 41;
   objectOpTypeIdCreate = 40;
 
+  // Security
+  assignedUserRoles: any = [];
+  assignedLevelUsers: any = [];
+  FirmAMLSupervisor: boolean = false;
+  ValidFirmSupervisor: boolean = false;
+  hideEditBtn: boolean = false;
+  hideSaveBtn: boolean = false;
+  hideCancelBtn: boolean = false;
+  hideCreateBtn: boolean = false;
+  hideReviseBtn: boolean = false;
+  hideDeleteBtn: boolean = false;
 
 
   constructor(
@@ -132,8 +143,27 @@ export class ControllersComponent implements OnInit {
       this.getTitleCreate();
       this.getAddressTypesControllerCreate();
       this.getlegalStatusControllerCreate();
-      console.log('Initial isEditable:', this.isEditable);
+      console.log('Initial isEditModeController:', this.isEditModeController);
       console.log('Initial canAddNewAddressOnEdit:', this.canAddNewAddressOnEdit);
+      
+      // Security
+      forkJoin([
+        this.firmDetailsService.loadAssignedUserRoles(this.userId),
+        this.firmDetailsService.loadAssignedLevelUsers(),
+        this.isValidFirmSupervisor(),
+        this.isValidFirmAMLSupervisor(),
+      ]).subscribe({
+        next: ([userRoles, levelUsers]) => {
+          // Assign the results to component properties
+          this.assignedUserRoles = userRoles;
+          this.assignedLevelUsers = levelUsers;
+
+          this.applySecurityOnPage(this.Page.Controller, this.isEditModeController);
+        },
+        error: (err) => {
+          console.error('Error loading user roles or level users:', err);
+        }
+      });
     })
 
   }
@@ -143,6 +173,61 @@ export class ControllersComponent implements OnInit {
       this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
     });
     this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+  }
+
+  applySecurityOnPage(objectId: FrimsObject, Mode: boolean) {
+    this.isLoading = true;
+    const currentOpType = Mode ? ObjectOpType.Edit : ObjectOpType.ListView;
+
+    // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+      let firmType = this.firmDetails?.FirmTypeID;
+
+
+      if (this.ValidFirmSupervisor) {
+        this.isLoading = false;
+        return; // No need to hide the button for Firm supervisor
+      } else if (this.firmDetailsService.isValidRSGMember()) {
+        this.isLoading = false;
+        return; // No need to hide the button for RSG Member
+      } else if (this.FirmAMLSupervisor || this.firmDetailsService.isValidAMLDirector()) {
+        if (firmType === 1) {
+          this.hideActionButton(); // Hide button for AML Team
+        }
+      } else {
+        this.hideActionButton(); // Default: hide the button
+      }
+      this.isLoading = false;
+    });
+  }
+
+  hideActionButton() {
+    this.hideEditBtn = true;
+    this.hideSaveBtn = true;
+    this.hideCancelBtn = true;
+    this.hideCreateBtn = true;
+    this.hideDeleteBtn = true;
+    this.hideReviseBtn = true;
+  }
+
+  isValidFirmSupervisor() {
+    return this.firmDetailsService.isValidFirmSupervisor(this.firmId, this.userId).pipe(
+      tap(response => this.ValidFirmSupervisor = response)
+    );
+  }
+
+  isValidFirmAMLSupervisor() {
+    return this.firmDetailsService.isValidFirmAMLSupervisor(this.firmId, this.userId).pipe(
+      tap(response => this.FirmAMLSupervisor = response)
+    );
+  }
+
+  getControlVisibility(controlName: string): boolean {
+    return this.firmDetailsService.getControlVisibility(controlName);
+  }
+
+  getControlEnablement(controlName: string): boolean {
+    return this.firmDetailsService.getControlEnablement(controlName);
   }
 
   loadFirmDetails(firmId: number) {
@@ -386,6 +471,7 @@ export class ControllersComponent implements OnInit {
           this.isLoading = false;
           this.loadControllers();
           this.loadControllersIndividual();
+          this.applySecurityOnPage(this.Page.Controller, this.isEditModeController);
           this.firmDetailsService.showSaveSuccessAlert(constants.ControllerMessages.RECORD_INSERTED);
         },
         error => {
@@ -543,7 +629,7 @@ export class ControllersComponent implements OnInit {
           console.log("Contact save successful:", response);
           this.isLoading = false;
           this.isPopupOpen = false;
-          this.isEditable = false;
+          this.isEditModeController = false;
           this.loadControllers();
           this.loadControllersIndividual();
           this.firmDetailsService.showSaveSuccessAlert(constants.ControllerMessages.RECORD_INSERTED);
@@ -775,7 +861,8 @@ export class ControllersComponent implements OnInit {
 
 
   editController(): void {
-    this.isEditable = true;
+    this.isEditModeController = true;
+    this.applySecurityOnPage(this.Page.Controller, this.isEditModeController);
     this.initializeAddressTypes();
     if (this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
       this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
@@ -1217,6 +1304,7 @@ export class ControllersComponent implements OnInit {
   };
 
   openControllerPopup(controller: any): void {
+    this.applySecurityOnPage(this.Page.Controller, this.isEditModeController);
     this.selectedController = JSON.parse(JSON.stringify(controller)); // Deep copy of controller
     this.controllerDetails = { ...this.selectedController }; // Populate the controller details if needed
     this.isPopupOpen = true;
@@ -1292,7 +1380,7 @@ export class ControllersComponent implements OnInit {
 
   closeControllerPopup(): void {
     this.isPopupOpen = false;
-    this.isEditable = false;
+    this.isEditModeController = false;
     this.errorMessages = {}; // Clear previous error messages
     this.hasValidationErrors = false;
     this.existingControllerCorporateAddresses.push(this.defaultAddress);
@@ -1304,7 +1392,7 @@ export class ControllersComponent implements OnInit {
   }
 
   closeCreateControllerPopup(): void {
-    this.isEditable = false;
+    this.isEditModeController = false;
     this.showCreateControllerSection = false; // Close the popup
     this.errorMessages = {}; // Clear previous error messages
     this.hasValidationErrors = false;
@@ -1526,7 +1614,7 @@ export class ControllersComponent implements OnInit {
   }
 
 
-  confarmDeleteControllerDetials(): void {
+  confirmDeleteControllerDetails(): void {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you really want to delete this controller detail?',
@@ -1670,12 +1758,13 @@ export class ControllersComponent implements OnInit {
         response => {
           console.log("Save successful:", response);
           this.isLoading = false;
-          this.isEditable = false;
+          this.isEditModeController = false;
           this.isPopupOpen = false;
           this.closeControllerPopup();
           this.getPlaceOfEstablishmentName();
           this.loadControllers();
           this.loadControllersIndividual();
+          this.applySecurityOnPage(this.Page.Controller, this.isEditModeController);
           this.firmDetailsService.showSaveSuccessAlert(constants.ControllerMessages.RECORD_MODIFIED);
         },
         error => {
@@ -1791,7 +1880,7 @@ export class ControllersComponent implements OnInit {
       this.contactService.saveupdatecontactform(saveControllerPopupChangesIndividualObj).subscribe(
         response => {
           console.log("Contact save successful:", response);
-          this.isEditable = false;
+          this.isEditModeController = false;
           this.isLoading = false;
           this.isPopupOpen = false;
           this.loadControllers();
@@ -1804,6 +1893,11 @@ export class ControllersComponent implements OnInit {
         }
       );
     }
+  }
+
+  cancelController() {
+    this.isEditModeController = false;
+    this.applySecurityOnPage(this.Page.Controller,this.isEditModeController)
   }
 
 

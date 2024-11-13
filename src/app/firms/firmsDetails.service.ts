@@ -428,16 +428,18 @@ export class FirmDetailsService {
   // Security
   applyAppSecurity(userId: number, objectId: number, OpType: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.securityService.getAppRoleAccess(userId, objectId, OpType).subscribe(
-        (response) => {
-          this.controlsPermissions = response.response;
-          resolve(); // Resolve the promise after fetching data
-        },
-        (error) => {
-          console.error('Error fetching app role access: ', error);
-          reject(error); // Reject the promise if there's an error
-        }
-      );
+      setTimeout(() => { // Brief delay to let Angular apply display updates
+        this.securityService.getAppRoleAccess(userId, objectId, OpType).subscribe(
+          (response) => {
+            this.controlsPermissions = response.response;
+            resolve();
+          },
+          (error) => {
+            console.error('Error fetching app role access: ', error);
+            reject(error);
+          }
+        );
+      }, 10);
     });
   }
 
@@ -451,6 +453,12 @@ export class FirmDetailsService {
 
   isValidFirmAMLSupervisor(firmId: number, userId: number): Observable<boolean> {
     return this.securityService.isValidFirmAMLSupervisor(firmId, userId).pipe(
+      map(response => response.response)
+    );
+  }
+
+  isUserDirector(userId: number): Observable<boolean> {
+    return this.securityService.isUserDirector(userId).pipe(
       map(response => response.response)
     );
   }
@@ -484,49 +492,6 @@ export class FirmDetailsService {
     }
     return false;
   }
-
-
-  // isValidFirmSupervisor(firmId: number, userId: number): void {
-  //   this.securityService.isValidFirmSupervisor(firmId, userId).subscribe((response) => {
-  //     this.isFirmSupervisor = response.response;
-  //   });
-  // }
-
-  // IsValidRSGMember(): boolean {
-  //   if (this.assignedUserRoles) {
-  //     return this.assignedUserRoles.some(role => role.AppRoleId === 5001);
-  //   }
-  //   return false;
-  // }
-
-  // isValidFirmAMLSupervisor(firmId: number, userId: number): void {
-  //   this.securityService.isValidFirmAMLSupervisor(firmId, userId).subscribe((response) => {
-  //     this.isFirmAMLSupervisor = response.response;
-  //   });
-  // }
-
-  // IsValidAMLDirector(): boolean {
-  //   if (this.assignedUserRoles) {
-  //     return this.assignedUserRoles.some(role => role.AppRoleId === 2007);
-  //   }
-  //   return false;
-  // }
-
-  // IsValidAMLSupervisor(): boolean {
-  //   if (this.assignedUserRoles) {
-  //     return this.assignedUserRoles.some(role => role.AppRoleId === 3009);
-  //   }
-  //   return false;
-  // }
-
-  // IsAMLSupervisorAssignedToFirm(FIRMRA: any[]): boolean {
-  //   if (this.assignedLevelUsers) {
-  //     if (FIRMRA.length > 0) {
-  //       return this.assignedLevelUsers.some(levelUser => levelUser.FirmUserAssnTypeID === 7 || levelUser.FirmUserAssnTypeID === 8 || levelUser.FirmUserAssnTypeID === 9)
-  //     }
-  //   }
-  //   return false;
-  // }
 
   getControlVisibility(controlName: string): boolean {
     const control = this.controlsPermissions.find(c => c.ControlName === controlName);

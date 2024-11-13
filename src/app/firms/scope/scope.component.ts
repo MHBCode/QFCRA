@@ -8,7 +8,7 @@ import { SecurityService } from 'src/app/ngServices/security.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import * as constants from 'src/app/app-constants';
 import { ActivityService } from 'src/app/ngServices/activity.service';
-import { forkJoin, switchMap } from 'rxjs';
+import { forkJoin, switchMap, tap } from 'rxjs';
 import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 import Swal from 'sweetalert2';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
@@ -45,12 +45,11 @@ export class ScopeComponent implements OnInit {
   Page = FrimsObject;
   firmDetails: any;
   userId = 30;
-  loading: boolean;
   isLoading: boolean = false;
   assignedUserRoles: any[] = [];
-  isFirmAMLSupervisor: boolean = false;
-  isFirmSupervisor: boolean = false;
   assignedLevelUsers: any = [];
+  FirmAMLSupervisor: boolean = false;
+  ValidFirmSupervisor: boolean = false;
   hideEditBtn: boolean = false;
   hideSaveBtn: boolean = false;
   hideCancelBtn: boolean = false;
@@ -143,7 +142,9 @@ export class ScopeComponent implements OnInit {
       // Security
       forkJoin([
         this.firmDetailsService.loadAssignedUserRoles(this.userId),
-        this.firmDetailsService.loadAssignedLevelUsers()
+        this.firmDetailsService.loadAssignedLevelUsers(),
+        this.isValidFirmSupervisor(),
+        this.isValidFirmAMLSupervisor(),
       ]).subscribe({
         next: ([userRoles, levelUsers]) => {
           // Assign the results to component properties
@@ -215,7 +216,7 @@ export class ScopeComponent implements OnInit {
 
   applySecurityOnPage(objectId: FrimsObject, isWritableMode: boolean) {
     this.maskCommandActionsControlsScope();
-    this.loading = true;
+    this.isLoading = true;
     let currentOpType;
     if (this.tabIndex === 0) {
       currentOpType = isWritableMode ? (this.isCreateModeLicense ? ObjectOpType.Create : ObjectOpType.Edit) : ObjectOpType.View;
@@ -224,25 +225,16 @@ export class ScopeComponent implements OnInit {
     }
 
     // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
-    this.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
       let firmType = this.firmDetails.FirmTypeID;
 
-
-      if (this.assignedUserRoles) {
-        const isMacroPrudentialGroup = this.assignedUserRoles.some(role => role.AppRoleId === 9013 || role.AppRoleId === 2005);
-        if (isMacroPrudentialGroup) {
-          this.loading = false;
-          return;
-        }
-      }
-
-      if (this.isFirmSupervisor) {
-        this.loading = false;
+      if (this.ValidFirmSupervisor) {
+        this.isLoading = false;
         return; // No need to hide the button for Firm supervisor
       } else if (this.firmDetailsService.isValidRSGMember()) {
-        this.loading = false;
+        this.isLoading = false;
         return; // No need to hide the button for RSG Member
-      } else if (this.isFirmAMLSupervisor || this.firmDetailsService.isValidAMLDirector()) {
+      } else if (this.FirmAMLSupervisor || this.firmDetailsService.isValidAMLDirector()) {
         if (firmType === 1) {
           this.hideActionButton(); // Hide button for AML Team
         }
@@ -253,24 +245,11 @@ export class ScopeComponent implements OnInit {
       } else {
         this.hideActionButton(); // Default: hide the button
       }
-      this.loading = false;
+      this.isLoading = false;
     });
   }
 
-  applyAppSecurity(userId: number, objectId: number, OpType: number): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.securityService.getAppRoleAccess(userId, objectId, OpType).subscribe(
-        (response) => {
-          this.controlsPermissions = response.response;
-          resolve(); // Resolve the promise after fetching data
-        },
-        (error) => {
-          console.error('Error fetching app role access: ', error);
-          reject(error); // Reject the promise if there's an error
-        }
-      );
-    });
-  }
+  
 
   maskCommandActionsControlsScope() {
     this.hideCreateBtn = false;
@@ -322,6 +301,18 @@ export class ScopeComponent implements OnInit {
     this.hideCreateBtn = true;
     this.hideDeleteBtn = true;
     this.hideReviseBtn = true;
+  }
+
+  isValidFirmSupervisor() {
+    return this.firmDetailsService.isValidFirmSupervisor(this.firmId, this.userId).pipe(
+      tap(response => this.ValidFirmSupervisor = response)
+    );
+  }
+
+  isValidFirmAMLSupervisor() {
+    return this.firmDetailsService.isValidFirmAMLSupervisor(this.firmId, this.userId).pipe(
+      tap(response => this.FirmAMLSupervisor = response)
+    );
   }
 
   switchScopeTab(section: string) {
@@ -1815,13 +1806,11 @@ export class ScopeComponent implements OnInit {
   }
 
   getControlVisibility(controlName: string): boolean {
-    const control = this.controlsPermissions.find(c => c.ControlName === controlName);
-    return control ? control.ShowProperty === 1 : false;
+    return this.firmDetailsService.getControlVisibility(controlName);
   }
 
   getControlEnablement(controlName: string): boolean {
-    const control = this.controlsPermissions.find(c => c.ControlName === controlName);
-    return control ? control.EnableProperty === 1 : false;
+    return this.firmDetailsService.getControlEnablement(controlName);
   }
 
   fetchPreviousScopeVersions(firmId: number, firmApplicationTypeId: number, scopeRevNum: number) {

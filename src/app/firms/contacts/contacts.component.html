@@ -8,8 +8,9 @@
           Contacts > <span>{{ firmDetails?.FirmName }}</span>
         </h2>
         <div class="btn">
-          <button (click)="createContact()">
-            <i class="bi bi-pen"></i>
+          <button (click)="createContact()"
+          >
+            <i class="bi bi-plus"></i>
             Create
           </button>
         </div>
@@ -106,7 +107,7 @@
           <select name="contactType" id="contactType" [(ngModel)]="Column2" (ngModelChange)="onContactChange($event)"
             [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === false ">
             <option value="select" selected>Select</option>
-            <option *ngFor="let AvilabilContact of AllAvilabilContact" [ngValue]="AvilabilContact.Column1">
+            <option *ngFor="let AvilabilContact of allAvailableContact" [ngValue]="AvilabilContact.Column1">
               {{ AvilabilContact.Column2 }}
             </option>
           </select>
@@ -968,13 +969,24 @@
         </div>
       </div>
       <div class="btn justify-content-end">
-        <button *ngIf="isEditContact" class="save-btn" (click)="saveEditContactPopup()">
+        <button class="save-btn" (click)="saveEditContactPopup()"
+        *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn"
+        [disabled]="!getControlEnablement('imgBtnSave')">
           Save
         </button>
-        <button *ngIf="!isEditContact" (click)="editContact()">
+        <button (click)="editContact()"
+        *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn"
+        [disabled]="!getControlEnablement('imgBtnEdit')">
           <i class="bi bi-pen"></i> Edit
         </button>
-        <button (click)="confirmDeleteContact()">
+
+        <button class="cancel-btn" (click)="cancelContact()"
+        *ngIf="getControlVisibility('imgBtnCancel') && !hideCancelBtn"
+        [disabled]="!getControlEnablement('imgBtnCancel')">Cancel</button>
+
+        <button (click)="confirmDeleteContact()"
+        *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn"
+        [disabled]="!getControlEnablement('imgBtnDelete')">
           <i class="bi bi-trash"></i> Delete
         </button>
       </div>
