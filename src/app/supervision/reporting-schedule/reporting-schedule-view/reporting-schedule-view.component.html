@@ -42,8 +42,14 @@
                 <div class="input-field">
                     <label for="reportType">Report Type</label>
                     <select id="reportType" [(ngModel)]="financialReportingPeriod.FirmFinYearEndTypeID">
-                        <option *ngFor="let option of reportPeriodTypes" [value]="option.RptPeriodTypeID">
-                            {{ option?.RptPeriodShortDesc }}
+                        <option value="1" selected>
+                            All
+                        </option>
+                          <option value="2" selected>
+                            Non - AML Reports
+                        </option>
+                          <option value="3" selected>
+                            AML Reports
                         </option>
                     </select>
                 </div>

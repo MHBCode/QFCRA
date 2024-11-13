@@ -6,7 +6,7 @@
             <div class="form-section-title">
                 <h2 class="edit-firm-header">
                     <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
-                    Admin Fee > <span>Al Rayyan </span>
+                    Admin Fee > <span>{{ firmDetails?.FirmName }} </span>
                 </h2>
             </div>
             <table>
@@ -23,7 +23,7 @@
                 <tbody>
                     <tr *ngFor="let fee of FirmAdminFees">
                         <td>{{ fee?.RptName }}</td>
-                        <td>{{ fee?.FirmRptDueDate }}</td>
+                        <td>{{ dateUtilService.formatDateToCustomFormat(fee?.FirmRptDueDate) }}</td>
                         <td>{{ fee?.FirstMateriallyCompleteRptReceivedDate }}</td>
                         <td>{{ fee?.CalculatedAmountCurrencyTypeDesc }} {{ fee?.CalculatedAmount }}</td>
                         <td>{{ fee?.ImposedAmountCurrencyTypeDesc }} {{ fee?.ImposedAmount }}</td>

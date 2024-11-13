@@ -39,10 +39,19 @@
     </thead>
     <tbody>
       <tr>
-        <td></td>
-        <td></td>
-        <td>
-          <button style="display: none" class="delete-file">
+        <td style="text-align: left">
+          <span [style.color]="tableDoc?.DocSubTypeDesc ? 'inherit' : 'red'">
+            {{ tableDoc?.DocSubTypeDesc || 'No documents attached' }}
+          </span>
+        </td>
+        <td style="text-align: left">
+          <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{
+              tableDoc?.FileLoc
+            }}" target="_blank">{{ tableDoc?.FileName }}</a>
+        </td>
+        <td *ngIf="isEditModeAuth" style="text-align: center">
+          <button class="delete-action" *ngIf="tableDoc?.DocSubTypeDesc"
+            (click)="showAlertDeleteFile()">
             Delete
           </button>
         </td>

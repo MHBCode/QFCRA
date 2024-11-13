@@ -91,3 +91,145 @@
 .input-field a {
     overflow-wrap: anywhere;
 }
+
+.button-style{
+    background-color: #a51e36;
+    color: #ffffff;
+    border: none;
+    padding: 5px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, padding 0.3s ease, min-width 0.3s ease;
+    min-width: 2.5rem;
+    position: relative;
+}
+
+.button-style .button-text{
+    display: none;
+    transition: opacity 0.3s ease;
+}
+
+.button-style:hover .button-text{
+    display: inline;
+    margin-left: 5px;
+}
+
+.button-style:hover i {
+    transform: scale(1);
+}
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.popup-container {
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 15px;
+    width: 60%;
+    max-width: 800px;
+    padding: 20px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease-in-out;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.close-button {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.close-icon {
+    font-size: 26px;
+    cursor: pointer;
+    color: #a51e36;
+}
+
+.popup-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.popup-header h2 {
+    color: #a51e36;
+    font-size: 1.5em;
+    margin: 0;
+    font-weight: 600;
+}
+
+.buttons-section{
+    display: inline-flex;
+    gap: 4px;
+}
+
+
+
+.dropdown-column{
+    display: inline-flex;
+    flex-wrap: wrap;
+    column-gap: 40px;
+}
+.input-field{
+    flex: 1 1 45%;
+    display: flex;
+    flex-direction: column;
+}
+
+.search-firms-inputs {
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.select-wrapper select, .input-field input {
+    padding: 8px 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border 0.3s ease;
+    width:100%;
+}
+
+.input-search-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin: 20px 0px;
+}
+
+.search, .reset {
+    background-color: #a51e36;
+    color: #ffffff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.reset {
+    background-color: #898989;
+}

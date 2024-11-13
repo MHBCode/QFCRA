@@ -1,13 +1,22 @@
 <app-loader *ngIf="isLoading"></app-loader>
 
-  <div class="form-section">
+<div class="form-section">
     <div class="inputs-field-set">
-        <div class="section">
+        <div class="section table">
             <div class="form-section-title">
                 <h2 class="edit-firm-header">
-                    <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
-                    Notices > <span>Al Rayyan </span>
+                    Notices > <span>{{ firmDetails?.FirmName }}</span>
                 </h2>
+                <div class="buttons-section">
+                    <button (click)="togglePopup()" class="button-style">
+                        <i style="font-size: 1.2rem;" class="bi bi-funnel-fill"></i>
+                        <span class="button-text">Filter</span>
+                    </button>
+                    <button type="button" (click)="resetFilters()" class="button-style">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        <span class="button-text">Reset Filter</span>
+                    </button>
+                </div>
             </div>
             <table>
                 <thead>
@@ -27,11 +36,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let notice of FIRMNotices">
-                        <td>{{ notice?.TypeOfNotice }}</td>
-                        <td>{{ notice?.NoticeName }}</td>
+                    <tr *ngFor="let notice of filteredNotices">
+                        <td>{{ notice?.NoticeTypeDesc }}</td>
+                        <td>{{ notice?.NoticeTemplateName }}</td>
                         <td>{{ notice?.InternalReferenceNumber }}</td>
-                        <td>{{ notice?.NoticeIssuedBy }}</td>
+                        <td>{{ notice?.NoticeIssuerShortName }}</td>
                         <td>{{ notice?.NoticeIssuedDate }}</td>
                         <td>{{ notice?.IssuersReferenceNumber }}</td>
                         <td>{{ notice?.Subject }}</td>
@@ -42,7 +51,142 @@
                         <td>{{ notice?.ResponseProvidedDate }}</td>
                     </tr>
                 </tbody>
+                <tfoot>
+                    <tr>
+                      <td  [attr.colspan]="12">
+                        <div class="pagination">
+                          <button (click)="previousPage()" [disabled]="currentPage === 1">
+                            <span>&lt;</span>
+                          </button>
+                          <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                          <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+                            <span>&gt;</span>
+                          </button>
+                          <span>Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows</span>
+                        </div>        
+                      </td>          
+                    </tr>
+                  </tfoot>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Search Popup -->
+<div class="popup-overlay" *ngIf="showPopup" (click)="togglePopup()">
+    <div class="popup-container" (click)="$event.stopPropagation()">
+        <div class="popup-header">
+            <h2>Notices Search</h2>
+            <button class="close-button" (click)="togglePopup()"><i class="bi bi-x-circle close-icon"></i></button>
+        </div>
+
+        <div class="popup-content">
+            <div class="search-firms-inputs" style="display: flex; justify-content: space-between;">
+
+                <div class="dropdown-column">
+                    <!-- Notices Type (Dropdown) -->
+                    <div class="input-field">
+                        <label for="noticeType">Notice Types</label>
+                        <div class="select-wrapper">
+                            <select name="noticeType" id="noticeType" [(ngModel)]="NoticeTypeID"
+                                (change)="onNoticeTypeChange()">
+                                <option value="">Select</option>
+                                <option *ngFor="let type of noticeTypes" [value]="type.NoticeTypeID">
+                                    {{ type.NoticeTypeDesc }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-field">
+                        <label for="noticeName">Notice Names</label>
+                        <div class="select-wrapper">
+                            <select name="noticeName" id="noticeName" [(ngModel)]="NoticeTemplateID">
+                                <option value="">Select</option>
+                                <option *ngFor="let name of noticeNames" [value]="name.NoticeTemplateID">
+                                    {{ name.NoticeTemplateName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-field">
+                        <label for="noticeIssuerID">Notice Issued By</label>
+                        <div class="select-wrapper">
+                            <select name="noticeIssuerID" id="noticeIssuerID" [(ngModel)]="NoticeIssuerID">
+                                <option value="">Select</option>
+                                <option *ngFor="let issuer of noticeIssuedBy" [value]="issuer.NoticeIssuerID">{{ issuer.NoticeIssuerName }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-field">
+                        <label for="issuersReferenceNumber">Issuer's Reference Number</label>
+                        <input name="issuersReferenceNumber" id="issuersReferenceNumber" type="text"
+                            [(ngModel)]="IssuersReferenceNumber" />
+                    </div>
+
+                    <div class="input-field">
+                        <label for="internalReferenceNumber">Internal Reference Number</label>
+                        <input name="internalReferenceNumber" id="internalReferenceNumber" type="text"
+                            [(ngModel)]="InternalReferenceNumber" />
+                    </div>
+
+
+                    <div class="input-field">
+                        <label for="cmsReferenceNumber">Correspondence Reference Number</label>
+                        <input name="cmsReferenceNumber" id="cmsReferenceNumber" type="text"
+                            [(ngModel)]="CMSReferenceNumber" />
+                    </div>
+
+                    <div class="input-field">
+                        <label for="noticeIssuedDateFrom">Notice Issued Date From</label>
+                        <input name="noticeIssuedDateFrom" id="noticeIssuedDateFrom" type="date"
+                            [(ngModel)]="NoticeIssuedDateFrom" />
+                    </div>
+
+                    <div class="input-field">
+                        <label for="noticeIssuedDateTo">Notice Issued Date To</label>
+                        <input name="noticeIssuedDateTo" id="noticeIssuedDateTo" type="date"
+                            [(ngModel)]="NoticeIssuedDateTo" />
+                    </div>
+
+
+                    <div class="input-field">
+                        <label for="noticeSentDateFrom">Notice Sent Date From</label>
+                        <input name="noticeSentDateFrom" id="noticeSentDateFrom" type="date"
+                            [(ngModel)]="NoticeSentDateFrom" />
+                    </div>
+
+
+                    <div class="input-field">
+                        <label for="noticeSentDateTo">Notice Sent Date To</label>
+                        <input name="noticeSentDateTo" id="noticeSentDateTo" type="date"
+                            [(ngModel)]="NoticeSentDateTo" />
+                    </div>
+
+                    <div class="input-field">
+                        <label for="responseDueDateFrom">Response Due Date From</label>
+                        <input name="responseDueDateFrom" id="responseDueDateFrom" type="date"
+                            [(ngModel)]="ResponseDueDateFrom" />
+                    </div>
+
+                    <div class="input-field">
+                        <label for="responseDueDateTo">Response Due Date To</label>
+                        <input name="responseDueDateTo" id="responseDueDateTo" type="date"
+                            [(ngModel)]="ResponseDueDateTo" />
+                    </div>
+
+
+                </div>
+
+            </div>
+
+            <!-- Buttons for Reset and Search -->
+            <div class="input-search-buttons">
+                <button type="button" (click)="resetFilters()" class="reset">Reset</button>
+                <button type="button" (click)="searchNotices()" class="search">Search</button>
+            </div>
         </div>
     </div>
 </div>

@@ -5,9 +5,18 @@
         <div class="section">
             <div class="form-section-title">
                 <h2 class="edit-firm-header">
-                    <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
-                    Breaches> <span>Al Rayyan </span>
+                    Breaches> <span>{{ firmDetails?.FirmName }}</span>
                 </h2>
+                <div class="buttons-section">
+                    <button (click)="togglePopup()" class="button-style">
+                        <i style="font-size: 1.2rem;" class="bi bi-funnel-fill"></i>
+                        <span class="button-text">Filter</span>
+                    </button>
+                    <button type="button" (click)="resetFilters()" class="button-style">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        <span class="button-text">Reset Filter</span>
+                    </button>
+                </div>
             </div>
             <table>
                 <thead>
@@ -24,19 +33,90 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Breach Number</td>
-                        <td>Version</td>
-                        <td>Breach Type</td>
-                        <td>Breach Category</td>
-                        <td>Breach Level</td>
-                        <td>Date Of Breach</td>
-                        <td>Breach Status</td>
-                        <td>Last Updated By</td>
-                        <td>Last Updated Date</td>
+                    <tr *ngFor="let breach of filteredBreaches">
+                        <td>{{breach.Column1}}</td>
+                        <td>{{breach.BreachRevNum}}</td>
+                        <td>{{breach.BreachType}}</td>
+                        <td>{{breach.BreachCategory}}</td>
+                        <td>{{breach.BreachLevel}}</td>
+                        <td>{{breach.BreachDate}}</td>
+                        <td>{{breach.BreachStatus}}</td>
+                        <td>{{breach.LastUpdateDate}}</td>
+                        <td>{{breach.LastUpdatedBy}}</td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- Search Popup -->
+<div class="popup-overlay" *ngIf="showPopup" (click)="togglePopup()">
+    <div class="popup-container" (click)="$event.stopPropagation()">
+        <div class="popup-header">
+            <h2>Notices Search</h2>
+            <button class="close-button" (click)="togglePopup()"><i class="bi bi-x-circle close-icon"></i></button>
+        </div>
+
+        <div class="popup-content">
+            <div class="search-firms-inputs" style="display: flex; justify-content: space-between;">
+                <div class="dropdown-column">
+                    <div class="input-field">
+                        <label for="breachNumber">Breach Number</label>
+                        <input name="breachNumber" id="breachNumber" type="text"
+                            [(ngModel)]="breachNumber" />
+                    </div>  
+
+                    <div class="input-field">
+                        <label for="breachType">Breach Type</label>
+                        <div class="select-wrapper">
+                            <select name="breachType" id="breachType" [(ngModel)]="breachType">
+                                <option value="">Select</option>
+                                <option *ngFor="let type of breachesTypes" [value]="type.BreachTypeID">
+                                    {{ type.BreachTypeDesc }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-field">
+                        <label for="breachCategories">Breach Categories</label>
+                        <div class="select-wrapper">
+                            <select name="breachCategories" id="breachCategories" [(ngModel)]="breachCategory">
+                                <option value="">Select</option>
+                                <option *ngFor="let category of breachCategories" [value]="category.BreachCategoryID">{{ category.BreachCategoryDesc }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-field">
+                        <label for="breachLevel">Breach Level</label>
+                        <div class="select-wrapper">
+                            <select name="breachLevel" id="breachLevel" [(ngModel)]="breachLevel">
+                                <option value="">Select</option>
+                                <option *ngFor="let level of breachLevels" [value]="level.BreachLevelTypeID">{{ level.BreachLevelTypeDesc }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-field">
+                        <label for="breachStatus">Breach Status</label>
+                        <div class="select-wrapper">
+                            <select name="breachStatus" id="breachStatus" [(ngModel)]="breachStatus">
+                                <option value="">Select</option>
+                                <option *ngFor="let status of breachAllStatus" [value]="status.BreachStatusTypeID">{{ status.BreachStatusTypeDesc }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons for Reset and Search -->
+            <div class="input-search-buttons">
+                <button type="button" (click)="resetFilters()" class="reset">Reset</button>
+                <button type="button" (click)="searchBreaches()" class="search">Search</button>
+            </div>
         </div>
     </div>
 </div>

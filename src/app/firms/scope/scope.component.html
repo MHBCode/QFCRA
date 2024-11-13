@@ -467,7 +467,21 @@
               {{ isCollapsed['scopeOfAuthorization'] ? '▲' : '▼' }}
             </button>
           </div>
-          <div *ngIf="isEditModeAuth && !scopeOfAuthTableDoc?.DocSubTypeDesc" class="inputs-row document-container">
+
+          <app-attachment 
+          [documentObj]="documentObj"
+          [tableDoc]="scopeOfAuthTableDoc"
+          [pageName]="Page.Scope"
+          [param1]="ActivityAuth[0].FirmScopeID"
+          [param2]="ActivityAuth[0].ScopeRevNum"
+          [isEditModeCore]="isEditModeCore"
+          [isEditModeAuth]="isEditModeAuth"
+          [DocSubTypeID]="fetchedScopeDocSubTypeID"
+          [loadDocuments]="loadDocuments.bind(this)"
+          (documentUploaded)="onDocumentUploaded($event)">
+        </app-attachment>
+
+          <!-- <div *ngIf="isEditModeAuth && !scopeOfAuthTableDoc?.DocSubTypeDesc" class="inputs-row document-container">
             <div class="input-field">
               <label>Document Type</label>
               <select [(ngModel)]="fetchedScopeDocSubTypeID.DocSubTypeID">
@@ -519,7 +533,7 @@
                 </tr>
               </tbody>
             </table>
-          </div>
+          </div> -->
         </div>
       </div>
 

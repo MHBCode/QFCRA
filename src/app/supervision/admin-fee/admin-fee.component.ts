@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { FirmService } from 'src/app/ngServices/firm.service';
+import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 
 @Component({
   selector: 'app-admin-fee',
@@ -11,10 +13,14 @@ export class AdminFeeComponent {
   FirmAdminFees: any;
   isLoading: boolean = false;
   firmId: number = 0;
+  firmDetails:any;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private firmService: FirmService
+    private firmService: FirmService,
+    public dateUtilService: DateUtilService,
+    private firmDetailsService: FirmDetailsService
   ) {
 
   }
@@ -23,7 +29,20 @@ export class AdminFeeComponent {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
       this.loadAdminFees();
+      this.loadFirmDetails(this.firmId);
     })
+  }
+
+  loadFirmDetails(firmId: number) {
+    this.firmDetailsService.loadFirmDetails(firmId).subscribe(
+      data => {
+        this.firmDetails = data.firmDetails;
+      },
+      error => {
+        console.error(error);
+      }
+    );
+  
   }
 
   loadAdminFees() {

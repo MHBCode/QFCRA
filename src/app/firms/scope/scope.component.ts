@@ -110,7 +110,8 @@ export class ScopeComponent implements OnInit {
   currentLicRevisionNumber: number | null = null;
   lastLicRevisionNumber: number | null = null;
   newActivity: any = {};
-
+  newfileNum: number;
+  documentObj: any;
 
   constructor(
     private securityService: SecurityService,
@@ -534,6 +535,65 @@ export class ScopeComponent implements OnInit {
         item.DocSubTypeID === 262
       );
     });
+  }
+
+  onDocumentUploaded(uploadedDocument: any) {
+    const { fileLocation, intranetGuid } = uploadedDocument;
+    this.documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid, constants.DocType.SCOPE, this.Page.Scope, this.fetchedScopeDocSubTypeID.DocSubTypeID, this.ActivityAuth[0].FirmScopeID, this.ActivityAuth[0].ScopeRevNum);
+    this.isLoading = true;
+    this.objectWF.insertDocument(this.documentObj).subscribe(
+      response => {
+        console.log('scope of authorsation document saved successfully:', response);
+        this.loadDocuments();
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Error updating scope of auth scope:', error);
+        this.isLoading = false;
+      }
+    );
+
+  }
+
+  loadDocuments() {
+    const firstActivity = this.ActivityAuth[0];
+    this.objectWF.getDocument(this.Page.Scope, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
+    ).subscribe(
+      data => {
+        this.scopeOfAuthTableDoc = data.response;
+        console.log('Document Data:', data);
+      },
+      error => {
+        console.error('Error loading document:', error);
+        this.scopeOfAuthTableDoc = [];
+
+      }
+    );
+  }
+  prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number, objectId: number, docSubTypeID: number, objectInstanceID: number, objectInstanceRevNum: number) {
+    return {
+      userId: userId,
+      docID: null,
+      referenceNumber: null,
+      fileName: this.selectedFile.name,
+      fileNumber: this.newfileNum.toString(),
+      firmId: this.firmId,
+      otherFirm: null,
+      docTypeID: docType,
+      loggedBy: userId,
+      loggedDate: this.currentDate,
+      receivedBy: userId,
+      receivedDate: this.currentDate,
+      docRecieptMethodID: constants.LogFormRecieptMethods.InternalDocument,
+      checkPrimaryDocID: true,
+      fileLocation: fileLocation,
+      docAttributeID: null,
+      intranetGuid: intranetGuid,
+      objectID: objectId,
+      objectInstanceID: objectInstanceID,
+      objectInstanceRevNum: objectInstanceRevNum,
+      docSubType: docSubTypeID
+    };
   }
 
   loadFormReference() {

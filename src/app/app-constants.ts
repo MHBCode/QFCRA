@@ -25,7 +25,14 @@ export const ControllerType = "V_ControllerType"
 export const firmAuditorName = "V_Firm_AuditorName";
 export const firmAuditorType = "V_Firm_AuditorType";
 export const Regulaters = "V_Regulators";
+export const NoticeIssuers = "V_NoticeIssuers";
 export const docSubTypes = "DocSubTypes";
+export const breachTypes = "BreachTypes";
+export const breachCategories = "BreachCategories";
+export const breachLevelTypes = "BreachLevelTypes";
+export const breachStatusTypes = "BreachStatusTypes";
+
+
 export const BLANK_DATE = "__/___/____";
 export const DataFieldLabel = "\"##DataFieldLable##\"";
 export const ContactTypes = "v_ContactTypes";

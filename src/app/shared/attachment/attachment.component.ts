@@ -18,8 +18,14 @@ import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 export class AttachmentComponent implements OnInit {
   @Input() loadDocuments: (documentObj?: any) => void;
   @Input() isEditModeCore: boolean = false;
+  @Input() isEditModeAuth: boolean = false;
+  
   @Input() documentObj: any;
   @Input() DocSubTypeID: any = {};
+  @Input() tableDoc;
+  @Input() pageName;
+  @Input() param1;
+  @Input() param2;
 
   selectedFile: File | null = null;
   fileError: string = '';
@@ -203,6 +209,25 @@ export class AttachmentComponent implements OnInit {
   }
 
 
+
+  showAlertDeleteFile() {
+    Swal.fire({
+      text: 'Do you really want to delete this attachment?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteDocument(this.tableDoc.DocID, this.pageName, this.param1, this.param2);
+        this.loadDocuments();
+      } else if (result.isDismissed) {
+        return;
+      }
+    });
+  }
+
+
   selectDocument() {
     this.callUploadDoc = true;
     setTimeout(() => {
@@ -228,7 +253,7 @@ export class AttachmentComponent implements OnInit {
       }
     }
   }
-  
+
   closeSelectDocument() {
     this.callUploadDoc = false;
     this.selectedFile = null;

@@ -14,6 +14,7 @@ import { JournalComponent } from './journal/journal.component';
 import { BreachesComponent } from './breaches/breaches.component';
 import { SupervisionRoutingModule } from './supervision-routing.module';
 import { SharedModule } from '../shared/shared.module';
+import { AdminFeePopupComponent } from './admin-fee/admin-fee-popup/admin-fee-popup.component';
 
 
 
@@ -30,7 +31,8 @@ import { SharedModule } from '../shared/shared.module';
     RegFundsComponent,
     JournalComponent,
     ReportingScheduleViewComponent,
-    BreachesComponent
+    BreachesComponent,
+    AdminFeePopupComponent
   ],
   imports: [
     CommonModule,

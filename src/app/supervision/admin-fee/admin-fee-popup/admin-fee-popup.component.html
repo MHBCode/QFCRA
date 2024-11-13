@@ -1,0 +1,151 @@
+<!-- <div class="overlay">
+    <div class="popupcontainer Rptpopupcontainer" (click)="$event.stopPropagation()">
+        <div class="popup-title-btn-row">
+            <div class="popup-header">
+                <h3>Submission Details</h3>
+            </div>
+            <button class="close-button close-icon" (click)="onClose()">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+
+        <div class="reporting-schedule-form">
+            <div class="inputs-row">
+                <div class="input-field">
+                    <label for="reportName">Report Name</label>
+                    <input type="text" id="reportName" [(ngModel)]="reportDetails.reportName"
+                        [disabled]="!isEditable" />
+                </div>
+                <div class="input-field">
+                    <label for="qfcNumber">QFC Number</label>
+                    <input type="text" id="qfcNumber" [(ngModel)]="reportDetails.qfcNumber" [disabled]="!isEditable" />
+                </div>
+                <div class="input-field">
+                    <label for="reportDate">Report Date</label>
+                    <input type="text" id="reportDate" [(ngModel)]="reportDetails.reportDate"
+                        [disabled]="!isEditable" />
+                </div>
+                <div class="input-field">
+                    <label for="reportingPeriodEnd">Reporting Period End Date</label>
+                    <input type="text" id="reportingPeriodEnd" [(ngModel)]="reportDetails.reportingPeriodEnd"
+                        [disabled]="!isEditable" />
+                </div>
+                <div class="input-field">
+                    <label for="materiallyComplete">Materially Complete</label>
+                    <input type="text" id="materiallyComplete" [(ngModel)]="reportDetails.materiallyComplete"
+                        [disabled]="!isEditable" />
+                </div>
+                <div class="input-field">
+                    <label for="linkToReturnReview">Link to Return Review</label>
+                    <a id="linkToReturnReview" href="{{reportDetails.linkToReturnReview}}" target="_blank">Link</a>
+                </div>
+            </div>
+
+            <div class="submission-history">
+                <h3>Submission History</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Submission Date</th>
+                            <th>Received Date</th>
+                            <th>Complete</th>
+                            <th>Requested By</th>
+                            <th>Comments</th>
+                            <th>Days Overdue</th>
+                            <th>Link</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let history of submissionHistory">
+                            <td>{{ history.submissionDate }}</td>
+                            <td>{{ history.receivedDate }}</td>
+                            <td>{{ history.complete }}</td>
+                            <td>{{ history.requestedBy }}</td>
+                            <td>{{ history.comments }}</td>
+                            <td>{{ history.daysOverdue }}</td>
+                            <td><a href="{{ history.link }}">Link</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="administrative-fee">
+                <h3>Administrative Fee</h3>
+                <div class="inputs-row">
+                    <div class="input-field">
+                        <label for="imposeFee">Impose an administrative fee</label>
+                        <input type="text" id="imposeFee" [(ngModel)]="feeDetails.imposeFee" [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="rulesImposed">Rules under which fee is imposed</label>
+                        <input type="text" id="rulesImposed" [(ngModel)]="feeDetails.rulesImposed"
+                            [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="recommendation">Recommendation</label>
+                        <input type="text" id="recommendation" [(ngModel)]="feeDetails.recommendation"
+                            [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="calculatedFee">Calculated Fee</label>
+                        <input type="text" id="calculatedFee" [(ngModel)]="feeDetails.calculatedFee"
+                            [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field fullwidth">
+                        <label for="justification">Justification</label>
+                        <textarea id="justification" [(ngModel)]="feeDetails.justification"
+                            [disabled]="!isEditable"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-comments">
+                <h3>Review Comments</h3>
+                <div *ngFor="let review of reviewComments">
+                    <div class="review-entry">
+                        <div class="input-field">
+                            <label>Task</label>
+                            <input type="text" [(ngModel)]="review.task" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label>Role Assigned To</label>
+                            <input type="text" [(ngModel)]="review.roleAssignedTo" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label>User Assigned To</label>
+                            <input type="text" [(ngModel)]="review.userAssignedTo" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label>Email (CC)</label>
+                            <input type="text" [(ngModel)]="review.emailCC" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label>Assigned Date</label>
+                            <input type="text" [(ngModel)]="review.assignedDate" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label>Due Date</label>
+                            <input type="text" [(ngModel)]="review.dueDate" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label>Status</label>
+                            <input type="text" [(ngModel)]="review.status" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label>Task Initiated By</label>
+                            <input type="text" [(ngModel)]="review.taskInitiatedBy" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field">
+                            <label>Task Initiated Date</label>
+                            <input type="text" [(ngModel)]="review.taskInitiatedDate" [disabled]="!isEditable" />
+                        </div>
+                        <div class="input-field fullwidth">
+                            <label>Comments</label>
+                            <textarea [(ngModel)]="review.comments" [disabled]="!isEditable"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->

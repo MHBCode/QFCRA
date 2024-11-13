@@ -13,7 +13,7 @@ export class RiskService {
   private baseUrlRisk = environment.API_URL + '/api/Risk/' //Risk
 
   getFirmRisk(firmId: number): Observable<any> {
-    const url = `${this.baseUrlRisk}get_rmp_list?firmId=${firmId}`;  //https://localhost:7091/api/Risk/get_rmp_list?firmId=40
+    const url = `${this.baseUrlRisk}get_rmp_list?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
 
