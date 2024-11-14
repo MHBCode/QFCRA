@@ -44,6 +44,7 @@
     gap: 5px;
     min-width: auto;
     min-height: auto;
+    margin-left: 10px;
 
     &:hover {
         width: 130px;
@@ -78,10 +79,6 @@
 .form-section-title {
     padding: 0px;
     justify-content: left;
-}
-
-.subbutton-open-history-container {
-    margin-left: 10px;
 }
 
 .enhanced-checkbox {

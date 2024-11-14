@@ -8,8 +8,10 @@
           Controllers > <span>{{ firmDetails?.FirmName }}</span>
         </h2>
         <div class="btn">
-          <button (click)="createController()">
-            <i class="bi bi-pen"></i>
+          <button (click)="createController()"
+          *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn"
+          [disabled]="!getControlEnablement('imgBtnCreate')">
+            <i class="bi bi-plus"></i>
             Create
           </button>
         </div>
@@ -156,13 +158,13 @@
               selectedController.EntityTypeID === ControllerType.UBO_Corporate||
               selectedController.EntityTypeID === ControllerType.Head_Office">
           <label>Full Name of Entity</label>
-          <input [(ngModel)]="selectedController.OtherEntityName" name="fullName" [disabled]="!isEditable" required />
+          <input [(ngModel)]="selectedController.OtherEntityName" name="fullName" [disabled]="!isEditModeController" required />
         </div>
         <div class="input-field" *ngIf="
               selectedController.EntityTypeID === ControllerType.UBO_Individual ||
               selectedController.EntityTypeID === ControllerType.IndividualController">
           <label for="title"> Title </label>
-          <ng-container *ngIf="isEditable; else titleDisplay">
+          <ng-container *ngIf="isEditModeController; else titleDisplay">
             <select [(ngModel)]="selectedIndividualController.Title"
               name="title" id="title">
               <option *ngFor="let title of Titles" [value]="title.TitleDesc">
@@ -181,7 +183,7 @@
             First Name <span style="color: red">*</span>
           </label>
           <input [(ngModel)]="selectedIndividualController.FirstName" name="firstName" id="firstName" type="text"
-            [disabled]="!isEditable" />
+            [disabled]="!isEditModeController" />
         </div>
         <!---->
         <div class="input-field" *ngIf="
@@ -191,7 +193,7 @@
             Second Name <span style="color: red">*</span>
           </label>
           <input [(ngModel)]="selectedIndividualController.SecondName" name="secondName" id="secondName" type="text"
-            [disabled]="!isEditable" />
+            [disabled]="!isEditModeController" />
         </div>
         <!---->
         <div class="input-field" *ngIf="
@@ -201,7 +203,7 @@
             Family Name <span style="color: red">*</span>
           </label>
           <input [(ngModel)]="selectedIndividualController.FamilyName" name="familyName" id="familyName" type="text"
-            [disabled]="!isEditable" />
+            [disabled]="!isEditModeController" />
         </div>
 
         <div class="input-field" *ngIf="
@@ -210,7 +212,7 @@
           <label for="placeOfBirth">
             Place Of Birth
           </label>
-          <input [disabled]="!isEditable" [(ngModel)]="selectedIndividualController.PlaceOfBirth" name="placeOfBirth"
+          <input [disabled]="!isEditModeController" [(ngModel)]="selectedIndividualController.PlaceOfBirth" name="placeOfBirth"
             id="placeOfBirth" type="text" />
         </div>
 
@@ -222,7 +224,7 @@
             Date of birth <span style="color: red">*</span>
           </label>
           <input [(ngModel)]="selectedIndividualController.DateOfBirth" #dateInputs placeholder name="dateOfBirth"
-            id="dateOfBirth" type="input" [disabled]="!isEditable" />
+            id="dateOfBirth" type="input" [disabled]="!isEditModeController" />
         </div>
         <!---->
         <div class="input-field" *ngIf="
@@ -230,13 +232,13 @@
         selectedController.EntityTypeID === ControllerType.IndividualController">
           <label for="passportNum"> Passport Number </label>
           <input [(ngModel)]="selectedIndividualController.PassportNum" name="passportNum" id="passportNum" type="text"
-            [disabled]="!isEditable" />
+            [disabled]="!isEditModeController" />
         </div>
         <div class="input-field" *ngIf="
         selectedController.EntityTypeID === ControllerType.UBO_Individual ||
         selectedController.EntityTypeID === ControllerType.IndividualController">
           <label for="jurisdictionIssue"> Jurisdiction of Issue </label>
-          <select *ngIf="isEditable; else jurisdictionOfIssue" [disabled]="!isEditable" name="jurisdictionIssue"
+          <select *ngIf="isEditModeController; else jurisdictionOfIssue" [disabled]="!isEditModeController" name="jurisdictionIssue"
             id="jurisdictionIssue" [(ngModel)]="selectedIndividualController.JurisdictionID">
             <option value="0">Select</option>
             <option *ngFor="let place of allCountries" [value]="place.CountryID">
@@ -256,7 +258,7 @@
             Is Politically Exposed Person (PEP)?
             <span style="color: red">*</span>
           </label>
-          <ng-container *ngIf="isEditable else isPePOnView">
+          <ng-container *ngIf="isEditModeController else isPePOnView">
             <div class="radio-wrapper">
               <input name="isPEP" id="yes" type="radio" [value]="true"
                 [(ngModel)]="selectedIndividualController.IsPep" />
@@ -277,7 +279,7 @@
         selectedController.EntityTypeID === ControllerType.UBO_Corporate||
         selectedController.EntityTypeID === ControllerType.Head_Office" class="input-field">
           <label>Legal Status</label>
-          <ng-container *ngIf="isEditable; else legalStatusDisplay">
+          <ng-container *ngIf="isEditModeController; else legalStatusDisplay">
             <select [(ngModel)]="selectedController.LegalStatusTypeID" name="legalStatus">
               <option value="0">Select</option>
               <option *ngFor="let status of legalStatusOptionsEdit" [value]="status.LegalStatusTypeID">
@@ -295,7 +297,7 @@
         selectedController.EntityTypeID === ControllerType.UBO_Corporate||
         selectedController.EntityTypeID === ControllerType.Head_Office" class="input-field">
           <label>Registered Number</label>
-          <input [(ngModel)]="selectedController.RegisteredNum" name="registeredNum" [disabled]="!isEditable" />
+          <input [(ngModel)]="selectedController.RegisteredNum" name="registeredNum" [disabled]="!isEditModeController" />
         </div>
         <div *ngIf="
         selectedController.EntityTypeID === ControllerType.ParentEntity ||
@@ -303,7 +305,7 @@
         selectedController.EntityTypeID === ControllerType.UBO_Corporate||
         selectedController.EntityTypeID === ControllerType.Head_Office" class="input-field">
           <label>Place of Establishment</label>
-          <ng-container *ngIf="isEditable; else placeOfEstablishmentDisplay">
+          <ng-container *ngIf="isEditModeController; else placeOfEstablishmentDisplay">
             <select [(ngModel)]="selectedController.CountryOfIncorporation"
               (change)="onCountryChange(selectedController.CountryOfIncorporation,existingRegulatorList, true)"
               name="placeOfEstablishment">
@@ -320,7 +322,7 @@
 
         <div class="input-field">
           <label for="typeOfControl">Type of Control</label>
-          <ng-container *ngIf="isEditable; else typeOfControlDisplay">
+          <ng-container *ngIf="isEditModeController; else typeOfControlDisplay">
             <select required [(ngModel)]="selectedController.ControllerControlTypeID"
               (ngModelChange)="updateControlTypeDesc($event)" name="typeOfControl" id="typeOfControl">
               <option value="0">Select</option>
@@ -339,27 +341,27 @@
           <div class="input-field">
             <label>% of Holding</label>
             <input [(ngModel)]="selectedController.PctOfShares" name="percentOfHolding" type="text"
-              [disabled]="!isEditable" />
+              [disabled]="!isEditModeController" />
           </div>
         </ng-container>
         <div class="input-field">
           <label>Effective Date</label>
-          <ng-container *ngIf="isEditable; else effectiveDateInput">
+          <ng-container *ngIf="isEditModeController; else effectiveDateInput">
             <input type="text" #dateInputs placeholder [(ngModel)]="selectedController.AssnDateFrom"
               name="effectiveDate" />
           </ng-container>
           <ng-template #effectiveDateInput>
-            <input [(ngModel)]="selectedController.AssnDateFrom" name="effectiveDate" [disabled]="!isEditable" />
+            <input [(ngModel)]="selectedController.AssnDateFrom" name="effectiveDate" [disabled]="!isEditModeController" />
           </ng-template>
         </div>
         <div class="input-field">
           <label>Cessation Date</label>
-          <ng-container *ngIf="isEditable; else cessationDateInput">
+          <ng-container *ngIf="isEditModeController; else cessationDateInput">
             <input type="text" #dateInputs placeholder [(ngModel)]="selectedController.AssnDateTo"
               name="cessationDate" />
           </ng-container>
           <ng-template #cessationDateInput>
-            <input [(ngModel)]="selectedController.AssnDateTo" name="cessationDate" [disabled]="!isEditable" />
+            <input [(ngModel)]="selectedController.AssnDateTo" name="cessationDate" [disabled]="!isEditModeController" />
           </ng-template>
         </div>
         <div class="input-field" *ngIf="
@@ -368,7 +370,7 @@
         selectedController.EntityTypeID === ControllerType.UBO_Corporate||
         selectedController.EntityTypeID === ControllerType.Head_Office">
           <label>Is The Company Regulated</label>
-          <ng-container *ngIf="isEditable; else regulatedValue">
+          <ng-container *ngIf="isEditModeController; else regulatedValue">
             <div style="display: flex; align-items: center">
               <input type="radio" id="regulatedYes" [(ngModel)]="selectedController.IsCompanyRegulated"
                 name="isCompanyRegulated" [value]="true" style="margin-right: 10px; cursor: pointer" />
@@ -393,7 +395,7 @@
 
         <div class="input-field" *ngIf="selectedController.EntityTypeDesc === 'UBO – Corporate'">
           <label for="isCompanyTraded">Is the company publicly traded?</label>
-          <ng-container *ngIf="isEditable; else tradedValue">
+          <ng-container *ngIf="isEditModeController; else tradedValue">
             <div style="display: flex; align-items: center">
               <input type="radio" id="tradedYes" [(ngModel)]="selectedController.IsPublicallyTraded"
                 name="isCompanyTraded" [value]="true" style="margin-right: 10px; cursor: pointer" />
@@ -420,7 +422,7 @@
             ">
           <label for="more10UBOs">Are there any UBOs that own more than 10% of this
             entity?</label>
-          <ng-container *ngIf="isEditable; else moreUBOsValue">
+          <ng-container *ngIf="isEditModeController; else moreUBOsValue">
             <div style="display: flex; align-items: center">
               <input type="radio" id="UBOYes" [(ngModel)]="selectedController.More10UBOs" name="more10UBOs"
                 [value]="true" style="margin-right: 10px; cursor: pointer" />
@@ -446,11 +448,11 @@
         <div class="input-field additional-details fullwidth">
           <label for="additionalDetails"> Additional Details </label>
           <textarea [(ngModel)]="selectedController.AdditionalDetails" name="additionalDetails" id="additionalDetails"
-            [disabled]="!isEditable"></textarea>
+            [disabled]="!isEditModeController"></textarea>
         </div>
       </div>
       <!-- Addresses Section -->
-      <div *ngIf="filteredControllerAddresses.length > 0 || isEditable" class="addresses">
+      <div *ngIf="filteredControllerAddresses.length > 0 || isEditModeController" class="addresses">
         <div class="popup-header">
           <h3>Addresses</h3>
         </div>
@@ -465,7 +467,7 @@
         </div>
         <div class="add-address-btn-container">
           <button class="addAddressBtn" (click)="addNewAddressOnEditMode()"
-            *ngIf="isEditable && canAddNewAddressOnEdit">
+            *ngIf="isEditModeController && canAddNewAddressOnEdit">
             Add Address
           </button>
         </div>
@@ -473,7 +475,7 @@
         <div class="inputs-row">
           <ng-container *ngFor="let address of filteredControllerAddresses; let i = index">
             <ng-container *ngIf="address.Valid === true">
-              <div class="input-field" *ngIf="!isEditable">
+              <div class="input-field" *ngIf="!isEditModeController">
                 <label for="addressType" class="history-row">
                   Address Type
                   <button *ngIf="address.PreviousRecords != 0" class="subbutton-open-history"
@@ -485,11 +487,11 @@
                 <input disabled name="addressType" id="addressType" type="text"
                   value="{{ address?.AddressTypeDesc }}" />
               </div>
-              <div *ngIf="isEditable" class="del-address-container">
+              <div *ngIf="isEditModeController" class="del-address-container">
                 <button (click)="removeAddressOnEditMode(i)" class="RmvAddressBtn bi-trash"></button>
               </div>
               <!-- address type on edit mode -->
-              <div class="input-field" *ngIf="isEditable">
+              <div class="input-field" *ngIf="isEditModeController">
                 <label for="addressType" class="history-row">
                   Address Type
                   <button *ngIf="address.PreviousRecords !== 0 && address.AddressID" class="subbutton-open-history"
@@ -510,7 +512,7 @@
               </div>
 
               <div class="input-field" *ngIf="
-        isEditable &&
+        isEditModeController &&
         (!address.AddressID || address.AddressID === '')
       ">
                 <label for="sameAsType"> Same As Type </label>
@@ -526,54 +528,54 @@
               <div class="input-field">
                 <label for="addressLine1"> Address Line 1 </label>
                 <input type="text" [disabled]="
-          !isEditable ||
+          !isEditModeController ||
           (address.isFieldsDisabled && !address.AddressID)
         " name="addressLine1" id="addressLine1" [(ngModel)]="address.AddressLine1" />
               </div>
               <div class="input-field">
                 <label for="addressLine2"> Address Line 2 </label>
                 <input [disabled]="
-          !isEditable ||
+          !isEditModeController ||
           (address.isFieldsDisabled && !address.AddressID)
         " name="addressLine2" id="addressLine2" type="text" [(ngModel)]="address.AddressLine2" />
               </div>
               <div class="input-field">
                 <label for="addressLine3"> Address Line 3 </label>
                 <input [disabled]="
-          !isEditable ||
+          !isEditModeController ||
           (address.isFieldsDisabled && !address.AddressID)
         " name="addressLine3" id="addressLine3" type="text" [(ngModel)]="address.AddressLine3" />
               </div>
               <div class="input-field">
                 <label for="addressLine4"> Address Line 4 </label>
                 <input [disabled]="
-          !isEditable ||
+          !isEditModeController ||
           (address.isFieldsDisabled && !address.AddressID)
         " name="addressLine4" id="addressLine4" type="text" [(ngModel)]="address.AddressLine4" />
               </div>
               <div class="input-field">
                 <label for="city"> City </label>
                 <input [disabled]="
-          !isEditable ||
+          !isEditModeController ||
           (address.isFieldsDisabled && !address.AddressID)
         " name="city" id="city" type="text" [(ngModel)]="address.City" />
               </div>
               <div class="input-field">
                 <label for="state"> state/province </label>
                 <input [disabled]="
-          !isEditable ||
+          !isEditModeController ||
           (address.isFieldsDisabled && !address.AddressID)
         " name="state" id="state" type="text" [(ngModel)]="address.Province" />
               </div>
-              <div class="input-field" *ngIf="!isEditable">
+              <div class="input-field" *ngIf="!isEditModeController">
                 <label for="country"> Country </label>
                 <input disabled type="text" name="country" id="country" [(ngModel)]="address.CountryName" />
               </div>
               <!-- countries on edit mode-->
-              <div class="input-field" *ngIf="isEditable">
+              <div class="input-field" *ngIf="isEditModeController">
                 <label for="country"> Country </label>
                 <select [disabled]="
-          !isEditable ||
+          !isEditModeController ||
           (address.isFieldsDisabled && !address.AddressID)
         " [(ngModel)]="address.CountryID">
                   <option *ngFor="let option of allCountries" [value]="option.CountryID">
@@ -584,7 +586,7 @@
               <div class="input-field">
                 <label for="zip"> Zip/Postal Code </label>
                 <input [disabled]="
-          !isEditable ||
+          !isEditModeController ||
           (address.isFieldsDisabled && !address.AddressID)
         " name="zip" id="zip" type="text" [(ngModel)]="address.PostalCode" />
               </div>
@@ -603,7 +605,7 @@
         </div>
 
         <div>
-          <button *ngIf="isEditable" (click)="addRegulator(existingRegulatorList)" style="
+          <button *ngIf="isEditModeController" (click)="addRegulator(existingRegulatorList)" style="
             background-color: green;
             color: white;
             border: none;
@@ -620,7 +622,7 @@
 
         <div *ngFor="let regulator of existingRegulatorList; let i = index">
           <hr>
-          <div *ngIf="isEditable" style="width: 100%">
+          <div *ngIf="isEditModeController" style="width: 100%">
             <button (click)="removeRegulator(existingRegulatorList,i,true)" style="
                 float: right;
                 background-color: red;
@@ -636,7 +638,7 @@
           <div class="inputs-row">
             <div class="input-field">
               <label for="regulators">Regulator <span style="color: red">*</span></label>
-              <ng-container *ngIf="isEditable; else regulatorinput">
+              <ng-container *ngIf="isEditModeController; else regulatorinput">
                 <select [(ngModel)]="regulator.RegulatorID" name="regulators" id="regulators">
                   <option value="0">Select</option>
                   <option *ngFor="let option of AllRegulater" [value]="option.RegulatorID">
@@ -658,13 +660,25 @@
       </ng-container>
 
       <div class="btn justify-content-end">
-        <button *ngIf="!isEditable" (click)="editController()">
+        <button (click)="editController()"
+        *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn"
+        [disabled]="!getControlEnablement('imgBtnEdit')">
           <i class="bi bi-pen"></i> Edit
         </button>
-        <button *ngIf="isEditable" (click)="saveControllerPopupChanges()">
-          <i></i> Save
+
+        <button (click)="saveControllerPopupChanges()"
+        *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn"
+        [disabled]="!getControlEnablement('imgBtnSave')">
+           Save
         </button>
-        <button (click)="confarmDeleteControllerDetials()">
+
+        <button class="cancel-btn" (click)="cancelController()"
+        *ngIf="getControlVisibility('imgBtnCancel') && !hideCancelBtn"
+        [disabled]="!getControlEnablement('imgBtnCancel')">Cancel</button>
+
+        <button (click)="confirmDeleteControllerDetails()"
+        *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn"
+        [disabled]="!getControlEnablement('imgBtnDelete')">
           <i class="bi bi-trash"></i> Delete
         </button>
       </div>
