@@ -550,7 +550,8 @@ export class FirmDetailsService {
             errorMessage = errorMessage.replace("#Date#", placeholderValue)
               .replace("##DateFieldLabel##", placeholderValue)
               .replace("#ApplicationDate#", placeholderValue)
-              .replace(constants.DataFieldLabel, placeholderValue);
+              .replace(constants.DataFieldLabel, placeholderValue)
+              .replace("#1#",placeholderValue);
           }
           // Store in the errorMessages object and the provided activity
           this.errorMessages[fieldName] = errorMessage;

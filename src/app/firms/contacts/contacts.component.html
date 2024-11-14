@@ -61,6 +61,9 @@
         <p *ngIf="errorMessages['firstName']">
           {{ errorMessages['firstName'] }}
         </p>
+        <p *ngIf="errorMessages['busEmail']">
+          {{ errorMessages['busEmail'] }}
+        </p>
       </div>
       <div class="inputs-row">
         <!-- <div class="input-field">
@@ -283,13 +286,14 @@
           <!-- Additional Section for DNFBP MLRO -->
           <div class="functions-row" *ngIf="showMLROSection">
             <div class="input-field">
-              <label for="sameAsType">
-                Is the individual a Resident or Non-Resident of Qatar?
-              </label>
-              <select name="sameAsType" id="sameAsType">
-                <option value="0">Select</option>
-                <option value="1">Resident</option>
-                <option value="2">Non-Resident</option>
+              <label for="ResidentStatus">Is the individual a Resident or Non-Resident of Qatar?</label>
+              <select 
+                name="ResidentStatus" 
+                id="ResidentStatus" 
+                [(ngModel)]="createResidentStateObj.attributeValue"
+                (change)="onResidentStatusChange($event)">
+                <option value="Resident">Resident</option>
+                <option value="Non-Resident">Non-Resident</option>
               </select>
             </div>
           </div>
@@ -667,7 +671,11 @@
           <ng-container *ngIf="isEditContact; else readOnlyView">
             <div class="input-field" *ngIf="showMLROSection">
               <label for="residencyStatus">Is the individual a Resident or Non-Resident of Qatar?</label>
-              <select id="residencyStatus" [(ngModel)]="ResidencyStatusCheck.AttributeValue">
+              <select
+                id="residencyStatus"
+                [(ngModel)]="EditResidentStateObj.attributeValue"
+                (change)="onResidentStatusEditChange($event)"
+              >
                 <option value="">Select</option>
                 <option value="Resident">Resident</option>
                 <option value="Non-Resident">Non-Resident</option>
@@ -676,7 +684,7 @@
           </ng-container>
           <!-- View Mode: Display Residency Status -->
           <ng-template #readOnlyView>
-            <div class="input-field" *ngIf="ResidencyStatusCheck?.AttributeValue">
+            <div class="input-field" *ngIf="ResidencyStatusCheck.AttributeValue">
               <label>Is the individual a Resident or Non-Resident of Qatar?</label>
               <span>{{ ResidencyStatusCheck.AttributeValue }}</span>
             </div>
@@ -726,7 +734,7 @@
             <div style="width: 20%;" class="input-field">
               <input type="text" #dateInputs placeholder placeholder="Effective Date"
                 [(ngModel)]="ContactFunctionType.effectiveDate" [disabled]="!ContactFunctionType.isSelected"
-                (blur)="updateFunctionDates(i, 'endDate', ContactFunctionType.endDate)" />
+                (blur)="updateFunctionDates(i, 'effectiveDate', ContactFunctionType.effectiveDate)" />
             </div>
             <!-- End Date Input -->
             <div style="width: 20%;" class="input-field">

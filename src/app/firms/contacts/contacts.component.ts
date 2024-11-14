@@ -67,21 +67,24 @@ export class ContactsComponent {
   removedAddresses: any = [];
   hideAddresses: boolean = true;
   callAddressType: boolean = false;
-
-
+  ResidencyStatusCheck: any = { AttributeValue: '' };
+  selectedAdditionalInfo: Set<number> = new Set<number>();
+  selectedAdditionalInfoLabels: Set<string> = new Set<string>();
+  selectedInfoTypes: { [key: string]: boolean } = {};
   // used variables on edit mode
   newAddressOnEdit: any = {};
   canAddNewAddressOnEdit: boolean = true;
   disableAddressFieldsOnEdit: boolean = false;
-
-
+  showContactModal: boolean = false;
+  EditResidentStateObj: any = { attributeValue: '' };
+  saveContactResponseObj: any =[];
   // used variables on create mode
   addedAddresses: any = []; // Array will hold the newly added addresses
   addedAddressesOnCreate: any = [];
   canAddNewAddressOnCreate: boolean = true;
   isAllAddressesAddedOnCreate: boolean;
   disableAddressFieldOnCreate = true;
-
+  isMobileNumExsits: boolean = false;
   constructor(
     private securityService: SecurityService,
     private router: Router,
@@ -342,6 +345,7 @@ export class ContactsComponent {
     this.showCreateContactSection = true;
     this.addedAddresses = [];
     this.addedAddresses = [this.createDefaultAddress()];
+    this.disableAddressFieldOnCreate = false;
   }
 
   closeCreateContactPopup() {
@@ -929,11 +933,20 @@ export class ContactsComponent {
         });
     }
   }
-
+  
   private saveContactForm(data: any): void {
     this.contactService.saveupdatecontactform(data).subscribe(
-      response => {
-        console.log("Contact save successful:", response);
+      data => {
+        console.log("Contact save successful:", data);
+       
+          this.saveContactResponseObj = data.response
+          const contactAssnID = this.saveContactResponseObj.contactAssnID;
+          const contactID = this.saveContactResponseObj.contactID;
+  
+          // Call createFunctionResidentState with the extracted IDs
+          this.createFunctionResidentState(contactAssnID, contactID);
+      
+
         this.isEditContact = false;
         this.loadContacts();
         this.closeContactPopup();
@@ -977,7 +990,13 @@ export class ContactsComponent {
         this.loadErrorMessages('contactType', constants.ContactMessage.SELECTCONTACTTYPE);
         this.hasValidationErrors = true;
       }
-
+      if (
+        !this.createContactObj.busEmail || 
+        !(this.createContactObj.busEmail.includes('@') && this.createContactObj.busEmail.includes('.com'))
+      ) {
+        this.loadErrorMessages('busEmail', constants.ContactMessage.INVALIDEMAIL,"Business");
+        this.hasValidationErrors = true;
+      }
 
       if (this.hasValidationErrors) {
         resolve(); // Form is invalid
@@ -992,6 +1011,8 @@ export class ContactsComponent {
       () => {
         this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
         console.log(`Error message for ${fieldName} loaded successfully`);
+        
+
       },
       error => {
         console.error(`Error loading error message for ${fieldName}:`, error);
@@ -1560,8 +1581,40 @@ export class ContactsComponent {
       });
     }
   }
-  ResidencyStatusCheck: any = { AttributeValue: '' };
+  
 
+  // fetchResidencyStatus(): void {
+  //   const ObjectID = 523;
+  //   const ObjectInstanceID = this.selectedContact.contactID;
+  //   const ObjectInstanceRevNum = 1;
+  //   const SourceObjectID = 523;
+  //   const SourceObjectInstanceID = this.selectedContact.contactAssnID;
+  //   const SourceObjectInstanceRevNum = 1;
+  //   const ActiveFlag = true;
+
+  //   this.aiElectronicswfService.getListObjectAttribute(
+  //     ObjectID,
+  //     ObjectInstanceID,
+  //     ObjectInstanceRevNum,
+  //     ActiveFlag,
+  //     SourceObjectID,
+  //     SourceObjectInstanceID,
+  //     SourceObjectInstanceRevNum
+  //   ).subscribe(
+  //     (data) => {
+  //       if (data.isSuccess && data.response?.length > 0) {
+  //         this.ResidencyStatusCheck = data.response[0];
+  //       } else {
+  //         this.ResidencyStatusCheck = { AttributeValue: '' };
+  //       }
+  //       this.cdr.detectChanges(); // Trigger change detection
+  //     },
+  //     (error) => {
+  //       console.error("Error fetching Residency Status:", error);
+  //       this.ResidencyStatusCheck = { AttributeValue: '' };
+  //     }
+  //   );
+  // }
   fetchResidencyStatus(): void {
     const ObjectID = 523;
     const ObjectInstanceID = this.selectedContact.contactID;
@@ -1570,7 +1623,7 @@ export class ContactsComponent {
     const SourceObjectInstanceID = this.selectedContact.contactAssnID;
     const SourceObjectInstanceRevNum = 1;
     const ActiveFlag = true;
-
+  
     this.aiElectronicswfService.getListObjectAttribute(
       ObjectID,
       ObjectInstanceID,
@@ -1580,21 +1633,20 @@ export class ContactsComponent {
       SourceObjectInstanceID,
       SourceObjectInstanceRevNum
     ).subscribe(
-      (data) => {
-        if (data.isSuccess && data.response?.length > 0) {
-          this.ResidencyStatusCheck = data.response[0];
-        } else {
-          this.ResidencyStatusCheck = { AttributeValue: '' };
-        }
-        this.cdr.detectChanges(); // Trigger change detection
-      },
-      (error) => {
-        console.error("Error fetching Residency Status:", error);
-        this.ResidencyStatusCheck = { AttributeValue: '' };
-      }
-    );
+          (data) => {
+            if (data.isSuccess && data.response?.length > 0) {
+              this.ResidencyStatusCheck = data.response[0];
+            } else {
+              this.ResidencyStatusCheck = { AttributeValue: '' };
+            }
+            this.cdr.detectChanges(); // Trigger change detection
+          },
+          (error) => {
+            console.error("Error fetching Residency Status:", error);
+            this.ResidencyStatusCheck = { AttributeValue: '' };
+          }
+        );
   }
-
   convertFunctionsToArray(): void {
     if (this.selectedContact && this.selectedContact.lstContactFunctions) {
       if (!Array.isArray(this.selectedContact.lstContactFunctions)) {
@@ -1629,6 +1681,9 @@ export class ContactsComponent {
           CreatedBy: this.userId
         });
       }
+      if (contactFunction.ContactFunctionTypeID === 17) {
+        this.showMLROSection = true;
+      }
     } else {
       // Confirm before removing a function
       Swal.fire({
@@ -1641,6 +1696,9 @@ export class ContactsComponent {
           this.selectedContactFunctions = this.selectedContactFunctions.filter(
             (func) => func.ContactFunctionTypeID !== contactFunction.ContactFunctionTypeID
           );
+          if (contactFunction.ContactFunctionTypeID === 17) {
+            this.showMLROSection = false;
+          }
         } else {
           contactFunction.isSelected = true;
         }
@@ -1758,13 +1816,86 @@ export class ContactsComponent {
     this.isHistoryPopupVisible = false;
     this.isHistoryCheckboxChecked = false;
   }
+  createResidentStateObj = { 
+    attributeValue:"",
+
+  }
+ createFunctionResidentState(contactAssnID: number, contactID: number) {
+  const savecreateResidentStateObj = {
+    objectAttributeID: null,
+    objectAttributeDefID: 1,
+    firmID: this.firmId,
+    objectID: constants.FrimsObject.Contatcs,
+    objectInstanceID: contactID, // Set the contactID here
+    objectInstanceRevNum: 1,
+    attributeName: "Residency Status",
+    attributeValue: this.createResidentStateObj.attributeValue,
+    activeFlag: true,
+    createdBy: this.userId,
+    sourceObjectID: constants.FrimsObject.Contatcs,
+    sourceObjectInstanceID: contactAssnID, // Set the contactAssnID here
+    sourceObjectInstanceRevNum: 1,
+    lastModifiedBy: "30",
+    lastModifiedDate: "03/Dec/2024"
+  };
+  console.log("save create Resident State Obj ",savecreateResidentStateObj)
+  this.aiElectronicswfService.InsertUpdateObjectAttributes(savecreateResidentStateObj).subscribe(
+    data => {
+      console.log("Function Resident State Saved Successfully");
+    },
+    error => {
+      console.error("Error saving Function Resident State", error);
+    }
+  );
+}
+  onResidentStatusChange(event: Event) {
+    const selectedValue = (event.target as HTMLSelectElement).value;
+    this.createResidentStateObj.attributeValue = selectedValue;
+  }
+  
+  onResidentStatusEditChange(event: Event) {
+    const selectedValue = (event.target as HTMLSelectElement).value;
+    this.EditResidentStateObj.attributeValue = selectedValue;
+  }
+  
+
+  EditFunctionResidentState(contactAssnID: number, contactID: number) {
+    const saveCreateResidentStateObj = {
+      objectAttributeID: null,
+      objectAttributeDefID: 1,
+      firmID: this.firmId,
+      objectID: constants.FrimsObject.Contatcs,
+      objectInstanceID: contactID,
+      objectInstanceRevNum: 1,
+      attributeName: "Residency Status",
+      attributeValue: this.EditResidentStateObj.attributeValue, // Bind the selected value here
+      activeFlag: true,
+      createdBy: this.userId,
+      sourceObjectID: constants.FrimsObject.Contatcs,
+      sourceObjectInstanceID: contactAssnID,
+      sourceObjectInstanceRevNum: 1,
+      lastModifiedBy: "30",
+      lastModifiedDate: this.dateUtilService.convertDateToYYYYMMDD(new Date())
+    };
+  
+    console.log("Saving Residency Status:", saveCreateResidentStateObj);
+  
+    this.aiElectronicswfService.InsertUpdateObjectAttributes(saveCreateResidentStateObj).subscribe(
+      data => {
+        console.log("Function Resident State Saved Successfully");
+      },
+      error => {
+        console.error("Error saving Function Resident State", error);
+      }
+    );
+  }
   ////////////// end DNFBP Functions  
 
 
 
 
 
-  isMobileNumExsits: boolean = false;
+  
   getSearchMobileNumber(mobileNum: string): void {
     this.contactService.getSearchMobileNumber(mobileNum).subscribe(
       data => {
@@ -1811,7 +1942,7 @@ export class ContactsComponent {
       }
     );
   }
-  showContactModal: boolean = false;
+  
   ShowcreateContactObj = {
     firstName: '',
     familyName: '',
@@ -1853,8 +1984,6 @@ export class ContactsComponent {
 
   //////////////////////// for Additional Information Checkboxes 
 
-  selectedAdditionalInfo: Set<number> = new Set<number>();
-  selectedAdditionalInfoLabels: Set<string> = new Set<string>();
 
   updateAdditionalInfoCreate(event: Event, label: string): void {
     const target = event.target as HTMLInputElement;
@@ -1902,13 +2031,13 @@ export class ContactsComponent {
     };
     return mapping[label] || null;
   }
-  selectedInfoTypes: { [key: string]: boolean } = {};
+ 
 
   initializeEditInfoTypes(): void {
 
-    this.selectedInfoTypes = {};
-    this.selectedAdditionalInfo.clear();
-    this.selectedAdditionalInfoLabels.clear();
+    //this.selectedInfoTypes = {};
+    //this.selectedAdditionalInfo.clear();
+    //this.selectedAdditionalInfoLabels.clear();
   
     if (this.selectedContact.strContactAddnInfoTypes) {
       const selectedLabels = this.selectedContact.strContactAddnInfoTypes.split(', ').map(label => label.trim());
