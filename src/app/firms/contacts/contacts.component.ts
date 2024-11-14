@@ -135,7 +135,6 @@ export class ContactsComponent {
       this.getContactFunctionType();
       this.initializeSelectedFunctions();
       //this.initializeCheckboxes();
-      
 
       // Security
       forkJoin([
@@ -1962,16 +1961,59 @@ export class ContactsComponent {
     }
   );
 }
+
+///////////// Resident State  && Counrty
+onCountryChange(event: Event): void {
+  const selectedCountryID = Number((event.target as HTMLSelectElement).value);
+  this.addedAddresses.CountryID = selectedCountryID;
+
+  const residentStatus = this.createResidentStateObj.attributeValue;
+  if (selectedCountryID !== 0) {
+    if (residentStatus === 'Resident' && selectedCountryID !== this.getQatarCountryID()) {
+      this.firmDetailsService.showErrorAlert(6503);
+    }
+    
+    // Check if the resident status is "Non-Resident" and country is Qatar
+    if (residentStatus === 'Non-Resident' && selectedCountryID === this.getQatarCountryID()) {
+      this.firmDetailsService.showErrorAlert(6503);
+    }
+  }
+  // Check if the resident status is "Resident" and country is not Qatar
+  
+}
   onResidentStatusChange(event: Event) {
     const selectedValue = (event.target as HTMLSelectElement).value;
     this.createResidentStateObj.attributeValue = selectedValue;
+
+    if (this.addedAddresses.CountryID !== 0) {
+
+      if (selectedValue === 'Resident' && this.addedAddresses.CountryID !== this.getQatarCountryID()) {
+        this.firmDetailsService.showErrorAlert(6503);
+      }
+    
+      // Check if the resident status is "Non-Resident" and country is Qatar
+      if (selectedValue === 'Non-Resident' && this.addedAddresses.CountryID === this.getQatarCountryID()) {
+        this.firmDetailsService.showErrorAlert(6503);
+      }
+    }
+    
   }
-  
+  showAlert(message: string): void {
+    Swal.fire({
+      text: message,
+      icon: 'warning',
+      confirmButtonText: 'OK'
+    });
+  }
+  getQatarCountryID(): number {
+    const qatar = this.allCountries.find(country => country.CountryName === 'Qatar');
+    return qatar ? qatar.CountryID : 0;
+  }
   onResidentStatusEditChange(event: Event) {
     const selectedValue = (event.target as HTMLSelectElement).value;
     this.EditResidentStateObj.attributeValue = selectedValue;
   }
-  
+  //////////////////////////// 
 
   EditFunctionResidentState(contactAssnID: number, contactID: number) {
     const saveCreateResidentStateObj = {

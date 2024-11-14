@@ -142,6 +142,7 @@ export enum ContactMessage
     SELECT_ISPEP = 9024,
      //Added By Salim on 02-June-2011
     SelectAvaiContact = 9015,
+    CurrentResidenceaddress = 6503,
 
     //Added by Abrar on 12 sep 2011
     SELECTCONTACT = 9016

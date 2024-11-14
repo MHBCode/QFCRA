@@ -417,7 +417,7 @@
             </div>
             <div class="input-field">
               <label for="country"> Country </label>
-              <select [(ngModel)]="address.CountryID" [disabled]="address.isFieldsDisabled">
+              <select [(ngModel)]="address.CountryID" [disabled]="address.isFieldsDisabled" (change)="onCountryChange($event)" >
                 <option value="0">Select</option>
                 <option *ngFor="let option of allCountries" [value]="option.CountryID">
                   {{ option?.CountryName }}
@@ -871,7 +871,7 @@
                 <select [disabled]="
           !isEditContact ||
           (disableAddressFieldsOnEdit && !address.AddressID)
-        " [(ngModel)]="address.CountryID">
+        " [(ngModel)]="address.CountryID" (change)="onCountryChange($event)">
                   <option *ngFor="let option of allCountries" [value]="option.CountryID">
                     {{ option?.CountryName }}
                   </option>

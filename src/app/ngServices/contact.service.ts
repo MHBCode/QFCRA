@@ -69,5 +69,5 @@ export class ContactService {
     const url = `${this.baseUrlContact}get_contact_function_list?contactId=${contactId}&contactAssId=${contactAssId}`;
     return this.http.get<any>(url);
   }
-
+  
 }
