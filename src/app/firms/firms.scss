@@ -198,6 +198,13 @@
     margin-right: 10px;
 }
 
+.addAddressBtn:disabled {
+    background-color: #A51E36; 
+    color: white;
+    cursor: default;
+    opacity: 0.6; 
+  }
+
 .addressHistoryPopup {
     width: 50vw;
 }

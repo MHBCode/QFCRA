@@ -42,6 +42,7 @@ export class CreateReminderComponent implements OnInit {
   ngOnInit(): void {
     const state = history.state;
     this.objectActItmID = state.objectActItmID;
+    
 
     if (this.objectActItmID) {
       this.loadReminderData(this.objectActItmID);

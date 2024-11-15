@@ -29,6 +29,11 @@ export class AttachmentComponent implements OnInit {
   @Input() selectedFile: File | null = null;
   @Input() newfileNum: number;
 
+  intranetSitePath = 'https://ictmds.sharepoint.com/sites/QFCRA';
+  filePathAfterDocLib = "";
+  strUserEmailAddress = 'k.thomas@ictmds.onmicrosoft.com';
+  fileLocation: string;
+
   Page = FrimsObject;
   fileError: string = '';
   callUploadDoc: boolean = false;
@@ -56,7 +61,6 @@ export class AttachmentComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
-      this.getNewFileNumber();
     });
   }
 
@@ -85,70 +89,65 @@ export class AttachmentComponent implements OnInit {
     this.isLoading = true;
 
     if (!this.selectedFile) {
-      this.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
-      this.hasValidationErrors = true;
+        this.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
+        this.hasValidationErrors = true;
     } else {
-      delete this.errorMessages['uploadDocument'];
+        delete this.errorMessages['uploadDocument'];
     }
 
     if (this.hasValidationErrors) {
-      this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
-      this.isLoading = false;
-      return;
+        this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+        this.isLoading = false;
+        return;
     }
 
     if (this.selectedFile) {
-      this.getNewFileNumber().pipe(
-        switchMap(() => {
-          const intranetSitePath = 'https://ictmds.sharepoint.com/sites/QFCRA';
-          const filePathAfterDocLib = "";
-          const strfileName = this.selectedFile.name;
-          const strUserEmailAddress = 'k.thomas@ictmds.onmicrosoft.com';
+        const strfileName = this.selectedFile.name;
 
-          return this.sharepointService.uploadFileToSharepoint(
+        this.sharepointService.uploadFileToSharepoint(
             this.selectedFile,
-            intranetSitePath,
-            filePathAfterDocLib,
+            this.intranetSitePath,
+            this.filePathAfterDocLib,
             strfileName,
-            strUserEmailAddress
-          );
-        })
-      ).subscribe({
-        next: (response: SharePointUploadResponse) => {
-          console.log('File uploaded successfully', response);
+            this.strUserEmailAddress
+        ).subscribe({
+            next: (response: SharePointUploadResponse) => {
+                console.log('File uploaded successfully', response);
 
-          const [fileLocation, intranetGuid] = response.result.split(';');
-          this.documentUploaded.emit({ fileLocation, intranetGuid });
+                const [fileLocation, intranetGuid] = response.result.split(';');
+                this.fileLocation = fileLocation;
+                this.documentUploaded.emit({ fileLocation, intranetGuid });
 
-          const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
-          if (uploadedDocumentsDiv) {
-            uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
-          }
+                const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
+                if (uploadedDocumentsDiv) {
+                    uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
+                }
 
-          this.callUploadDoc = false;
-          const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
-          setTimeout(() => {
-            if (popupWrapper) {
-              popupWrapper.style.display = 'none';
-            } else {
-              console.error('Element with class not found');
+                this.callUploadDoc = false;
+                const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
+                setTimeout(() => {
+                    if (popupWrapper) {
+                        popupWrapper.style.display = 'none';
+                    } else {
+                        console.error('Element with class not found');
+                    }
+                }, 0);
+
+                this.uploadFileSuccess(constants.DocumentAttechment.saveDocument);
+                this.isLoading = false;
+            },
+            error: (err) => {
+                console.error('Error occurred during file upload', err);
+                this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ERROR_UPLOADING_FILE);
+                this.isLoading = false;
             }
-          }, 0);
-
-          this.uploadFileSuccess(constants.DocumentAttechment.saveDocument);
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Error occurred during file upload', err);
-          this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ERROR_UPLOADING_FILE);
-          this.isLoading = false;
-        }
-      });
+        });
     } else {
-      console.error('No valid PDF file selected.');
-      this.isLoading = false;
+        console.error('No valid PDF file selected.');
+        this.isLoading = false;
     }
-  }
+}
+
 
 
   deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number) {
@@ -194,16 +193,6 @@ export class AttachmentComponent implements OnInit {
     );
     this.isLoading = false;
   }
-
-  getNewFileNumber() {
-    return this.logForm.getNewFileNumber(this.firmId, this.currentDate).pipe(
-        tap(data => {
-            this.newfileNum = data.response.Column1;
-        })
-    );
-}
-
-
 
   getErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
     this.logForm.errorMessages(msgKey).subscribe(

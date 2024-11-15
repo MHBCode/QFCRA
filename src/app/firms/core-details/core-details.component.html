@@ -40,7 +40,7 @@
                 </button>
             </h2>
 
-            <div style="display: flex; gap: 10px">
+            <div *ngIf="!isLoading" style="display: flex; gap: 10px">
                 <!-- loading flag for rendering buttons, hideSaveBtn..etc flag for supervisor access and other roles, getControlVisiblity function for role access endpoint -->
                 <div class="btn" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn">
                     <button [disabled]="!getControlEnablement('imgBtnEdit')" class="edit-btn" (click)="editFirm()">
@@ -423,8 +423,8 @@
             <app-attachment [documentObj]="documentObj" [isEdit]="isEditModeCore"
                 [DocSubTypeID]="fetchedCoreDetailDocSubTypeID" [loadDocuments]="loadDocuments.bind(this)"
                 (documentUploaded)="onDocumentUploaded($event)" [selectedFile]="selectedFile"
-                (selectedFileChange)="selectedFile = $event" [tableDoc]="pressReleaseTableDoc" [pageName]="Page.CoreDetail"
-                [param1]="firmAppDetailsCurrentAuthorized.FirmApplStatusID" [param2]="1">
+                (selectedFileChange)="selectedFile = $event" [tableDoc]="pressReleaseTableDoc"
+                [pageName]="Page.CoreDetail" [param1]="firmAppDetailsCurrentAuthorized.FirmApplStatusID" [param2]="1">
             </app-attachment>
         </div>
 
@@ -509,7 +509,7 @@
                         <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID"
                             (change)="onAddressTypeChange($event, address)" [ngClass]="{
                 'error-border':
-                  !address.AddressID && errorMessages['AddressTypeID'],
+                !address.AddressTypeID && errorMessages['AddressTypeID']
                 
               }">
                             <option value="0">Select</option>

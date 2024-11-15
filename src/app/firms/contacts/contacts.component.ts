@@ -71,27 +71,27 @@ export class ContactsComponent {
   ResidencyStatusCheck: any = { AttributeValue: '' };
   selectedAdditionalInfo: Set<number> = new Set<number>();
   selectedAdditionalInfoLabels: Set<string> = new Set<string>();
-    // Security
-    FIRMRA: any[] = [];
-    ASSILevel: number = 4;
-    assignedUserRoles: any = [];
-    assignedLevelUsers: any = [];
-    FirmAMLSupervisor: boolean = false;
-    ValidFirmSupervisor: boolean = false;
-    hideEditBtn: boolean = false;
-    hideSaveBtn: boolean = false;
-    hideCancelBtn: boolean = false;
-    hideCreateBtn: boolean = false;
-    hideReviseBtn: boolean = false;
-    hideDeleteBtn: boolean = false;
-    selectedInfoTypes: { [key: string]: boolean } = {};
+  // Security
+  FIRMRA: any[] = [];
+  ASSILevel: number = 4;
+  assignedUserRoles: any = [];
+  assignedLevelUsers: any = [];
+  FirmAMLSupervisor: boolean = false;
+  ValidFirmSupervisor: boolean = false;
+  hideEditBtn: boolean = false;
+  hideSaveBtn: boolean = false;
+  hideCancelBtn: boolean = false;
+  hideCreateBtn: boolean = false;
+  hideReviseBtn: boolean = false;
+  hideDeleteBtn: boolean = false;
+  selectedInfoTypes: { [key: string]: boolean } = {};
   // used variables on edit mode
   newAddressOnEdit: any = {};
   canAddNewAddressOnEdit: boolean = true;
   disableAddressFieldsOnEdit: boolean = false;
   showContactModal: boolean = false;
   EditResidentStateObj: any = { attributeValue: '' };
-  saveContactResponseObj: any =[];
+  saveContactResponseObj: any = [];
   // used variables on create mode
   addedAddresses: any = []; // Array will hold the newly added addresses
   addedAddressesOnCreate: any = [];
@@ -234,7 +234,7 @@ export class ContactsComponent {
       })
     );
   }
-  
+
 
 
   loadFirmDetails(firmId: number) {
@@ -319,7 +319,7 @@ export class ContactsComponent {
     // Reset the selected contact and hide the popup until data is loaded
     this.selectedContact = {};
     this.isPopupVisible = false;
-    this.applySecurityOnPage(this.Page.Contatcs,this.isEditContact);
+    this.applySecurityOnPage(this.Page.Contatcs, this.isEditContact);
     // Fetch contact details based on the selected row
     this.contactService.getContactDetails(this.firmId, contact.ContactID, contact.ContactAssnID).subscribe(
       (data) => {
@@ -447,6 +447,7 @@ export class ContactsComponent {
     this.addedAddresses = [];
     this.addedAddresses = [this.createDefaultAddress()];
     this.disableAddressFieldOnCreate = false;
+    this.canAddNewAddressOnCreate = false;
   }
 
   closeCreateContactPopup() {
@@ -921,7 +922,7 @@ export class ContactsComponent {
     this.CreateContactValidateForm();
 
     if (this.hasValidationErrors) {
-      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       this.isLoading = false;
       return;
     }
@@ -1031,7 +1032,7 @@ export class ContactsComponent {
       this.contactService.IsMainContact(this.firmId, this.createContactObj.entityId, this.createContactObj.contactType)
         .subscribe(response => {
           if (response != null) {
-            this.showErrorAlert(constants.ContactMessage.MAIN_CONTACT_EXISTS);
+            this.firmDetailsService.showErrorAlert(constants.ContactMessage.MAIN_CONTACT_EXISTS);
             this.isLoading = false;
             return;
           } else {
@@ -1040,25 +1041,25 @@ export class ContactsComponent {
         });
     }
   }
-  
+
   private saveContactForm(data: any): void {
     this.contactService.saveupdatecontactform(data).subscribe(
       data => {
         console.log("Contact save successful:", data);
-       
-          this.saveContactResponseObj = data.response
-          const contactAssnID = this.saveContactResponseObj.contactAssnID;
-          const contactID = this.saveContactResponseObj.contactID;
-  
-          // Call createFunctionResidentState with the extracted IDs
-          this.createFunctionResidentState(contactAssnID, contactID);
-      
+
+        this.saveContactResponseObj = data.response
+        const contactAssnID = this.saveContactResponseObj.contactAssnID;
+        const contactID = this.saveContactResponseObj.contactID;
+
+        // Call createFunctionResidentState with the extracted IDs
+        this.createFunctionResidentState(contactAssnID, contactID);
+
 
         this.isEditContact = false;
         this.loadContacts();
         this.closeContactPopup();
         this.closeCreateContactPopup();
-        this.applySecurityOnPage(this.Page.Contatcs,this.isEditContact);
+        this.applySecurityOnPage(this.Page.Contatcs, this.isEditContact);
         this.firmDetailsService.showSaveSuccessAlert(constants.ContactMessage.UPDATECONTACT);
       },
       error => {
@@ -1067,18 +1068,6 @@ export class ContactsComponent {
     );
   }
 
-  showErrorAlert(messageKey: number) {
-    this.logForm.errorMessages(messageKey).subscribe(
-      (response) => {
-        Swal.fire({
-          text: response.response,
-          icon: 'error',
-          confirmButtonText: 'Ok',
-        });
-      },
-    );
-    this.isLoading = false;
-  }
   CreateContactValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.errorMessages = {}; // Clear previous error messages
@@ -1099,11 +1088,20 @@ export class ContactsComponent {
         this.hasValidationErrors = true;
       }
       if (
-        !this.createContactObj.busEmail || 
+        !this.createContactObj.busEmail ||
         !(this.createContactObj.busEmail.includes('@') && this.createContactObj.busEmail.includes('.com'))
       ) {
-        this.loadErrorMessages('busEmail', constants.ContactMessage.INVALIDEMAIL,"Business");
+        this.loadErrorMessages('busEmail', constants.ContactMessage.INVALIDEMAIL, "Business");
         this.hasValidationErrors = true;
+      }
+
+      // ADDRESS TYPE VALIDATION
+      this.invalidAddress = this.addedAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
+      if (this.invalidAddress) {
+        this.loadErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['AddressTypeID'];
       }
 
       if (this.hasValidationErrors) {
@@ -1119,7 +1117,7 @@ export class ContactsComponent {
       () => {
         this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
         console.log(`Error message for ${fieldName} loaded successfully`);
-        
+
 
       },
       error => {
@@ -1142,14 +1140,21 @@ export class ContactsComponent {
     if (this.existingContactAddresses.length === 0) {
       this.existingContactAddresses = [this.createDefaultAddress()];
     }
+    const validAddressCount = this.existingContactAddresses.filter(addr => addr.Valid && !addr.isRemoved).length;
+    const totalAddressTypes = this.allAddressTypes.length;
+    if (validAddressCount >= totalAddressTypes) {
+      this.canAddNewAddressOnEdit = false;
+    } else {
+      this.canAddNewAddressOnEdit = true;
+    }
     this.isEditContact = true
-    this.applySecurityOnPage(this.Page.Contatcs,this.isEditContact);
+    this.applySecurityOnPage(this.Page.Contatcs, this.isEditContact);
   }
 
   saveEditContactPopup(): void {
     this.EditContactValidateForm();
     if (this.hasValidationErrors) {
-      this.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       this.isLoading = false;
       return;
     }
@@ -1261,14 +1266,14 @@ export class ContactsComponent {
       this.contactService.IsMainContact(this.firmId, this.selectedContact.entityID, this.selectedContact.entityTypeID)
         .subscribe(response => {
           if (response != null) {
-            this.showErrorAlert(constants.ContactMessage.MAIN_CONTACT_EXISTS);
+            this.firmDetailsService.showErrorAlert(constants.ContactMessage.MAIN_CONTACT_EXISTS);
             this.isLoading = false;
             return;
           } else {
             this.contactService.IsContactTypeExists(this.firmId, this.selectedContact.entityID, this.selectedContact.entityTypeID, this.selectedContact.contactID, this.selectedContact.contactAssnID)
               .subscribe(response => {
                 if (response != null) {
-                  this.showErrorAlert(constants.ContactMessage.CONTACT_TYPE_EXISTS);
+                  this.firmDetailsService.showErrorAlert(constants.ContactMessage.CONTACT_TYPE_EXISTS);
                   this.isLoading = false;
                   return;
                 } else {
@@ -1282,7 +1287,8 @@ export class ContactsComponent {
 
   cancelContact() {
     this.isEditContact = false;
-    this.applySecurityOnPage(this.Page.Contatcs,this.isEditContact);
+    this.loadContactFirmAdresses(this.selectedContact.contactAssnID, this.userId)
+    this.applySecurityOnPage(this.Page.Contatcs, this.isEditContact);
   }
 
   EditContactValidateForm(): Promise<void> {
@@ -1449,11 +1455,12 @@ export class ContactsComponent {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   addNewAddressOnCreateMode() {
-    this.firmDetailsService.addNewAddressOnCreateMode(this.addedAddresses, this.allAddressTypes, this.currentDate);
+    const result = this.firmDetailsService.addNewAddressOnCreateMode(this.addedAddresses, this.allAddressTypes, this.currentDate);
 
-    // Now call checkCanAddNewAddressOnCreateMode to get the updated flags
+    this.canAddNewAddressOnCreate = result.canAddNewAddressOnCreate;
+    this.isAllAddressesAddedOnCreate = result.isAllAddressesAddedOnCreate;
+
     this.checkCanAddNewAddressOnCreateMode();
-    this.disableAddressFieldOnCreate = false;
   }
 
   createDefaultAddress(): any {
@@ -1535,7 +1542,6 @@ export class ContactsComponent {
         currentAddress.AddressTypeID = selectedAddressType.AddressTypeID;
         currentAddress.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
       }
-      currentAddress.isAddressTypeSelected = true; // Disable the dropdown after selection
     }
 
     // Check if the "Add Address" button should be enabled
@@ -1694,7 +1700,7 @@ export class ContactsComponent {
       });
     }
   }
-  
+
 
   // fetchResidencyStatus(): void {
   //   const ObjectID = 523;
@@ -1736,7 +1742,7 @@ export class ContactsComponent {
     const SourceObjectInstanceID = this.selectedContact.contactAssnID;
     const SourceObjectInstanceRevNum = 1;
     const ActiveFlag = true;
-  
+
     this.aiElectronicswfService.getListObjectAttribute(
       ObjectID,
       ObjectInstanceID,
@@ -1746,19 +1752,19 @@ export class ContactsComponent {
       SourceObjectInstanceID,
       SourceObjectInstanceRevNum
     ).subscribe(
-          (data) => {
-            if (data.isSuccess && data.response?.length > 0) {
-              this.ResidencyStatusCheck = data.response[0];
-            } else {
-              this.ResidencyStatusCheck = { AttributeValue: '' };
-            }
-            this.cdr.detectChanges(); // Trigger change detection
-          },
-          (error) => {
-            console.error("Error fetching Residency Status:", error);
-            this.ResidencyStatusCheck = { AttributeValue: '' };
-          }
-        );
+      (data) => {
+        if (data.isSuccess && data.response?.length > 0) {
+          this.ResidencyStatusCheck = data.response[0];
+        } else {
+          this.ResidencyStatusCheck = { AttributeValue: '' };
+        }
+        this.cdr.detectChanges(); // Trigger change detection
+      },
+      (error) => {
+        console.error("Error fetching Residency Status:", error);
+        this.ResidencyStatusCheck = { AttributeValue: '' };
+      }
+    );
   }
   convertFunctionsToArray(): void {
     if (this.selectedContact && this.selectedContact.lstContactFunctions) {
@@ -1929,58 +1935,58 @@ export class ContactsComponent {
     this.isHistoryPopupVisible = false;
     this.isHistoryCheckboxChecked = false;
   }
-  createResidentStateObj = { 
-    attributeValue:"",
+  createResidentStateObj = {
+    attributeValue: "",
 
   }
- createFunctionResidentState(contactAssnID: number, contactID: number) {
-  const savecreateResidentStateObj = {
-    objectAttributeID: null,
-    objectAttributeDefID: 1,
-    firmID: this.firmId,
-    objectID: constants.FrimsObject.Contatcs,
-    objectInstanceID: contactID, // Set the contactID here
-    objectInstanceRevNum: 1,
-    attributeName: "Residency Status",
-    attributeValue: this.createResidentStateObj.attributeValue,
-    activeFlag: true,
-    createdBy: this.userId,
-    sourceObjectID: constants.FrimsObject.Contatcs,
-    sourceObjectInstanceID: contactAssnID, // Set the contactAssnID here
-    sourceObjectInstanceRevNum: 1,
-    lastModifiedBy: "30",
-    lastModifiedDate: "03/Dec/2024"
-  };
-  console.log("save create Resident State Obj ",savecreateResidentStateObj)
-  this.aiElectronicswfService.InsertUpdateObjectAttributes(savecreateResidentStateObj).subscribe(
-    data => {
-      console.log("Function Resident State Saved Successfully");
-    },
-    error => {
-      console.error("Error saving Function Resident State", error);
-    }
-  );
-}
-
-///////////// Resident State  && Counrty
-onCountryChange(event: Event): void {
-  const selectedCountryID = Number((event.target as HTMLSelectElement).value);
-  this.addedAddresses.CountryID = selectedCountryID;
-
-  const residentStatus = this.createResidentStateObj.attributeValue;
-  if (selectedCountryID !== 0) {
-    if (residentStatus === 'Resident' && selectedCountryID !== this.getQatarCountryID()) {
-      this.firmDetailsService.showErrorAlert(6503);
-    }
-    
-    // Check if the resident status is "Non-Resident" and country is Qatar
-    if (residentStatus === 'Non-Resident' && selectedCountryID === this.getQatarCountryID()) {
-      this.firmDetailsService.showErrorAlert(6503);
-    }
+  createFunctionResidentState(contactAssnID: number, contactID: number) {
+    const savecreateResidentStateObj = {
+      objectAttributeID: null,
+      objectAttributeDefID: 1,
+      firmID: this.firmId,
+      objectID: constants.FrimsObject.Contatcs,
+      objectInstanceID: contactID, // Set the contactID here
+      objectInstanceRevNum: 1,
+      attributeName: "Residency Status",
+      attributeValue: this.createResidentStateObj.attributeValue,
+      activeFlag: true,
+      createdBy: this.userId,
+      sourceObjectID: constants.FrimsObject.Contatcs,
+      sourceObjectInstanceID: contactAssnID, // Set the contactAssnID here
+      sourceObjectInstanceRevNum: 1,
+      lastModifiedBy: "30",
+      lastModifiedDate: "03/Dec/2024"
+    };
+    console.log("save create Resident State Obj ", savecreateResidentStateObj)
+    this.aiElectronicswfService.InsertUpdateObjectAttributes(savecreateResidentStateObj).subscribe(
+      data => {
+        console.log("Function Resident State Saved Successfully");
+      },
+      error => {
+        console.error("Error saving Function Resident State", error);
+      }
+    );
   }
-  // Check if the resident status is "Resident" and country is not Qatar
-  
-}
+
+  ///////////// Resident State  && Counrty
+  onCountryChange(event: Event): void {
+    const selectedCountryID = Number((event.target as HTMLSelectElement).value);
+    this.addedAddresses.CountryID = selectedCountryID;
+
+    const residentStatus = this.createResidentStateObj.attributeValue;
+    if (selectedCountryID !== 0) {
+      if (residentStatus === 'Resident' && selectedCountryID !== this.getQatarCountryID()) {
+        this.firmDetailsService.showErrorAlert(6503);
+      }
+
+      // Check if the resident status is "Non-Resident" and country is Qatar
+      if (residentStatus === 'Non-Resident' && selectedCountryID === this.getQatarCountryID()) {
+        this.firmDetailsService.showErrorAlert(6503);
+      }
+    }
+    // Check if the resident status is "Resident" and country is not Qatar
+
+  }
   onResidentStatusChange(event: Event) {
     const selectedValue = (event.target as HTMLSelectElement).value;
     this.createResidentStateObj.attributeValue = selectedValue;
@@ -1990,13 +1996,13 @@ onCountryChange(event: Event): void {
       if (selectedValue === 'Resident' && this.addedAddresses.CountryID !== this.getQatarCountryID()) {
         this.firmDetailsService.showErrorAlert(6503);
       }
-    
+
       // Check if the resident status is "Non-Resident" and country is Qatar
       if (selectedValue === 'Non-Resident' && this.addedAddresses.CountryID === this.getQatarCountryID()) {
         this.firmDetailsService.showErrorAlert(6503);
       }
     }
-    
+
   }
   showAlert(message: string): void {
     Swal.fire({
@@ -2033,9 +2039,9 @@ onCountryChange(event: Event): void {
       lastModifiedBy: "30",
       lastModifiedDate: this.dateUtilService.convertDateToYYYYMMDD(new Date())
     };
-  
+
     console.log("Saving Residency Status:", saveCreateResidentStateObj);
-  
+
     this.aiElectronicswfService.InsertUpdateObjectAttributes(saveCreateResidentStateObj).subscribe(
       data => {
         console.log("Function Resident State Saved Successfully");
@@ -2051,7 +2057,7 @@ onCountryChange(event: Event): void {
 
 
 
-  
+
   getSearchMobileNumber(mobileNum: string): void {
     this.contactService.getSearchMobileNumber(mobileNum).subscribe(
       data => {
@@ -2098,7 +2104,7 @@ onCountryChange(event: Event): void {
       }
     );
   }
-  
+
   ShowcreateContactObj = {
     firstName: '',
     familyName: '',
@@ -2187,7 +2193,7 @@ onCountryChange(event: Event): void {
     };
     return mapping[label] || null;
   }
- 
+
 
   initializeEditInfoTypes(): void {
 

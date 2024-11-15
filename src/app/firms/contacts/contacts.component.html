@@ -8,8 +8,7 @@
           Contacts > <span>{{ firmDetails?.FirmName }}</span>
         </h2>
         <div class="btn">
-          <button (click)="createContact()"
-          >
+          <button (click)="createContact()">
             <i class="bi bi-plus"></i>
             Create
           </button>
@@ -288,10 +287,7 @@
           <div class="functions-row" *ngIf="showMLROSection">
             <div class="input-field">
               <label for="ResidentStatus">Is the individual a Resident or Non-Resident of Qatar?</label>
-              <select 
-                name="ResidentStatus" 
-                id="ResidentStatus" 
-                [(ngModel)]="createResidentStateObj.attributeValue"
+              <select name="ResidentStatus" id="ResidentStatus" [(ngModel)]="createResidentStateObj.attributeValue"
                 (change)="onResidentStatusChange($event)">
                 <option value="Resident">Resident</option>
                 <option value="Non-Resident">Non-Resident</option>
@@ -342,18 +338,18 @@
       <div class="addresses create-inputs-field-set">
         <div class="popup-header">
           <h3>Addresses</h3>
-          <button [disabled]="!canAddNewAddressOnCreate" *ngIf="!isAllAddressesAddedOnCreate"
-            (click)="addNewAddressOnCreateMode()" style="
-                    background-color: green;
-                    color: white;
-                    border: none;
-                    padding: 5px;
-                    cursor: pointer;
-                    border-radius: 5px;
-                    float: right;
-                  ">
-            <i style="size: 7px" class="bi bi-plus-lg"></i>
-          </button>
+          <!--Error messages for addresses-->
+          <div class="error-messages">
+            <p *ngIf="errorMessages['AddressTypeID']">
+              {{ errorMessages['AddressTypeID'] }}
+            </p>
+          </div>
+          <div class="add-address-btn-container">
+            <button class="addAddressBtn" [disabled]="!canAddNewAddressOnCreate" *ngIf="!isAllAddressesAddedOnCreate"
+              (click)="addNewAddressOnCreateMode()">
+              Add Address
+            </button>
+          </div>
         </div>
         <ng-container *ngFor="let address of addedAddresses; let i = index">
           <div class="inputs-row">
@@ -366,8 +362,7 @@
                 Address Type
               </label>
               <select [(ngModel)]="address.AddressTypeID" [ngClass]="{
-                        'error-border': address === invalidAddress}"
-                [disabled]="address.isAddressTypeSelected || disableAddressFieldOnCreate"
+                'error-border': !address.AddressTypeID && errorMessages['AddressTypeID']}" [disabled]="address.isAddressTypeSelected || disableAddressFieldOnCreate"
                 (change)="onAddressTypeChangeOnCreateMode($event,i)">
                 <option value="0">Select</option>
                 <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
@@ -417,7 +412,8 @@
             </div>
             <div class="input-field">
               <label for="country"> Country </label>
-              <select [(ngModel)]="address.CountryID" [disabled]="address.isFieldsDisabled" (change)="onCountryChange($event)" >
+              <select [(ngModel)]="address.CountryID" [disabled]="address.isFieldsDisabled"
+                (change)="onCountryChange($event)">
                 <option value="0">Select</option>
                 <option *ngFor="let option of allCountries" [value]="option.CountryID">
                   {{ option?.CountryName }}
@@ -672,11 +668,8 @@
           <ng-container *ngIf="isEditContact; else readOnlyView">
             <div class="input-field" *ngIf="showMLROSection">
               <label for="residencyStatus">Is the individual a Resident or Non-Resident of Qatar?</label>
-              <select
-                id="residencyStatus"
-                [(ngModel)]="EditResidentStateObj.attributeValue"
-                (change)="onResidentStatusEditChange($event)"
-              >
+              <select id="residencyStatus" [(ngModel)]="EditResidentStateObj.attributeValue"
+                (change)="onResidentStatusEditChange($event)">
                 <option value="">Select</option>
                 <option value="Resident">Resident</option>
                 <option value="Non-Resident">Non-Resident</option>
@@ -797,7 +790,7 @@
                 </label>
                 <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID"
                   (change)="onAddressTypeChangeOnEditMode($event, address)" [ngClass]="{
-                        'error-border': address === invalidAddress}">
+                'error-border': !address.AddressTypeID && errorMessages['AddressTypeID']}">
                   <option value="0">Select</option>
                   <option *ngFor="let option of allAddressTypes" [value]="option.AddressTypeID">
                     {{ option.AddressTypeDesc }}
@@ -978,23 +971,20 @@
       </div>
       <div class="btn justify-content-end">
         <button class="save-btn" (click)="saveEditContactPopup()"
-        *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn"
-        [disabled]="!getControlEnablement('imgBtnSave')">
+          *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn" [disabled]="!getControlEnablement('imgBtnSave')">
           Save
         </button>
-        <button (click)="editContact()"
-        *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn"
-        [disabled]="!getControlEnablement('imgBtnEdit')">
+        <button (click)="editContact()" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn"
+          [disabled]="!getControlEnablement('imgBtnEdit')">
           <i class="bi bi-pen"></i> Edit
         </button>
 
         <button class="cancel-btn" (click)="cancelContact()"
-        *ngIf="getControlVisibility('imgBtnCancel') && !hideCancelBtn"
-        [disabled]="!getControlEnablement('imgBtnCancel')">Cancel</button>
+          *ngIf="getControlVisibility('imgBtnCancel') && !hideCancelBtn"
+          [disabled]="!getControlEnablement('imgBtnCancel')">Cancel</button>
 
-        <button (click)="confirmDeleteContact()"
-        *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn"
-        [disabled]="!getControlEnablement('imgBtnDelete')">
+        <button (click)="confirmDeleteContact()" *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn"
+          [disabled]="!getControlEnablement('imgBtnDelete')">
           <i class="bi bi-trash"></i> Delete
         </button>
       </div>

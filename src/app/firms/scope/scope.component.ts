@@ -138,6 +138,7 @@ export class ScopeComponent implements OnInit {
       this.populateAuthorisationCategoryTypes();
       this.populatePrudentialCategoryTypes();
       this.populateFirmScopeTypes();
+      this.loadDocuments();
 
       // Security
       forkJoin([
@@ -168,6 +169,8 @@ export class ScopeComponent implements OnInit {
       this.firmDetailsService.checkFirmLicense(this.firmId);
       this.firmDetailsService.checkFirmAuthorisation(this.firmId);
     })
+
+    this.fetchSubTypeDocIDs();
   }
 
   ngAfterViewInit() {
@@ -185,6 +188,14 @@ export class ScopeComponent implements OnInit {
       error => {
         console.error(error);
       }
+    );
+  }
+
+  getNewFileNumber() {
+    return this.logForm.getNewFileNumber(this.firmId, this.currentDate).pipe(
+      tap(data => {
+        this.newfileNum = data.response.Column1;
+      })
     );
   }
 
@@ -249,7 +260,7 @@ export class ScopeComponent implements OnInit {
     });
   }
 
-  
+
 
   maskCommandActionsControlsScope() {
     this.hideCreateBtn = false;
@@ -537,23 +548,43 @@ export class ScopeComponent implements OnInit {
   }
 
 
-  onDocumentUploaded(uploadedDocument: any) {
-    const { fileLocation, intranetGuid } = uploadedDocument;
-    this.documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid, constants.DocType.SCOPE, this.Page.Scope, this.fetchedScopeDocSubTypeID.DocSubTypeID, this.ActivityAuth[0].FirmScopeID, this.ActivityAuth[0].ScopeRevNum);
+  async onDocumentUploaded(uploadedDocument: any) {
     this.isLoading = true;
-    this.objectWF.insertDocument(this.documentObj).subscribe(
-      response => {
-        console.log('scope of authorsation document saved successfully:', response);
-        this.loadDocuments();
-        this.isLoading = false;
-      },
-      error => {
-        console.error('Error updating scope of auth scope:', error);
-        this.isLoading = false;
-      }
-    );
 
+    try {
+      // Call getNewFileNumber and wait for it to complete
+      await this.getNewFileNumber().toPromise();
+
+      // Continue with the rest of the code after getNewFileNumber completes
+      const { fileLocation, intranetGuid } = uploadedDocument;
+      this.documentObj = this.prepareDocumentObject(
+        this.userId,
+        fileLocation,
+        intranetGuid,
+        constants.DocType.SCOPE,
+        this.Page.Scope,
+        this.fetchedScopeDocSubTypeID.DocSubTypeID,
+        this.ActivityAuth[0].FirmScopeID,
+        this.ActivityAuth[0].ScopeRevNum
+      );
+
+      this.objectWF.insertDocument(this.documentObj).subscribe(
+        response => {
+          console.log('Scope of authorization document saved successfully:', response);
+          this.loadDocuments();
+          this.isLoading = false;
+        },
+        error => {
+          console.error('Error updating scope of auth scope:', error);
+          this.isLoading = false;
+        }
+      );
+    } catch (error) {
+      console.error('Error in getNewFileNumber:', error);
+      this.isLoading = false;
+    }
   }
+
 
   loadDocuments() {
     const firstActivity = this.ActivityAuth[0];
