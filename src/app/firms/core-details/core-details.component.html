@@ -254,6 +254,27 @@
         </div>
     </div>
     <!---->
+    <div class="inputs-field-set" *ngIf="selectedFirmTypeID == 3"
+        [ngClass]="{ collapsed: isCollapsed['pressReleaseSection'] }">
+        <div class="form-section-title collapse-container">
+            <h2 class="edit-firm-header">Press Releases</h2>
+            <button [ngClass]="{ 'hidden-button': !isEditModeCore }" class="collapse-button"
+                (click)="toggleCollapse('pressReleaseSection')">
+                {{ isCollapsed['pressReleaseSection'] ? '▲' : '▼' }}
+            </button>
+        </div>
+        <!-- Aicha -->
+        <div class="inputs-row">
+            <app-attachment [documentObj]="documentObj" [isEdit]="isEditModeCore"
+                [DocSubTypeID]="fetchedCoreDetailDocSubTypeID" [loadDocuments]="loadDocuments.bind(this)"
+                (documentUploaded)="onDocumentUploaded($event)" [selectedFile]="selectedFile"
+                (selectedFileChange)="selectedFile = $event" [tableDoc]="pressReleaseTableDoc"
+                [pageName]="Page.CoreDetail" [param1]="firmAppDetailsCurrentAuthorized?.FirmApplStatusID" [param2]="1">
+            </app-attachment>
+        </div>
+
+    </div>
+    <!---->
     <div class="inputs-field-set" [ngClass]="{ collapsed: isCollapsed['appDetailsSection'] }">
         <div class="form-section-title collapse-container">
             <div class="history-row">
@@ -408,28 +429,6 @@
             </div>
         </div>
     </div>
-    <!---->
-    <div class="inputs-field-set" *ngIf="isEditModeCore && selectedFirmTypeID == 3"
-        [ngClass]="{ collapsed: isCollapsed['pressReleaseSection'] }">
-        <div class="form-section-title collapse-container">
-            <h2 class="edit-firm-header">Press Releases</h2>
-            <button [ngClass]="{ 'hidden-button': !isEditModeCore }" class="collapse-button"
-                (click)="toggleCollapse('pressReleaseSection')">
-                {{ isCollapsed['pressReleaseSection'] ? '▲' : '▼' }}
-            </button>
-        </div>
-        <!-- Aicha -->
-        <div class="inputs-row">
-            <app-attachment [documentObj]="documentObj" [isEdit]="isEditModeCore"
-                [DocSubTypeID]="fetchedCoreDetailDocSubTypeID" [loadDocuments]="loadDocuments.bind(this)"
-                (documentUploaded)="onDocumentUploaded($event)" [selectedFile]="selectedFile"
-                (selectedFileChange)="selectedFile = $event" [tableDoc]="pressReleaseTableDoc"
-                [pageName]="Page.CoreDetail" [param1]="firmAppDetailsCurrentAuthorized.FirmApplStatusID" [param2]="1">
-            </app-attachment>
-        </div>
-
-    </div>
-
     <!---->
     <div *ngIf="
       !isNullOrEmpty(firmDetails?.FirmApplicationDataComments) ||
