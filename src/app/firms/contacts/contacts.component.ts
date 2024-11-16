@@ -713,7 +713,40 @@ export class ContactsComponent {
       this.loadContactFirmAdresses(contactAssnID, this.userId);
     } else {
       this.selectedAvilableContact = false;
+      this.resetCreateContactObj();
+      this.addedAddresses = [];
+      this.addedAddresses = [this.createDefaultAddress()];
+      
     }
+  }
+  resetCreateContactObj() {
+    this.createContactObj = {
+      ...this.createContactObj,
+      firmID: 0,
+      contactID: 0,
+      contactAssnID: 0,
+      title:  '',
+      contactType:  0,
+      firstName: '',
+      secondName: '',
+      familyName: '',
+      countryOfResidence: 0,
+      dateOfBirth: '',
+      nationalID: '',
+      nationality: 0,
+      passportNum:  '',
+      placeOfBirth: '',
+      isPeP: 0,
+      mobileNum:  '',
+      busEmail: '',
+      otherEmail:  '',
+      contactMethodTypeID:  0,
+      entityId: 0,
+      jobTitle:  '',
+      fax:'',
+    };
+    console.log("createContactObj has been reset:", this.createContactObj);
+    this.cdr.detectChanges(); // Trigger change detection to update the view
   }
   selectedAvilableContactDetails: any = [];
   fitchContactDetailsCreateContact(contactId: number, contactAssnID: number) {
@@ -944,7 +977,7 @@ export class ContactsComponent {
           aIsContactTypeID: this.createContactObj.aIsContactTypeID,
           ResidencePhone: 'test',
           JobTitle: this.createContactObj.jobTitle,
-          EntityTypeID: this.createContactObj.EntityTypeID,
+          EntityTypeID: this.createContactObj.EntityTypeID == 0 ? 1 : this.createContactObj.EntityTypeID,
           contactMethodTypeID: this.createContactObj.ContactMethodTypeID,
           Title: this.createContactObj.title,
           FirstName: this.createContactObj.firstName,
@@ -1013,8 +1046,8 @@ export class ContactsComponent {
         faxNumber: address.FaxNumber || '',
         lastModifiedDate: this.currentDate,
         addressState: 2, // New address state is 2, existing modified or unchanged is 6, 4 is delete
-        fromDate: address.FromDate || null,
-        toDate: address.ToDate || null,
+        fromDate:  '1970-01-01',
+        toDate:  '1970-01-01',
         objectID: address.ObjectID || this.Page.Contatcs,
         objectInstanceID: address.ObjectInstanceID || this.firmId,
         objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
@@ -1484,7 +1517,7 @@ export class ContactsComponent {
       addressState: 2,
       FromDate: null,
       ToDate: null,
-      Valid: true
+      Valid: true,
     };
   }
 

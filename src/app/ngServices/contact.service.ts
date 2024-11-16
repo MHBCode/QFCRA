@@ -26,7 +26,7 @@ export class ContactService {
   }
   ///////////////////
   deleteContactDetails(objectID: number, contactID: number, contactAssnID: number,userID:number): Observable<any> {
-    const url = `${this.baseUrlContact}delete_contact_details?objectID=${objectID}&contactId=${contactID}&contactAssId=${contactAssnID}&userID=${userID}`;
+    const url = `${this.baseUrlContact}delete_contact_details?contactId=${contactID}&contactAssId=${contactAssnID}&userID=${userID}&objectID=${objectID}`;
     return this.http.delete<any>(url);
   }
   saveContactDetails(contactDetails: any): Observable<any> {
