@@ -42,38 +42,38 @@
 
             <div *ngIf="!isLoading" style="display: flex; gap: 10px">
                 <!-- loading flag for rendering buttons, hideSaveBtn..etc flag for supervisor access and other roles, getControlVisiblity function for role access endpoint -->
-                <div class="btn" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn">
+                <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnEdit') && !hideEditBtn">
                     <button [disabled]="!getControlEnablement('imgBtnEdit')" class="edit-btn" (click)="editFirm()">
                         <i class="bi bi-pen"></i>Edit
                     </button>
                 </div>
 
-                <div class="btn" *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn">
+                <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnSave') && !hideSaveBtn">
                     <button [disabled]="!getControlEnablement('imgBtnSave')" class="save-btn" (click)="saveFirm()">
                         Save
                     </button>
                 </div>
 
-                <div class="btn" *ngIf="getControlVisibility('imgBtnCancel') && !hideCancelBtn">
+                <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnCancel') && !hideCancelBtn">
                     <button [disabled]="!getControlEnablement('imgBtnCancel')" class="cancel-btn"
                         (click)="cancelEditFirm()">
                         Cancel
                     </button>
                 </div>
 
-                <div class="btn" *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn">
+                <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnCreate') && !hideCreateBtn">
                     <button [disabled]="!getControlEnablement('imgBtnCreate')">
                         Create
                     </button>
                 </div>
 
-                <div class="btn" *ngIf="getControlVisibility('imgBtnRevise') && !hideReviseBtn">
+                <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnRevise') && !hideReviseBtn">
                     <button [disabled]="!getControlEnablement('imgBtnRevise')">
                         Revise
                     </button>
                 </div>
 
-                <div class="btn" *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
+                <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
                     <button [disabled]="!getControlEnablement('imgBtnDelete')">
                         Delete
                     </button>
@@ -254,7 +254,7 @@
         </div>
     </div>
     <!---->
-    <div class="inputs-field-set" *ngIf="selectedFirmTypeID == 3"
+    <div class="inputs-field-set" *ngIf="(pressReleaseTableDoc.length !== 0 && !isEditModeCore) || isEditModeCore && selectedFirmTypeID == 3"
         [ngClass]="{ collapsed: isCollapsed['pressReleaseSection'] }">
         <div class="form-section-title collapse-container">
             <h2 class="edit-firm-header">Press Releases</h2>

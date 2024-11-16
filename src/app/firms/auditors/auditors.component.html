@@ -8,7 +8,7 @@
           Auditors > <span>{{ firmDetails?.FirmName }}</span>
         </h2>
         <div class="btn">
-          <button (click)="createAuditor()">
+          <button *ngIf="!hideCreateBtn" (click)="createAuditor()">
             <i class="bi bi-plus"></i>
             Create
           </button>
@@ -133,17 +133,17 @@
           </div>
         </div>
         <div class="btn justify-content-end">
-          <button *ngIf="!IsEditAuditorVisible" (click)="editAuditor()">
+          <button (click)="editAuditor()"
+          *ngIf="!isLoading && getControlVisibility('imgBtnEdit') && !hideEditBtn" [disabled]="!getControlEnablement('imgBtnEdit')">
             <i class="bi bi-pen"></i> Edit
           </button>
-          <button *ngIf="!IsEditAuditorVisible" (click)="confirmDeleteAuditor()">
+          <button (click)="saveEditAuditor()"
+          *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn" [disabled]="!getControlEnablement('imgBtnSave')">
+             Save
+          </button>
+          <button (click)="confirmDeleteAuditor()"
+          *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn" [disabled]="!getControlEnablement('imgBtnDelete')">
             <i class="bi bi-trash"></i> Delete
-          </button>
-          <button *ngIf="IsEditAuditorVisible" (click)="saveEditAuditor()">
-            <i class="bi bi-save"></i> Save
-          </button>
-          <button *ngIf="IsEditAuditorVisible" (click)="cancelEdit()">
-            <i class="bi bi-x"></i> Cancel
           </button>
         </div>
       </form>
@@ -229,7 +229,7 @@
           </div>
         </div>
         <div class="btn justify-content-end">
-          <button (click)="saveCreateAuditor()">Save</button>
+          <button *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn" [disabled]="!getControlEnablement('imgBtnSave')" (click)="saveCreateAuditor()">Save</button>
         </div>
       </form>
     </div>

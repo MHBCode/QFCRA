@@ -89,80 +89,97 @@ export class AttachmentComponent implements OnInit {
     this.isLoading = true;
 
     if (!this.selectedFile) {
-        this.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
-        this.hasValidationErrors = true;
+      this.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
+      this.hasValidationErrors = true;
     } else {
-        delete this.errorMessages['uploadDocument'];
+      delete this.errorMessages['uploadDocument'];
     }
 
     if (this.hasValidationErrors) {
-        this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
-        this.isLoading = false;
-        return;
+      this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
+      this.isLoading = false;
+      return;
     }
 
     if (this.selectedFile) {
-        const strfileName = this.selectedFile.name;
+      const strfileName = this.selectedFile.name;
 
-        this.sharepointService.uploadFileToSharepoint(
-            this.selectedFile,
-            this.intranetSitePath,
-            this.filePathAfterDocLib,
-            strfileName,
-            this.strUserEmailAddress
-        ).subscribe({
-            next: (response: SharePointUploadResponse) => {
-                console.log('File uploaded successfully', response);
+      this.sharepointService.uploadFileToSharepoint(
+        this.selectedFile,
+        this.intranetSitePath,
+        this.filePathAfterDocLib,
+        strfileName,
+        this.strUserEmailAddress
+      ).subscribe({
+        next: (response: SharePointUploadResponse) => {
+          console.log('File uploaded successfully', response);
 
-                const [fileLocation, intranetGuid] = response.result.split(';');
-                this.fileLocation = fileLocation;
-                this.documentUploaded.emit({ fileLocation, intranetGuid });
+          const [fileLocation, intranetGuid] = response.result.split(';');
+          this.fileLocation = fileLocation;
+          this.documentUploaded.emit({ fileLocation, intranetGuid });
 
-                const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
-                if (uploadedDocumentsDiv) {
-                    uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
-                }
+          const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
+          if (uploadedDocumentsDiv) {
+            uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
+          }
 
-                this.callUploadDoc = false;
-                const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
-                setTimeout(() => {
-                    if (popupWrapper) {
-                        popupWrapper.style.display = 'none';
-                    } else {
-                        console.error('Element with class not found');
-                    }
-                }, 0);
-
-                this.uploadFileSuccess(constants.DocumentAttechment.saveDocument);
-                this.isLoading = false;
-            },
-            error: (err) => {
-                console.error('Error occurred during file upload', err);
-                this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ERROR_UPLOADING_FILE);
-                this.isLoading = false;
+          this.callUploadDoc = false;
+          const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
+          setTimeout(() => {
+            if (popupWrapper) {
+              popupWrapper.style.display = 'none';
+            } else {
+              console.error('Element with class not found');
             }
-        });
+          }, 0);
+
+          this.uploadFileSuccess(constants.DocumentAttechment.saveDocument);
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error occurred during file upload', err);
+          this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ERROR_UPLOADING_FILE);
+          this.isLoading = false;
+        }
+      });
     } else {
-        console.error('No valid PDF file selected.');
-        this.isLoading = false;
+      console.error('No valid PDF file selected.');
+      this.isLoading = false;
     }
-}
+  }
 
 
 
   deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number) {
-    this.objectWF.deleteDocument(docID, objectId, objectInstanceId, ObjectInstanceRevNum).subscribe({
-      next: (response) => {
-        console.log('Document deleted successfully:', response);
-        if (this.loadDocuments) {
-          this.loadDocuments();
+    if (this.fileLocation) {
+    
+      this.sharepointService.deleteFileFromSharepoint(this.intranetSitePath, this.fileLocation).subscribe({
+        next: () => {
+          console.log('File deleted from SharePoint successfully');
+
+          this.objectWF.deleteDocument(docID, objectId, objectInstanceId, ObjectInstanceRevNum).subscribe({
+            next: (response) => {
+              console.log('Document deleted from database successfully:', response);
+
+              if (this.loadDocuments) {
+                this.loadDocuments();
+              }
+            },
+            error: (err) => {
+              console.error('Error occurred while deleting the document from the database:', err);
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Error deleting file from SharePoint:', err);
         }
-      },
-      error: (err) => {
-        console.error('Error occurred while deleting the document:', err);
-      }
-    });
+      });
+    } else {
+      console.error('No file location available for SharePoint deletion');
+    }
   }
+
+
 
   showUploadConfirmation(documentObj: any) {
     Swal.fire({

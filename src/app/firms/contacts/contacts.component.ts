@@ -716,7 +716,7 @@ export class ContactsComponent {
       this.resetCreateContactObj();
       this.addedAddresses = [];
       this.addedAddresses = [this.createDefaultAddress()];
-      
+      this.disableAddressFieldOnCreate = false;
     }
   }
   resetCreateContactObj() {
