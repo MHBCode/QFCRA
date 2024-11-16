@@ -449,6 +449,7 @@ export class ContactsComponent {
     this.addedAddresses = [this.createDefaultAddress()];
     this.disableAddressFieldOnCreate = false;
     this.canAddNewAddressOnCreate = false;
+    this.Column2 = "select"
   }
 
   closeCreateContactPopup() {
@@ -1088,7 +1089,7 @@ export class ContactsComponent {
     isFunctionActive: 0,
     isRecordEditable: 0,
   }
-
+  IsMainContactResponse: any = {};
   createContactPopup(): void {
     this.CreateContactValidateForm();
 
@@ -1201,8 +1202,9 @@ export class ContactsComponent {
       this.loadContacts();
     } else {
       this.contactService.IsMainContact(this.firmId, this.createContactObj.entityId, this.createContactObj.contactType)
-        .subscribe(response => {
-          if (response != null) {
+        .subscribe(data => {
+          this.IsMainContactResponse = data;
+          if (this.IsMainContactResponse?.response?.Column1 === 1) {
             this.firmDetailsService.showErrorAlert(constants.ContactMessage.MAIN_CONTACT_EXISTS);
             this.isLoading = false;
             return;
@@ -1434,26 +1436,20 @@ export class ContactsComponent {
     if (this.selectedContact.contactTypeID !== 1 || !this.selectedContact.contactTypeID) {
       this.saveContactForm(saveEditContactObj);
     } else {
-      this.contactService.IsMainContact(this.firmId, this.selectedContact.entityID, this.selectedContact.entityTypeID)
+      this.contactService.IsContactTypeExists(this.firmId, this.selectedContact.entityID, this.selectedContact.entityTypeID, this.selectedContact.contactID, this.selectedContact.contactAssnID)
         .subscribe(response => {
           if (response != null) {
-            this.firmDetailsService.showErrorAlert(constants.ContactMessage.MAIN_CONTACT_EXISTS);
+            this.firmDetailsService.showErrorAlert(constants.ContactMessage.CONTACT_TYPE_EXISTS);
             this.isLoading = false;
             return;
           } else {
-            this.contactService.IsContactTypeExists(this.firmId, this.selectedContact.entityID, this.selectedContact.entityTypeID, this.selectedContact.contactID, this.selectedContact.contactAssnID)
-              .subscribe(response => {
-                if (response != null) {
-                  this.firmDetailsService.showErrorAlert(constants.ContactMessage.CONTACT_TYPE_EXISTS);
-                  this.isLoading = false;
-                  return;
-                } else {
-                  this.saveContactForm(saveEditContactObj);
-                }
-              })
+            this.saveContactForm(saveEditContactObj);
           }
-        });
+        })
+        
+
     }
+    this.saveContactForm(saveEditContactObj);
   }
 
   cancelContact() {
@@ -2140,7 +2136,7 @@ export class ContactsComponent {
   }
   onNationalityChange(event: Event): void {
     const selectedNationality = Number((event.target as HTMLSelectElement).value);
-     
+
     const residentStatus = this.createResidentStateObj.attributeValue;
     if (selectedNationality !== 0) {
       if (residentStatus === 'Resident' && selectedNationality !== this.getQatarCountryID()) {
@@ -2156,8 +2152,8 @@ export class ContactsComponent {
   ///////////// Resident State  && Counrty
   onCountryChange(event: Event): void {
     const selectedCountryID = Number((event.target as HTMLSelectElement).value);
-    this.addedAddresses.CountryID = selectedCountryID; 
-     
+    this.addedAddresses.CountryID = selectedCountryID;
+
     const residentStatus = this.createResidentStateObj.attributeValue;
     if (selectedCountryID !== 0) {
       if (residentStatus === 'Resident' && selectedCountryID !== this.getQatarCountryID()) {
