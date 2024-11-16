@@ -5,30 +5,28 @@ import Swal from 'sweetalert2';
 import { FirmService } from '../firm.service';
 import { FirmDetailsService } from '../firmsDetails.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
-import { ParententityService } from 'src/app/ngServices/parententity.service';
 import * as constants from 'src/app/app-constants';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
+import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
+import { forkJoin, Observable, tap } from 'rxjs';
 
 @Component({
   selector: 'app-auditors',
   templateUrl: './auditors.component.html',
-  styleUrls: ['./auditors.component.scss','../firms.scss']
+  styleUrls: ['./auditors.component.scss', '../firms.scss']
 })
 export class AuditorsComponent {
 
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   userId = 30; // Replace with dynamic userId as needed
+  Page = FrimsObject;
   firmId: number = 0;
   errorMessages: { [key: string]: string } = {};
   IsViewAuditorVisible: boolean = false;
   IsCreateAuditorVisible: boolean = false;
   IsEditAuditorVisible: boolean = false;
   firmDetails: any;
-  canAddNewAddress: boolean = true;
-  disableAddressFields: boolean = false;
-  isFirmLicensed: boolean;
-  isFirmAuthorised: boolean;
   selectedAuditor: any = {};
   categorizedData = [];
   selectedAuditorNameFromSelectBox: string = 'select';
@@ -45,7 +43,22 @@ export class AuditorsComponent {
   firmAuditorType: { EntitySubTypeID: number, EntitySubTypeDesc: string }[] = [];
   objectOpTypeIdEdit = 41;
   objectOpTypeIdCreate = 40;
+  firmAuditorsObj: {};
+
+  // Security
+  FIRMRA: any[] = [];
+  ASSILevel: number = 4;
   assignedUserRoles: any = [];
+  assignedLevelUsers: any = [];
+  FirmAMLSupervisor: boolean = false;
+  ValidFirmSupervisor: boolean = false;
+  UserDirector: boolean = false;
+  hideEditBtn: boolean = false;
+  hideSaveBtn: boolean = false;
+  hideCancelBtn: boolean = false;
+  hideCreateBtn: boolean = false;
+  hideReviseBtn: boolean = false;
+  hideDeleteBtn: boolean = false;
 
 
   constructor(
@@ -69,15 +82,27 @@ export class AuditorsComponent {
       if (this.FIRMAuditors.length === 0) {
         this.loadAuditors();
       }
-      this.firmDetailsService.isFirmLicensed$.subscribe(
-        (value) => (this.isFirmLicensed = value)
-      );
-      this.firmDetailsService.isFirmAuthorised$.subscribe(
-        (value) => (this.isFirmAuthorised = value)
-      );
 
-      this.firmDetailsService.checkFirmLicense(this.firmId);
-      this.firmDetailsService.checkFirmAuthorisation(this.firmId);
+      // Security
+      forkJoin([
+        this.firmDetailsService.loadAssignedUserRoles(this.userId),
+        this.firmDetailsService.loadAssignedLevelUsers(),
+        this.isValidFirmSupervisor(),
+        this.isValidFirmAMLSupervisor(),
+        this.loadAssiRA()
+      ]).subscribe({
+        next: ([userRoles, levelUsers]) => {
+          // Assign the results to component properties
+          this.assignedUserRoles = userRoles;
+          this.assignedLevelUsers = levelUsers;
+
+          this.applySecurityOnPage(this.Page.Auditor);
+        },
+        error: (err) => {
+          console.error('Error loading user roles or level users:', err);
+        }
+      });
+
     })
   }
 
@@ -86,6 +111,83 @@ export class AuditorsComponent {
       this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
     });
     this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+  }
+
+  applySecurityOnPage(objectId: FrimsObject) {
+    this.isLoading = true;
+    const currentOpType = ObjectOpType.ListView;
+
+    // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+      let firmType = this.firmDetails?.FirmTypeID;
+
+
+      if (this.ValidFirmSupervisor) {
+        this.isLoading = false;
+        return; // No need to hide the button for Firm supervisor
+      } else if (this.firmDetailsService.isValidRSGMember()) {
+        this.isLoading = false;
+        return; // No need to hide the button for RSG Member
+      } else if (this.FirmAMLSupervisor || this.firmDetailsService.isValidAMLDirector()) {
+        this.isLoading = false;
+        return;
+      }
+      else if (this.UserDirector) {
+        this.isLoading = false;
+        return;
+      }
+      else {
+        this.hideActionButton(); // Default: hide the button
+        this.isLoading = false;
+      }
+      
+    });
+  }
+
+  hideActionButton() {
+    this.hideEditBtn = true;
+    this.hideSaveBtn = true;
+    this.hideCancelBtn = true;
+    this.hideCreateBtn = true;
+    this.hideDeleteBtn = true;
+    this.hideReviseBtn = true;
+  }
+
+  isValidFirmSupervisor() {
+    return this.firmDetailsService.isValidFirmSupervisor(this.firmId, this.userId).pipe(
+      tap(response => this.ValidFirmSupervisor = response)
+    );
+  }
+
+  isValidFirmAMLSupervisor() {
+    return this.firmDetailsService.isValidFirmAMLSupervisor(this.firmId, this.userId).pipe(
+      tap(response => this.FirmAMLSupervisor = response)
+    );
+  }
+
+  isUserDirector() {
+    return this.firmDetailsService.isUserDirector(this.userId).pipe(
+      tap(response => this.UserDirector = response)
+    );
+  }
+
+  getControlVisibility(controlName: string): boolean {
+    return this.firmDetailsService.getControlVisibility(controlName);
+  }
+
+  getControlEnablement(controlName: string): boolean {
+    return this.firmDetailsService.getControlEnablement(controlName);
+  }
+
+  loadAssiRA(): Observable<any> {
+    this.isLoading = true;
+    return this.firmService.getFIRMUsersRAFunctions(this.firmId, this.ASSILevel).pipe(
+      tap(data => {
+        this.FIRMRA = data.response;
+        console.log('Firm RA Functions details:', this.FIRMRA);
+        this.isLoading = false;
+      })
+    );
   }
 
   loadFirmDetails(firmId: number) {
@@ -132,36 +234,35 @@ export class AuditorsComponent {
       });
   }
   viewAuditor(auditor: any) {
+    this.IsViewAuditorVisible = true;
     this.selectedAuditor = auditor; // Set the selected auditor
-    console.log("selectedAuditor",this.selectedAuditor)
-    this.IsViewAuditorVisible = true; // Show view section
-    this.IsEditAuditorVisible = false; // Hide edit section
-    this.IsCreateAuditorVisible = false; // Hide create section
+    console.log("selectedAuditor", this.selectedAuditor);
+    this.hideSaveBtn = true;
+    this.hideEditBtn = false;
+    this.applySecurityOnPage(this.Page.Auditor);
   }
   closeAuditorPopup() {
     this.selectedAuditor = {}; // Reset the selected auditor object
-    this.IsEditAuditorVisible = false; // Hide edit section
     this.IsViewAuditorVisible = false; // Hide view section
-    this.IsCreateAuditorVisible = false; // Hide create section
+    this.IsEditAuditorVisible = false;
     this.hasValidationErrors = false;
     this.errorMessages = {};
   }
   closecreateAuditor() {
     this.selectedAuditor = {};
     this.IsCreateAuditorVisible = false;
-    this.IsViewAuditorVisible = false;
     this.firmAuditorsObj = {};
     this.hasValidationErrors = false;
     this.errorMessages = {};
   }
   editAuditor() {
     this.IsEditAuditorVisible = true; // Show the edit section
-    this.IsCreateAuditorVisible = false; // Hide the create section
-    this.IsViewAuditorVisible = false; // Hide the view section
-
+    this.hideSaveBtn = false;
+    this.hideEditBtn = true;
     // Fetch dropdown values when entering edit mode
     this.getFirmAuditorName();
     this.getFirmAuditorType();
+    this.applySecurityOnPage(this.Page.Auditor);
   }
   EditAuditorValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -173,7 +274,7 @@ export class AuditorsComponent {
         this.loadErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
         this.hasValidationErrors = true;
       }
-      if ( this.firmService.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined) {
+      if (this.firmService.isNullOrEmpty(this.selectedAuditor.AssnDateFrom) || this.selectedAuditor.AssnDateFrom === undefined) {
         this.loadErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
         this.hasValidationErrors = true;
       }
@@ -183,7 +284,7 @@ export class AuditorsComponent {
       }
     });
   }
-  firmAuditorsObj: {};
+ 
   saveEditAuditor() {
     this.EditAuditorValidateForm();
 
@@ -244,6 +345,7 @@ export class AuditorsComponent {
         this.IsEditAuditorVisible = false;
         this.IsViewAuditorVisible = false;
         this.loadAuditors();
+        this.applySecurityOnPage(this.Page.Auditor);
       },
       (error) => {
         console.error("Error saving auditor", error);
@@ -255,7 +357,7 @@ export class AuditorsComponent {
   showError(messageKey: number) {
     this.firmDetailsService.showErrorAlert(messageKey, this.isLoading);
   }
-  
+
   onAuditorChange(event: any): void {
     const selectedAuditorID = event.target.value;
 
@@ -273,12 +375,12 @@ export class AuditorsComponent {
     return new Promise<void>((resolve, reject) => {
       this.errorMessages = {};
       this.hasValidationErrors = false;
-  
+
       // Map existing auditor names to a lowercase array for case-insensitive comparison
       const existingAuditorNames = this.filteredAuditors
         .map(auditor => auditor.OtherEntityName?.toLowerCase())
         .filter(name => name); // Remove any undefined names
-  
+
       // Validate dropdown selection or custom auditor name
       if (this.CreateAuditorObj.OtherEntityName === 'other') {
         // Custom auditor name validation
@@ -292,7 +394,7 @@ export class AuditorsComponent {
       } else {
         // Directly validate selected auditor name to prevent duplicates
         const selectedAuditorName = this.CreateAuditorObj.OtherEntityName?.toLowerCase();
-        
+
         if (!selectedAuditorName) {
           this.loadErrorMessages('auditorName', constants.AuditorsMessages.Select_Auditor_Name);
           this.hasValidationErrors = true;
@@ -301,24 +403,24 @@ export class AuditorsComponent {
           this.hasValidationErrors = true;
         }
       }
-  
+
       // Additional validations (same as before)
       if (!this.CreateAuditorObj.EntitySubTypeID) {
         this.loadErrorMessages('EntitySubTypeID', constants.AuditorsMessages.Select_Auditor_Type);
         this.hasValidationErrors = true;
       }
-  
+
       if (this.firmService.isNullOrEmpty(this.CreateAuditorObj.AssnDateFrom)) {
         this.loadErrorMessages('AssnDateFrom', constants.AuditorsMessages.Select_Valid_Data_From);
         this.hasValidationErrors = true;
       }
-  
-      if (this.CreateAuditorObj.AssnDateTo && 
-          this.dateUtilService.convertDateToYYYYMMDD(this.CreateAuditorObj.AssnDateFrom) >= this.dateUtilService.convertDateToYYYYMMDD(this.CreateAuditorObj.AssnDateTo)) {
+
+      if (this.CreateAuditorObj.AssnDateTo &&
+        this.dateUtilService.convertDateToYYYYMMDD(this.CreateAuditorObj.AssnDateFrom) >= this.dateUtilService.convertDateToYYYYMMDD(this.CreateAuditorObj.AssnDateTo)) {
         this.loadErrorMessages('AssnDateTo', constants.AuditorsMessages.Select_Valid_Data_From_Later_Than_To);
         this.hasValidationErrors = true;
       }
-  
+
       // Resolve or reject the promise based on validation results
       if (this.hasValidationErrors) {
         reject();
@@ -327,7 +429,7 @@ export class AuditorsComponent {
       }
     });
   }
-  
+
   // CreateAuditorValidateForm(): Promise<void> {
   //   return new Promise<void>((resolve, reject) => {
   //     this.errorMessages = {};
@@ -395,12 +497,12 @@ export class AuditorsComponent {
     EntityTypeID: 1,
     entityID: this.firmId,
     controllerControlTypeID: null,
-    customAuditorName:'',
+    customAuditorName: '',
     numOfShares: 0,
     pctOfShares: 0,
     majorityStockHolder: true,
     AssnDateFrom: "",
-    AssnDateTo:"",
+    AssnDateTo: "",
     LastModifiedByOfRelatedEntity: this.userId,
   }
   saveCreateAuditor() {
@@ -465,6 +567,7 @@ export class AuditorsComponent {
           this.IsViewAuditorVisible = false;
           this.IsCreateAuditorVisible = false;
           this.loadAuditors();
+          this.applySecurityOnPage(this.Page.Auditor);
         },
         (error) => {
           console.error("Error saving auditor", error);
@@ -480,6 +583,7 @@ export class AuditorsComponent {
   cancelEdit() {
     this.IsEditAuditorVisible = false;
     this.IsViewAuditorVisible = true;
+    this.loadAuditors();
   }
   createAuditor() {
     this.selectedAuditor = {};
@@ -585,13 +689,13 @@ export class AuditorsComponent {
       return this.FIRMAuditors.filter(auditor => {
         const assnDateTo = auditor.AssnDateTo ? new Date(auditor.AssnDateTo) : null;
         const currentDate = new Date(this.currentDate);
-  
+
         // Include active records if AssnDateTo is null or if it is in the future
         return !assnDateTo || assnDateTo.getTime() >= currentDate.getTime();
       });
     }
   }
-  
+
   onInactiveAuditorsToggle(event: Event) {
     this.showInactiveAuditors = (event.target as HTMLInputElement).checked;
   }

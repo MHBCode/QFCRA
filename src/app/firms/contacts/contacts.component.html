@@ -8,7 +8,7 @@
           Contacts > <span>{{ firmDetails?.FirmName }}</span>
         </h2>
         <div class="btn">
-          <button (click)="createContact()">
+          <button *ngIf="!hideCreateBtn" (click)="createContact()">
             <i class="bi bi-plus"></i>
             Create
           </button>
@@ -27,7 +27,7 @@
             <th>Position/Job Title</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody *ngIf="filteredContacts?.length > 0; else noFirmContactsRecords">
           <tr *ngFor="let contact of filteredContacts" (click)="openContactPopup(contact)">
             <td>{{ contact.FullName }}</td>
             <td>{{ contact.ContactTypeDesc }}</td>
@@ -35,6 +35,13 @@
             <td>{{ contact.JobTitle }}</td>
           </tr>
         </tbody>
+        <ng-template #noFirmContactsRecords>
+          <tbody>
+            <tr>
+              <td colspan="4" class="norecords" style="color: red">No Records Found</td>
+            </tr>
+          </tbody>
+        </ng-template>
       </table>
     </div>
   </div>

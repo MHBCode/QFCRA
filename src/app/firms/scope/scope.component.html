@@ -47,13 +47,13 @@
             Scope > <span>{{ firmDetails?.FirmName }}</span>
           </h2>
           <div *ngIf="currentLicRevisionNumber === lastLicRevisionNumber" style="display: flex; gap: 10px">
-            <div class="btn" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn">
+            <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnEdit') && !hideEditBtn">
               <button [disabled]="!getControlEnablement('imgBtnEdit')" class="edit-btn" (click)="editLicenseScope()">
                 <i class="bi bi-pen"></i>Edit
               </button>
             </div>
 
-            <div class="btn" *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn">
+            <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnSave') && !hideSaveBtn">
               <button [disabled]="!getControlEnablement('imgBtnSave')" class="save-btn" (click)="saveLicenseScope()">
                 Save
               </button>
@@ -66,20 +66,20 @@
               </button>
             </div>
 
-            <div class="btn" *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn">
+            <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnCreate') && !hideCreateBtn">
               <button [disabled]="!getControlEnablement('imgBtnCreate')" (click)="createLicenseScope()">
                 Create
               </button>
             </div>
 
-            <div class="btn" *ngIf="getControlVisibility('imgBtnRevise') && !hideReviseBtn
+            <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnRevise') && !hideReviseBtn
               ">
               <button [disabled]="!getControlEnablement('imgBtnRevise')">
                 Revise
               </button>
             </div>
 
-            <div class="btn" *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
+            <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
               <button [disabled]="!getControlEnablement('imgBtnDelete')">
                 Delete
               </button>
@@ -337,38 +337,38 @@
             Scope ><span>{{ firmDetails?.FirmName }}</span>
           </h2>
           <div *ngIf="currentAuthRevisionNumber === lastAuthRevisionNumber" style="display: flex; gap: 10px">
-            <div class="btn" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn">
+            <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnEdit') && !hideEditBtn">
               <button [disabled]="!getControlEnablement('imgBtnEdit')" class="edit-btn" (click)="editAuthScope()">
                 <i class="bi bi-pen"></i>Edit
               </button>
             </div>
 
-            <div class="btn" *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn">
+            <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnSave') && !hideSaveBtn">
               <button [disabled]="!getControlEnablement('imgBtnSave')" class="save-btn" (click)="saveAuthScope()">
                 Save
               </button>
             </div>
 
-            <div class="btn" *ngIf="getControlVisibility('imgBtnCancel') && !hideCancelBtn">
+            <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnCancel') && !hideCancelBtn">
               <button [disabled]="!getControlEnablement('imgBtnCancel')" class="cancel-btn"
                 (click)="cancelEditAuthScope()">
                 Cancel
               </button>
             </div>
 
-            <div class="btn" *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn">
+            <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnCreate') && !hideCreateBtn">
               <button [disabled]="!getControlEnablement('imgBtnCreate')" (click)="createAuthorisedScope()">
                 Create
               </button>
             </div>
 
-            <div class="btn" *ngIf="getControlVisibility('imgBtnRevise') && !hideReviseBtn">
+            <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnRevise') && !hideReviseBtn">
               <button [disabled]="!getControlEnablement('imgBtnRevise')">
                 Revise
               </button>
             </div>
 
-            <div class="btn" *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
+            <div class="btn" *ngIf="!isLoading && getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
               <button [disabled]="!getControlEnablement('imgBtnDelete')">
                 Delete
               </button>
