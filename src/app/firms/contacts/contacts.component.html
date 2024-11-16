@@ -88,23 +88,23 @@
             </option>
           </select>
         </div>
-        <div class="input-field" style="width: 100%" *ngIf="isFirmSelected()">
+        <div class="input-field" style="width: 100%" *ngIf="isFirmSelected() && firmDetails.FirmTypeID !== 2">
           <label for="aIsContactTypeID">
             Is contact information being provided for an approved individual or an individual who has applied for
             approval of controlled functions?
           </label>
           <div class="radio-wrapper">
-            <input type="radio" id="true" name="aIsContactTypeID" [(ngModel)]="createContactObj.aIsContactTypeID"
+            <input type="radio" id="true" name="aIsContactTypeID" [(ngModel)]="createContactObj.aIsContactTypeID" (ngModelChange)="onAIsContactTypeChange()"
               [value]="true" /> Yes
 
-            <input type="radio" id="false" name="aIsContactTypeID" [(ngModel)]="createContactObj.aIsContactTypeID"
+            <input type="radio" id="false" name="aIsContactTypeID" [(ngModel)]="createContactObj.aIsContactTypeID" (ngModelChange)="onAIsContactTypeChange()"
               [value]="false" /> No
           </div>
         </div>
 
 
         <!-- Available Contacts Section -->
-        <div class="input-field" *ngIf="isFirmSelected()">
+        <div class="input-field" *ngIf="isFirmSelected() && firmDetails.FirmTypeID !== 2">
           <label for="contactType">Available Contacts</label>
           <select name="contactType" id="contactType" [(ngModel)]="Column2" (ngModelChange)="onContactChange($event)"
             [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === false ">
@@ -119,8 +119,8 @@
         <div class="input-field">
           <label for="contactType">Contact Type<span style="color: red">&nbsp;*</span></label>
           <select name="contactType" id="contactType"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true &&  !selectedAvilableContact"
-            [(ngModel)]="createContactObj.contactType">
+          [disabled]="firmDetails.FirmTypeID !== 2 && (createContactObj.aIsContactTypeID === null || (createContactObj.aIsContactTypeID === true && !selectedAvilableContact))"
+          [(ngModel)]="createContactObj.contactType">
             <option value="select" selected>Select</option>
             <option *ngFor="let contactType of contactTypeOption" [ngValue]="contactType.ContactTypeID">
               {{ contactType.ContactTypeDesc }}
@@ -133,12 +133,12 @@
           <label for="isPEP">Is Politically Exposed Person (PEP)?<span style="color: red">&nbsp;*</span></label>
           <div class="radio-wrapper">
             <input name="isPEP" id="yes" type="radio" [value]="true"
-              [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true &&  !selectedAvilableContact"
-              [(ngModel)]="createContactObj.isPeP" />
+            [disabled]="firmDetails.FirmTypeID !== 2 && (createContactObj.aIsContactTypeID === null || (createContactObj.aIsContactTypeID === true && !selectedAvilableContact))"
+            [(ngModel)]="createContactObj.isPeP" />
             Yes
             <input name="isPEP" id="no" type="radio" [value]="false"
-              [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true"
-              [(ngModel)]="createContactObj.isPeP" />
+            [disabled]="firmDetails.FirmTypeID !== 2 && (createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true)"
+            [(ngModel)]="createContactObj.isPeP" />
             No
           </div>
         </div>
@@ -147,16 +147,16 @@
         <div class="input-field">
           <label for="position/JobTitle">Position/Job Title</label>
           <input name="position/JobTitle" id="position/JobTitle" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true &&  !selectedAvilableContact"
-            [(ngModel)]="createContactObj.jobTitle" />
+          [disabled]="firmDetails.FirmTypeID !== 2 && (createContactObj.aIsContactTypeID === null || (createContactObj.aIsContactTypeID === true && !selectedAvilableContact))"
+          [(ngModel)]="createContactObj.jobTitle" />
         </div>
 
         <!-- Title Section -->
         <div class="input-field">
           <label for="Title">Title</label>
           <select name="Title" id="Title"
-            [disabled]="createContactObj.aIsContactTypeID === null && !selectedAvilableContact"
-            [(ngModel)]="createContactObj.title">
+          [disabled]="firmDetails.FirmTypeID !== 2 && (createContactObj.aIsContactTypeID === null && !selectedAvilableContact)"
+          [(ngModel)]="createContactObj.title">
             <option *ngFor="let title of Titles" [value]="title.TitleDesc">
               {{ title.TitleDesc }}
             </option>
@@ -166,70 +166,96 @@
         <!-- First Name Section -->
         <div class="input-field">
           <label for="firstName">First Name<span style="color: red">&nbsp;*</span></label>
-          <input name="firstName" id="firstName" type="text" [disabled]="createContactObj.aIsContactTypeID === null"
+          <input name="firstName" id="firstName" type="text"    
+           [disabled]="firmDetails.FirmTypeID !== 2 && createContactObj.aIsContactTypeID === null"
             [(ngModel)]="createContactObj.firstName" (blur)="onNameBlur()" />
         </div>
 
         <!-- Second Name Section -->
         <div class="input-field">
           <label for="SecondName">Second Name</label>
-          <input name="SecondName" id="SecondName" type="text" [disabled]="createContactObj.aIsContactTypeID === null"
-            [(ngModel)]="createContactObj.secondName" (blur)="onNameBlur()" />
+          <input name="SecondName" id="SecondName" type="text"     
+          [disabled]="firmDetails.FirmTypeID !== 2 && createContactObj.aIsContactTypeID === null"
+          [(ngModel)]="createContactObj.secondName" (blur)="onNameBlur()" />
         </div>
 
         <!-- Family Name Section -->
         <div class="input-field">
           <label for="FamilyName">Family Name</label>
-          <input name="FamilyName" id="FamilyName" type="text" [disabled]="createContactObj.aIsContactTypeID === null"
+          <input name="FamilyName" id="FamilyName" type="text"     
+          [disabled]="firmDetails.FirmTypeID !== 2 && createContactObj.aIsContactTypeID === null"
             [(ngModel)]="createContactObj.familyName" />
         </div>
 
+        <!-- Date Of Birth -->
+        <div class="input-field" *ngIf="firmDetails.FirmTypeID === 2">
+          <label for="dateOfBirth">
+            Date of birth <span style="color: red">*</span>
+          </label>
+          <input [(ngModel)]="createContactObj.dateOfBirth" #dateInputs placeholder name="dateOfBirth"
+            id="dateOfBirth" type="input"     
+            [disabled]="firmDetails.FirmTypeID !== 2 && createContactObj.aIsContactTypeID === null" />
+            />
+        </div>
+
+        <!-- Nationality -->
+        <div class="input-field" *ngIf="firmDetails.FirmTypeID === 2">
+          <label for="country"> Nationality </label>
+          <select [(ngModel)]="createContactObj.nationality"    
+          [disabled]="firmDetails.FirmTypeID !== 2 && createContactObj.aIsContactTypeID === null"
+            (change)="onNationalityChange($event)">
+            <option value="0">Select</option>
+            <option *ngFor="let option of allCountries" [value]="option.CountryID">
+              {{ option?.CountryName }}
+            </option>
+          </select>
+        </div>
         <!-- Mobile Phone Section -->
         <div class="input-field">
           <label for="MobilePhone">Mobile Phone</label>
           <input name="MobilePhone" id="MobilePhone" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
-            [(ngModel)]="createContactObj.mobileNum" (blur)="checkMobileNumberExists(createContactObj.mobileNum)" />
+          [disabled]="firmDetails.FirmTypeID !== 2 && (createContactObj.aIsContactTypeID === null || (createContactObj.aIsContactTypeID === true && !selectedAvilableContact))"
+          [(ngModel)]="createContactObj.mobileNum" (blur)="checkMobileNumberExists(createContactObj.mobileNum)" />
         </div>
 
         <!-- Fax Section -->
         <div class="input-field">
           <label for="Fax">Fax</label>
           <input name="Fax" id="Fax" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
-            [(ngModel)]="createContactObj.fax" />
+          [disabled]="firmDetails.FirmTypeID !== 2 && (createContactObj.aIsContactTypeID === null || (createContactObj.aIsContactTypeID === true && !selectedAvilableContact))"
+          [(ngModel)]="createContactObj.fax" />
         </div>
 
         <!-- Business Phone Section -->
         <div class="input-field">
           <label for="BusinessPhone">Business Phone</label>
           <input name="BusinessPhone" id="BusinessPhone" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
-            [(ngModel)]="createContactObj.busPhone" />
+          [disabled]="firmDetails.FirmTypeID !== 2 && (createContactObj.aIsContactTypeID === null || (createContactObj.aIsContactTypeID === true && !selectedAvilableContact))"
+          [(ngModel)]="createContactObj.busPhone" />
         </div>
 
         <!-- Business Email Section -->
         <div class="input-field">
           <label for="BusinessEmail">Business Email</label>
           <input name="BusinessEmail" id="BusinessEmail" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
-            [(ngModel)]="createContactObj.busEmail" />
+          [disabled]="firmDetails.FirmTypeID !== 2 && (createContactObj.aIsContactTypeID === null || (createContactObj.aIsContactTypeID === true && !selectedAvilableContact))"
+          [(ngModel)]="createContactObj.busEmail" />
         </div>
 
         <!-- Other Email Section -->
         <div class="input-field">
           <label for="OtherEmail">Other Email</label>
           <input name="OtherEmail" id="OtherEmail" type="text"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
-            [(ngModel)]="createContactObj.otherEmail" />
+          [disabled]="firmDetails.FirmTypeID !== 2 && (createContactObj.aIsContactTypeID === null || (createContactObj.aIsContactTypeID === true && !selectedAvilableContact))"
+          [(ngModel)]="createContactObj.otherEmail" />
         </div>
 
         <!-- Method of Contact Section -->
         <div class="input-field">
           <label for="MethodofContact">Preferred Method of Contact</label>
           <select name="MethodofContact" id="MethodofContact"
-            [disabled]="createContactObj.aIsContactTypeID === null || createContactObj.aIsContactTypeID === true && !selectedAvilableContact"
-            [(ngModel)]="createContactObj.ContactMethodTypeID">
+          [disabled]="firmDetails.FirmTypeID !== 2 && (createContactObj.aIsContactTypeID === null || (createContactObj.aIsContactTypeID === true && !selectedAvilableContact))"
+          [(ngModel)]="createContactObj.ContactMethodTypeID">
             <option *ngFor="let MethodofContact of MethodofContactOption" [value]="MethodofContact.ContactMethodTypeID">
               {{ MethodofContact.ContactMethodTypeDesc }}
             </option>
@@ -520,7 +546,7 @@
                   </option>
                 </select>
               </div> -->
-        <!-- <div class="input-field" style="width: 100%" *ngIf="isFirmSelected()">
+        <div class="input-field" style="width: 100%" *ngIf="isFirmSelected() && firmDetails.FirmTypeID !== 2">
           <label for="aIsContactTypeID">
             Is contact information being provided for an approved individual or an individual who has applied for
             approval of controlled functions?
@@ -532,8 +558,8 @@
             <input type="radio" id="false" name="aIsContactTypeID" [(ngModel)]="selectedContact.aIsContactTypeID"
               [value]="false" /> No
           </div>
-        </div> -->
-        <!-- <div class="input-field" *ngIf="isFirmSelected()">
+        </div>
+         <div class="input-field" *ngIf="isFirmSelected() && firmDetails.FirmTypeID !== 2">
           <label for="contactType">
             Available Contacts
           </label>
@@ -541,11 +567,11 @@
             (ngModelChange)="onContactChange($event)"
             [disabled]="selectedContact.aIsContactTypeID === null || selectedContact.aIsContactTypeID === false || !isEditContact">
             <option value="select" selected>Select</option>
-            <option *ngFor="let AvilabilContact of AllAvilabilContact" [ngValue]="AvilabilContact.Column1">
+            <option *ngFor="let AvilabilContact of allAvailableContact" [ngValue]="AvilabilContact.Column1">
               {{ AvilabilContact.Column2 }}
             </option>
           </select>
-        </div> -->
+        </div> 
         <div class="input-field">
           <label for="contactType">
             Contact Type<span style="color: red">*</span>
@@ -599,6 +625,26 @@
           <label for="FamilyName"> Family Name</label>
           <input name="FamilyName" id="FamilyName" type="text" [(ngModel)]="selectedContact.familyName"
             [disabled]="!isEditContact" />
+        </div>
+        <!-- Date Of Birth -->
+        <div class="input-field" *ngIf="firmDetails.FirmTypeID === 2">
+          <label for="dateOfBirth">
+            Date of birth <span style="color: red">*</span>
+          </label>
+          <input [(ngModel)]="createContactObj.dateOfBirth" #dateInputs placeholder name="dateOfBirth"
+            id="dateOfBirth" type="input" [disabled]="!isEditContact" />
+        </div>
+
+        <!-- Nationality -->
+        <div class="input-field" *ngIf="firmDetails.FirmTypeID === 2">
+          <label for="country"> Nationality </label>
+          <select [(ngModel)]="createContactObj.nationality" [disabled]="!isEditContact"
+            (change)="onNationalityChange($event)">
+            <option value="0">Select</option>
+            <option *ngFor="let option of allCountries" [value]="option.CountryID">
+              {{ option?.CountryName }}
+            </option>
+          </select>
         </div>
         <div class="input-field">
           <label for="MobilePhone">Mobile Phone</label>

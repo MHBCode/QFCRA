@@ -444,6 +444,7 @@ export class ContactsComponent {
   createContact() {
     this.showCreateContactSection = true;
     this.disableAddressFieldOnCreate = false;
+    this.createContactObj.aIsContactTypeID = null;
     this.addedAddresses = [];
     this.addedAddresses = [this.createDefaultAddress()];
     this.disableAddressFieldOnCreate = false;
@@ -464,6 +465,140 @@ export class ContactsComponent {
       contactFunction.reviewStatus = '';
     });
   }
+  onAIsContactTypeChange() {
+    if (this.createContactObj.aIsContactTypeID === false || this.createContactObj.aIsContactTypeID === true) {
+      this.createContactObj.firmID = 0;
+      this.createContactObj.contactID = 0;
+      this.createContactObj.contactAssnID = 0;
+      this.createContactObj.title = "";
+      this.createContactObj.contactType = 0;
+      this.createContactObj.firstName = "";
+      this.createContactObj.secondName = "";
+      this.createContactObj.thirdName = "";
+      this.createContactObj.familyName = "";
+      this.createContactObj.countryOfResidence = 0;
+      this.createContactObj.ContactMethodTypeID = null;
+      this.createContactObj.createdBy = 0;
+      this.createContactObj.dateOfBirth = "";
+      this.createContactObj.fullName = "";
+      this.createContactObj.lastModifiedBy = 0;
+      this.createContactObj.ContactFrom = '';
+      this.createContactObj.nationalID = "";
+      this.createContactObj.nationality = 0;
+      this.createContactObj.passportNum = "";
+      this.createContactObj.placeOfBirth = "";
+      this.createContactObj.previousName = "";
+      this.createContactObj.isExists = true;
+      this.createContactObj.nameInPassport = "";
+      this.createContactObj.contactAddnlInfoTypeID = 0;
+      this.createContactObj.isFromContact = true;
+      this.createContactObj.countryofBirth = 0;
+      this.createContactObj.juridictionID = 0;
+      this.createContactObj.objectID = 0;
+      this.createContactObj.isPeP = null;
+      this.createContactObj.EntityTypeID = 0;
+      this.createContactObj.contactTypeId = 0;
+      this.createContactObj.functionTypeId = 0;
+      this.createContactObj.mobileNum = "";
+      this.createContactObj.busEmail = "";
+      this.createContactObj.otherEmail = "";
+      this.createContactObj.contactMethodTypeID = null;
+      this.createContactObj.entitySubTypeID = 0;
+      this.createContactObj.numOfShares = 0;
+      this.createContactObj.pctOfShares = 0;
+      this.createContactObj.majorityStockHolder = true;
+      this.createContactObj.assnDateFrom = "";
+      this.createContactObj.assnDateTo = "";
+      this.createContactObj.controllerControlTypeID = 0;
+      this.createContactObj.jobTitle = "";
+      this.createContactObj.nameAsInPassport = "";
+      this.createContactObj.busPhone = "";
+      this.createContactObj.residencePhone = "";
+      this.createContactObj.strContactAddnlInfoTypeID = "";
+      this.createContactObj.strContactAddnInfoTypes = "";
+      this.createContactObj.fax = "";
+      this.createContactObj.qfcNumber = "";
+      this.createContactObj.isContactSelected = true;
+      this.createContactObj.isIndividualRegulated = true;
+      this.createContactObj.additionalDetails = "";
+      this.createContactObj.ipAddress = "";
+      this.createContactObj.ainId = 0;
+      this.createContactObj.ainNumber = 0;
+      this.createContactObj.applicationID = 0;
+      this.createContactObj.docID = 0;
+      this.createContactObj.dateRecieved = "";
+      this.createContactObj.formProcessor = 0;
+      this.createContactObj.comment = "";
+      this.createContactObj.condApprovalReasonTypeID = 0;
+      this.createContactObj.reasonForDelayInFiling = "";
+      this.createContactObj.residentStatus = "";
+      this.createContactObj.isOrdinarilyResident = true;
+      this.createContactObj.applFeeReceived = "";
+      this.createContactObj.applFeeComment = "";
+      this.createContactObj.wcfAddnlInfo = "";
+      this.createContactObj.placeOfBirthCountryID = 0;
+      this.createContactObj.jurisdictionId = 0;
+      this.createContactObj.totalIndiustryExperenceYear = 0;
+      this.createContactObj.totalIndustryExperenceMonth = 0;
+      this.createContactObj.roleExperenceMonth = 0;
+      this.createContactObj.roleExperenceYear = 0;
+      this.createContactObj.pastPositionFlag = 0;
+      this.createContactObj.experience = "";
+      this.createContactObj.appIndividualArrangementTypeID = 0;
+      this.createContactObj.otherArrangementTypeDesc = "";
+      this.createContactObj.appIndividualDataID = 0;
+      this.createContactObj.pastPositionDesc = "";
+      this.createContactObj.fandPAddnlInfo = "";
+      this.createContactObj.poposedJobTitle = "";
+      this.createContactObj.jobDescription = "";
+      this.createContactObj.cfExercise = "";
+      this.createContactObj.withdrawlReasonDesc = "";
+      this.createContactObj.altArrangementDesc = "";
+      this.createContactObj.competenciesAndExp = "";
+      this.createContactObj.createdDate = "";
+      this.createContactObj.lastModifedDate = "";
+      this.createContactObj.proposedToQatarDateDays = "";
+      this.createContactObj.proposedToQatarDateMonth = "";
+      this.createContactObj.proposedToQatarDateYear = "";
+      this.createContactObj.contactFunctionID = 0;
+      this.createContactObj.contactFunctionTypeID = 0;
+      this.createContactObj.contactFunctionTypeDesc = "";
+      this.createContactObj.effectiveDate = "";
+      this.createContactObj.endDate = "";
+      this.createContactObj.lastModifiedDate = "";
+      this.createContactObj.reviewStatus = "";
+      this.createContactObj.selected = true;
+      this.createContactObj.isFunctionActive = true;
+      this.createContactObj.isRecordEditable = 0;
+      this.createContactObj.countryID = 0;
+      this.createContactObj.addressTypeID = 0;
+      this.createContactObj.sameAsTypeID = 0;
+      this.createContactObj.addressAssnID = 0;
+      this.createContactObj.addressID = "";
+      this.createContactObj.addressLine1 = "";
+      this.createContactObj.addressLine2 = "";
+      this.createContactObj.addressLine3 = "";
+      this.createContactObj.addressLine4 = "";
+      this.createContactObj.city = "";
+      this.createContactObj.province = "";
+      this.createContactObj.postalCode = "";
+      this.createContactObj.entityId = this.firmId;
+      this.createContactObj.phoneNumber = "";
+      this.createContactObj.phoneExt = "";
+      this.createContactObj.faxNumber = "";
+      this.createContactObj.addressState = 0;
+      this.createContactObj.fromDate = "";
+      this.createContactObj.toDate = "";
+      this.createContactObj.objectInstanceID = 0;
+      this.createContactObj.objectInstanceRevNumber = 0;
+      this.createContactObj.sourceObjectID = 0;
+      this.createContactObj.sourceObjectInstanceID = 0;
+      this.createContactObj.sourceObjectInstanceRevNumber = 0;
+      this.createContactObj.selectedContactFrom = '';
+      this.createContactObj.lstContactFunctions = [];
+      this.Column2 = "select"
+    }
+  }
   initializeCreateContactObj(): any {
     return {
       firmID: 0,
@@ -476,8 +611,7 @@ export class ContactsComponent {
       thirdName: "",
       familyName: "",
       countryOfResidence: 0,
-      ContactMethodTypeID: 0,
-      aIsContactTypeID: null,
+      ContactMethodTypeID: null,
       createdBy: 0,
       dateOfBirth: "",
       fullName: "",
@@ -502,7 +636,7 @@ export class ContactsComponent {
       mobileNum: "",
       busEmail: "",
       otherEmail: "",
-      contactMethodTypeID: 0,
+      contactMethodTypeID: null,
       entitySubTypeID: 0,
       numOfShares: 0,
       pctOfShares: 0,
@@ -644,10 +778,14 @@ export class ContactsComponent {
   //     this.createContactObj.EntityTypeID = entityTypeIDParts[0]; // Take the first part
   //   }
   // }
+
   onContactFromChange(selectedValue: string): void {
     // Ensure the value is defined and not "select"
+
     if (selectedValue && selectedValue !== 'select') {
       this.selectedContactFrom = selectedValue;
+      this.createContactObj = this.initializeCreateContactObj();
+      this.addedAddresses = [this.createDefaultAddress];
 
       // Find the selected entity from the list
       const selectedContact = this.AllContactFrom.find(item => item.EntityTypeID === selectedValue);
@@ -716,7 +854,7 @@ export class ContactsComponent {
       this.resetCreateContactObj();
       this.addedAddresses = [];
       this.addedAddresses = [this.createDefaultAddress()];
-      
+
     }
   }
   resetCreateContactObj() {
@@ -725,8 +863,8 @@ export class ContactsComponent {
       firmID: 0,
       contactID: 0,
       contactAssnID: 0,
-      title:  '',
-      contactType:  0,
+      title: '',
+      contactType: 0,
       firstName: '',
       secondName: '',
       familyName: '',
@@ -734,16 +872,16 @@ export class ContactsComponent {
       dateOfBirth: '',
       nationalID: '',
       nationality: 0,
-      passportNum:  '',
+      passportNum: '',
       placeOfBirth: '',
       isPeP: 0,
-      mobileNum:  '',
+      mobileNum: '',
       busEmail: '',
-      otherEmail:  '',
-      contactMethodTypeID:  0,
+      otherEmail: '',
+      contactMethodTypeID: null,
       entityId: 0,
-      jobTitle:  '',
-      fax:'',
+      jobTitle: '',
+      fax: '',
     };
     console.log("createContactObj has been reset:", this.createContactObj);
     this.cdr.detectChanges(); // Trigger change detection to update the view
@@ -776,7 +914,7 @@ export class ContactsComponent {
             mobileNum: response.mobileNum || '',
             busEmail: response.busEmail,
             otherEmail: response.otherEmail || '',
-            contactMethodTypeID: response.contactMethodTypeID || 0,
+            contactMethodTypeID: response.contactMethodTypeID || null,
             entityId: response.entityID || 0,
             jobTitle: response.jobTitle || '',
             fax: response.fax || '',
@@ -816,7 +954,7 @@ export class ContactsComponent {
     thirdName: "",
     familyName: "",
     countryOfResidence: 0,
-    ContactMethodTypeID: 0,
+    ContactMethodTypeID: null,
     aIsContactTypeID: null,
     createdBy: 0,
     dateOfBirth: "",
@@ -842,7 +980,7 @@ export class ContactsComponent {
     mobileNum: "",
     busEmail: "",
     otherEmail: "",
-    contactMethodTypeID: 0,
+    contactMethodTypeID: null,
     entitySubTypeID: 0,
     numOfShares: 0,
     pctOfShares: 0,
@@ -995,7 +1133,7 @@ export class ContactsComponent {
           lastModifiedBy: this.userId,
           MyState: 0,
           nationalID: null,
-          nationality: null,
+          nationality: this.createContactObj.nationality,
           EntityID: this.firmId,
           passportNum: this.createContactObj.passportNum,
           placeOfBirth: this.createContactObj.placeOfBirth,
@@ -1046,8 +1184,8 @@ export class ContactsComponent {
         faxNumber: address.FaxNumber || '',
         lastModifiedDate: this.currentDate,
         addressState: 2, // New address state is 2, existing modified or unchanged is 6, 4 is delete
-        fromDate:  '1970-01-01',
-        toDate:  '1970-01-01',
+        fromDate: '1970-01-01',
+        toDate: '1970-01-01',
         objectID: address.ObjectID || this.Page.Contatcs,
         objectInstanceID: address.ObjectInstanceID || this.firmId,
         objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
@@ -2000,12 +2138,26 @@ export class ContactsComponent {
       }
     );
   }
+  onNationalityChange(event: Event): void {
+    const selectedNationality = Number((event.target as HTMLSelectElement).value);
+     
+    const residentStatus = this.createResidentStateObj.attributeValue;
+    if (selectedNationality !== 0) {
+      if (residentStatus === 'Resident' && selectedNationality !== this.getQatarCountryID()) {
+        this.firmDetailsService.showErrorAlert(6503);
+      }
 
+      if (residentStatus === 'Non-Resident' && selectedNationality === this.getQatarCountryID()) {
+        this.firmDetailsService.showErrorAlert(6503);
+      }
+    }
+
+  }
   ///////////// Resident State  && Counrty
   onCountryChange(event: Event): void {
     const selectedCountryID = Number((event.target as HTMLSelectElement).value);
-    this.addedAddresses.CountryID = selectedCountryID;
-
+    this.addedAddresses.CountryID = selectedCountryID; 
+     
     const residentStatus = this.createResidentStateObj.attributeValue;
     if (selectedCountryID !== 0) {
       if (residentStatus === 'Resident' && selectedCountryID !== this.getQatarCountryID()) {
