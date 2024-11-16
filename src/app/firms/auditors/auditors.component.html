@@ -111,6 +111,7 @@
             <label for="auditorType">Auditor Type</label>
             <ng-container *ngIf="IsEditAuditorVisible; else viewAuditorType">
               <select name="auditorType" id="auditorType" [(ngModel)]="selectedAuditor.EntitySubTypeID">
+                <option value="0">Select</option>
                 <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">
                   {{ type.EntitySubTypeDesc }}
                 </option>
@@ -210,6 +211,7 @@
               Auditor Type <span style="color: red">*</span>
             </label>
             <select name="auditorType" id="auditorType" [(ngModel)]="CreateAuditorObj.EntitySubTypeID">
+              <option value="0">Select</option>
               <option *ngFor="let type of firmAuditorType" [value]="type.EntitySubTypeID">
                 {{ type.EntitySubTypeDesc }}
               </option>
