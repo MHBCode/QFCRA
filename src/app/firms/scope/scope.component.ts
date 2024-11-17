@@ -138,6 +138,7 @@ export class ScopeComponent implements OnInit {
       this.populateAuthorisationCategoryTypes();
       this.populatePrudentialCategoryTypes();
       this.populateFirmScopeTypes();
+      this.loadDocuments();
 
       // Security
       forkJoin([
@@ -168,6 +169,8 @@ export class ScopeComponent implements OnInit {
       this.firmDetailsService.checkFirmLicense(this.firmId);
       this.firmDetailsService.checkFirmAuthorisation(this.firmId);
     })
+
+    this.fetchSubTypeDocIDs();
   }
 
   ngAfterViewInit() {
@@ -185,6 +188,14 @@ export class ScopeComponent implements OnInit {
       error => {
         console.error(error);
       }
+    );
+  }
+
+  getNewFileNumber() {
+    return this.logForm.getNewFileNumber(this.firmId, this.currentDate).pipe(
+      tap(data => {
+        this.newfileNum = data.response.Column1;
+      })
     );
   }
 
@@ -248,7 +259,9 @@ export class ScopeComponent implements OnInit {
       this.isLoading = false;
     });
   }
-  
+
+
+
   maskCommandActionsControlsScope() {
     this.hideCreateBtn = false;
     this.hideEditBtn = false;
@@ -535,23 +548,43 @@ export class ScopeComponent implements OnInit {
   }
 
 
-  onDocumentUploaded(uploadedDocument: any) {
-    const { fileLocation, intranetGuid } = uploadedDocument;
-    this.documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid, constants.DocType.SCOPE, this.Page.Scope, this.fetchedScopeDocSubTypeID.DocSubTypeID, this.ActivityAuth[0].FirmScopeID, this.ActivityAuth[0].ScopeRevNum);
+  async onDocumentUploaded(uploadedDocument: any) {
     this.isLoading = true;
-    this.objectWF.insertDocument(this.documentObj).subscribe(
-      response => {
-        console.log('scope of authorsation document saved successfully:', response);
-        this.loadDocuments();
-        this.isLoading = false;
-      },
-      error => {
-        console.error('Error updating scope of auth scope:', error);
-        this.isLoading = false;
-      }
-    );
 
+    try {
+      // Call getNewFileNumber and wait for it to complete
+      await this.getNewFileNumber().toPromise();
+
+      // Continue with the rest of the code after getNewFileNumber completes
+      const { fileLocation, intranetGuid } = uploadedDocument;
+      this.documentObj = this.prepareDocumentObject(
+        this.userId,
+        fileLocation,
+        intranetGuid,
+        constants.DocType.SCOPE,
+        this.Page.Scope,
+        this.fetchedScopeDocSubTypeID.DocSubTypeID,
+        this.ActivityAuth[0].FirmScopeID,
+        this.ActivityAuth[0].ScopeRevNum
+      );
+
+      this.objectWF.insertDocument(this.documentObj).subscribe(
+        response => {
+          console.log('Scope of authorization document saved successfully:', response);
+          this.loadDocuments();
+          this.isLoading = false;
+        },
+        error => {
+          console.error('Error updating scope of auth scope:', error);
+          this.isLoading = false;
+        }
+      );
+    } catch (error) {
+      console.error('Error in getNewFileNumber:', error);
+      this.isLoading = false;
+    }
   }
+
 
   loadDocuments() {
     const firstActivity = this.ActivityAuth[0];
@@ -803,22 +836,6 @@ export class ScopeComponent implements OnInit {
     const updatedLicenseScope = this.prepareLicenseScopeObject(this.userId);
     this.saveLicenseScopeDetails(updatedLicenseScope, this.userId);
   }
-
-  // showFirmScopeLicSaveSuccessAlert(messageKey: number) {
-  //   this.isLoading = true;
-  //   this.logForm.errorMessages(messageKey).subscribe(
-  //     (response) => {
-  //       const replacedText = response.response.replace('#Tab#', 'Licensed');
-  //       Swal.fire({
-  //         title: 'Success!',
-  //         text: replacedText,
-  //         icon: 'success',
-  //         confirmButtonText: 'Ok',
-  //       });
-  //     },
-  //   );
-  //   this.isLoading = false;
-  // }
 
   prepareLicenseScopeObject(userId: number) {
     const isCreateMode = this.isCreateModeLicense;
@@ -2250,15 +2267,19 @@ export class ScopeComponent implements OnInit {
 
   onActivityChange(activity: any) {
     const activityTypeID = activity.ActivityTypeID;
-
+  
     if (activityTypeID) {
       console.log('Selected Activity ID:', activityTypeID);
-
-      // First, check if the activity is a parent
+  
+      // Clear previous data
+      activity.categorizedProducts = [];
+      activity.selectedSubActivity = null;
+  
+      // Check if the activity is a parent or not
       this.activityService.isParentActivity(activityTypeID).pipe(
         switchMap(response => {
           this.isParentActivity = response.response.Column1;
-
+  
           if (this.isParentActivity) {
             // If it's a parent, load sub-activities
             return this.activityService.getSubActivities(activityTypeID);
@@ -2270,14 +2291,14 @@ export class ScopeComponent implements OnInit {
       ).subscribe(
         data => {
           if (this.isParentActivity) {
-            // Process sub-activities if the activity is a parent
+            // Handle parent activity by showing sub-activities
             this.subActivities = data.response.map(sub => ({ ...sub, isSelected: false }));
             console.log('Loaded Sub-Activities:', this.subActivities);
             this.showSubActivitiesPopup(this.subActivities);
           } else {
-            // Process products if it's not a parent
+            // Handle non-parent activity by loading and categorizing products
             activity.categorizedProducts = this.categorizeProducts(data.response);
-            console.log("Categorized Products:", activity.categorizedProducts);
+            console.log('Categorized Products:', activity.categorizedProducts);
           }
         },
         error => {
@@ -2287,27 +2308,30 @@ export class ScopeComponent implements OnInit {
       );
     }
   }
+  
 
   // Fetch and categorize products in a single function
-  fetchAndCategorizeProducts(activityTypeID: number, activity: any) {
-    this.activityService.getAllProducts(activityTypeID).subscribe(
-      data => {
-        const products = data.response;
-        if (!products || products.length === 0) {
-          activity.categorizedProducts = [];
-          console.log('No products found.');
-          return;
-        }
-        activity.categorizedProducts = this.categorizeProducts(products);
-        console.log("Updated activity.categorizedProducts:", activity.categorizedProducts); // Confirm update here
-      },
-      error => {
-        console.error('Error fetching products:', error);
-        activity.categorizedProducts = [];
-      }
-    );
-  }
-
+  // fetchAndCategorizeProducts(activityTypeID: number, activity: any) {
+  //   this.activityService.getAllProducts(activityTypeID).subscribe(
+  //     data => {
+  //       const products = data.response;
+  //       if (!products || products.length === 0) {
+  //         activity.categorizedProducts = [];
+  //         console.log('No products found.');
+  //         return;
+  //       }
+  //       setTimeout(() => {
+  //         activity.categorizedProducts = this.categorizeProducts(products);
+  //         console.log("Updated activity.categorizedProducts with timeout:", activity.categorizedProducts);
+  //       }, 0);
+  //       console.log("Updated activity.categorizedProducts:", activity.categorizedProducts); // Confirm update here
+  //     },
+  //     error => {
+  //       console.error('Error fetching products:', error);
+  //       activity.categorizedProducts = [];
+  //     }
+  //   );
+  // }
 
 
   // Helper function to categorize products
@@ -2328,33 +2352,37 @@ export class ScopeComponent implements OnInit {
         currentCategory.subProducts.push(subProduct);
       }
     });
-
+    console.log('Categorized Products:', categorizedProducts);
     return categorizedProducts;
   }
 
   selectSubActivity(sub: any) {
     this.subActivities.forEach(activity => activity.isSelected = false); // Clear previous selection
-    sub.isSelected = true; // Set selected sub-activity
-    this.selectedSubActivityID = sub.ActivityTypeID; // Track selected ID if needed
+    sub.isSelected = true; // Mark selected sub-activity
+    this.selectedSubActivityID = sub.ActivityTypeID; // Track selected sub-activity ID
   }
+  
 
   confirmSelection(activity: any) {
     const selectedSubActivity = this.subActivities.find(sub => sub.isSelected);
+  
     if (selectedSubActivity) {
-      activity.selectedSubActivity = selectedSubActivity; // Attach directly to the activity
-      console.log("Selected Sub-Activity:", selectedSubActivity);
-      // Fetch products for this specific sub-activity and save to this activity
-      this.fetchAndCategorizeProducts(selectedSubActivity.ActivityTypeID, activity);
+      activity.selectedSubActivity = selectedSubActivity; // Attach the selected sub-activity to the activity
+      console.log('Confirmed Sub-Activity:', selectedSubActivity);
+  
+      // Use the `onActivityChange` method to fetch products for the selected sub-activity
+      this.onActivityChange({ ActivityTypeID: selectedSubActivity.ActivityTypeID, ...activity });
     }
-    this.closeSubActivity();
+  
+    this.closeSubActivity(); // Close the sub-activity popup
   }
+  
+
 
 
   toggleExpand(activityTypeID: number) {
     this.parentActivity = this.parentActivity === activityTypeID ? null : activityTypeID;
   }
-
-
 
 
   toggleCollapse(section: string) {

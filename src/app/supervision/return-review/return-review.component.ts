@@ -5,6 +5,7 @@ import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { LogformService } from 'src/app/ngServices/logform.service'; 
 import { SupervisionService } from '../supervision.service';
 import * as constants from 'src/app/app-constants';
+import { ReturnReviewService } from 'src/app/ngServices/return-review.service';
 @Component({
   selector: 'app-return-review',
   templateUrl: './return-review.component.html',
@@ -31,6 +32,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     private firmDetailsService: FirmDetailsService,
     private logformService: LogformService,
     private supervisionService : SupervisionService,
+    private returnReviewService: ReturnReviewService
   ) {}
 
   ngOnInit(): void {
@@ -62,7 +64,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
 
   getReturnReviewList() {
     this.isLoading = true;
-    this.firmService.getReturnReviewList(this.firmId).subscribe(
+    this.returnReviewService.getReturnReviewList(this.firmId).subscribe(
       data => {
         this.allReturnreView = data.response || [];
         this.filteredReturnreView = [...this.allReturnreView]; // Initialize filtered array with all data

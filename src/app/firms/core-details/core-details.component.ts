@@ -119,6 +119,7 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isLoading = true;
     this.firmService.scrollToTop();
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
@@ -132,27 +133,39 @@ export class CoreDetailsComponent implements OnInit {
       this.populateFinAccStd();
       this.populateFinYearEnd();
       this.populateLegalStatus();
-      this.loadCurrentAppDetails();
-      
+
+      this.loadCurrentAppDetails().subscribe({
+        next: () => {
+          // Once loadCurrentAppDetails is complete, call loadDocuments
+          this.loadDocuments();
+        },
+        error: (err) => {
+          console.error('Error loading current application details:', err);
+        }
+      });
+
+
       forkJoin([
         this.isValidFirmSupervisor(),
         this.isValidFirmAMLSupervisor(),
         this.loadAssiRA(),
         this.firmDetailsService.loadAssignedUserRoles(this.userId),
         this.firmDetailsService.loadAssignedLevelUsers()
-    ]).subscribe({
+      ]).subscribe({
         next: ([userRoles, levelUsers]) => {
-            // Assign the results to component properties
-            this.assignedUserRoles = userRoles;
-            this.assignedLevelUsers = levelUsers;
+          // Assign the results to component properties
+          this.assignedUserRoles = userRoles;
+          this.assignedLevelUsers = levelUsers;
 
-            // Now apply security on the page
-            this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
+          // Now apply security on the page
+          this.applySecurityOnPage(this.Page.CoreDetail, this.isEditModeCore);
+          this.isLoading = false;
         },
         error: (err) => {
-            console.error('Error loading user roles or level users:', err);
+          console.error('Error loading user roles or level users:', err);
+          this.isLoading = false;
         }
-    });
+      });
 
       this.firmDetailsService.isFirmLicensed$.subscribe(
         (value) => (this.isFirmLicensed = value)
@@ -218,7 +231,7 @@ export class CoreDetailsComponent implements OnInit {
       })
     );
   }
-  
+
 
   editFirm() {
     this.isLoading = true;
@@ -286,11 +299,11 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   getControlVisibility(controlName: string): boolean {
-    return this.firmDetailsService.getControlVisibility(controlName);
+    return !this.isLoading && this.firmDetailsService.getControlVisibility(controlName);
   }
 
   getControlEnablement(controlName: string): boolean {
-    return this.firmDetailsService.getControlEnablement(controlName);
+    return !this.isLoading && this.firmDetailsService.getControlEnablement(controlName);
   }
 
   applySecurityOnPage(objectId: FrimsObject, Mode: boolean) {
@@ -335,7 +348,7 @@ export class CoreDetailsComponent implements OnInit {
   isNullOrEmpty(value) {
     return this.firmService.isNullOrEmpty(value);
   }
-  
+
   hideActionButton() {
     this.hideEditBtn = true;
     this.hideSaveBtn = true;
@@ -788,24 +801,38 @@ export class CoreDetailsComponent implements OnInit {
     );
   }
 
-  loadCurrentAppDetails() {
+  loadCurrentAppDetails(): Observable<any> {
     this.isLoading = true;
-    this.applicationService.getCurrentAppDetailsLicensedAndAuth(this.firmId, 2).subscribe(data => {
-      this.firmAppDetailsCurrentLicensed = data.response;
-      this.isLoading = false;
-    }, error => {
-      console.log(error)
-      this.isLoading = false;
-    })
 
-    this.applicationService.getCurrentAppDetailsLicensedAndAuth(this.firmId, 3).subscribe(data => {
-      this.firmAppDetailsCurrentAuthorized = data.response;
-      this.isLoading = false;
-    }, error => {
-      console.log(error)
-      this.isLoading = false;
-    })
+    // Create observables for each API call
+    const licensedDetails$ = this.applicationService.getCurrentAppDetailsLicensedAndAuth(this.firmId, 2).pipe(
+      tap(data => {
+        this.firmAppDetailsCurrentLicensed = data.response;
+      })
+    );
+
+    const authorizedDetails$ = this.applicationService.getCurrentAppDetailsLicensedAndAuth(this.firmId, 3).pipe(
+      tap(data => {
+        this.firmAppDetailsCurrentAuthorized = data.response;
+      })
+    );
+
+    // Use forkJoin to wait for both observables to complete
+    return forkJoin([licensedDetails$, authorizedDetails$]).pipe(
+      tap({
+        next: () => {
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error(error);
+          this.isLoading = false;
+        }
+      })
+    );
   }
+
+
+
   // Popups when you click save
   showApplnStatusValidationPopup(messageKey: number, placeholder: string, onConfirmed?: () => void): Promise<boolean> {
     return new Promise((resolve, reject) => {
@@ -1510,24 +1537,45 @@ export class CoreDetailsComponent implements OnInit {
     );
   }
 
-
-  onDocumentUploaded(uploadedDocument: any) {
-    const { fileLocation, intranetGuid } = uploadedDocument;
-    this.documentObj = this.prepareDocumentObject(this.userId, fileLocation, intranetGuid, constants.DocType.FIRM_DOCS, this.Page.CoreDetail, this.fetchedCoreDetailDocSubTypeID.DocSubTypeID, this.firmAppDetailsCurrentAuthorized.FirmApplStatusID, 1);
-    this.isLoading = true;
-    this.objectWF.insertDocument(this.documentObj).subscribe(
-      response => {
-        console.log('scope of authorsation document saved successfully:', response);
-        this.loadDocuments();
-        this.isLoading = false;
-      },
-      error => {
-        console.error('Error updating scope of auth scope:', error);
-        this.isLoading = false;
-      }
+  getNewFileNumber() {
+    return this.logForm.getNewFileNumber(this.firmId, this.currentDate).pipe(
+      tap(data => {
+        this.newfileNum = data.response.Column1;
+      })
     );
-
   }
+
+  async onDocumentUploaded(uploadedDocument: any) {
+    this.isLoading = true;
+
+    try {
+      // Call getNewFileNumber and wait for it to complete
+      await this.getNewFileNumber().toPromise();
+
+      // Proceed with the rest of the function after getNewFileNumber completes
+      const { fileLocation, intranetGuid } = uploadedDocument;
+      this.documentObj = this.prepareDocumentObject(
+        this.userId,
+        fileLocation,
+        intranetGuid,
+        constants.DocType.FIRM_DOCS,
+        this.Page.CoreDetail,
+        this.fetchedCoreDetailDocSubTypeID.DocSubTypeID,
+        this.firmAppDetailsCurrentAuthorized.FirmApplStatusID,
+        1
+      );
+
+      // Insert document and handle the response asynchronously
+      const response = await this.objectWF.insertDocument(this.documentObj).toPromise();
+      console.log('Press release document saved successfully:', response);
+      this.loadDocuments();
+    } catch (error) {
+      console.error('Error in getNewFileNumber or updating document:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
 
   prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number, objectId: number, docSubTypeID: number, objectInstanceID: number, objectInstanceRevNum: number) {
     return {

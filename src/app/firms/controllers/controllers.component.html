@@ -503,7 +503,7 @@
                 </label>
                 <select [disabled]="!!address.AddressID" [(ngModel)]="address.AddressTypeID"
                   (change)="onAddressTypeChangeOnEditMode($event, address)" [ngClass]="{
-                        'error-border': address === invalidAddress}">
+                'error-border': !address.AddressTypeID && errorMessages['AddressTypeID']}">
                   <option value="0">Select</option>
                   <option *ngFor="let option of currentAddressTypes" [value]="option.AddressTypeID">
                     {{ option.AddressTypeDesc }}
@@ -672,7 +672,7 @@
            Save
         </button>
 
-        <button class="cancel-btn" (click)="cancelController()"
+        <button class="cancel-btn" (click)="cancelEditController()"
         *ngIf="getControlVisibility('imgBtnCancel') && !hideCancelBtn"
         [disabled]="!getControlEnablement('imgBtnCancel')">Cancel</button>
 
@@ -1035,7 +1035,7 @@
                 Address Type
               </label>
               <select [(ngModel)]="address.AddressTypeID" [ngClass]="{
-                        'error-border': address === invalidAddress}" [disabled]="address.isAddressTypeSelected"
+                'error-border': !address.AddressTypeID && errorMessages['AddressTypeID']}" [disabled]="address.isAddressTypeSelected"
                 (change)="onAddressTypeChangeOnCreateMode($event,i)">
                 <option value="0">Select</option>
                 <option *ngFor="let option of currentAddressTypes" [value]="option.AddressTypeID">

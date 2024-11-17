@@ -1,6 +1,31 @@
+<app-loader *ngIf="isLoading"></app-loader>
 <div class="form-section">
     <div class="inputs-field-set">
         <div class="section">
+            <!-- Validation Errors Messages-->
+            <div class="error-messages">
+                <p *ngIf="errorMessages['SupCategoryType']">
+                  {{ errorMessages['SupCategoryType'] }}
+                </p>
+                <p *ngIf="errorMessages['SupCatEffectiveDateFrom']">
+                    {{ errorMessages['SupCatEffectiveDateFrom'] }}
+                </p>
+                <p *ngIf="errorMessages['FRBTEffectiveDate']">
+                    {{ errorMessages['FRBTEffectiveDate'] }}
+                </p>
+                <p *ngIf="errorMessages['OPEffectiveDateFrom']">
+                    {{ errorMessages['OPEffectiveDateFrom'] }}
+                </p>
+                <p *ngIf="errorMessages['NumOfLocalStaff']">
+                    {{ errorMessages['NumOfLocalStaff'] }}
+                </p>
+                <p *ngIf="errorMessages['NumOfTotalStaff']">
+                    {{ errorMessages['NumOfTotalStaff'] }}
+                </p>
+                <p *ngIf="errorMessages['NumOfLocalStaffGreaterThanNumOfLocalStaff']">
+                    {{ errorMessages['NumOfLocalStaffGreaterThanNumOfLocalStaff'] }}
+                </p>
+              </div>
             <div class="supervision-container-title">
                 <div class="form-section-title">
                     <h2 class="section-header">
@@ -16,38 +41,21 @@
                 <div style="display: flex; gap: 10px">
                     <!-- loading flag for rendering buttons, hideSaveBtn..etc flag for supervisor access and other roles, getControlVisiblity function for role access endpoint -->
                     <div class="btn" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn">
-                        <button [disabled]="!getControlEnablement('imgBtnEdit')" class="edit-btn">
+                        <button (click)="editSupervision()" [disabled]="!getControlEnablement('imgBtnEdit')"
+                            class="edit-btn">
                             <i class="bi bi-pen"></i>Edit
                         </button>
                     </div>
 
                     <div class="btn" *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn">
-                        <button [disabled]="!getControlEnablement('imgBtnSave')" class="save-btn">
+                        <button (click)="saveSupervision()" [disabled]="!getControlEnablement('imgBtnSave')" class="save-btn">
                             Save
                         </button>
                     </div>
 
                     <div class="btn" *ngIf="getControlVisibility('imgBtnCancel') && !hideCancelBtn">
-                        <button [disabled]="!getControlEnablement('imgBtnCancel')" class="cancel-btn">
+                        <button (click)="cancelSupervision()" [disabled]="!getControlEnablement('imgBtnCancel')" class="cancel-btn">
                             Cancel
-                        </button>
-                    </div>
-
-                    <div class="btn" *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn">
-                        <button [disabled]="!getControlEnablement('imgBtnCreate')">
-                            Create
-                        </button>
-                    </div>
-
-                    <div class="btn" *ngIf="getControlVisibility('imgBtnRevise') && !hideReviseBtn">
-                        <button [disabled]="!getControlEnablement('imgBtnRevise')">
-                            Revise
-                        </button>
-                    </div>
-
-                    <div class="btn" *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
-                        <button [disabled]="!getControlEnablement('imgBtnDelete')">
-                            Delete
                         </button>
                     </div>
                 </div>
@@ -61,14 +69,26 @@
                     [(ngModel)]="SupervisionCategory[0].AuthorisationCategoryTypeDesc" />
             </div>
             <div class="input-field">
-                <label for="supervisionCategory">Supervision Category</label>
-                <input disabled name="supervisionCategory" id="supervisionCategory" type="text"
-                    [(ngModel)]="SupervisionCategory[0].FirmRptClassificationTypeDesc" />
+                <label for="supervisionCategory">Supervision Category<span *ngIf="isEditModeSupervisor" style="color:red;">*</span></label>
+
+                <input *ngIf="!isEditModeSupervisor; else supervisionCategory" disabled name="supervisionCategory"
+                    id="supervisionCategory" type="text"
+                    [(ngModel)]="SupervisionCategory[0].FirmRptClassificationTypeDesc"/>
+                <ng-template #supervisionCategory>
+                    <select [(ngModel)]="SupervisionCategory[0].FirmRptClassificationTypeID" [ngClass]="{'error-border': errorMessages['SupCategoryType']}">
+                        <option value="0">Select</option>
+                        <option
+                            *ngFor="let option of (firmDetails.FirmTypeID === 1 || firmDetails.FirmTypeID === 3 ? allFirmRptClassificationTypes : allFirmRptClassificationTypesForDNFBPs)"
+                            [value]="option.FirmRptClassificationTypeID">{{option.FirmRptClassificationTypeDesc}}
+                        </option>
+                    </select>
+                </ng-template>
+
             </div>
             <div class="input-field">
-                <label for="effectiveFromDate">Date Effective From</label>
-                <input disabled name="effectiveFromDate" id="effectiveFromDate" type="text"
-                    [(ngModel)]="SupervisionCategory[0].EffectiveFromDate" />
+                <label for="effectiveFromDate">Date Effective From<span *ngIf="isEditModeSupervisor" style="color:red;">*</span></label>
+                <input [disabled]="!isEditModeSupervisor" name="effectiveFromDate" id="effectiveFromDate" type="text" #dateInputs
+                    [(ngModel)]="SupervisionCategory[0].EffectiveFromDate" [ngClass]="{'error-border': errorMessages['SupCatEffectiveDateFrom']}"/>
             </div>
         </div>
     </div>
@@ -85,7 +105,14 @@
         <div class="inputs-row">
             <div class="input-field">
                 <label for="holdsclientmoney">Holds Client Money</label>
-                <input disabled name="holdsclientmoney" id="holdsclientmoney" type="text" value="holdsclientmoney" />
+                <input *ngIf="!isEditModeSupervisor; else holdsclientmoney" disabled name="holdsclientmoney" id="holdsclientmoney" type="text" value="{{ clientClassification[0]?.HoldsClientMoney === true ? 'Yes' : (clientClassification[0]?.HoldsClientMoney === false ? 'No' : '') }}" />
+                <ng-template #holdsclientmoney>
+                    <select [(ngModel)]="clientClassification[0].HoldsClientMoney">
+                        <option value="null">Select</option>
+                        <option [value]="true">Yes</option>
+                        <option [value]="false">No</option>
+                    </select>
+                </ng-template>
             </div>
         </div>
     </div>
@@ -103,11 +130,18 @@
         <div class="inputs-row">
             <div class="input-field">
                 <label for="firmreportbasistype">Firm Report Basis Type</label>
-                <input disabled name="firmreportbasistype" id="firmreportbasistype" type="text" value="Solo" />
+                <input *ngIf="!isEditModeSupervisor; else firmsBasisType" disabled name="firmreportbasistype" id="firmreportbasistype" type="text" value="{{RPTBasis.FirmRptBasisTypeDesc}}"/>
+                <ng-template #firmsBasisType>
+                    <select [(ngModel)]="RPTBasis.FirmRptBasisTypeID">
+                        <option value="0">Select</option>
+                        <option *ngFor="let option of allFirmRptBasisTypes" [value]="option.FirmRptBasisTypeID">{{option.FirmRptBasisTypeDesc}}</option>
+                    </select>
+                </ng-template>
             </div>
             <div class="input-field">
-                <label for="effectivedate">Effective Date</label>
-                <input disabled name="effectivedate" id="effectivedate" type="text" value="01/Apr/2014" />
+                <label for="effectivedate">Effective Date <span *ngIf="isEditModeSupervisor" style="color:red;">*</span></label>
+                <input [disabled]="!isEditModeSupervisor" name="effectivedate" id="effectivedate" type="text" #dateInputs
+                    [(ngModel)]="RPTBasis.Column1" [ngClass]="{'error-border': errorMessages['FRBTEffectiveDate']}"/>
             </div>
         </div>
     </div>
@@ -129,22 +163,22 @@
         <div class="inputs-row" *ngIf="OperationalData">
             <div class="input-field">
                 <label for="Noofstaffinqatar"> No. of Staff in Qatar</label>
-                <input disabled name="Noofstaffinqatar" id=" Noofstaffinqatar" type="text"
-                    [(ngModel)]="OperationalData[0].NumOfLocalStaff" />
+                <input [disabled]="!isEditModeSupervisor" name="Noofstaffinqatar" id=" Noofstaffinqatar" type="text"
+                    [(ngModel)]="OperationalData[0].NumOfLocalStaff" [ngClass]="{'error-border': errorMessages['NumOfLocalStaff']}"/>
             </div>
             <div class="input-field">
                 <label for="stafftotal">Staff Total</label>
-                <input disabled name="stafftotal" id="stafftotal" type="text"
-                    [(ngModel)]="OperationalData[0].NumOfTotalStaff" />
+                <input [disabled]="!isEditModeSupervisor" name="stafftotal" id="stafftotal" type="text"
+                    [(ngModel)]="OperationalData[0].NumOfTotalStaff" [ngClass]="{'error-border': errorMessages['NumOfTotalStaff']}"/>
             </div>
             <div class="input-field">
-                <label for="operationalDateEffectiveFrom">Date Effective From</label>
-                <input disabled name="operationalDateEffectiveFrom" id="operationalDateEffectiveFrom" type="text"
-                    [(ngModel)]="OperationalData[0].EffectiveFromDate" />
+                <label for="operationalDateEffectiveFrom">Date Effective From<span *ngIf="isEditModeSupervisor" style="color:red;">*</span></label>
+                <input [disabled]="!isEditModeSupervisor" name="operationalDateEffectiveFrom" id="operationalDateEffectiveFrom" type="text" #dateInputs
+                    [(ngModel)]="OperationalData[0].EffectiveFromDate" [ngClass]="{'error-border': errorMessages['OPEffectiveDateFrom']}"/>
             </div>
             <div class="input-field fullwidth">
                 <label for="notes"> Notes </label>
-                <textarea name="notes" disabled id="notes" [(ngModel)]="OperationalData[0].Notes"></textarea>
+                <textarea name="notes" [disabled]="!isEditModeSupervisor" id="notes" [(ngModel)]="OperationalData[0].Notes"></textarea>
             </div>
         </div>
     </div>

@@ -39,7 +39,6 @@ export class NewFirmComponent implements OnInit {
   /* flags */
   hasValidationErrors: boolean = false;
   canAddNewAddress: boolean = true;
-  disableAddressFields: boolean = false;
   isAllAddressesAdded: boolean;
   invalidAddress: boolean;
   /* Firm Details Object */
@@ -436,7 +435,7 @@ export class NewFirmComponent implements OnInit {
       this.QFCDateApplicationLabel = `Date ${selectedOption.FirmApplStatusTypeDesc}`;
     }
 
-    if (selectedOption.FirmApplStatusTypeID == constants.FirmLicenseApplStatusType.Application) {
+    if (selectedOption?.FirmApplStatusTypeID == constants.FirmLicenseApplStatusType.Application) {
       this.applicationDetails.LicensedDate = this.applicationDetails.dateOfApplication;
     }
   }
@@ -516,13 +515,17 @@ export class NewFirmComponent implements OnInit {
   }
 
   addNewAddress() {
+    if (parseInt(this.addedAddresses[0]?.AddressTypeID) === 0 && this.addedAddresses.length > 1) {
+      this.canAddNewAddress = false;
+      return;
+    }
     const totalAddressTypes = this.allAddressTypes.length;
-
     // Ensure there are unused address types
     if (this.addedAddresses.length < totalAddressTypes) {
       // Ensure the last added address is marked as selected
       if (this.addedAddresses.length > 0) {
-        this.addedAddresses[this.addedAddresses.length - 1].isAddressTypeSelected = true;
+        const lastAddress = this.addedAddresses[0]; // Most recently added address
+        lastAddress.isAddressTypeSelected = true; // Mark as selected
       }
 
       const newAddress = {
@@ -568,38 +571,40 @@ export class NewFirmComponent implements OnInit {
   onAddressTypeChange(event: any, index: number) {
     const selectedTypeID = Number(event.target.value); // Convert the selected value to a number
     const currentAddress = this.addedAddresses[index];
-
+  
     if (!currentAddress) {
       console.error('No current address found at index:', index);
       return;
     }
-
+  
     // Check if the selected type is already in use by another address
     const isDuplicate = this.addedAddresses.some((address, i) => {
       return i !== index && address.AddressTypeID === selectedTypeID;
     });
-
+  
     if (isDuplicate) {
       // Show an alert message if a duplicate is found
       this.firmDetailsService.showErrorAlert(constants.AddressControlMessages.DUPLICATE_ADDRESSTYPES);
-
+  
       // Reset the dropdown to default ("Select" option)
       event.target.value = "0";
-      currentAddress.AddressTypeID = 0;  // Also reset the AddressTypeID in the model
+      currentAddress.AddressTypeID = 0; // Also reset the AddressTypeID in the model
       currentAddress.AddressTypeDesc = ''; // Reset the description as well
     } else {
-      // If not a duplicate, update the current address
+      // Update the current address with the selected type
       const selectedAddressType = this.allAddressTypes.find(type => type.AddressTypeID === selectedTypeID);
       if (selectedAddressType) {
         currentAddress.AddressTypeID = selectedAddressType.AddressTypeID;
         currentAddress.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
       }
-      currentAddress.isAddressTypeSelected = true; // Disable the dropdown after selection
     }
-
+  
     // Check if the "Add Address" button should be enabled
     this.checkCanAddNewAddress();
   }
+
+  
+  
 
   removeAddress(index: number) {
     if (this.addedAddresses.length > 1) {
@@ -613,11 +618,14 @@ export class NewFirmComponent implements OnInit {
           if (result.isConfirmed) {
              this.addedAddresses.splice(index, 1);
              this.checkCanAddNewAddress();
- 
-             // Explicitly enable address type selection if only one address is left
-             if (this.addedAddresses.length === 1) {
-                this.addedAddresses[0].isAddressTypeSelected = false;
-             }
+             this.addedAddresses[0].isAddressTypeSelected = false;
+             this.addedAddresses.forEach(address => {
+               if (address.SameAsTypeID) {
+                address.SameAsTypeID = 0;
+                address.isFieldsDisabled = false;
+               }
+             });
+             
           }
        });
     }

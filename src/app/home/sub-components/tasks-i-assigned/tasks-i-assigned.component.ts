@@ -360,6 +360,7 @@ export class TasksIAssignedComponent implements OnInit {
 
   redirectBasedOnLink(item: any, event: Event): void {
     event.preventDefault();
+    event.stopPropagation();
   
     const objActItmIdInLink = item.Link.includes('ObjActItmID');
     if (objActItmIdInLink) {

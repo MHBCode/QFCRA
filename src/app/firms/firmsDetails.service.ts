@@ -188,6 +188,14 @@ export class FirmDetailsService {
           }
         }
 
+        targetArray.forEach(address => {
+          if (address.SameAsTypeID) {
+           address.SameAsTypeID = 0;
+           address.isFieldsDisabled = false;
+          }
+        });
+
+
         // Calculate the updated valid address count
         const validAddressCount = targetArray.filter(addr => addr.Valid && !addr.isRemoved).length;
         const canAddNewAddress = validAddressCount < totalAddressTypes;
@@ -253,21 +261,21 @@ export class FirmDetailsService {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  addNewAddressOnCreateMode(targetArray: any[], allAddressTypes: any[], currentDate: string) {
-
-    const totalAddressTypes = allAddressTypes.length;
-
-    if (targetArray.length > 0 && targetArray[targetArray.length - 1].AddressTypeID === 0) {
-      return; // Exit without adding if the last added address has AddressTypeID of 0
+  addNewAddressOnCreateMode(targetArray: any[], allAddressTypes: any[], currentDate: string): { canAddNewAddressOnCreate: boolean, isAllAddressesAddedOnCreate: boolean } {
+    if (parseInt(targetArray[0]?.AddressTypeID) === 0 && targetArray.length >= 1) {
+      return { canAddNewAddressOnCreate: false, isAllAddressesAddedOnCreate: false };
     }
-
+  
+    const totalAddressTypes = allAddressTypes.length;
+  
     // Ensure there are unused address types
     if (targetArray.length < totalAddressTypes) {
       // Ensure the last added address is marked as selected
       if (targetArray.length > 0) {
-        targetArray[targetArray.length - 1].isAddressTypeSelected = true;
+        const lastAddress = targetArray[0]; // Most recently added address
+        lastAddress.isAddressTypeSelected = true; // Mark as selected
       }
-
+  
       const newAddress = {
         AddressID: null,
         AddressTypeID: 0, // Default value, ensuring it's not selected yet
@@ -291,17 +299,20 @@ export class FirmDetailsService {
         Valid: true,
         isAddressTypeSelected: false // Initially false
       };
-
+  
       targetArray.unshift(newAddress); // Add new address at the beginning
-      this.checkCanAddNewAddressOnCreateMode(targetArray, allAddressTypes); // Re-evaluate if more addresses can be added
     }
+  
+    // Re-evaluate and return the updated flags
+    return this.checkCanAddNewAddressOnCreateMode(targetArray, allAddressTypes);
   }
+  
 
   checkCanAddNewAddressOnCreateMode(targetArray: any[], allAddressTypes: any[]): { canAddNewAddressOnCreate: boolean, isAllAddressesAddedOnCreate: boolean } {
     const totalAddressTypes = allAddressTypes.length;
 
     // Check if all addresses have a selected AddressTypeID
-    const allTypesSelected = targetArray.every(address => address.AddressTypeID !== 0);
+    const allTypesSelected = targetArray.every(address => parseInt(address.AddressTypeID) !== 0);
 
     // Calculate flags based on conditions
     const canAddNewAddressOnCreate = allTypesSelected && targetArray.length < totalAddressTypes;
@@ -324,9 +335,15 @@ export class FirmDetailsService {
             targetArray.splice(index, 1);
             this.checkCanAddNewAddressOnCreateMode(targetArray, allAddressTypes);
 
-            if (targetArray.length === 1) {
-              targetArray[0].isAddressTypeSelected = false;
-            }
+            targetArray[0].isAddressTypeSelected = false;
+
+            targetArray.forEach(address => {
+              if (address.SameAsTypeID) {
+               address.SameAsTypeID = 0;
+               address.isFieldsDisabled = false;
+              }
+            });
+
             resolve();
           } else {
             reject('Operation canceled by user');
@@ -515,7 +532,8 @@ export class FirmDetailsService {
             errorMessage = errorMessage.replace("#Date#", placeholderValue)
               .replace("##DateFieldLabel##", placeholderValue)
               .replace("#ApplicationDate#", placeholderValue)
-              .replace(constants.DataFieldLabel, placeholderValue);
+              .replace(constants.DataFieldLabel, placeholderValue)
+              .replace("#1#",placeholderValue);
           }
           // Store in the errorMessages object and the provided activity
           this.errorMessages[fieldName] = errorMessage;

@@ -364,7 +364,7 @@ export class ShadowSupervisorComponent implements OnInit {
 
   redirectBasedOnLink(item: any, event: Event): void {
     event.preventDefault();
-  
+    event.stopPropagation();
     const objActItmIdInLink = item.Link.includes('ObjActItmID');
     if (objActItmIdInLink) {
       const urlParams = new URLSearchParams(item.Link.split('?')[1]);

@@ -8,6 +8,7 @@
     display: flex;
     gap: 5px;
     align-items: center;
+    margin-right: 10px;
 
     span {
         color: #a51e36;
@@ -41,23 +42,32 @@
     align-items: center;
     overflow: hidden;
     padding-left: 13px;
-    gap: 5px;
-    min-width: auto;
-    min-height: auto;
-    margin-left: 10px;
+
+    span {
+        visibility: hidden;
+        opacity: 0;
+        white-space: nowrap;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
 
     &:hover {
         width: 130px;
 
+        /* Expand the width on hover */
         span {
-            display: inline-flex;
+            visibility: visible;
+            opacity: 1;
+            padding-left: 6px;
         }
     }
 
-    span {
-        display: none;
+    .subbutton {
+        padding: 0.1rem 1rem;
+        color: white;
+        background: #a51e36;
+        border: none;
+        border-radius: 5px;
     }
-
 }
 
 .inputs-field-set {
@@ -251,6 +261,11 @@
 .error-messages p {
     margin-bottom: 10px;
     color: red;
+}
+
+.error-border {
+    border-color: red !important;
+    outline: 0;
 }
 
 .space-between {

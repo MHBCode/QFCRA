@@ -29,6 +29,11 @@ export class AttachmentComponent implements OnInit {
   @Input() selectedFile: File | null = null;
   @Input() newfileNum: number;
 
+  intranetSitePath = 'https://ictmds.sharepoint.com/sites/QFCRA';
+  filePathAfterDocLib = "";
+  strUserEmailAddress = 'k.thomas@ictmds.onmicrosoft.com';
+  fileLocation: string;
+
   Page = FrimsObject;
   fileError: string = '';
   callUploadDoc: boolean = false;
@@ -56,7 +61,6 @@ export class AttachmentComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
-      this.getNewFileNumber();
     });
   }
 
@@ -98,26 +102,20 @@ export class AttachmentComponent implements OnInit {
     }
 
     if (this.selectedFile) {
-      this.getNewFileNumber().pipe(
-        switchMap(() => {
-          const intranetSitePath = 'https://ictmds.sharepoint.com/sites/QFCRA';
-          const filePathAfterDocLib = "";
-          const strfileName = this.selectedFile.name;
-          const strUserEmailAddress = 'k.thomas@ictmds.onmicrosoft.com';
+      const strfileName = this.selectedFile.name;
 
-          return this.sharepointService.uploadFileToSharepoint(
-            this.selectedFile,
-            intranetSitePath,
-            filePathAfterDocLib,
-            strfileName,
-            strUserEmailAddress
-          );
-        })
+      this.sharepointService.uploadFileToSharepoint(
+        this.selectedFile,
+        this.intranetSitePath,
+        this.filePathAfterDocLib,
+        strfileName,
+        this.strUserEmailAddress
       ).subscribe({
         next: (response: SharePointUploadResponse) => {
           console.log('File uploaded successfully', response);
 
           const [fileLocation, intranetGuid] = response.result.split(';');
+          this.fileLocation = fileLocation;
           this.documentUploaded.emit({ fileLocation, intranetGuid });
 
           const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
@@ -151,19 +149,37 @@ export class AttachmentComponent implements OnInit {
   }
 
 
+
   deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number) {
-    this.objectWF.deleteDocument(docID, objectId, objectInstanceId, ObjectInstanceRevNum).subscribe({
-      next: (response) => {
-        console.log('Document deleted successfully:', response);
-        if (this.loadDocuments) {
-          this.loadDocuments();
+    if (this.fileLocation) {
+    
+      this.sharepointService.deleteFileFromSharepoint(this.intranetSitePath, this.fileLocation).subscribe({
+        next: () => {
+          console.log('File deleted from SharePoint successfully');
+
+          this.objectWF.deleteDocument(docID, objectId, objectInstanceId, ObjectInstanceRevNum).subscribe({
+            next: (response) => {
+              console.log('Document deleted from database successfully:', response);
+
+              if (this.loadDocuments) {
+                this.loadDocuments();
+              }
+            },
+            error: (err) => {
+              console.error('Error occurred while deleting the document from the database:', err);
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Error deleting file from SharePoint:', err);
         }
-      },
-      error: (err) => {
-        console.error('Error occurred while deleting the document:', err);
-      }
-    });
+      });
+    } else {
+      console.error('No file location available for SharePoint deletion');
+    }
   }
+
+
 
   showUploadConfirmation(documentObj: any) {
     Swal.fire({
@@ -194,16 +210,6 @@ export class AttachmentComponent implements OnInit {
     );
     this.isLoading = false;
   }
-
-  getNewFileNumber() {
-    return this.logForm.getNewFileNumber(this.firmId, this.currentDate).pipe(
-        tap(data => {
-            this.newfileNum = data.response.Column1;
-        })
-    );
-}
-
-
 
   getErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
     this.logForm.errorMessages(msgKey).subscribe(

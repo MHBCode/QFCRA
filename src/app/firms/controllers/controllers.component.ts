@@ -145,7 +145,7 @@ export class ControllersComponent implements OnInit {
       this.getlegalStatusControllerCreate();
       console.log('Initial isEditModeController:', this.isEditModeController);
       console.log('Initial canAddNewAddressOnEdit:', this.canAddNewAddressOnEdit);
-      
+
       // Security
       forkJoin([
         this.firmDetailsService.loadAssignedUserRoles(this.userId),
@@ -491,7 +491,7 @@ export class ControllersComponent implements OnInit {
         functionTypeId = FunctionType.UBO_IndividualController;
       } else if (this.CreatecontrollerDetails.EntityTypeID === constants.EntityType.IndividualController) {
         functionTypeId = FunctionType.IndividualController;
-      } 
+      }
 
       const saveControllerPopupChangesIndividualObj = {
         contactDetails: {
@@ -628,8 +628,8 @@ export class ControllersComponent implements OnInit {
         response => {
           console.log("Contact save successful:", response);
           this.isLoading = false;
-          this.isPopupOpen = false;
           this.isEditModeController = false;
+          this.showCreateControllerSection = false;
           this.loadControllers();
           this.loadControllersIndividual();
           this.firmDetailsService.showSaveSuccessAlert(constants.ControllerMessages.RECORD_INSERTED);
@@ -1116,6 +1116,7 @@ export class ControllersComponent implements OnInit {
       this.canAddNewAddressOnEdit = canAddNewAddress;
       this.existingAddresses = updatedArray;
     });
+
   }
 
   onSameAsTypeChangeOnEditMode(selectedTypeID: number, index: number) {
@@ -1156,11 +1157,14 @@ export class ControllersComponent implements OnInit {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   addNewAddressOnCreateMode() {
-    this.firmDetailsService.addNewAddressOnCreateMode(this.addedAddresses, this.currentAddressTypes, this.currentDate);
+  const result = this.firmDetailsService.addNewAddressOnCreateMode(this.addedAddresses, this.currentAddressTypes, this.currentDate);
 
-    // Now call checkCanAddNewAddressOnCreateMode to get the updated flags
-    this.checkCanAddNewAddressOnCreateMode()
-  }
+  // Update the flags in the controller component based on the returned values
+  this.canAddNewAddressOnCreate = result.canAddNewAddressOnCreate;
+  this.isAllAddressesAddedOnCreate = result.isAllAddressesAddedOnCreate;
+
+  this.checkCanAddNewAddressOnCreateMode();
+}
 
   createDefaultAddress(): any {
     return {
@@ -1241,7 +1245,6 @@ export class ControllersComponent implements OnInit {
         currentAddress.AddressTypeID = selectedAddressType.AddressTypeID;
         currentAddress.AddressTypeDesc = selectedAddressType.AddressTypeDesc;
       }
-      currentAddress.isAddressTypeSelected = true; // Disable the dropdown after selection
     }
 
     // Check if the "Add Address" button should be enabled
@@ -1344,7 +1347,7 @@ export class ControllersComponent implements OnInit {
       } else if (this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual) {
         functionTypeId = FunctionType.UBO_IndividualController;
       }
-      
+
       const contactId = this.selectedController.OtherEntityID;
       const contactAssId = this.selectedController.RelatedEntityID;
 
@@ -1402,7 +1405,8 @@ export class ControllersComponent implements OnInit {
   createController() {
     this.getControllerType();
     this.showCreateControllerSection = true;
-    
+    this.canAddNewAddressOnCreate = false;
+
     this.CreatecontrollerDetails.EntityTypeID = 0;
     this.CreatecontrollerDetails.OtherEntityID = 0;
     this.CreatecontrollerDetails.OtherEntityName = '';
@@ -1895,9 +1899,13 @@ export class ControllersComponent implements OnInit {
     }
   }
 
-  cancelController() {
+  cancelEditController() {
     this.isEditModeController = false;
-    this.applySecurityOnPage(this.Page.Controller,this.isEditModeController)
+    this.loadControllerCorporateFirmAdresses(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID,this.userId,constants.ObjectOpType.View) // Static opTypeId);
+    this.loadControllerIndividualAdresses(
+      this.selectedController.RelatedEntityID, this.userId, constants.ObjectOpType.View
+    );
+    this.applySecurityOnPage(this.Page.Controller, this.isEditModeController)
   }
 
 

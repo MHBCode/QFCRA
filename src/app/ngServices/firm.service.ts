@@ -9,7 +9,6 @@ import { environment } from 'src/environments/environment';
 export class FirmService {
 
   private baseUrlFirms = environment.API_URL + '/api/Firms/';  // Base URL
-  private returnViewUrl = environment.API_URL + '/api/ReturnView/';  
 
 
   constructor(private http: HttpClient) { }
@@ -171,7 +170,7 @@ export class FirmService {
   }
 
   getRPTBasis(firmId: number): Observable<any> {
-    const url = `${this.baseUrlFirms}get_firm_prt_basis?firmId=${firmId}`;
+    const url = `${this.baseUrlFirms}get_firm_rpt_basis?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
 
@@ -180,19 +179,24 @@ export class FirmService {
     return this.http.get<any>(url);
   }
 
+  getLegalStatusTypeID(firmId: number) {  
+    const url = `${this.baseUrlFirms}get_firm_legal_status_type_by_firm_id?firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
+  
+  saveSupervision(rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlFirms}insert_update_supervision_data`, rowData, { headers: headers });
+  }
+
+  saveSupCategory(rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlFirms}insert_update_sup_category_data`, rowData, { headers: headers });
+  }
+
   checkisFirmAuthorised(firmId: number): Observable<any> {
     const url = `${this.baseUrlFirms}is_firm_authorised?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
   
-  // Return Review > supervision
-  getReturnReviewList(firmId: number): Observable<any> {
-    const url = `${this.returnViewUrl}get_report_reviewed_list?firmId=${firmId}`;
-    return this.http.get<any>(url);
-  }
-
-  isFirmAuthorisedForWaivers(firmId: number){
-    const url = `${this.returnViewUrl}is_firm_authorised_for_waivers?firmId=${firmId}`;
-    return this.http.get<any>(url);
-  }
 }

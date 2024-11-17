@@ -26,4 +26,8 @@ export class AiElectronicswfService {
     const url = `${this.aiElectronicsWFUrl}get_list_object_attribute?ObjectID=${ObjectID}&ObjectInstanceID=${ObjectInstanceID}&ObjectInstanceRevNum=${ObjectInstanceRevNum}&ActiveFlag=${ActiveFlag}&SourceObjectID=${SourceObjectID}&SourceObjectInstanceID=${SourceObjectInstanceID}&SourceObjectInstanceRevNum=${SourceObjectInstanceRevNum}`;  
     return this.http.get<any>(url);
   }
+  InsertUpdateObjectAttributes(savecreateResidentStateObj: any): Observable<any> {
+    const url = `${this.aiElectronicsWFUrl}insert_update_object_attributes`;
+    return this.http.post<any>(url, savecreateResidentStateObj);
+  }
 }

@@ -26,7 +26,7 @@ export class ContactService {
   }
   ///////////////////
   deleteContactDetails(objectID: number, contactID: number, contactAssnID: number,userID:number): Observable<any> {
-    const url = `${this.baseUrlContact}delete_contact_details?objectID=${objectID}&contactId=${contactID}&contactAssId=${contactAssnID}&userID=${userID}`;
+    const url = `${this.baseUrlContact}delete_contact_details?contactId=${contactID}&contactAssId=${contactAssnID}&userID=${userID}&objectID=${objectID}`;
     return this.http.delete<any>(url);
   }
   saveContactDetails(contactDetails: any): Observable<any> {
@@ -69,4 +69,5 @@ export class ContactService {
     const url = `${this.baseUrlContact}get_contact_function_list?contactId=${contactId}&contactAssId=${contactAssId}`;
     return this.http.get<any>(url);
   }
+  
 }
