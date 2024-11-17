@@ -268,11 +268,30 @@
     outline: 0;
 }
 
-.form-section-title.space-between {
+.space-between {
     justify-content: space-between;
 }
 
 .no-data-message {
     text-align: center;
     font-weight: bold;
+}
+
+.revision-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.revision-list li {
+    margin-bottom: 0.5rem;
+}
+
+.revision-list li a:hover {
+    color: #bc3a52;
+    cursor: pointer;
 }

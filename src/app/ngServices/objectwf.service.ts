@@ -17,6 +17,11 @@ export class ObjectwfService {
     return this.http.get<any>(url);
   }
 
+  getRevisions(objectId:number,objectInstanceId: number): Observable<any> {
+    const url = `${this.baseUrlObjectWF}get_revision?objectId=${objectId}&objectInstanceId=${objectInstanceId}`
+    return this.http.get<any>(url);
+  }
+
   getDocument(objectId: number, scopeId: number, scopeRevNum: number): Observable<any> {
     const url = `${this.baseUrlObjectWF}get_document?objectId=${objectId}&objectInstanceId=${scopeId}&ObjectInstanceRevNum=${scopeRevNum}`
     return this.http.get<any>(url);

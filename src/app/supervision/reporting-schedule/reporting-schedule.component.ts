@@ -90,9 +90,8 @@ export class ReportingScheduleComponent {
         console.error(error);
       }
     );
-  
   }
-  openReportSchedulePopup(rpt: any): void {
+  openReportSchedulePopup(rpt: any,firmDetails : any): void {
     this.selectedReport = rpt;
     this.showPopup = true;
   }

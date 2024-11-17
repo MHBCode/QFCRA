@@ -12,8 +12,8 @@ export class RegisteredfundService {
 
   private baseUrlRegisteredFund = environment.API_URL + '/api/RegisteredFund/' // Funds
 
-  getFIRMRegisteredFund(firmId: number): Observable<any> {
-    const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?firmId=${firmId}`; //https://localhost:7091/api/RegisteredFund/get_registered_fund_data?firmId=69
+  getFIRMRegisteredFund(userId: number,firmId: number, registeredFundID: number | null = null): Observable<any> {
+    const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?userId=${userId}&firmId=${firmId}${registeredFundID !== null ? `&registeredFundID=${registeredFundID}` : ''}`;
     return this.http.get<any>(url);
   }
 }

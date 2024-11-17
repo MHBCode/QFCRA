@@ -30,5 +30,10 @@ export class BreachesService {
     const url = `${this.baseUrlBreaches}get_breach_list`;
     return this.http.get<any>(url, { params: httpParams });
   }
+
+  getEnfData(userId: number,firmId: number, enforcementAndDisciplinaryActnID: number | null = null): Observable<any> {
+    const url = `${this.baseUrlBreaches}get_enforcement_data?userId=${userId}&firmId=${firmId}${enforcementAndDisciplinaryActnID !== null ? `&enforcementAndDisciplinaryActnID=${enforcementAndDisciplinaryActnID}` : ''}`;
+    return this.http.get<any>(url);
+  }
   
 }
