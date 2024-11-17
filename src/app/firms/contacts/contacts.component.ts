@@ -2176,11 +2176,13 @@ export class ContactsComponent {
 
       if (selectedValue === 'Resident' && this.addedAddresses.CountryID !== this.getQatarCountryID()) {
         this.firmDetailsService.showErrorAlert(6503);
+        this.createResidentStateObj.attributeValue = "0";
       }
 
       // Check if the resident status is "Non-Resident" and country is Qatar
       if (selectedValue === 'Non-Resident' && this.addedAddresses.CountryID === this.getQatarCountryID()) {
         this.firmDetailsService.showErrorAlert(6503);
+        this.createResidentStateObj.attributeValue = "0";
       }
     }
 
@@ -2252,8 +2254,6 @@ export class ContactsComponent {
             icon: 'warning',
             confirmButtonText: 'OK',
           });
-
-          // Optionally, clear the input field if the number exists
          
         }
       },

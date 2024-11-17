@@ -183,7 +183,7 @@
           <label for="SecondName">Second Name</label>
           <input name="SecondName" id="SecondName" type="text"     
           [disabled]="firmDetails.FirmTypeID !== 2 && createContactObj.aIsContactTypeID === null"
-          [(ngModel)]="createContactObj.secondName" (blur)="onNameBlur()" />
+          [(ngModel)]="createContactObj.secondName"  />
         </div>
 
         <!-- Family Name Section -->
@@ -191,7 +191,7 @@
           <label for="FamilyName">Family Name</label>
           <input name="FamilyName" id="FamilyName" type="text"     
           [disabled]="firmDetails.FirmTypeID !== 2 && createContactObj.aIsContactTypeID === null"
-            [(ngModel)]="createContactObj.familyName" />
+            [(ngModel)]="createContactObj.familyName" (blur)="onNameBlur()"/>
         </div>
 
         <!-- Date Of Birth -->
@@ -321,6 +321,7 @@
               <label for="ResidentStatus">Is the individual a Resident or Non-Resident of Qatar?</label>
               <select name="ResidentStatus" id="ResidentStatus" [(ngModel)]="createResidentStateObj.attributeValue"
                 (change)="onResidentStatusChange($event)">
+                <option value="0">select</option> 
                 <option value="Resident">Resident</option>
                 <option value="Non-Resident">Non-Resident</option>
               </select>
