@@ -2254,7 +2254,7 @@ export class ContactsComponent {
           });
 
           // Optionally, clear the input field if the number exists
-          this.createContactObj.mobileNum = '';
+         
         }
       },
       error => {

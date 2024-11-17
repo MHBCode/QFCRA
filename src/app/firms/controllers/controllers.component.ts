@@ -412,7 +412,7 @@ export class ControllersComponent implements OnInit {
           entityID: this.firmId, // not integrated in the form
           controllerControlTypeID: this.CreatecontrollerDetails.ControllerControlTypeID,
           numOfShares: this.CreatecontrollerDetails.NumOfShares,
-          pctOfShares: this.CreatecontrollerDetails.ControllerControlTypeID === 1 ? this.CreatecontrollerDetails.PctOfShares : null,
+          PctOfShares: this.CreatecontrollerDetails.ControllerControlTypeID == 1 ? this.CreatecontrollerDetails.PctOfShares : null,
           majorityStockHolder: false, // not integrated in the form
           assnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
           assnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo)
@@ -532,7 +532,7 @@ export class ControllersComponent implements OnInit {
             entityID: this.firmId,
             entitySubTypeID: null, //check
             numOfShares: null,
-            pctOfShares: this.CreatecontrollerDetails.ControllerControlTypeID === 1 ? this.CreatecontrollerDetails.PctOfShares : null,
+            pctOfShares: this.CreatecontrollerDetails.ControllerControlTypeID == 1 ? this.CreatecontrollerDetails.PctOfShares : null,
             majorityStockHolder: false,
             assnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
             assnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo),
