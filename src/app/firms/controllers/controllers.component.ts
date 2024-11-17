@@ -1948,7 +1948,7 @@ export class ControllersComponent implements OnInit {
 
     // Check if adding the new percentage would exceed 100%
     if (currentTotal + newPctOfShares > 100) {
-      this.loadErrorMessages('PctOfShares', constants.ControllerMessages.ENTER_PERCENTAGE_NOTEXCEED);
+      this.loadErrorMessages('PCTOFSHARESLESSTHAN100', constants.ControllerMessages.ENTER_PERCENTAGE_NOTEXCEED);
       this.hasValidationErrors = true;
       return false;
     } else {

@@ -75,7 +75,7 @@
                     id="supervisionCategory" type="text"
                     [(ngModel)]="SupervisionCategory[0].FirmRptClassificationTypeDesc"/>
                 <ng-template #supervisionCategory>
-                    <select [(ngModel)]="SupervisionCategory[0].FirmRptClassificationTypeID" [ngClass]="{'error-border': errorMessages['SupCategoryType']}">
+                    <select [disabled]="!pnlSupCategoryData" [(ngModel)]="SupervisionCategory[0].FirmRptClassificationTypeID" [ngClass]="{'error-border': errorMessages['SupCategoryType']}">
                         <option value="0">Select</option>
                         <option
                             *ngFor="let option of (firmDetails.FirmTypeID === 1 || firmDetails.FirmTypeID === 3 ? allFirmRptClassificationTypes : allFirmRptClassificationTypesForDNFBPs)"
@@ -87,7 +87,7 @@
             </div>
             <div class="input-field">
                 <label for="effectiveFromDate">Date Effective From<span *ngIf="isEditModeSupervisor" style="color:red;">*</span></label>
-                <input [disabled]="!isEditModeSupervisor" name="effectiveFromDate" id="effectiveFromDate" type="text" #dateInputs
+                <input [disabled]="!isEditModeSupervisor || !pnlSupCategoryData" name="effectiveFromDate" id="effectiveFromDate" type="text" #dateInputs
                     [(ngModel)]="SupervisionCategory[0].EffectiveFromDate" [ngClass]="{'error-border': errorMessages['SupCatEffectiveDateFrom']}"/>
             </div>
         </div>
@@ -107,7 +107,7 @@
                 <label for="holdsclientmoney">Holds Client Money</label>
                 <input *ngIf="!isEditModeSupervisor; else holdsclientmoney" disabled name="holdsclientmoney" id="holdsclientmoney" type="text" value="{{ clientClassification[0]?.HoldsClientMoney === true ? 'Yes' : (clientClassification[0]?.HoldsClientMoney === false ? 'No' : '') }}" />
                 <ng-template #holdsclientmoney>
-                    <select [(ngModel)]="clientClassification[0].HoldsClientMoney">
+                    <select [disabled]="!pnlClientClassificationData" [(ngModel)]="clientClassification[0].HoldsClientMoney">
                         <option value="null">Select</option>
                         <option [value]="true">Yes</option>
                         <option [value]="false">No</option>
@@ -132,7 +132,7 @@
                 <label for="firmreportbasistype">Firm Report Basis Type</label>
                 <input *ngIf="!isEditModeSupervisor; else firmsBasisType" disabled name="firmreportbasistype" id="firmreportbasistype" type="text" value="{{RPTBasis.FirmRptBasisTypeDesc}}"/>
                 <ng-template #firmsBasisType>
-                    <select [(ngModel)]="RPTBasis.FirmRptBasisTypeID">
+                    <select [disabled]="!pnlFirmRPTBasisData" [(ngModel)]="RPTBasis.FirmRptBasisTypeID">
                         <option value="0">Select</option>
                         <option *ngFor="let option of allFirmRptBasisTypes" [value]="option.FirmRptBasisTypeID">{{option.FirmRptBasisTypeDesc}}</option>
                     </select>
@@ -140,7 +140,7 @@
             </div>
             <div class="input-field">
                 <label for="effectivedate">Effective Date <span *ngIf="isEditModeSupervisor" style="color:red;">*</span></label>
-                <input [disabled]="!isEditModeSupervisor" name="effectivedate" id="effectivedate" type="text" #dateInputs
+                <input [disabled]="!isEditModeSupervisor || !pnlFirmRPTBasisData" name="effectivedate" id="effectivedate" type="text" #dateInputs
                     [(ngModel)]="RPTBasis.Column1" [ngClass]="{'error-border': errorMessages['FRBTEffectiveDate']}"/>
             </div>
         </div>
@@ -163,22 +163,22 @@
         <div class="inputs-row" *ngIf="OperationalData">
             <div class="input-field">
                 <label for="Noofstaffinqatar"> No. of Staff in Qatar</label>
-                <input [disabled]="!isEditModeSupervisor" name="Noofstaffinqatar" id=" Noofstaffinqatar" type="text"
+                <input [disabled]="!isEditModeSupervisor || !pnlOperationalData" name="Noofstaffinqatar" id=" Noofstaffinqatar" type="text"
                     [(ngModel)]="OperationalData[0].NumOfLocalStaff" [ngClass]="{'error-border': errorMessages['NumOfLocalStaff']}"/>
             </div>
             <div class="input-field">
                 <label for="stafftotal">Staff Total</label>
-                <input [disabled]="!isEditModeSupervisor" name="stafftotal" id="stafftotal" type="text"
+                <input [disabled]="!isEditModeSupervisor || !pnlOperationalData" name="stafftotal" id="stafftotal" type="text"
                     [(ngModel)]="OperationalData[0].NumOfTotalStaff" [ngClass]="{'error-border': errorMessages['NumOfTotalStaff']}"/>
             </div>
             <div class="input-field">
                 <label for="operationalDateEffectiveFrom">Date Effective From<span *ngIf="isEditModeSupervisor" style="color:red;">*</span></label>
-                <input [disabled]="!isEditModeSupervisor" name="operationalDateEffectiveFrom" id="operationalDateEffectiveFrom" type="text" #dateInputs
+                <input [disabled]="!isEditModeSupervisor || !pnlOperationalData" name="operationalDateEffectiveFrom" id="operationalDateEffectiveFrom" type="text" #dateInputs
                     [(ngModel)]="OperationalData[0].EffectiveFromDate" [ngClass]="{'error-border': errorMessages['OPEffectiveDateFrom']}"/>
             </div>
             <div class="input-field fullwidth">
                 <label for="notes"> Notes </label>
-                <textarea name="notes" [disabled]="!isEditModeSupervisor" id="notes" [(ngModel)]="OperationalData[0].Notes"></textarea>
+                <textarea name="notes" [disabled]="!isEditModeSupervisor || !pnlOperationalData" id="notes" [(ngModel)]="OperationalData[0].Notes"></textarea>
             </div>
         </div>
     </div>
