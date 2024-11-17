@@ -263,6 +263,11 @@
     color: red;
 }
 
+.error-border {
+    border-color: red !important;
+    outline: 0;
+}
+
 .form-section-title.space-between {
     justify-content: space-between;
 }

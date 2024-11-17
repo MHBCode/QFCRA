@@ -31,6 +31,10 @@ export const breachTypes = "BreachTypes";
 export const breachCategories = "BreachCategories";
 export const breachLevelTypes = "BreachLevelTypes";
 export const breachStatusTypes = "BreachStatusTypes";
+// Supervision
+export const firmRptClassificationTypes = "V_FirmRptClassificationTypes";
+export const firmRptClassificationTypesForDNFBPs = "V_FirmRptClassificationTypesForDNFBPs"
+export const firmRptBasisTypes = "FirmRptBasisTypes";
 
 
 export const BLANK_DATE = "__/___/____";
@@ -580,4 +584,26 @@ export enum ReturnReviewMessages
     NOT_AUTHORIZED_TO_EDIT_MLRO_REPORTS = 1514,
     EXPLANATION_PENDING_WARNINGS = 12049,
     NO_DOCUMENT_SELECTED=12052
+}
+
+export enum FirmRptBasisTypes
+{
+    Solo = 1,
+    Consolidated = 2
+}
+
+export enum SupervisionData_Messages
+{
+    SUPERVISION_DATA_SAVED_SUCCESSFULLY = 8600,
+    INVALID_NO_OF_STAFF = 8601,
+    INVALID_TOTAL_STAFF = 8602,
+    ENTER_OPERATIONAL_DATE = 8603,
+    INVALID_OPERATIONAL_DATE = 8604,
+    INVALID_EFFECTIVE_DATE = 8605,
+    ENTER_EFFECTIVE_DATE = 8606,
+    SUPERVISION_SAVE_ERROR = 8607,
+
+    NO_OF_STAFF_SHOULD_BE_LESS_THAN_OR_EQUAL_TOTAL_STAFF = 8608,
+    NOTES_OUT_OF_LIMIT = 8609,
+    SELECT_OPERATIONAL_STATUS = 8610
 }
