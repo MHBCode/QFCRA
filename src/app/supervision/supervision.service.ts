@@ -2,14 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient} from '@angular/common/http';
 import { LogformService } from '../ngServices/logform.service';
 import Swal from 'sweetalert2';
+import * as constants from 'src/app/app-constants';
 import { Observable } from 'rxjs';
+import { SecurityService } from '../ngServices/security.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupervisionService {
   errorMessages: { [key: string]: string } = {};
-  constructor(private http: HttpClient,private logForm: LogformService) { }
+  constructor(private http: HttpClient,private logForm: LogformService,private securityService: SecurityService) { }
 
   showErrorAlert(messageKey: number, isLoading?: boolean) {
     this.logForm.errorMessages(messageKey).subscribe(
@@ -47,5 +49,51 @@ export class SupervisionService {
         }
       );
     });
+  }
+
+  populateFirmRptClassificationTypes(): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(constants.firmRptClassificationTypes).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching FirmRptClassificationTypes options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  populateFirmRptClassificationTypesForDNFBPs(): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(constants.firmRptClassificationTypesForDNFBPs).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching FirmRptClassificationTypesForDNFBPs options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  populateFirmRptBasisTypes(): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(constants.firmRptBasisTypes).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching FirmRptBasisTypes options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  isNullOrEmpty(value: any): boolean {
+    return value === null || value === '';
   }
 }

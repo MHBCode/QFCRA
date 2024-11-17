@@ -31,7 +31,42 @@ export const breachTypes = "BreachTypes";
 export const breachCategories = "BreachCategories";
 export const breachLevelTypes = "BreachLevelTypes";
 export const breachStatusTypes = "BreachStatusTypes";
+// Supervision
+export const firmRptClassificationTypes = "V_FirmRptClassificationTypes";
+export const firmRptClassificationTypesForDNFBPs = "V_FirmRptClassificationTypesForDNFBPs"
+export const firmRptBasisTypes = "FirmRptBasisTypes";
 
+//Query String Parameter for FS Reporting
+export const QUERYSTRING_FSRPTDATAID = "fsRptDataID";
+
+export const TEXT_MR = "Mr";
+export const TEXT_MS = "Ms";
+export const TEXT_MRS = "Mrs";
+export const TEXT_DR = "Dr";
+export const TEXT_YES = "Yes";
+export const TEXT_NOT_APPLICABLE = "Not applicable";
+export const TEXT_NO = "No";
+export const TEXT_ALL = "All";
+export const TEXT_SELECT = "Select";
+export const TEXT_ZERO = "0";
+export const TEXT_ONE = "1";
+export const TEXT_TWO = "2";
+export const TEXT_THREE = "3";
+export const TEXT_FOUR = "4";
+export const TEXT_FIVE = "5";
+export const TEXT_SIX = "6";
+export const TEXT_SEVEN = "7";
+export const TEXT_EIGHT = "8";
+
+export const TEXT_NINE = "9";
+export const TEXT_OTHER = "Other";
+export const TEXT_OTHER_VALUE = "o";
+export const TEXT_MINUS_ONE = "-1";
+export const TEXT_TRUE = "True";
+export const TEXT_OTHERS = "Others";
+
+export const TEXT_GRANT = "Grant";
+export const TEXT_REVOKE = "Revoke";
 
 export const BLANK_DATE = "__/___/____";
 export const DataFieldLabel = "\"##DataFieldLable##\"";
@@ -492,6 +527,15 @@ export enum ReportingScheduleMessages
     ADDITIONAL_SHEETS_ERROR_MSG = 12056,
     ALLITEM_PUBLISHED = 12057
 }
+
+export enum MessagesWaiverList
+{
+    SELECT_WAIVER = 800,
+    FIRMEXIST = 801,
+    WAIVEREDIT = 802,
+    WAIVERNOTFOUND = 803
+}
+
 export enum LogFormRecieptMethods {
     Fax = 1,
     Email = 2,
@@ -580,4 +624,26 @@ export enum ReturnReviewMessages
     NOT_AUTHORIZED_TO_EDIT_MLRO_REPORTS = 1514,
     EXPLANATION_PENDING_WARNINGS = 12049,
     NO_DOCUMENT_SELECTED=12052
+}
+
+export enum FirmRptBasisTypes
+{
+    Solo = 1,
+    Consolidated = 2
+}
+
+export enum SupervisionData_Messages
+{
+    SUPERVISION_DATA_SAVED_SUCCESSFULLY = 8600,
+    INVALID_NO_OF_STAFF = 8601,
+    INVALID_TOTAL_STAFF = 8602,
+    ENTER_OPERATIONAL_DATE = 8603,
+    INVALID_OPERATIONAL_DATE = 8604,
+    INVALID_EFFECTIVE_DATE = 8605,
+    ENTER_EFFECTIVE_DATE = 8606,
+    SUPERVISION_SAVE_ERROR = 8607,
+
+    NO_OF_STAFF_SHOULD_BE_LESS_THAN_OR_EQUAL_TOTAL_STAFF = 8608,
+    NOTES_OUT_OF_LIMIT = 8609,
+    SELECT_OPERATIONAL_STATUS = 8610
 }

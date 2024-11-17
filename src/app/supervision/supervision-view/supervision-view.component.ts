@@ -1,11 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FirmService } from 'src/app/ngServices/firm.service';
 import { RiskService } from 'src/app/ngServices/risk.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
+import * as constants from 'src/app/app-constants';
 import { forkJoin, tap } from 'rxjs';
+import { SecurityService } from 'src/app/ngServices/security.service';
+import { SupervisionService } from '../supervision.service';
+import Swal from 'sweetalert2';
+import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
+import { LogformService } from 'src/app/ngServices/logform.service';
 
 interface CreditRating {
   CreditRatingTypeID: number;
@@ -24,17 +30,20 @@ type CreditRatingsGrouped = { [key: string]: CreditRating[] };
   styleUrls: ['./supervision-view.component.scss', '../supervision.scss']
 })
 export class SupervisionViewComponent {
+
+  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   callSupervisionCategory: boolean = false;
   callOperationalData: boolean = false;
   callCreditRatingsSovereign: boolean = false;
   callCreditRatings: boolean = false;
   Page = FrimsObject;
-  userId: number = 10044; // Emira Yacoubi
-  clientClassification: any;
+  userId: number = 10044; // Ewald Muller
+  clientClassification: any = [];
   isLoading: boolean = false;
   firmId: number = 0;
   OperationalData: any;
-  RPTBasis: any;
+  RPTBasis: any = {};
   SupervisionCategory: any;
   CreditRatings: CreditRating[] = [];
   FiltredCreditRatingsFirm: CreditRating[] = [];
@@ -47,9 +56,24 @@ export class SupervisionViewComponent {
   HistoryCreditRatingGrouped: CreditRatingsGrouped = {};
   HistoryCreditRatingCountryGrouped: CreditRatingsGrouped = {};
   firmDetails: any;
+  legalStatusTypeID: number;
+
+  currentDate = new Date();
+  currentDateISOString = this.currentDate.toISOString();
 
   isEditModeSupervisor: boolean = false;
 
+
+  // Dropdowns
+  allFirmRptClassificationTypes: any = [];
+  allFirmRptClassificationTypesForDNFBPs: any = [];
+  allFirmRptBasisTypes: any = [];
+
+  // Validations
+  hasValidationErrors: boolean = false;
+  errorMessages: { [key: string]: string } = {};
+
+  // Security
   hideEditBtn: boolean = false;
   hideSaveBtn: boolean = false;
   hideCancelBtn: boolean = false;
@@ -61,6 +85,12 @@ export class SupervisionViewComponent {
   ValidFirmSupervisor: boolean = false;
   UserDirector: boolean = false;
 
+  // Panel Security flags
+  pnlSupCategoryData: boolean = false;
+  pnlClientClassificationData: boolean = false;
+  pnlFirmRPTBasisData: boolean = false;
+  pnlOperationalData: boolean = false;
+
   assignedUserRoles: any = [];
   assignedLevelUsers: any = [];
 
@@ -69,7 +99,11 @@ export class SupervisionViewComponent {
     private firmsService: FirmService,
     private riskService: RiskService,
     private firmDetailsService: FirmDetailsService,
-    private dateUtilService: DateUtilService) {
+    private dateUtilService: DateUtilService,
+    private supervisionService: SupervisionService,
+    private flatpickrService: FlatpickrService,
+    private logForm: LogformService
+  ) {
 
   }
 
@@ -80,6 +114,7 @@ export class SupervisionViewComponent {
       this.getClientClassificationData();
       this.getOperationalData();
       this.getRPTBasisData();
+      this.getLegalStatusTypeID();
       // Credit Ratings - Firm
       this.getCreditRatingsData(true, false);
       // Credit Ratings - Sovereign ( Home Country - Qatar )
@@ -107,6 +142,13 @@ export class SupervisionViewComponent {
       });
     })
     this.loadFirmDetails(this.firmId);
+  }
+
+  ngAfterViewInit() {
+    this.dateInputs.changes.subscribe(() => {
+      this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+    });
+    this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
   }
 
   applySecurityOnPage(objectId: FrimsObject, Mode: boolean) {
@@ -311,6 +353,7 @@ export class SupervisionViewComponent {
     this.firmsService.getSupervisionCategory(this.firmId).subscribe(
       data => {
         this.SupervisionCategory = data.response;
+        console.log('Supervision Category Data: ', this.SupervisionCategory)
       },
       error => {
         console.error('Error fetching Firm SupervisionCategory ', error);
@@ -422,6 +465,287 @@ export class SupervisionViewComponent {
       },
       error => {
         console.error(error);
+      }
+    );
+  }
+
+  savedDate: string;
+  savedSupCategoryID: number;
+
+  // on edit mode
+  editSupervision() {
+    this.isEditModeSupervisor = true;
+    this.savedDate = this.SupervisionCategory[0].EffectiveFromDate;
+    this.savedSupCategoryID = this.SupervisionCategory[0].FirmRptClassificationTypeID;
+    this.populateFirmRptClassificationTypes();
+    this.populateFirmRptClassificationTypesForDNFBPs();
+    this.populateFirmRptBasisTypes();
+    this.applyPanelSecurity();
+    this.applySecurityOnPage(this.Page.Supervision, this.isEditModeSupervisor);
+  }
+
+  applyPanelSecurity() {
+    if (this.UserDirector && !this.ValidFirmSupervisor) {
+      this.pnlSupCategoryData = true;
+      this.pnlClientClassificationData = false;
+      this.pnlFirmRPTBasisData = false;
+      this.pnlOperationalData = false;
+    } else if (!this.UserDirector && this.ValidFirmSupervisor) {
+      this.pnlSupCategoryData = false;
+      this.pnlClientClassificationData = true;
+      this.pnlFirmRPTBasisData = true;
+      this.pnlOperationalData = true;
+    } else if (this.UserDirector && this.ValidFirmSupervisor) {
+      this.pnlSupCategoryData = true;
+      this.pnlClientClassificationData = true;
+      this.pnlFirmRPTBasisData = true;
+      this.pnlOperationalData = true;
+    }
+  }
+
+  cancelSupervision() {
+    Swal.fire({
+      text: 'Are you sure you want to cancel your changes ?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isEditModeSupervisor = false;
+        this.errorMessages = {};
+        this.applySecurityOnPage(this.Page.Supervision, this.isEditModeSupervisor);
+        this.getSupervisionCategoryData();
+        this.getClientClassificationData();
+        this.getRPTBasisData();
+        this.getOperationalData();
+      }
+    });
+  }
+
+  getLegalStatusTypeID() {
+    this.firmsService.getLegalStatusTypeID(this.firmId).subscribe(response => {
+      this.legalStatusTypeID = response.LegalStatusTypeID
+    }, error => {
+      console.log("Error Fetching LegalStatusTypeID: ", error)
+    })
+  }
+
+  populateFirmRptClassificationTypes() {
+    this.supervisionService.populateFirmRptClassificationTypes().subscribe(
+      firmRptClassification => {
+        this.allFirmRptClassificationTypes = firmRptClassification;
+      },
+      error => {
+        console.error('Error fetching countries:', error);
+      }
+    );
+  }
+
+  populateFirmRptClassificationTypesForDNFBPs() {
+    this.supervisionService.populateFirmRptClassificationTypesForDNFBPs().subscribe(
+      firmRptClassificationDNFBPs => {
+        this.allFirmRptClassificationTypesForDNFBPs = firmRptClassificationDNFBPs;
+      },
+      error => {
+        console.error('Error fetching countries:', error);
+      }
+    );
+  }
+
+  populateFirmRptBasisTypes() {
+    this.supervisionService.populateFirmRptBasisTypes().subscribe(
+      firmRptBasisTypes => {
+        this.allFirmRptBasisTypes = firmRptBasisTypes;
+      },
+      error => {
+        console.error('Error fetching countries:', error);
+      }
+    );
+  }
+
+  async validateSupervision(): Promise<boolean> {
+    this.hasValidationErrors = false;
+  
+    if (this.supervisionService.isNullOrEmpty(this.SupervisionCategory[0].EffectiveFromDate)) {
+      this.loadErrorMessages('SupCatEffectiveDateFrom', constants.SupervisionData_Messages.ENTER_EFFECTIVE_DATE);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['SupCatEffectiveDateFrom'];
+    }
+  
+    if (parseInt(this.SupervisionCategory[0].FirmRptClassificationTypeID) === 0) {
+      this.loadErrorMessages('SupCategoryType', 8611);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['SupCategoryType'];
+    }
+  
+    if (this.supervisionService.isNullOrEmpty(this.RPTBasis.Column1)) {
+      this.loadErrorMessages('FRBTEffectiveDate', constants.SupervisionData_Messages.ENTER_EFFECTIVE_DATE);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['FRBTEffectiveDate'];
+    }
+  
+    if (this.supervisionService.isNullOrEmpty(this.OperationalData[0].EffectiveFromDate)) {
+      this.loadErrorMessages('OPEffectiveDateFrom', 3219);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['OPEffectiveDateFrom'];
+    }
+  
+    if (this.OperationalData[0].NumOfLocalStaff < 0 || !Number.isInteger(+this.OperationalData[0].NumOfLocalStaff)) {
+      this.loadErrorMessages('NumOfLocalStaff', constants.SupervisionData_Messages.INVALID_NO_OF_STAFF);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['NumOfLocalStaff'];
+    }
+  
+    if (this.OperationalData[0].NumOfTotalStaff < 0 || !Number.isInteger(+this.OperationalData[0].NumOfTotalStaff)) {
+      this.loadErrorMessages('NumOfTotalStaff', constants.SupervisionData_Messages.INVALID_NO_OF_STAFF);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['NumOfTotalStaff'];
+    }
+  
+    if (this.OperationalData[0].NumOfLocalStaff > this.OperationalData[0].NumOfTotalStaff) {
+      this.loadErrorMessages('NumOfLocalStaffGreaterThanNumOfLocalStaff', constants.SupervisionData_Messages.NO_OF_STAFF_SHOULD_BE_LESS_THAN_OR_EQUAL_TOTAL_STAFF);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['NumOfLocalStaffGreaterThanNumOfLocalStaff'];
+    }
+  
+    if (this.savedSupCategoryID !== parseInt(this.SupervisionCategory[0].FirmRptClassificationTypeID) && parseInt(this.SupervisionCategory[0].FirmRptClassificationTypeID) !== 0) {
+      if (this.savedDate === this.SupervisionCategory[0].EffectiveFromDate) {
+        this.isLoading = false;
+        const isConfirmed = await this.showPopupAlert(8613);
+        if (!isConfirmed) {
+          return false; // Stop the process if user cancels
+        }
+      }
+    }
+  
+    return !this.hasValidationErrors;
+  }
+  
+  
+
+  // save
+  async saveSupervision() {
+    this.isLoading = true;
+  
+    // Validate before saving
+    const isValid = await this.validateSupervision();
+  
+    console.log('Validation result:', isValid); // Debug log
+  
+    if (!isValid) {
+      this.firmDetailsService.showErrorAlert(constants.SupervisionData_Messages.SUPERVISION_SAVE_ERROR);
+      this.isLoading = false;
+      return; // Prevent further action if validation fails or the user cancels
+    }
+  
+    // Proceed with saving
+    const supervisionDataObj = this.prepareSupervisionObject(this.userId);
+    const supCategoryDataObj = this.prepareSupCategoryObject(this.userId);
+  
+    forkJoin({
+      saveSupervision: this.firmsService.saveSupervision(supervisionDataObj),
+      saveSupCategory: this.firmsService.saveSupCategory(supCategoryDataObj)
+    }).subscribe(
+      response => {
+        console.log('Save successful:', response); // Debug log
+        this.firmDetailsService.showSaveSuccessAlert(constants.SupervisionData_Messages.SUPERVISION_DATA_SAVED_SUCCESSFULLY);
+        this.isEditModeSupervisor = false;
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Error saving data:', error);
+        this.isLoading = false;
+      }
+    );
+  }
+  
+  
+
+
+  prepareSupervisionObject(userId: number) {
+    return {
+      firmSupervisionObj: {
+        firmId: this.firmId,
+        notes: this.OperationalData[0].Notes,
+        noOfLocalStaff: this.OperationalData[0].NumOfLocalStaff,
+        noOfTotalStaff: this.OperationalData[0].NumOfTotalStaff,
+        firmOperatinalStatusId: this.OperationalData[0].FirmOperationalStatusID,
+        createdBy: userId,
+        effectiveFromDate: this.dateUtilService.convertDateToYYYYMMDD(this.OperationalData[0].EffectiveFromDate)
+      },
+      firmClientClassificationObj: {
+        firmClientsClassificationID: this.clientClassification[0].FirmClientsClassificationID,
+        firmId: this.firmId,
+        holdsClientMoney: this.clientClassification[0].HoldsClientMoney,
+        holdsInsuranceMoney: this.clientClassification[0].HoldsInsuranceMoney,
+        holdsClientMoneyDesc: null,
+        holdsInsuranceMoneyDesc: null,
+        createdBy: userId,
+        lastModifiedBy: userId,
+        createdDate: this.currentDate,
+        lastModifiedDate: this.currentDate,
+        firmClientsClassificationDesc: null
+      },
+      rptBasisObj: {
+        firmId: this.firmId,
+        firmRptBasisID: this.RPTBasis.FirmRptBasisID,
+        firmRptBasisDesc: null,
+        firmRptBasisTypeID: this.RPTBasis.FirmRptBasisTypeID,
+        firmRptBasisTypeDesc: this.RPTBasis.FirmRptBasisTypeDesc,
+        effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(this.RPTBasis.Column1),
+        expirationDate: null,
+        createdBy: userId,
+        lastModifiedBy: userId,
+        createdDate: this.currentDate,
+        lastModifiedDate: this.currentDate,
+      }
+    }
+  }
+
+  prepareSupCategoryObject(userId: number) {
+    return {
+      firmRptClassificationID: this.SupervisionCategory[0].FirmRptClassificationID,
+      firmId: this.firmId,
+      firmRptClassificationTypeID: this.SupervisionCategory[0].FirmRptClassificationTypeID,
+      effectiveFromDate: this.dateUtilService.convertDateToYYYYMMDD(this.SupervisionCategory[0].EffectiveFromDate),
+      createdBy: userId,
+    }
+  }
+
+  showPopupAlert(msgKey: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      this.logForm.errorMessages(msgKey).subscribe((response) => {
+        Swal.fire({
+          text: response.response, 
+          showCancelButton: true,
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+        }).then((result) => {
+          this.isLoading = false;
+          resolve(result.isConfirmed); // Resolve the promise with the user's choice
+        });
+      });
+    });
+  }
+
+
+  loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+    this.firmDetailsService.getErrorMessages(fieldName, msgKey, null, null, placeholderValue).subscribe(
+      () => {
+        this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
+        console.log(`Error message for ${fieldName} loaded successfully`);
+      },
+      error => {
+        console.error(`Error loading error message for ${fieldName}:`, error);
       }
     );
   }

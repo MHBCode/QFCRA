@@ -12,8 +12,11 @@ export class WaiverService {
 
   private baseUrlWaiver = environment.API_URL + '/api/Waiver/' //Waiver
 
-  getFirmwaiver(firmId: number): Observable<any> {
-    const url = `${this.baseUrlWaiver}get_waiver_list?firmId=${firmId}`;
+  getFirmwaiver(firmId: number, roleId: number | null = null, objectOpType: number | null = null): Observable<any> {
+    const url = `${this.baseUrlWaiver}get_waiver_list?firmId=${firmId}${
+      roleId !== null ? `&roleId=${roleId}` : ''
+    }${objectOpType !== null ? `&objectOpType=${objectOpType}` : ''}`;
     return this.http.get<any>(url);
   }
+  
 }

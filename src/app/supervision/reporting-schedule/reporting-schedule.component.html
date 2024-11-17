@@ -17,7 +17,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let rpt of paginatedItems" (click)="openReportSchedulePopup(rpt)">
+                    <tr *ngFor="let rpt of paginatedItems" (click)="openReportSchedulePopup(rpt,firmDetails)">
                         <td>{{rpt.FirmRptFrom}}</td>
                         <td>{{rpt.FirmRptTo}}</td>
                     </tr>
@@ -36,6 +36,6 @@
 
 <app-reporting-schedule-view
   *ngIf="showPopup"
-  [report]="selectedReport" [firmId]="firmId"
+  [report]="selectedReport" [firmId]="firmId" [firmDetails]="firmDetails"
   (closeRptPopup)="closePopup()">
 </app-reporting-schedule-view>

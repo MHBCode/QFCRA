@@ -8,10 +8,15 @@ import { environment } from 'src/environments/environment';
 export class ReturnReviewService {
   constructor(private http: HttpClient) { }
 
-  private baseUrlRpt = environment.API_URL + '/api/ReturnView/'
+  private returnViewUrl = environment.API_URL + '/api/ReturnView/';  
   
   getReturnReviewDetail(firmId: number,firmRptSchID: number): Observable<any> {
-    const url = `${this.baseUrlRpt}get_firm_report_schedule_item_detail?firmId=${firmId}&reportSchID=${firmRptSchID}`;
+    const url = `${this.returnViewUrl}get_firm_report_schedule_item_detail?firmId=${firmId}&reportSchID=${firmRptSchID}`;
+    return this.http.get<any>(url);
+  }
+
+  getReturnReviewList(firmId: number): Observable<any> {
+    const url = `${this.returnViewUrl}get_report_reviewed_list?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
 }

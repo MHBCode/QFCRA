@@ -572,7 +572,7 @@ export class ViewFirmPageComponent implements OnInit {
         break;
       case FrimsObject.RegisteredFunds:
         this.showSection(this.regFundsSection);
-        this.loadRegisteredFund()
+        // this.loadRegisteredFund()
         break;
       case FrimsObject.SupervisionJournal:
         this.showSection(this.journalSection);
@@ -4085,20 +4085,21 @@ export class ViewFirmPageComponent implements OnInit {
       }
     );
   }
-  loadRegisteredFund() {
-    this.isLoading = true;
-    this.registeredFund.getFIRMRegisteredFund(this.firmId).subscribe(
-      data => {
-        this.RegisteredFund = data.response;
-        console.log('Firm FIRM RegisteredFund details:', this.RegisteredFund);
-        this.isLoading = false;
-      },
-      error => {
-        console.error('Error fetching firm RegisteredFund', error);
-        this.isLoading = false;
-      }
-    );
-  }
+
+  // loadRegisteredFund() {
+  //   this.isLoading = true;
+  //   this.registeredFund.getFIRMRegisteredFund(this.firmId).subscribe(
+  //     data => {
+  //       this.RegisteredFund = data.response;
+  //       console.log('Firm FIRM RegisteredFund details:', this.RegisteredFund);
+  //       this.isLoading = false;
+  //     },
+  //     error => {
+  //       console.error('Error fetching firm RegisteredFund', error);
+  //       this.isLoading = false;
+  //     }
+  //   );
+  // }
   loadAdminFees() {
     this.isLoading = true;
     this.firmService.getFIRMAdminFees(this.firmId).subscribe(

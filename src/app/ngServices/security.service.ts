@@ -22,6 +22,10 @@ export class SecurityService {
     const url = `${this.baseUrlSecurity}is_firm_supervisor?FirmID=${firmId}&UserID=${userId}`
     return this.http.get<any>(url);
   }
+  isValidSupervisor(firmId: number,userId: number) {
+    const url = `${this.baseUrlSecurity}is_valid_supervisor?FirmID=${firmId}&UserID=${userId}`
+    return this.http.get<any>(url);
+  }
   isUserDirector(userId: number) {
     const url = `${this.baseUrlSecurity}is_director_user?userID=${userId}`
     return this.http.get<any>(url);

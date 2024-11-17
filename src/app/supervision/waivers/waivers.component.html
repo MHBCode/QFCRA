@@ -3,10 +3,17 @@
 <div class="form-section">
   <div class="inputs-field-set">
     <div class="section table">
-      <div class="form-section-title">
+      <div class="form-section-title space-between">
         <h2 class="edit-firm-header">
           Waivers > <span>{{ firmDetails?.FirmName }}</span>
         </h2>
+        <div class="btn">
+          <button (click)="createWaiver()"
+          *ngIf="!hideCreateBtn">
+            <i class="bi bi-plus"></i>
+            Create
+          </button>
+        </div>
       </div>
       <table>
         <thead>
@@ -25,7 +32,7 @@
         <tbody>
           <tr *ngFor="let waiver of paginatedItems">
             <td>{{ waiver?.WaiverNumber }}</td>
-            <td>{{ waiver?.WaiverRevNum }}</td>
+            <td (click)="loadRevisions(waiver?.WaiverRevNum)">{{ waiver?.WaiverRevNum }}</td>
             <td>{{ waiver?.WaiverTypeDesc }}</td>
             <td>{{ waiver?.WaiverSubject }}</td>
             <td>{{ waiver?.WaiverStatusTypeDesc }}</td>
@@ -48,5 +55,23 @@
         </tfoot>
       </table>
     </div>
+  </div>
+</div>
+
+
+<div *ngIf="callPrev" class="overlay show"></div>
+<div *ngIf="callPrev" class="PreviousVersionsPopup popupcontainer" style="display:flex">
+  <i class="bi bi-x-circle close-icon close-icon-prev-revisions" (click)="closePreviousVersions()"></i>
+
+  <div class="popup-header">
+    <h3>Revisions for Waiver No.</h3>
+  </div>
+
+  <div style="width: 80%" class="popup-info-place">
+    <ul class="revision-list">
+      <li *ngFor="let rev of waiversRevisions">
+        {{ rev.WaiverRevNum }}
+      </li>
+    </ul>
   </div>
 </div>

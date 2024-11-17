@@ -2,11 +2,10 @@
 
 <div class="form-section">
     <div class="inputs-field-set">
-        <div class="section">
-            <div class="form-section-title">
+        <div class="section table">
+            <div class="form-section-title space-between">
                 <h2 class="edit-firm-header">
-                    <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
-                    Enforcement & Disciplinary Actions > <span>Al Rayyan </span>
+                    List Of Enforcement & Disciplinary Actions > <span>{{ firmDetails?.FirmName }}</span>
                 </h2>
                 <div class="btn">
                     <button>
@@ -15,9 +14,13 @@
                     </button>
                 </div>
             </div>
-            <span class="enhanced-checkbox"><input id="deletedRecords" type="checkbox"><label for="deletedRecords">Display Deleted Records</label></span>
+            <span class="enhanced-checkbox">
+                <input id="deletedRecords" type="checkbox" (change)="onDeletedEnfToggle($event)">
+                <label for="deletedRecords">Display Deleted Records</label>
+            </span>
+
             <table>
-                <thead>						
+                <thead>
                     <tr>
                         <th>Action On</th>
                         <th>Type of Action</th>
@@ -29,25 +32,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- <tr *ngFor="let enf of enfActions">
-                        <td>{{ rmp?.FirmRMPID }}</td>
-                        <td>{{ rmp?.RMPCreatedDate }}</td>
-                        <td>{{ rmp?.FirmRMPTypeDesc }}</td>
-                        <td>{{ rmp?.DateFirmAgreedOn }}</td>
-                        <td>{{ rmp?.AgreedBy }}</td>
-                        <td>{{ rmp?.RMPStatus }}</td>
-                        <td>{{ rmp?.SignOffStatus }}</td>
-                    </tr> -->
-                    <tr>
-                        <td>Action</td>
-                        <td>Type Of Action</td>
-                        <td>Date Of Action</td>
-                        <td>Firm Name</td>
-                        <td>Approved Individual</td>
-                        <td>Approved Individual</td>
-                        <td>Approved Individual</td>
+                    <tr *ngFor="let enf of paginatedItems">
+                        <td>{{ enf?.EnforcementActionOnTypeDesc }}</td>
+                        <td>{{ enf?.EnforcementType }}</td>
+                        <td>{{ enf?.FirmName }}</td>
+                        <td>{{ enf?.AppIndividualName }}</td>
+                        <td>{{ enf?.EnforcementActionFromDate }}</td>
+                        <td>{{ enf?.EnforcementActionToDate }}</td>
+                        <td>{{ enf?.Published }}</td>
                     </tr>
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td [attr.colspan]="12">
+                            <app-pagination [items]="enfActions" [pageSize]="pageSize"
+                                (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>

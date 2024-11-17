@@ -34,7 +34,7 @@ const routes: Routes = [
             data: { subsiteName: 'Supervision', pageTitle: 'Reporting Schedule' },
           },
           {
-            path: 'return-review/:id',
+            path: 'return-review/:id/:firmRptSchID',
             component: ReturnReviewComponent,
             data: { subsiteName: 'Supervision', pageTitle: 'Return Review' },
           },
