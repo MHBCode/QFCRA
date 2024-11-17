@@ -248,9 +248,7 @@ export class ScopeComponent implements OnInit {
       this.isLoading = false;
     });
   }
-
   
-
   maskCommandActionsControlsScope() {
     this.hideCreateBtn = false;
     this.hideEditBtn = false;

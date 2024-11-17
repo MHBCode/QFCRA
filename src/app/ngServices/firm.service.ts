@@ -190,4 +190,9 @@ export class FirmService {
     const url = `${this.returnViewUrl}get_report_reviewed_list?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
+
+  isFirmAuthorisedForWaivers(firmId: number){
+    const url = `${this.returnViewUrl}is_firm_authorised_for_waivers?firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
 }

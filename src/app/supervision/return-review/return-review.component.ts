@@ -39,7 +39,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
       this.isFirmAuthorised();
     });
     this.loadFirmDetails(this.firmId);
-    this.getDocumentType(7);
+    this.getDocumentType(constants.DocType_DocCategory.AMLMLROReports);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

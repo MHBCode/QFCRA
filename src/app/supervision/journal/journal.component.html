@@ -2,11 +2,10 @@
 
 <div class="form-section">
     <div class="inputs-field-set">
-        <div class="section">
-            <div class="form-section-title">
+        <div class="section table">
+            <div class="form-section-title space-between">
                 <h2 class="edit-firm-header">
-                    <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
-                    Journal > <span>Al Rayyan </span>
+                    Journal Entries for > <span>{{ firmDetails?.FirmName }}</span>
                 </h2>
                 <div class="btn">
                     <button>
@@ -15,8 +14,11 @@
                     </button>
                 </div>
             </div>
-            <span class="enhanced-checkbox"><input id="deletedRecords" type="checkbox"><label
-                    for="deletedRecords">Display Deleted Entities</label></span>
+            <span class="enhanced-checkbox">
+                <input id="deletedRecords" type="checkbox" (change)="onDeletedJournalToggle($event)">
+                <label for="deletedRecords">Display Deleted Entities</label>
+            </span>
+
             <table>
                 <thead>
                     <tr>
@@ -27,19 +29,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- <tr *ngFor="let enf of enfActions">
-                        <td>{{ rmp?.FirmRMPID }}</td>
-                        <td>{{ rmp?.RMPCreatedDate }}</td>
-                        <td>{{ rmp?.FirmRMPTypeDesc }}</td>
-                        <td>{{ rmp?.DateFirmAgreedOn }}</td>
-                    </tr> -->
-                    <tr>
-                        <td>Entry Type</td>
-                        <td>Title</td>
-                        <td>Entry Date</td>
-                        <td>Last Modified By</td>
+                    <tr *ngFor="let journal of paginatedItems">
+                        <td>{{ journal?.JournalEntryTypeDesc }}</td>
+                        <td>{{ journal?.EntryTitle }}</td>
+                        <td>{{ journal?.EntryDate }}</td>
+                        <td>{{ journal?.LastModifiedBy }}</td>
                     </tr>
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td [attr.colspan]="12">
+                            <app-pagination [items]="journaldata" [pageSize]="pageSize"
+                                (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>

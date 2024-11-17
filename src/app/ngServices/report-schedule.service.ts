@@ -26,8 +26,8 @@ export class ReportScheduleService {
     return this.http.get<any>(url);
   }
 
-  getFirmReportScheduledItemDetail(firmId: number,firmRptSchID: number): Observable<any> {
-    const url = `${this.baseUrlRpt}get_firm_report_schedule_item_detail?firmId=${firmId}&reportSchID=${firmRptSchID}`;
+  getFirmReportScheduledItemDetail(firmId: number,firmRptSchID: number,constructDocUrl : boolean): Observable<any> {
+    const url = `${this.baseUrlRpt}get_firm_report_schedule_item_detail?firmId=${firmId}&reportSchID=${firmRptSchID}&constructDocUrl=${constructDocUrl}`;
     return this.http.get<any>(url);
   }
 
