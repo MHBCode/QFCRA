@@ -152,7 +152,7 @@
 
                         <div class="input-field">
                             <label for="linkToReview">Link to Review</label>
-                            <a *ngIf="!isEditable" [routerLink]="['/supervision/view/return-review', firmId, rpt.FirmRptSchID]" target="_blank">
+                            <a *ngIf="!isEditable" [routerLink]="['/supervision/view/return-review', firmId]" [queryParams]="{ firmRptSchID: rpt.firmRptSchID }"  target="_blank">
                                 Link to Review
                             </a>
                         </div>
