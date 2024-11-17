@@ -199,4 +199,8 @@ export class FirmService {
     return this.http.get<any>(url);
   }
   
+  isFirmAuthorisedForWaivers(firmId: number){
+    const url = `${this.baseUrlFirms}is_firm_authorised_for_waivers?firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
 }
