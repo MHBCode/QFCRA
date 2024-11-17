@@ -85,6 +85,12 @@ export class SupervisionViewComponent {
   ValidFirmSupervisor: boolean = false;
   UserDirector: boolean = false;
 
+  // Panel Security flags
+  pnlSupCategoryData: boolean = false;
+  pnlClientClassificationData: boolean = false;
+  pnlFirmRPTBasisData: boolean = false;
+  pnlOperationalData: boolean = false;
+
   assignedUserRoles: any = [];
   assignedLevelUsers: any = [];
 
@@ -474,7 +480,27 @@ export class SupervisionViewComponent {
     this.populateFirmRptClassificationTypes();
     this.populateFirmRptClassificationTypesForDNFBPs();
     this.populateFirmRptBasisTypes();
+    this.applyPanelSecurity();
     this.applySecurityOnPage(this.Page.Supervision, this.isEditModeSupervisor);
+  }
+
+  applyPanelSecurity() {
+    if (this.UserDirector && !this.ValidFirmSupervisor) {
+      this.pnlSupCategoryData = true;
+      this.pnlClientClassificationData = false;
+      this.pnlFirmRPTBasisData = false;
+      this.pnlOperationalData = false;
+    } else if (!this.UserDirector && this.ValidFirmSupervisor) {
+      this.pnlSupCategoryData = false;
+      this.pnlClientClassificationData = true;
+      this.pnlFirmRPTBasisData = true;
+      this.pnlOperationalData = true;
+    } else if (this.UserDirector && this.ValidFirmSupervisor) {
+      this.pnlSupCategoryData = true;
+      this.pnlClientClassificationData = true;
+      this.pnlFirmRPTBasisData = true;
+      this.pnlOperationalData = true;
+    }
   }
 
   cancelSupervision() {
