@@ -266,7 +266,7 @@ export class ScopeComponent implements OnInit {
     this.hideCreateBtn = false;
     this.hideEditBtn = false;
     this.hideDeleteBtn = false;
-    this.hideReviseBtn = false;
+    this.hideReviseBtn = true;
     if (this.tabIndex === 0) { //Licensed
       if (!(this.firmService.isNullOrEmpty(this.ActivityLicensed[0].FirmScopeID)) && this.ActivityLicensed[0].FirmScopeID) {
         this.hideCreateBtn = true;

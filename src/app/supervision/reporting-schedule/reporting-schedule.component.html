@@ -8,6 +8,14 @@
                     <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
                     Reporting Schedule > <span>{{firmDetails?.FirmName}} </span>
                 </h2>
+                <div class="btn">
+                    <button
+                    *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn"
+                    [disabled]="!getControlEnablement('imgBtnCreate')">
+                      <i class="bi bi-plus"></i>
+                      Create
+                    </button>
+                  </div>
             </div>
             <table class="report-schedule-list">
                 <thead>

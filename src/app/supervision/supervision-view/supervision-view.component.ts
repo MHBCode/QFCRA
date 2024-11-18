@@ -86,6 +86,9 @@ export class SupervisionViewComponent {
   FirmAMLSupervisor: boolean = false;
   ValidFirmSupervisor: boolean = false;
   UserDirector: boolean = false;
+  
+  assignedUserRoles: any = [];
+  assignedLevelUsers: any = [];
 
   // Panel Security flags
   pnlSupCategoryData: boolean = false;
@@ -93,8 +96,6 @@ export class SupervisionViewComponent {
   pnlFirmRPTBasisData: boolean = false;
   pnlOperationalData: boolean = false;
 
-  assignedUserRoles: any = [];
-  assignedLevelUsers: any = [];
 
   constructor(private router: Router,
     private route: ActivatedRoute,
