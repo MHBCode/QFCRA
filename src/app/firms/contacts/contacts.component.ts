@@ -47,8 +47,6 @@ export class ContactsComponent {
   allAddressTypes: any = [];
   controlTypeOptionsCreate: any[] = [];
   controllerTypeOption: any = [];
-  objectOpTypeIdEdit = 41;
-  objectOpTypeIdCreate = 40;
   legalStatusOptionsEdit: any[] = [];
   Titles: any[] = [];
   MethodofContactOption: any = [];
@@ -394,7 +392,7 @@ export class ContactsComponent {
     // this.existingContactAddresses.push(this.defaultAddress);
   }
   getContactType(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.ContactTypes, 40)
+    this.securityService.getObjectTypeTable(this.userId, constants.ContactTypes, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.contactTypeOption = data.response;
         console.log("Controllers", data)
@@ -746,7 +744,7 @@ export class ContactsComponent {
   }
 
   populateCountries() {
-    this.firmDetailsService.getCountries().subscribe(
+    this.firmDetailsService.getCountries(this.userId,constants.ObjectOpType.Edit).subscribe(
       countries => {
         this.allCountries = countries;
       },
@@ -758,7 +756,7 @@ export class ContactsComponent {
 
 
   getAddressTypesContact(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.contactAddressTypes, this.objectOpTypeIdEdit)
+    this.securityService.getObjectTypeTable(this.userId, constants.contactAddressTypes, constants.ObjectOpType.Edit)
       .subscribe(data => {
         this.allAddressTypes = data.response;
         console.log("getAddressTypesContact", data)
@@ -768,7 +766,7 @@ export class ContactsComponent {
   }
 
   getTitleCreate(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdCreate)
+    this.securityService.getObjectTypeTable(this.userId, constants.Title, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.Titles = data.response;
         console.log("All Titles", data)
@@ -1313,7 +1311,7 @@ export class ContactsComponent {
   }
 
   getPreferredMethodofContact(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.PreferredMethodofContact, 40)
+    this.securityService.getObjectTypeTable(this.userId, constants.PreferredMethodofContact, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.MethodofContactOption = data.response;
         console.log("Controllers", data)

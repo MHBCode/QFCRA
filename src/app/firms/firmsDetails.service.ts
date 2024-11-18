@@ -576,9 +576,9 @@ export class FirmDetailsService {
     return strValue.padStart(5, '0'); // Ensure the value has a length of 5 digits
   }
 
-  getCountries(): Observable<any[]> {
+  getCountries(userId: number, OpType: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.countries).subscribe(
+      this.securityService.getObjectTypeTable(userId,constants.countries,OpType).subscribe(
         data => {
           observer.next(data.response);
         },
@@ -590,9 +590,9 @@ export class FirmDetailsService {
     });
   }
 
-  getAddressTypes(): Observable<any[]> {
+  getAddressTypes(userId: number, OpType: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.addressTypes).subscribe(
+      this.securityService.getObjectTypeTable(userId,constants.addressTypes,OpType).subscribe(
         data => {
           observer.next(data.response);
         },
@@ -604,9 +604,9 @@ export class FirmDetailsService {
     });
   }
 
-  getContactAddressTypes(): Observable<any[]> {
+  getContactAddressTypes(userId: number,OpType: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.contactAddressTypes)
+      this.securityService.getObjectTypeTable(userId,constants.contactAddressTypes,OpType)
         .subscribe(data => {
           observer.next(data.response);
         }, error => {
@@ -617,9 +617,9 @@ export class FirmDetailsService {
     });
   }
 
-  getAuthorisationStatus(): Observable<any[]> {
+  getAuthorisationStatus(userId: number,OpType: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.authorisationStatus).subscribe(
+      this.securityService.getObjectTypeTable(userId,constants.authorisationStatus,OpType).subscribe(
         data => {
           observer.next(data.response);
         },
@@ -631,9 +631,9 @@ export class FirmDetailsService {
     });
   }
 
-  getQFCLicenseStatus(): Observable<any[]> {
+  getQFCLicenseStatus(userId: number,OpType: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(
+      this.securityService.getObjectTypeTable(userId,constants.qfcLicenseStatus,OpType).subscribe(
         data => {
           observer.next(data.response);
         },
@@ -645,9 +645,9 @@ export class FirmDetailsService {
     });
   }
 
-  getFirmAppTypes(): Observable<any[]> {
+  getFirmAppTypes(userId: number,OpType: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.firmAppTypes).subscribe(
+      this.securityService.getObjectTypeTable(userId, constants.firmAppTypes,OpType).subscribe(
         data => {
           observer.next(data.response);
         },
@@ -659,9 +659,9 @@ export class FirmDetailsService {
     });
   }
 
-  getFinAccStd(): Observable<any[]> {
+  getFinAccStd(userId: number,OpType: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.FinAccStd).subscribe(
+      this.securityService.getObjectTypeTable(userId, constants.FinAccStd,OpType).subscribe(
         data => {
           observer.next(data.response);
         },
@@ -673,9 +673,9 @@ export class FirmDetailsService {
     });
   }
 
-  getFinYearEnd(): Observable<any[]> {
+  getFinYearEnd(userId: number,OpType: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.FinYearEnd).subscribe(
+      this.securityService.getObjectTypeTable(userId, constants.FinYearEnd,OpType).subscribe(
         data => {
           observer.next(data.response);
         },
@@ -687,9 +687,9 @@ export class FirmDetailsService {
     });
   }
 
-  getLegalStatus(): Observable<any[]> {
+  getLegalStatus(userId: number,OpType: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.legalStatus).subscribe(
+      this.securityService.getObjectTypeTable(userId, constants.legalStatus, OpType).subscribe(
         data => {
           observer.next(data.response);
         },

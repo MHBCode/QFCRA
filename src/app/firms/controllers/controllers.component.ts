@@ -93,9 +93,6 @@ export class ControllersComponent implements OnInit {
   removedRegulators: any = [];
   invalidRegulator: boolean;
 
-  objectOpTypeIdEdit = 41;
-  objectOpTypeIdCreate = 40;
-
   // Security
   assignedUserRoles: any = [];
   assignedLevelUsers: any = [];
@@ -244,7 +241,7 @@ export class ControllersComponent implements OnInit {
 
   getAllRegulater(firmId: number, countryID: number, regulatorArray: any[], callback?: () => void): void {
     if (countryID === 0) {
-      this.securityService.getObjectTypeTable(constants.Regulaters)
+      this.securityService.getObjectTypeTable(this.userId,constants.Regulaters,constants.ObjectOpType.Create)
         .subscribe(data => {
           this.AllRegulater = data.response;  // Store dropdown options separately
           console.log("General Regulators fetched:", data);
@@ -703,7 +700,7 @@ export class ControllersComponent implements OnInit {
     Output: 0,
     NumOfShares: 0,
     CountryID: 0,
-    jurisdictionOfIssue: 0,
+    jurisdictionOfIssue: null,
     AddressTypeID: 0,
     CreatedDate: '',
     EntityID: 0,
@@ -973,7 +970,7 @@ export class ControllersComponent implements OnInit {
 
 
   populateCountries() {
-    this.firmDetailsService.getCountries().subscribe(
+    this.firmDetailsService.getCountries(this.userId,constants.ObjectOpType.Edit).subscribe(
       countries => {
         this.allCountries = countries;
       },
@@ -984,7 +981,7 @@ export class ControllersComponent implements OnInit {
   }
 
   populateAddressTypes() {
-    this.firmDetailsService.getAddressTypes().subscribe(
+    this.firmDetailsService.getAddressTypes(this.userId,constants.ObjectOpType.Edit).subscribe(
       addressTypes => {
         this.allAddressTypes = addressTypes;
         this.currentAddressTypes = this.allAddressTypes; // Assign after data is loaded
@@ -996,7 +993,7 @@ export class ControllersComponent implements OnInit {
   }
 
   populateContactAddressTypes() {
-    this.firmDetailsService.getContactAddressTypes().subscribe(
+    this.firmDetailsService.getContactAddressTypes(this.userId,constants.ObjectOpType.Edit).subscribe(
       addressTypes => {
         this.allContactAddressTypes = addressTypes;
         this.currentAddressTypes = this.allContactAddressTypes; // Assign after data is loaded
@@ -1393,6 +1390,7 @@ export class ControllersComponent implements OnInit {
     this.selectedController = [];
     this.controllerDetails = this.selectedController;
     this.canAddNewAddressOnEdit = true;
+    this.applySecurityOnPage(this.Page.Controller,this.isEditModeController);
   }
 
   closeCreateControllerPopup(): void {
@@ -1490,7 +1488,7 @@ export class ControllersComponent implements OnInit {
   }
 
   getControllerControlTypes(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdEdit)
+    this.securityService.getObjectTypeTable(this.userId, constants.ControllerControlTypes, constants.ObjectOpType.Edit)
       .subscribe(data => {
         this.controlTypeOptionsEdit = data.response;
         console.log("getControllerControlTypes", data)
@@ -1499,7 +1497,7 @@ export class ControllersComponent implements OnInit {
       });
   }
   getControllerControlTypesCreate(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdCreate)
+    this.securityService.getObjectTypeTable(this.userId, constants.ControllerControlTypes, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.controlTypeOptionsCreate = data.response;
         console.log("getControllerControlTypes", data)
@@ -1509,7 +1507,7 @@ export class ControllersComponent implements OnInit {
   }
 
   getTitleCreate(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdCreate)
+    this.securityService.getObjectTypeTable(this.userId, constants.Title, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.Titles = data.response;
         console.log("Countries", data)
@@ -1519,7 +1517,7 @@ export class ControllersComponent implements OnInit {
   }
 
   getAddressTypesControllerCreate(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdCreate)
+    this.securityService.getObjectTypeTable(this.userId, constants.addressTypes, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.addressTypeOptionsEdit = data.response;
         console.log("getAddressTypesController", data)
@@ -1529,7 +1527,7 @@ export class ControllersComponent implements OnInit {
   }
 
   getlegalStatusController(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdEdit)
+    this.securityService.getObjectTypeTable(this.userId, constants.legalStatusController, constants.ObjectOpType.Edit)
       .subscribe(data => {
         this.legalStatusOptionsEdit = data.response;
         console.log("getlegalStatusController", data)
@@ -1539,7 +1537,7 @@ export class ControllersComponent implements OnInit {
   }
 
   getlegalStatusControllerCreate(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdCreate)
+    this.securityService.getObjectTypeTable(this.userId, constants.legalStatusController, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.legalStatusOptionsCreate = data.response;
         console.log("getlegalStatusController", data)
@@ -1549,7 +1547,7 @@ export class ControllersComponent implements OnInit {
   }
 
   getCorporateController(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.CorporateController, this.objectOpTypeIdEdit)
+    this.securityService.getObjectTypeTable(this.userId, constants.CorporateController, constants.ObjectOpType.Edit)
       .subscribe(data => {
         this.CorporateControllerEdit = data.response;
         console.log("getCorporateController", data)
@@ -1558,7 +1556,7 @@ export class ControllersComponent implements OnInit {
       });
   }
   getCorporateControllerCreate(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.CorporateController, this.objectOpTypeIdCreate)
+    this.securityService.getObjectTypeTable(this.userId, constants.CorporateController, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.CorporateControllerEdit = data.response;
         console.log("getCorporateController", data)
@@ -1582,7 +1580,7 @@ export class ControllersComponent implements OnInit {
   }
 
   getControllerType(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerType, this.objectOpTypeIdEdit)
+    this.securityService.getObjectTypeTable(this.userId, constants.ControllerType, constants.ObjectOpType.Edit)
       .subscribe(data => {
         this.controllerTypeOption = data.response;
 

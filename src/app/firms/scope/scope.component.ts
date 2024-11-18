@@ -539,7 +539,7 @@ export class ScopeComponent implements OnInit {
 
   // Added by Moe
   fetchSubTypeDocIDs() {
-    this.securityService.getObjectTypeTable(constants.docSubTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.docSubTypes, constants.ObjectOpType.Edit).subscribe(data => {
       // Scope Of Authorsation in Scope Authorised
       this.fetchedScopeDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
         item.DocSubTypeID === 262
@@ -1965,7 +1965,7 @@ export class ScopeComponent implements OnInit {
 
 
   populateAuthorisationCategoryTypes() {
-    this.securityService.getObjectTypeTable(constants.authorisationCategoryTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.authorisationCategoryTypes, constants.ObjectOpType.Edit).subscribe(data => {
       this.allAuthorisationCategoryTypes = data.response;
     }, error => {
       console.error('Error Fetching Authorisation Category Types dropdown: ', error);
@@ -1973,7 +1973,7 @@ export class ScopeComponent implements OnInit {
   }
 
   populatePrudentialCategoryTypes() {
-    this.securityService.getObjectTypeTable(constants.prudentialCategoryTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.prudentialCategoryTypes, constants.ObjectOpType.Edit).subscribe(data => {
       this.allPrudentialCategoryTypes = data.response;
     }, error => {
       console.error('Error Fetching Prudential Category Types dropdown: ', error);
@@ -1981,7 +1981,7 @@ export class ScopeComponent implements OnInit {
   }
 
   populateFirmScopeTypes() {
-    this.securityService.getObjectTypeTable(constants.firmScopeTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.firmScopeTypes, constants.ObjectOpType.Edit).subscribe(data => {
       this.allFirmScopeTypes = data.response;
     }, error => {
       console.error('Error Fetching Firm Scope Types dropdown: ', error);

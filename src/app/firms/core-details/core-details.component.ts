@@ -875,7 +875,7 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   populateCountries() {
-    this.firmDetailsService.getCountries().subscribe(
+    this.firmDetailsService.getCountries(this.userId,constants.ObjectOpType.Edit).subscribe(
       countries => {
         this.allCountries = countries;
       },
@@ -886,7 +886,7 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   populateAddressTypes() {
-    this.firmDetailsService.getAddressTypes().subscribe(
+    this.firmDetailsService.getAddressTypes(this.userId,constants.ObjectOpType.Edit).subscribe(
       addressTypes => {
         this.allAddressTypes = addressTypes;
       },
@@ -897,7 +897,7 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   populateAuthorisationStatus() {
-    this.firmDetailsService.getAuthorisationStatus().subscribe(
+    this.firmDetailsService.getAuthorisationStatus(this.userId,constants.ObjectOpType.Edit).subscribe(
       authorisationStatus => {
         this.allAuthorisationStatus = authorisationStatus;
       },
@@ -1295,7 +1295,7 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   populateQFCLicenseStatus() {
-    this.firmDetailsService.getQFCLicenseStatus().subscribe(
+    this.firmDetailsService.getQFCLicenseStatus(this.userId,constants.ObjectOpType.Edit).subscribe(
       qfcLicenseStatus => {
         this.allQFCLicenseStatus = qfcLicenseStatus;
       },
@@ -1307,7 +1307,7 @@ export class CoreDetailsComponent implements OnInit {
 
 
   populateFirmAppTypes() {
-    this.firmDetailsService.getFirmAppTypes().subscribe(
+    this.firmDetailsService.getFirmAppTypes(this.userId,constants.ObjectOpType.Edit).subscribe(
       firmAppTypes => {
         this.allFirmTypes = firmAppTypes;
       },
@@ -1318,7 +1318,7 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   populateFinAccStd() {
-    this.firmDetailsService.getFinAccStd().subscribe(
+    this.firmDetailsService.getFinAccStd(this.userId,constants.ObjectOpType.Edit).subscribe(
       finAccStd => {
         this.allFinAccStd = finAccStd;
       },
@@ -1329,7 +1329,7 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   populateFinYearEnd() {
-    this.firmDetailsService.getFinYearEnd().subscribe(
+    this.firmDetailsService.getFinYearEnd(this.userId,constants.ObjectOpType.Edit).subscribe(
       finYearEnd => {
         this.allFinYearEnd = finYearEnd;
       },
@@ -1340,7 +1340,7 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   populateLegalStatus() {
-    this.firmDetailsService.getLegalStatus().subscribe(
+    this.firmDetailsService.getLegalStatus(this.userId,constants.ObjectOpType.Edit).subscribe(
       legalStatus => {
         this.allLegalStatus = legalStatus;
       },
@@ -1604,7 +1604,7 @@ export class CoreDetailsComponent implements OnInit {
   }
 
   fetchSubTypeDocIDs() {
-    this.securityService.getObjectTypeTable(constants.docSubTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId,constants.docSubTypes,constants.ObjectOpType.Edit).subscribe(data => {
       this.fetchedCoreDetailDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
         item.DocSubTypeID === 263
       );

@@ -36,8 +36,6 @@ export class NoticesComponent implements OnInit {
   // Form search fields with defaults
   TypeOfNotice: string = '';
 
-  objectOpType = constants.ObjectOpType.List;
-
 
   NoticeID: number | null = null;
   CSVFirmIDs: string | null = null;
@@ -187,7 +185,7 @@ export class NoticesComponent implements OnInit {
 
 
   getNoticeIssuedBy() {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.NoticeIssuers, this.objectOpType)
+    this.securityService.getObjectTypeTable(this.userId, constants.NoticeIssuers, constants.ObjectOpType.List)
       .subscribe(data => {
         this.noticeIssuedBy = data.response;
         console.log("General Regulators fetched:", this.noticeIssuedBy);

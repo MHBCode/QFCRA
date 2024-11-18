@@ -86,7 +86,7 @@ export class SupervisionViewComponent {
   FirmAMLSupervisor: boolean = false;
   ValidFirmSupervisor: boolean = false;
   UserDirector: boolean = false;
-  
+
   assignedUserRoles: any = [];
   assignedLevelUsers: any = [];
 
@@ -492,6 +492,14 @@ export class SupervisionViewComponent {
     this.isEditModeSupervisor = true;
     this.savedSupEffectiveDate = this.SupervisionCategory[0].EffectiveFromDate;
     this.savedSupCategoryID = this.SupervisionCategory[0].FirmRptClassificationTypeID;
+    if (this.RPTBasis.FirmRptBasisTypeID) {
+      if (this.legalStatusTypeID === constants.TEXT_TWO) {
+        this.RPTBasis.FirmRptBasisTypeID = constants.FirmRptBasisTypes.Solo;
+      } else if (this.legalStatusTypeID === constants.TEXT_ONE) {
+        this.RPTBasis.FirmRptBasisTypeID = constants.FirmRptBasisTypes.Consolidated;
+      }
+    }
+
     this.populateFirmRptClassificationTypes();
     this.populateFirmRptClassificationTypesForDNFBPs();
     this.populateFirmRptBasisTypes();
@@ -546,7 +554,7 @@ export class SupervisionViewComponent {
   }
 
   populateFirmRptClassificationTypes() {
-    this.supervisionService.populateFirmRptClassificationTypes().subscribe(
+    this.supervisionService.populateFirmRptClassificationTypes(this.userId,constants.ObjectOpType.Edit).subscribe(
       firmRptClassification => {
         this.allFirmRptClassificationTypes = firmRptClassification;
       },
@@ -557,7 +565,7 @@ export class SupervisionViewComponent {
   }
 
   populateFirmRptClassificationTypesForDNFBPs() {
-    this.supervisionService.populateFirmRptClassificationTypesForDNFBPs().subscribe(
+    this.supervisionService.populateFirmRptClassificationTypesForDNFBPs(this.userId,constants.ObjectOpType.Edit).subscribe(
       firmRptClassificationDNFBPs => {
         this.allFirmRptClassificationTypesForDNFBPs = firmRptClassificationDNFBPs;
       },
@@ -568,7 +576,7 @@ export class SupervisionViewComponent {
   }
 
   populateFirmRptBasisTypes() {
-    this.supervisionService.populateFirmRptBasisTypes().subscribe(
+    this.supervisionService.populateFirmRptBasisTypes(this.userId,constants.ObjectOpType.Edit).subscribe(
       firmRptBasisTypes => {
         this.allFirmRptBasisTypes = firmRptBasisTypes;
       },
@@ -725,10 +733,10 @@ export class SupervisionViewComponent {
       firmClientClassificationObj: {
         firmClientsClassificationID: this.clientClassification[0].FirmClientsClassificationID,
         firmId: this.firmId,
-        holdsClientMoney: this.clientClassification[0].HoldsClientMoney,
-        holdsInsuranceMoney: this.clientClassification[0].HoldsInsuranceMoney,
-        holdsClientMoneyDesc: null,
-        holdsInsuranceMoneyDesc: null,
+        holdsClientMoney: null,
+        holdsInsuranceMoney: null,
+        holdsClientMoneyDesc: this.clientClassification[0].HoldsClientMoney,
+        holdsInsuranceMoneyDesc: this.clientClassification[0].HoldsInsuranceMoney,
         createdBy: userId,
         lastModifiedBy: userId,
         createdDate: this.currentDate,

@@ -59,7 +59,7 @@ export class ReportingScheduleComponent {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
       this.isFirmAuthorised();
-
+      this.isUserHasRestrictedAccess();
       forkJoin([
         this.isUserDirector(),
         this.isValidFirmSupervisor(),
@@ -151,6 +151,22 @@ export class ReportingScheduleComponent {
   getControlEnablement(controlName: string): boolean {
     return this.firmDetailsService.getControlEnablement(controlName);
   }
+
+  isUserHasRestrictedAccess(): void {
+    this.supervisionService.isUserHasRestrictedAccess(this.userId, this.firmId, this.Page.ReportingSchedule)
+      .subscribe(
+        (hasAccess: boolean) => {
+          if (hasAccess) {
+            // User has restricted access
+            this.hideActionButton();
+          } 
+        },
+        (error) => {
+          console.error('Error checking user restricted access:', error);
+        }
+      );
+  }
+
 
   isFirmAuthorised() {
     this.firmService.checkisFirmAuthorised(this.firmId).subscribe(
