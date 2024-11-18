@@ -656,6 +656,7 @@ export class ControllersComponent implements OnInit {
     SecondName: '',
     FamilyName: '',
     PlaceOfBirth: '',
+    JobTitle:'',
     DateOfBirth: '',
     PassportNum: '',
     isPEP: true,
@@ -2143,5 +2144,45 @@ export class ControllersComponent implements OnInit {
         }
       );
     }
+  }
+  ////// git data by firstName and familyName 
+
+  onNameBlur(): void {
+    const { FirstName, FamilyName } = this.CreatecontrollerDetails;
+
+    // Check if both fields are filled before calling the API
+    if (FirstName && FamilyName) {
+      this.SearchContactDetails(FirstName, FamilyName);
+    }
+  }
+  ControllerDetailsByPassingParam: any = [];
+  showControllerModal: boolean = false;
+  SearchContactDetails(firstName: string, familyName: string,) {
+    this.contactService.SearchContactDetailsByPassingParam(firstName, familyName, this.firmId).subscribe(
+      data => {
+        if (data.isSuccess && data.response.length > 0) {
+          this.ControllerDetailsByPassingParam = data.response;
+          this.showControllerModal = true;
+          console.log("ControllerDetailsByPassingParam", this.ControllerDetailsByPassingParam)
+        }
+      },
+      error => {
+        console.error('Error finding contact details', error);
+      }
+    );
+  }
+  closeModal() {
+    this.showControllerModal = false;
+  }
+  ShowselectContact(contact: any) {
+    this.CreatecontrollerDetails.FirstName = contact.FirstName;
+    this.CreatecontrollerDetails.FamilyName = contact.FamilyName;
+    this.CreatecontrollerDetails.MobilePhone = contact.MobileNum;
+    this.CreatecontrollerDetails.businessEmail = contact.BusEmail;
+    this.CreatecontrollerDetails.JobTitle = contact.JobTitle;
+    this.CreatecontrollerDetails.Title = contact.Title;
+    this.CreatecontrollerDetails.isPEP = contact.isPeP;
+    this.CreatecontrollerDetails.DateOfBirth = contact.DateOfBirth;
+    this.closeModal();
   }
 }

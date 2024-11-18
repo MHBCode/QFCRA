@@ -34,8 +34,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let ReturnreView of paginatedFirms">
-            <td>{{ReturnreView.RptReviewRevNum}}</td>
+          <tr *ngFor="let ReturnreView of paginatedFirms" (click)="openReturnreViewPopup(ReturnreView,firmDetails)">
+            <td (click)="getReturnReviewRevision(ReturnreView)" class="clickable-cell">
+              {{ReturnreView.RptReviewRevNum}}
+            </td>
             <td>{{ReturnreView.ReportName}}</td>
             <td>{{ReturnreView.PeriodFrom}}</td>
             <td>{{ReturnreView.PeriodTo}}</td>
@@ -59,12 +61,33 @@
                   <span>&gt;</span>
                 </button>
                 <span style="color: #555; font-size: 14px;">Showing {{ startRow }} to {{ endRow }} of {{ totalRows }}
-                  rows</span> 
+                  rows</span>
               </div>
             </td>
           </tr>
         </tfoot>
       </table>
     </div>
+  </div>
+</div>
+
+<!-- show Return Review Revision Popup-->
+
+<div *ngIf="showReturnReviewRevision" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Report Review Revisions:</h3>
+    </div>
+    <div class="revisions-container">
+      <span *ngFor="let ReviewRevision of ReturnReviewRevisionList" 
+            (click)="getReturnReviewRevision(ReviewRevision)" 
+            class="revision-item">
+        {{ ReviewRevision.RptReviewRevNum }}
+      </span>
+    </div>
+    <div class="btn">
+      <button class="close-button" (click)="closeReturnReviewRevisionModal()">Close</button>
+    </div>
+    
   </div>
 </div>

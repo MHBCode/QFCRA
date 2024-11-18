@@ -315,6 +315,9 @@ export class ContactsComponent {
       }
     });
   }
+  isBusinessEmailReadOnly:boolean = false;
+  isBusinessEmailEnabled:boolean = false;
+  showInfoIcon:boolean = false;
   openContactPopup(contact: any): void {
     // Reset the selected contact and hide the popup until data is loaded
     this.selectedContact = {};
@@ -327,6 +330,15 @@ export class ContactsComponent {
           this.selectedContact = data.response; // Assign the received data to selectedContact
           console.log("Selected contact: ", this.selectedContact); // Log to check data
 
+          if (this.selectedContact.isESSAccessActive) {
+            this.isBusinessEmailReadOnly = true;
+            this.isBusinessEmailEnabled = false;
+            this.showInfoIcon = true;
+          } else {
+            this.isBusinessEmailReadOnly = false;
+            this.isBusinessEmailEnabled = true;
+            this.showInfoIcon = false;
+          }
           // Convert lstContactFunctions to an array if needed
           this.loadContactFirmAdresses(this.selectedContact.contactAssnID, this.userId);
           this.convertFunctionsToArray();
@@ -337,7 +349,7 @@ export class ContactsComponent {
           this.initializeEditInfoTypes();
           // Trigger change detection to update the view
           this.cdr.detectChanges();
-
+        
           // Show the popup after data is loaded and processed
           this.isPopupVisible = true;
         } else {
@@ -1140,6 +1152,7 @@ export class ContactsComponent {
           placeOfBirth: this.createContactObj.placeOfBirth,
           previousName: null,
           isExists: false,
+          IsESSAccessActive:true,
           FunctionTypeId: null,
           ContactAddnlInfoTypeID: this.createContactObj.strContactAddnlInfoTypeID,
           strContactAddnInfoType: this.createContactObj.strContactAddnInfoTypes,
@@ -1367,6 +1380,7 @@ export class ContactsComponent {
           MyState: 3,
           nationalID: null,
           nationality: null,
+          isESSAccessActive: true,
           EntityID: this.firmId,
           passportNum: this.selectedContact.passportNum,
           placeOfBirth: this.selectedContact.placeOfBirth,
@@ -2314,6 +2328,7 @@ export class ContactsComponent {
     this.createContactObj.title = contact.Title;
     this.createContactObj.isPeP = contact.isPeP;
     this.createContactObj.ContactMethodTypeID = contact.ContactMethodTypeID;
+    this.createContactObj.contactTypeId = contact.ContactTypeID;
     this.closeModal();
 
   }

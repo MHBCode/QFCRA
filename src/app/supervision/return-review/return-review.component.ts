@@ -21,11 +21,15 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
   totalPages: number = 0;
   totalRows: number = 0;
   paginatedFirms: any[] = [];
+  selectedReturnreView: any = null;
   startRow: number = 0;
   endRow: number = 0;
+  showPopup: boolean = false;
   errorMessages: { [key: string]: string } = {};
   @Input() pageSize: number = 10;
   firmDetails: any;
+  ReturnReviewRevisionList: any = [];
+  showReturnReviewRevision: boolean = false;
   constructor(
     private firmService: FirmService,
     private route: ActivatedRoute,
@@ -190,4 +194,32 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
       }
     );
   }
+
+  getReturnReviewRevision(ReturnreView: any){
+    const objectId = constants.FrimsObject.ReturnsReview;
+    const objectInstanceId = ReturnreView.RptReviewID
+    this.returnReviewService.getReturnReviewRevision(objectId,objectInstanceId).subscribe(
+      data => {
+        this.ReturnReviewRevisionList = data.response;
+        console.log("this.ReturnReviewRevisionList",this.ReturnReviewRevisionList)
+        if(this.ReturnReviewRevisionList.length > 1){
+          this.showReturnReviewRevision = true
+        }
+      },
+      error => {
+        console.error(error);
+      }
+    )
+
+
+  }
+  openReturnreViewPopup(ReturnreView: any,firmDetails : any): void {
+    this.selectedReturnreView = ReturnreView;
+    this.showPopup = true;
+  }
+  closeReturnReviewRevisionModal(){
+    this.showReturnReviewRevision = false;
+    this.ReturnReviewRevisionList = [];
+  }
+
 }

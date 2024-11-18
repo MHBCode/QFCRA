@@ -777,14 +777,14 @@
             <label for="firstName">
               First Name <span style="color: red">*</span>
             </label>
-            <input [(ngModel)]="CreatecontrollerDetails.FirstName" name="firstName" id="firstName" type="text" />
+            <input [(ngModel)]="CreatecontrollerDetails.FirstName" name="firstName" id="firstName" type="text" (blur)="onNameBlur()"/>
           </div>
           <!---->
           <div class="input-field" *ngIf="
           CreatecontrollerDetails.EntityTypeID === ControllerType.UBO_Individual ||
           CreatecontrollerDetails.EntityTypeID === ControllerType.IndividualController">
             <label for="secondName">
-              Second Name <span style="color: red">*</span>
+              Second Name
             </label>
             <input [(ngModel)]="CreatecontrollerDetails.SecondName" name="secondName" id="secondName" type="text" />
           </div>
@@ -795,7 +795,7 @@
             <label for="familyName">
               Family Name <span style="color: red">*</span>
             </label>
-            <input [(ngModel)]="CreatecontrollerDetails.FamilyName" name="familyName" id="familyName" type="text" />
+            <input [(ngModel)]="CreatecontrollerDetails.FamilyName" name="familyName" id="familyName" type="text" (blur)="onNameBlur()"/>
           </div>
           <!---->
           <div class="input-field" *ngIf="
@@ -1212,5 +1212,43 @@
   </div>
   <div class="popup-operations-place">
     <button class="subbutton" (click)="closeAddressTypeHistory()">Close</button>
+  </div>
+</div>
+<!-- Modal Popup for Showing Search Results -->
+<div *ngIf="showControllerModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Contact Search Results</h3>
+      <button class="close-button" (click)="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="contact-table">
+        <thead>
+          <tr>
+            <th>Select</th>
+            <th>Full Name</th>
+            <th>Mobile Number</th>
+            <th>Email</th>
+            <th>Country</th>
+            <th>Passport Number</th>
+            <th>Date of Birth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let contact of ControllerDetailsByPassingParam">
+            <td>
+              <button style="color: #a41e36; text-decoration: none;"
+                (click)="ShowselectContact(contact)">Select</button>
+            </td>
+            <td>{{ contact.FullName }}</td>
+            <td>{{ contact.MobileNum || 'N/A' }}</td>
+            <td>{{ contact.BusEmail || 'N/A' }}</td>
+            <td>{{ contact.CountryName || 'N/A' }}</td>
+            <td>{{ contact.PassportNum || 'N/A' }}</td>
+            <td>{{ contact.DateOfBirth || 'N/A' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

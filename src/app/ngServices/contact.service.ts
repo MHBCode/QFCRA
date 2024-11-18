@@ -62,7 +62,7 @@ export class ContactService {
     return this.http.get<any>(url);
   }
   SearchContactDetailsByPassingParam(firstName: string, familyName: string,firmId:number): Observable<any> {
-    const url = `${this.baseUrlContact}search_contact_details_by_passing_param?firstName=${firstName}&familyNam=${familyName}&firmId=${firmId}`;
+    const url = `${this.baseUrlContact}search_contact_details_by_passing_param?firmId=${firmId}&firstName=${firstName}&familyNam=${familyName}`;
     return this.http.get<any>(url);
   }
   getContactFunctionsList(contactId: number, contactAssId: number): Observable<any> {
