@@ -1,3 +1,11 @@
+.edit-firm-header>span {
+    color: #a51e36;
+    font-size: 1em;
+    font-weight: 500;
+    line-height: 24px;
+    word-wrap: break-word;
+}
+
 .input-field {
     display: flex;
     flex-direction: column;
@@ -9,6 +17,10 @@
 
     &.fullwidth {
         width: 100%;
+    }
+
+    textarea {
+        padding: 0.5rem!important;
     }
 
     input,

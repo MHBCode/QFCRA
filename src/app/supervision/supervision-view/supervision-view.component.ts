@@ -39,10 +39,10 @@ export class SupervisionViewComponent {
   callCreditRatings: boolean = false;
   Page = FrimsObject;
   userId: number = 10044; // Ewald Muller
-  clientClassification: any = [];
+  clientClassification: any = [{}];
   isLoading: boolean = false;
   firmId: number = 0;
-  OperationalData: any;
+  OperationalData: any[] = [{}];
   RPTBasis: any = {};
   SupervisionCategory: any;
   CreditRatings: CreditRating[] = [];
@@ -57,6 +57,8 @@ export class SupervisionViewComponent {
   HistoryCreditRatingCountryGrouped: CreditRatingsGrouped = {};
   firmDetails: any;
   legalStatusTypeID: number;
+  savedSupEffectiveDate: string;
+  savedSupCategoryID: number;
 
   currentDate = new Date();
   currentDateISOString = this.currentDate.toISOString();
@@ -110,10 +112,7 @@ export class SupervisionViewComponent {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
-      this.getSupervisionCategoryData();
-      this.getClientClassificationData();
-      this.getOperationalData();
-      this.getRPTBasisData();
+      this.initializeSupvisionData();
       this.getLegalStatusTypeID();
       // Credit Ratings - Firm
       this.getCreditRatingsData(true, false);
@@ -458,6 +457,15 @@ export class SupervisionViewComponent {
       }
     );
   }
+
+  hasCreditRatings(creditRatings: CreditRatingsGrouped): boolean {
+    return creditRatings && Object.keys(creditRatings).length > 0;
+  }
+
+  hasCountryCreditRatings(countryCreditRatings: CreditRatingsGrouped): boolean {
+    return countryCreditRatings && Object.keys(countryCreditRatings).length > 0;
+  }
+
   loadFirmDetails(firmId: number) {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
       data => {
@@ -469,13 +477,19 @@ export class SupervisionViewComponent {
     );
   }
 
-  savedDate: string;
-  savedSupCategoryID: number;
+
+
+  initializeSupvisionData() {
+    this.getSupervisionCategoryData();
+    this.getClientClassificationData();
+    this.getRPTBasisData();
+    this.getOperationalData();
+  }
 
   // on edit mode
   editSupervision() {
     this.isEditModeSupervisor = true;
-    this.savedDate = this.SupervisionCategory[0].EffectiveFromDate;
+    this.savedSupEffectiveDate = this.SupervisionCategory[0].EffectiveFromDate;
     this.savedSupCategoryID = this.SupervisionCategory[0].FirmRptClassificationTypeID;
     this.populateFirmRptClassificationTypes();
     this.populateFirmRptClassificationTypesForDNFBPs();
@@ -516,10 +530,7 @@ export class SupervisionViewComponent {
         this.isEditModeSupervisor = false;
         this.errorMessages = {};
         this.applySecurityOnPage(this.Page.Supervision, this.isEditModeSupervisor);
-        this.getSupervisionCategoryData();
-        this.getClientClassificationData();
-        this.getRPTBasisData();
-        this.getOperationalData();
+        this.initializeSupvisionData();
       }
     });
   }
@@ -527,6 +538,7 @@ export class SupervisionViewComponent {
   getLegalStatusTypeID() {
     this.firmsService.getLegalStatusTypeID(this.firmId).subscribe(response => {
       this.legalStatusTypeID = response.LegalStatusTypeID
+      console.log('Legal Status Type ID: ' + this.legalStatusTypeID)
     }, error => {
       console.log("Error Fetching LegalStatusTypeID: ", error)
     })
@@ -565,92 +577,117 @@ export class SupervisionViewComponent {
     );
   }
 
+  // getters and setters
+  get RPTBasisEffectiveDate(): string {
+    if (!this.RPTBasis.Column1 && this.isEditModeSupervisor) {
+      // show this date only on edit mode if there is none
+      return this.dateUtilService.formatDateToCustomFormat(this.currentDateISOString);
+    }
+    return this.RPTBasis.Column1;
+  }
+
+  set RPTBasisEffectiveDate(value: string) {
+    this.RPTBasis.Column1 = value;
+  }
+
+
   async validateSupervision(): Promise<boolean> {
     this.hasValidationErrors = false;
-  
+
     if (this.supervisionService.isNullOrEmpty(this.SupervisionCategory[0].EffectiveFromDate)) {
       this.loadErrorMessages('SupCatEffectiveDateFrom', constants.SupervisionData_Messages.ENTER_EFFECTIVE_DATE);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['SupCatEffectiveDateFrom'];
     }
-  
-    if (parseInt(this.SupervisionCategory[0].FirmRptClassificationTypeID) === 0) {
+
+    if (this.SupervisionCategory[0].FirmRptClassificationTypeID === null) {
       this.loadErrorMessages('SupCategoryType', 8611);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['SupCategoryType'];
     }
-  
-    if (this.supervisionService.isNullOrEmpty(this.RPTBasis.Column1)) {
+
+    if (this.supervisionService.isNullOrEmpty(this.RPTBasisEffectiveDate)) {
       this.loadErrorMessages('FRBTEffectiveDate', constants.SupervisionData_Messages.ENTER_EFFECTIVE_DATE);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['FRBTEffectiveDate'];
     }
-  
-    if (this.supervisionService.isNullOrEmpty(this.OperationalData[0].EffectiveFromDate)) {
-      this.loadErrorMessages('OPEffectiveDateFrom', 3219);
-      this.hasValidationErrors = true;
-    } else {
-      delete this.errorMessages['OPEffectiveDateFrom'];
+
+    if (this.pnlOperationalData) {
+      if (this.supervisionService.isNullOrEmpty(this.OperationalData[0].EffectiveFromDate)) {
+        this.loadErrorMessages('OPEffectiveDateFrom', 3219);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['OPEffectiveDateFrom'];
+      }
     }
-  
-    if (this.OperationalData[0].NumOfLocalStaff < 0 || !Number.isInteger(+this.OperationalData[0].NumOfLocalStaff)) {
-      this.loadErrorMessages('NumOfLocalStaff', constants.SupervisionData_Messages.INVALID_NO_OF_STAFF);
-      this.hasValidationErrors = true;
-    } else {
-      delete this.errorMessages['NumOfLocalStaff'];
+
+    if (this.pnlOperationalData) {
+      if (this.OperationalData[0].NumOfLocalStaff < 0 || !Number.isInteger(+this.OperationalData[0].NumOfLocalStaff)) {
+        this.loadErrorMessages('NumOfLocalStaff', constants.SupervisionData_Messages.INVALID_NO_OF_STAFF);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['NumOfLocalStaff'];
+      }
     }
-  
-    if (this.OperationalData[0].NumOfTotalStaff < 0 || !Number.isInteger(+this.OperationalData[0].NumOfTotalStaff)) {
-      this.loadErrorMessages('NumOfTotalStaff', constants.SupervisionData_Messages.INVALID_NO_OF_STAFF);
-      this.hasValidationErrors = true;
-    } else {
-      delete this.errorMessages['NumOfTotalStaff'];
+
+    if (this.pnlOperationalData) {
+      if (this.OperationalData[0].NumOfTotalStaff < 0 || !Number.isInteger(+this.OperationalData[0].NumOfTotalStaff)) {
+        this.loadErrorMessages('NumOfTotalStaff', constants.SupervisionData_Messages.INVALID_NO_OF_STAFF);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['NumOfTotalStaff'];
+      }
     }
-  
+
     if (this.OperationalData[0].NumOfLocalStaff > this.OperationalData[0].NumOfTotalStaff) {
       this.loadErrorMessages('NumOfLocalStaffGreaterThanNumOfLocalStaff', constants.SupervisionData_Messages.NO_OF_STAFF_SHOULD_BE_LESS_THAN_OR_EQUAL_TOTAL_STAFF);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['NumOfLocalStaffGreaterThanNumOfLocalStaff'];
     }
-  
-    if (this.savedSupCategoryID !== parseInt(this.SupervisionCategory[0].FirmRptClassificationTypeID) && parseInt(this.SupervisionCategory[0].FirmRptClassificationTypeID) !== 0) {
-      if (this.savedDate === this.SupervisionCategory[0].EffectiveFromDate) {
-        this.isLoading = false;
-        const isConfirmed = await this.showPopupAlert(8613);
-        if (!isConfirmed) {
-          return false; // Stop the process if user cancels
-        }
-      }
-    }
-  
+
     return !this.hasValidationErrors;
   }
-  
-  
+
+
 
   // save
   async saveSupervision() {
     this.isLoading = true;
-  
+
     // Validate before saving
     const isValid = await this.validateSupervision();
-  
+
     console.log('Validation result:', isValid); // Debug log
-  
+
     if (!isValid) {
       this.firmDetailsService.showErrorAlert(constants.SupervisionData_Messages.SUPERVISION_SAVE_ERROR);
       this.isLoading = false;
       return; // Prevent further action if validation fails or the user cancels
     }
-  
+
+    if (
+      this.savedSupCategoryID !== parseInt(this.SupervisionCategory[0].FirmRptClassificationTypeID) &&
+      (parseInt(this.SupervisionCategory[0].FirmRptClassificationTypeID) !== 0 || null)
+    ) {
+      if (this.savedSupEffectiveDate === this.SupervisionCategory[0].EffectiveFromDate) {
+        this.isLoading = false;
+        const isConfirmed = await this.showPopupAlert(8613);
+        if (!isConfirmed) {
+          // If user cancels, stop the process
+          this.isLoading = false;
+          return;
+        }
+      }
+    }
+
     // Proceed with saving
     const supervisionDataObj = this.prepareSupervisionObject(this.userId);
     const supCategoryDataObj = this.prepareSupCategoryObject(this.userId);
-  
+
     forkJoin({
       saveSupervision: this.firmsService.saveSupervision(supervisionDataObj),
       saveSupCategory: this.firmsService.saveSupCategory(supCategoryDataObj)
@@ -660,6 +697,8 @@ export class SupervisionViewComponent {
         this.firmDetailsService.showSaveSuccessAlert(constants.SupervisionData_Messages.SUPERVISION_DATA_SAVED_SUCCESSFULLY);
         this.isEditModeSupervisor = false;
         this.isLoading = false;
+        this.initializeSupvisionData();
+        this.applySecurityOnPage(this.Page.Supervision, this.isEditModeSupervisor);
       },
       error => {
         console.error('Error saving data:', error);
@@ -667,8 +706,8 @@ export class SupervisionViewComponent {
       }
     );
   }
-  
-  
+
+
 
 
   prepareSupervisionObject(userId: number) {
@@ -699,9 +738,9 @@ export class SupervisionViewComponent {
         firmId: this.firmId,
         firmRptBasisID: this.RPTBasis.FirmRptBasisID,
         firmRptBasisDesc: null,
-        firmRptBasisTypeID: this.RPTBasis.FirmRptBasisTypeID,
+        firmRptBasisTypeID: this.RPTBasis.FirmRptBasisTypeID ?? 0,
         firmRptBasisTypeDesc: this.RPTBasis.FirmRptBasisTypeDesc,
-        effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(this.RPTBasis.Column1),
+        effectiveDate: this.dateUtilService.convertDateToYYYYMMDD(this.RPTBasisEffectiveDate),
         expirationDate: null,
         createdBy: userId,
         lastModifiedBy: userId,
@@ -715,7 +754,7 @@ export class SupervisionViewComponent {
     return {
       firmRptClassificationID: this.SupervisionCategory[0].FirmRptClassificationID,
       firmId: this.firmId,
-      firmRptClassificationTypeID: this.SupervisionCategory[0].FirmRptClassificationTypeID,
+      firmRptClassificationTypeID: this.SupervisionCategory[0].FirmRptClassificationTypeID ?? null,
       effectiveFromDate: this.dateUtilService.convertDateToYYYYMMDD(this.SupervisionCategory[0].EffectiveFromDate),
       createdBy: userId,
     }
@@ -725,7 +764,7 @@ export class SupervisionViewComponent {
     return new Promise((resolve) => {
       this.logForm.errorMessages(msgKey).subscribe((response) => {
         Swal.fire({
-          text: response.response, 
+          text: response.response,
           showCancelButton: true,
           confirmButtonText: 'OK',
           cancelButtonText: 'Cancel',

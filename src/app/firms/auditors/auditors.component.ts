@@ -119,7 +119,7 @@ export class AuditorsComponent {
 
     // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
     this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
-      let firmType = this.firmDetails?.FirmTypeID;
+      // let firmType = this.firmDetails?.FirmTypeID;
 
 
       if (this.ValidFirmSupervisor) {
