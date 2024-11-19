@@ -27,7 +27,7 @@ export class JournalComponent {
   firmId: number = 0;
   paginatedItems: any[] = [];
   pageSize: number = 10;
-  userId: number = 10044;
+  userId: number = 10055;
   firmDetails: any;
   showDeletedJournal: boolean = false;
   alljournaldata: any;
@@ -130,7 +130,6 @@ export class JournalComponent {
         this.hideActionButton();
         this.isLoading = false;
       }
-      this.isLoading = false;
     });
   }
 

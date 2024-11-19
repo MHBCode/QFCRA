@@ -2,7 +2,10 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, QueryList, 
 import { forkJoin, tap } from 'rxjs';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
+import { JournalService } from 'src/app/ngServices/journal.service';
+import * as constants from 'src/app/app-constants';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
+import { SupervisionService } from '../../supervision.service';
 
 @Component({
   selector: 'app-journal-view-details',
@@ -21,8 +24,13 @@ export class JournalViewDetailsComponent implements OnInit {
   isEditModeJournal: boolean = false;
 
   isLoading: boolean = false;
-  userId: number = 10044;
+  userId: number = 30;
   Page = FrimsObject;
+  journalDetails: any = [];
+  subjectData: any = [];
+
+  // dropdowns
+  alljournalEntryTypes: any = [];
 
   // Security
   hideEditBtn: boolean = false;
@@ -32,6 +40,8 @@ export class JournalViewDetailsComponent implements OnInit {
   hideReviseBtn: boolean = false;
   hideDeleteBtn: boolean = false;
 
+  hideExportBtn: boolean = false;
+
   FirmAMLSupervisor: boolean = false;
   ValidFirmSupervisor: boolean = false;
   UserDirector: boolean = false;
@@ -39,11 +49,18 @@ export class JournalViewDetailsComponent implements OnInit {
   assignedUserRoles: any = [];
   assignedLevelUsers: any = [];
 
-  constructor(private flatpickrService: FlatpickrService, private firmDetailsService: FirmDetailsService) {
-
+  constructor(
+    private flatpickrService: FlatpickrService,
+    private firmDetailsService: FirmDetailsService,
+    private journalService: JournalService,
+    private supervisionService: SupervisionService
+  ) {
   }
 
   ngOnInit(): void {
+    this.loadJournalDetails(this.journal.SupervisionJournalID);
+    this.loadSupJournalSubjectData(this.journal.SupervisionJournalID);
+    this.populateJournalEntryTypes();
     forkJoin([
       this.isUserDirector(),
       this.isValidFirmSupervisor(),
@@ -57,7 +74,7 @@ export class JournalViewDetailsComponent implements OnInit {
         this.assignedLevelUsers = levelUsers;
 
         // Now apply security on the page
-        this.applySecurityOnPage(this.Page.SupervisionJournal);
+        this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
       },
       error: (err) => {
         console.error('Error loading user roles or level users:', err);
@@ -72,17 +89,36 @@ export class JournalViewDetailsComponent implements OnInit {
     this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
   }
 
-  applySecurityOnPage(objectId: FrimsObject) {
+  applySecurityOnPage(objectId: FrimsObject, Mode: boolean) {
     this.isLoading = true;
-    const currentOpType = ObjectOpType.Edit;
+    const currentOpType = Mode ? ObjectOpType.Create : ObjectOpType.List;
 
-    // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
     this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+      this.registerMasterPageControlEvents();
+    });
+  }
 
+  registerMasterPageControlEvents() {
+      // Edit mode
+      if (this.isEditModeJournal) {
+        this.hideSaveBtn = false;
+        this.hideCancelBtn = false;
+        this.hideDeleteBtn = true;
+        return;
+      }
+
+      // View mode
+      this.hideSaveBtn = true;
+      this.hideCancelBtn = true;
       this.hideEditBtn = false;
+      this.hideDeleteBtn = false;
+      this.hideExportBtn = true;
+      if (this.journalDetails[0].IsDeleted) {
+        this.hideDeleteBtn = true;
+        this.hideEditBtn = true;
+      }
 
       if (this.ValidFirmSupervisor) {
-        this.isLoading = false;
         return; // No need to hide the button for Firm supervisor
       } else if (this.firmDetailsService.isValidRSGMember()) {
         this.isLoading = false;
@@ -91,12 +127,12 @@ export class JournalViewDetailsComponent implements OnInit {
         this.isLoading = false;
         return;
       } else {
-        this.hideActionButton();
         this.isLoading = false;
+        this.hideActionButton();
       }
-      this.isLoading = false;
-    });
+    this.isLoading = false;
   }
+
 
   hideActionButton() {
     this.hideEditBtn = true;
@@ -135,9 +171,49 @@ export class JournalViewDetailsComponent implements OnInit {
 
   editJournal() {
     this.isEditModeJournal = true;
+    this.hideExportBtn = true;
+    this.hideEditBtn = true;
+    this.registerMasterPageControlEvents();
+  }
+
+  cancelJournal() {
+    this.isEditModeJournal = false;
+    this.loadJournalDetails(this.journal.SupervisionJournalID);
+    this.loadSupJournalSubjectData(this.journal.SupervisionJournalID);
+    this.applySecurityOnPage(this.Page.SupervisionJournal,this.isEditModeJournal);
   }
 
   onClose() {
     this.closeJournalPopup.emit();
+  }
+
+  loadJournalDetails(supJournalID: number) {
+    this.journalService.getJournalDataDetails(this.firmId, supJournalID).subscribe(
+      data => {
+        this.journalDetails = data.response;
+        error => {
+          console.error('Error fetching Firm regFunds ', error);
+        }
+      }
+    );
+  }
+
+  loadSupJournalSubjectData(supJournalID: number) {
+    this.journalService.getSupJournalSubjectData(supJournalID).subscribe(data => {
+      this.subjectData = data.response;
+    }, error => {
+      console.error('Error Fetching Subject Data: ', error);
+    })
+  }
+
+  populateJournalEntryTypes() {
+    this.supervisionService.populateJournalEntryTypes(this.userId, constants.ObjectOpType.Edit).subscribe(
+      journalEntryTypes => {
+        this.alljournalEntryTypes = journalEntryTypes;
+      },
+      error => {
+        console.error('Error fetching journal types:', error);
+      }
+    );
   }
 }

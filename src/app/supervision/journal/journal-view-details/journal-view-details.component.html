@@ -1,3 +1,4 @@
+<app-loader *ngIf="isLoading"></app-loader>
 <div class="overlay">
     <div class="popupcontainer Journalpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
         <!-- <div class="error-messages">
@@ -21,89 +22,68 @@
         <div class="journal-form">
             <div class="inputs-row">
                 <div class="input-field">
-                    <label for="entryType">Entry Type <span *ngIf="isEditModeJournal" style="color: red;">*</span></label>
-                    <select *ngIf="isEditModeJournal; else entryTypedropdown" name="entryType" id="entryType">
+                    <label for="entryType">Entry Type <span *ngIf="isEditModeJournal"
+                            style="color: red;">*</span></label>
+                    <select *ngIf="isEditModeJournal; else entryTypedropdown"
+                        [(ngModel)]="journalDetails[0].JournalEntryTypeID" name="entryType" id="entryType">
                         <option [value]="0">Select</option>
                         <option value=""></option>
                     </select>
                     <ng-template #entryTypedropdown>
-                        <input disabled type="text">
+                        <input disabled [(ngModel)]="journalDetails[0].JournalEntryTypeDesc" type="text">
                     </ng-template>
                 </div>
 
                 <div class="input-field">
-                    <label for="entryDate">Entry Date <span *ngIf="isEditModeJournal" style="color: red;">*</span></label>
-                    <input [disabled]="!isEditModeJournal" type="text" id="entryDate" name="entryDate" #dateInputs />
+                    <label for="entryDate">Entry Date <span *ngIf="isEditModeJournal"
+                            style="color: red;">*</span></label>
+                    <input [disabled]="!isEditModeJournal" [(ngModel)]="journalDetails[0].EntryDate" type="text"
+                        id="entryDate" name="entryDate" #dateInputs />
                 </div>
 
                 <div class="input-field">
                     <label for="enteredBy">Entered By</label>
-                    <input disabled type="text" id="enteredBy" name="enteredBy" />
+                    <input disabled type="text" [(ngModel)]="journalDetails[0].EntryByUser" id="enteredBy"
+                        name="enteredBy" />
                 </div>
 
                 <div class="input-field">
                     <label for="lastmodifiedBy">Last Modified By</label>
-                    <input disabled type="text" id="lastmodifiedBy" name="lastmodifiedBy" />
+                    <input disabled type="text" [(ngModel)]="journalDetails[0].LastModifiedBy" id="lastmodifiedBy"
+                        name="lastmodifiedBy" />
                 </div>
 
                 <div class="input-field">
-                    <label for="lastmodifiedBy">Title <span *ngIf="isEditModeJournal" style="color: red;">*</span></label>
-                    <input [disabled]="!isEditModeJournal" type="text" id="lastmodifiedBy" name="lastmodifiedBy" />
+                    <label for="lastmodifiedBy">Title <span *ngIf="isEditModeJournal"
+                            style="color: red;">*</span></label>
+                    <input [disabled]="!isEditModeJournal" [(ngModel)]="journalDetails[0].EntryTitle" type="text"
+                        id="lastmodifiedBy" name="lastmodifiedBy" />
                 </div>
 
                 <div class="subject-container">
-                    <label class="subject-label" for="subject">Subject <span *ngIf="isEditModeJournal" style="color: red;">*</span></label>
-                    
+                    <label class="subject-label" for="subject">
+                        Subject
+                        <span *ngIf="isEditModeJournal" style="color: red;">*</span>
+                    </label>
+
                     <table class="subject-table">
-                        <tr>
+                        <tr *ngFor="let subject of subjectData">
                             <td>
-                                <input [disabled]="!isEditModeJournal" type="checkbox">
+                                <input [disabled]="!isEditModeJournal" type="checkbox" [checked]="false" />
                             </td>
-                            <td>Registered Individual</td>
-                            <td>Alek Alek Kunde</td>
-                        </tr>
-                        <tr>
+                            <td>{{ subject.JournalSubjectTypeDesc }}</td>
                             <td>
-                                <input [disabled]="!isEditModeJournal" type="checkbox">
+                                {{ subject.ObjectInstanceDesc || subject.JournalSubjectOtherDesc || '' }}
                             </td>
-                            <td>Firm</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input [disabled]="!isEditModeJournal" type="checkbox">
-                            </td>
-                            <td>External Auditors</td>
-                            <td>340</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input [disabled]="!isEditModeJournal" type="checkbox">
-                            </td>
-                            <td>Others</td>
-                            <td>test</td>
                         </tr>
                     </table>
                 </div>
 
+
                 <div class="input-field notes">
                     <label for="notes">Notes</label>
                     <p>
-                        In the Self-Assessment Questionnaire, where MMCA has marked itself a rating other than fully
-                        compliant or not applicable, MMCA must strive to achieve full compliance, particularly in those
-                        areas that pose a higher risk to the Firm.
-                        Relevant to customer files, in some instances it was observed that the level of documentation
-                        maintained in the files was insufficient, such as screening records, filled risk profiling forms
-                        and an acceptable level of English translations for non-English documents. Henceforth, MMCA is
-                        required to ensure that customer files are comprehensively maintained with relevant documents.
-                        Additionally, the Firm is advised to develop a risk based approach to verify the authenticity of
-                        customer identification documentation.
-                        MMCA is cautioned about the storage and retrieval of documents. During the risk assessment, MMCA
-                        stated that documents are held in an external location, for which concerns of security are
-                        raised. MMCA is advised to ensure that documents are held in a secure storage facility and to
-                        ensure compliance with chapter 7 and other relevant sections of the AML/CFTR.
-                        As the firm is a medium low risk, the supervisory cycle is set for 36 months. Hence, the above
-                        recommendations and enhancements will need to be reviewed during the next on-site assessment.
+                        {{journalDetails[0].EntryNotes}}
                     </p>
                 </div>
             </div>
@@ -114,140 +94,29 @@
                 <div class="popup-header">
                     <h3>Attachment (if any)</h3>
                 </div>
-
-                <!-- <ng-container *ngFor="let rpt of firmRptDetails ; let i = index">
-                    <div class="inputs-row report-entry" [ngClass]="{ 'border-style': i !== 0 }">
-                        <div class="input-field">
-                            <label for="reportTypeEntry">Report Type</label>
-                            <input type="text" id="reportTypeEntry" name="reportTypeEntry" [(ngModel)]="rpt.DocTypeDesc"
-                                [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label for="publish">Publish</label>
-                            <input type="checkbox" id="publish" name="publish"
-                                [(ngModel)]="rpt.WPublished" [disabled]="!isEditable" />
-                        </div>
-                        
-                        <div class="input-field">
-                            <label for="submissionType">Submission Type</label>
-                            <input type="text" id="submissionType" name="submissionType"
-                                [(ngModel)]="rpt.FirmRptSubmissionTypeDesc" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label for="reportingPeriodType">Reporting Period Type</label>
-                            <select id="reportingPeriodType" [disabled]="!isEditable" [(ngModel)]="rpt.RptPeriodTypeID">
-                                <option *ngFor="let option of reportPeriodTypes" [value]="option.RptPeriodTypeID">
-                                    {{ option?.RptPeriodShortDesc }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="input-field">
-                            <label for="reportingPeriodStartDate">Reporting Period Start Date</label>
-                            <input type="text" id="reportingPeriodStartDate" name="reportingPeriodStartDate"
-                                [(ngModel)]="rpt.RptPeriodFromDate" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label for="reportingPeriodEndDate">Reporting Period End Date</label>
-                            <input type="text" id="reportingPeriodEndDate" name="reportingPeriodEndDate"
-                                [(ngModel)]="rpt.RptPeriodToDate" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label for="reportName">Report Name</label>
-                            <input type="text" id="reportName" name="reportName" [(ngModel)]="rpt.ReportName"
-                                [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label for="dueDate">Due Date</label>
-                            <input type="text" id="dueDate" name="dueDate" [(ngModel)]="rpt.FirmRptDueDate"
-                                [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label for="required">Required</label>
-                            <ng-container *ngIf="isEditable; else FirmRptReqdBitValue">
-                                <div style="display: flex; align-items: center">
-                                    <input type="radio" id="isRequiredYes" [(ngModel)]="rpt.FirmRptReqdBit"
-                                        name="IsRequired" [value]="true" style="margin-right: 10px; cursor: pointer" />
-                                    <label for="isRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
-
-                                    <input type="radio" id="isRequiredNo" [(ngModel)]="rpt.FirmRptReqdBit"
-                                        name="IsRequired" [value]="false" style="
-                                        margin-left: 20px;
-                                        margin-right: 10px;
-                                        cursor: pointer;
-                                      " />
-                                    <label for="isRequiredNo" style="margin-left: 5px; color: #413b3c">No</label>
-                                </div>
-                            </ng-container>
-                            <ng-template #FirmRptReqdBitValue>
-                                <span style="margin-left: 10px; color: #413b3c">
-                                    {{ rpt.FirmRptReqdBit ? 'Yes' : 'No' }}
-                                </span>
-                            </ng-template>
-                        </div>
-                        <div class="input-field">
-                            <label for="reportLink">Link to Report</label>
-                            <input *ngIf="isEditable" type="text" value="" [(ngModel)]="rpt.DocFileLocation"
-                                id="reportLink" />
-                            <span *ngIf="!isEditable && rpt.DocFileLocation">{{rpt.DocTypeDesc}} : </span>
-                            <a id="websiteLink" *ngIf="!isEditable" [href]="rpt.DocFileLocation" target="_blank"
-                                rel="noopener noreferrer">
-                                {{rpt.documentDetails?.FileName}}
-                            </a>
-
-                        </div>
-
-                        <div class="input-field">
-                            <label for="reportGivenBy">Report Given By</label>
-                            <input type="text" id="reportGivenBy" name="reportGivenBy"
-                                [(ngModel)]="rpt.WPublishedByUserName" [disabled]="!isEditable" />
-                        </div>
-
-                        <div class="input-field">
-                            <label for="receivedDate">Received Date</label>
-                            <input type="text" id="receivedDate" name="receivedDate" [(ngModel)]="rpt.DocReceivedDate"
-                                [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label for="submissionStatus">Submission Status</label>
-                            <input type="text" id="submissionStatus" name="submissionStatus"
-                                [(ngModel)]="rpt.ObjectStatusTypeDesc" [disabled]="!isEditable" />
-                        </div>
-
-                        <div class="input-field">
-                            <label for="linkToReview">Link to Review</label>
-                            <a *ngIf="!isEditable" [routerLink]="['/supervision/view/return-review', firmId]" [queryParams]="{ firmRptSchID: rpt.firmRptSchID }"  target="_blank">
-                                Link to Review
-                            </a>
-                        </div>
-
-
-                        <div class="input-field">
-                            <label for="returnReviewStatus">Return Review Status</label>
-                            <input type="text" id="returnReviewStatus" name="returnReviewStatus"
-                                [(ngModel)]="rpt.ReviewStatusDesc" [disabled]="!isEditable" />
-                        </div>
-
-                        <div class="input-field fullwidth">
-                            <label for="notes">Notes</label>
-                            <textarea [(ngModel)]="rpt.FirmRptNotes" name="notes" id="notes"
-                                [disabled]="!isEditable"></textarea>
-                        </div>
-                    </div>
-                </ng-container> -->
             </div>
 
             <!-- Action Buttons -->
             <div class="btn justify-content-end">
-                <button>
+                <button *ngIf="!hideExportBtn">
                     <i class="bi bi-file-earmark-text"></i> Export to word
                 </button>
-                <button (click)="editJournal()">
+
+                <button (click)="editJournal()" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn"
+                    [disabled]="!getControlEnablement('imgBtnEdit')">
                     <i class="bi bi-pen"></i> Edit
                 </button>
-                <button>
-                     Save
+
+                <button *ngIf="!hideSaveBtn">
+                    Save
                 </button>
-                <button>
+                
+                <button class="cancel-btn" *ngIf="!hideCancelBtn" (click)="cancelJournal()">
+                     Cancel
+                </button>
+                
+                <button *ngIf="getControlVisibility('imgBtnDelete') || !hideDeleteBtn"
+                [disabled]="!getControlEnablement('imgBtnDelete')">
                     <i class="bi bi-trash"></i> Delete
                 </button>
             </div>
