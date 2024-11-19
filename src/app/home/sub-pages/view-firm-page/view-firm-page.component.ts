@@ -354,34 +354,34 @@ export class ViewFirmPageComponent implements OnInit {
       this.getAssignedLevelUsers(); // Fetch user levels
 
       // functions for documents
-      this.fetchSubTypeDocIDs();
-      this.getNewFileNumber();
+      // this.fetchSubTypeDocIDs();
+      // this.getNewFileNumber();
 
-      // functions for dropdowns
-      this.populateCountries();
-      this.populateQFCLicenseStatus();
-      this.populateAuthorisationStatus();
-      this.populateLegalStatus();
-      this.populateFinYearEnd();
-      this.populateFinAccStd();
-      this.populateFirmAppTypes();
-      this.populateAddressTypes();
-      this.populatePrudentialCategoryTypes();
-      this.populateAuthorisationCategoryTypes();
-      this.populateFirmScopeTypes();
+      // // functions for dropdowns
+      // this.populateCountries();
+      // this.populateQFCLicenseStatus();
+      // this.populateAuthorisationStatus();
+      // this.populateLegalStatus();
+      // this.populateFinYearEnd();
+      // this.populateFinAccStd();
+      // this.populateFirmAppTypes();
+      // this.populateAddressTypes();
+      // this.populatePrudentialCategoryTypes();
+      // this.populateAuthorisationCategoryTypes();
+      // this.populateFirmScopeTypes();
 
-      // functions for dropdowns
-      this.getControllerControlTypes();
-      this.getControllerControlTypesCreat();
-      this.getTitle();
-      this.getAddressTypesController();
-      this.getlegalStatusController();
-      this.getlegalStatusControllerCreate()
-      this.getCorporateController();
-      this.getFirmAuditorName();
-      this.getFirmAuditorType();
-      this.getControllerType();
-      this.getAllRegulater(this.Address.countryID, this.firmId);
+      // // functions for dropdowns
+      // this.getControllerControlTypes();
+      // this.getControllerControlTypesCreat();
+      // this.getTitle();
+      // this.getAddressTypesController();
+      // this.getlegalStatusController();
+      // this.getlegalStatusControllerCreate()
+      // this.getCorporateController();
+      // this.getFirmAuditorName();
+      // this.getFirmAuditorType();
+      // this.getControllerType();
+      // this.getAllRegulater(this.Address.countryID, this.firmId);
       this.getAllContactFromByFrimsId();
 
 
@@ -525,8 +525,8 @@ export class ViewFirmPageComponent implements OnInit {
         if (this.FIRMContacts.length === 0) {
           this.loadContacts();
         }
-        this.getContactType();
-        this.getPreferredMethodofContact();
+        // this.getContactType();
+        // this.getPreferredMethodofContact();
         this.getAvilabilContact();
         break;
       case FrimsObject.Controller:
@@ -2426,99 +2426,99 @@ export class ViewFirmPageComponent implements OnInit {
 
 
 
-  objectOpTypeIdEdit = 41;
-  objectOpTypeIdCreate = 40;
-  getControllerControlTypes(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdEdit)
-      .subscribe(data => {
-        this.controlTypeOptionsEdit = data.response;
-        console.log("getControllerControlTypes", data)
-      }, error => {
-        console.error("Error fetching controller control types:", error);
-      });
-  }
-  getControllerControlTypesCreat(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdCreate)
-      .subscribe(data => {
-        this.controlTypeOptionsCreate = data.response;
-        console.log("getControllerControlTypes", data)
-      }, error => {
-        console.error("Error fetching controller control types:", error);
-      });
-  }
-  getCorporateController(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.CorporateController, this.objectOpTypeIdEdit)
-      .subscribe(data => {
-        this.CorporateControllerEdit = data.response;
-        console.log("getCorporateController", data)
-      }, error => {
-        console.error("Error fetching controller", error);
-      });
-  }
-  getCorporateControllerCreate(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.CorporateController, this.objectOpTypeIdCreate)
-      .subscribe(data => {
-        this.CorporateControllerEdit = data.response;
-        console.log("getCorporateController", data)
-      }, error => {
-        console.error("Error fetching controller", error);
-      });
-  }
-  getlegalStatusController(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdEdit)
-      .subscribe(data => {
-        this.legalStatusOptionsEdit = data.response;
-        console.log("getlegalStatusController", data)
-      }, error => {
-        console.error("Error fetching legalStatus", error);
-      });
-  }
-  getlegalStatusControllerCreate(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdCreate)
-      .subscribe(data => {
-        this.legalStatusOptionsCreate = data.response;
-        console.log("getlegalStatusController", data)
-      }, error => {
-        console.error("Error fetching legalStatus", error);
-      });
-  }
+  // objectOpTypeIdEdit = 41;
+  // objectOpTypeIdCreate = 40;
+  // getControllerControlTypes(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdEdit)
+  //     .subscribe(data => {
+  //       this.controlTypeOptionsEdit = data.response;
+  //       console.log("getControllerControlTypes", data)
+  //     }, error => {
+  //       console.error("Error fetching controller control types:", error);
+  //     });
+  // }
+  // getControllerControlTypesCreat(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerControlTypes, this.objectOpTypeIdCreate)
+  //     .subscribe(data => {
+  //       this.controlTypeOptionsCreate = data.response;
+  //       console.log("getControllerControlTypes", data)
+  //     }, error => {
+  //       console.error("Error fetching controller control types:", error);
+  //     });
+  // }
+  // getCorporateController(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.CorporateController, this.objectOpTypeIdEdit)
+  //     .subscribe(data => {
+  //       this.CorporateControllerEdit = data.response;
+  //       console.log("getCorporateController", data)
+  //     }, error => {
+  //       console.error("Error fetching controller", error);
+  //     });
+  // }
+  // getCorporateControllerCreate(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.CorporateController, this.objectOpTypeIdCreate)
+  //     .subscribe(data => {
+  //       this.CorporateControllerEdit = data.response;
+  //       console.log("getCorporateController", data)
+  //     }, error => {
+  //       console.error("Error fetching controller", error);
+  //     });
+  // }
+  // getlegalStatusController(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdEdit)
+  //     .subscribe(data => {
+  //       this.legalStatusOptionsEdit = data.response;
+  //       console.log("getlegalStatusController", data)
+  //     }, error => {
+  //       console.error("Error fetching legalStatus", error);
+  //     });
+  // }
+  // getlegalStatusControllerCreate(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.legalStatusController, this.objectOpTypeIdCreate)
+  //     .subscribe(data => {
+  //       this.legalStatusOptionsCreate = data.response;
+  //       console.log("getlegalStatusController", data)
+  //     }, error => {
+  //       console.error("Error fetching legalStatus", error);
+  //     });
+  // }
 
-  getAddressTypesController(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdEdit)
-      .subscribe(data => {
-        this.addressTypeOptionsEdit = data.response;
-        console.log("getAddressTypesController", data)
-      }, error => {
-        console.error("Error fetching AddressTypes", error);
-      });
-  }
-  getAddressTypesControllerCreate(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdCreate)
-      .subscribe(data => {
-        this.addressTypeOptionsEdit = data.response;
-        console.log("getAddressTypesController", data)
-      }, error => {
-        console.error("Error fetching AddressTypes", error);
-      });
-  }
-  getTitle(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdEdit)
-      .subscribe(data => {
-        this.TitleEdit = data.response;
-        console.log("Countries", data)
-      }, error => {
-        console.error("Error fetching TitleTypes", error);
-      });
-  }
-  getTitleCreate(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdCreate)
-      .subscribe(data => {
-        this.TitleEdit = data.response;
-        console.log("Countries", data)
-      }, error => {
-        console.error("Error fetching TitleTypes", error);
-      });
-  }
+  // getAddressTypesController(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdEdit)
+  //     .subscribe(data => {
+  //       this.addressTypeOptionsEdit = data.response;
+  //       console.log("getAddressTypesController", data)
+  //     }, error => {
+  //       console.error("Error fetching AddressTypes", error);
+  //     });
+  // }
+  // getAddressTypesControllerCreate(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.addressTypes, this.objectOpTypeIdCreate)
+  //     .subscribe(data => {
+  //       this.addressTypeOptionsEdit = data.response;
+  //       console.log("getAddressTypesController", data)
+  //     }, error => {
+  //       console.error("Error fetching AddressTypes", error);
+  //     });
+  // }
+  // getTitle(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdEdit)
+  //     .subscribe(data => {
+  //       this.TitleEdit = data.response;
+  //       console.log("Countries", data)
+  //     }, error => {
+  //       console.error("Error fetching TitleTypes", error);
+  //     });
+  // }
+  // getTitleCreate(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdCreate)
+  //     .subscribe(data => {
+  //       this.TitleEdit = data.response;
+  //       console.log("Countries", data)
+  //     }, error => {
+  //       console.error("Error fetching TitleTypes", error);
+  //     });
+  // }
 
 
   closeControllerPopup(): void {
@@ -2711,10 +2711,10 @@ export class ViewFirmPageComponent implements OnInit {
 
   createController() {
     this.showCreateControllerSection = true;
-    this.getTitleCreate();
-    this.getAddressTypesControllerCreate();
-    this.getlegalStatusControllerCreate();
-    this.getControllerControlTypesCreat();
+    // this.getTitleCreate();
+    // this.getAddressTypesControllerCreate();
+    // this.getlegalStatusControllerCreate();
+    // this.getControllerControlTypesCreat();
   }
   confarmDeleteControllerDetials(): void {
     Swal.fire({
@@ -3442,15 +3442,15 @@ export class ViewFirmPageComponent implements OnInit {
       this.CreatecontrollerDetails.EntityTypeID = selectedControllerType.EntityTypeID;
     }
   }
-  getControllerType(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerType, this.objectOpTypeIdEdit)
-      .subscribe(data => {
-        this.controllerTypeOption = data.response;
-        console.log("Controllers", data)
-      }, error => {
-        console.error("Error fetching Controllers", error);
-      });
-  }
+  // getControllerType(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.ControllerType, this.objectOpTypeIdEdit)
+  //     .subscribe(data => {
+  //       this.controllerTypeOption = data.response;
+  //       console.log("Controllers", data)
+  //     }, error => {
+  //       console.error("Error fetching Controllers", error);
+  //     });
+  // }
   ///
   newAddressOnEdit: any = {};
   canAddNewAddressOnEdit: boolean = true;
@@ -3747,27 +3747,27 @@ export class ViewFirmPageComponent implements OnInit {
   removeRegulator(index: number) {
     this.regulatorList.splice(index, 1);
   }
-  getAllRegulater(countryID: number, firmId: number): void {
-    if (!countryID) {
-      // If no country is selected, get general regulators
-      this.securityService.getObjectTypeTable(constants.Regulaters)
-        .subscribe(data => {
-          this.AllRegulater = data.response;
-          console.log("General Regulators fetched:", data);
-        }, error => {
-          console.error("Error fetching Regulators:", error);
-        });
-    } else {
-      // If a country is selected, get regulators specific to the country
-      this.parentEntity.getRegulatorsByCountry(firmId, countryID)
-        .subscribe(data => {
-          this.AllRegulater = data.response;
-          console.log("Country-specific Regulators fetched for CountryID:", countryID, data);
-        }, error => {
-          console.error("Error fetching Country-specific Regulators:", error);
-        });
-    }
-  }
+  // getAllRegulater(countryID: number, firmId: number): void {
+  //   if (!countryID) {
+  //     // If no country is selected, get general regulators
+  //     this.securityService.getObjectTypeTable(constants.Regulaters)
+  //       .subscribe(data => {
+  //         this.AllRegulater = data.response;
+  //         console.log("General Regulators fetched:", data);
+  //       }, error => {
+  //         console.error("Error fetching Regulators:", error);
+  //       });
+  //   } else {
+  //     // If a country is selected, get regulators specific to the country
+  //     this.parentEntity.getRegulatorsByCountry(firmId, countryID)
+  //       .subscribe(data => {
+  //         this.AllRegulater = data.response;
+  //         console.log("Country-specific Regulators fetched for CountryID:", countryID, data);
+  //       }, error => {
+  //         console.error("Error fetching Country-specific Regulators:", error);
+  //       });
+  //   }
+  // }
   createControllerPopupChanges(): void {
     console.log("CreatecontrollerDetails", this.CreatecontrollerDetails)
     this.CreateControllerValidateForm();
@@ -4976,93 +4976,93 @@ export class ViewFirmPageComponent implements OnInit {
     })
   }
 
-  populateCountries() {
-    this.securityService.getObjectTypeTable(constants.countries).subscribe(data => {
-      this.allCountries = data.response;
-    }, error => {
-      console.error('Error Fetching Countries dropdown: ', error);
-    })
-  }
+  // populateCountries() {
+  //   this.securityService.getObjectTypeTable(constants.countries).subscribe(data => {
+  //     this.allCountries = data.response;
+  //   }, error => {
+  //     console.error('Error Fetching Countries dropdown: ', error);
+  //   })
+  // }
 
-  populateLegalStatus() {
-    this.securityService.getObjectTypeTable(constants.legalStatus).subscribe(data => {
-      this.allLegalStatus = data.response;
-    }, error => {
-      console.error('Error Fetching Legal Status dropdown: ', error);
-    })
-  }
+  // populateLegalStatus() {
+  //   this.securityService.getObjectTypeTable(constants.legalStatus).subscribe(data => {
+  //     this.allLegalStatus = data.response;
+  //   }, error => {
+  //     console.error('Error Fetching Legal Status dropdown: ', error);
+  //   })
+  // }
 
-  populateQFCLicenseStatus() {
-    this.securityService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
-      this.allQFCLicenseStatus = data.response;
-    }, error => {
-      console.error('Error Fetching QFC License Status dropdown: ', error);
-    })
-  }
+  // populateQFCLicenseStatus() {
+  //   this.securityService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
+  //     this.allQFCLicenseStatus = data.response;
+  //   }, error => {
+  //     console.error('Error Fetching QFC License Status dropdown: ', error);
+  //   })
+  // }
 
-  populateAuthorisationStatus() {
-    this.securityService.getObjectTypeTable(constants.authorisationStatus).subscribe(data => {
-      this.allAuthorisationStatus = data.response;
-    }, error => {
-      console.error('Error Fetching Authorisation Status dropdown: ', error);
-    })
-  }
+  // populateAuthorisationStatus() {
+  //   this.securityService.getObjectTypeTable(constants.authorisationStatus).subscribe(data => {
+  //     this.allAuthorisationStatus = data.response;
+  //   }, error => {
+  //     console.error('Error Fetching Authorisation Status dropdown: ', error);
+  //   })
+  // }
 
-  populateFinYearEnd() {
-    this.securityService.getObjectTypeTable(constants.FinYearEnd).subscribe(data => {
-      this.allFinYearEnd = data.response;
-    }, error => {
-      console.error('Error Fetching Fin Year End dropdown: ', error);
-    })
-  }
+  // populateFinYearEnd() {
+  //   this.securityService.getObjectTypeTable(constants.FinYearEnd).subscribe(data => {
+  //     this.allFinYearEnd = data.response;
+  //   }, error => {
+  //     console.error('Error Fetching Fin Year End dropdown: ', error);
+  //   })
+  // }
 
-  populateFinAccStd() {
-    this.securityService.getObjectTypeTable(constants.FinAccStd).subscribe(data => {
-      this.allFinAccStd = data.response;
-    }, error => {
-      console.error('Error Fetching Fin Acc Std dropdown: ', error);
-    })
-  }
+  // populateFinAccStd() {
+  //   this.securityService.getObjectTypeTable(constants.FinAccStd).subscribe(data => {
+  //     this.allFinAccStd = data.response;
+  //   }, error => {
+  //     console.error('Error Fetching Fin Acc Std dropdown: ', error);
+  //   })
+  // }
 
-  populateFirmAppTypes() {
-    this.securityService.getObjectTypeTable(constants.firmAppTypes).subscribe(data => {
-      this.allFirmTypes = data.response;
-    }, error => {
-      console.error('Error Fetching Firm Application Types dropdown: ', error);
-    })
-  }
+  // populateFirmAppTypes() {
+  //   this.securityService.getObjectTypeTable(constants.firmAppTypes).subscribe(data => {
+  //     this.allFirmTypes = data.response;
+  //   }, error => {
+  //     console.error('Error Fetching Firm Application Types dropdown: ', error);
+  //   })
+  // }
 
-  populateAddressTypes() {
-    this.securityService.getObjectTypeTable(constants.addressTypes).subscribe(data => {
-      this.allAddressTypes = data.response;
-    }, error => {
-      console.error('Error Fetching Address Types dropdown: ', error);
-    })
-  }
+  // populateAddressTypes() {
+  //   this.securityService.getObjectTypeTable(constants.addressTypes).subscribe(data => {
+  //     this.allAddressTypes = data.response;
+  //   }, error => {
+  //     console.error('Error Fetching Address Types dropdown: ', error);
+  //   })
+  // }
 
-  populatePrudentialCategoryTypes() {
-    this.securityService.getObjectTypeTable(constants.prudentialCategoryTypes).subscribe(data => {
-      this.allPrudentialCategoryTypes = data.response;
-    }, error => {
-      console.error('Error Fetching Prudential Category Types dropdown: ', error);
-    })
-  }
+  // populatePrudentialCategoryTypes() {
+  //   this.securityService.getObjectTypeTable(constants.prudentialCategoryTypes).subscribe(data => {
+  //     this.allPrudentialCategoryTypes = data.response;
+  //   }, error => {
+  //     console.error('Error Fetching Prudential Category Types dropdown: ', error);
+  //   })
+  // }
 
-  populateAuthorisationCategoryTypes() {
-    this.securityService.getObjectTypeTable(constants.authorisationCategoryTypes).subscribe(data => {
-      this.allAuthorisationCategoryTypes = data.response;
-    }, error => {
-      console.error('Error Fetching Authorisation Category Types dropdown: ', error);
-    })
-  }
+  // populateAuthorisationCategoryTypes() {
+  //   this.securityService.getObjectTypeTable(constants.authorisationCategoryTypes).subscribe(data => {
+  //     this.allAuthorisationCategoryTypes = data.response;
+  //   }, error => {
+  //     console.error('Error Fetching Authorisation Category Types dropdown: ', error);
+  //   })
+  // }
 
-  populateFirmScopeTypes() {
-    this.securityService.getObjectTypeTable(constants.firmScopeTypes).subscribe(data => {
-      this.allFirmScopeTypes = data.response;
-    }, error => {
-      console.error('Error Fetching Firm Scope Types dropdown: ', error);
-    })
-  }
+  // populateFirmScopeTypes() {
+  //   this.securityService.getObjectTypeTable(constants.firmScopeTypes).subscribe(data => {
+  //     this.allFirmScopeTypes = data.response;
+  //   }, error => {
+  //     console.error('Error Fetching Firm Scope Types dropdown: ', error);
+  //   })
+  // }
 
   onCategoryChange(activity: any) {
     const selectedCategoryID = activity.CategoryID; // The selected category ID
@@ -5686,26 +5686,26 @@ export class ViewFirmPageComponent implements OnInit {
   //       console.error("Error fetching controller", error);
   //     });
   // }
-  getFirmAuditorName(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.firmAuditorName, this.objectOpTypeIdEdit)
-      .subscribe(data => {
-        this.firmAuditorName = data.response.filter(item => {
-          return isNaN(item.OtherEntityName) && !/\d/.test(item.OtherEntityName);
-        });
-        console.log("Filtered firmAuditorName", this.firmAuditorName);
-      }, error => {
-        console.error("Error fetching controller", error);
-      });
-  }
-  getFirmAuditorType(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.firmAuditorType, this.objectOpTypeIdEdit)
-      .subscribe(data => {
-        this.firmAuditorType = data.response;
-        console.log("firmAuditorName", data)
-      }, error => {
-        console.error("Error fetching controller", error);
-      });
-  }
+  // getFirmAuditorName(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.firmAuditorName, this.objectOpTypeIdEdit)
+  //     .subscribe(data => {
+  //       this.firmAuditorName = data.response.filter(item => {
+  //         return isNaN(item.OtherEntityName) && !/\d/.test(item.OtherEntityName);
+  //       });
+  //       console.log("Filtered firmAuditorName", this.firmAuditorName);
+  //     }, error => {
+  //       console.error("Error fetching controller", error);
+  //     });
+  // }
+  // getFirmAuditorType(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.firmAuditorType, this.objectOpTypeIdEdit)
+  //     .subscribe(data => {
+  //       this.firmAuditorType = data.response;
+  //       console.log("firmAuditorName", data)
+  //     }, error => {
+  //       console.error("Error fetching controller", error);
+  //     });
+  // }
   viewAuditor(auditor: any) {
     this.selectedAuditor = auditor; // Set the selected auditor
     this.IsViewAuditorVisible = true; // Show view section
@@ -5734,8 +5734,8 @@ export class ViewFirmPageComponent implements OnInit {
     this.IsViewAuditorVisible = false; // Hide the view section
 
     // Fetch dropdown values when entering edit mode
-    this.getFirmAuditorName();
-    this.getFirmAuditorType();
+    // this.getFirmAuditorName();
+    // this.getFirmAuditorType();
   }
   EditAuditorValidateForm(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -6039,8 +6039,8 @@ export class ViewFirmPageComponent implements OnInit {
     this.IsCreateAuditorVisible = true;
     this.IsEditAuditorVisible = false;
     this.IsViewAuditorVisible = false;
-    this.getFirmAuditorName();
-    this.getFirmAuditorType();
+    // this.getFirmAuditorName();
+    // this.getFirmAuditorType();
   }
 
   confirmDeleteAuditor() {
@@ -6288,18 +6288,18 @@ export class ViewFirmPageComponent implements OnInit {
     this.isLoading = false;
   }
 
-  fetchSubTypeDocIDs() {
-    this.securityService.getObjectTypeTable(constants.docSubTypes).subscribe(data => {
-      // Scope Of Authorsation in Scope Authorised
-      this.fetchedScopeDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
-        item.DocSubTypeID === 262
-      );
-      // Press Release in Core Detail
-      this.fetchedCoreDetailDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
-        item.DocSubTypeID === 263
-      );
-    });
-  }
+  // fetchSubTypeDocIDs() {
+  //   this.securityService.getObjectTypeTable(constants.docSubTypes).subscribe(data => {
+  //     // Scope Of Authorsation in Scope Authorised
+  //     this.fetchedScopeDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
+  //       item.DocSubTypeID === 262
+  //     );
+  //     // Press Release in Core Detail
+  //     this.fetchedCoreDetailDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
+  //       item.DocSubTypeID === 263
+  //     );
+  //   });
+  // }
 
   prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number, objectId: number, docSubTypeID: number, objectInstanceID: number, objectInstanceRevNum: number) {
     return {
@@ -6909,24 +6909,24 @@ export class ViewFirmPageComponent implements OnInit {
     });
   }
 
-  getContactType(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.ContactTypes, 40)
-      .subscribe(data => {
-        this.contactTypeOption = data.response;
-        console.log("Controllers", data)
-      }, error => {
-        console.error("Error fetching Controllers", error);
-      });
-  }
-  getPreferredMethodofContact(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.PreferredMethodofContact, 40)
-      .subscribe(data => {
-        this.MethodofContactOption = data.response;
-        console.log("Controllers", data)
-      }, error => {
-        console.error("Error fetching Controllers", error);
-      });
-  }
+  // getContactType(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.ContactTypes, 40)
+  //     .subscribe(data => {
+  //       this.contactTypeOption = data.response;
+  //       console.log("Controllers", data)
+  //     }, error => {
+  //       console.error("Error fetching Controllers", error);
+  //     });
+  // }
+  // getPreferredMethodofContact(): void {
+  //   this.securityService.getobjecttypetableEdit(this.userId, constants.PreferredMethodofContact, 40)
+  //     .subscribe(data => {
+  //       this.MethodofContactOption = data.response;
+  //       console.log("Controllers", data)
+  //     }, error => {
+  //       console.error("Error fetching Controllers", error);
+  //     });
+  // }
   CreateContactIbj = {
 
   }

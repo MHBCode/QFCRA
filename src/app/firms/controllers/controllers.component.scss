@@ -1,3 +1,85 @@
 .error-messages {
     margin: 0!important;
 }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .contact-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .contact-table th, .contact-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .contact-table th {
+    background-color: #f4f4f4;
+  }
+
+  .custom-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #7d1d1d; /* Underline for the header */
+    padding-bottom: 10px;
+  }
+  
+  /* Close Button Styles */
+  .custom-close-button {
+    background-color: transparent;
+    border: none;
+    font-size: 24px; /* Adjust font size for larger 'X' */
+    cursor: pointer;
+    color: #d9534f; /* Red color similar to your screenshot */
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+  
+  /* Hover effect for close button */
+  .custom-close-button:hover {
+    transform: scale(1.2); /* Slightly increase size on hover */
+    color: #a94442; /* Darker shade on hover */
+  }
+  .function-history{
+    margin-top: 12px;
+  }
+
+.error-messages {
+    margin: 0!important;
+}

@@ -76,7 +76,7 @@
                     [(ngModel)]="SupervisionCategory[0].FirmRptClassificationTypeDesc"/>
                 <ng-template #supervisionCategory>
                     <select [disabled]="!pnlSupCategoryData" [(ngModel)]="SupervisionCategory[0].FirmRptClassificationTypeID" [ngClass]="{'error-border': errorMessages['SupCategoryType']}">
-                        <option value="0">Select</option>
+                        <option [ngValue]="null">Select</option>
                         <option
                             *ngFor="let option of (firmDetails.FirmTypeID === 1 || firmDetails.FirmTypeID === 3 ? allFirmRptClassificationTypes : allFirmRptClassificationTypesForDNFBPs)"
                             [value]="option.FirmRptClassificationTypeID">{{option.FirmRptClassificationTypeDesc}}
@@ -108,9 +108,9 @@
                 <input *ngIf="!isEditModeSupervisor; else holdsclientmoney" disabled name="holdsclientmoney" id="holdsclientmoney" type="text" value="{{ clientClassification[0]?.HoldsClientMoney === true ? 'Yes' : (clientClassification[0]?.HoldsClientMoney === false ? 'No' : '') }}" />
                 <ng-template #holdsclientmoney>
                     <select [disabled]="!pnlClientClassificationData" [(ngModel)]="clientClassification[0].HoldsClientMoney">
-                        <option value="null">Select</option>
-                        <option [value]="true">Yes</option>
-                        <option [value]="false">No</option>
+                        <option [ngValue]="null">Select</option>
+                        <option [ngValue]="true">Yes</option>
+                        <option [ngValue]="false">No</option>
                     </select>
                 </ng-template>
             </div>
@@ -133,7 +133,7 @@
                 <input *ngIf="!isEditModeSupervisor; else firmsBasisType" disabled name="firmreportbasistype" id="firmreportbasistype" type="text" value="{{RPTBasis.FirmRptBasisTypeDesc}}"/>
                 <ng-template #firmsBasisType>
                     <select [disabled]="!pnlFirmRPTBasisData" [(ngModel)]="RPTBasis.FirmRptBasisTypeID">
-                        <option value="0">Select</option>
+                        <option [ngValue]="null">Select</option>
                         <option *ngFor="let option of allFirmRptBasisTypes" [value]="option.FirmRptBasisTypeID">{{option.FirmRptBasisTypeDesc}}</option>
                     </select>
                 </ng-template>
@@ -141,7 +141,7 @@
             <div class="input-field">
                 <label for="effectivedate">Effective Date <span *ngIf="isEditModeSupervisor" style="color:red;">*</span></label>
                 <input [disabled]="!isEditModeSupervisor || !pnlFirmRPTBasisData" name="effectivedate" id="effectivedate" type="text" #dateInputs
-                    [(ngModel)]="RPTBasis.Column1" [ngClass]="{'error-border': errorMessages['FRBTEffectiveDate']}"/>
+                    [(ngModel)]="RPTBasisEffectiveDate" [ngClass]="{'error-border': errorMessages['FRBTEffectiveDate']}"/>
             </div>
         </div>
     </div>
@@ -160,7 +160,7 @@
             </div>
         </div>
 
-        <div class="inputs-row" *ngIf="OperationalData">
+        <div class="inputs-row">
             <div class="input-field">
                 <label for="Noofstaffinqatar"> No. of Staff in Qatar</label>
                 <input [disabled]="!isEditModeSupervisor || !pnlOperationalData" name="Noofstaffinqatar" id=" Noofstaffinqatar" type="text"
@@ -183,7 +183,7 @@
         </div>
     </div>
 
-    <div *ngIf="!(firmDetails?.FirmTypeID === 2)" class="inputs-field-set">
+    <div *ngIf="firmDetails?.FirmTypeID !== 2 && hasCreditRatings(CreditRatingsFirm)" class="inputs-field-set">
         <div class="section">
             <div class="form-section-title">
                 <h2 class="section-header">
@@ -221,7 +221,7 @@
     </div>
 
 
-    <div *ngIf="!(firmDetails?.FirmTypeID === 2)" class="inputs-field-set">
+    <div *ngIf="firmDetails?.FirmTypeID !== 2 && hasCountryCreditRatings(CountryCreditRatingsFirm)" class="inputs-field-set">
         <div class="section">
             <div class="form-section-title">
                 <h2 class="section-header">
@@ -269,7 +269,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Authorisation Category</th>
+                    <th *ngIf="firmDetails.FirmTypeID !== 2">Authorisation Category</th>
                     <th>Supervision Category</th>
                     <th>Date Effective From</th>
                     <th>Date Effective To</th>
@@ -279,12 +279,12 @@
             </thead>
             <tbody>
                 <tr *ngFor="let category of SupervisionCategory">
-                    <td>{{category.AuthorisationCategoryTypeDesc}}</td>
+                    <td *ngIf="firmDetails.FirmTypeID !== 2">{{category.AuthorisationCategoryTypeDesc}}</td>
                     <td>{{category.FirmRptClassificationTypeDesc}}</td>
-                    <td>{{category.EffectiveFromDate}}</td>
-                    <td>{{category.EffectiveToDate}}</td>
+                    <td class="text-center">{{category.EffectiveFromDate}}</td>
+                    <td class="text-center">{{category.EffectiveToDate}}</td>
                     <td>{{category.LastModifiedBy}}</td>
-                    <td>{{category.LastModifiedDate}}</td>
+                    <td class="text-center">{{category.LastModifiedDate}}</td>
                 </tr>
             </tbody>
         </table>
@@ -306,18 +306,18 @@
         <table>
             <thead>
                 <tr>
-                    <th>No. of Staff in Qatar</th>
-                    <th>Staff Total</th>
-                    <th>Notes</th>
-                    <th>Date Effective From</th>
+                    <th class="text-center">No. of Staff in Qatar</th>
+                    <th class="text-center">Staff Total</th>
+                    <th class="text-center">Notes</th>
+                    <th class="text-center">Date Effective From</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let operational of OperationalData">
-                    <td>{{operational.NumOfLocalStaff}}</td>
-                    <td>{{operational.NumOfTotalStaff}}</td>
-                    <td>{{operational.EffectiveFromDate}}</td>
+                    <td class="text-center">{{operational.NumOfLocalStaff}}</td>
+                    <td class="text-center">{{operational.NumOfTotalStaff}}</td>
                     <td>{{operational.Notes}}</td>
+                    <td class="text-center">{{operational.EffectiveFromDate}}</td>
                 </tr>
             </tbody>
         </table>
@@ -352,7 +352,7 @@
                     <tr *ngFor="let rating of agency.value" class="rating-row">
                         <td>{{ rating.CreditRatingDisplayName }}</td>
                         <td>{{ rating.Ratings }}</td>
-                        <td>{{ rating.RatingsAsOfDate }}</td>
+                        <td class="text-center">{{ rating.RatingsAsOfDate }}</td>
                     </tr>
                 </ng-container>
             </tbody>
@@ -387,7 +387,7 @@
                     <tr *ngFor="let rating of agency.value" class="rating-row">
                         <td>{{ rating.CreditRatingDisplayName }}</td>
                         <td>{{ rating.Ratings }}</td>
-                        <td>{{ rating.RatingsAsOfDate }}</td>
+                        <td class="text-center">{{ rating.RatingsAsOfDate }}</td>
                     </tr>
                 </ng-container>
             </tbody>

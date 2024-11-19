@@ -143,7 +143,7 @@ export class FirmsPageComponent implements OnInit {
     this.router.navigate(['home/new-firm']);
   }
   populateQFCLicenseStatus() {
-    this.securityService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId,constants.qfcLicenseStatus, constants.ObjectOpType.Edit).subscribe(data => {
       this.allQFCLicenseStatus = data.response;
       console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
     }, error => {
@@ -152,7 +152,7 @@ export class FirmsPageComponent implements OnInit {
     console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
   }
   getSupervisionCaseOfficer() {
-    this.securityService.getObjectTypeTable(constants.SupervisionCaseOfficer).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.SupervisionCaseOfficer, constants.ObjectOpType.Edit).subscribe(data => {
       this.allSupervisionCaseOfficer = data.response;
       console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
     }, error => {
@@ -161,7 +161,7 @@ export class FirmsPageComponent implements OnInit {
     console.log("allQFCLicenseStatus", this.allQFCLicenseStatus)
   }
   getAuthorisationCaseOfficer() {
-    this.securityService.getObjectTypeTable(constants.AuthorisationCaseOfficer).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.AuthorisationCaseOfficer, constants.ObjectOpType.Edit).subscribe(data => {
       this.allAuthorisationCaseOfficer = data.response;
       console.log("allQFCLicenseStatus", this.allAuthorisationCaseOfficer)
     }, error => {
@@ -170,7 +170,7 @@ export class FirmsPageComponent implements OnInit {
     console.log("allQFCLicenseStatus", this.allAuthorisationCaseOfficer)
   }
   getlegalStatus(): void {
-    this.securityService.getObjectTypeTable(constants.legalStatusfilter)
+    this.securityService.getObjectTypeTable(this.userId, constants.legalStatusfilter, constants.ObjectOpType.Edit)
         .subscribe(data => {
             this.legalStatusOptions = data.response;
             console.log("Fetched Legal Status Options:", this.legalStatusOptions);
@@ -184,7 +184,7 @@ export class FirmsPageComponent implements OnInit {
         });
 }
 getauthorisationStatus(): void {
-  this.securityService.getObjectTypeTable(constants.authorisationStatus)
+  this.securityService.getObjectTypeTable(this.userId, constants.authorisationStatus, constants.ObjectOpType.Edit)
     .subscribe(data => {
       this.authorisationStatusOptions = data.response;
       console.log("getlegalStatusController", data)

@@ -47,8 +47,6 @@ export class ContactsComponent {
   allAddressTypes: any = [];
   controlTypeOptionsCreate: any[] = [];
   controllerTypeOption: any = [];
-  objectOpTypeIdEdit = 41;
-  objectOpTypeIdCreate = 40;
   legalStatusOptionsEdit: any[] = [];
   Titles: any[] = [];
   MethodofContactOption: any = [];
@@ -315,6 +313,9 @@ export class ContactsComponent {
       }
     });
   }
+  isBusinessEmailReadOnly: boolean = false;
+  isBusinessEmailEnabled: boolean = false;
+  showInfoIcon: boolean = false;
   openContactPopup(contact: any): void {
     // Reset the selected contact and hide the popup until data is loaded
     this.selectedContact = {};
@@ -327,6 +328,15 @@ export class ContactsComponent {
           this.selectedContact = data.response; // Assign the received data to selectedContact
           console.log("Selected contact: ", this.selectedContact); // Log to check data
 
+          if (this.selectedContact.isESSAccessActive) {
+            this.isBusinessEmailReadOnly = true;
+            this.isBusinessEmailEnabled = false;
+            this.showInfoIcon = true;
+          } else {
+            this.isBusinessEmailReadOnly = false;
+            this.isBusinessEmailEnabled = true;
+            this.showInfoIcon = false;
+          }
           // Convert lstContactFunctions to an array if needed
           this.loadContactFirmAdresses(this.selectedContact.contactAssnID, this.userId);
           this.convertFunctionsToArray();
@@ -382,7 +392,7 @@ export class ContactsComponent {
     // this.existingContactAddresses.push(this.defaultAddress);
   }
   getContactType(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.ContactTypes, 40)
+    this.securityService.getObjectTypeTable(this.userId, constants.ContactTypes, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.contactTypeOption = data.response;
         console.log("Controllers", data)
@@ -734,7 +744,7 @@ export class ContactsComponent {
   }
 
   populateCountries() {
-    this.firmDetailsService.getCountries().subscribe(
+    this.firmDetailsService.getCountries(this.userId, constants.ObjectOpType.Edit).subscribe(
       countries => {
         this.allCountries = countries;
       },
@@ -746,7 +756,7 @@ export class ContactsComponent {
 
 
   getAddressTypesContact(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.contactAddressTypes, this.objectOpTypeIdEdit)
+    this.securityService.getObjectTypeTable(this.userId, constants.contactAddressTypes, constants.ObjectOpType.Edit)
       .subscribe(data => {
         this.allAddressTypes = data.response;
         console.log("getAddressTypesContact", data)
@@ -756,7 +766,7 @@ export class ContactsComponent {
   }
 
   getTitleCreate(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.Title, this.objectOpTypeIdCreate)
+    this.securityService.getObjectTypeTable(this.userId, constants.Title, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.Titles = data.response;
         console.log("All Titles", data)
@@ -1140,6 +1150,7 @@ export class ContactsComponent {
           placeOfBirth: this.createContactObj.placeOfBirth,
           previousName: null,
           isExists: false,
+          IsESSAccessActive: true,
           FunctionTypeId: null,
           ContactAddnlInfoTypeID: this.createContactObj.strContactAddnlInfoTypeID,
           strContactAddnInfoType: this.createContactObj.strContactAddnInfoTypes,
@@ -1161,40 +1172,42 @@ export class ContactsComponent {
         },
         lstContactFunctions: this.selectedContactFunctions,
       },
-      Addresses: this.addedAddresses.map(address => ({
-        firmID: this.firmId,
-        countryID: Number(address.CountryID) || 0,
-        addressTypeID: address.AddressTypeID || 0,
-        sameAsTypeID: address.SameAsTypeID || null,
-        lastModifiedBy: this.userId, // must be dynamic
-        addressAssnID: address.AddressAssnID || null,
-        entityTypeID: address.EntityTypeID || 1,
-        entityID: address.EntityID || this.firmId,
-        contactAssnID: 0,
-        contactID: 0,
-        addressID: address.AddressID?.toString() || '',
-        addressLine1: address.AddressLine1 || '',
-        addressLine2: address.AddressLine2 || '',
-        addressLine3: address.AddressLine3 || '',
-        addressLine4: address.AddressLine4 || '',
-        city: address.City || '',
-        province: address.Province || '',
-        postalCode: address.PostalCode || '',
-        phoneNumber: address.PhoneNumber || '',
-        phoneExt: address.PhoneExt || '',
-        faxNumber: address.FaxNumber || '',
-        lastModifiedDate: this.currentDate,
-        addressState: 2, // New address state is 2, existing modified or unchanged is 6, 4 is delete
-        fromDate: '1970-01-01',
-        toDate: '1970-01-01',
-        objectID: address.ObjectID || this.Page.Contatcs,
-        objectInstanceID: address.ObjectInstanceID || this.firmId,
-        objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
-        sourceObjectID: address.SourceObjectID || this.Page.Contatcs,
-        sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
-        sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
-        objAis: null,
-      }))
+      Addresses: this.addedAddresses.some(address => address.AddressTypeID === 0)
+        ? []
+        : this.addedAddresses.map(address => ({
+          firmID: this.firmId,
+          countryID: Number(address.CountryID) || 0,
+          addressTypeID: address.AddressTypeID || 0,
+          sameAsTypeID: address.SameAsTypeID || null,
+          lastModifiedBy: this.userId, // must be dynamic
+          addressAssnID: address.AddressAssnID || null,
+          entityTypeID: address.EntityTypeID || 1,
+          entityID: address.EntityID || this.firmId,
+          contactAssnID: 0,
+          contactID: 0,
+          addressID: address.AddressID?.toString() || '',
+          addressLine1: address.AddressLine1 || '',
+          addressLine2: address.AddressLine2 || '',
+          addressLine3: address.AddressLine3 || '',
+          addressLine4: address.AddressLine4 || '',
+          city: address.City || '',
+          province: address.Province || '',
+          postalCode: address.PostalCode || '',
+          phoneNumber: address.PhoneNumber || '',
+          phoneExt: address.PhoneExt || '',
+          faxNumber: address.FaxNumber || '',
+          lastModifiedDate: this.currentDate,
+          addressState: 2, // New address state is 2, existing modified or unchanged is 6, 4 is delete
+          fromDate: null,
+          toDate: null,
+          objectID: address.ObjectID || this.Page.Contatcs,
+          objectInstanceID: address.ObjectInstanceID || this.firmId,
+          objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
+          sourceObjectID: address.SourceObjectID || this.Page.Contatcs,
+          sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
+          sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
+          objAis: null,
+        })),
     };
     console.log("Contact Object to be creted", saveCreateContactObj)
     if (this.createContactObj.contactType !== 1 || !this.createContactObj.contactType) {
@@ -1246,6 +1259,33 @@ export class ContactsComponent {
       this.errorMessages = {}; // Clear previous error messages
       this.hasValidationErrors = false;
 
+      // ADDRESS TYPE VALIDATION
+      this.invalidAddress = this.addedAddresses.find(address => {
+        // Check if AddressTypeID is invalid (0 or undefined)
+        const isAddressTypeInvalid = !address.AddressTypeID || address.AddressTypeID === 0;
+
+        // Check if any of the address fields contain a meaningful value
+        const hasAddressDetails =
+          !!address.AddressLine1?.trim() ||
+          !!address.AddressLine2?.trim() ||
+          !!address.AddressLine3?.trim() ||
+          !!address.AddressLine4?.trim() ||
+          !!address.City?.trim() ||
+          !!address.Province?.trim() ||
+          !!address.PostalCode?.trim() ||
+          (address.CountryID && parseInt(address.CountryID) !== 0);
+
+        // Return true if both conditions are met
+        return isAddressTypeInvalid && hasAddressDetails;
+      });
+
+      if (this.invalidAddress) {
+        this.loadErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['AddressTypeID'];
+      }
+
       // Validate First Name
       if (!this.createContactObj.firstName || this.createContactObj.firstName.trim().length === 0) {
         this.loadErrorMessages('firstName', constants.ControllerMessages.ENTER_FIRSTNAME);
@@ -1266,15 +1306,6 @@ export class ContactsComponent {
       ) {
         this.loadErrorMessages('busEmail', constants.ContactMessage.INVALIDEMAIL, "Business");
         this.hasValidationErrors = true;
-      }
-
-      // ADDRESS TYPE VALIDATION
-      this.invalidAddress = this.addedAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
-      if (this.invalidAddress) {
-        this.loadErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
-        this.hasValidationErrors = true;
-      } else {
-        delete this.errorMessages['AddressTypeID'];
       }
 
       if (this.hasValidationErrors) {
@@ -1300,7 +1331,7 @@ export class ContactsComponent {
   }
 
   getPreferredMethodofContact(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.PreferredMethodofContact, 40)
+    this.securityService.getObjectTypeTable(this.userId, constants.PreferredMethodofContact, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.MethodofContactOption = data.response;
         console.log("Controllers", data)
@@ -1367,6 +1398,7 @@ export class ContactsComponent {
           MyState: 3,
           nationalID: null,
           nationality: null,
+          isESSAccessActive: true,
           EntityID: this.firmId,
           passportNum: this.selectedContact.passportNum,
           placeOfBirth: this.selectedContact.placeOfBirth,
@@ -1387,50 +1419,52 @@ export class ContactsComponent {
         },
         lstContactFunctions: this.selectedContactFunctions,
       },
-      addresses: [...this.existingContactAddresses, ...this.removedAddresses].map(address => {
-        let addressState: number;
+      Addresses: [...this.existingContactAddresses, ...this.removedAddresses]
+        .filter(address => address.AddressTypeID !== 0) // Exclude Addresses with Address Type = 0
+        .map(address => {
+          let addressState: number;
 
-        if (address.isRemoved) {
-          addressState = 4; // Deleted address
-        } else if (address.AddressID === null) {
-          addressState = 2; // New address
-        } else {
-          addressState = 3; // Modified address
-        }
+          if (address.isRemoved) {
+            addressState = 4; // Deleted address
+          } else if (address.AddressID === null) {
+            addressState = 2; // New address
+          } else {
+            addressState = 3; // Modified address
+          }
 
-        return {
-          firmID: this.firmId,
-          countryID: Number(address.CountryID) || 0,
-          addressTypeID: address.AddressTypeID || 0,
-          sameAsTypeID: address.SameAsTypeID || null,
-          lastModifiedBy: this.userId, // must be dynamic
-          addressAssnID: address.AddressAssnID || null,
-          entityTypeID: address.EntityTypeID || 1,
-          entityID: address.EntityID || this.firmId,
-          addressID: address.AddressID?.toString() || '',
-          addressLine1: address.AddressLine1 || '',
-          addressLine2: address.AddressLine2 || '',
-          addressLine3: address.AddressLine3 || '',
-          addressLine4: address.AddressLine4 || '',
-          city: address.City || '',
-          province: address.Province || '',
-          postalCode: address.PostalCode || '',
-          phoneNumber: address.PhoneNumber || '',
-          phoneExt: address.PhoneExt || '',
-          faxNumber: address.FaxNumber || '',
-          lastModifiedDate: address.LastModifiedDate || this.currentDate, // Default to current date
-          addressState: addressState, // New address state is 2, existing modified or unchanged is 6, 4 is delete
-          fromDate: '1970-01-01',
-          toDate: '1970-01-01',
-          objectID: address.ObjectID || this.Page.Contatcs,
-          objectInstanceID: this.firmId,
-          objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
-          sourceObjectID: address.SourceObjectID || this.Page.Contatcs,
-          sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
-          sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
-          objAis: null,
-        };
-      }),
+          return {
+            firmID: this.firmId,
+            countryID: Number(address.CountryID) || 0,
+            addressTypeID: address.AddressTypeID || 0,
+            sameAsTypeID: address.SameAsTypeID || null,
+            lastModifiedBy: this.userId, // must be dynamic
+            addressAssnID: address.AddressAssnID || null,
+            entityTypeID: address.EntityTypeID || 1,
+            entityID: address.EntityID || this.firmId,
+            addressID: address.AddressID?.toString() || '',
+            addressLine1: address.AddressLine1 || '',
+            addressLine2: address.AddressLine2 || '',
+            addressLine3: address.AddressLine3 || '',
+            addressLine4: address.AddressLine4 || '',
+            city: address.City || '',
+            province: address.Province || '',
+            postalCode: address.PostalCode || '',
+            phoneNumber: address.PhoneNumber || '',
+            phoneExt: address.PhoneExt || '',
+            faxNumber: address.FaxNumber || '',
+            lastModifiedDate: address.LastModifiedDate || this.currentDate, // Default to current date
+            addressState: addressState, // New address state is 2, existing modified or unchanged is 6, 4 is delete
+            fromDate: null,
+            toDate: null,
+            objectID: address.ObjectID || this.Page.Contatcs,
+            objectInstanceID: this.firmId,
+            objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
+            sourceObjectID: address.SourceObjectID || this.Page.Contatcs,
+            sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
+            sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
+            objAis: null,
+          };
+        }),
     };
     console.log("saveEditContactObj", saveEditContactObj)
     if (this.selectedContact.contactTypeID !== 1 || !this.selectedContact.contactTypeID) {
@@ -1446,7 +1480,7 @@ export class ContactsComponent {
             this.saveContactForm(saveEditContactObj);
           }
         })
-        
+
 
     }
     this.saveContactForm(saveEditContactObj);
@@ -1463,6 +1497,33 @@ export class ContactsComponent {
       this.errorMessages = {}; // Clear previous error messages
       this.hasValidationErrors = false;
 
+      // ADDRESS TYPE VALIDATION
+      this.invalidAddress = this.existingContactAddresses.find(address => {
+        // Check if AddressTypeID is invalid (0 or undefined)
+        const isAddressTypeInvalid = !address.AddressTypeID || address.AddressTypeID === 0;
+
+        // Check if any of the address fields contain a meaningful value
+        const hasAddressDetails =
+          !!address.AddressLine1?.trim() ||
+          !!address.AddressLine2?.trim() ||
+          !!address.AddressLine3?.trim() ||
+          !!address.AddressLine4?.trim() ||
+          !!address.City?.trim() ||
+          !!address.Province?.trim() ||
+          !!address.PostalCode?.trim() ||
+          (address.CountryID && parseInt(address.CountryID) !== 0);
+
+        // Return true if both conditions are met
+        return isAddressTypeInvalid && hasAddressDetails;
+      });
+
+      if (this.invalidAddress) {
+        this.loadErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['AddressTypeID'];
+      }
+
       // Validate First Name
       if (!this.selectedContact.firstName || this.selectedContact.firstName.trim().length === 0) {
         this.loadErrorMessages('firstName', constants.ControllerMessages.ENTER_FIRSTNAME);
@@ -1476,15 +1537,6 @@ export class ContactsComponent {
       if (!this.selectedContact.contactTypeDesc) {
         this.loadErrorMessages('contactTypeDesc', constants.ContactMessage.SELECTCONTACTTYPE);
         this.hasValidationErrors = true;
-      }
-
-      // ADDRESS TYPE VALIDATION
-      this.invalidAddress = this.existingContactAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
-      if (this.invalidAddress) {
-        this.loadErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
-        this.hasValidationErrors = true;
-      } else {
-        delete this.errorMessages['AddressTypeID'];
       }
 
 
@@ -2176,11 +2228,13 @@ export class ContactsComponent {
 
       if (selectedValue === 'Resident' && this.addedAddresses.CountryID !== this.getQatarCountryID()) {
         this.firmDetailsService.showErrorAlert(6503);
+        this.createResidentStateObj.attributeValue = "0";
       }
 
       // Check if the resident status is "Non-Resident" and country is Qatar
       if (selectedValue === 'Non-Resident' && this.addedAddresses.CountryID === this.getQatarCountryID()) {
         this.firmDetailsService.showErrorAlert(6503);
+        this.createResidentStateObj.attributeValue = "0";
       }
     }
 
@@ -2253,8 +2307,6 @@ export class ContactsComponent {
             confirmButtonText: 'OK',
           });
 
-          // Optionally, clear the input field if the number exists
-          this.createContactObj.mobileNum = '';
         }
       },
       error => {
@@ -2314,6 +2366,7 @@ export class ContactsComponent {
     this.createContactObj.title = contact.Title;
     this.createContactObj.isPeP = contact.isPeP;
     this.createContactObj.ContactMethodTypeID = contact.ContactMethodTypeID;
+    this.createContactObj.contactTypeId = contact.ContactTypeID;
     this.closeModal();
 
   }

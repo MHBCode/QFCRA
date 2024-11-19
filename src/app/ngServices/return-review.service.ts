@@ -9,6 +9,7 @@ export class ReturnReviewService {
   constructor(private http: HttpClient) { }
 
   private returnViewUrl = environment.API_URL + '/api/ReturnView/';  
+  private objectWFUrl = environment.API_URL + '/api/ObjectWF/';
   
   getReturnReviewDetail(firmId: number,firmRptSchID: number): Observable<any> {
     const url = `${this.returnViewUrl}get_firm_report_schedule_item_detail?firmId=${firmId}&reportSchID=${firmRptSchID}`;
@@ -17,6 +18,10 @@ export class ReturnReviewService {
 
   getReturnReviewList(firmId: number): Observable<any> {
     const url = `${this.returnViewUrl}get_report_reviewed_list?firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
+  getReturnReviewRevision(objectId: number,objectInstanceId: number): Observable<any> {
+    const url = `${this.objectWFUrl}get_revision?objectId=${objectId}&objectInstanceId=${objectInstanceId}`;
     return this.http.get<any>(url);
   }
 }

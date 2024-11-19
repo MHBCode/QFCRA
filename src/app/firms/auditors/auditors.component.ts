@@ -41,8 +41,6 @@ export class AuditorsComponent {
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   firmAuditorName: { OtherEntityID: number, OtherEntityName: string }[] = [];
   firmAuditorType: { EntitySubTypeID: number, EntitySubTypeDesc: string }[] = [];
-  objectOpTypeIdEdit = 41;
-  objectOpTypeIdCreate = 40;
   firmAuditorsObj: {};
 
   // Security
@@ -119,7 +117,7 @@ export class AuditorsComponent {
 
     // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
     this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
-      let firmType = this.firmDetails?.FirmTypeID;
+      // let firmType = this.firmDetails?.FirmTypeID;
 
 
       if (this.ValidFirmSupervisor) {
@@ -214,7 +212,7 @@ export class AuditorsComponent {
   }
 
   getFirmAuditorName(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.firmAuditorName, this.objectOpTypeIdEdit)
+    this.securityService.getObjectTypeTable(this.userId, constants.firmAuditorName, constants.ObjectOpType.Edit)
       .subscribe(data => {
         this.firmAuditorName = data.response.filter(item => {
           return isNaN(item.OtherEntityName) && !/\d/.test(item.OtherEntityName);
@@ -225,7 +223,7 @@ export class AuditorsComponent {
       });
   }
   getFirmAuditorType(): void {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.firmAuditorType, this.objectOpTypeIdEdit)
+    this.securityService.getObjectTypeTable(this.userId, constants.firmAuditorType, constants.ObjectOpType.Edit)
       .subscribe(data => {
         this.firmAuditorType = data.response;
         console.log("firmAuditorName", data)

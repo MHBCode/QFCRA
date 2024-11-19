@@ -94,7 +94,7 @@
 
     h3 {
         color: white !important;
-        width: 50% !important;
+        width: 100% !important;
         margin: auto !important;
         text-align: center;
     }
@@ -188,7 +188,7 @@
     min-height: 50px;
 }
 
-.addAddressBtn {
+.addAddressBtn, .addRegulatorBtn {
     background: #A51E36;
     color: white;
     border: none;
@@ -223,7 +223,7 @@
     justify-content: flex-end;
 }
 
-.RmvAddressBtn {
+.RmvTrashBtn {
     background: red;
     color: white;
     border: none;
@@ -294,15 +294,6 @@ hr {
 
 // end document style
 
-
-.edit-firm-header>span {
-    color: #a51e36;
-    font-size: 1em;
-    font-weight: 500;
-    line-height: 24px;
-    word-wrap: break-word;
-}
-
 #websiteLink {
     color: #a41e36;
     text-decoration: none;
@@ -364,13 +355,12 @@ hr {
     margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 2px solid #a51e36;
-    width: 95%;
 }
 .contollerPopupContent .popup-title-btn-row h3 {
     border-bottom: 0px !important;
 }
 .contollerPopupContent .popup-title-btn-row .popup-header {
-    width: 50%;
+    width: 100%;
 }
 .close-button {
     background: transparent;
@@ -442,7 +432,7 @@ hr {
     justify-content: space-between;
 }
 
-.add-address-btn-container {
+.add-address-btn-container, .add-regulator-btn-container {
     width: 100%;
     display: flex;
     justify-content: flex-end;;

@@ -36,8 +36,6 @@ export class BreachesComponent {
   roleId: number | null = null;
   objectOpType: number | null = null;
 
-  objectOpTypeList = constants.ObjectOpType.List;
-
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -138,7 +136,7 @@ export class BreachesComponent {
 
   
   getBreachesTypes() {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.breachTypes, this.objectOpTypeList)
+    this.securityService.getObjectTypeTable(this.userId, constants.breachTypes, constants.ObjectOpType.List)
       .subscribe(data => {
         this.breachesTypes = data.response;
         console.log("General breachesTypes fetched:", this.breachesTypes);
@@ -148,7 +146,7 @@ export class BreachesComponent {
   }
 
   getBreachesCategory() {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.breachCategories, this.objectOpTypeList)
+    this.securityService.getObjectTypeTable(this.userId, constants.breachCategories, constants.ObjectOpType.List)
       .subscribe(data => {
         this.breachCategories = data.response;
         console.log("General breachCategories fetched:", this.breachCategories);
@@ -158,7 +156,7 @@ export class BreachesComponent {
   }
 
   getBreachesLevel() {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.breachLevelTypes, this.objectOpTypeList)
+    this.securityService.getObjectTypeTable(this.userId, constants.breachLevelTypes, constants.ObjectOpType.List)
       .subscribe(data => {
         this.breachLevels = data.response;
         console.log("General breachLevels fetched:", this.breachLevels);
@@ -168,7 +166,7 @@ export class BreachesComponent {
   }
 
   getBreachesStatus() {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.breachStatusTypes, this.objectOpTypeList)
+    this.securityService.getObjectTypeTable(this.userId, constants.breachStatusTypes, constants.ObjectOpType.List)
       .subscribe(data => {
         this.breachAllStatus = data.response;
         console.log("General breachAllStatus fetched:", this.breachAllStatus);

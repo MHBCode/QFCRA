@@ -12,7 +12,7 @@
       <!-- Filter Dropdown -->
       <div style="margin-bottom: 1rem;">
         <label for="reportFilter">Filter Reports: </label>
-        <select id="reportFilter" (change)="filterReports($event)" style="padding: 5px;">
+        <select id="reportFilter" (change)="filterReports($event)">
           <option selected="selected" value="1">All</option>
           <option value="2">Non - AML Reports</option>
           <option value="3">AML Reports</option>
@@ -34,14 +34,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let ReturnreView of paginatedFirms">
-            <td>{{ReturnreView.RptReviewRevNum}}</td>
-            <td>{{ReturnreView.ReportName}}</td>
-            <td>{{ReturnreView.PeriodFrom}}</td>
-            <td>{{ReturnreView.PeriodTo}}</td>
-            <td>{{ReturnreView.ReceivedDate}}</td>
-            <td>{{ReturnreView.ReviewStatus}}</td>
-            <td>{{ReturnreView.ReviewStatusDate}}</td>
+          <tr *ngFor="let ReturnreView of paginatedFirms" (click)="openReturnreViewPopup(ReturnreView,firmDetails)">
+            <td (click)="getReturnReviewRevision(ReturnreView)" class="clickable-cell text-center">
+              {{ReturnreView.RptReviewRevNum}}
+            </td>
+            <td >{{ReturnreView.ReportName}}</td>
+            <td class="text-center">{{ReturnreView.PeriodFrom}}</td>
+            <td class="text-center">{{ReturnreView.PeriodTo}}</td>
+            <td class="text-center">{{ReturnreView.ReceivedDate}}</td>
+            <td class="text-center">{{ReturnreView.ReviewStatus}}</td>
+            <td class="text-center">{{ReturnreView.ReviewStatusDate}}</td>
           </tr>
         </tbody>
         <tfoot>
@@ -59,12 +61,33 @@
                   <span>&gt;</span>
                 </button>
                 <span style="color: #555; font-size: 14px;">Showing {{ startRow }} to {{ endRow }} of {{ totalRows }}
-                  rows</span> 
+                  rows</span>
               </div>
             </td>
           </tr>
         </tfoot>
       </table>
     </div>
+  </div>
+</div>
+
+<!-- show Return Review Revision Popup-->
+
+<div *ngIf="showReturnReviewRevision" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Report Review Revisions:</h3>
+    </div>
+    <div class="revisions-container">
+      <span *ngFor="let ReviewRevision of ReturnReviewRevisionList" 
+            (click)="getReturnReviewRevision(ReviewRevision)" 
+            class="revision-item">
+        {{ ReviewRevision.RptReviewRevNum }}
+      </span>
+    </div>
+    <div class="btn">
+      <button class="close-button" (click)="closeReturnReviewRevisionModal()">Close</button>
+    </div>
+    
   </div>
 </div>

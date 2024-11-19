@@ -18,6 +18,7 @@ export class UserAccessComponent implements OnInit {
   firmLevels: any = [];
   selectedUserId: number | string = ''; // Property to store the selected user ID
   noDataFound: boolean = false; // To track if no data was found
+  userId: number = 30;
 
   userAccessForm: FormGroup;
 
@@ -76,7 +77,7 @@ export class UserAccessComponent implements OnInit {
 
 
   populateFirmLevels() {
-    this.securityService.getObjectTypeTable(constants.firmLevels).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId,constants.firmLevels, constants.ObjectOpType.Create).subscribe(data => {
       this.firmLevels = data.response;
     }, error => {
       console.error('Error Fetching Countries dropdown: ', error);

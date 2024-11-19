@@ -19,6 +19,8 @@ export class NewFirmComponent implements OnInit {
 
   @ViewChildren('dateInputs') dateInputs: QueryList<ElementRef<HTMLInputElement>>;
 
+  userId: number = 30;
+
   /* todays date */
   now = new Date();
   isoString = this.now.toISOString();
@@ -134,7 +136,6 @@ export class NewFirmComponent implements OnInit {
   }
 
   createFirm() {
-    const userId = 30;
     this.hasValidationErrors = false;
 
     // QFC VALIDATION SPECIAL CASES
@@ -223,8 +224,8 @@ export class NewFirmComponent implements OnInit {
       }
 
       // Step 3: Create New Firm (Save)
-      const firmObj = this.prepareFirmObject(userId);
-      this.saveFirmDetails(firmObj, userId);
+      const firmObj = this.prepareFirmObject(this.userId);
+      this.saveFirmDetails(firmObj, this.userId);
       this.firmDetailsService.showSaveSuccessAlert(constants.Firm_CoreDetails_Messages.FIRMDETAILS_SAVED_SUCCESSFULLY);
     })
   }
@@ -445,7 +446,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateCountries() {
-    this.securityService.getObjectTypeTable(constants.countries).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.countries,constants.ObjectOpType.Create).subscribe(data => {
       this.allCountries = data.response;
     }, error => {
       console.error('Error Fetching Countries dropdown: ', error);
@@ -453,7 +454,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateLegalStatus() {
-    this.securityService.getObjectTypeTable(constants.legalStatus).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.legalStatus,constants.ObjectOpType.Create).subscribe(data => {
       this.allLegalStatus = data.response;
     }, error => {
       console.error('Error Fetching Legal Status dropdown: ', error);
@@ -461,7 +462,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateQFCLicenseStatus() {
-    this.securityService.getObjectTypeTable(constants.qfcLicenseStatus).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.qfcLicenseStatus,constants.ObjectOpType.Create).subscribe(data => {
       this.allQFCLicenseStatus = data.response;
     }, error => {
       console.error('Error Fetching QFC License Status dropdown: ', error);
@@ -469,7 +470,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateAuthorisationStatus() {
-    this.securityService.getObjectTypeTable(constants.authorisationStatus).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.authorisationStatus,constants.ObjectOpType.Create).subscribe(data => {
       this.allAuthorisationStatus = data.response;
     }, error => {
       console.error('Error Fetching Authorisation Status dropdown: ', error);
@@ -477,7 +478,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateFinYearEnd() {
-    this.securityService.getObjectTypeTable(constants.FinYearEnd).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.FinYearEnd,constants.ObjectOpType.Create).subscribe(data => {
       this.allFinYearEnd = data.response;
     }, error => {
       console.error('Error Fetching Fin Year End dropdown: ', error);
@@ -485,7 +486,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateFinAccStd() {
-    this.securityService.getObjectTypeTable(constants.FinAccStd).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.FinAccStd,constants.ObjectOpType.Create).subscribe(data => {
       this.allFinAccStd = data.response;
     }, error => {
       console.error('Error Fetching Fin Acc Std dropdown: ', error);
@@ -493,7 +494,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateFirmAppTypes() {
-    this.securityService.getObjectTypeTable(constants.firmAppTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.firmAppTypes,constants.ObjectOpType.Create).subscribe(data => {
       this.allFirmTypes = data.response;
     }, error => {
       console.error('Error Fetching Firm Application Types dropdown: ', error);
@@ -501,7 +502,7 @@ export class NewFirmComponent implements OnInit {
   }
 
   populateAddressTypes() {
-    this.securityService.getObjectTypeTable(constants.addressTypes).subscribe(data => {
+    this.securityService.getObjectTypeTable(this.userId, constants.addressTypes,constants.ObjectOpType.Create).subscribe(data => {
       this.allAddressTypes = data.response;
       // Add an address if none exists
       if (this.addedAddresses.length === 0) {

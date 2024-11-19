@@ -1,17 +1,23 @@
 import { Injectable } from '@angular/core';
-import { HttpClient} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { LogformService } from '../ngServices/logform.service';
 import Swal from 'sweetalert2';
 import * as constants from 'src/app/app-constants';
 import { Observable } from 'rxjs';
 import { SecurityService } from '../ngServices/security.service';
+import { UsersService } from '../ngServices/users.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupervisionService {
   errorMessages: { [key: string]: string } = {};
-  constructor(private http: HttpClient,private logForm: LogformService,private securityService: SecurityService) { }
+  constructor(
+    private http: HttpClient,
+    private logForm: LogformService,
+    private securityService: SecurityService,
+    private userService: UsersService,
+  ) { }
 
   showErrorAlert(messageKey: number, isLoading?: boolean) {
     this.logForm.errorMessages(messageKey).subscribe(
@@ -40,7 +46,7 @@ export class SupervisionService {
 
           // Store in the errorMessages object and the provided activity
           this.errorMessages[fieldName] = errorMessage;
- 
+
           observer.next();
         },
         error => {
@@ -51,9 +57,9 @@ export class SupervisionService {
     });
   }
 
-  populateFirmRptClassificationTypes(): Observable<any[]> {
+  populateFirmRptClassificationTypes(userId: number, OpTypeId: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.firmRptClassificationTypes).subscribe(
+      this.securityService.getObjectTypeTable(userId, constants.firmRptClassificationTypes,OpTypeId).subscribe(
         data => {
           observer.next(data.response);
         },
@@ -65,9 +71,9 @@ export class SupervisionService {
     });
   }
 
-  populateFirmRptClassificationTypesForDNFBPs(): Observable<any[]> {
+  populateFirmRptClassificationTypesForDNFBPs(userId: number, OpTypeId: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.firmRptClassificationTypesForDNFBPs).subscribe(
+      this.securityService.getObjectTypeTable(userId, constants.firmRptClassificationTypesForDNFBPs, OpTypeId).subscribe(
         data => {
           observer.next(data.response);
         },
@@ -79,9 +85,9 @@ export class SupervisionService {
     });
   }
 
-  populateFirmRptBasisTypes(): Observable<any[]> {
+  populateFirmRptBasisTypes(userId: number, OpTypeId: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(constants.firmRptBasisTypes).subscribe(
+      this.securityService.getObjectTypeTable(userId, constants.firmRptBasisTypes, OpTypeId).subscribe(
         data => {
           observer.next(data.response);
         },
@@ -92,6 +98,22 @@ export class SupervisionService {
       );
     });
   }
+
+  isUserHasRestrictedAccess(userId: number, firmId: number, objectID: number): Observable<boolean> {
+    return new Observable(observer => {
+      this.userService.isUserHasRestrictedAccess(userId, firmId, objectID).subscribe(
+        response => {
+          observer.next(response.response.Column1); 
+          observer.complete();
+        },
+        error => {
+          console.error('Error checking restricted access:', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
 
   isNullOrEmpty(value: any): boolean {
     return value === null || value === '';

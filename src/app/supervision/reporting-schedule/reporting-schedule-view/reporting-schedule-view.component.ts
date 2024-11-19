@@ -23,7 +23,7 @@ export class ReportingScheduleViewComponent {
   firmRptDetails: any;
   financialReportingPeriod: any;
   userId = 30;
-  reportType: string = '1';
+  reportType: number = 1;
   isLoading: boolean = false;
   isCreateMode: boolean = false;
   documentTypeList: any = [];

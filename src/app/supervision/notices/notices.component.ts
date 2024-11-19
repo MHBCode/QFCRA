@@ -1,4 +1,4 @@
-import { Component, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { NoticeService } from 'src/app/ngServices/notice.service';
@@ -6,6 +6,7 @@ import { SecurityService } from 'src/app/ngServices/security.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import * as constants from 'src/app/app-constants';
 import { PaginationComponent } from 'src/app/shared/pagination/pagination.component';
+import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 
 @Component({
   selector: 'app-notices',
@@ -14,6 +15,8 @@ import { PaginationComponent } from 'src/app/shared/pagination/pagination.compon
 })
 export class NoticesComponent implements OnInit {
   @ViewChild(PaginationComponent) paginationComponent!: PaginationComponent;
+  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   userId = 30;
 
   pageSize: number = 10; // Define pageSize here
@@ -32,8 +35,6 @@ export class NoticesComponent implements OnInit {
   noticeIssuedBy: any[] = [];
   // Form search fields with defaults
   TypeOfNotice: string = '';
-
-  objectOpType = constants.ObjectOpType.List;
 
 
   NoticeID: number | null = null;
@@ -64,7 +65,8 @@ export class NoticesComponent implements OnInit {
     private noticeService: NoticeService,
     private firmDetailsService: FirmDetailsService,
     public dateUtilService: DateUtilService,
-    private securityService: SecurityService
+    private securityService: SecurityService,
+    private flatpickrService: FlatpickrService
   ) {
 
   }
@@ -77,6 +79,13 @@ export class NoticesComponent implements OnInit {
       this.loadFirmDetails(this.firmId);
       this.getNoticeIssuedBy();
     })
+  }
+
+  ngAfterViewInit() {
+    this.dateInputs.changes.subscribe(() => {
+      this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+    });
+    this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
   }
 
   loadFirmDetails(firmId: number) {
@@ -176,7 +185,7 @@ export class NoticesComponent implements OnInit {
 
 
   getNoticeIssuedBy() {
-    this.securityService.getobjecttypetableEdit(this.userId, constants.NoticeIssuers, this.objectOpType)
+    this.securityService.getObjectTypeTable(this.userId, constants.NoticeIssuers, constants.ObjectOpType.List)
       .subscribe(data => {
         this.noticeIssuedBy = data.response;
         console.log("General Regulators fetched:", this.noticeIssuedBy);
