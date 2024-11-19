@@ -79,12 +79,14 @@
     flex-direction: column;
     justify-content: center;
     padding: 1rem;
+    gap: 1rem;
 }
 
 .enhanced-checkbox {
     display: flex;
     align-items: center;
     gap: 8px;
+    justify-content: flex-end;
 }
 
 .popup-header {
@@ -287,4 +289,11 @@
 
 .inputs-row.report-entry input[type="checkbox"] {
     width: auto;
+}
+
+.form-section-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    // margin-bottom: 2rem;
 }
