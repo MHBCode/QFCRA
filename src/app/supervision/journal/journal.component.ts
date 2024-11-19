@@ -8,10 +8,15 @@ import * as constants from 'src/app/app-constants';
 import { UsersService } from 'src/app/ngServices/users.service';
 import { SupervisionService } from '../supervision.service';
 
+
+// this is for text editor 
+import { ToolbarSettingsModel} from '@syncfusion/ej2-angular-richtexteditor';
+import { QuickToolbarSettingsModel } from '@syncfusion/ej2-angular-richtexteditor';
+
 @Component({
   selector: 'app-journal',
   templateUrl: './journal.component.html',
-  styleUrls: ['./journal.component.scss', '../supervision.scss']
+  styleUrls: ['./journal.component.scss',  '../supervision.scss']
 })
 export class JournalComponent {
 
@@ -43,6 +48,24 @@ export class JournalComponent {
 
   assignedUserRoles: any = [];
   assignedLevelUsers: any = [];
+
+  // this is for text editor 
+  public quickToolbarSettings: QuickToolbarSettingsModel = {
+    table: ['TableHeader', 'TableRows', 'TableColumns', 'TableCell', '-', 'BackgroundColor', 'TableRemove', 'TableCellVerticalAlign', 'Styles'],
+    showOnRightClick: true,
+  };
+  public placeholder: string = 'Type something or use @ to tag a user...';
+  public tools: ToolbarSettingsModel = {
+    items: [
+      'Undo', 'Redo', '|',
+      'Bold', 'Italic', 'Underline', 'StrikeThrough', 'SuperScript', 'SubScript', '|',
+      'FontName', 'FontSize', 'FontColor', 'BackgroundColor', '|',
+      'LowerCase', 'UpperCase', '|',
+      'Formats', 'Alignments', 'Blockquote', '|', 'NumberFormatList', 'BulletFormatList', '|',
+      'Outdent', 'Indent', '|', 'CreateLink', 'Image', 'FileManager', 'Video', 'Audio', 'CreateTable', '|', 'FormatPainter', 'ClearFormat',
+      '|', 'EmojiPicker', 'Print', '|',
+      'SourceCode', 'FullScreen']
+  };
 
   constructor(
     private router: Router,
@@ -183,8 +206,10 @@ export class JournalComponent {
       data => {
         this.alljournaldata = data.response;
         if (this.showDeletedJournal) {
+        if (this.showDeletedJournal) {
           this.journaldata = this.alljournaldata;
         }
+        else {
         else {
           this.journaldata = this.alljournaldata.filter(item => !item.IsDeleted);
         }
@@ -212,4 +237,5 @@ export class JournalComponent {
   updatePaginatedItems(paginatedItems: any[]): void {
     this.paginatedItems = paginatedItems; // Update current page items
   }
+
 }
