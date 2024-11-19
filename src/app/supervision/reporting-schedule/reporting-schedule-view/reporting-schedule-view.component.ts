@@ -28,6 +28,10 @@ export class ReportingScheduleViewComponent {
   isCreateMode: boolean = false;
   documentTypeList: any = [];
 
+  paginatedItems = [];
+  pageSize = 10;
+  selectedReport: any = null;
+
   /* user access and security */
   firmSectorID: any;
   isFirmAMLSupervisor: boolean = false;
@@ -37,8 +41,8 @@ export class ReportingScheduleViewComponent {
   isEditAllowed: boolean = false;
   canPublish: boolean = true;
   firmType: any;
-  originalFirmRptDetails: any;
-
+  originalFirmRptDetails: any[] = [];
+  filteredFirmRptDetails: any[] = [];
   constructor(
     private firmDetailsService: FirmDetailsService,
     private reportScheduleService: ReportScheduleService,
@@ -75,6 +79,9 @@ export class ReportingScheduleViewComponent {
     this.closeRptPopup.emit();
   }
 
+  onCloseReport(){
+    this.selectedReport = null;
+  }
   getReportPeriodTypes() {
     this.reportScheduleService.getReportPeriodTypes().subscribe(res => {
       this.reportPeriodTypes = res.response;
@@ -88,33 +95,62 @@ export class ReportingScheduleViewComponent {
       console.log('financialReportingPeriod', this.financialReportingPeriod);
     })
   }
-
   getFirmReportScheduledItemDetail() {
+    this.isLoading = true;
     this.reportScheduleService.getFirmReportScheduledItemDetail(
       this.firmId,
       this.report.FirmRptSchID,
       true
-    ).subscribe(res => {
-      this.originalFirmRptDetails = res.response;
-      this.firmRptDetails = [...this.originalFirmRptDetails];
-
-      const documentDetailRequests = this.firmRptDetails
-        .filter(item => item.DocID)
-        .map(item =>
-          this.logForm.getDocumentDetails(item.DocID).pipe(
-            map(data => ({
-              ...item,
-              documentDetails: data.response
-            }))
-          )
-        );
-
-      forkJoin(documentDetailRequests).subscribe(updatedDetails => {
-        this.firmRptDetails = updatedDetails;
-        console.log('firmRptDetails', this.firmRptDetails);
-      });
+    ).subscribe({
+      next: (res) => {
+        // Step 1: Set initial data
+        this.originalFirmRptDetails = res.response;
+        this.firmRptDetails = [...this.originalFirmRptDetails];
+        this.filteredFirmRptDetails = [...this.firmRptDetails]; // Initialize filtered data
+  
+        // Step 2: Prepare document detail requests
+        const documentDetailRequests = this.firmRptDetails
+          .filter(item => item.DocID) // Only items with DocID
+          .map(item =>
+            this.logForm.getDocumentDetails(item.DocID).pipe(
+              map(data => ({
+                ...item,
+                documentDetails: data.response
+              }))
+            )
+          );
+  
+        // Step 3: Fetch document details (if any)
+        if (documentDetailRequests.length > 0) {
+          forkJoin(documentDetailRequests).subscribe({
+            next: (updatedDetails) => {
+              this.firmRptDetails = updatedDetails;
+              this.filteredFirmRptDetails = [...this.firmRptDetails];
+            },
+            error: (err) => {
+              console.error('Error fetching document details:', err);
+            },
+            complete: () => {
+              this.isLoading = false;
+              this.updatePaginatedItems(
+                this.filteredFirmRptDetails.slice(0, this.pageSize) 
+              );
+            }
+          });
+        } else {
+          this.isLoading = false;
+          this.updatePaginatedItems(
+            this.filteredFirmRptDetails.slice(0, this.pageSize)
+          );
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching firm report schedule details:', err);
+        this.isLoading = false;
+      }
     });
   }
+  
 
 
 
@@ -153,34 +189,60 @@ export class ReportingScheduleViewComponent {
     )
   }
 
-
   filterReports(event: Event): void {
     const selectedFilter = (event.target as HTMLSelectElement).value;
-
-    let filteredReports;
+  
+    // Apply the filter logic to create the filtered dataset
     switch (selectedFilter) {
       case '1': // All
-        this.firmRptDetails = [...this.originalFirmRptDetails];
+        this.filteredFirmRptDetails = [...this.originalFirmRptDetails];
         break;
-
+  
       case '2': // Non - AML Reports
-        this.firmRptDetails = this.originalFirmRptDetails.filter(item =>
+        this.filteredFirmRptDetails = this.originalFirmRptDetails.filter(item =>
           !this.documentTypeList.some(docType => docType.DocTypeID === item.DocTypeID)
         );
         break;
-
+  
       case '3': // AML Reports
-      this.firmRptDetails = this.originalFirmRptDetails.filter(item =>
-        this.documentTypeList.some(docType => docType.DocTypeID === item.DocTypeID)
-      );
-
+        this.filteredFirmRptDetails = this.originalFirmRptDetails.filter(item =>
+          this.documentTypeList.some(docType => docType.DocTypeID === item.DocTypeID)
+        );
         break;
-
+  
       default:
-        this.firmRptDetails = [...this.originalFirmRptDetails];
+        this.filteredFirmRptDetails = [...this.originalFirmRptDetails];
+    }
+  
+    // Update paginated items after filtering
+    this.updatePaginatedItems(this.filteredFirmRptDetails.slice(0, this.pageSize));
+  }
+
+
+  updatePaginatedItems(items: any[]) {
+    this.paginatedItems = items;
+  }
+
+
+  editReport(report: any) {
+    this.selectedReport = { ...report }; // Clone the object to avoid modifying directly
+  }
+
+  deleteReport(report: any) {
+    const index = this.firmRptDetails.indexOf(report);
+    if (index > -1) {
+      this.firmRptDetails.splice(index, 1);
+      this.updatePaginatedItems(this.firmRptDetails.slice(0, this.pageSize));
     }
   }
 
+  saveReport() {
+    const index = this.firmRptDetails.findIndex((r) => r === this.selectedReport);
+    if (index > -1) {
+      this.firmRptDetails[index] = this.selectedReport;
+      this.selectedReport = null; // Reset the form
+    }
+  }
 
   applySecurityOnPage(isWritableMode: boolean) {
     // this.maskCommandActionsControlsScope();

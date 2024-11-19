@@ -27,6 +27,7 @@ td {
     border-right: 1px solid #ddd;
     text-align: left;
     vertical-align: middle;
+    overflow-wrap: anywhere;
 }
 
 tr:nth-child(even) {
