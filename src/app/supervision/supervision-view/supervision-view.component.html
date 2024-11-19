@@ -281,10 +281,10 @@
                 <tr *ngFor="let category of SupervisionCategory">
                     <td *ngIf="firmDetails.FirmTypeID !== 2">{{category.AuthorisationCategoryTypeDesc}}</td>
                     <td>{{category.FirmRptClassificationTypeDesc}}</td>
-                    <td>{{category.EffectiveFromDate}}</td>
-                    <td>{{category.EffectiveToDate}}</td>
+                    <td class="text-center">{{category.EffectiveFromDate}}</td>
+                    <td class="text-center">{{category.EffectiveToDate}}</td>
                     <td>{{category.LastModifiedBy}}</td>
-                    <td>{{category.LastModifiedDate}}</td>
+                    <td class="text-center">{{category.LastModifiedDate}}</td>
                 </tr>
             </tbody>
         </table>
@@ -306,18 +306,18 @@
         <table>
             <thead>
                 <tr>
-                    <th>No. of Staff in Qatar</th>
-                    <th>Staff Total</th>
-                    <th>Notes</th>
-                    <th>Date Effective From</th>
+                    <th class="text-center">No. of Staff in Qatar</th>
+                    <th class="text-center">Staff Total</th>
+                    <th class="text-center">Notes</th>
+                    <th class="text-center">Date Effective From</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let operational of OperationalData">
-                    <td>{{operational.NumOfLocalStaff}}</td>
-                    <td>{{operational.NumOfTotalStaff}}</td>
-                    <td>{{operational.EffectiveFromDate}}</td>
+                    <td class="text-center">{{operational.NumOfLocalStaff}}</td>
+                    <td class="text-center">{{operational.NumOfTotalStaff}}</td>
                     <td>{{operational.Notes}}</td>
+                    <td class="text-center">{{operational.EffectiveFromDate}}</td>
                 </tr>
             </tbody>
         </table>
@@ -352,7 +352,7 @@
                     <tr *ngFor="let rating of agency.value" class="rating-row">
                         <td>{{ rating.CreditRatingDisplayName }}</td>
                         <td>{{ rating.Ratings }}</td>
-                        <td>{{ rating.RatingsAsOfDate }}</td>
+                        <td class="text-center">{{ rating.RatingsAsOfDate }}</td>
                     </tr>
                 </ng-container>
             </tbody>
@@ -387,7 +387,7 @@
                     <tr *ngFor="let rating of agency.value" class="rating-row">
                         <td>{{ rating.CreditRatingDisplayName }}</td>
                         <td>{{ rating.Ratings }}</td>
-                        <td>{{ rating.RatingsAsOfDate }}</td>
+                        <td class="text-center">{{ rating.RatingsAsOfDate }}</td>
                     </tr>
                 </ng-container>
             </tbody>
