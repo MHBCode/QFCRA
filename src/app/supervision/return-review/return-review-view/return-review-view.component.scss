@@ -1,0 +1,28 @@
+.popupcontainer .input-field{
+    width: 31%;
+}
+.popupcontainer .fullwidth{
+    width: 100%;
+}
+.popupcontainer .inputs-row {
+    gap: 3.5%;
+    justify-content: flex-start;
+    padding: 0px;
+}
+.rpt-list {
+    margin: 10px 0px;
+}
+.rpt-list .inputs-row.report-entry.border-style {
+    margin-top: 10px;
+    border-top: 1px solid #a51e36;
+    padding-top: 10px !important;
+}
+
+.popupcontainer.Rptpopupcontainer {
+    max-height: 97vh;
+}
+.disabled {
+    background-color: #f9f9f9;
+    pointer-events: none;
+    opacity: 0.6;
+  }

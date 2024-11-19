@@ -38,7 +38,6 @@ export class ReportingScheduleViewComponent {
   canPublish: boolean = true;
   firmType: any;
   originalFirmRptDetails: any;
-
   constructor(
     private firmDetailsService: FirmDetailsService,
     private reportScheduleService: ReportScheduleService,
@@ -89,12 +88,13 @@ export class ReportingScheduleViewComponent {
     })
   }
 
-  getFirmReportScheduledItemDetail() {
+  getFirmReportScheduledItemDetail() {   
     this.reportScheduleService.getFirmReportScheduledItemDetail(
       this.firmId,
       this.report.FirmRptSchID,
       true
     ).subscribe(res => {
+      this.isLoading = true
       this.originalFirmRptDetails = res.response;
       this.firmRptDetails = [...this.originalFirmRptDetails];
 
@@ -108,12 +108,14 @@ export class ReportingScheduleViewComponent {
             }))
           )
         );
-
       forkJoin(documentDetailRequests).subscribe(updatedDetails => {
+        this.isLoading = true
         this.firmRptDetails = updatedDetails;
         console.log('firmRptDetails', this.firmRptDetails);
-      });
+        this.isLoading = false;
+      });    
     });
+  
   }
 
 

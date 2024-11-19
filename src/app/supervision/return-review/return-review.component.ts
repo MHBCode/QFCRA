@@ -30,6 +30,8 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
   firmDetails: any;
   ReturnReviewRevisionList: any = [];
   showReturnReviewRevision: boolean = false;
+  selectedReviewRevision: any = null;
+  documentTypeList:any = [];
   constructor(
     private firmService: FirmService,
     private route: ActivatedRoute,
@@ -123,6 +125,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
       data => {
         this.firmDetails = data.firmDetails;
+        console.log("firmDetails",this.firmDetails)
       },
       error => {
         console.error(error);
@@ -130,7 +133,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     );
   }
 
-  documentTypeList:any = [];
+  
   getDocumentType(docCategoryTypeID:number){
     this.logformService.getDocumentType(docCategoryTypeID).subscribe(
       data => {
@@ -195,14 +198,16 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     );
   }
 
-  getReturnReviewRevision(ReturnreView: any){
+  getReturnReviewRevision(ReturnreView: any,event:Event){
+    event.stopPropagation();
     const objectId = constants.FrimsObject.ReturnsReview;
-    const objectInstanceId = ReturnreView.RptReviewID
+    const objectInstanceId = ReturnreView.RptReviewID;
+    this.selectedReturnreView = ReturnreView;
     this.returnReviewService.getReturnReviewRevision(objectId,objectInstanceId).subscribe(
       data => {
         this.ReturnReviewRevisionList = data.response;
         console.log("this.ReturnReviewRevisionList",this.ReturnReviewRevisionList)
-        if(this.ReturnReviewRevisionList.length > 1){
+        if(this.ReturnReviewRevisionList.length > 0){
           this.showReturnReviewRevision = true
         }
       },
@@ -216,10 +221,25 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
   openReturnreViewPopup(ReturnreView: any,firmDetails : any): void {
     this.selectedReturnreView = ReturnreView;
     this.showPopup = true;
+    console.log("openReturnreViewPopup")
   }
   closeReturnReviewRevisionModal(){
     this.showReturnReviewRevision = false;
     this.ReturnReviewRevisionList = [];
+  }
+
+  openReviewRevisionDetails(ReviewRevision: any, ReturnreView: any): void {
+    this.selectedReviewRevision = ReviewRevision;
+    this.selectedReviewRevision = ReviewRevision;
+    this.selectedReturnreView = ReturnreView;
+    this.showPopup = true;
+    console.log("this.selectedReviewRevision",this.selectedReviewRevision)
+    this.closeReturnReviewRevisionModal()
+  }
+  
+  closePopup(): void {
+    this.showPopup = false;
+    this.selectedReviewRevision = null; // Reset the selected review
   }
 
 }
