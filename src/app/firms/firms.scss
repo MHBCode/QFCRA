@@ -94,7 +94,7 @@
 
     h3 {
         color: white !important;
-        width: 50% !important;
+        width: 100% !important;
         margin: auto !important;
         text-align: center;
     }
@@ -188,7 +188,7 @@
     min-height: 50px;
 }
 
-.addAddressBtn {
+.addAddressBtn, .addRegulatorBtn {
     background: #A51E36;
     color: white;
     border: none;
@@ -223,7 +223,7 @@
     justify-content: flex-end;
 }
 
-.RmvAddressBtn {
+.RmvTrashBtn {
     background: red;
     color: white;
     border: none;
@@ -360,7 +360,7 @@ hr {
     border-bottom: 0px !important;
 }
 .contollerPopupContent .popup-title-btn-row .popup-header {
-    width: 50%;
+    width: 100%;
 }
 .close-button {
     background: transparent;
@@ -432,7 +432,7 @@ hr {
     justify-content: space-between;
 }
 
-.add-address-btn-container {
+.add-address-btn-container, .add-regulator-btn-container {
     width: 100%;
     display: flex;
     justify-content: flex-end;;

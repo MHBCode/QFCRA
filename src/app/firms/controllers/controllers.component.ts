@@ -241,7 +241,7 @@ export class ControllersComponent implements OnInit {
 
   getAllRegulater(firmId: number, countryID: number, regulatorArray: any[], callback?: () => void): void {
     if (countryID === 0) {
-      this.securityService.getObjectTypeTable(this.userId,constants.Regulaters,constants.ObjectOpType.Create)
+      this.securityService.getObjectTypeTable(this.userId, constants.Regulaters, constants.ObjectOpType.Create)
         .subscribe(data => {
           this.AllRegulater = data.response;  // Store dropdown options separately
           console.log("General Regulators fetched:", data);
@@ -414,40 +414,43 @@ export class ControllersComponent implements OnInit {
           assnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateFrom),
           assnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.CreatecontrollerDetails.AssnDateTo)
         },
-        addressList: this.addedAddresses.map(address => ({
-          firmID: this.firmId,
-          countryID: Number(address.CountryID) || 0,
-          addressTypeID: address.AddressTypeID || 0,
-          sameAsTypeID: address.SameAsTypeID || null,
-          lastModifiedBy: this.userId, // must be dynamic
-          addressAssnID: address.AddressAssnID || null,
-          entityTypeID: address.EntityTypeID || 1,
-          entityID: address.EntityID || this.firmId,
-          contactAssnID: 0,
-          contactID: 0,
-          addressID: address.AddressID?.toString() || '',
-          addressLine1: address.AddressLine1 || '',
-          addressLine2: address.AddressLine2 || '',
-          addressLine3: address.AddressLine3 || '',
-          addressLine4: address.AddressLine4 || '',
-          city: address.City || '',
-          province: address.Province || '',
-          postalCode: address.PostalCode || '',
-          phoneNumber: address.PhoneNumber || '',
-          phoneExt: address.PhoneExt || '',
-          faxNumber: address.FaxNumber || '',
-          lastModifiedDate: this.currentDate,
-          addressState: 2, // New address state is 2, existing modified or unchanged is 6, 4 is delete
-          fromDate: address.FromDate || null,
-          toDate: address.ToDate || null,
-          objectID: address.ObjectID || this.Page.Controller,
-          objectInstanceID: address.ObjectInstanceID || this.firmId,
-          objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
-          sourceObjectID: address.SourceObjectID || this.Page.Controller,
-          sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
-          sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
-          objAis: null,
-        })),
+        addressList: this.addedAddresses.some(address => address.AddressTypeID === 0)
+          ? []
+          : this.addedAddresses.map(address => ({
+            firmID: this.firmId,
+            countryID: Number(address.CountryID) || 0,
+            addressTypeID: address.AddressTypeID || 0,
+            sameAsTypeID: address.SameAsTypeID || null,
+            lastModifiedBy: this.userId, // must be dynamic
+            addressAssnID: address.AddressAssnID || null,
+            entityTypeID: address.EntityTypeID || 1,
+            entityID: address.EntityID || this.firmId,
+            contactAssnID: null,
+            contactID: null,
+            addressID: address.AddressID?.toString() || '',
+            addressLine1: address.AddressLine1 || '',
+            addressLine2: address.AddressLine2 || '',
+            addressLine3: address.AddressLine3 || '',
+            addressLine4: address.AddressLine4 || '',
+            city: address.City || '',
+            province: address.Province || '',
+            postalCode: address.PostalCode || '',
+            phoneNumber: address.PhoneNumber || '',
+            phoneExt: address.PhoneExt || '',
+            faxNumber: address.FaxNumber || '',
+            lastModifiedDate: this.currentDate,
+            addressState: 2, // New address state is 2, existing modified or unchanged is 6, 4 is delete
+            fromDate: address.FromDate || null,
+            toDate: address.ToDate || null,
+            objectID: address.ObjectID || this.Page.Controller,
+            objectInstanceID: address.ObjectInstanceID || this.firmId,
+            objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
+            sourceObjectID: address.SourceObjectID || this.Page.Controller,
+            sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
+            sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
+            objAis: null,
+          })),
+
 
         regulatorList: this.CreatecontrollerDetails.IsCompanyRegulated ? this.regulatorList.map(regulator => ({
           regulatorState: 2, // add new regulator
@@ -559,7 +562,7 @@ export class ControllersComponent implements OnInit {
             applFeeComment: null,
             wcfAddnlInfo: null,
             placeOfBirthCountryID: null,
-            jurisdictionId: this.CreatecontrollerDetails.jurisdictionOfIssue,
+            jurisdictionId: this.CreatecontrollerDetails.jurisdictionOfIssue === 0 ? null : this.CreatecontrollerDetails.jurisdictionOfIssue,
             totalIndiustryExperenceYear: null,
             totalIndustryExperenceMonth: null,
             roleExperenceMonth: null,
@@ -585,7 +588,9 @@ export class ControllersComponent implements OnInit {
           },
           lstContactFunctions: null,
         },
-        addresses: this.addedAddresses.map(address => ({
+        addresses: this.addedAddresses.some(address => address.AddressTypeID === 0)
+        ? []
+        : this.addedAddresses.map(address => ({
           firmID: this.firmId,
           countryID: Number(address.CountryID) || 0,
           addressTypeID: address.AddressTypeID || 0,
@@ -594,8 +599,8 @@ export class ControllersComponent implements OnInit {
           addressAssnID: address.AddressAssnID || null,
           entityTypeID: address.EntityTypeID || 1,
           entityID: address.EntityID || this.firmId,
-          contactAssnID: 0,
-          contactID: 0,
+          contactAssnID: null,
+          contactID: null,
           addressID: address.AddressID?.toString() || '',
           addressLine1: address.AddressLine1 || '',
           addressLine2: address.AddressLine2 || '',
@@ -653,7 +658,7 @@ export class ControllersComponent implements OnInit {
     SecondName: '',
     FamilyName: '',
     PlaceOfBirth: '',
-    JobTitle:'',
+    JobTitle: '',
     DateOfBirth: '',
     PassportNum: '',
     isPEP: true,
@@ -700,7 +705,7 @@ export class ControllersComponent implements OnInit {
     Output: 0,
     NumOfShares: 0,
     CountryID: 0,
-    jurisdictionOfIssue: null,
+    jurisdictionOfIssue: 0,
     AddressTypeID: 0,
     CreatedDate: '',
     EntityID: 0,
@@ -733,7 +738,25 @@ export class ControllersComponent implements OnInit {
       }
 
       // ADDRESS TYPE VALIDATION
-      this.invalidAddress = this.addedAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
+      this.invalidAddress = this.addedAddresses.find(address => {
+        // Check if AddressTypeID is invalid (0 or undefined)
+        const isAddressTypeInvalid = !address.AddressTypeID || address.AddressTypeID === 0;
+
+        // Check if any of the address fields contain a meaningful value
+        const hasAddressDetails =
+          !!address.AddressLine1?.trim() ||
+          !!address.AddressLine2?.trim() ||
+          !!address.AddressLine3?.trim() ||
+          !!address.AddressLine4?.trim() ||
+          !!address.City?.trim() ||
+          !!address.Province?.trim() ||
+          !!address.PostalCode?.trim() ||
+          (address.CountryID && parseInt(address.CountryID) !== 0);
+
+        // Return true if both conditions are met
+        return isAddressTypeInvalid && hasAddressDetails;
+      });
+
       if (this.invalidAddress) {
         this.loadErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
         this.hasValidationErrors = true;
@@ -862,6 +885,12 @@ export class ControllersComponent implements OnInit {
     this.isEditModeController = true;
     this.applySecurityOnPage(this.Page.Controller, this.isEditModeController);
     this.initializeAddressTypes();
+    if (!this.existingControllerCorporateAddresses || this.existingControllerCorporateAddresses.length === 0) {
+      this.existingControllerCorporateAddresses = [this.createDefaultAddress()];
+    }
+    if (!this.existingControllerIndividualAddresses || this.existingControllerIndividualAddresses.length === 0) {
+      this.existingControllerIndividualAddresses = [this.createDefaultAddress()];
+    }
     if (this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
       this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
       this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
@@ -970,7 +999,7 @@ export class ControllersComponent implements OnInit {
 
 
   populateCountries() {
-    this.firmDetailsService.getCountries(this.userId,constants.ObjectOpType.Edit).subscribe(
+    this.firmDetailsService.getCountries(this.userId, constants.ObjectOpType.Edit).subscribe(
       countries => {
         this.allCountries = countries;
       },
@@ -981,7 +1010,7 @@ export class ControllersComponent implements OnInit {
   }
 
   populateAddressTypes() {
-    this.firmDetailsService.getAddressTypes(this.userId,constants.ObjectOpType.Edit).subscribe(
+    this.firmDetailsService.getAddressTypes(this.userId, constants.ObjectOpType.Edit).subscribe(
       addressTypes => {
         this.allAddressTypes = addressTypes;
         this.currentAddressTypes = this.allAddressTypes; // Assign after data is loaded
@@ -993,7 +1022,7 @@ export class ControllersComponent implements OnInit {
   }
 
   populateContactAddressTypes() {
-    this.firmDetailsService.getContactAddressTypes(this.userId,constants.ObjectOpType.Edit).subscribe(
+    this.firmDetailsService.getContactAddressTypes(this.userId, constants.ObjectOpType.Edit).subscribe(
       addressTypes => {
         this.allContactAddressTypes = addressTypes;
         this.currentAddressTypes = this.allContactAddressTypes; // Assign after data is loaded
@@ -1035,7 +1064,7 @@ export class ControllersComponent implements OnInit {
 
   getFilteredAddressTypes() {
     return this.getExistingAddresses()
-      .filter(address => address.AddressTypeID && address.AddressTypeID !== 0) // Exclude blank and '0' entries
+      .filter(address => address.AddressTypeID && address.AddressTypeID !== 0)
       .map(address => ({
         AddressTypeID: address.AddressTypeID,
         AddressTypeDesc: address.AddressTypeDesc
@@ -1155,14 +1184,14 @@ export class ControllersComponent implements OnInit {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   addNewAddressOnCreateMode() {
-  const result = this.firmDetailsService.addNewAddressOnCreateMode(this.addedAddresses, this.currentAddressTypes, this.currentDate);
+    const result = this.firmDetailsService.addNewAddressOnCreateMode(this.addedAddresses, this.currentAddressTypes, this.currentDate);
 
-  // Update the flags in the controller component based on the returned values
-  this.canAddNewAddressOnCreate = result.canAddNewAddressOnCreate;
-  this.isAllAddressesAddedOnCreate = result.isAllAddressesAddedOnCreate;
+    // Update the flags in the controller component based on the returned values
+    this.canAddNewAddressOnCreate = result.canAddNewAddressOnCreate;
+    this.isAllAddressesAddedOnCreate = result.isAllAddressesAddedOnCreate;
 
-  this.checkCanAddNewAddressOnCreateMode();
-}
+    this.checkCanAddNewAddressOnCreateMode();
+  }
 
   createDefaultAddress(): any {
     return {
@@ -1337,7 +1366,7 @@ export class ControllersComponent implements OnInit {
 
 
 
-    if (this.selectedController.EntityTypeID === 11 || this.selectedController.EntityTypeID === 9) {
+    if (this.selectedController.EntityTypeID === constants.EntityType.IndividualController || this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual) {
       let functionTypeId = 0;
       const firmId = this.firmId;
       if (this.selectedController.EntityTypeID === constants.EntityType.IndividualController) {
@@ -1372,13 +1401,189 @@ export class ControllersComponent implements OnInit {
     );
   }
 
-  // onTitleChange(newTitle: string): void {
-  //   this.selectedIndividualController = {
-  //     ...this.selectedIndividualController,
-  //     Title: newTitle
-  //   };
-  // }
+  //////////////////////////////////////////////////////setters and getters//////////////////////////////////////////////////// 
+  get AssnDateFrom(): string {
+    if (
+      this.selectedController.EntityTypeID === constants.EntityType.IndividualController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual
+    ) {
+      return this.selectedIndividualController.AssnDateFrom;
+    } else if (
+      this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
+      this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
+      this.selectedController.EntityTypeID === constants.EntityType.Head_Office
+    ) {
+      return this.selectedController.AssnDateFrom;
+    }
+    return '';
+  }
 
+  set AssnDateFrom(value: string) {
+    if (
+      this.selectedController.EntityTypeID === constants.EntityType.IndividualController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual
+    ) {
+      this.selectedIndividualController.AssnDateFrom = value;
+    } else if (
+      this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
+      this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
+      this.selectedController.EntityTypeID === constants.EntityType.Head_Office
+    ) {
+      this.selectedController.AssnDateFrom = value;
+    }
+  }
+
+  get AssnDateTo(): string {
+    if (
+      this.selectedController.EntityTypeID === constants.EntityType.IndividualController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual
+    ) {
+      return this.selectedIndividualController.AssnDateTo;
+    } else if (
+      this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
+      this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
+      this.selectedController.EntityTypeID === constants.EntityType.Head_Office
+    ) {
+      return this.selectedController.AssnDateTo;
+    }
+    return '';
+  }
+
+  set AssnDateTo(value: string) {
+    if (
+      this.selectedController.EntityTypeID === constants.EntityType.IndividualController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual
+    ) {
+      this.selectedIndividualController.AssnDateTo = value;
+    } else if (
+      this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
+      this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
+      this.selectedController.EntityTypeID === constants.EntityType.Head_Office
+    ) {
+      this.selectedController.AssnDateTo = value;
+    }
+  }
+
+  get PctOfShares(): string {
+    if (
+      this.selectedController.EntityTypeID === constants.EntityType.IndividualController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual
+    ) {
+      return this.selectedIndividualController.PctOfShares;
+    } else if (
+      this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
+      this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
+      this.selectedController.EntityTypeID === constants.EntityType.Head_Office
+    ) {
+      return this.selectedController.PctOfShares;
+    }
+    return '';
+  }
+
+  set PctOfShares(value: string) {
+    if (
+      this.selectedController.EntityTypeID === constants.EntityType.IndividualController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual
+    ) {
+      this.selectedIndividualController.PctOfShares = value;
+    } else if (
+      this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
+      this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
+      this.selectedController.EntityTypeID === constants.EntityType.Head_Office
+    ) {
+      this.selectedController.PctOfShares = value;
+    }
+  }
+
+  get ControllerControlTypeID(): string {
+    if (
+      this.selectedController.EntityTypeID === constants.EntityType.IndividualController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual
+    ) {
+      return this.selectedIndividualController.ControllerControlTypeID;
+    } else if (
+      this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
+      this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
+      this.selectedController.EntityTypeID === constants.EntityType.Head_Office
+    ) {
+      return this.selectedController.ControllerControlTypeID;
+    }
+    return null;
+  }
+
+  set ControllerControlTypeID(value: string) {
+    if (
+      this.selectedController.EntityTypeID === constants.EntityType.IndividualController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual
+    ) {
+      this.selectedIndividualController.ControllerControlTypeID = value;
+    } else if (
+      this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
+      this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
+      this.selectedController.EntityTypeID === constants.EntityType.Head_Office
+    ) {
+      this.selectedController.ControllerControlTypeID = value;
+    }
+  }
+
+  get ControllerControlTypeDesc(): number {
+    if (
+      this.selectedController.EntityTypeID === constants.EntityType.IndividualController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual
+    ) {
+      return this.selectedIndividualController.ControllerControlTypeDesc;
+    } else if (
+      this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
+      this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
+      this.selectedController.EntityTypeID === constants.EntityType.Head_Office
+    ) {
+      return this.selectedController.ControllerControlTypeDesc;
+    }
+    return null;
+  }
+
+  get AdditionalDetails(): string {
+    if (
+      this.selectedController.EntityTypeID === constants.EntityType.IndividualController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual
+    ) {
+      return this.selectedIndividualController.AdditionalDetails;
+    } else if (
+      this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
+      this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
+      this.selectedController.EntityTypeID === constants.EntityType.Head_Office
+    ) {
+      return this.selectedController.AdditionalDetails;
+    }
+    return null;
+  }
+
+  set AdditionalDetails(value: string) {
+    if (
+      this.selectedController.EntityTypeID === constants.EntityType.IndividualController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Individual
+    ) {
+      this.selectedIndividualController.AdditionalDetails = value;
+    } else if (
+      this.selectedController.EntityTypeID === constants.EntityType.ParentEntity ||
+      this.selectedController.EntityTypeID === constants.EntityType.CorporateController ||
+      this.selectedController.EntityTypeID === constants.EntityType.UBO_Corporate ||
+      this.selectedController.EntityTypeID === constants.EntityType.Head_Office
+    ) {
+      this.selectedController.AdditionalDetails = value;
+    }
+  }
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////
   closeControllerPopup(): void {
     this.isPopupOpen = false;
     this.isEditModeController = false;
@@ -1390,7 +1595,7 @@ export class ControllersComponent implements OnInit {
     this.selectedController = [];
     this.controllerDetails = this.selectedController;
     this.canAddNewAddressOnEdit = true;
-    this.applySecurityOnPage(this.Page.Controller,this.isEditModeController);
+    this.applySecurityOnPage(this.Page.Controller, this.isEditModeController);
   }
 
   closeCreateControllerPopup(): void {
@@ -1668,7 +1873,7 @@ export class ControllersComponent implements OnInit {
           ControllerControlTypeDesc: null,
           isAuditor: this.selectedController.isAuditor,
           isCompanyRegulated: this.selectedController.IsCompanyRegulated,
-          additionalDetails: this.selectedController.AdditionalDetails,
+          additionalDetails: this.AdditionalDetails,
           isParentController: this.selectedController.isParentController,
           isPublicallyTraded: this.selectedController.isPublicallyTraded,
           areAnyUBOs: this.selectedController.areAnyUBOs,
@@ -1677,60 +1882,63 @@ export class ControllersComponent implements OnInit {
           FirmID: this.selectedController.FirmID,
           EntityTypeID: this.selectedController.EntityTypeID,
           EntityID: this.selectedController.FirmID,
-          controllerControlTypeID: this.selectedController.ControllerControlTypeID,
+          controllerControlTypeID: this.ControllerControlTypeID,
           numOfShares: this.selectedController.numOfShares,
-          PctOfShares: this.selectedController.ControllerControlTypeID === 1 ? this.selectedController.PctOfShares : null,
+          PctOfShares: parseInt(this.ControllerControlTypeID) === 1 ? this.PctOfShares : null,
           MajorityStockHolder: false,
-          AssnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.selectedController.AssnDateFrom),
-          AssnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.selectedController.AssnDateTo),
+          AssnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.AssnDateFrom),
+          AssnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.AssnDateTo),
           LastModifiedByOfOtherEntity: this.userId,
         },
-        addressList: [...this.existingControllerCorporateAddresses, ...this.removedAddresses].map(address => {
-          let addressState: number;
+        addressList: [...this.existingControllerCorporateAddresses, ...this.removedAddresses]
+          .filter(address => address.AddressTypeID !== 0) // Exclude Addresses with Address Type = 0
+          .map(address => {
+            let addressState: number;
 
-          if (address.isRemoved) {
-            addressState = 4; // Deleted address
-          } else if (address.AddressID === null) {
-            addressState = 2; // New address
-          } else {
-            addressState = 3; // Modified address
-          }
+            if (address.isRemoved) {
+              addressState = 4; // Deleted address
+            } else if (address.AddressID === null) {
+              addressState = 2; // New address
+            } else {
+              addressState = 3; // Modified address
+            }
 
-          return {
-            firmID: this.firmId,
-            countryID: Number(address.CountryID) || 0,
-            addressTypeID: address.AddressTypeID || 0,
-            sameAsTypeID: address.SameAsTypeID || null,
-            lastModifiedBy: this.userId, // must be dynamic
-            addressAssnID: address.AddressAssnID || null,
-            entityTypeID: address.EntityTypeID || 1,
-            entityID: address.EntityID || this.firmId,
-            contactAssnID: 0,
-            contactID: 0,
-            addressID: address.AddressID?.toString() || '',
-            addressLine1: address.AddressLine1 || '',
-            addressLine2: address.AddressLine2 || '',
-            addressLine3: address.AddressLine3 || '',
-            addressLine4: address.AddressLine4 || '',
-            city: address.City || '',
-            province: address.Province || '',
-            postalCode: address.PostalCode || '',
-            phoneNumber: address.PhoneNumber || '',
-            phoneExt: address.PhoneExt || '',
-            faxNumber: address.FaxNumber || '',
-            lastModifiedDate: this.currentDate, // Default to current date
-            addressState: addressState, // New address state is 2, existing modified or unchanged is 6, 4 is delete
-            fromDate: address.FromDate || null,
-            toDate: address.ToDate || null,
-            objectID: address.ObjectID || this.Page.Controller,
-            objectInstanceID: address.ObjectInstanceID || this.firmId,
-            objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
-            sourceObjectID: address.SourceObjectID || this.Page.Controller,
-            sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
-            sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
-            objAis: null,
-          };
-        }),
+            return {
+              firmID: this.firmId,
+              countryID: Number(address.CountryID) || 0,
+              addressTypeID: address.AddressTypeID || 0,
+              sameAsTypeID: address.SameAsTypeID || null,
+              lastModifiedBy: this.userId, // must be dynamic
+              addressAssnID: address.AddressAssnID || null,
+              entityTypeID: address.EntityTypeID || 1,
+              entityID: address.EntityID || this.firmId,
+              contactAssnID: 0,
+              contactID: 0,
+              addressID: address.AddressID?.toString() || '',
+              addressLine1: address.AddressLine1 || '',
+              addressLine2: address.AddressLine2 || '',
+              addressLine3: address.AddressLine3 || '',
+              addressLine4: address.AddressLine4 || '',
+              city: address.City || '',
+              province: address.Province || '',
+              postalCode: address.PostalCode || '',
+              phoneNumber: address.PhoneNumber || '',
+              phoneExt: address.PhoneExt || '',
+              faxNumber: address.FaxNumber || '',
+              lastModifiedDate: this.currentDate,
+              addressState: addressState, // New address state is 2, existing modified or unchanged is 6, 4 is delete
+              fromDate: address.FromDate || null,
+              toDate: address.ToDate || null,
+              objectID: address.ObjectID || this.Page.Controller,
+              objectInstanceID: address.ObjectInstanceID || this.firmId,
+              objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
+              sourceObjectID: address.SourceObjectID || this.Page.Controller,
+              sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
+              sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
+              objAis: null,
+            };
+          }),
+
 
         regulatorList: this.selectedController.IsCompanyRegulated ? [...this.existingRegulatorList, ...this.removedRegulators].map(regulator => {
           let regulatorState: number;
@@ -1800,10 +2008,10 @@ export class ControllersComponent implements OnInit {
             secondName: this.selectedIndividualController.SecondName,
             thirdName: this.selectedIndividualController.ThirdName,
             familyName: this.selectedIndividualController.FamilyName,
-            PctOfShares: this.selectedIndividualController.ControllerControlTypeID === 1 ? this.selectedIndividualController.PctOfShares : null,
+            PctOfShares: parseInt(this.ControllerControlTypeID) === 1 ? this.PctOfShares : null,
             tempContactID: 0,
             countryOfResidence: null,
-            ControllerControlTypeID: this.selectedIndividualController.ControllerControlTypeID,
+            ControllerControlTypeID: this.ControllerControlTypeID,
             createdBy: this.userId,
             dateOfBirth: this.dateUtilService.convertDateToYYYYMMDD(this.selectedIndividualController.DateOfBirth),
             fullName: null,
@@ -1824,59 +2032,63 @@ export class ControllersComponent implements OnInit {
             juridictionID: null,
             objectID: this.Page.Controller,
             isPEP: this.selectedIndividualController.IsPep,
-            AssnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.selectedIndividualController.AssnDateFrom),
-            AssnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.selectedIndividualController.AssnDateTo),
+            AssnDateFrom: this.dateUtilService.convertDateToYYYYMMDD(this.AssnDateFrom),
+            AssnDateTo: this.dateUtilService.convertDateToYYYYMMDD(this.AssnDateTo),
             LastModifiedByOfOtherEntity: this.userId,
             JurisdictionId: this.selectedIndividualController.JurisdictionID,
+            additionalDetails: this.AdditionalDetails
           },
           lstContactFunctions: null,
         },
-        Addresses: [...this.existingControllerIndividualAddresses, ...this.removedAddresses].map(address => {
-          let addressState: number;
+        Addresses: [...this.existingControllerIndividualAddresses, ...this.removedAddresses]
+          .filter(address => address.AddressTypeID !== 0) // Exclude Addresses with Address Type = 0
+          .map(address => {
+            let addressState: number;
 
-          if (address.isRemoved) {
-            addressState = 4; // Deleted address
-          } else if (address.AddressID === null) {
-            addressState = 2; // New address
-          } else {
-            addressState = 3; // Modified address
-          }
+            if (address.isRemoved) {
+              addressState = 4; // Deleted address
+            } else if (address.AddressID === null) {
+              addressState = 2; // New address
+            } else {
+              addressState = 3; // Modified address
+            }
 
-          return {
-            firmID: this.firmId,
-            countryID: Number(address.CountryID) || 0,
-            addressTypeID: address.AddressTypeID || 0,
-            sameAsTypeID: address.SameAsTypeID || null,
-            lastModifiedBy: this.userId, // must be dynamic
-            addressAssnID: address.AddressAssnID || null,
-            entityTypeID: address.EntityTypeID || 1,
-            entityID: address.EntityID || this.firmId,
-            contactAssnID: this.selectedController.RelatedEntityID,
-            contactID: this.selectedController.OtherEntityID,
-            addressID: address.AddressID?.toString() || '',
-            addressLine1: address.AddressLine1 || '',
-            addressLine2: address.AddressLine2 || '',
-            addressLine3: address.AddressLine3 || '',
-            addressLine4: address.AddressLine4 || '',
-            city: address.City || '',
-            province: address.Province || '',
-            postalCode: address.PostalCode || '',
-            phoneNumber: address.PhoneNumber || '',
-            phoneExt: address.PhoneExt || '',
-            faxNumber: address.FaxNumber || '',
-            lastModifiedDate: this.currentDate,
-            addressState: addressState, // New address state is 2, existing modified or unchanged is 6, 4 is delete
-            fromDate: address.FromDate || null,
-            toDate: address.ToDate || null,
-            objectID: address.ObjectID || this.Page.Controller,
-            objectInstanceID: address.ObjectInstanceID || this.firmId,
-            objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
-            sourceObjectID: address.SourceObjectID || this.Page.Controller,
-            sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
-            sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
-            objAis: null,
-          }
-        })
+            return {
+              firmID: this.firmId,
+              countryID: Number(address.CountryID) || 0,
+              addressTypeID: address.AddressTypeID || 0,
+              sameAsTypeID: address.SameAsTypeID || null,
+              lastModifiedBy: this.userId, // must be dynamic
+              addressAssnID: address.AddressAssnID || null,
+              entityTypeID: address.EntityTypeID || 1,
+              entityID: address.EntityID || this.firmId,
+              contactAssnID: 0,
+              contactID: 0,
+              addressID: address.AddressID?.toString() || '',
+              addressLine1: address.AddressLine1 || '',
+              addressLine2: address.AddressLine2 || '',
+              addressLine3: address.AddressLine3 || '',
+              addressLine4: address.AddressLine4 || '',
+              city: address.City || '',
+              province: address.Province || '',
+              postalCode: address.PostalCode || '',
+              phoneNumber: address.PhoneNumber || '',
+              phoneExt: address.PhoneExt || '',
+              faxNumber: address.FaxNumber || '',
+              lastModifiedDate: this.currentDate, // Default to current date
+              addressState: addressState, // New address state is 2, existing modified or unchanged is 6, 4 is delete
+              fromDate: address.FromDate || null,
+              toDate: address.ToDate || null,
+              objectID: address.ObjectID || this.Page.Controller,
+              objectInstanceID: address.ObjectInstanceID || this.firmId,
+              objectInstanceRevNumber: address.ObjectInstanceRevNumber || 1,
+              sourceObjectID: address.SourceObjectID || this.Page.Controller,
+              sourceObjectInstanceID: address.SourceObjectInstanceID || this.firmId,
+              sourceObjectInstanceRevNumber: address.SourceObjectInstanceRevNumber || 1,
+              objAis: null,
+            };
+          }),
+
       };
 
       // Call the save/update contact form endpoint
@@ -1900,7 +2112,7 @@ export class ControllersComponent implements OnInit {
 
   cancelEditController() {
     this.isEditModeController = false;
-    this.loadControllerCorporateFirmAdresses(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID,this.userId,constants.ObjectOpType.View) // Static opTypeId);
+    this.loadControllerCorporateFirmAdresses(this.selectedController.OtherEntityID, this.selectedController.EntityTypeID, this.userId, constants.ObjectOpType.View) // Static opTypeId);
     this.loadControllerIndividualAdresses(
       this.selectedController.RelatedEntityID, this.userId, constants.ObjectOpType.View
     );
@@ -1968,7 +2180,25 @@ export class ControllersComponent implements OnInit {
         this.hasValidationErrors = false;
 
         // ADDRESS TYPE VALIDATION
-        this.invalidAddress = this.existingControllerCorporateAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
+        this.invalidAddress = this.existingControllerCorporateAddresses.find(address => {
+          // Check if AddressTypeID is invalid (0 or undefined)
+          const isAddressTypeInvalid = !address.AddressTypeID || address.AddressTypeID === 0;
+
+          // Check if any of the address fields contain a meaningful value
+          const hasAddressDetails =
+            !!address.AddressLine1?.trim() ||
+            !!address.AddressLine2?.trim() ||
+            !!address.AddressLine3?.trim() ||
+            !!address.AddressLine4?.trim() ||
+            !!address.City?.trim() ||
+            !!address.Province?.trim() ||
+            !!address.PostalCode?.trim() ||
+            (address.CountryID && parseInt(address.CountryID) !== 0);
+
+          // Return true if both conditions are met
+          return isAddressTypeInvalid && hasAddressDetails;
+        });
+
         if (this.invalidAddress) {
           this.loadErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
           this.hasValidationErrors = true;
@@ -1997,14 +2227,14 @@ export class ControllersComponent implements OnInit {
         }
 
         // Validate Type of Control
-        if (!this.selectedController.ControllerControlTypeID) {
+        if (!this.ControllerControlTypeID) {
           this.loadErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
           this.hasValidationErrors = true;
         }
 
         // Validate Percentage of Holding
-        if (this.selectedController.PctOfShares) {
-          const newPct = parseFloat(this.selectedController.PctOfShares);
+        if (this.PctOfShares) {
+          const newPct = parseFloat(this.PctOfShares);
 
           // Check if the newPct is a valid percentage (0–100)
           if (isNaN(newPct) || newPct < 0 || newPct >= 100) {
@@ -2030,6 +2260,33 @@ export class ControllersComponent implements OnInit {
         this.errorMessages = {}; // Clear previous error messages
         this.hasValidationErrors = false;
 
+        // ADDRESS TYPE VALIDATION
+        this.invalidAddress = this.existingControllerIndividualAddresses.find(address => {
+          // Check if AddressTypeID is invalid (0 or undefined)
+          const isAddressTypeInvalid = !address.AddressTypeID || address.AddressTypeID === 0;
+
+          // Check if any of the address fields contain a meaningful value
+          const hasAddressDetails =
+            !!address.AddressLine1?.trim() ||
+            !!address.AddressLine2?.trim() ||
+            !!address.AddressLine3?.trim() ||
+            !!address.AddressLine4?.trim() ||
+            !!address.City?.trim() ||
+            !!address.Province?.trim() ||
+            !!address.PostalCode?.trim() ||
+            (address.CountryID && parseInt(address.CountryID) !== 0);
+
+          // Return true if both conditions are met
+          return isAddressTypeInvalid && hasAddressDetails;
+        });
+
+        if (this.invalidAddress) {
+          this.loadErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
+          this.hasValidationErrors = true;
+        } else {
+          delete this.errorMessages['AddressTypeID'];
+        }
+
         // Validate First Name
         if (!this.selectedIndividualController.FirstName || this.selectedIndividualController.FirstName.trim().length === 0) {
           this.loadErrorMessages('firstName', constants.ControllerMessages.ENTER_FIRSTNAME);
@@ -2050,7 +2307,7 @@ export class ControllersComponent implements OnInit {
         }
 
         // Validate Type of Control
-        if (!this.selectedIndividualController.ControllerControlTypeID) {
+        if (!this.ControllerControlTypeID) {
           this.loadErrorMessages('ControllerControlTypeDesc', constants.ControllerMessages.SELECT_TYPEOFCONTROL);
           this.hasValidationErrors = true;
         }
@@ -2069,18 +2326,9 @@ export class ControllersComponent implements OnInit {
           }
         }
 
-        // ADDRESS TYPE VALIDATION
-        this.invalidAddress = this.existingControllerIndividualAddresses.find(address => !address.AddressTypeID || address.AddressTypeID === 0);
-        if (this.invalidAddress) {
-          this.loadErrorMessages('AddressTypeID', constants.AddressControlMessages.SELECT_ADDRESSTYPE);
-          this.hasValidationErrors = true;
-        } else {
-          delete this.errorMessages['AddressTypeID'];
-        }
-
         // Validate Percentage of Holding
-        if (this.selectedIndividualController.PctOfShares) {
-          const newPct = parseFloat(this.selectedIndividualController.PctOfShares);
+        if (this.PctOfShares) {
+          const newPct = parseFloat(this.PctOfShares);
 
           // Check if the newPct is a valid percentage (0–100)
           if (isNaN(newPct) || newPct < 0 || newPct >= 100) {
