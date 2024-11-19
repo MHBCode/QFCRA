@@ -10,17 +10,17 @@ import { SupervisionService } from '../supervision.service';
 
 
 // this is for text editor 
-import { ToolbarSettingsModel} from '@syncfusion/ej2-angular-richtexteditor';
+import { ToolbarSettingsModel } from '@syncfusion/ej2-angular-richtexteditor';
 import { QuickToolbarSettingsModel } from '@syncfusion/ej2-angular-richtexteditor';
 
 @Component({
   selector: 'app-journal',
   templateUrl: './journal.component.html',
-  styleUrls: ['./journal.component.scss',  '../supervision.scss']
+  styleUrls: ['./journal.component.scss', '../supervision.scss']
 })
 export class JournalComponent {
 
-  
+
   Page = FrimsObject;
   journaldata: any;
   isLoading: boolean = false;
@@ -206,17 +206,15 @@ export class JournalComponent {
       data => {
         this.alljournaldata = data.response;
         if (this.showDeletedJournal) {
-        if (this.showDeletedJournal) {
           this.journaldata = this.alljournaldata;
         }
-        else {
         else {
           this.journaldata = this.alljournaldata.filter(item => !item.IsDeleted);
         }
         this.applySearchAndPagination();
-      },
-      error => {
-        console.error('Error fetching Firm regFunds ', error);
+        error => {
+          console.error('Error fetching Firm regFunds ', error);
+        }
       }
     );
   }

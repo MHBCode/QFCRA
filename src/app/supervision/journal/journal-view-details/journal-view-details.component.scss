@@ -1,0 +1,40 @@
+.popupcontainer .input-field {
+    width: 31%;
+}
+
+.popupcontainer .fullwidth {
+    width: 100%;
+}
+
+.popupcontainer .inputs-row {
+    gap: 3.5%;
+    justify-content: flex-start;
+    padding: 0px;
+}
+
+.popupcontainer.Journalpopupcontainer {
+    max-height: 97vh;
+    width: 96vw;
+}
+
+.btn button {
+    margin-bottom: 5px;
+}
+
+.notes {
+    width: 100% !important;
+    margin-top: 10px;
+}
+
+.subject-container {
+    width: 100% !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 10px;
+}
+
+
+.subject-table {
+    border-radius: 15px;
+}
