@@ -633,19 +633,20 @@
           <input name="FamilyName" id="FamilyName" type="text" [(ngModel)]="selectedContact.familyName"
             [disabled]="!isEditContact" />
         </div>
+        
         <!-- Date Of Birth -->
         <div class="input-field" *ngIf="firmDetails.FirmTypeID === 2">
           <label for="dateOfBirth">
             Date of birth <span style="color: red">*</span>
           </label>
-          <input [(ngModel)]="createContactObj.dateOfBirth" #dateInputs placeholder name="dateOfBirth" id="dateOfBirth"
+          <input [(ngModel)]="selectedContact.dateOfBirth" #dateInputs placeholder name="dateOfBirth" id="dateOfBirth"
             type="input" [disabled]="!isEditContact" />
         </div>
 
         <!-- Nationality -->
         <div class="input-field" *ngIf="firmDetails.FirmTypeID === 2">
           <label for="country"> Nationality </label>
-          <select [(ngModel)]="createContactObj.nationality" [disabled]="!isEditContact"
+          <select [(ngModel)]="selectedContact.nationality" [disabled]="!isEditContact"
             (change)="onNationalityChange($event)">
             <option [value]="0">Select</option>
             <option *ngFor="let option of allCountries" [value]="option.CountryID">

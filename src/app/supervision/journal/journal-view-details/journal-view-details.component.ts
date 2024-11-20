@@ -24,7 +24,7 @@ export class JournalViewDetailsComponent implements OnInit {
   isEditModeJournal: boolean = false;
 
   isLoading: boolean = false;
-  userId: number = 30;
+  userId: number = 10055;
   Page = FrimsObject;
   journalDetails: any = [];
   subjectData: any = [];

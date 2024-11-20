@@ -39,7 +39,7 @@ export class PaginationComponent {
   }
 
   updatePagination(): void {
-    const totalRows = this.items.length;
+    const totalRows = this.items?.length;
     this.totalRows = totalRows;
     
     this.totalPages = Math.ceil(totalRows / this.pageSize);
@@ -47,7 +47,7 @@ export class PaginationComponent {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = Math.min(startIndex + this.pageSize, totalRows);
   
-    const paginatedItems = this.items.slice(startIndex, endIndex);
+    const paginatedItems = this.items?.slice(startIndex, endIndex);
     this.paginatedItemsChange.emit(paginatedItems);
     
     this.startRow = startIndex + 1;

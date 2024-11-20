@@ -269,7 +269,7 @@
         <table>
             <thead>
                 <tr>
-                    <th *ngIf="firmDetails.FirmTypeID !== 2">Authorisation Category</th>
+                    <th *ngIf="SupervisionCategory[0].AuthorisationCategoryTypeID">Authorisation Category</th>
                     <th>Supervision Category</th>
                     <th>Date Effective From</th>
                     <th>Date Effective To</th>
@@ -279,7 +279,7 @@
             </thead>
             <tbody>
                 <tr *ngFor="let category of SupervisionCategory">
-                    <td *ngIf="firmDetails.FirmTypeID !== 2">{{category.AuthorisationCategoryTypeDesc}}</td>
+                    <td *ngIf="SupervisionCategory[0].AuthorisationCategoryTypeID">{{category.AuthorisationCategoryTypeDesc}}</td>
                     <td>{{category.FirmRptClassificationTypeDesc}}</td>
                     <td class="text-center">{{category.EffectiveFromDate}}</td>
                     <td class="text-center">{{category.EffectiveToDate}}</td>
