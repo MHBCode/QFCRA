@@ -10,8 +10,25 @@ import { SupervisionService } from '../supervision.service';
 
 
 // this is for text editor 
-import { ToolbarSettingsModel } from '@syncfusion/ej2-angular-richtexteditor';
-import { QuickToolbarSettingsModel } from '@syncfusion/ej2-angular-richtexteditor';
+import {
+  ClassicEditor,
+  Bold,
+  Essentials,
+  Heading,
+  Indent,
+  IndentBlock,
+  Italic,
+  Link,
+  List,
+  MediaEmbed,
+  Paragraph,
+  Table,
+  Undo,
+  Font,
+  FontSize,
+  FontColor 
+} from 'ckeditor5';
+
 
 @Component({
   selector: 'app-journal',
@@ -49,23 +66,36 @@ export class JournalComponent {
   assignedUserRoles: any = [];
   assignedLevelUsers: any = [];
 
-  // this is for text editor 
-  public quickToolbarSettings: QuickToolbarSettingsModel = {
-    table: ['TableHeader', 'TableRows', 'TableColumns', 'TableCell', '-', 'BackgroundColor', 'TableRemove', 'TableCellVerticalAlign', 'Styles'],
-    showOnRightClick: true,
+  public Editor = ClassicEditor;
+
+  public config = {
+    toolbar: [
+      'undo', 'redo', '|',
+      'heading', '|', 'bold', 'italic', '|',
+      'fontSize', 'fontColor', '|',
+      'link', 'insertTable', 'mediaEmbed', '|',
+      'bulletedList', 'numberedList', 'indent', 'outdent'
+    ],
+    plugins: [
+      Bold,
+      Essentials,
+      Heading,
+      Indent,
+      IndentBlock,
+      Italic,
+      Link,
+      List,
+      MediaEmbed,
+      Paragraph,
+      Table,
+      Undo,
+      Font,
+      FontSize,
+      FontColor
+    ]
   };
-  public placeholder: string = 'Type something or use @ to tag a user...';
-  public tools: ToolbarSettingsModel = {
-    items: [
-      'Undo', 'Redo', '|',
-      'Bold', 'Italic', 'Underline', 'StrikeThrough', 'SuperScript', 'SubScript', '|',
-      'FontName', 'FontSize', 'FontColor', 'BackgroundColor', '|',
-      'LowerCase', 'UpperCase', '|',
-      'Formats', 'Alignments', 'Blockquote', '|', 'NumberFormatList', 'BulletFormatList', '|',
-      'Outdent', 'Indent', '|', 'CreateLink', 'Image', 'FileManager', 'Video', 'Audio', 'CreateTable', '|', 'FormatPainter', 'ClearFormat',
-      '|', 'EmojiPicker', 'Print', '|',
-      'SourceCode', 'FullScreen']
-  };
+  
+
 
   constructor(
     private router: Router,

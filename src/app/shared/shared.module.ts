@@ -10,8 +10,7 @@ import { DataPlaceComponent } from './data-place/data-place.component';
 import { AttachmentComponent } from './attachment/attachment.component';
 import { LoaderComponent } from './loader/loader.component';
 import { PaginationComponent } from './pagination/pagination.component';
-import { ToolbarService, LinkService, ImageService, HtmlEditorService } from '@syncfusion/ej2-angular-richtexteditor';
-import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor'
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 @NgModule({
   declarations: [
@@ -25,8 +24,7 @@ import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor'
     SharedRoutingModule,
     ReactiveFormsModule,
     FormsModule,
-    HttpClientModule,
-    RichTextEditorAllModule
+    HttpClientModule
   ],
   exports: [
     DataPlaceComponent,
@@ -36,13 +34,7 @@ import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor'
     AttachmentComponent,
     LoaderComponent,
     PaginationComponent,
-    RichTextEditorAllModule
-  ],
-  providers: [
-    ToolbarService,
-    LinkService,
-    ImageService,
-    HtmlEditorService
-  ],
+    CKEditorModule
+  ]
 })
 export class SharedModule { }
