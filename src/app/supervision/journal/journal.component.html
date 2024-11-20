@@ -47,15 +47,7 @@
             </table>
         </div>
 
-        // this is for text editor 
-        <div class="control-section">
-            <ejs-richtexteditor #toolsRTE id="alltoolRTE" [toolbarSettings]="tools" [showCharCount]="true" [enableXhtml]="true"
-                 [quickToolbarSettings]="quickToolbarSettings" [enableTabKey]="true"
-                [placeholder]="placeholder">
-                <ng-template #valueTemplate>
-                </ng-template>
-            </ejs-richtexteditor>
+        <ckeditor [editor]="Editor" style="height: 200px;" [config]="config" data="Hello from CKEditor 5!"></ckeditor>
 
-        </div>
 
     </div>
