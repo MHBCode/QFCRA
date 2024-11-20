@@ -30,6 +30,11 @@
     min-height: 40px;
 }
 
+.btn {
+    display: flex;
+    gap: 1%;
+}
+
 .subbutton-open-history {
     padding: 0.1rem;
     color: white;
@@ -296,5 +301,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    // margin-bottom: 2rem;
+}
+
+.journal-list tbody td {
+    cursor: pointer;
 }

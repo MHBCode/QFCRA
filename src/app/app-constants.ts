@@ -35,6 +35,8 @@ export const breachStatusTypes = "BreachStatusTypes";
 export const firmRptClassificationTypes = "V_FirmRptClassificationTypes";
 export const firmRptClassificationTypesForDNFBPs = "V_FirmRptClassificationTypesForDNFBPs"
 export const firmRptBasisTypes = "FirmRptBasisTypes";
+// Journal
+export const journalEntryTypes = "V_SupervisionJournalEntryTypes";
 
 //Query String Parameter for FS Reporting
 export const QUERYSTRING_FSRPTDATAID = "fsRptDataID";

@@ -16,5 +16,15 @@ export class JournalService {
     const url = `${this.baseUrlJournal}get_supervision_journal?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
+
+  getJournalDataDetails(firmId: number,supJournalID: number): Observable<any> {
+    const url = `${this.baseUrlJournal}get_supervision_journal?firmId=${firmId}&supJournalID=${supJournalID}`;
+    return this.http.get<any>(url);
+  }
+
+  getSupJournalSubjectData(supJournalID: number): Observable<any> {
+    const url = `${this.baseUrlJournal}get_supervision_journal_subject_data?supJournalID=${supJournalID}`;
+    return this.http.get<any>(url);
+  }
   
 }

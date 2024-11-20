@@ -57,6 +57,7 @@ export class SupervisionService {
     });
   }
 
+  // Supervision
   populateFirmRptClassificationTypes(userId: number, OpTypeId: number): Observable<any[]> {
     return new Observable(observer => {
       this.securityService.getObjectTypeTable(userId, constants.firmRptClassificationTypes,OpTypeId).subscribe(
@@ -93,6 +94,21 @@ export class SupervisionService {
         },
         error => {
           console.error('Error Fetching FirmRptBasisTypes options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  // Journal
+  populateJournalEntryTypes(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.journalEntryTypes, OpTypeId).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Journal Entry Types options: ', error);
           observer.error(error);
         }
       );
