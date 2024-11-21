@@ -239,6 +239,8 @@
                         <th>Rating Name</th>
                         <th>Rating Assigned</th>
                         <th>Rating Effective From</th>
+                        <th>Last Modified By</th>
+                        <th>Last Modified Date</th>
                     </tr>
                 </thead>
                 <ng-container *ngFor="let agency of CountryCreditRatingsFirm | keyvalue">
@@ -249,6 +251,8 @@
                         <td>{{ rating.CreditRatingDisplayName }}</td>
                         <td>{{ rating.Ratings }}</td>
                         <td>{{ rating.RatingsAsOfDate }}</td>
+                        <td>{{ rating.LastModifiedBy }}</td>
+                        <td>{{ rating.LastModifiedDate }}</td>
                     </tr>
                 </ng-container>
             </table>
@@ -342,17 +346,21 @@
                     <th>Rating Name</th>
                     <th>Rating Assigned</th>
                     <th>Rating Effective From</th>
+                    <th>Last Modified By</th>
+                    <th>Last Modified Date</th>
                 </tr>
             </thead>
             <tbody>
                 <ng-container *ngFor="let agency of HistoryCreditRatingGrouped | keyvalue">
                     <tr>
-                        <td colspan="3" class="agency-name">Rating Agency: {{ agency.key }}</td>
+                        <td colspan="5" class="agency-name">Rating Agency: {{ agency.key }}</td>
                     </tr>
                     <tr *ngFor="let rating of agency.value" class="rating-row">
                         <td>{{ rating.CreditRatingDisplayName }}</td>
                         <td>{{ rating.Ratings }}</td>
                         <td class="text-center">{{ rating.RatingsAsOfDate }}</td>
+                        <td>{{ rating.LastModifiedBy }}</td>
+                        <td>{{ rating.LastModifiedDate }}</td>
                     </tr>
                 </ng-container>
             </tbody>
@@ -377,17 +385,21 @@
                     <th>Rating Name</th>
                     <th>Rating Assigned</th>
                     <th>Rating Effective From</th>
+                    <th>Last Modified By</th>
+                    <th>Last Modified Date</th>
                 </tr>
             </thead>
             <tbody>
                 <ng-container *ngFor="let agency of HistoryCreditRatingCountryGrouped | keyvalue">
                     <tr>
-                        <td colspan="3" class="agency-name">Rating Agency: {{ agency.key }}</td>
+                        <td colspan="5" class="agency-name">Rating Agency: {{ agency.key }}</td>
                     </tr>
                     <tr *ngFor="let rating of agency.value" class="rating-row">
                         <td>{{ rating.CreditRatingDisplayName }}</td>
                         <td>{{ rating.Ratings }}</td>
                         <td class="text-center">{{ rating.RatingsAsOfDate }}</td>
+                        <td>{{ rating.LastModifiedBy }}</td>
+                        <td>{{ rating.LastModifiedDate }}</td>
                     </tr>
                 </ng-container>
             </tbody>

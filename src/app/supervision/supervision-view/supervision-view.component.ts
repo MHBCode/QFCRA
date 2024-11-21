@@ -21,7 +21,10 @@ interface CreditRating {
   RatingsAsOfDate: string;
   DisplayOrder: number;
   IsLatest: number;
+  LastModifiedDate: string;
+  LastModifiedBy: string;
 }
+
 
 type CreditRatingsGrouped = { [key: string]: CreditRating[] };
 @Component({
@@ -379,7 +382,7 @@ export class SupervisionViewComponent {
               return acc;
             }, {} as CreditRatingsGrouped);
           } else {
-            // Credit Firm Popup Table
+
             this.FiltredHistoryCreditRatingFirm = this.CreditRatings
               .filter(item => item.CreditRatingTypeID === 1)
               .sort((a, b) => {
@@ -407,6 +410,36 @@ export class SupervisionViewComponent {
               acc[agencyName].push(item);
               return acc;
             }, {} as CreditRatingsGrouped);
+
+            // Add logic to group by CreditRatingDisplayName and Ratings, and select the last item
+            this.HistoryCreditRatingGrouped = Object.keys(this.HistoryCreditRatingGrouped).reduce((acc, agencyName) => {
+              // Get the group
+              const group = this.HistoryCreditRatingGrouped[agencyName];
+
+              // Group by both CreditRatingDisplayName and Ratings
+              const groupedByDisplayNameAndRatings = group.reduce((innerAcc, item) => {
+                const key = `${item.CreditRatingDisplayName}-${item.Ratings}`; // Group by both display name and ratings
+                if (!innerAcc[key]) {
+                  innerAcc[key] = [];
+                }
+                innerAcc[key].push(item);
+                return innerAcc;
+              }, {} as { [key: string]: CreditRating[] });
+
+              // Now, for each inner group, select the last item
+              const lastItemsPerGroup = Object.keys(groupedByDisplayNameAndRatings).reduce((lastAcc, key) => {
+                const innerGroup = groupedByDisplayNameAndRatings[key];
+                lastAcc[key] = innerGroup[innerGroup.length - 1]; // Select the last item in each group
+                return lastAcc;
+              }, {} as { [key: string]: CreditRating });
+
+              // Add to the final accumulator
+              acc[agencyName] = Object.values(lastItemsPerGroup); // Convert to an array
+              return acc;
+            }, {} as CreditRatingsGrouped);
+
+            console.log('HistoryCreditRatingGrouped', this.HistoryCreditRatingGrouped);
+
           }
         } else {
           if (!isHistory) {
@@ -427,11 +460,11 @@ export class SupervisionViewComponent {
               .filter(item => item.CreditRatingTypeID === 2)
               .sort((a, b) => {
                 // Sort by DisplayOrder
-                const displayOrderComparison = a.DisplayOrder - b.DisplayOrder;
+                const displayOrderComparison = b.DisplayOrder - a.DisplayOrder;
                 if (displayOrderComparison !== 0) {
                   return displayOrderComparison; // Ascending order for DisplayOrder
                 }
-
+                
                 const formattedDateA = this.dateUtilService.formatDateToCustomFormat(a.RatingsAsOfDate);
                 const formattedDateB = this.dateUtilService.formatDateToCustomFormat(b.RatingsAsOfDate);
 
@@ -448,6 +481,33 @@ export class SupervisionViewComponent {
                 acc[agencyName] = [];
               }
               acc[agencyName].push(item);
+              return acc;
+            }, {} as CreditRatingsGrouped);
+
+            // Add logic to group by CreditRatingDisplayName and Ratings, and select the last item
+            this.HistoryCreditRatingCountryGrouped = Object.keys(this.HistoryCreditRatingCountryGrouped).reduce((acc, agencyName) => {
+              // Get the group
+              const group = this.HistoryCreditRatingCountryGrouped[agencyName];
+
+              // Group by both CreditRatingDisplayName and Ratings
+              const groupedByDisplayNameAndRatings = group.reduce((innerAcc, item) => {
+                const key = `${item.CreditRatingDisplayName}-${item.Ratings}`; // Group by both display name and ratings
+                if (!innerAcc[key]) {
+                  innerAcc[key] = [];
+                }
+                innerAcc[key].push(item);
+                return innerAcc;
+              }, {} as { [key: string]: CreditRating[] });
+
+              // Now, for each inner group, select the last item
+              const lastItemsPerCountry = Object.keys(groupedByDisplayNameAndRatings).reduce((lastAcc, key) => {
+                const innerGroup = groupedByDisplayNameAndRatings[key];
+                lastAcc[key] = innerGroup[innerGroup.length - 1]; // Select the last item in each group
+                return lastAcc;
+              }, {} as { [key: string]: CreditRating });
+
+              // Add to the final accumulator
+              acc[agencyName] = Object.values(lastItemsPerCountry); // Convert to an array
               return acc;
             }, {} as CreditRatingsGrouped);
           }
@@ -554,7 +614,7 @@ export class SupervisionViewComponent {
   }
 
   populateFirmRptClassificationTypes() {
-    this.supervisionService.populateFirmRptClassificationTypes(this.userId,constants.ObjectOpType.Edit).subscribe(
+    this.supervisionService.populateFirmRptClassificationTypes(this.userId, constants.ObjectOpType.Edit).subscribe(
       firmRptClassification => {
         this.allFirmRptClassificationTypes = firmRptClassification;
       },
@@ -565,7 +625,7 @@ export class SupervisionViewComponent {
   }
 
   populateFirmRptClassificationTypesForDNFBPs() {
-    this.supervisionService.populateFirmRptClassificationTypesForDNFBPs(this.userId,constants.ObjectOpType.Edit).subscribe(
+    this.supervisionService.populateFirmRptClassificationTypesForDNFBPs(this.userId, constants.ObjectOpType.Edit).subscribe(
       firmRptClassificationDNFBPs => {
         this.allFirmRptClassificationTypesForDNFBPs = firmRptClassificationDNFBPs;
       },
@@ -576,7 +636,7 @@ export class SupervisionViewComponent {
   }
 
   populateFirmRptBasisTypes() {
-    this.supervisionService.populateFirmRptBasisTypes(this.userId,constants.ObjectOpType.Edit).subscribe(
+    this.supervisionService.populateFirmRptBasisTypes(this.userId, constants.ObjectOpType.Edit).subscribe(
       firmRptBasisTypes => {
         this.allFirmRptBasisTypes = firmRptBasisTypes;
       },
