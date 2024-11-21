@@ -23,6 +23,9 @@ export class NoticesComponent implements OnInit {
   filteredNotices: any[] = []; // Full list of notices
   paginatedItems: any[] = []; 
 
+  selectedNotice: any = null;
+  showViewPopup: boolean = false;
+
   firmDetails: any;
   FIRMNotices: any;
   paginatedNotices: any = [];
@@ -230,6 +233,14 @@ export class NoticesComponent implements OnInit {
       this.AppReportHeaderName = null
   }
 
+  openNoticeViewPopup(notice: any, firmDetails: any): void {
+    this.selectedNotice = notice;
+    this.showViewPopup = true;
+  }
+
+  closeViewPopup(): void {
+    this.showViewPopup = false;
+  }
 
 
 }

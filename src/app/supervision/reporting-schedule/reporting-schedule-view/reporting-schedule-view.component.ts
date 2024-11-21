@@ -11,7 +11,7 @@ import { forkJoin, map, tap } from 'rxjs';
 @Component({
   selector: 'app-reporting-schedule-view',
   templateUrl: './reporting-schedule-view.component.html',
-  styleUrls: ['./reporting-schedule-view.component.scss', '../../../shared/popup.scss', '../../supervision.scss']
+  styleUrls: ['./reporting-schedule-view.component.scss', '../../supervision.scss']
 })
 export class ReportingScheduleViewComponent {
   @Input() report: any;
@@ -103,12 +103,10 @@ export class ReportingScheduleViewComponent {
       true
     ).subscribe({
       next: (res) => {
-        // Step 1: Set initial data
         this.originalFirmRptDetails = res.response;
         this.firmRptDetails = [...this.originalFirmRptDetails];
         this.filteredFirmRptDetails = [...this.firmRptDetails]; // Initialize filtered data
   
-        // Step 2: Prepare document detail requests
         const documentDetailRequests = this.firmRptDetails
           .filter(item => item.DocID) // Only items with DocID
           .map(item =>
@@ -195,23 +193,23 @@ export class ReportingScheduleViewComponent {
     // Apply the filter logic to create the filtered dataset
     switch (selectedFilter) {
       case '1': // All
-        this.filteredFirmRptDetails = [...this.originalFirmRptDetails];
+        this.filteredFirmRptDetails = [...this.firmRptDetails];
         break;
   
       case '2': // Non - AML Reports
-        this.filteredFirmRptDetails = this.originalFirmRptDetails.filter(item =>
+        this.filteredFirmRptDetails = this.firmRptDetails.filter(item =>
           !this.documentTypeList.some(docType => docType.DocTypeID === item.DocTypeID)
         );
         break;
   
       case '3': // AML Reports
-        this.filteredFirmRptDetails = this.originalFirmRptDetails.filter(item =>
+        this.filteredFirmRptDetails = this.firmRptDetails.filter(item =>
           this.documentTypeList.some(docType => docType.DocTypeID === item.DocTypeID)
         );
         break;
   
       default:
-        this.filteredFirmRptDetails = [...this.originalFirmRptDetails];
+        this.filteredFirmRptDetails = [...this.firmRptDetails];
     }
   
     // Update paginated items after filtering
