@@ -9,27 +9,6 @@ import { UsersService } from 'src/app/ngServices/users.service';
 import { SupervisionService } from '../supervision.service';
 
 
-// this is for text editor 
-import {
-  ClassicEditor,
-  Bold,
-  Essentials,
-  Heading,
-  Indent,
-  IndentBlock,
-  Italic,
-  Link,
-  List,
-  MediaEmbed,
-  Paragraph,
-  Table,
-  Undo,
-  Font,
-  FontSize,
-  FontColor 
-} from 'ckeditor5';
-
-
 @Component({
   selector: 'app-journal',
   templateUrl: './journal.component.html',
@@ -44,7 +23,7 @@ export class JournalComponent {
   firmId: number = 0;
   paginatedItems: any[] = [];
   pageSize: number = 10;
-  userId: number = 10055;
+  userId: number = 10044;
   firmDetails: any;
   showDeletedJournal: boolean = false;
   alljournaldata: any;
@@ -65,36 +44,6 @@ export class JournalComponent {
 
   assignedUserRoles: any = [];
   assignedLevelUsers: any = [];
-
-  public Editor = ClassicEditor;
-
-  public config = {
-    toolbar: [
-      'undo', 'redo', '|',
-      'heading', '|', 'bold', 'italic', '|',
-      'fontSize', 'fontColor', '|',
-      'link', 'insertTable', 'mediaEmbed', '|',
-      'bulletedList', 'numberedList', 'indent', 'outdent'
-    ],
-    plugins: [
-      Bold,
-      Essentials,
-      Heading,
-      Indent,
-      IndentBlock,
-      Italic,
-      Link,
-      List,
-      MediaEmbed,
-      Paragraph,
-      Table,
-      Undo,
-      Font,
-      FontSize,
-      FontColor
-    ]
-  };
-  
 
 
   constructor(
@@ -143,7 +92,6 @@ export class JournalComponent {
 
     // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
     this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
-      let firmType = this.firmDetails?.FirmTypeID;
 
       this.hideCreateBtn = false;
 

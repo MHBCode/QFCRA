@@ -115,6 +115,21 @@ export class SupervisionService {
     });
   }
 
+
+  populateJournalExternalAuditors(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.externalAuditors, OpTypeId).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching External Auditors options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
   isUserHasRestrictedAccess(userId: number, firmId: number, objectID: number): Observable<boolean> {
     return new Observable(observer => {
       this.userService.isUserHasRestrictedAccess(userId, firmId, objectID).subscribe(

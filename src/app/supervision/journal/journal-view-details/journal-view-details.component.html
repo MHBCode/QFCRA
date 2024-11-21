@@ -27,7 +27,7 @@
                     <select *ngIf="isEditModeJournal; else entryTypedropdown"
                         [(ngModel)]="journalDetails[0].JournalEntryTypeID" name="entryType" id="entryType">
                         <option [value]="0">Select</option>
-                        <option value=""></option>
+                        <option *ngFor="let option of alljournalEntryTypes" [value]="option.JournalEntryTypeID">{{option.JournalEntryTypeDesc}}</option>
                     </select>
                     <ng-template #entryTypedropdown>
                         <input disabled [(ngModel)]="journalDetails[0].JournalEntryTypeDesc" type="text">
@@ -66,25 +66,48 @@
                         <span *ngIf="isEditModeJournal" style="color: red;">*</span>
                     </label>
 
+
                     <table class="subject-table">
-                        <tr *ngFor="let subject of subjectData">
-                            <td>
-                                <input [disabled]="!isEditModeJournal" type="checkbox" [checked]="false" />
-                            </td>
-                            <td>{{ subject.JournalSubjectTypeDesc }}</td>
-                            <td>
-                                {{ subject.ObjectInstanceDesc || subject.JournalSubjectOtherDesc || '' }}
-                            </td>
+                        <tr *ngFor="let subject of (isEditModeJournal ? journalSubjectTypes : subjectData)">
+                          <td>
+                            <input
+                              type="checkbox"
+                              [disabled]="!isEditModeJournal"
+                              [checked]="isChecked(subject)"
+                              (change)="isEditModeJournal && toggleSelection(subject, $event)"
+                            />
+                          </td>
+                          <td>{{ subject.JournalSubjectTypeDesc }}</td>
+                          <td>
+                            <!-- Display content conditionally -->
+                            <ng-container *ngIf="isEditModeJournal; else viewMode">
+                              <select>
+                                <option [value]="0">Select</option>
+                                <option *ngFor="let option of getDropdownOptions(subject)" [value]="option.value">
+                                  {{ option.label }}
+                                </option>
+                              </select>
+                            </ng-container>
+                            <ng-template #viewMode>
+                              {{ subject.ObjectInstanceDesc || subject.JournalSubjectOtherDesc || '' }}
+                            </ng-template>
+                          </td>
                         </tr>
-                    </table>
+                      </table>
+                      
                 </div>
 
 
                 <div class="input-field notes">
                     <label for="notes">Notes</label>
-                    <p>
-                        {{journalDetails[0].EntryNotes}}
-                    </p>
+                    <div>
+                        <ckeditor *ngIf="isEditModeJournal; else notes" [(ngModel)]="journalDetails[0].EntryNotes" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                    </div>
+                    <ng-template #notes>
+                        <p>
+                            {{journalDetails[0].EntryNotes}}
+                        </p>
+                    </ng-template>
                 </div>
             </div>
 
