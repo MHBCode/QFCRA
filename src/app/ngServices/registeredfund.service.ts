@@ -16,4 +16,16 @@ export class RegisteredfundService {
     const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?userId=${userId}&firmId=${firmId}${registeredFundID !== null ? `&registeredFundID=${registeredFundID}` : ''}`;
     return this.http.get<any>(url);
   }
+  getFIRMRegisteredFundDetials(userId: number,firmId: number, registeredFundID: number): Observable<any> {
+    const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?userId=${userId}&firmId=${firmId}&registeredFundID=${registeredFundID}`;
+    return this.http.get<any>(url);
+  }
+  getRegisteredFundStatus(registeredFundID:number): Observable<any>{
+    const url = `${this.baseUrlRegisteredFund}get_registered_fund_status?registeredFundID=${registeredFundID}`;
+    return this.http.get<any>(url);
+  }
+  getSubFundData(registeredFundID:number): Observable<any>{
+    const url = `${this.baseUrlRegisteredFund}get_sub_fund_data?registeredFundID=${registeredFundID}`;
+    return this.http.get<any>(url);
+  }
 }

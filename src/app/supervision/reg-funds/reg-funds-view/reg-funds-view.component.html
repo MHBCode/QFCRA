@@ -1,0 +1,158 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<!-- view & Edit popup  -->
+<div class="overlay">
+  <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+    <!-- Title -->
+    <div class="popup-title-btn-row">
+      <div class="popup-header">
+        <h3>
+          Registered Fund {{ firmDetails?.FirmName }} ({{firmDetails.QFCNum}})
+        </h3>
+      </div>
+      <!-- Save and Cancel Buttons -->
+      <button class="close-button  close-icon" (click)="onClose()">
+        <i class="bi bi-x-circle"></i>
+      </button>
+    </div>
+    <div class="reporting-schedule-form">
+      <div class="inputs-row" *ngFor="let RegFundDetials of RegisteredFundDetials">
+        <div class="input-field">
+          <label for="fundNumber-{{RegFundDetials.RegisteredFundID}}">Fund Number</label>
+          <input type="text" id="fundNumber-{{RegFundDetials.RegisteredFundID}}"
+            name="fundNumber-{{RegFundDetials.RegisteredFundID}}" [(ngModel)]="RegFundDetials.RegisteredFundNumber"
+            [disabled]="!isEditable" />
+        </div>
+        <div class="input-field">
+          <label for="FundType-{{RegFundDetials.RegisteredFundID}}">Type of Fund</label>
+          <input type="text" id="FundType-{{RegFundDetials.RegisteredFundID}}"
+            name="FundType-{{RegFundDetials.RegisteredFundID}}" [(ngModel)]="RegFundDetials.RegisteredFundTypeDesc"
+            [disabled]="!isEditable" />
+        </div>
+        <div class="input-field">
+          <label for="operator-{{RegFundDetials.RegisteredFundID}}">Operator</label>
+          <input type="text" id="operator-{{RegFundDetials.RegisteredFundID}}"
+            name="operator-{{RegFundDetials.RegisteredFundID}}" [(ngModel)]="RegFundDetials.FirmName"
+            [disabled]="!isEditable" />
+        </div>
+        <div class="input-field">
+          <label for="fundName-{{RegFundDetials.RegisteredFundID}}">Fund Name</label>
+          <input type="text" id="fundName-{{RegFundDetials.RegisteredFundID}}"
+            name="fundName-{{RegFundDetials.RegisteredFundID}}" [(ngModel)]="RegFundDetials.FundName"
+            [disabled]="!isEditable" />
+        </div>
+      </div>
+      <div class="rpt-list margin-top-10">
+        <div class="popup-header">
+          <h3>Sub-Fund Data</h3>
+        </div>
+        <ng-container>
+            <div class="inputs-row report-entry" *ngFor="let RegFundDetials of RegisteredFundDetials">
+              <div class="input-field">
+                <label for="subFundName-{{RegFundDetials.RegisteredFundID}}">Sub Fund Name</label>
+                <input type="text" id="subFundName-{{RegFundDetials.RegisteredFundID}}"
+                  name="subFundName-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.PreviousName" />
+              </div>
+
+              <div class="input-field">
+                <label for="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}">Other Related Entities</label>
+                <input type="text" id="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}"
+                  name="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.OtherRelatedEntityName" />
+              </div>
+
+              <div class="input-field">
+                <label for="Status-{{RegFundDetials.RegisteredFundID}}">Status</label>
+                <input type="text" id="Status-{{RegFundDetials.RegisteredFundID}}"
+                  name="Status-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.RegisteredFundStatusTypeDesc" />
+              </div>
+
+              <div class="input-field">
+                <label for="statusDate-{{RegFundDetials.RegisteredFundID}}">Status Date</label>
+                <input type="text" id="statusDate-{{RegFundDetials.RegisteredFundID}}"
+                  name="statusDate-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.RegisteredFundStatusDate" />
+              </div>
+            </div>
+          </ng-container>
+      </div>
+      <div class="rpt-list margin-top-10">
+        <div class="popup-header">
+          <h3>Sub-Fund Details</h3>
+        </div>
+        <ng-container>
+            <div class="inputs-row report-entry" *ngFor="let RegFundDetials of RegisteredFundDetials">
+              <div class="input-field">
+                <label for="PreviousName-{{RegFundDetials.RegisteredFundID}}">Previous Name(s)</label>
+                <input type="text" id="PreviousName-{{RegFundDetials.RegisteredFundID}}"
+                  name="PreviousName-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.PreviousName" />
+              </div>
+
+              <div class="input-field">
+                <label for="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}">Other Related Entities</label>
+                <input type="text" id="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}"
+                  name="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.OtherRelatedEntityName" />
+              </div>
+
+              <div class="input-field">
+                <label for="Status-{{RegFundDetials.RegisteredFundID}}">Status</label>
+                <input type="text" id="Status-{{RegFundDetials.RegisteredFundID}}"
+                  name="Status-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.RegisteredFundStatusTypeDesc" />
+              </div>
+
+              <div class="input-field">
+                <label for="statusDate-{{RegFundDetials.RegisteredFundID}}">Status Date</label>
+                <input type="text" id="statusDate-{{RegFundDetials.RegisteredFundID}}"
+                  name="statusDate-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.RegisteredFundStatusDate" />
+              </div>
+            </div>
+          </ng-container>
+      </div>
+      <div class="rpt-list margin-top-10">
+        <div class="popup-header">
+          <h3>Fund Status Details</h3>
+        </div>
+        <table class="fund-status-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Status Date</th>
+              <th>Last Modified By</th>
+              <th>Last Modified Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let statusDetail of RegisteredFundStatusDetials">
+              <td>{{ statusDetail.STATUS }}</td>
+              <td>{{ statusDetail.StatusDate }}</td>
+              <td>{{ statusDetail.LastModifiedByName }}</td>
+              <td>{{ statusDetail.LastModifiedDate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="rpt-list margin-top-10">
+        <div class="popup-header">
+          <h3>Review</h3>
+        </div>
+        <div class="inputs-row report-entry">
+          <div class="input-field">
+            <label for="submissionStatus">Additional Review Required Decision Made By</label>
+            <input type="text" id="submissionStatus" name="submissionStatus" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="submissionStatus">Additional Review Required Decision Made On</label>
+            <input type="text" id="submissionStatus" name="submissionStatus" [disabled]="!isEditable" />
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+

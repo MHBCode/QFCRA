@@ -16,7 +16,10 @@ export class RegFundsComponent {
   paginatedItems: any[] = []; 
   pageSize : number = 10;
   firmDetails:any;
-
+  selectedRegisteredFund:any;
+  showPopup: boolean = false;
+  showCreatePopup: boolean = false;
+  popupMode: 'create' | 'view' = 'view';
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -33,6 +36,7 @@ export class RegFundsComponent {
       this.loadRegFunds();
     })
   }
+  
 
 
   loadFirmDetails(firmId: number) {
@@ -41,7 +45,7 @@ export class RegFundsComponent {
         this.firmDetails = data.firmDetails;
       },
       error => {
-        console.error(error);
+        console.error(error); 
       }
     );
   
@@ -52,6 +56,7 @@ export class RegFundsComponent {
       data => {
         this.regFunds = data.response;
         this.applySearchAndPagination();
+        console.log("regFunds", this.regFunds)
       },
       error => {
         console.error('Error fetching Firm regFunds ', error);
@@ -68,4 +73,27 @@ export class RegFundsComponent {
     this.paginatedItems = paginatedItems; // Update current page items
   }
 
+  openRegisteredFundPopup(reg: any,firmDetails : any): void {
+    this.selectedRegisteredFund = reg;
+    this.showPopup = true;
+    this.popupMode = 'view';
+    console.log("openRegisteredFundPopup")
+  }
+  closePopup(): void {
+    this.showPopup = false;
+    this.selectedRegisteredFund = null; // Reset the selected review
+  }
+   
+
+  //////// Create Registered Funds
+  closeCreatePopup(){
+    this.showCreatePopup = false;
+  }
+  openCreatePopup(): void {
+    this.popupMode = 'create';
+    this.showCreatePopup = true;
+  }
+  createRegFundObj = {
+    
+  }
 }

@@ -620,7 +620,7 @@
         </div>
         <div class="input-field">
           <label for="firstName"> First Name</label>
-          <input name="firstName" id="firstName" type="text" [(ngModel)]="selectedContact.firstName"
+          <input name="firstName" id="firstName" type="text" [(ngModel)]="selectedContact.firstName" (blur)="onNameBlur()"
             [disabled]="!isEditContact" />
         </div>
         <div class="input-field">
@@ -630,7 +630,7 @@
         </div>
         <div class="input-field">
           <label for="FamilyName"> Family Name</label>
-          <input name="FamilyName" id="FamilyName" type="text" [(ngModel)]="selectedContact.familyName"
+          <input name="FamilyName" id="FamilyName" type="text" [(ngModel)]="selectedContact.familyName" (blur)="onNameBlur()"
             [disabled]="!isEditContact" />
         </div>
         <!-- Date Of Birth -->

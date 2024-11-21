@@ -35,7 +35,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let ReturnreView of paginatedFirms" (click)="openReturnreViewPopup(ReturnreView,firmDetails)">
-            <td (click)="getReturnReviewRevision(ReturnreView)" class="clickable-cell text-center">
+            <td (click)="getReturnReviewRevision(ReturnreView,$event)" class="clickable-cell text-center">
               {{ReturnreView.RptReviewRevNum}}
             </td>
             <td >{{ReturnreView.ReportName}}</td>
@@ -80,7 +80,7 @@
     </div>
     <div class="revisions-container">
       <span *ngFor="let ReviewRevision of ReturnReviewRevisionList" 
-            (click)="getReturnReviewRevision(ReviewRevision)" 
+           (click)="openReviewRevisionDetails(ReviewRevision, selectedReturnreView)"  
             class="revision-item">
         {{ ReviewRevision.RptReviewRevNum }}
       </span>
@@ -91,3 +91,11 @@
     
   </div>
 </div>
+<app-return-review-view
+  *ngIf="showPopup"
+  [ReviewRevision]="selectedReviewRevision"
+  [review]="selectedReturnreView"
+  [firmDetails]="firmDetails"
+  (closeRevPopup)="closePopup()">
+</app-return-review-view>
+

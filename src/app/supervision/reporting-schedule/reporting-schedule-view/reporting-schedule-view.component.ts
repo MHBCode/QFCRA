@@ -147,6 +147,7 @@ export class ReportingScheduleViewComponent {
         this.isLoading = false;
       }
     });
+  
   }
   
 
