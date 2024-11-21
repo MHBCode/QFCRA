@@ -46,33 +46,33 @@
           <h3>Sub-Fund Data</h3>
         </div>
         <ng-container>
-            <div class="inputs-row report-entry" *ngFor="let RegFundDetials of RegisteredFundDetials">
+            <div class="inputs-row report-entry" *ngFor="let SubFund of SubFundData">
               <div class="input-field">
-                <label for="subFundName-{{RegFundDetials.RegisteredFundID}}">Sub Fund Name</label>
-                <input type="text" id="subFundName-{{RegFundDetials.RegisteredFundID}}"
-                  name="subFundName-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="RegFundDetials.PreviousName" />
+                <label for="subFundName-{{SubFund.RegisteredFundID}}">Sub Fund Name</label>
+                <input type="text" id="subFundName-{{SubFund.RegisteredFundID}}"
+                  name="subFundName-{{SubFund.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="SubFund.SubFundName" />
               </div>
 
               <div class="input-field">
-                <label for="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}">Other Related Entities</label>
-                <input type="text" id="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}"
-                  name="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="RegFundDetials.OtherRelatedEntityName" />
+                <label for="OtherRelatedEntities-{{SubFund.RegisteredFundID}}">Other Related Entities</label>
+                <input type="text" id="OtherRelatedEntities-{{SubFund.RegisteredFundID}}"
+                  name="OtherRelatedEntities-{{SubFund.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="SubFund.OtherRelatedEntityName" />
               </div>
 
               <div class="input-field">
-                <label for="Status-{{RegFundDetials.RegisteredFundID}}">Status</label>
-                <input type="text" id="Status-{{RegFundDetials.RegisteredFundID}}"
-                  name="Status-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="RegFundDetials.RegisteredFundStatusTypeDesc" />
+                <label for="Status-{{SubFund.RegisteredFundID}}">Status</label>
+                <input type="text" id="Status-{{SubFund.RegisteredFundID}}"
+                  name="Status-{{SubFund.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="SubFund.RegisteredFundStatusTypeDesc" />
               </div>
 
               <div class="input-field">
-                <label for="statusDate-{{RegFundDetials.RegisteredFundID}}">Status Date</label>
-                <input type="text" id="statusDate-{{RegFundDetials.RegisteredFundID}}"
-                  name="statusDate-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="RegFundDetials.RegisteredFundStatusDate" />
+                <label for="statusDate-{{SubFund.RegisteredFundID}}">Status Date</label>
+                <input type="text" id="statusDate-{{SubFund.RegisteredFundID}}"
+                  name="statusDate-{{SubFund.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="SubFund.RegisteredFundStatusDate" />
               </div>
             </div>
           </ng-container>
