@@ -1,0 +1,125 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="overlay">
+    <div class="popupcontainer Journalpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+        <!-- <div class="error-messages">
+        <p *ngIf="errorMessages['OtherEntityName']">
+          {{ errorMessages['OtherEntityName'] }}
+        </p>
+      </div> -->
+        <!-- Title -->
+        <div class="popup-title-btn-row">
+            <div class="popup-header">
+                <h3>
+                    Journal Entry For {{ firmDetails?.FirmName }}
+                </h3>
+            </div>
+            <button class="close-button  close-icon" (click)="onClose()">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+
+
+        <div class="journal-form">
+            <div class="inputs-row">
+                <div class="input-field">
+                    <label for="entryType">Entry Type <span *ngIf="isEditModeJournal"
+                            style="color: red;">*</span></label>
+                    <select *ngIf="isEditModeJournal; else entryTypedropdown"
+                        [(ngModel)]="journalDetails[0].JournalEntryTypeID" name="entryType" id="entryType">
+                        <option [value]="0">Select</option>
+                        <option value=""></option>
+                    </select>
+                    <ng-template #entryTypedropdown>
+                        <input disabled [(ngModel)]="journalDetails[0].JournalEntryTypeDesc" type="text">
+                    </ng-template>
+                </div>
+
+                <div class="input-field">
+                    <label for="entryDate">Entry Date <span *ngIf="isEditModeJournal"
+                            style="color: red;">*</span></label>
+                    <input [disabled]="!isEditModeJournal" [(ngModel)]="journalDetails[0].EntryDate" type="text"
+                        id="entryDate" name="entryDate" #dateInputs />
+                </div>
+
+                <div class="input-field">
+                    <label for="enteredBy">Entered By</label>
+                    <input disabled type="text" [(ngModel)]="journalDetails[0].EntryByUser" id="enteredBy"
+                        name="enteredBy" />
+                </div>
+
+                <div class="input-field">
+                    <label for="lastmodifiedBy">Last Modified By</label>
+                    <input disabled type="text" [(ngModel)]="journalDetails[0].LastModifiedBy" id="lastmodifiedBy"
+                        name="lastmodifiedBy" />
+                </div>
+
+                <div class="input-field">
+                    <label for="lastmodifiedBy">Title <span *ngIf="isEditModeJournal"
+                            style="color: red;">*</span></label>
+                    <input [disabled]="!isEditModeJournal" [(ngModel)]="journalDetails[0].EntryTitle" type="text"
+                        id="lastmodifiedBy" name="lastmodifiedBy" />
+                </div>
+
+                <div class="subject-container">
+                    <label class="subject-label" for="subject">
+                        Subject
+                        <span *ngIf="isEditModeJournal" style="color: red;">*</span>
+                    </label>
+
+                    <table class="subject-table">
+                        <tr *ngFor="let subject of subjectData">
+                            <td>
+                                <input [disabled]="!isEditModeJournal" type="checkbox" [checked]="false" />
+                            </td>
+                            <td>{{ subject.JournalSubjectTypeDesc }}</td>
+                            <td>
+                                {{ subject.ObjectInstanceDesc || subject.JournalSubjectOtherDesc || '' }}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+
+                <div class="input-field notes">
+                    <label for="notes">Notes</label>
+                    <p>
+                        {{journalDetails[0].EntryNotes}}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Attachment Section -->
+
+            <div class="attachment">
+                <div class="popup-header">
+                    <h3>Attachment (if any)</h3>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="btn justify-content-end">
+                <button *ngIf="!hideExportBtn">
+                    <i class="bi bi-file-earmark-text"></i> Export to word
+                </button>
+
+                <button (click)="editJournal()" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn"
+                    [disabled]="!getControlEnablement('imgBtnEdit')">
+                    <i class="bi bi-pen"></i> Edit
+                </button>
+
+                <button *ngIf="!hideSaveBtn">
+                    Save
+                </button>
+                
+                <button class="cancel-btn" *ngIf="!hideCancelBtn" (click)="cancelJournal()">
+                     Cancel
+                </button>
+                
+                <button *ngIf="getControlVisibility('imgBtnDelete') || !hideDeleteBtn"
+                [disabled]="!getControlEnablement('imgBtnDelete')">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -108,7 +108,7 @@ export class ReturnReviewViewComponent {
     this.returnReviewService.getRegulatorData(firmId).subscribe({
       next: (res) => {
           this.RegulatorData = res.response;
-          console.log("Regulator Data",this.RegulatorData)
+          console.log("Regulator Data",this.RegulatorData) 
       },
        error: (error) => {
         console.error('Error fetching Reporting Basis:', error);

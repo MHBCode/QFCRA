@@ -103,6 +103,7 @@
 .close-icon-prev-revisions {
     top: 2rem !important;
 }
+
 .ApplicationDetailsPopUp table {
     border-top-left-radius: initial;
     border-top-right-radius: initial;
@@ -188,7 +189,8 @@
     min-height: 50px;
 }
 
-.addAddressBtn, .addRegulatorBtn {
+.addAddressBtn,
+.addRegulatorBtn {
     background: #A51E36;
     color: white;
     border: none;
@@ -199,11 +201,11 @@
 }
 
 .addAddressBtn:disabled {
-    background-color: #A51E36; 
+    background-color: #A51E36;
     color: white;
     cursor: default;
-    opacity: 0.6; 
-  }
+    opacity: 0.6;
+}
 
 .addressHistoryPopup {
     width: 50vw;
@@ -331,7 +333,7 @@ hr {
     height: fit-content;
 }
 
-.contollerPopupOverlay{
+.contollerPopupOverlay {
     display: flex;
     justify-content: center;
     z-index: 1000;
@@ -344,6 +346,7 @@ hr {
     z-index: 99;
     padding-top: 5vh;
 }
+
 .contollerPopupContent .popup-title-btn-row {
     display: inline-flex;
     justify-content: space-between;
@@ -351,17 +354,21 @@ hr {
     border-bottom: 2px solid #a51e36;
     margin-bottom: 15px;
 }
-.contollerPopupContent .popup-header h3{
+
+.contollerPopupContent .popup-header h3 {
     margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 2px solid #a51e36;
 }
+
 .contollerPopupContent .popup-title-btn-row h3 {
     border-bottom: 0px !important;
 }
+
 .contollerPopupContent .popup-title-btn-row .popup-header {
     width: 100%;
 }
+
 .close-button {
     background: transparent;
     border: none;
@@ -371,7 +378,7 @@ hr {
     transition: color 0.3s ease;
 }
 
-.close-icon{
+.close-icon {
     font-size: 26px;
     cursor: pointer;
     color: #a51e36;
@@ -380,14 +387,16 @@ hr {
     top: 1rem;
 }
 
-.contollerPopupContent .inputs-row{
+.contollerPopupContent .inputs-row {
     gap: 3.5%;
     justify-content: flex-start;
     padding: 0px;
 }
+
 .contollerPopupContent .input-field {
     width: 31%;
 }
+
 .btn {
     display: flex;
     gap: 1%;
@@ -401,14 +410,21 @@ hr {
     width: 100% !important;
 }
 
-.contollerPopupContent .input-field input:disabled, .contollerPopupContent .input-field input[readonly], .contollerPopupContent .input-field select:disabled, .contollerPopupContent .input-field select[readonly] {
+.contollerPopupContent .input-field input:disabled,
+.contollerPopupContent .input-field input[readonly],
+.contollerPopupContent .input-field select:disabled,
+.contollerPopupContent .input-field select[readonly] {
     width: 100%;
     padding: 8px;
     border-radius: 5px;
     border: 1px solid #c2c2c2;
 }
 
-.auditor-header, .contacts-header, .return-review-header, .ENFAction-header, .Journal-header {
+.auditor-header,
+.contacts-header,
+.return-review-header,
+.ENFAction-header,
+.Journal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -421,7 +437,9 @@ hr {
     gap: 8px;
 }
 
-.controller-tables td, .auditor-table td, .contacts-table td {
+.controller-tables td,
+.auditor-table td,
+.contacts-table td {
     cursor: pointer;
 }
 
@@ -432,10 +450,12 @@ hr {
     justify-content: space-between;
 }
 
-.add-address-btn-container, .add-regulator-btn-container {
+.add-address-btn-container,
+.add-regulator-btn-container {
     width: 100%;
     display: flex;
-    justify-content: flex-end;;
+    justify-content: flex-end;
+    ;
     margin-bottom: 10px;
 }
 
@@ -452,4 +472,12 @@ hr {
     border: none !important;
     margin-bottom: 0px !important;
     padding-bottom: 0px !important;
+}
+
+.form-section-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
 }

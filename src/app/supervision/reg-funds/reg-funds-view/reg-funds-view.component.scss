@@ -20,9 +20,9 @@
 
 .popupcontainer.Rptpopupcontainer {
     max-height: 97vh;
-    width: 96vw;
 }
-
-.btn button {
-    margin-bottom: 5px;
-}
+.disabled {
+    background-color: #f9f9f9;
+    pointer-events: none;
+    opacity: 0.6;
+  }

@@ -13,7 +13,6 @@
                     Reporting Schedule For {{ firmDetails?.FirmName }}
                 </h3>
             </div>
-            <!-- Save and Cancel Buttons -->
             <button class="close-button  close-icon" (click)="onClose()">
                 <i class="bi bi-x-circle"></i>
             </button>
@@ -40,7 +39,7 @@
                 </div>
                 <div class="input-field">
                     <label for="reportType">Report Type</label>
-                    <select id="reportType" [(ngModel)]="reportType" (change)="filterReports($event)" >
+                    <select id="reportType" [(ngModel)]="reportType" (change)="filterReports($event)">
                         <option value="1" selected>
                             All
                         </option>
@@ -53,19 +52,79 @@
                     </select>
                 </div>
             </div>
-            <div class="rpt-list margin-top-10">
+            <div class="rpt-list margin-top-10 table">
                 <div class="popup-header">
                     <h3>Reports List</h3>
                 </div>
 
-                <ng-container *ngFor="let rpt of firmRptDetails ; let i = index">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Report Type</th>
+                            <th>Publish</th>
+                            <th>Submission Type</th>
+                            <th>Reporting Period Start</th>
+                            <th>Reporting Period End</th>
+                            <th>Report Name</th>
+                            <th>Due Date</th>
+                            <th>Required</th>
+                            <th>Link to Report</th>
+                            <th>Report Given By</th>
+                            <th>Received Date</th>
+                            <th>Submission Status</th>
+                            <th>Return Review Status</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let rpt of paginatedItems">
+                            <td>{{ rpt.DocTypeDesc }}</td>
+                            <td>{{ rpt.WPublished ? 'Yes' : 'No' }}</td>
+                            <td>{{ rpt.FirmRptSubmissionTypeDesc }}</td>
+                            <td>{{ rpt.RptPeriodFromDate }}</td>
+                            <td>{{ rpt.RptPeriodToDate }}</td>
+                            <td>{{ rpt.ReportName }}</td>
+                            <td>{{ rpt.FirmRptDueDate }}</td>
+                            <td>{{ rpt.FirmRptReqdBit ? 'Yes' : 'No' }}</td>
+                            <td>
+                                <a *ngIf="rpt.DocFileLocation" [href]="rpt.DocFileLocation" target="_blank">
+                                    {{ rpt.documentDetails?.FileName || 'Link' }}
+                                </a>
+                            </td>
+                            <td>{{ rpt.WPublishedByUserName }}</td>
+                            <td>{{ rpt.DocReceivedDate }}</td>
+                            <td>{{ rpt.ObjectStatusTypeDesc }}</td>
+                            <td>{{ rpt.ReviewStatusDesc }}</td>
+                            <td>{{ rpt.FirmRptNotes }}</td>
+                            <td class="btn">
+                                <button (click)="editReport(rpt)">Edit</button>
+                                <button (click)="deleteReport(rpt)">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td [attr.colspan]="15" style="text-align: center;">
+                                <app-pagination [items]="filteredFirmRptDetails" [pageSize]="pageSize"
+                                    (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <!-- <ng-container *ngFor="let rpt of firmRptDetails ; let i = index">
                     <div class="inputs-row report-entry" [ngClass]="{ 'border-style': i !== 0 }">
                         <div class="input-field">
                             <label for="reportTypeEntry">Report Type</label>
                             <input type="text" id="reportTypeEntry" name="reportTypeEntry" [(ngModel)]="rpt.DocTypeDesc"
                                 [disabled]="!isEditable" />
                         </div>
-
+                        <div class="input-field">
+                            <label for="publish">Publish</label>
+                            <input type="checkbox" id="publish" name="publish"
+                                [(ngModel)]="rpt.WPublished" [disabled]="!isEditable" />
+                        </div>
+                        
                         <div class="input-field">
                             <label for="submissionType">Submission Type</label>
                             <input type="text" id="submissionType" name="submissionType"
@@ -171,7 +230,7 @@
                                 [disabled]="!isEditable"></textarea>
                         </div>
                     </div>
-                </ng-container>
+                </ng-container> -->
             </div>
 
             <!-- Action Buttons -->
@@ -187,5 +246,102 @@
                 </button>
             </div> -->
         </div>
+    </div>
+</div>
+
+<div class="overlay" *ngIf="selectedReport">
+    <div class="form-container popupcontainer editFormPopup" style="display: block;">
+        <div class="popup-title-btn-row">
+            <div class="popup-header">
+                <h3>
+                    Edit Report
+                </h3>
+            </div>
+            <button class="close-button  close-icon" (click)="onCloseReport()">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+        <form (ngSubmit)="saveReport()">
+            <div class="inputs-row report-entry">
+                <div class="input-field">
+                    <label for="reportTypeEntry">Report Type</label>
+                    <input type="text" id="reportTypeEntry" name="reportTypeEntry"
+                        [(ngModel)]="selectedReport.DocTypeDesc" class="form-control" />
+                </div>
+                <div class="input-field">
+                    <label for="publish">Publish</label>
+                    <input type="checkbox" id="publish" name="publish" [(ngModel)]="selectedReport.WPublished"
+                        class="form-control" />
+                </div>
+                <div class="input-field">
+                    <label for="submissionType">Submission Type</label>
+                    <input type="text" id="submissionType" name="submissionType"
+                        [(ngModel)]="selectedReport.FirmRptSubmissionTypeDesc" class="form-control" />
+                </div>
+                <div class="input-field">
+                    <label for="reportingPeriodStartDate">Reporting Period Start Date</label>
+                    <input type="text" id="reportingPeriodStartDate" name="reportingPeriodStartDate"
+                        [(ngModel)]="selectedReport.RptPeriodFromDate" class="form-control" />
+                </div>
+                <div class="input-field">
+                    <label for="reportingPeriodEndDate">Reporting Period End Date</label>
+                    <input type="text" id="reportingPeriodEndDate" name="reportingPeriodEndDate"
+                        [(ngModel)]="selectedReport.RptPeriodToDate" class="form-control" />
+                </div>
+                <div class="input-field">
+                    <label for="reportName">Report Name</label>
+                    <input type="text" id="reportName" name="reportName" [(ngModel)]="selectedReport.ReportName"
+                        class="form-control" />
+                </div>
+                <div class="input-field">
+                    <label for="dueDate">Due Date</label>
+                    <input type="text" id="dueDate" name="dueDate" [(ngModel)]="selectedReport.FirmRptDueDate"
+                        class="form-control" />
+                </div>
+                <div class="input-field">
+                    <label for="required">
+                        Required
+                    </label>
+                    <div class="radio-wrapper">
+                        <input [(ngModel)]="selectedReport.FirmRptReqdBit" name="isRequired" [value]="true"  type="radio"> Yes
+                        <input id="isRequiredNo" [(ngModel)]="selectedReport.FirmRptReqdBit" name="isRequired" type="radio" [value]="false"> No
+                    </div>
+                </div>
+                <div class="input-field">
+                    <label for="reportLink">Link to Report</label>
+                    <input type="text" id="reportLink" name="reportLink" [(ngModel)]="selectedReport.DocFileLocation"
+                        class="form-control" />
+                </div>
+                <div class="input-field">
+                    <label for="reportGivenBy">Report Given By</label>
+                    <input type="text" id="reportGivenBy" name="reportGivenBy"
+                        [(ngModel)]="selectedReport.WPublishedByUserName" class="form-control" />
+                </div>
+                <div class="input-field">
+                    <label for="receivedDate">Received Date</label>
+                    <input type="text" id="receivedDate" name="receivedDate"
+                        [(ngModel)]="selectedReport.DocReceivedDate" class="form-control" />
+                </div>
+                <div class="input-field">
+                    <label for="submissionStatus">Submission Status</label>
+                    <input type="text" id="submissionStatus" name="submissionStatus"
+                        [(ngModel)]="selectedReport.ObjectStatusTypeDesc" class="form-control" />
+                </div>
+                <div class="input-field">
+                    <label for="returnReviewStatus">Return Review Status</label>
+                    <input type="text" id="returnReviewStatus" name="returnReviewStatus"
+                        [(ngModel)]="selectedReport.ReviewStatusDesc" class="form-control" />
+                </div>
+                <div class="input-field fullwidth">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes" [(ngModel)]="selectedReport.FirmRptNotes"
+                        class="form-control"></textarea>
+                </div>
+            </div>
+            <div class="btn justify-content-end">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-primary">Cancel</button>
+            </div>
+        </form>
     </div>
 </div>

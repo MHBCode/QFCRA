@@ -8,8 +8,9 @@
                     Journal Entries for > <span>{{ firmDetails?.FirmName }}</span>
                 </h2>
                 <div class="btn">
-                    <button>
-                        <i class="bi bi-pen"></i>
+                    <button *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn"
+                        [disabled]="!getControlEnablement('imgBtnCreate')">
+                        <i class="bi bi-plus"></i>
                         Create
                     </button>
                 </div>
@@ -19,7 +20,7 @@
                 <label for="deletedRecords">Display Deleted Entities</label>
             </span>
 
-            <table>
+            <table class="journal-list">
                 <thead>
                     <tr>
                         <th>Entry Type</th>
@@ -28,14 +29,21 @@
                         <th>Last Modified By</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr *ngFor="let journal of paginatedItems">
+                <tbody *ngIf="paginatedItems?.length > 0; else noJournal">
+                    <tr *ngFor="let journal of paginatedItems" (click)="openJournalPopup(journal,firmDetails)">
                         <td>{{ journal?.JournalEntryTypeDesc }}</td>
                         <td>{{ journal?.EntryTitle }}</td>
                         <td>{{ journal?.EntryDate }}</td>
                         <td>{{ journal?.LastModifiedBy }}</td>
                     </tr>
                 </tbody>
+                <ng-template #noJournal>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" class="norecords" style="color: red">No Records Found</td>
+                        </tr>
+                    </tbody>
+                </ng-template>
                 <tfoot>
                     <tr>
                         <td [attr.colspan]="12">
@@ -46,5 +54,22 @@
                 </tfoot>
             </table>
         </div>
+
+        <!--  this is for text editor  -->
+        <!-- <div class="control-section">
+            <ejs-richtexteditor #toolsRTE id="alltoolRTE" [toolbarSettings]="tools" [showCharCount]="true" [enableXhtml]="true"
+                 [quickToolbarSettings]="quickToolbarSettings" [enableTabKey]="true"
+                [placeholder]="placeholder">
+                <ng-template #valueTemplate>
+                </ng-template>
+            </ejs-richtexteditor>
+
+        </div> -->
+
     </div>
-</div>
+
+<app-journal-view-details 
+*ngIf="showPopup"
+[journal]="selectedJournal" [firmId]="firmId" [firmDetails]="firmDetails"
+(closeJournalPopup)="closePopup()">
+</app-journal-view-details>

@@ -213,9 +213,8 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
       },
       error => {
         console.error(error);
-      }
+      } 
     )
-
 
   }
   openReturnreViewPopup(ReturnreView: any,firmDetails : any): void {

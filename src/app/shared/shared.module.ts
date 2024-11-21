@@ -10,7 +10,8 @@ import { DataPlaceComponent } from './data-place/data-place.component';
 import { AttachmentComponent } from './attachment/attachment.component';
 import { LoaderComponent } from './loader/loader.component';
 import { PaginationComponent } from './pagination/pagination.component';
-
+import { ToolbarService, LinkService, ImageService, HtmlEditorService } from '@syncfusion/ej2-angular-richtexteditor';
+import { RichTextEditorAllModule } from '@syncfusion/ej2-angular-richtexteditor'
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { PaginationComponent } from './pagination/pagination.component';
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
+    RichTextEditorAllModule
   ],
   exports: [
     DataPlaceComponent,
@@ -33,7 +35,14 @@ import { PaginationComponent } from './pagination/pagination.component';
     HttpClientModule,
     AttachmentComponent,
     LoaderComponent,
-    PaginationComponent
-  ]
+    PaginationComponent,
+    RichTextEditorAllModule
+  ],
+  providers: [
+    ToolbarService,
+    LinkService,
+    ImageService,
+    HtmlEditorService
+  ],
 })
 export class SharedModule { }
