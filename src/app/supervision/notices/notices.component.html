@@ -36,7 +36,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let notice of paginatedItems">
+                    <tr *ngFor="let notice of paginatedItems"  (click)="openNoticeViewPopup(notice,firmDetails)">
                         <td>{{ notice?.NoticeTypeDesc }}</td>
                         <td>{{ notice?.NoticeTemplateName }}</td>
                         <td>{{ notice?.InternalReferenceNumber }}</td>
@@ -181,3 +181,9 @@
         </div>
     </div>
 </div>
+
+<app-notices-details
+  *ngIf="showViewPopup"
+  [notice]="selectedNotice" [firmId]="firmId" [firmDetails]="firmDetails"
+  (closeNoticePopup)="closeViewPopup()">
+</app-notices-details>

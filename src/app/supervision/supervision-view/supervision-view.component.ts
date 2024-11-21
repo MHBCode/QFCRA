@@ -47,7 +47,7 @@ export class SupervisionViewComponent {
   firmId: number = 0;
   OperationalData: any[] = [{}];
   RPTBasis: any = {};
-  SupervisionCategory: any;
+  SupervisionCategory: any = [];
   CreditRatings: CreditRating[] = [];
   FiltredCreditRatingsFirm: CreditRating[] = [];
   FiltredHistoryCreditRatingFirm: CreditRating[] = [];
@@ -363,6 +363,7 @@ export class SupervisionViewComponent {
       }
     );
   }
+
   getCreditRatingsData(isFirm?: boolean, isHistory?: boolean) {
     this.riskService.getCreditRatings(this.firmId).subscribe(
       data => {
@@ -531,6 +532,7 @@ export class SupervisionViewComponent {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
       data => {
         this.firmDetails = data.firmDetails;
+        console.log('firm details: ',this.firmDetails);
       },
       error => {
         console.error(error);
@@ -752,6 +754,18 @@ export class SupervisionViewComponent {
         }
       }
     }
+    
+
+      const effectiveFromDate = this.supervisionService.isNullOrEmpty(this.savedSupEffectiveDate) ? this.currentDate : this.savedSupEffectiveDate;
+      if (this.dateUtilService.convertDateToYYYYMMDD(effectiveFromDate) > this.dateUtilService.convertDateToYYYYMMDD(this.SupervisionCategory[0].EffectiveFromDate)) {
+        this.isLoading = false;
+        const isConfirmed = await this.showPopupAlert(3919);
+        if (!isConfirmed) {
+          this.isLoading = false;
+          return;
+        }
+      }
+  
 
     // Proceed with saving
     const supervisionDataObj = this.prepareSupervisionObject(this.userId);
@@ -833,7 +847,7 @@ export class SupervisionViewComponent {
     return new Promise((resolve) => {
       this.logForm.errorMessages(msgKey).subscribe((response) => {
         Swal.fire({
-          text: response.response,
+          html: response.response,
           showCancelButton: true,
           confirmButtonText: 'OK',
           cancelButtonText: 'Cancel',

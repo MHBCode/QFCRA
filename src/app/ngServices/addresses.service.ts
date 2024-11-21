@@ -26,8 +26,8 @@ export class AddressesService {
     return this.http.get<any>(url);
   }
 
-  getContactFirmAddresses(contactAssId: number, userId: number): Observable<any> {
-    const url = `${this.baseUrlAddress}get_address_list?contactAssnId=${contactAssId}&userId=${userId}`;
+  getContactFirmAddresses(contactAssId: number, userId: number, OpType: number, contactID: number): Observable<any> {
+    const url = `${this.baseUrlAddress}get_address_list?contactAssnId=${contactAssId}&userId=${userId}&opTypeId=${OpType}&contanctID=${contactID}`;
     return this.http.get<any>(url);
   }
 

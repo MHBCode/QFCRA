@@ -26,5 +26,20 @@ export class JournalService {
     const url = `${this.baseUrlJournal}get_supervision_journal_subject_data?supJournalID=${supJournalID}`;
     return this.http.get<any>(url);
   }
-  
+
+  getSupJournalSubjectTypes(firmId: number) {
+    const url = `${this.baseUrlJournal}get_supervision_journal_subject_types?firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
+
+  getAllRequiredIndividuals(firmId: number) {
+    const url = `${this.baseUrlJournal}get_all_required_individuals?firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
+
+  getAllApprovedIndividuals(firmId: number) {
+    const url = `${this.baseUrlJournal}get_all_approved_individuals?firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
+
 }

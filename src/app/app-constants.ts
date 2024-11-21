@@ -37,6 +37,7 @@ export const firmRptClassificationTypesForDNFBPs = "V_FirmRptClassificationTypes
 export const firmRptBasisTypes = "FirmRptBasisTypes";
 // Journal
 export const journalEntryTypes = "V_SupervisionJournalEntryTypes";
+export const externalAuditors = "V_Firm_AuditorName";
 
 //Query String Parameter for FS Reporting
 export const QUERYSTRING_FSRPTDATAID = "fsRptDataID";

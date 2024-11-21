@@ -264,11 +264,11 @@ export class ContactsComponent {
     );
   }
 
-  loadContactFirmAdresses(contactAssId: number, userId: number): void {
+  loadContactFirmAdresses(contactAssId: number, userId: number, OpType: number, contactID: number): void {
     this.isLoading = true;
 
     // Fetch firm addresses from the service
-    this.addressService.getContactFirmAddresses(contactAssId, userId).subscribe(
+    this.addressService.getContactFirmAddresses(contactAssId, userId, OpType, contactID).subscribe(
       data => {
         if (data.response) {
           this.contactFirmAddresses = data.response;
@@ -339,7 +339,7 @@ export class ContactsComponent {
             this.showInfoIcon = false;
           }
           // Convert lstContactFunctions to an array if needed
-          this.loadContactFirmAdresses(this.selectedContact.contactAssnID, this.userId);
+          this.loadContactFirmAdresses(this.selectedContact.contactAssnID, this.userId, this.Page.Contatcs, this.selectedContact.contactID);
           this.convertFunctionsToArray();
           // Fetch additional data after the contact details are set
           this.fetchResidencyStatus();
@@ -860,7 +860,7 @@ export class ContactsComponent {
       this.selectedAvilableContact = true;
       // Call the method to fetch contact details
       this.fitchContactDetailsCreateContact(contactId, contactAssnID);
-      this.loadContactFirmAdresses(contactAssnID, this.userId);
+      this.loadContactFirmAdresses(contactAssnID, this.userId, this.Page.Contatcs, contactAssnID);
     } else {
       this.selectedAvilableContact = false;
       this.resetCreateContactObj();
@@ -1184,8 +1184,8 @@ export class ContactsComponent {
           addressAssnID: address.AddressAssnID || null,
           entityTypeID: address.EntityTypeID || 1,
           entityID: address.EntityID || this.firmId,
-          contactAssnID: 0,
-          contactID: 0,
+          contactAssnID: null,
+          contactID: null,
           addressID: address.AddressID?.toString() || '',
           addressLine1: address.AddressLine1 || '',
           addressLine2: address.AddressLine2 || '',
@@ -1489,7 +1489,7 @@ export class ContactsComponent {
 
   cancelContact() {
     this.isEditContact = false;
-    this.loadContactFirmAdresses(this.selectedContact.contactAssnID, this.userId)
+    this.loadContactFirmAdresses(this.selectedContact.contactAssnID, this.userId, this.Page.Contatcs, this.selectedContact.contactID)
     this.applySecurityOnPage(this.Page.Contatcs, this.isEditContact);
   }
 
@@ -2367,7 +2367,10 @@ export class ContactsComponent {
     this.createContactObj.title = contact.Title;
     this.createContactObj.isPeP = contact.isPeP;
     this.createContactObj.ContactMethodTypeID = contact.ContactMethodTypeID;
-    this.createContactObj.contactTypeId = contact.ContactTypeID;
+    this.createContactObj.contactType = contact.ContactTypeID;
+    this.createContactObj.fax = contact.MobileNum;
+    this.createContactObj.nationality = contact.nationalID;
+    this.loadContactFirmAdresses(contact.ContactAssnID, this.userId, this.Page.Contatcs, contact.ContactID);
     this.closeModal();
     
   }

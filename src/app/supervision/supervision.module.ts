@@ -17,6 +17,7 @@ import { SupervisionRoutingModule } from './supervision-routing.module';
 import { SharedModule } from '../shared/shared.module';
 import { AdminFeePopupComponent } from './admin-fee/admin-fee-popup/admin-fee-popup.component';
 import { JournalViewDetailsComponent } from './journal/journal-view-details/journal-view-details.component';
+import { NoticesDetailsComponent } from './notices/notices-details/notices-details.component';
 import { RegFundsViewComponent } from './reg-funds/reg-funds-view/reg-funds-view.component';
 
 
@@ -38,6 +39,7 @@ import { RegFundsViewComponent } from './reg-funds/reg-funds-view/reg-funds-view
     BreachesComponent,
     AdminFeePopupComponent,
     JournalViewDetailsComponent,
+    NoticesDetailsComponent,
     RegFundsViewComponent
   ],
   imports: [
