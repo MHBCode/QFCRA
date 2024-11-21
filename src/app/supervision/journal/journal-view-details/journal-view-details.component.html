@@ -104,8 +104,7 @@
                         <ckeditor *ngIf="isEditModeJournal; else notes" [(ngModel)]="journalDetails[0].EntryNotes" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
                     </div>
                     <ng-template #notes>
-                        <p>
-                            {{journalDetails[0].EntryNotes}}
+                        <p [innerHTML]="journalDetails[0].EntryNotes">
                         </p>
                     </ng-template>
                 </div>
