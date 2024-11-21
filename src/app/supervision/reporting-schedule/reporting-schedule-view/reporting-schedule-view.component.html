@@ -1,3 +1,4 @@
+<app-loader *ngIf="isLoading"></app-loader>
 <div class="overlay">
     <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
         <!-- <div class="error-messages">
@@ -88,7 +89,7 @@
                             <td>{{ rpt.FirmRptReqdBit ? 'Yes' : 'No' }}</td>
                             <td>
                                 <a *ngIf="rpt.DocFileLocation" [href]="rpt.DocFileLocation" target="_blank">
-                                    {{ rpt.documentDetails?.FileName || 'Link' }}
+                                    {{ rpt.documentDetails?.FileName }}
                                 </a>
                             </td>
                             <td>{{ rpt.WPublishedByUserName }}</td>

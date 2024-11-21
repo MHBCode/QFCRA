@@ -6,11 +6,11 @@
             <div class="form-section-title space-between">
                 <h2 class="edit-firm-header">
                     <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
-                    Registered Funds > <span>Al Rayyan </span>
+                    Registered Funds > <span>{{firmDetails.FirmName}} </span>
                 </h2>
                 <div class="btn">
-                    <button>
-                        <i class="bi bi-pen"></i>
+                    <button (click)="openCreatePopup()">
+                        <i class="bi bi-pen"></i> 
                         Create
                     </button>
                 </div>
@@ -26,7 +26,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let reg of paginatedItems">
+                    <tr *ngFor="let reg of paginatedItems" (click)="openRegisteredFundPopup(reg,firmDetails)">
                         <td>{{ reg?.RegisteredFundNumber }}</td>
                         <td>{{ reg?.FundName }}</td>
                         <td>{{ reg?.RegisteredFundTypeDesc }}</td>
@@ -46,3 +46,106 @@
         </div>
     </div>
 </div>
+
+<!--  Create Popup   -->
+
+<div class="overlay" *ngIf="showCreatePopup">
+    <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+      <!-- Title -->
+      <div class="popup-title-btn-row">
+        <div class="popup-header">
+          <h3>
+            Registered Fund {{ firmDetails?.FirmName }} ({{firmDetails.QFCNum}})
+          </h3>
+        </div>
+        <!-- Save and Cancel Buttons -->
+        <button class="close-button  close-icon" (click)="closeCreatePopup()">
+          <i class="bi bi-x-circle"></i>
+        </button>
+      </div>
+      <div class="reporting-schedule-form">
+        <div class="inputs-row" >
+          <div class="input-field">
+            <label for="fundNumber">Fund Number</label>
+            <input type="text" id="fundNumber"
+              name="fundNumber"  />
+          </div>
+          <div class="input-field">
+            <label for="FundType">Type of Fund</label>
+            <input type="text" id="fundType"
+              name="FundType"  />
+          </div>
+          <div class="input-field">
+            <label for="operator">Operator</label>
+            <input type="text" id="operator"
+              name="operator"  />
+          </div>
+          <div class="input-field">
+            <label for="fundName">Fund Name</label>
+            <input type="text" id="fundName"
+              name="fundName"  />
+          </div>
+        </div>
+        <div class="rpt-list margin-top-10">
+          <div class="popup-header">
+            <h3>Sub-Fund Details</h3>
+          </div>
+          <ng-container>
+              <div class="inputs-row report-entry" >
+                <div class="input-field">
+                  <label for="PreviousName">Previous Name(s)</label>
+                  <input type="text" id="PreviousName"
+                    name="PreviousName" 
+                     />
+                </div>
+  
+                <div class="input-field">
+                  <label for="OtherRelatedEntities">Other Related Entities</label>
+                  <input type="text" id="OtherRelatedEntities"
+                    name="OtherRelatedEntities"
+                     />
+                </div>
+  
+                <div class="input-field">
+                  <label for="Status">Status</label>
+                  <input type="text" id="Status"
+                    name="Status"
+                     />
+                </div>
+  
+                <div class="input-field">
+                  <label for="statusDate">Status Date</label>
+                  <input type="text" id="statusDate"
+                    name="statusDate" 
+                     />
+                </div>
+              </div>
+            </ng-container>
+        </div>
+        
+        <div class="rpt-list margin-top-10">
+          <div class="popup-header">
+            <h3>Review</h3>
+          </div>
+          <div class="inputs-row report-entry">
+            <div class="input-field">
+              <label for="submissionStatus">Additional Review Required Decision Made By</label>
+              <input type="text" id="submissionStatus" name="submissionStatus" />
+            </div>
+            <div class="input-field">
+              <label for="submissionStatus">Additional Review Required Decision Made On</label>
+              <input type="text" id="submissionStatus" name="submissionStatus" />
+            </div>
+          </div>
+  
+        </div>
+      </div>
+    </div>
+  </div>
+
+<app-reg-funds-view
+*ngIf="showPopup"
+  [reg]="selectedRegisteredFund"
+  [firmDetails]="firmDetails"
+  (closeRegPopup)="closePopup()">
+</app-reg-funds-view>

@@ -24,6 +24,23 @@ export class ReturnReviewService {
     const url = `${this.objectWFUrl}get_revision?objectId=${objectId}&objectInstanceId=${objectInstanceId}`;
     return this.http.get<any>(url);
   }
+  getReturnReviewDetilas(params: { firmRptReviewId: number; firmRptReviewRevNum: number; roleId: number; objectOpTypeId: number }): Observable<any> {
+    const httpParams = new HttpParams()
+      .set('firmRptReviewId', params.firmRptReviewId.toString())
+      .set('firmRptReviewRevNum', params.firmRptReviewRevNum.toString())
+      .set('roleId', params.roleId.toString())
+      .set('objectOpTypeId', params.objectOpTypeId.toString());
+  
+    return this.http.get<any>(`${this.returnViewUrl}get_rpt_review_details`, { params: httpParams });
+  }
+  getReportingBasis(firmId:number,firmRptShcItemID:number): Observable<any> {
+    const url = `${this.returnViewUrl}get_reporting_basis?firmId=${firmId}&firmRptShcItemID=${firmRptShcItemID}`;
+    return this.http.get<any>(url);
+  }
+  getRegulatorData(firmId:number): Observable<any> {
+    const url = `${this.returnViewUrl}get_regulator_data?firmId=${firmId}`;
+    return this.http.get<any>(url);
+  }
 }
 
 

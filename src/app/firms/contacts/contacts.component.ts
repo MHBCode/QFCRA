@@ -97,6 +97,7 @@ export class ContactsComponent {
   isAllAddressesAddedOnCreate: boolean;
   disableAddressFieldOnCreate = true;
   isMobileNumExsits: boolean = false;
+  ContactDetailsByPassingParam: any = [];
   constructor(
     private securityService: SecurityService,
     private router: Router,
@@ -2322,7 +2323,7 @@ export class ContactsComponent {
   }
 
   /////////////////////////// for contact modal 
-  ContactDetailsByPassingParam: any = [];
+ 
   SearchContactDetails(firstName: string, familyName: string,) {
     this.contactService.SearchContactDetailsByPassingParam(firstName, familyName, this.firmId).subscribe(
       data => {
@@ -2371,7 +2372,7 @@ export class ContactsComponent {
     this.createContactObj.nationality = contact.nationalID;
     this.loadContactFirmAdresses(contact.ContactAssnID, this.userId, this.Page.Contatcs, contact.ContactID);
     this.closeModal();
-
+    
   }
   // Close the modal
   closeModal() {
