@@ -17,7 +17,7 @@ export class JournalService {
     return this.http.get<any>(url);
   }
 
-  getJournalDataDetails(firmId: number,supJournalID: number): Observable<any> {
+  getJournalDataDetails(firmId: number, supJournalID: number): Observable<any> {
     const url = `${this.baseUrlJournal}get_supervision_journal?firmId=${firmId}&supJournalID=${supJournalID}`;
     return this.http.get<any>(url);
   }
@@ -40,6 +40,24 @@ export class JournalService {
   getAllApprovedIndividuals(firmId: number) {
     const url = `${this.baseUrlJournal}get_all_approved_individuals?firmId=${firmId}`;
     return this.http.get<any>(url);
+  }
+
+  saveSupJournalData(rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlJournal}save_sup_journal_data`, rowData, { headers: headers });
+  }
+
+  insertUpdateJournalSup(rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlJournal}inser_update_journal_supervision`, rowData, { headers: headers });
+  }
+
+  deleteJournalData(rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.delete<any>(`${this.baseUrlJournal}delete_journal_data`, {
+      headers: headers,
+      body: rowData
+    });
   }
 
 }

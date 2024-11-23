@@ -27,7 +27,8 @@
                     <select *ngIf="isEditModeJournal; else entryTypedropdown"
                         [(ngModel)]="journalDetails[0].JournalEntryTypeID" name="entryType" id="entryType">
                         <option [value]="0">Select</option>
-                        <option *ngFor="let option of alljournalEntryTypes" [value]="option.JournalEntryTypeID">{{option.JournalEntryTypeDesc}}</option>
+                        <option *ngFor="let option of alljournalEntryTypes" [value]="option.JournalEntryTypeID">
+                            {{option.JournalEntryTypeDesc}}</option>
                     </select>
                     <ng-template #entryTypedropdown>
                         <input disabled [(ngModel)]="journalDetails[0].JournalEntryTypeDesc" type="text">
@@ -69,39 +70,45 @@
 
                     <table class="subject-table">
                         <tr *ngFor="let subject of (isEditModeJournal ? journalSubjectTypes : subjectData)">
-                          <td>
-                            <input
-                              type="checkbox"
-                              [disabled]="!isEditModeJournal"
-                              [checked]="isChecked(subject)"
-                              (change)="isEditModeJournal && toggleSelection(subject, $event)"
-                            />
-                          </td>
-                          <td>{{ subject.JournalSubjectTypeDesc }}</td>
-                          <td>
-                            <!-- Display content conditionally -->
-                            <ng-container *ngIf="isEditModeJournal; else viewMode">
-                              <select>
-                                <option [value]="0">Select</option>
-                                <option *ngFor="let option of getDropdownOptions(subject)" [value]="option.value">
-                                  {{ option.label }}
-                                </option>
-                              </select>
-                            </ng-container>
-                            <ng-template #viewMode>
-                              {{ subject.ObjectInstanceDesc || subject.JournalSubjectOtherDesc || '' }}
-                            </ng-template>
-                          </td>
+                            <td>
+                                <input type="checkbox" [disabled]="!isEditModeJournal" [checked]="isChecked(subject)"
+                                    (change)="toggleSelection(subject, $event)" />
+                            </td>
+                            <td>{{ subject.JournalSubjectTypeDesc }}</td>
+                            <td>
+                                <!-- Conditionally display dropdown or input field based on subject type -->
+                                <ng-container *ngIf="subject.isSelected">
+                                    <ng-container *ngIf="getDropdownOptions(subject).length > 0; else otherInput">
+                                        <select [(ngModel)]="subject.selectedValue">
+                                            <option [value]="0">Select</option>
+                                            <option *ngFor="let option of getDropdownOptions(subject)"
+                                                [value]="option.value">
+                                                {{ option.label }}
+                                            </option>
+                                        </select>
+                                    </ng-container>
+                                    <ng-template #otherInput>
+                                        <input *ngIf="subject.JournalSubjectTypeID === 4" type="text"
+                                            placeholder="Enter value" [(ngModel)]="subject.JournalSubjectOtherDesc" />
+                                    </ng-template>
+                                </ng-container>
+                                <!-- Show static text in view mode -->
+                                <ng-container *ngIf="!subject.isSelected || !isEditModeJournal">
+                                    {{ subject.ObjectInstanceDesc || subject.JournalSubjectOtherDesc || '' }}
+                                </ng-container>
+                            </td>
                         </tr>
-                      </table>
-                      
+                    </table>
+
+
                 </div>
 
 
                 <div class="input-field notes">
                     <label for="notes">Notes</label>
                     <div>
-                        <ckeditor *ngIf="isEditModeJournal; else notes" [(ngModel)]="journalDetails[0].EntryNotes" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                        <ckeditor *ngIf="isEditModeJournal; else notes" [(ngModel)]="journalDetails[0].EntryNotes"
+                            [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
                     </div>
                     <ng-template #notes>
                         <p [innerHTML]="journalDetails[0].EntryNotes">
@@ -129,19 +136,37 @@
                     <i class="bi bi-pen"></i> Edit
                 </button>
 
-                <button *ngIf="!hideSaveBtn">
+                <button (click)="saveJournal()" *ngIf="!hideSaveBtn">
                     Save
                 </button>
-                
+
                 <button class="cancel-btn" *ngIf="!hideCancelBtn" (click)="cancelJournal()">
-                     Cancel
+                    Cancel
                 </button>
-                
-                <button *ngIf="getControlVisibility('imgBtnDelete') || !hideDeleteBtn"
-                [disabled]="!getControlEnablement('imgBtnDelete')">
+
+                <button (click)="getJournalDeletePopup()" *ngIf="getControlVisibility('imgBtnDelete') || !hideDeleteBtn">
                     <i class="bi bi-trash"></i> Delete
                 </button>
             </div>
         </div>
+    </div>
+</div>
+
+<div *ngIf="callDeleteJournal" class="overlay show"></div>
+<div *ngIf="callDeleteJournal" class="JournalDeletion popupcontainer">
+    <i class="bi bi-x-circle close-icon" (click)="closeDeleteJournalPopup()"></i>
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Reason for Deletion</h3>
+        </div>
+        <div class="input-field delete-textarea">
+            <textarea [(ngModel)]="reasonOfDeletion" name="deleteReason" id="deleteReason">
+            </textarea>
+        </div>
+        <button class="butt ok-butt" (click)="deleteJournal()">Ok</button>
+        <button class="butt cancel-butt" (click)="closeDeleteJournalPopup()">Cancel</button>
+    </div>
+    <div class="popup-operations-place">
+        <button class="subbutton" (click)="closeDeleteJournalPopup()">Close</button>
     </div>
 </div>
