@@ -28,4 +28,8 @@ export class RegisteredfundService {
     const url = `${this.baseUrlRegisteredFund}get_sub_fund_data?registeredFundID=${registeredFundID}`;
     return this.http.get<any>(url);
   }
+  deleteRegisteredFund(registeredFundID:number): Observable<any>{
+    const url = `${this.baseUrlRegisteredFund}delete_registered_fund?registeredFundID=${registeredFundID}`;
+    return this.http.get<any>(url);
+  }
 }

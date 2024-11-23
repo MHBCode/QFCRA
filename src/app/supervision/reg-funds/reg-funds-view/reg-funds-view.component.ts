@@ -7,6 +7,7 @@ import * as constants from 'src/app/app-constants';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { ActivatedRoute } from '@angular/router';
 import { RegisteredfundService } from 'src/app/ngServices/registeredfund.service';
+import { Bold, ClassicEditor, Essentials, Font, FontColor, FontSize, Heading, Indent, IndentBlock, Italic, Link, List, MediaEmbed, Paragraph, Table, Undo } from 'ckeditor5';
 
 @Component({
   selector: 'app-reg-funds-view',
@@ -102,4 +103,50 @@ export class RegFundsViewComponent {
       },
     });
   }
+  
+  deleteRegisteredFund(){
+    const  RegisteredFundID= this.reg.RegisteredFundID;
+    this.registeredFundService.deleteRegisteredFund(RegisteredFundID).subscribe({
+      next: (res) => {
+          console.log("RegisteredFund deleted Sucessfuly")
+        this.isLoading=false;
+      },
+      error: (error) => {
+        console.error('Error deleting RegisteredFund', error);
+        this.isLoading=false;
+      },
+    });
+  }
+
+
+  public Editor = ClassicEditor;
+
+  public config = {
+    toolbar: [
+      'undo', 'redo', '|',
+      'heading', '|', 'bold', 'italic', '|',
+      'fontSize', 'fontColor', '|',
+      'link', 'insertTable', 'mediaEmbed', '|',
+      'bulletedList', 'numberedList', 'indent', 'outdent'
+    ],
+    plugins: [
+      Bold,
+      Essentials,
+      Heading,
+      Indent,
+      IndentBlock,
+      Italic,
+      Link,
+      List,
+      MediaEmbed,
+      Paragraph,
+      Table,
+      Undo,
+      Font,
+      FontSize,
+      FontColor
+    ],
+    licenseKey: ''
+  };
+
 }

@@ -148,12 +148,11 @@
                       
                         <div class="input-field fullwidth">
                           <label for="notes-{{ i }}">Comments/Findings :</label>
-                          <textarea
-                            name="notes-{{ i }}"
-                            id="notes-{{ i }}"
-                            [disabled]="!isEditable"
-                            [(ngModel)]="item.firmRptReviewFindings[i].firmRptReviewFindings"
-                          ></textarea>
+                          <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="item.firmRptReviewFindings[i].firmRptReviewFindings" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                          <ng-template #notes>
+                            <p [innerHTML]="item.firmRptReviewFindings[i].firmRptReviewFindings">
+                            </p>
+                          </ng-template>
                         </div>
                       </div>
                 </ng-container>

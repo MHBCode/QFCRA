@@ -6,6 +6,7 @@ import { LogformService } from 'src/app/ngServices/logform.service';
 import * as constants from 'src/app/app-constants';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { ActivatedRoute } from '@angular/router';
+import { Bold, ClassicEditor, Essentials, Font, FontColor, FontSize, Heading, Indent, IndentBlock, Italic, Link, List, MediaEmbed, Paragraph, Table, Undo } from 'ckeditor5';
 
 @Component({
   selector: 'app-return-review-view',
@@ -123,5 +124,34 @@ export class ReturnReviewViewComponent {
   //     console.error('Error fetching assigned roles: ', error);
   //   })
   // }
-  
+  public Editor = ClassicEditor;
+
+  public config = {
+    toolbar: [
+      'undo', 'redo', '|',
+      'heading', '|', 'bold', 'italic', '|',
+      'fontSize', 'fontColor', '|',
+      'link', 'insertTable', 'mediaEmbed', '|',
+      'bulletedList', 'numberedList', 'indent', 'outdent'
+    ],
+    plugins: [
+      Bold,
+      Essentials,
+      Heading,
+      Indent,
+      IndentBlock,
+      Italic,
+      Link,
+      List,
+      MediaEmbed,
+      Paragraph,
+      Table,
+      Undo,
+      Font,
+      FontSize,
+      FontColor
+    ],
+    licenseKey: ''
+  };
+
 }
