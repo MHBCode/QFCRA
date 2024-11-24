@@ -191,7 +191,10 @@ export class JournalViewDetailsComponent implements OnInit {
           // Assign other data to component properties
           this.allRequiredIndividuals = requiredIndividuals.response;
           this.allApprovedIndividuals = approvedIndividuals.response;
+
+          this.registerMasterPageControlEvents();
         },
+
         error: (err) => {
           console.error('Error initializing page:', err);
         },
@@ -232,6 +235,15 @@ export class JournalViewDetailsComponent implements OnInit {
       this.hideCancelBtn = false;
       this.hideDeleteBtn = true;
       return;
+    } else {
+      if (this.isCreate) {
+        this.hideSaveBtn = false;
+        this.hideCancelBtn = false;
+        this.hideEditBtn = true;
+        this.hideDeleteBtn = true;
+        this.hideExportBtn = true;
+        return;
+      }
     }
 
     // View mode
