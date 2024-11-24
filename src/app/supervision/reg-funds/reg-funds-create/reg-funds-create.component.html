@@ -1,0 +1,236 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<!--  Create Popup   -->
+
+ <div class="overlay">
+    <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+      <div class="popup-title-btn-row">
+        <div class="popup-header">
+          <h3>
+            Registered Fund {{ firmDetails?.FirmName }} ({{firmDetails.QFCNum}})
+          </h3>
+        </div>
+        <button class="close-button  close-icon" (click)="onClose()">
+          <i class="bi bi-x-circle"></i>
+        </button>
+      </div>
+      <div class="reporting-schedule-form">
+        <div class="inputs-row" >
+          <div class="input-field">
+            <label for="FundType">Type of Fund</label>
+
+              <select name="fundType" id="fundType" (change)="onFundTypeChange($event,createRegFundsObj)" [(ngModel)]="createRegFundsObj.typeOfFundID">
+                <option [value]="0">Select</option>
+                <option *ngFor="let option of TypeOfFunddropdown" [value]="option.RegisteredFundTypeID">
+                  {{ option.RegisteredFundTypeDesc }}
+                </option>
+              </select>
+          </div>
+          <div class="input-field">
+            <label for="operator">Operator</label>
+            <input type="text" id="operator"
+              name="operator"  [(ngModel)]="createRegFundsObj.firmName"/>
+          </div>
+          <div class="input-field">
+            <label for="fundName">Fund Name</label>
+            <input type="text" id="fundName"
+              name="fundName"  [(ngModel)]="createRegFundsObj.fundName"/>
+          </div>
+        </div>
+        <div class="rpt-list margin-top-10">
+          <div class="popup-header">
+            <h3>Sub-Fund Details</h3>
+            <div class="add-sub-funds-btn-container">
+                <button class="addSubFunsdBtn"
+                (click)="addSubFund()">
+                Add Sub-Fund
+                </button>
+            </div>
+
+          </div>
+          <div *ngFor="let subFund of createRegFundsObj.lstSubFunds; let i = index" class="inputs-row report-entry">
+            <div class="del-address-container">
+                <button  (click)="removeSubFund(i)"
+                  class="RmvTrashBtn bi-trash"></button>
+            </div>
+            <div class="input-field">
+              <label for="subFundName">Sub-Fund Name</label>
+              <input
+                type="text"
+                [(ngModel)]="createRegFundsObj.lstSubFunds[i].subFundName"
+                name="subFundName-{{ i }}"
+              />
+            </div>
+            <div class="input-field">
+              <label for="dateFrom">Date From</label>
+              <input
+               type="text" #dateInputs placeholder
+                [(ngModel)]="createRegFundsObj.lstSubFunds[i].dateFrom"
+                name="dateFrom-{{ i }}"
+              />
+            </div>
+            <div class="input-field">
+              <label for="dateTo">Date To</label>
+              <input
+                 type="text" #dateInputs placeholder
+                [(ngModel)]="createRegFundsObj.lstSubFunds[i].dateTo"
+                name="dateTo-{{ i }}"
+              />
+            </div>
+            <div class="input-field">
+              <label for="typeOfSubFund">Type of Sub-Fund</label>
+              <input
+                type="text"
+                [(ngModel)]="createRegFundsObj.lstSubFunds[i].typeOfSubFund"
+                name="typeOfSubFund-{{ i }}"
+              />
+            </div>
+            <!-- <button class="remove-button" (click)="removeSubFund(i)">X</button> -->
+            
+          </div>
+        </div>
+       
+        <div class="rpt-list margin-top-10">
+          <div class="popup-header">
+            <h3></h3>
+          </div>
+          <div class="inputs-row" >
+            <div class="input-field">
+                <label for="PreviousName">Previous Name(s)</label>
+                <input type="text" id="PreviousName"
+                  name="PreviousName" [(ngModel)]="createRegFundsObj.previousName"/>
+              </div>
+    
+              <div class="input-field">
+                <label for="OtherRelatedEntities">Other Related Entities</label>
+                <input type="text" id="OtherRelatedEntities"
+                  name="OtherRelatedEntities" [(ngModel)]="createRegFundsObj.otherEntities"/>
+              </div>
+    
+              <div class="input-field">
+                <label for="Status">Status</label>
+                <input type="text" id="Status"
+                  name="Status" />
+              </div>
+              <div class="input-field">
+                <label for="Status">Status</label>
+    
+                  <select name="Status" id="Status" (change)="onSatusTypeChange($event,createRegFundsObj)" [(ngModel)]="createRegFundsObj.registeredFundStatusTypeID">
+                    <option [value]="0">Select</option>
+                    <option *ngFor="let option of RFFundStatusdropdown" [value]="option.RegisteredFundStatusTypeID">
+                      {{ option.RegisteredFundStatusTypeDesc }}
+                    </option>
+                  </select>
+              </div>
+              <div class="input-field">
+                <label for="statusDate">Status Date</label>
+                <input type="text" #dateInputs placeholder [(ngModel)]="createRegFundsObj.registeredFundStatusDate"/>
+                </div>
+      
+          </div>
+          <div class="input-field notes">
+            <label for="notes">Notes</label>
+            <div>
+                <ckeditor [(ngModel)]="createRegFundsObj.rfNotes" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+            </div>
+          </div>
+        </div>
+        <div class="btn justify-content-end">
+            <button (click)="createUpdateRegFunds()">
+               Save
+            </button>
+          </div>    
+      </div>
+    </div>
+  </div> 
+
+
+
+
+
+
+  <!-- <div class="overlay">
+    <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+
+      <div class="popup-title-btn-row">
+        <div class="popup-header">
+          <h3>
+            Registered Fund {{ createRegFundsObj.firmName }} ({{ createRegFundsObj.firmID }})
+          </h3>
+        </div>
+
+        <button class="close-button close-icon" (click)="onClose()">
+          <i class="bi bi-x-circle"></i>
+        </button>
+      </div>
+      <div class="reporting-schedule-form">
+
+        <div class="inputs-row">
+          <div class="input-field">
+            <label for="fundType">Type of Fund</label>
+            <select name="fundType" id="fundType" [(ngModel)]="createRegFundsObj.typeOfFundID">
+              <option [value]="0">Select</option>
+              <option *ngFor="let option of TypeOfFunddropdown" [value]="option.RegisteredFundTypeID">
+                {{ option.RegisteredFundTypeDesc }}
+              </option>
+            </select>
+          </div>
+          <div class="input-field">
+            <label for="fundName">Fund Name</label>
+            <input type="text" id="fundName" [(ngModel)]="createRegFundsObj.fundName" />
+          </div>
+          <div class="input-field">
+            <label for="rfNotes">Notes</label>
+            <ckeditor
+              [editor]="Editor"
+              style="height: 200px;"
+              [config]="config"
+              [(ngModel)]="createRegFundsObj.rfNotes"
+            ></ckeditor>
+          </div>
+        </div>
+  
+
+        <div class="rpt-list margin-top-10">
+          <div class="popup-header">
+            <h3>Sub-Fund Details</h3>
+            <button class="add-button" (click)="addSubFund()">+ Add Sub-Fund</button>
+          </div>
+          <div *ngFor="let subFund of createRegFundsObj.lstSubFunds; let i = index" class="inputs-row report-entry">
+            <div class="input-field">
+              <label for="subFundName">Sub-Fund Name</label>
+              <input
+                type="text"
+                [(ngModel)]="createRegFundsObj.lstSubFunds[i].subFundName"
+                name="subFundName-{{ i }}"
+              />
+            </div>
+            <div class="input-field">
+              <label for="dateFrom">Date From</label>
+              <input
+                type="date"
+                [(ngModel)]="createRegFundsObj.lstSubFunds[i].dateFrom"
+                name="dateFrom-{{ i }}"
+              />
+            </div>
+            <div class="input-field">
+              <label for="dateTo">Date To</label>
+              <input
+                type="date"
+                [(ngModel)]="createRegFundsObj.lstSubFunds[i].dateTo"
+                name="dateTo-{{ i }}"
+              />
+            </div>
+            <div class="input-field">
+              <label for="typeOfSubFund">Type of Sub-Fund</label>
+              <input
+                type="text"
+                [(ngModel)]="createRegFundsObj.lstSubFunds[i].typeOfSubFund"
+                name="typeOfSubFund-{{ i }}"
+              />
+            </div>
+            <button class="remove-button" (click)="removeSubFund(i)">X</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->

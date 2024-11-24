@@ -38,7 +38,9 @@ export const firmRptBasisTypes = "FirmRptBasisTypes";
 // Journal
 export const journalEntryTypes = "V_SupervisionJournalEntryTypes";
 export const externalAuditors = "V_Firm_AuditorName";
-
+// Reg.Funds
+export const TypeOfFund = "V_RegisteredFundTypes" ;
+export const RFFundStatus = "V_RegisteredFundStatusTypes";
 //Query String Parameter for FS Reporting
 export const QUERYSTRING_FSRPTDATAID = "fsRptDataID";
 
@@ -75,6 +77,8 @@ export const BLANK_DATE = "__/___/____";
 export const DataFieldLabel = "\"##DataFieldLable##\"";
 export const ContactTypes = "v_ContactTypes";
 export const PreferredMethodofContact = "ContactMethodTypes";
+
+
 export enum FirmLicenseApplStatusType {
     Application = 4,
     Licensed = 5,
@@ -649,4 +653,9 @@ export enum SupervisionData_Messages
     NO_OF_STAFF_SHOULD_BE_LESS_THAN_OR_EQUAL_TOTAL_STAFF = 8608,
     NOTES_OUT_OF_LIMIT = 8609,
     SELECT_OPERATIONAL_STATUS = 8610
+}
+export enum RegisteredFund_Messages 
+{
+    RegisteredFund_Saved_SUCCESSFULLY = 18042,
+    Error_deleting_RegisteredFund = 18045 ,
 }

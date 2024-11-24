@@ -36,6 +36,9 @@ export class ObjectwfService {
     const url = `${this.baseUrlObjectWF}delete_document?docID=${docId}&objectId=${objectId}&objectInstanceId=${objectInstanceId}&ObjectInstanceRevNum=${objRevNumber}`
     return this.http.delete<any>(url);
   }
-
+  getDocumentType(docTypeId: number): Observable<any> {
+    const url = `${this.baseUrlObjectWF}get_document_type?docCategoryTypeID=${docTypeId}`
+    return this.http.get<any>(url);
+  }
 
 }

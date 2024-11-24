@@ -11,7 +11,7 @@ export class RegisteredfundService {
   constructor(private http: HttpClient) { }
 
   private baseUrlRegisteredFund = environment.API_URL + '/api/RegisteredFund/' // Funds
-
+  private baseUrlObjectWF = environment.API_URL + '/api/ObjectWF/' // Object WF
   getFIRMRegisteredFund(userId: number,firmId: number, registeredFundID: number | null = null): Observable<any> {
     const url = `${this.baseUrlRegisteredFund}get_registered_fund_data?userId=${userId}&firmId=${firmId}${registeredFundID !== null ? `&registeredFundID=${registeredFundID}` : ''}`;
     return this.http.get<any>(url);
@@ -30,6 +30,14 @@ export class RegisteredfundService {
   }
   deleteRegisteredFund(registeredFundID:number): Observable<any>{
     const url = `${this.baseUrlRegisteredFund}delete_registered_fund?registeredFundID=${registeredFundID}`;
+    return this.http.delete<any>(url);
+  }
+  saveUpdateRegisteredFund(saveUpdateRegisteredFundObj: any):Observable<any>{
+    const url = `${this.baseUrlRegisteredFund}save_update_registered_fund`;
+    return this.http.post<any>(url,saveUpdateRegisteredFundObj);
+  }
+  getDocument(objectId: number, objectInstanceId: number): Observable<any> {
+    const url = `${this.baseUrlObjectWF}get_document?objectId=${objectId}&objectInstanceId=${objectInstanceId}&ObjectInstanceRevNum=${1}`
     return this.http.get<any>(url);
   }
 }

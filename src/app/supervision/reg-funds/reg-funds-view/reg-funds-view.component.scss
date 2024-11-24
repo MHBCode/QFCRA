@@ -26,3 +26,39 @@
     pointer-events: none;
     opacity: 0.6;
   }
+
+.addSubFunsdBtn {
+    background-color: #A51E36;
+    color: white;
+    cursor: default;
+}
+.addSubFunsdBtn {
+    background: #ac112d;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px;
+    border-radius: 7px;
+    margin-right: 10px;
+}
+
+.add-sub-funds-btn-container {
+    width: 13%;
+    display: flex;
+    justify-content: flex-end;
+    ;
+    margin-bottom: 10px;
+}
+.del-address-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .RmvTrashBtn {
+    background: red;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px 10px;
+    border-radius: 7px;
+  }

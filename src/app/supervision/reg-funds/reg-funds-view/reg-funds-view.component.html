@@ -20,13 +20,27 @@
           <label for="fundNumber-{{RegFundDetials.RegisteredFundID}}">Fund Number</label>
           <input type="text" id="fundNumber-{{RegFundDetials.RegisteredFundID}}"
             name="fundNumber-{{RegFundDetials.RegisteredFundID}}" [(ngModel)]="RegFundDetials.RegisteredFundNumber"
-            [disabled]="!isEditable" />
+            disabled />
         </div>
         <div class="input-field">
           <label for="FundType-{{RegFundDetials.RegisteredFundID}}">Type of Fund</label>
-          <input type="text" id="FundType-{{RegFundDetials.RegisteredFundID}}"
-            name="FundType-{{RegFundDetials.RegisteredFundID}}" [(ngModel)]="RegFundDetials.RegisteredFundTypeDesc"
-            [disabled]="!isEditable" />
+          
+            <ng-container *ngIf="isEditable; else TypeOfFund">
+              <select name="fundType" id="fundType" 
+              [(ngModel)]="RegFundDetials.RegisteredFundTypeDesc"
+              (change)="onFundTypeChange($event, RegFundDetials)"
+              >
+                <option *ngFor="let option of TypeOfFunddropdown" [value]="option.RegisteredFundTypeDesc">
+                  {{ option.RegisteredFundTypeDesc }}
+                </option>
+              </select>
+            </ng-container>
+            <ng-template #TypeOfFund>
+              <input type="text" id="FundType-{{RegFundDetials.RegisteredFundID}}"
+              name="FundType-{{RegFundDetials.RegisteredFundID}}" [(ngModel)]="RegFundDetials.RegisteredFundTypeDesc"
+              [disabled]="!isEditable" />
+            </ng-template>
+            
         </div>
         <div class="input-field">
           <label for="operator-{{RegFundDetials.RegisteredFundID}}">Operator</label>
@@ -43,75 +57,41 @@
       </div>
       <div class="rpt-list margin-top-10">
         <div class="popup-header">
-          <h3>Sub-Fund Data</h3>
-        </div>
-        <ng-container>
-            <div class="inputs-row report-entry" *ngFor="let SubFund of SubFundData">
-              <div class="input-field">
-                <label for="subFundName-{{SubFund.SubRegisteredFundID}}">Sub Fund Name</label>
-                <input type="text" id="subFundName-{{SubFund.SubRegisteredFundID}}"
-                  name="subFundName-{{SubFund.SubRegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="SubFund.SubFundName" />
-              </div>
-
-              <div class="input-field">
-                <label for="TypeOfSubFund-{{SubFund.SubRegisteredFundID}}">Sub Fund Type</label>
-                <input type="text" id="TypeOfSubFund-{{SubFund.SubRegisteredFundID}}"
-                  name="TypeOfSubFund-{{SubFund.SubRegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="SubFund.TypeOfSubFund" />
-              </div>
-
-              <div class="input-field">
-                <label for="SubFundDateFrom-{{SubFund.SubRegisteredFundID}}">Status</label>
-                <input type="text" id="SubFundDateFrom-{{SubFund.SubRegisteredFundID}}"
-                  name="SubFundDateFrom-{{SubFund.SubRegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="SubFund.SubFundDateFrom" />
-              </div>
-
-              <div class="input-field">
-                <label for="SubFundDateTo-{{SubFund.SubRegisteredFundID}}">Status Date</label>
-                <input type="text" id="SubFundDateTo-{{SubFund.SubRegisteredFundID}}"
-                  name="SubFundDateTo-{{SubFund.SubRegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="SubFund.SubFundDateTo" />
-              </div>
-            </div>
-          </ng-container>
-      </div>
-      <div class="rpt-list margin-top-10">
-        <div class="popup-header">
           <h3>Sub-Fund Details</h3>
+          <div class="add-sub-funds-btn-container">
+            <button class="addSubFunsdBtn" [disabled]="!isEditable" (click)="addSubFund()">Add Sub-Fund</button>
+          </div>
         </div>
         <ng-container>
-            <div class="inputs-row report-entry" *ngFor="let RegFundDetials of RegisteredFundDetials">
-              <div class="input-field">
-                <label for="PreviousName-{{RegFundDetials.RegisteredFundID}}">Previous Name(s)</label>
-                <input type="text" id="PreviousName-{{RegFundDetials.RegisteredFundID}}"
-                  name="PreviousName-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="RegFundDetials.PreviousName" />
-              </div>
-
-              <div class="input-field">
-                <label for="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}">Other Related Entities</label>
-                <input type="text" id="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}"
-                  name="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="RegFundDetials.OtherRelatedEntityName" />
-              </div>
-
-              <div class="input-field">
-                <label for="Status-{{RegFundDetials.RegisteredFundID}}">Status</label>
-                <input type="text" id="Status-{{RegFundDetials.RegisteredFundID}}"
-                  name="Status-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="RegFundDetials.RegisteredFundStatusTypeDesc" />
-              </div>
-
-              <div class="input-field">
-                <label for="statusDate-{{RegFundDetials.RegisteredFundID}}">Status Date</label>
-                <input type="text" id="statusDate-{{RegFundDetials.RegisteredFundID}}"
-                  name="statusDate-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
-                  [(ngModel)]="RegFundDetials.RegisteredFundStatusDate" />
-              </div>
+          <div class="inputs-row report-entry"  *ngFor="let SubFund of SubFundData; let i = index">
+            <div class="del-address-container">
+              <button (click)="removeSubFund(i)" [disabled]="!isEditable" class="RmvTrashBtn bi-trash"></button>
             </div>
-          </ng-container>
+            <div class="input-field">
+              <label for="subFundName-{{i}}">Sub Fund Name</label>
+              <input type="text" [disabled]="!isEditable" id="subFundName-{{i}}" name="subFundName-{{i}}" 
+                [(ngModel)]="SubFund.SubFundName" />
+            </div>
+      
+            <div class="input-field">
+              <label for="TypeOfSubFund-{{i}}">Sub Fund Type</label>
+              <input type="text" [disabled]="!isEditable" id="TypeOfSubFund-{{i}}" name="TypeOfSubFund-{{i}}" 
+                [(ngModel)]="SubFund.TypeOfSubFund" />
+            </div>
+      
+            <div class="input-field">
+              <label for="SubFundDateFrom-{{i}}">Date From</label>
+              <input type="text" #dateInputs placeholder [disabled]="!isEditable" id="SubFundDateFrom-{{i}}" name="SubFundDateFrom-{{i}}" 
+                [(ngModel)]="SubFund.SubFundDateFrom" />
+            </div>
+      
+            <div class="input-field">
+              <label for="SubFundDateTo-{{i}}">Date To</label>
+              <input type="text" #dateInputs placeholder [disabled]="!isEditable" id="SubFundDateTo-{{i}}" name="SubFundDateTo-{{i}}" 
+                [(ngModel)]="SubFund.SubFundDateTo" />
+            </div>
+          </div>
+        </ng-container>
       </div>
       <div class="rpt-list margin-top-10">
         <div class="popup-header">
@@ -138,19 +118,94 @@
       </div>
       <div class="rpt-list margin-top-10">
         <div class="popup-header">
-          <h3>Review</h3>
+          <h3></h3>
+        </div>
+        <ng-container>
+            <div class="inputs-row report-entry" *ngFor="let RegFundDetials of RegisteredFundDetials">
+              <div class="input-field">
+                <label for="PreviousName-{{RegFundDetials.RegisteredFundID}}">Previous Name(s)</label>
+                <input type="text" id="PreviousName-{{RegFundDetials.RegisteredFundID}}"
+                  name="PreviousName-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.PreviousNames" />
+              </div>
+
+              <div class="input-field">
+                <label for="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}">Other Related Entities</label>
+                <input type="text" id="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}"
+                  name="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.OtherRelatedEntityName" />
+              </div>
+
+              <div class="input-field">
+                <label for="Status-{{RegFundDetials.RegisteredFundID}}">Status</label>
+              
+                  <ng-container *ngIf="isEditable; else ViewStatus">
+                    <select name="Status" id="Status" 
+                    [(ngModel)]="RegFundDetials.RegisteredFundStatusTypeDesc"
+                    (change)="onSatusTypeChange($event, RegFundDetials)"
+                    >
+                      <option *ngFor="let option of RFFundStatusdropdown" [value]="option.RegisteredFundStatusTypeDesc">
+                        {{ option.RegisteredFundStatusTypeDesc }}
+                      </option>
+                    </select>
+                  </ng-container>
+                  <ng-template #ViewStatus>
+                    <input type="text" id="Status-{{RegFundDetials.RegisteredFundID}}"
+                    name="Status-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                    [(ngModel)]="RegFundDetials.RegisteredFundStatusTypeDesc" />
+                  </ng-template>
+                 
+              </div>
+               
+              <div class="input-field">
+                <label for="statusDate-{{RegFundDetials.RegisteredFundID}}">Status Date</label>
+                <input type="text" #dateInputs placeholder id="statusDate-{{RegFundDetials.RegisteredFundID}}"
+                  name="statusDate-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.RegisteredFundStatusDate" />
+              </div>
+            </div>
+          </ng-container>
+      </div>
+     
+      <div class="rpt-list margin-top-10">
+        <div class="popup-header">
+          <h3>Attachments (if any)</h3>
+          <div class="add-sub-funds-btn-container">
+            <button class="addSubFunsdBtn" [disabled]="!isEditable" (click)="addSubFund()">Select Document</button>
+            <button class="addSubFunsdBtn" [disabled]="!isEditable" (click)="addSubFund()">Upload</button>
+          </div>
         </div>
         <div class="inputs-row report-entry">
           <div class="input-field">
-            <label for="submissionStatus">Additional Review Required Decision Made By</label>
-            <input type="text" id="submissionStatus" name="submissionStatus" [disabled]="!isEditable" />
+            <label for="DocumentType">Document Type</label>
+            <!-- <input type="text" id="DocumentType" name="DocumentType" [disabled]="!isEditable" /> -->
+
+              <select name="DocumentType" id="DocumentType" >
+                <option *ngFor="let option of DocumentTypeList" [value]="option.DocSubTypeID">
+                  {{ option.DocSubTypeDesc }}
+                </option>
+              </select>
           </div>
-          <div class="input-field">
-            <label for="submissionStatus">Additional Review Required Decision Made On</label>
+          <!-- <div class="input-field">
+            <label for="submissionStatus">File Name</label>
             <input type="text" id="submissionStatus" name="submissionStatus" [disabled]="!isEditable" />
-          </div>
+          </div> -->
         </div>
       </div>
+      <div class="btn justify-content-end">
+        <button (click)="confirmDeleteRegisteredFund()" *ngIf="!isEditable">
+          <i class="bi bi-trash"></i> Delete
+        </button>
+        <button (click)="editRegFunds()" *ngIf="!isEditable">
+        <i class="bi bi-pen"></i> Edit
+       </button>
+       <button (click)="SaveUpdateRegFunds()" *ngIf="isEditable">
+          Save
+       </button>
+       <button (click)="onClose()" *ngIf="isEditable">
+          Cancel
+       </button>
+      </div>    
     </div>
   </div>
 </div>

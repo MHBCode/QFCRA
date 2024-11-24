@@ -93,7 +93,4 @@ export class RegFundsComponent {
     this.popupMode = 'create';
     this.showCreatePopup = true;
   }
-  createRegFundObj = {
-    
-  }
 }
