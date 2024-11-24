@@ -43,10 +43,10 @@
             </div>
             <div class="inputs-row">
                 <div class="input-field">
-                    <label for="entryType">Entry Type <span *ngIf="isEditModeJournal || isCreate"
+                    <label for="entryType">Entry Type <span *ngIf="isEditModeJournal || isCreateJournal"
                             style="color: red;">*</span></label>
-                    <select *ngIf="isEditModeJournal || isCreate; else entryTypedropdown"
-                        [(ngModel)]="journalDetails[0].JournalEntryTypeID" name="entryType" id="entryType" [ngClass]="{
+                    <select *ngIf="isEditModeJournal || isCreateJournal; else entryTypedropdown"
+                        [(ngModel)]="entryTypeID" name="entryType" id="entryType" [ngClass]="{
                             'error-border': errorMessages['EntryType']}">
                         <option [value]="0">Select</option>
                         <option *ngFor="let option of alljournalEntryTypes" [value]="option.JournalEntryTypeID">
@@ -58,16 +58,16 @@
                 </div>
 
                 <div class="input-field">
-                    <label for="entryDate">Entry Date <span *ngIf="isEditModeJournal || isCreate"
+                    <label for="entryDate">Entry Date <span *ngIf="isEditModeJournal || isCreateJournal"
                             style="color: red;">*</span></label>
-                    <input [disabled]="!isEditModeJournal && !isCreate" [(ngModel)]="journalDetails[0].EntryDate" type="text"
+                    <input [disabled]="!isEditModeJournal && !isCreateJournal" [(ngModel)]="entryDate" type="text"
                         id="entryDate" name="entryDate" #dateInputs [ngClass]="{
                             'error-border': errorMessages['EntryDate']}" />
                 </div>
 
                 <div class="input-field">
                     <label for="enteredBy">Entered By</label>
-                    <input disabled type="text" [(ngModel)]="journalDetails[0].EntryByUser" id="enteredBy"
+                    <input disabled type="text" [(ngModel)]="entryBy" id="enteredBy"
                         name="enteredBy" />
                 </div>
 
@@ -78,9 +78,9 @@
                 </div>
 
                 <div class="input-field">
-                    <label for="lastmodifiedBy">Title <span *ngIf="isEditModeJournal || isCreate"
+                    <label for="lastmodifiedBy">Title <span *ngIf="isEditModeJournal || isCreateJournal"
                             style="color: red;">*</span></label>
-                    <input [disabled]="!isEditModeJournal && !isCreate" [(ngModel)]="journalDetails[0].EntryTitle" type="text"
+                    <input [disabled]="!isEditModeJournal && !isCreateJournal" [(ngModel)]="entryTitle" type="text"
                         id="lastmodifiedBy" name="lastmodifiedBy" [ngClass]="{
                             'error-border': errorMessages['EntryTitle']}" />
                 </div>
@@ -88,16 +88,16 @@
                 <div class="subject-container">
                     <label class="subject-label" for="subject">
                         Subject
-                        <span *ngIf="isEditModeJournal || isCreate" style="color: red;">*</span>
+                        <span *ngIf="isEditModeJournal || isCreateJournal" style="color: red;">*</span>
                     </label>
 
 
                     <table class="subject-table fixed-width-table">
-                        <tr *ngFor="let subject of ((isEditModeJournal || isCreate ) ? journalSubjectTypes : subjectData)"
-                            [hidden]="!isEditModeJournal && !subject.isSelected && !isCreate">
+                        <tr *ngFor="let subject of ((isEditModeJournal || isCreateJournal ) ? journalSubjectTypes : subjectData)"
+                            [hidden]="!isEditModeJournal && !subject.isSelected && !isCreateJournal">
                             <!-- Checkbox column -->
                             <td class="checkbox-column">
-                                <input type="checkbox" [disabled]="!isEditModeJournal && !isCreate" [checked]="subject.isSelected"
+                                <input type="checkbox" [disabled]="!isEditModeJournal && !isCreateJournal" [checked]="subject.isSelected"
                                     (change)="toggleSelection(subject, $event)" />
                             </td>
 
@@ -107,7 +107,7 @@
                             <!-- Action column -->
                             <td class="action-column">
                                 <ng-container *ngIf="subject.isSelected">
-                                    <ng-container *ngIf="isEditModeJournal || isCreate">
+                                    <ng-container *ngIf="isEditModeJournal || isCreateJournal">
                                         <!-- Dropdown options -->
                                         <ng-container *ngIf="getDropdownOptions(subject).length > 0; else otherInput">
                                             <select class="subject-dropdown" [(ngModel)]="subject.selectedValue"
@@ -129,7 +129,7 @@
                                     </ng-container>
 
                                     <!-- Static text for checked items in view mode -->
-                                    <ng-container *ngIf="!isEditModeJournal && !isCreate">
+                                    <ng-container *ngIf="!isEditModeJournal && !isCreateJournal">
                                         {{ subject.ObjectInstanceDesc || subject.JournalSubjectOtherDesc || '' }}
                                     </ng-container>
                                 </ng-container>
@@ -147,7 +147,7 @@
                 <div class="input-field notes">
                     <label for="notes">Notes</label>
                     <div>
-                        <ckeditor *ngIf="isEditModeJournal || isCreate; else notes" [(ngModel)]="journalDetails[0].EntryNotes"
+                        <ckeditor *ngIf="isEditModeJournal || isCreateJournal; else notes" [(ngModel)]="entryNotes"
                             [editor]="Editor" [config]="config"></ckeditor>
                     </div>
                     <ng-template #notes>
@@ -179,7 +179,7 @@
 
             <!-- Attachment Section -->
 
-            <div class="attachment">
+            <div *ngIf="journalDoc.length > 0" class="attachment">
                 <div class="popup-header">
                     <h3>Attachment (if any)</h3>
                 </div>

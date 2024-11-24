@@ -24,7 +24,7 @@ export class JournalViewDetailsComponent implements OnInit {
   @Input() journal: any;
   @Input() firmDetails: any;
   @Input() firmId: any;
-  @Input() isCreate: boolean = false;
+  @Input() isCreateJournal: boolean = false;
 
   @Output() closeJournalPopup = new EventEmitter<void>();
   @Output() reloadJournal = new EventEmitter<void>();
@@ -41,7 +41,7 @@ export class JournalViewDetailsComponent implements OnInit {
 
   currentDate = new Date();
 
-  journalDoc: any = {};
+  journalDoc: any = [];
 
   // dropdowns
   alljournalEntryTypes: any = [];
@@ -72,6 +72,21 @@ export class JournalViewDetailsComponent implements OnInit {
 
   // popups
   callDeleteJournal: boolean = false;
+
+  createJournalObj = {
+    JournalEntryTypeID: 0,
+    JournalEntryTypeDesc: null, 
+    EntryTitle: null,
+    EntryDate: null, 
+    EntryBy: null,
+    EntryByUser: null,
+    LastModifiedBy: null, 
+    IsDeleted: false, 
+    EntryNotes: null, 
+    DeletedBy: null,
+    DeletedDate: null, 
+    ReasonForDeletion: null,
+  }
 
   public Editor = ClassicEditor;
 
@@ -115,7 +130,7 @@ export class JournalViewDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (!this.isCreate) {
+    if (!this.isCreateJournal) {
       forkJoin({
         subjectData: this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes),
         subjectTypes: this.popuplateSubjectTypes(),
@@ -165,6 +180,8 @@ export class JournalViewDetailsComponent implements OnInit {
           this.UserDirector = isDirector;
           this.ValidFirmSupervisor = isSupervisor;
           this.FirmAMLSupervisor = isAMLSupervisor;
+
+          this.loadDocuments();
 
           // Apply security after all data is loaded
           this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
@@ -236,7 +253,7 @@ export class JournalViewDetailsComponent implements OnInit {
       this.hideDeleteBtn = true;
       return;
     } else {
-      if (this.isCreate) {
+      if (this.isCreateJournal) {
         this.hideSaveBtn = false;
         this.hideCancelBtn = false;
         this.hideEditBtn = true;
@@ -321,11 +338,11 @@ export class JournalViewDetailsComponent implements OnInit {
 
   cancelJournal() {
     this.errorMessages = {};
-    if (this.isCreate) {
+    if (this.isCreateJournal) {
       this.closeJournalPopup.emit();
     }
     this.isEditModeJournal = false;
-    
+
     this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.subjectData).subscribe(() => {
       console.log('Journal Subject Data Updated:', this.subjectData);
     });
@@ -411,14 +428,22 @@ export class JournalViewDetailsComponent implements OnInit {
   }
 
   toggleSelection(subject: any, event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    subject.isSelected = inputElement.checked; // Update the selection status
-
-    if (!subject.isSelected) {
-      subject.ObjectInstanceDesc = null; // Clear description when unchecked
-      subject.JournalSubjectOtherDesc = null; // Clear other description when unchecked
+    const checkbox = event.target as HTMLInputElement;
+    subject.isSelected = checkbox.checked;
+  
+    if (subject.isSelected) {
+      // Ensure selectedValue is set to the default "Select" option (0) in create mode
+      if (this.isCreateJournal && subject.selectedValue === undefined) {
+        subject.selectedValue = 0; // Default to 'Select'
+      }
+    } else {
+      // Clear values when unchecked
+      subject.selectedValue = 0;
+      subject.JournalSubjectOtherDesc = '';
+      subject.ObjectInstanceDesc = null;
     }
   }
+  
 
 
 
@@ -475,27 +500,95 @@ export class JournalViewDetailsComponent implements OnInit {
     );
   }
 
+  //getters and setters
+  get entryTypeID() {
+    return this.isCreateJournal ? this.createJournalObj.JournalEntryTypeID : this.journalDetails[0]?.JournalEntryTypeID;
+  }
+  
+  set entryTypeID(value: number) {
+    if (this.isCreateJournal) {
+      this.createJournalObj.JournalEntryTypeID = value;
+    } else {
+      this.journalDetails[0].JournalEntryTypeID = value;
+    }
+  }
+  
+  get entryDate() {
+    return this.isCreateJournal ? this.createJournalObj.EntryDate : this.journalDetails[0]?.EntryDate;
+  }
+  
+  set entryDate(value: string) {
+    if (this.isCreateJournal) {
+      this.createJournalObj.EntryDate = value;
+    } else {
+      this.journalDetails[0].EntryDate = value;
+    }
+  }
+
+  get entryBy() {
+    return this.isCreateJournal ? this.createJournalObj.EntryByUser : this.journalDetails[0]?.EntryByUser;
+  }
+  
+  set entryBy(value: number) {
+    if (this.isCreateJournal) {
+      this.createJournalObj.EntryBy = value;
+    } else {
+      this.journalDetails[0].EntryBy = value;
+    }
+  }
+
+  get entryTitle() {
+    return this.isCreateJournal ? this.createJournalObj.EntryTitle : this.journalDetails[0]?.EntryTitle;
+  }
+  
+  set entryTitle(value: string) {
+    if (this.isCreateJournal) {
+      this.createJournalObj.EntryTitle = value;
+    } else {
+      this.journalDetails[0].EntryTitle = value;
+    }
+  }
+
+  get entryNotes() {
+    return this.isCreateJournal ? this.createJournalObj.EntryNotes : this.journalDetails[0].EntryNotes;
+  }
+  
+  set entryNotes(value: string) {
+    if (this.isCreateJournal) {
+      this.createJournalObj.EntryNotes = value;
+    } else {
+      this.journalDetails[0].EntryNotes = value;
+    }
+  }
+
   async validateJournal(): Promise<boolean> {
     this.hasValidationErrors = false;
 
+    const entryType = this.isCreateJournal ? this.createJournalObj.JournalEntryTypeID : this.journalDetails[0].JournalEntryTypeID
+
     // Validate Journal Entry Type
-    if (parseInt(this.journalDetails[0].JournalEntryTypeID) === 0) {
+    if (parseInt(entryType) === 0) {
       this.loadErrorMessages('EntryType', 18017);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['EntryType'];
     }
 
+    const entryDate = this.isCreateJournal ? this.createJournalObj.JournalEntryTypeID : this.journalDetails[0].EntryDate;
+
     // Validate Entry Date
-    if (this.supervisionService.isNullOrEmpty(this.journalDetails[0].EntryDate)) {
+    if (this.supervisionService.isNullOrEmpty(entryDate)) {
       this.loadErrorMessages('EntryDate', 18018);
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['EntryDate'];
     }
 
+    const entryTitle = this.isCreateJournal ? this.createJournalObj.EntryTitle : this.journalDetails[0].EntryTitle;
+
+
     // Validate Entry Title
-    if (this.supervisionService.isNullOrEmpty(this.journalDetails[0].EntryTitle)) {
+    if (this.supervisionService.isNullOrEmpty(entryTitle)) {
       this.loadErrorMessages('EntryTitle', 18020);
       this.hasValidationErrors = true;
     } else {
@@ -615,6 +708,9 @@ export class JournalViewDetailsComponent implements OnInit {
         this.firmDetailsService.showSaveSuccessAlert(18025);
         this.isEditModeJournal = false;
         this.isLoading = false;
+        if (this.isCreateJournal) {
+          this.closeJournalPopup.emit();
+        }
         this.loadJournalDetails(this.journal.SupervisionJournalID);
         this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.subjectData).subscribe(() => {
           console.log('Journal Subject Data Updated:', this.subjectData);
@@ -635,20 +731,20 @@ export class JournalViewDetailsComponent implements OnInit {
   prepareJournalObject(userId: number) {
     return {
       objSupJournal: {
-        supervisionJournalID: this.journalDetails[0].SupervisionJournalID,
+        supervisionJournalID: this.isCreateJournal ? null : this.journalDetails[0].SupervisionJournalID,
         firmID: this.firmId,
-        journalEntryTypeID: this.journalDetails[0].JournalEntryTypeID,
-        journalEntryTypeDesc: this.journalDetails[0].JournalEntryTypeDesc,
-        entryBy: this.journalDetails[0].EntryBy,
+        journalEntryTypeID: this.isCreateJournal ? this.createJournalObj.JournalEntryTypeID : this.journalDetails[0].JournalEntryTypeID,
+        journalEntryTypeDesc: this.isCreateJournal ? this.createJournalObj.JournalEntryTypeDesc : this.journalDetails[0].JournalEntryTypeDesc,
+        entryBy: this.isCreateJournal ? this.userId : this.journalDetails[0].EntryBy,
         entryByUser: null,
-        entryDate: this.dateUtilService.convertDateToYYYYMMDD(this.journalDetails[0].EntryDate),
-        entryTitle: this.journalDetails[0].EntryTitle,
-        entryNotes: this.journalDetails[0].EntryNotes,
-        isDeleted: this.journalDetails[0].IsDeleted,
-        deletedBy: this.journalDetails[0].DeletedBy,
-        deletedByUser: this.journalDetails[0].DeletedBy,
-        deletedDate: this.journalDetails[0].DeletedDate,
-        reasonForDeletion: this.reasonOfDeletion,
+        entryDate: this.isCreateJournal ? this.dateUtilService.convertDateToYYYYMMDD(this.createJournalObj.EntryDate) : this.dateUtilService.convertDateToYYYYMMDD(this.journalDetails[0].EntryDate),
+        entryTitle: this.isCreateJournal ? this.createJournalObj.EntryTitle : this.journalDetails[0].EntryTitle,
+        entryNotes: this.isCreateJournal ? this.createJournalObj.EntryNotes : this.journalDetails[0].EntryNotes,
+        isDeleted: this.isCreateJournal ? this.createJournalObj.IsDeleted : this.journalDetails[0].IsDeleted,
+        deletedBy: this.isCreateJournal ? this.createJournalObj.DeletedBy : this.journalDetails[0].DeletedBy,
+        deletedByUser: this.isCreateJournal ? null : this.journalDetails[0].DeletedBy,
+        deletedDate: this.isCreateJournal ? this.createJournalObj.DeletedDate : this.journalDetails[0].DeletedDate,
+        reasonForDeletion: this.isCreateJournal ? null : this.reasonOfDeletion,
         createdBy: this.userId,
         lastModifiedBy: null,
         lastModifiedDate: this.currentDate,
@@ -663,7 +759,7 @@ export class JournalViewDetailsComponent implements OnInit {
           return {
             journalSubjectAssnID: matchedData?.JournalSubjectAssnID || null,
             journalSubjectTypeID: subject.JournalSubjectTypeID,
-            supervisionJournalID: matchedData?.SupervisionJournalID || this.journalDetails[0].SupervisionJournalID,
+            supervisionJournalID: matchedData?.SupervisionJournalID || this.journalDetails[0].SupervisionJournalID || null,
             objectID: subject.ObjectID || null,
             objectInstanceID:
               subject.JournalSubjectTypeID === 1 // 1 is the ID for "Firm"
@@ -714,7 +810,7 @@ export class JournalViewDetailsComponent implements OnInit {
       deletedBy: this.userId,
       deletedDate: this.currentDate,
       reasonForDeletion: this.reasonOfDeletion || null,
-      lastModifiedBy: this.userId,
+      lastModifiedBy: this.userId.toString(),
     };
 
     this.journalService.deleteJournalData(deletePayload).subscribe(
@@ -722,6 +818,7 @@ export class JournalViewDetailsComponent implements OnInit {
         console.log('Delete successful:', response);
         this.firmDetailsService.showSaveSuccessAlert(18015);
         this.closeDeleteJournalPopup();
+        this.reloadJournal.emit();
         this.onClose();
       },
       error => {
@@ -740,7 +837,7 @@ export class JournalViewDetailsComponent implements OnInit {
       },
       error => {
         console.error('Error loading document:', error);
-        this.journalDoc = {};
+        this.journalDoc = [];
 
       }
     );
