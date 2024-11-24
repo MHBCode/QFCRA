@@ -320,8 +320,12 @@ export class JournalViewDetailsComponent implements OnInit {
   }
 
   cancelJournal() {
-    this.isEditModeJournal = false;
     this.errorMessages = {};
+    if (this.isCreate) {
+      this.closeJournalPopup.emit();
+    }
+    this.isEditModeJournal = false;
+    
     this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.subjectData).subscribe(() => {
       console.log('Journal Subject Data Updated:', this.subjectData);
     });

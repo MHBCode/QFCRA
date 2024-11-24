@@ -129,7 +129,7 @@
                                     </ng-container>
 
                                     <!-- Static text for checked items in view mode -->
-                                    <ng-container *ngIf="!isEditModeJournal">
+                                    <ng-container *ngIf="!isEditModeJournal && !isCreate">
                                         {{ subject.ObjectInstanceDesc || subject.JournalSubjectOtherDesc || '' }}
                                     </ng-container>
                                 </ng-container>
