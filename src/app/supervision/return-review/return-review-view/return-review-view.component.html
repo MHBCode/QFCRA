@@ -45,7 +45,7 @@
                     <input type="text" id="leadRegulator" name="leadRegulator" [(ngModel)]="RegulatorData"                         [disabled]="!isEditable" />
                 </div>
             </div>
-            <div class="rpt-list margin-top-10">
+            <div class="rpt-list margin-top-10" *ngIf="firmRevDetails.firmRptReviewItems">
                 <div class="popup-header">
                     <h3>Report Reviewed</h3>
                 </div>
@@ -157,7 +157,7 @@
                       </div>
                 </ng-container>
             </div>
-            <div class="rpt-list margin-top-10">
+            <div class="rpt-list margin-top-10" >
                 <div class="popup-header">
                     <h3>Review</h3>
                 </div>

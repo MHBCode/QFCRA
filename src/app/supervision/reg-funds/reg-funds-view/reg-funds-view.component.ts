@@ -102,7 +102,6 @@ export class RegFundsViewComponent {
         // Assign full response to firmRevDetails
         this.RegisteredFundStatusDetials = res.response;
         console.log("RegisteredFundStatusDetials",this.RegisteredFundStatusDetials)
-        this.isLoading=false;
       },
       error: (error) => {
         console.error('Error fetching return review details:', error);
@@ -117,7 +116,6 @@ export class RegFundsViewComponent {
       next: (res) => {
         this.SubFundData = res.response; // Assign the response
         console.log('SubFundData:', this.SubFundData);
-        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error fetching sub-fund data:', error);
