@@ -44,12 +44,7 @@ export class JournalService {
 
   saveSupJournalData(rowData: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<any>(`${this.baseUrlJournal}save_sup_journal_data`, rowData, { headers: headers });
-  }
-
-  insertUpdateJournalSup(rowData: any): Observable<any> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<any>(`${this.baseUrlJournal}inser_update_journal_supervision`, rowData, { headers: headers });
+    return this.http.post<any>(`${this.baseUrlJournal}save_update_sup_journal`, rowData, { headers: headers });
   }
 
   deleteJournalData(rowData: any): Observable<any> {

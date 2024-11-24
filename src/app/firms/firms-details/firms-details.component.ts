@@ -114,7 +114,7 @@ export class FirmsDetailsComponent implements OnInit{
 
 
   getSanitizedNotes(notes: string) {
-    return this.sanitizerService.getSanitizedNotes(notes);
+    return this.sanitizerService.sanitizeHtml(notes);
   }
 
   getInactiveUsers() {

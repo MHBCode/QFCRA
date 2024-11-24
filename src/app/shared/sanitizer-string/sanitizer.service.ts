@@ -1,30 +1,33 @@
 import { Injectable } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SanitizerService {
+  constructor(private sanitizer: DomSanitizer) {}
 
-  constructor(private sanitizer: DomSanitizer) { }
-
-  getSanitizedNotes(notes: string): SafeHtml {
-    if (typeof notes !== 'string') return '';
-  
-    // Use the sanitizer to bypass security and render the notes as HTML
-    return this.sanitizer.bypassSecurityTrustHtml(notes);
+  /**
+   * Sanitizes HTML content and allows rendering it safely.
+   * @param html - The HTML string to be sanitized.
+   * @returns SafeHtml
+   */
+  sanitizeHtml(html: string): SafeHtml {
+    if (typeof html !== 'string') return '';
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
+  /**
+   * Removes HTML tags and returns plain text.
+   * @param input - The string from which HTML tags should be removed.
+   * @returns Plain text
+   */
   removeHtmlTags(input: string | null | undefined): string {
-    // Check if input is null or undefined
     if (!input) {
       return ''; // Return an empty string if input is null or undefined
     }
-    // This regex will remove all HTML tags
+    // Regex to remove all HTML tags
     return input.replace(/<[^>]*>/g, '');
   }
 
-
 }
-

@@ -59,6 +59,6 @@
         </div>
     </div>
 
-    <app-journal-view-details *ngIf="showPopup" [journal]="selectedJournal" [firmId]="firmId"
+    <app-journal-view-details (reloadJournal)="loadJournal()" *ngIf="showPopup" [journal]="selectedJournal" [firmId]="firmId"
         [firmDetails]="firmDetails" (closeJournalPopup)="closePopup()">
     </app-journal-view-details>

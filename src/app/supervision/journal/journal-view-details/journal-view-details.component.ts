@@ -8,6 +8,8 @@ import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 import { SupervisionService } from '../../supervision.service';
 import { ClassicEditor, Bold, Essentials, Heading, Indent, IndentBlock, Italic, Link, List, MediaEmbed, Paragraph, Table, Undo, Font, FontSize, FontColor } from 'ckeditor5';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
+import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';
+import { SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-journal-view-details',
@@ -22,6 +24,7 @@ export class JournalViewDetailsComponent implements OnInit {
   @Input() firmDetails: any;
   @Input() firmId: any;
   @Output() closeJournalPopup = new EventEmitter<void>();
+  @Output() reloadJournal = new EventEmitter<void>();
 
   isEditModeJournal: boolean = false;
 
@@ -101,6 +104,7 @@ export class JournalViewDetailsComponent implements OnInit {
     private journalService: JournalService,
     private supervisionService: SupervisionService,
     private dateUtilService: DateUtilService,
+    private sanitizerService: SanitizerService
   ) {
   }
 
@@ -127,18 +131,22 @@ export class JournalViewDetailsComponent implements OnInit {
         isSupervisor,
         isAMLSupervisor,
       }) => {
-        // Process `subjectData` and `subjectTypes` together
+        // Assign the response to journalSubjectTypes and subjectData
         this.journalSubjectTypes = subjectTypes.response;
-        this.subjectData = subjectData.response;
 
-        // Map subject data to subject types
-        this.journalSubjectTypes.forEach((subject) => {
-          const matchedSubject = this.subjectData.find(
-            (s) => s.JournalSubjectTypeID === subject.JournalSubjectTypeID
+        // Synchronize `isSelected` and other properties for subjectData
+        this.subjectData = this.journalSubjectTypes.map((subject) => {
+          const matchedSubject = subjectData.response.find(
+            (s: any) => s.JournalSubjectTypeID === subject.JournalSubjectTypeID
           );
-          subject.isSelected = !!matchedSubject; // Mark as selected if it exists in the response
-          subject.ObjectInstanceDesc = matchedSubject?.ObjectInstanceDesc || null;
-          subject.JournalSubjectOtherDesc = matchedSubject?.JournalSubjectOtherDesc || null;
+
+          return {
+            ...subject, // Preserve existing properties from journalSubjectTypes
+            isSelected: !!matchedSubject, // Mark as selected if matched
+            ObjectInstanceDesc: matchedSubject?.ObjectInstanceDesc || null,
+            JournalSubjectOtherDesc: matchedSubject?.JournalSubjectOtherDesc || null,
+            selectedValue: matchedSubject?.ObjectInstanceID || 0, // Use matched ObjectInstanceID or default
+          };
         });
 
         // Assign other data to component properties
@@ -164,6 +172,7 @@ export class JournalViewDetailsComponent implements OnInit {
     this.populateJournalEntryTypes();
     this.populateJournalExternalAuditors();
   }
+
 
 
 
@@ -269,12 +278,17 @@ export class JournalViewDetailsComponent implements OnInit {
 
   cancelJournal() {
     this.isEditModeJournal = false;
+    this.errorMessages = {};
+    this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.subjectData).subscribe(() => {
+      console.log('Journal Subject Data Updated:', this.subjectData);
+    });
     this.loadJournalDetails(this.journal.SupervisionJournalID);
-    this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes);
+    this.reloadJournal.emit(); // recalls the loadJournal() function in journal component
     this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
   }
 
   onClose() {
+    this.errorMessages = {};
     this.closeJournalPopup.emit();
   }
 
@@ -417,10 +431,117 @@ export class JournalViewDetailsComponent implements OnInit {
   async validateJournal(): Promise<boolean> {
     this.hasValidationErrors = false;
 
+    // Validate Journal Entry Type
+    if (parseInt(this.journalDetails[0].JournalEntryTypeID) === 0) {
+      this.loadErrorMessages('EntryType', 18017);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['EntryType'];
+    }
 
+    // Validate Entry Date
+    if (this.supervisionService.isNullOrEmpty(this.journalDetails[0].EntryDate)) {
+      this.loadErrorMessages('EntryDate', 18018);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['EntryDate'];
+    }
+
+    // Validate Entry Title
+    if (this.supervisionService.isNullOrEmpty(this.journalDetails[0].EntryTitle)) {
+      this.loadErrorMessages('EntryTitle', 18020);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['EntryTitle'];
+    }
+
+    // Validate Checkbox Selection
+    const hasSelectedCheckbox = this.journalSubjectTypes.some(subject => subject.isSelected);
+    if (!hasSelectedCheckbox) {
+      this.loadErrorMessages('CheckboxSelection', 18024); // Message Key for No Checkbox Selected
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['CheckboxSelection'];
+    }
+
+    // Validate Dropdowns for Selected Checkboxes
+    let isSubjectSelected = false; // To track if any subject is selected
+
+    this.journalSubjectTypes.forEach((subject) => {
+      if (subject.isSelected) {
+        isSubjectSelected = true;
+
+        // Check specific dropdowns based on ObjectID
+        switch (subject.ObjectID) {
+          case FrimsObject.Firm:
+            // No additional validation for Firm
+            break;
+
+          case FrimsObject.Ais: // Approved Individuals
+            if (parseInt(subject.selectedValue) === 0) {
+              this.loadErrorMessages('AI', 18021);
+              this.hasValidationErrors = true;
+            } else {
+              delete this.errorMessages['AI'];
+            }
+            break;
+
+          case FrimsObject.Auditor: // External Auditors
+            if (parseInt(subject.selectedValue) === 0) {
+              this.loadErrorMessages('EA', 18022);
+              this.hasValidationErrors = true;
+            } else {
+              delete this.errorMessages['EA'];
+            }
+            break;
+
+          case FrimsObject.Contatcs: // Required Individuals
+            if (parseInt(subject.selectedValue) === 0) {
+              this.loadErrorMessages('RI', 18027);
+              this.hasValidationErrors = true;
+            } else {
+              delete this.errorMessages['RI'];
+            }
+            break;
+
+          default:
+            // For "Others" (JournalSubjectTypeID === 4)
+            if (parseInt(subject.JournalSubjectTypeID) === 4 && this.supervisionService.isNullOrEmpty(subject.JournalSubjectOtherDesc)) {
+              this.loadErrorMessages('Others', 18023);
+              this.hasValidationErrors = true;
+            } else {
+              delete this.errorMessages['Others'];
+            }
+            break;
+        }
+      } else {
+        delete this.errorMessages['Others'];
+        delete this.errorMessages['RI'];
+        delete this.errorMessages['AI'];
+        delete this.errorMessages['EA'];
+      }
+    });
 
     return !this.hasValidationErrors;
   }
+
+  hasDropdownError(objectID: number): boolean {
+    switch (objectID) {
+      case FrimsObject.Ais: // Approved Individuals
+        return !!this.errorMessages['AI'];
+      case FrimsObject.Auditor: // External Auditors
+        return !!this.errorMessages['EA'];
+      case FrimsObject.Contatcs: // Required Individuals
+        return !!this.errorMessages['RI'];
+      default:
+        return false;
+    }
+  }
+  
+  hasOtherInputError(subject: any): boolean {
+    return subject.JournalSubjectTypeID === 4 && !!this.errorMessages['Others'];
+  }
+
 
   // save
   async saveJournal() {
@@ -432,7 +553,7 @@ export class JournalViewDetailsComponent implements OnInit {
     console.log('Validation result:', isValid); // Debug log
 
     if (!isValid) {
-      this.firmDetailsService.showErrorAlert(constants.SupervisionData_Messages.SUPERVISION_SAVE_ERROR);
+      this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ENTER_REQUIREDFIELD_PRIORSAVING);
       this.isLoading = false;
       return; // Prevent further action if validation fails or the user cancels
     }
@@ -440,19 +561,18 @@ export class JournalViewDetailsComponent implements OnInit {
 
     // Proceed with saving
     const journalDataObj = this.prepareJournalObject(this.userId);
-    const subjectDataObj = this.prepareSubjectObject(this.userId);
 
-    forkJoin({
-      saveSupervision: this.journalService.saveSupJournalData(journalDataObj),
-      saveSupCategory: this.journalService.insertUpdateJournalSup(subjectDataObj)
-    }).subscribe(
+    this.journalService.saveSupJournalData(journalDataObj).subscribe(
       response => {
         console.log('Save successful:', response); // Debug log
         this.firmDetailsService.showSaveSuccessAlert(18025);
         this.isEditModeJournal = false;
         this.isLoading = false;
         this.loadJournalDetails(this.journal.SupervisionJournalID);
-        this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes)
+        this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.subjectData).subscribe(() => {
+          console.log('Journal Subject Data Updated:', this.subjectData);
+        });
+        this.reloadJournal.emit(); // recalls the loadJournal() function in journal component
         this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
       },
       error => {
@@ -467,37 +587,53 @@ export class JournalViewDetailsComponent implements OnInit {
 
   prepareJournalObject(userId: number) {
     return {
-      supervisionJournalID: this.journalDetails[0].SupervisionJournalID,
-      firmId: this.firmId,
-      journalEntryTypeID: this.journalDetails[0].JournalEntryTypeID,
-      entryBy: this.journalDetails[0].EntryBy,
-      entryDate: this.dateUtilService.convertDateToYYYYMMDD(this.journalDetails[0].EntryDate),
-      entryTitle: this.journalDetails[0].EntryTitle,
-      entryNotes: this.journalDetails[0].EntryNotes,
-      createdBy: userId,
-    }
+      objSupJournal: {
+        supervisionJournalID: this.journalDetails[0].SupervisionJournalID,
+        firmID: this.firmId,
+        journalEntryTypeID: this.journalDetails[0].JournalEntryTypeID,
+        journalEntryTypeDesc: this.journalDetails[0].JournalEntryTypeDesc,
+        entryBy: this.journalDetails[0].EntryBy,
+        entryByUser: null,
+        entryDate: this.dateUtilService.convertDateToYYYYMMDD(this.journalDetails[0].EntryDate),
+        entryTitle: this.journalDetails[0].EntryTitle,
+        entryNotes: this.journalDetails[0].EntryNotes,
+        isDeleted: this.journalDetails[0].IsDeleted,
+        deletedBy: this.journalDetails[0].DeletedBy,
+        deletedByUser: this.journalDetails[0].DeletedBy,
+        deletedDate: this.journalDetails[0].DeletedDate,
+        reasonForDeletion: this.reasonOfDeletion,
+        createdBy: this.userId,
+        lastModifiedBy: null,
+        lastModifiedDate: this.currentDate,
+      },
+      lstSupSubjects: this.journalSubjectTypes
+        .filter(subject => subject.isSelected) // Include only selected subjects
+        .map(subject => {
+          const matchedData = this.subjectData.find(
+            (data: any) => data.JournalSubjectTypeID === subject.JournalSubjectTypeID
+          );
+
+          return {
+            journalSubjectAssnID: matchedData?.JournalSubjectAssnID || null,
+            journalSubjectTypeID: subject.JournalSubjectTypeID,
+            supervisionJournalID: matchedData?.SupervisionJournalID || this.journalDetails[0].SupervisionJournalID,
+            objectID: subject.ObjectID || null,
+            objectInstanceID:
+              subject.JournalSubjectTypeID === 1 // 1 is the ID for "Firm"
+                ? this.firmId
+                : subject.selectedValue || matchedData?.ObjectInstanceID || null,
+            journalSubjectOtherDesc: subject.JournalSubjectOtherDesc || matchedData?.JournalSubjectOtherDesc || null,
+            journalSubjectTypeDesc: null,
+            displayOrder: subject.DisplayOrder || 0,
+            regulatorName: null,
+            individualName: null,
+            objectInstanceDesc: matchedData?.ObjectInstanceDesc,
+            createdBy: userId,
+          };
+        }),
+    };
   }
 
-
-  prepareSubjectObject(userId: number): any[] {
-    return this.journalSubjectTypes
-      .filter(subject => subject.isSelected) // Include only selected subjects
-      .map(subject => {
-        const matchedData = this.subjectData.find(
-          (data: any) => data.JournalSubjectTypeID === subject.JournalSubjectTypeID
-        );
-
-        return {
-          journalSubjectAssnID: matchedData?.JournalSubjectAssnID || 0,
-          supervisionJournalID: matchedData?.SupervisionJournalID || this.journal.SupervisionJournalID,
-          journalSubjectTypeID: subject.JournalSubjectTypeID,
-          objectID: subject.ObjectID || 0,
-          objectInstanceID: subject.selectedValue || matchedData?.ObjectInstanceID || 0,
-          journalSubjectOtherDesc: subject.JournalSubjectOtherDesc || matchedData?.JournalSubjectOtherDesc || '',
-          createdBy: userId,
-        };
-      });
-  }
 
   // delete
   getJournalDeletePopup() {
@@ -526,10 +662,10 @@ export class JournalViewDetailsComponent implements OnInit {
 
   deleteJournal() {
     const deletePayload = {
-      supervisionJournalID: this.journal.SupervisionJournalID, 
+      supervisionJournalID: this.journal.SupervisionJournalID,
       isDeleted: true,
-      deletedBy: this.userId, 
-      deletedDate: this.currentDate, 
+      deletedBy: this.userId,
+      deletedDate: this.currentDate,
       reasonForDeletion: this.reasonOfDeletion || null,
       lastModifiedBy: this.userId,
     };
@@ -547,6 +683,19 @@ export class JournalViewDetailsComponent implements OnInit {
     );
   }
 
+  loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+    this.supervisionService.getErrorMessages(fieldName, msgKey, null, placeholderValue).subscribe(
+      () => {
+        this.errorMessages[fieldName] = this.supervisionService.errorMessages[fieldName];
+        console.log(`Error message for ${fieldName} loaded successfully`);
+      },
+      error => {
+        console.error(`Error loading error message for ${fieldName}:`, error);
+      }
+    );
+  }
 
-
+  sanitizeHtml(html: string): SafeHtml {
+    return this.sanitizerService.sanitizeHtml(html);
+  }
 }
