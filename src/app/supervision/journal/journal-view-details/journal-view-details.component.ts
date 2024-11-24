@@ -7,6 +7,9 @@ import * as constants from 'src/app/app-constants';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 import { SupervisionService } from '../../supervision.service';
 import { ClassicEditor, Bold, Essentials, Heading, Indent, IndentBlock, Italic, Link, List, MediaEmbed, Paragraph, Table, Undo, Font, FontSize, FontColor } from 'ckeditor5';
+import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
+import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';
+import { SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-journal-view-details',
@@ -21,6 +24,7 @@ export class JournalViewDetailsComponent implements OnInit {
   @Input() firmDetails: any;
   @Input() firmId: any;
   @Output() closeJournalPopup = new EventEmitter<void>();
+  @Output() reloadJournal = new EventEmitter<void>();
 
   isEditModeJournal: boolean = false;
 
@@ -30,6 +34,9 @@ export class JournalViewDetailsComponent implements OnInit {
   journalDetails: any = [{}];
   subjectData: any[] = [];
   journalSubjectTypes: any = [];
+  reasonOfDeletion: string;
+
+  currentDate = new Date();
 
   // dropdowns
   alljournalEntryTypes: any = [];
@@ -37,6 +44,9 @@ export class JournalViewDetailsComponent implements OnInit {
   allApprovedIndividuals: any = [];
   allRequiredIndividuals: any = [];
 
+  // Validations
+  hasValidationErrors: boolean = false;
+  errorMessages: { [key: string]: string } = {};
 
   // Security
   hideEditBtn: boolean = false;
@@ -54,6 +64,9 @@ export class JournalViewDetailsComponent implements OnInit {
 
   assignedUserRoles: any = [];
   assignedLevelUsers: any = [];
+
+  // popups
+  callDeleteJournal: boolean = false;
 
   public Editor = ClassicEditor;
 
@@ -89,7 +102,9 @@ export class JournalViewDetailsComponent implements OnInit {
     private flatpickrService: FlatpickrService,
     private firmDetailsService: FirmDetailsService,
     private journalService: JournalService,
-    private supervisionService: SupervisionService
+    private supervisionService: SupervisionService,
+    private dateUtilService: DateUtilService,
+    private sanitizerService: SanitizerService
   ) {
   }
 
@@ -116,30 +131,34 @@ export class JournalViewDetailsComponent implements OnInit {
         isSupervisor,
         isAMLSupervisor,
       }) => {
-        // Process `subjectData` and `subjectTypes` together
+        // Assign the response to journalSubjectTypes and subjectData
         this.journalSubjectTypes = subjectTypes.response;
-        this.subjectData = subjectData.response;
-  
-        // Map subject data to subject types
-        this.journalSubjectTypes.forEach((subject) => {
-          const matchedSubject = this.subjectData.find(
-            (s) => s.JournalSubjectTypeID === subject.JournalSubjectTypeID
+
+        // Synchronize `isSelected` and other properties for subjectData
+        this.subjectData = this.journalSubjectTypes.map((subject) => {
+          const matchedSubject = subjectData.response.find(
+            (s: any) => s.JournalSubjectTypeID === subject.JournalSubjectTypeID
           );
-          subject.isSelected = !!matchedSubject; // Mark as selected if it exists in the response
-          subject.ObjectInstanceDesc = matchedSubject?.ObjectInstanceDesc || null;
-          subject.JournalSubjectOtherDesc = matchedSubject?.JournalSubjectOtherDesc || null;
+
+          return {
+            ...subject, // Preserve existing properties from journalSubjectTypes
+            isSelected: !!matchedSubject, // Mark as selected if matched
+            ObjectInstanceDesc: matchedSubject?.ObjectInstanceDesc || null,
+            JournalSubjectOtherDesc: matchedSubject?.JournalSubjectOtherDesc || null,
+            selectedValue: matchedSubject?.ObjectInstanceID || 0, // Use matched ObjectInstanceID or default
+          };
         });
-  
+
         // Assign other data to component properties
         this.assignedUserRoles = userRoles;
         this.assignedLevelUsers = levelUsers;
         this.allRequiredIndividuals = requiredIndividuals.response;
         this.allApprovedIndividuals = approvedIndividuals.response;
-  
+
         this.UserDirector = isDirector;
         this.ValidFirmSupervisor = isSupervisor;
         this.FirmAMLSupervisor = isAMLSupervisor;
-  
+
         // Apply security after all data is loaded
         this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
       },
@@ -147,14 +166,15 @@ export class JournalViewDetailsComponent implements OnInit {
         console.error('Error initializing page:', err);
       },
     });
-  
+
     // Load additional data that does not depend on forkJoin
     this.loadJournalDetails(this.journal.SupervisionJournalID);
     this.populateJournalEntryTypes();
     this.populateJournalExternalAuditors();
   }
-  
-  
+
+
+
 
 
 
@@ -251,16 +271,24 @@ export class JournalViewDetailsComponent implements OnInit {
     this.hideEditBtn = true;
     this.populateJournalExternalAuditors();
     this.registerMasterPageControlEvents();
+    this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes).subscribe(() => {
+      console.log('Journal Subject Data Loaded:', this.journalSubjectTypes);
+    });
   }
 
   cancelJournal() {
     this.isEditModeJournal = false;
+    this.errorMessages = {};
+    this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.subjectData).subscribe(() => {
+      console.log('Journal Subject Data Updated:', this.subjectData);
+    });
     this.loadJournalDetails(this.journal.SupervisionJournalID);
-    this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes);
+    this.reloadJournal.emit(); // recalls the loadJournal() function in journal component
     this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
   }
 
   onClose() {
+    this.errorMessages = {};
     this.closeJournalPopup.emit();
   }
 
@@ -280,49 +308,72 @@ export class JournalViewDetailsComponent implements OnInit {
       tap((data) => {
         const selectedSubjects = data.response;
 
-        // Map selected subjects to the main list and add `isSelected`
+        // Map selected subjects to the main list and add `isSelected` and `selectedValue`
         subjectTypes.forEach((subject) => {
           const matchedSubject = selectedSubjects.find(
             (s) => s.JournalSubjectTypeID === subject.JournalSubjectTypeID
           );
+
           subject.isSelected = !!matchedSubject; // Mark as selected if it exists in the response
+          console.log(`Subject: ${subject.JournalSubjectTypeID}, isSelected: ${subject.isSelected}`);
           subject.ObjectInstanceDesc = matchedSubject?.ObjectInstanceDesc || null;
           subject.JournalSubjectOtherDesc = matchedSubject?.JournalSubjectOtherDesc || null;
+
+          // Set selectedValue for dropdowns
+          subject.selectedValue = matchedSubject?.ObjectInstanceID || 0; // Use ObjectInstanceID or default to 0
+
+          console.log('Updated Subject:', subject);
         });
       })
     );
   }
 
 
+
   getDropdownOptions(subject: any): any[] {
     switch (subject.JournalSubjectTypeID) {
-      case 5: // Registered Individual
-        return this.allRequiredIndividuals.map((ind: any) => ({
-          value: ind.ObjectInstanceID,
-          label: ind.ObjectInstanceDesc,
-        }));
       case 1: // Firm
+        return []; // No options for Firm
+      case 2: // Approved Individual
         return this.allApprovedIndividuals.map((ind: any) => ({
-          value: ind.ObjectInstanceID,
-          label: ind.ObjectInstanceDesc,
+          value: ind.AppIndividualID, // Ensure this is correctly set
+          label: ind.FullName, // Ensure this is correctly set
         }));
-      default: // External Auditors
+      case 5: // Required Individual
+        return this.allRequiredIndividuals.map((ind: any) => ({
+          value: ind.ContactID,
+          label: ind.FullName,
+        }));
+      case 3: // External Auditors
         return this.allExternalAuditors.map((auditor: any) => ({
-          value: auditor.ObjectInstanceID,
-          label: auditor.ObjectInstanceDesc,
+          value: auditor.OtherEntityID,
+          label: auditor.OtherEntityName,
         }));
+      case 4: // Others
+        return []; // Others does not have dropdown options
+      default:
+        return []; // Default case to handle unexpected types
     }
   }
 
 
+
+
   isChecked(subject: any): boolean {
-    return subject.isSelected;
+    return subject.isSelected === true;
   }
 
   toggleSelection(subject: any, event: Event): void {
     const inputElement = event.target as HTMLInputElement;
     subject.isSelected = inputElement.checked; // Update the selection status
+
+    if (!subject.isSelected) {
+      subject.ObjectInstanceDesc = null; // Clear description when unchecked
+      subject.JournalSubjectOtherDesc = null; // Clear other description when unchecked
+    }
   }
+
+
 
   populateJournalEntryTypes() {
     this.supervisionService.populateJournalEntryTypes(this.userId, constants.ObjectOpType.Edit).subscribe(
@@ -375,5 +426,276 @@ export class JournalViewDetailsComponent implements OnInit {
         console.error('Error fetching journal types:', error);
       }
     );
+  }
+
+  async validateJournal(): Promise<boolean> {
+    this.hasValidationErrors = false;
+
+    // Validate Journal Entry Type
+    if (parseInt(this.journalDetails[0].JournalEntryTypeID) === 0) {
+      this.loadErrorMessages('EntryType', 18017);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['EntryType'];
+    }
+
+    // Validate Entry Date
+    if (this.supervisionService.isNullOrEmpty(this.journalDetails[0].EntryDate)) {
+      this.loadErrorMessages('EntryDate', 18018);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['EntryDate'];
+    }
+
+    // Validate Entry Title
+    if (this.supervisionService.isNullOrEmpty(this.journalDetails[0].EntryTitle)) {
+      this.loadErrorMessages('EntryTitle', 18020);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['EntryTitle'];
+    }
+
+    // Validate Checkbox Selection
+    const hasSelectedCheckbox = this.journalSubjectTypes.some(subject => subject.isSelected);
+    if (!hasSelectedCheckbox) {
+      this.loadErrorMessages('CheckboxSelection', 18024); // Message Key for No Checkbox Selected
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['CheckboxSelection'];
+    }
+
+    // Validate Dropdowns for Selected Checkboxes
+    let isSubjectSelected = false; // To track if any subject is selected
+
+    this.journalSubjectTypes.forEach((subject) => {
+      if (subject.isSelected) {
+        isSubjectSelected = true;
+
+        // Check specific dropdowns based on ObjectID
+        switch (subject.ObjectID) {
+          case FrimsObject.Firm:
+            // No additional validation for Firm
+            break;
+
+          case FrimsObject.Ais: // Approved Individuals
+            if (parseInt(subject.selectedValue) === 0) {
+              this.loadErrorMessages('AI', 18021);
+              this.hasValidationErrors = true;
+            } else {
+              delete this.errorMessages['AI'];
+            }
+            break;
+
+          case FrimsObject.Auditor: // External Auditors
+            if (parseInt(subject.selectedValue) === 0) {
+              this.loadErrorMessages('EA', 18022);
+              this.hasValidationErrors = true;
+            } else {
+              delete this.errorMessages['EA'];
+            }
+            break;
+
+          case FrimsObject.Contatcs: // Required Individuals
+            if (parseInt(subject.selectedValue) === 0) {
+              this.loadErrorMessages('RI', 18027);
+              this.hasValidationErrors = true;
+            } else {
+              delete this.errorMessages['RI'];
+            }
+            break;
+
+          default:
+            // For "Others" (JournalSubjectTypeID === 4)
+            if (parseInt(subject.JournalSubjectTypeID) === 4 && this.supervisionService.isNullOrEmpty(subject.JournalSubjectOtherDesc)) {
+              this.loadErrorMessages('Others', 18023);
+              this.hasValidationErrors = true;
+            } else {
+              delete this.errorMessages['Others'];
+            }
+            break;
+        }
+      } else {
+        delete this.errorMessages['Others'];
+        delete this.errorMessages['RI'];
+        delete this.errorMessages['AI'];
+        delete this.errorMessages['EA'];
+      }
+    });
+
+    return !this.hasValidationErrors;
+  }
+
+  hasDropdownError(objectID: number): boolean {
+    switch (objectID) {
+      case FrimsObject.Ais: // Approved Individuals
+        return !!this.errorMessages['AI'];
+      case FrimsObject.Auditor: // External Auditors
+        return !!this.errorMessages['EA'];
+      case FrimsObject.Contatcs: // Required Individuals
+        return !!this.errorMessages['RI'];
+      default:
+        return false;
+    }
+  }
+  
+  hasOtherInputError(subject: any): boolean {
+    return subject.JournalSubjectTypeID === 4 && !!this.errorMessages['Others'];
+  }
+
+
+  // save
+  async saveJournal() {
+    this.isLoading = true;
+
+    // Validate before saving
+    const isValid = await this.validateJournal();
+
+    console.log('Validation result:', isValid); // Debug log
+
+    if (!isValid) {
+      this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ENTER_REQUIREDFIELD_PRIORSAVING);
+      this.isLoading = false;
+      return; // Prevent further action if validation fails or the user cancels
+    }
+
+
+    // Proceed with saving
+    const journalDataObj = this.prepareJournalObject(this.userId);
+
+    this.journalService.saveSupJournalData(journalDataObj).subscribe(
+      response => {
+        console.log('Save successful:', response); // Debug log
+        this.firmDetailsService.showSaveSuccessAlert(18025);
+        this.isEditModeJournal = false;
+        this.isLoading = false;
+        this.loadJournalDetails(this.journal.SupervisionJournalID);
+        this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.subjectData).subscribe(() => {
+          console.log('Journal Subject Data Updated:', this.subjectData);
+        });
+        this.reloadJournal.emit(); // recalls the loadJournal() function in journal component
+        this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
+      },
+      error => {
+        console.error('Error saving data:', error);
+        this.isLoading = false;
+      }
+    );
+  }
+
+
+
+
+  prepareJournalObject(userId: number) {
+    return {
+      objSupJournal: {
+        supervisionJournalID: this.journalDetails[0].SupervisionJournalID,
+        firmID: this.firmId,
+        journalEntryTypeID: this.journalDetails[0].JournalEntryTypeID,
+        journalEntryTypeDesc: this.journalDetails[0].JournalEntryTypeDesc,
+        entryBy: this.journalDetails[0].EntryBy,
+        entryByUser: null,
+        entryDate: this.dateUtilService.convertDateToYYYYMMDD(this.journalDetails[0].EntryDate),
+        entryTitle: this.journalDetails[0].EntryTitle,
+        entryNotes: this.journalDetails[0].EntryNotes,
+        isDeleted: this.journalDetails[0].IsDeleted,
+        deletedBy: this.journalDetails[0].DeletedBy,
+        deletedByUser: this.journalDetails[0].DeletedBy,
+        deletedDate: this.journalDetails[0].DeletedDate,
+        reasonForDeletion: this.reasonOfDeletion,
+        createdBy: this.userId,
+        lastModifiedBy: null,
+        lastModifiedDate: this.currentDate,
+      },
+      lstSupSubjects: this.journalSubjectTypes
+        .filter(subject => subject.isSelected) // Include only selected subjects
+        .map(subject => {
+          const matchedData = this.subjectData.find(
+            (data: any) => data.JournalSubjectTypeID === subject.JournalSubjectTypeID
+          );
+
+          return {
+            journalSubjectAssnID: matchedData?.JournalSubjectAssnID || null,
+            journalSubjectTypeID: subject.JournalSubjectTypeID,
+            supervisionJournalID: matchedData?.SupervisionJournalID || this.journalDetails[0].SupervisionJournalID,
+            objectID: subject.ObjectID || null,
+            objectInstanceID:
+              subject.JournalSubjectTypeID === 1 // 1 is the ID for "Firm"
+                ? this.firmId
+                : subject.selectedValue || matchedData?.ObjectInstanceID || null,
+            journalSubjectOtherDesc: subject.JournalSubjectOtherDesc || matchedData?.JournalSubjectOtherDesc || null,
+            journalSubjectTypeDesc: null,
+            displayOrder: subject.DisplayOrder || 0,
+            regulatorName: null,
+            individualName: null,
+            objectInstanceDesc: matchedData?.ObjectInstanceDesc,
+            createdBy: userId,
+          };
+        }),
+    };
+  }
+
+
+  // delete
+  getJournalDeletePopup() {
+    this.callDeleteJournal = true;
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.JournalDeletion') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .JournalDeletion not found');
+      }
+    }, 0);
+  }
+
+  closeDeleteJournalPopup() {
+    this.callDeleteJournal = false;
+    const popupWrapper = document.querySelector('.JournalDeletion') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none';
+      this.reasonOfDeletion = '';
+    } else {
+      console.error('Element with class .JournalDeletion not found');
+    }
+  }
+
+
+  deleteJournal() {
+    const deletePayload = {
+      supervisionJournalID: this.journal.SupervisionJournalID,
+      isDeleted: true,
+      deletedBy: this.userId,
+      deletedDate: this.currentDate,
+      reasonForDeletion: this.reasonOfDeletion || null,
+      lastModifiedBy: this.userId,
+    };
+
+    this.journalService.deleteJournalData(deletePayload).subscribe(
+      response => {
+        console.log('Delete successful:', response);
+        this.firmDetailsService.showSaveSuccessAlert(18015);
+        this.closeDeleteJournalPopup();
+        this.onClose();
+      },
+      error => {
+        console.error('Error deleting journal:', error);
+      }
+    );
+  }
+
+  loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+    this.supervisionService.getErrorMessages(fieldName, msgKey, null, placeholderValue).subscribe(
+      () => {
+        this.errorMessages[fieldName] = this.supervisionService.errorMessages[fieldName];
+        console.log(`Error message for ${fieldName} loaded successfully`);
+      },
+      error => {
+        console.error(`Error loading error message for ${fieldName}:`, error);
+      }
+    );
+  }
+
+  sanitizeHtml(html: string): SafeHtml {
+    return this.sanitizerService.sanitizeHtml(html);
   }
 }
