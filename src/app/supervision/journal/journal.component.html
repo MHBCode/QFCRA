@@ -9,7 +9,7 @@
                 </h2>
                 <div class="btn">
                     <button *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn"
-                        [disabled]="!getControlEnablement('imgBtnCreate')">
+                        [disabled]="!getControlEnablement('imgBtnCreate')" (click)="openJournalPopup(null,firmDetails,true)">
                         <i class="bi bi-plus"></i>
                         Create
                     </button>
@@ -30,7 +30,7 @@
                     </tr>
                 </thead>
                 <tbody *ngIf="paginatedItems?.length > 0; else noJournal">
-                    <tr *ngFor="let journal of paginatedItems" (click)="openJournalPopup(journal,firmDetails)">
+                    <tr *ngFor="let journal of paginatedItems" (click)="openJournalPopup(journal,firmDetails,false)">
                         <td>{{ journal?.JournalEntryTypeDesc }}</td>
                         <td>
                             <span *ngIf="journal.IsDeleted" style="color: red;">(Deleted)</span>
@@ -59,6 +59,6 @@
         </div>
     </div>
 
-    <app-journal-view-details (reloadJournal)="loadJournal()" *ngIf="showPopup" [journal]="selectedJournal" [firmId]="firmId"
+    <app-journal-view-details (reloadJournal)="loadJournal()" *ngIf="showPopup" [journal]="selectedJournal" [firmId]="firmId" [isCreate]="isCreate"
         [firmDetails]="firmDetails" (closeJournalPopup)="closePopup()">
     </app-journal-view-details>

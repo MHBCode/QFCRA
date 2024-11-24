@@ -24,6 +24,8 @@ export class JournalViewDetailsComponent implements OnInit {
   @Input() journal: any;
   @Input() firmDetails: any;
   @Input() firmId: any;
+  @Input() isCreate: boolean = false;
+
   @Output() closeJournalPopup = new EventEmitter<void>();
   @Output() reloadJournal = new EventEmitter<void>();
 
@@ -113,66 +115,94 @@ export class JournalViewDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    forkJoin({
-      subjectData: this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes),
-      subjectTypes: this.popuplateSubjectTypes(),
-      userRoles: this.firmDetailsService.loadAssignedUserRoles(this.userId),
-      levelUsers: this.firmDetailsService.loadAssignedLevelUsers(),
-      requiredIndividuals: this.popuplateRequiredIndividuals(),
-      approvedIndividuals: this.populateApprovedIndividuals(),
-      isDirector: this.isUserDirector(),
-      isSupervisor: this.isValidFirmSupervisor(),
-      isAMLSupervisor: this.isValidFirmAMLSupervisor(),
-    }).subscribe({
-      next: ({
-        subjectData,
-        subjectTypes,
-        userRoles,
-        levelUsers,
-        requiredIndividuals,
-        approvedIndividuals,
-        isDirector,
-        isSupervisor,
-        isAMLSupervisor,
-      }) => {
-        // Assign the response to journalSubjectTypes and subjectData
-        this.journalSubjectTypes = subjectTypes.response;
+    if (!this.isCreate) {
+      forkJoin({
+        subjectData: !this.isCreate ? this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes) : null,
+        subjectTypes: this.popuplateSubjectTypes(),
+        userRoles: this.firmDetailsService.loadAssignedUserRoles(this.userId),
+        levelUsers: this.firmDetailsService.loadAssignedLevelUsers(),
+        requiredIndividuals: this.popuplateRequiredIndividuals(),
+        approvedIndividuals: this.populateApprovedIndividuals(),
+        isDirector: this.isUserDirector(),
+        isSupervisor: this.isValidFirmSupervisor(),
+        isAMLSupervisor: this.isValidFirmAMLSupervisor(),
+      }).subscribe({
+        next: ({
+          subjectData,
+          subjectTypes,
+          userRoles,
+          levelUsers,
+          requiredIndividuals,
+          approvedIndividuals,
+          isDirector,
+          isSupervisor,
+          isAMLSupervisor,
+        }) => {
+          // Assign the response to journalSubjectTypes and subjectData
+          this.journalSubjectTypes = subjectTypes.response;
 
-        // Synchronize `isSelected` and other properties for subjectData
-        this.subjectData = this.journalSubjectTypes.map((subject) => {
-          const matchedSubject = subjectData.response.find(
-            (s: any) => s.JournalSubjectTypeID === subject.JournalSubjectTypeID
-          );
+          // Synchronize `isSelected` and other properties for subjectData
+          this.subjectData = this.journalSubjectTypes.map((subject) => {
+            const matchedSubject = subjectData.response.find(
+              (s: any) => s.JournalSubjectTypeID === subject.JournalSubjectTypeID
+            );
 
-          return {
-            ...subject, // Preserve existing properties from journalSubjectTypes
-            isSelected: !!matchedSubject, // Mark as selected if matched
-            ObjectInstanceDesc: matchedSubject?.ObjectInstanceDesc || null,
-            JournalSubjectOtherDesc: matchedSubject?.JournalSubjectOtherDesc || null,
-            selectedValue: matchedSubject?.ObjectInstanceID || 0, // Use matched ObjectInstanceID or default
-          };
-        });
+            return {
+              ...subject, // Preserve existing properties from journalSubjectTypes
+              isSelected: !!matchedSubject, // Mark as selected if matched
+              ObjectInstanceDesc: matchedSubject?.ObjectInstanceDesc || null,
+              JournalSubjectOtherDesc: matchedSubject?.JournalSubjectOtherDesc || null,
+              selectedValue: matchedSubject?.ObjectInstanceID || 0, // Use matched ObjectInstanceID or default
+            };
+          });
 
-        // Assign other data to component properties
-        this.assignedUserRoles = userRoles;
-        this.assignedLevelUsers = levelUsers;
-        this.allRequiredIndividuals = requiredIndividuals.response;
-        this.allApprovedIndividuals = approvedIndividuals.response;
+          // Assign other data to component properties
+          this.assignedUserRoles = userRoles;
+          this.assignedLevelUsers = levelUsers;
+          this.allRequiredIndividuals = requiredIndividuals.response;
+          this.allApprovedIndividuals = approvedIndividuals.response;
 
-        this.UserDirector = isDirector;
-        this.ValidFirmSupervisor = isSupervisor;
-        this.FirmAMLSupervisor = isAMLSupervisor;
+          this.UserDirector = isDirector;
+          this.ValidFirmSupervisor = isSupervisor;
+          this.FirmAMLSupervisor = isAMLSupervisor;
 
-        // Apply security after all data is loaded
-        this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
-      },
-      error: (err) => {
-        console.error('Error initializing page:', err);
-      },
-    });
+          // Apply security after all data is loaded
+          this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
+        },
+        error: (err) => {
+          console.error('Error initializing page:', err);
+        },
+      });
 
+      this.isEditModeJournal = true;
+      this.loadJournalDetails(this.journal.SupervisionJournalID);
+    }
+    else {
+      debugger;
+      forkJoin({
+        subjectTypes: this.popuplateSubjectTypes(),
+        requiredIndividuals: this.popuplateRequiredIndividuals(),
+        approvedIndividuals: this.populateApprovedIndividuals(),
+      }).subscribe({
+        next: ({
+          subjectTypes,
+          requiredIndividuals,
+          approvedIndividuals
+        }) => {
+          // Assign the response to journalSubjectTypes and subjectData
+          this.journalSubjectTypes = subjectTypes.response;
+          // Assign other data to component properties
+          this.allRequiredIndividuals = requiredIndividuals.response;
+          this.allApprovedIndividuals = approvedIndividuals.response;
+        },
+        error: (err) => {
+          console.error('Error initializing page:', err);
+        },
+      });
+
+      this.isEditModeJournal = false;
+    }
     // Load additional data that does not depend on forkJoin
-    this.loadJournalDetails(this.journal.SupervisionJournalID);
     this.populateJournalEntryTypes();
     this.populateJournalExternalAuditors();
   }
@@ -541,7 +571,7 @@ export class JournalViewDetailsComponent implements OnInit {
         return false;
     }
   }
-  
+
   hasOtherInputError(subject: any): boolean {
     return subject.JournalSubjectTypeID === 4 && !!this.errorMessages['Others'];
   }
