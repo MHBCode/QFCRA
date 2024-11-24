@@ -29,6 +29,7 @@ export class JournalComponent {
   alljournaldata: any;
   showPopup: boolean = false;
   selectedJournal: any = null;
+  isCreate:boolean = false;
 
   // Security
   hideEditBtn: boolean = false;
@@ -196,8 +197,11 @@ export class JournalComponent {
     );
   }
 
-  openJournalPopup(journal: any, firmDetails: any): void {
-    this.selectedJournal = journal;
+  openJournalPopup(journal: any, firmDetails: any,isCreate : boolean): void {
+    this.isCreate = isCreate;
+    if(journal){
+      this.selectedJournal = journal;
+    }
     this.showPopup = true;
   }
 

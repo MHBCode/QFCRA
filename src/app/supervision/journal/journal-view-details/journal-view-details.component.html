@@ -43,9 +43,9 @@
             </div>
             <div class="inputs-row">
                 <div class="input-field">
-                    <label for="entryType">Entry Type <span *ngIf="isEditModeJournal"
+                    <label for="entryType">Entry Type <span *ngIf="isEditModeJournal || isCreate"
                             style="color: red;">*</span></label>
-                    <select *ngIf="isEditModeJournal; else entryTypedropdown"
+                    <select *ngIf="isEditModeJournal || isCreate; else entryTypedropdown"
                         [(ngModel)]="journalDetails[0].JournalEntryTypeID" name="entryType" id="entryType" [ngClass]="{
                             'error-border': errorMessages['EntryType']}">
                         <option [value]="0">Select</option>
@@ -58,9 +58,9 @@
                 </div>
 
                 <div class="input-field">
-                    <label for="entryDate">Entry Date <span *ngIf="isEditModeJournal"
+                    <label for="entryDate">Entry Date <span *ngIf="isEditModeJournal || isCreate"
                             style="color: red;">*</span></label>
-                    <input [disabled]="!isEditModeJournal" [(ngModel)]="journalDetails[0].EntryDate" type="text"
+                    <input [disabled]="!isEditModeJournal && !isCreate" [(ngModel)]="journalDetails[0].EntryDate" type="text"
                         id="entryDate" name="entryDate" #dateInputs [ngClass]="{
                             'error-border': errorMessages['EntryDate']}" />
                 </div>
@@ -78,9 +78,9 @@
                 </div>
 
                 <div class="input-field">
-                    <label for="lastmodifiedBy">Title <span *ngIf="isEditModeJournal"
+                    <label for="lastmodifiedBy">Title <span *ngIf="isEditModeJournal || isCreate"
                             style="color: red;">*</span></label>
-                    <input [disabled]="!isEditModeJournal" [(ngModel)]="journalDetails[0].EntryTitle" type="text"
+                    <input [disabled]="!isEditModeJournal && !isCreate" [(ngModel)]="journalDetails[0].EntryTitle" type="text"
                         id="lastmodifiedBy" name="lastmodifiedBy" [ngClass]="{
                             'error-border': errorMessages['EntryTitle']}" />
                 </div>
@@ -88,16 +88,16 @@
                 <div class="subject-container">
                     <label class="subject-label" for="subject">
                         Subject
-                        <span *ngIf="isEditModeJournal" style="color: red;">*</span>
+                        <span *ngIf="isEditModeJournal || isCreate" style="color: red;">*</span>
                     </label>
 
 
                     <table class="subject-table fixed-width-table">
-                        <tr *ngFor="let subject of (isEditModeJournal ? journalSubjectTypes : subjectData)"
-                            [hidden]="!isEditModeJournal && !subject.isSelected">
+                        <tr *ngFor="let subject of ((isEditModeJournal || isCreate ) ? journalSubjectTypes : subjectData)"
+                            [hidden]="!isEditModeJournal && !subject.isSelected && !isCreate">
                             <!-- Checkbox column -->
                             <td class="checkbox-column">
-                                <input type="checkbox" [disabled]="!isEditModeJournal" [checked]="subject.isSelected"
+                                <input type="checkbox" [disabled]="!isEditModeJournal && !isCreate" [checked]="subject.isSelected"
                                     (change)="toggleSelection(subject, $event)" />
                             </td>
 
@@ -107,7 +107,7 @@
                             <!-- Action column -->
                             <td class="action-column">
                                 <ng-container *ngIf="subject.isSelected">
-                                    <ng-container *ngIf="isEditModeJournal">
+                                    <ng-container *ngIf="isEditModeJournal || isCreate">
                                         <!-- Dropdown options -->
                                         <ng-container *ngIf="getDropdownOptions(subject).length > 0; else otherInput">
                                             <select class="subject-dropdown" [(ngModel)]="subject.selectedValue"
