@@ -117,7 +117,7 @@ export class JournalViewDetailsComponent implements OnInit {
   ngOnInit(): void {
     if (!this.isCreate) {
       forkJoin({
-        subjectData: !this.isCreate ? this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes) : null,
+        subjectData: this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes),
         subjectTypes: this.popuplateSubjectTypes(),
         userRoles: this.firmDetailsService.loadAssignedUserRoles(this.userId),
         levelUsers: this.firmDetailsService.loadAssignedLevelUsers(),
@@ -173,12 +173,9 @@ export class JournalViewDetailsComponent implements OnInit {
           console.error('Error initializing page:', err);
         },
       });
-
-      this.isEditModeJournal = true;
       this.loadJournalDetails(this.journal.SupervisionJournalID);
     }
     else {
-      debugger;
       forkJoin({
         subjectTypes: this.popuplateSubjectTypes(),
         requiredIndividuals: this.popuplateRequiredIndividuals(),
