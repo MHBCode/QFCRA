@@ -2423,6 +2423,8 @@ export class ControllersComponent implements OnInit {
   ShowselectContact(contact: any) {
     this.CreatecontrollerDetails.FirstName = contact.FirstName;
     this.CreatecontrollerDetails.FamilyName = contact.FamilyName;
+    this.CreatecontrollerDetails.SecondName = contact.SecondName;
+    this.CreatecontrollerDetails.PassportNum = contact.PassportNum
     this.CreatecontrollerDetails.MobilePhone = contact.MobileNum;
     this.CreatecontrollerDetails.businessEmail = contact.BusEmail;
     this.CreatecontrollerDetails.JobTitle = contact.JobTitle;

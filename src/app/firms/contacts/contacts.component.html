@@ -674,8 +674,7 @@
         <div class="input-field">
           <label for="BusinessEmail">Business Email</label>
           <input name="BusinessEmail" id="BusinessEmail" type="text" [(ngModel)]="selectedContact.busEmail"
-            [readonly]="isBusinessEmailReadOnly" [disabled]="isBusinessEmailEnabled || !isEditContact" />
-          <i *ngIf="showInfoIcon" class="bi bi-info-circle" style="color: red;"></i>
+            [readonly]="isBusinessEmailReadOnly" [disabled]="isBusinessEmailEnabled || !isEditContact" (click)="onBusinessEmailChange()"/>
         </div>
         <div class="input-field">
           <label for="OtherEmail">Other Email</label>

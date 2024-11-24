@@ -274,6 +274,8 @@ deleteRegisteredFund() {
          userID: this.userId,
          createdByName: this.RegisteredFundDetials[0].CreatedByName,
          createdByDate: "",
+         previousName:this.RegisteredFundDetials[0].PreviousNames,
+         otherEntities:this.RegisteredFundDetials[0].OtherRelatedEntityName,
          lastModifiedByName: this.RegisteredFundDetials[0].LastModifiedByName,
          lastModifieDate: this.currentDate,
          registeredFundStatusTypeID: this.registeredFundStatusTypeID || 1,

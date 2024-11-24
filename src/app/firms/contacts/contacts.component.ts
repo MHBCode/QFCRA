@@ -329,7 +329,7 @@ export class ContactsComponent {
           this.selectedContact = data.response; // Assign the received data to selectedContact
           console.log("Selected contact: ", this.selectedContact); // Log to check data
 
-          if (this.selectedContact.isESSAccessActive) {
+          if (this.isESSAccessActive) {
             this.isBusinessEmailReadOnly = true;
             this.isBusinessEmailEnabled = false;
             this.showInfoIcon = true;
@@ -374,7 +374,17 @@ export class ContactsComponent {
   onInactiveContactsToggle(event: any): void {
     this.displayInactiveContacts = event.target.checked;
   }
-
+  isESSAccessActive : boolean = true;
+  onBusinessEmailChange(): void {
+    if (this.isESSAccessActive) {
+      Swal.fire({
+        
+        html: `The Business Email Address provided has been used to create an ESS User Account for this DNFBP individual and therefore cannot be modified.<br/><br/>
+               To have this email address updated, please ask the individual to update their user profile on the ESS website and FIRMS will be updated automatically.`,
+        confirmButtonText: 'OK'
+      });
+    }
+  }
   closeContactPopup() {
     this.isPopupVisible = false;
     this.isEditContact = false;
