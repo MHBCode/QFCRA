@@ -81,7 +81,7 @@
       
             <div class="input-field">
               <label for="SubFundDateFrom-{{i}}">Date From</label>
-              <input type="text" #dateInputs placeholder [disabled]="!isEditable" id="SubFundDateFrom-{{i}}" name="SubFundDateFrom-{{i}}" 
+              <input type="text" #dateInputs placeholder [disabled]="!isEditable" name="SubFundDateFrom-{{i}}" 
                 [(ngModel)]="SubFund.SubFundDateFrom" />
             </div>
       
@@ -163,11 +163,18 @@
                   name="statusDate-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
                   [(ngModel)]="RegFundDetials.RegisteredFundStatusDate" />
               </div>
+              <div class="input-field-notes">
+                <label for="notes">Notes</label>
+                <div>
+                    <ckeditor [(ngModel)]="RegFundDetials.RegisteredFundNotes" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                </div>
+              </div>
             </div>
+            
           </ng-container>
       </div>
      
-      <div class="rpt-list margin-top-10">
+      <!-- <div class="rpt-list margin-top-10">
         <div class="popup-header">
           <h3>Attachments (if any)</h3>
           <div class="add-sub-funds-btn-container">
@@ -177,21 +184,14 @@
         </div>
         <div class="inputs-row report-entry">
           <div class="input-field">
-            <label for="DocumentType">Document Type</label>
-            <!-- <input type="text" id="DocumentType" name="DocumentType" [disabled]="!isEditable" /> -->
-
-              <select name="DocumentType" id="DocumentType" >
-                <option *ngFor="let option of DocumentTypeList" [value]="option.DocSubTypeID">
-                  {{ option.DocSubTypeDesc }}
-                </option>
-              </select>
+            
           </div>
           <!-- <div class="input-field">
             <label for="submissionStatus">File Name</label>
             <input type="text" id="submissionStatus" name="submissionStatus" [disabled]="!isEditable" />
-          </div> -->
+          </div> 
         </div>
-      </div>
+      </div> -->
       <div class="btn justify-content-end">
         <button (click)="confirmDeleteRegisteredFund()" *ngIf="!isEditable">
           <i class="bi bi-trash"></i> Delete

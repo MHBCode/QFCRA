@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output,ChangeDetectorRef, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { ReturnReviewService } from 'src/app/ngServices/return-review.service';
 import { SupervisionService } from '../../supervision.service';
 import { SecurityService } from 'src/app/ngServices/security.service';
@@ -10,6 +10,8 @@ import { RegisteredfundService } from 'src/app/ngServices/registeredfund.service
 import { Bold, ClassicEditor, Essentials, Font, FontColor, FontSize, Heading, Indent, IndentBlock, Italic, Link, List, MediaEmbed, Paragraph, Table, Undo } from 'ckeditor5';
 import Swal from 'sweetalert2';
 import {ObjectwfService} from 'src/app/ngServices/objectwf.service';
+import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
+
 @Component({
   selector: 'app-reg-funds-view',
   templateUrl: './reg-funds-view.component.html',
@@ -31,6 +33,7 @@ export class RegFundsViewComponent {
   now = new Date();
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
+  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
   constructor(
     private returnReviewService: ReturnReviewService,
     private supervisionService: SupervisionService,
@@ -40,6 +43,7 @@ export class RegFundsViewComponent {
     private registeredFundService: RegisteredfundService,
     private firmDetailsService: FirmDetailsService,
     private objectwfService: ObjectwfService,
+    private flatpickrService: FlatpickrService,
 
   ) {
 
@@ -56,6 +60,12 @@ export class RegFundsViewComponent {
     this.getRegisteredFundDetail();
     this.getDocumentType();
     this.initializeDefaults();
+  }
+  ngAfterViewInit() {
+    this.dateInputs.changes.subscribe(() => {
+      this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+    });
+    this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
   }
   onClose(): void {
     this.closeRegPopup.emit();
@@ -274,6 +284,7 @@ deleteRegisteredFund() {
          userID: this.userId,
          createdByName: this.RegisteredFundDetials[0].CreatedByName,
          createdByDate: "",
+         rfNotes: this.RegisteredFundDetials[0].RegisteredFundNotes,
          previousName:this.RegisteredFundDetials[0].PreviousNames,
          otherEntities:this.RegisteredFundDetials[0].OtherRelatedEntityName,
          lastModifiedByName: this.RegisteredFundDetials[0].LastModifiedByName,
