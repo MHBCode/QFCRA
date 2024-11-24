@@ -44,9 +44,9 @@
     margin-bottom: 20px;
   }
   
-  .btn {
-    justify-content: center;
-  }
+  // .btn {
+  //   justify-content: center;
+  // }
   
   .revision-item {
     cursor: pointer;
@@ -60,20 +60,20 @@
     }
   }
   
-  .close-button {
-    background-color: #a43030;
-    color: white;
-    border: none;
-    padding: 4px 6px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 20px auto 0 auto;
-    /* Center horizontally */
-    display: block;
-    text-align: center;
-    width: fit-content;
-    /* Adjust width to fit content */
-  }
+  // .close-button {
+  //   background-color: #a43030;
+  //   color: white;
+  //   border: none;
+  //   padding: 4px 6px;
+  //   border-radius: 4px;
+  //   cursor: pointer;
+  //   margin: 20px auto 0 auto;
+  //   /* Center horizontally */
+  //   display: block;
+  //   text-align: center;
+  //   width: fit-content;
+  //   /* Adjust width to fit content */
+  // }
   
   #reportFilter {
     padding: 5px;
@@ -149,4 +149,8 @@
   width: 100%;
   display: flex;
   justify-content: flex-end;
+}
+.input-field-notes{
+  width: 100%;
+  min-height: 250px;
 }
