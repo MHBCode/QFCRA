@@ -129,7 +129,7 @@
                                     </ng-container>
 
                                     <!-- Static text for checked items in view mode -->
-                                    <ng-container *ngIf="!isEditModeJournal">
+                                    <ng-container *ngIf="!isEditModeJournal && !isCreate">
                                         {{ subject.ObjectInstanceDesc || subject.JournalSubjectOtherDesc || '' }}
                                     </ng-container>
                                 </ng-container>
@@ -147,8 +147,8 @@
                 <div class="input-field notes">
                     <label for="notes">Notes</label>
                     <div>
-                        <ckeditor *ngIf="isEditModeJournal; else notes" [(ngModel)]="journalDetails[0].EntryNotes"
-                            [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                        <ckeditor *ngIf="isEditModeJournal || isCreate; else notes" [(ngModel)]="journalDetails[0].EntryNotes"
+                            [editor]="Editor" [config]="config"></ckeditor>
                     </div>
                     <ng-template #notes>
                         <p [innerHTML]="sanitizeHtml(journalDetails[0].EntryNotes)">
