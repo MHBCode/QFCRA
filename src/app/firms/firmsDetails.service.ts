@@ -401,7 +401,6 @@ export class FirmDetailsService {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-  // Added by Moe
   loadFirmAddresses(firmId: number): Observable<any> {
     return new Observable(observer => {
       this.addressService.getCoreFirmAddresses(firmId).subscribe(
@@ -416,7 +415,6 @@ export class FirmDetailsService {
     });
   }
 
-  // Added by Moe
   checkFirmLicense(firmId: number) {
     this.applicationService.isFirmLicensed(firmId).subscribe(
       (response) => {
@@ -429,7 +427,6 @@ export class FirmDetailsService {
     );
   }
 
-  // Added by Moe
   checkFirmAuthorisation(firmId: number) {
     this.applicationService.isFirmAuthorised(firmId).subscribe(
       (response) => {

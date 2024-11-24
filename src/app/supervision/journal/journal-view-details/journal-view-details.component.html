@@ -111,7 +111,7 @@
                                         <!-- Dropdown options -->
                                         <ng-container *ngIf="getDropdownOptions(subject).length > 0; else otherInput">
                                             <select class="subject-dropdown" [(ngModel)]="subject.selectedValue"
-                                            [ngClass]="{'error-border': hasDropdownError(subject.ObjectID)}">
+                                                [ngClass]="{'error-border': hasDropdownError(subject.ObjectID)}">
                                                 <option [value]="0">Select</option>
                                                 <option *ngFor="let option of getDropdownOptions(subject)"
                                                     [value]="option.value">
@@ -123,8 +123,8 @@
                                         <!-- Input field for "Others" -->
                                         <ng-template #otherInput>
                                             <input class="others-text" *ngIf="subject.JournalSubjectTypeID === 4"
-                                                type="text" [(ngModel)]="subject.JournalSubjectOtherDesc" 
-                                                [ngClass]="{'error-border': hasOtherInputError(subject)}"/>
+                                                type="text" [(ngModel)]="subject.JournalSubjectOtherDesc"
+                                                [ngClass]="{'error-border': hasOtherInputError(subject)}" />
                                         </ng-template>
                                     </ng-container>
 
@@ -154,6 +154,26 @@
                         <p [innerHTML]="sanitizeHtml(journalDetails[0].EntryNotes)">
                         </p>
                     </ng-template>
+                </div>
+            </div>
+
+            <div *ngIf="journalDetails[0].IsDeleted" class="inputs-row">
+                <div class="input-field">
+                    <label for="deletedBy">Deleted By</label>
+                    <input disabled type="text" [(ngModel)]="journalDetails[0].DeletedBy" id="deletedBy"
+                        name="deletedBy" />
+                </div>
+
+                <div class="input-field">
+                    <label for="deletedDate">Deleted Date</label>
+                    <input disabled type="text" [(ngModel)]="journalDetails[0].DeletedDate" id="deletedDate"
+                        name="deletedDate" />
+                </div>
+
+                <div class="input-field">
+                    <label for="reasonForDeletion">Reason for deletion</label>
+                    <input disabled type="text" [(ngModel)]="journalDetails[0].ReasonForDeletion" id="reasonForDeletion"
+                        name="reasonForDeletion" />
                 </div>
             </div>
 
@@ -204,10 +224,9 @@
             <textarea [(ngModel)]="reasonOfDeletion" name="deleteReason" id="deleteReason">
             </textarea>
         </div>
-        <button class="butt ok-butt" (click)="deleteJournal()">Ok</button>
-        <button class="butt cancel-butt" (click)="closeDeleteJournalPopup()">Cancel</button>
-    </div>
-    <div class="popup-operations-place">
-        <button class="subbutton" (click)="closeDeleteJournalPopup()">Close</button>
+        <div class="btns-container">
+            <button class="butt ok-butt" (click)="deleteJournal()">Ok</button>
+            <button class="butt cancel-butt" (click)="closeDeleteJournalPopup()">Cancel</button>
+        </div>
     </div>
 </div>

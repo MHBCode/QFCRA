@@ -537,7 +537,6 @@ export class ScopeComponent implements OnInit {
     );
   }
 
-  // Added by Moe
   fetchSubTypeDocIDs() {
     this.securityService.getObjectTypeTable(this.userId, constants.docSubTypes, constants.ObjectOpType.Edit).subscribe(data => {
       // Scope Of Authorsation in Scope Authorised

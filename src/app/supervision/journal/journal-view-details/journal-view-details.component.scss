@@ -41,6 +41,12 @@
 }
 
 .delete-textarea {
+    width: 100% !important;
+}
+
+.btns-container {
+    display: flex;
+    justify-content: center;
     width: 100%;
 }
 

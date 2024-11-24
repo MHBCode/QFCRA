@@ -10,6 +10,7 @@ import { ClassicEditor, Bold, Essentials, Heading, Indent, IndentBlock, Italic, 
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';
 import { SafeHtml } from '@angular/platform-browser';
+import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 
 @Component({
   selector: 'app-journal-view-details',
@@ -37,6 +38,8 @@ export class JournalViewDetailsComponent implements OnInit {
   reasonOfDeletion: string;
 
   currentDate = new Date();
+
+  journalDoc: any = {};
 
   // dropdowns
   alljournalEntryTypes: any = [];
@@ -104,7 +107,8 @@ export class JournalViewDetailsComponent implements OnInit {
     private journalService: JournalService,
     private supervisionService: SupervisionService,
     private dateUtilService: DateUtilService,
-    private sanitizerService: SanitizerService
+    private sanitizerService: SanitizerService,
+    private objectWF: ObjectwfService,
   ) {
   }
 
@@ -679,6 +683,22 @@ export class JournalViewDetailsComponent implements OnInit {
       },
       error => {
         console.error('Error deleting journal:', error);
+      }
+    );
+  }
+
+  // Documents
+  loadDocuments() {
+    this.objectWF.getDocument(this.Page.SupervisionJournal, this.journalDetails[0].SupervisionJournalID, 1).pipe(
+    ).subscribe(
+      data => {
+        this.journalDoc = data.response;
+        console.log('Document Data:', data);
+      },
+      error => {
+        console.error('Error loading document:', error);
+        this.journalDoc = {};
+
       }
     );
   }
