@@ -163,12 +163,25 @@
                   name="statusDate-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
                   [(ngModel)]="RegFundDetials.RegisteredFundStatusDate" />
               </div>
-              <div class="input-field-notes">
+              <!-- <div class="input-field-notes">
+                
                 <label for="notes">Notes</label>
                 <div>
-                    <ckeditor [(ngModel)]="RegFundDetials.RegisteredFundNotes" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                    <ckeditor [disabled]="!isEditable" [(ngModel)]="RegFundDetials.RegisteredFundNotes" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
                 </div>
-              </div>
+              </div> -->
+
+              <div class="input-field notes">
+                <label for="notes">Notes</label>
+                <div>
+                    <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="RegFundDetials.RegisteredFundNotes"
+                        [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                </div>
+                <ng-template #notes>
+                    <p [innerHTML]="sanitizeHtml(RegFundDetials.RegisteredFundNotes)">
+                    </p>
+                </ng-template>
+               </div>
             </div>
             
           </ng-container>

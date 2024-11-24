@@ -11,6 +11,8 @@ import { Bold, ClassicEditor, Essentials, Font, FontColor, FontSize, Heading, In
 import Swal from 'sweetalert2';
 import {ObjectwfService} from 'src/app/ngServices/objectwf.service';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
+import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';
+import { SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-reg-funds-view',
@@ -44,6 +46,7 @@ export class RegFundsViewComponent {
     private firmDetailsService: FirmDetailsService,
     private objectwfService: ObjectwfService,
     private flatpickrService: FlatpickrService,
+    private sanitizerService: SanitizerService,
 
   ) {
 
@@ -404,6 +407,8 @@ getDocument(){
     },
   });
 }
-
+sanitizeHtml(html: string): SafeHtml {
+  return this.sanitizerService.sanitizeHtml(html);
+}
 
 }

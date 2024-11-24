@@ -150,7 +150,7 @@
                           <label for="notes-{{ i }}">Comments/Findings :</label>
                           <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="item.firmRptReviewFindings[i].firmRptReviewFindings" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
                           <ng-template #notes>
-                            <p [innerHTML]="item.firmRptReviewFindings[i].firmRptReviewFindings">
+                            <p class="comments" [innerHTML]="item.firmRptReviewFindings[i].firmRptReviewFindings">
                             </p>
                           </ng-template>
                         </div>
