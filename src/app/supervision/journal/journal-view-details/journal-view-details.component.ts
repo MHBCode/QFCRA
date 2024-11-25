@@ -136,8 +136,18 @@ export class JournalViewDetailsComponent implements OnInit {
         subjectTypes: this.popuplateSubjectTypes(),
         userRoles: this.firmDetailsService.loadAssignedUserRoles(this.userId),
         levelUsers: this.firmDetailsService.loadAssignedLevelUsers(),
-        requiredIndividuals: this.popuplateRequiredIndividuals(),
-        approvedIndividuals: this.populateApprovedIndividuals(),
+        requiredIndividuals: this.popuplateRequiredIndividuals().pipe(
+          catchError((err) => {
+            console.warn('Error populating required individuals:', err);
+            return of({ response: [] }); // Return a fallback value
+          })
+        ),
+        approvedIndividuals: this.populateApprovedIndividuals().pipe(
+          catchError((err) => {
+            console.warn('Error populating approved individuals:', err);
+            return of({ response: [] }); // Return a fallback value
+          })
+        ),
         isDirector: this.isUserDirector(),
         isSupervisor: this.isValidFirmSupervisor(),
         isAMLSupervisor: this.isValidFirmAMLSupervisor(),
@@ -181,8 +191,6 @@ export class JournalViewDetailsComponent implements OnInit {
           this.ValidFirmSupervisor = isSupervisor;
           this.FirmAMLSupervisor = isAMLSupervisor;
 
-          this.loadDocuments();
-
           // Apply security after all data is loaded
           this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
         },
@@ -195,20 +203,29 @@ export class JournalViewDetailsComponent implements OnInit {
     else {
       forkJoin({
         subjectTypes: this.popuplateSubjectTypes(),
-        requiredIndividuals: this.popuplateRequiredIndividuals(),
-        approvedIndividuals: this.populateApprovedIndividuals(),
+        requiredIndividuals: this.popuplateRequiredIndividuals().pipe(
+          catchError((err) => {
+            console.warn('Error populating required individuals:', err);
+            return of({ response: [] }); // Return a fallback value
+          })
+        ),
+        approvedIndividuals: this.populateApprovedIndividuals().pipe(
+          catchError((err) => {
+            console.warn('Error populating approved individuals:', err);
+            return of({ response: [] }); // Return a fallback value
+          })
+        ),
       }).subscribe({
         next: ({
           subjectTypes,
           requiredIndividuals,
-          approvedIndividuals
+          approvedIndividuals,
         }) => {
           // Assign the response to journalSubjectTypes and subjectData
           this.journalSubjectTypes = subjectTypes.response;
           // Assign other data to component properties
           this.allRequiredIndividuals = requiredIndividuals.response;
           this.allApprovedIndividuals = approvedIndividuals.response;
-
           this.registerMasterPageControlEvents();
         },
 
@@ -220,6 +237,7 @@ export class JournalViewDetailsComponent implements OnInit {
       this.isEditModeJournal = false;
     }
     // Load additional data that does not depend on forkJoin
+    this.loadDocuments();
     this.populateJournalEntryTypes();
     this.populateJournalExternalAuditors();
   }
@@ -275,6 +293,7 @@ export class JournalViewDetailsComponent implements OnInit {
     }
 
     if (this.ValidFirmSupervisor) {
+      this.isLoading = false;
       return; // No need to hide the button for Firm supervisor
     } else if (this.firmDetailsService.isValidRSGMember()) {
       this.isLoading = false;
@@ -329,7 +348,6 @@ export class JournalViewDetailsComponent implements OnInit {
     this.isEditModeJournal = true;
     this.hideExportBtn = true;
     this.hideEditBtn = true;
-    this.populateJournalExternalAuditors();
     this.registerMasterPageControlEvents();
     this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes).subscribe(() => {
       console.log('Journal Subject Data Loaded:', this.journalSubjectTypes);
@@ -470,6 +488,7 @@ export class JournalViewDetailsComponent implements OnInit {
     return this.journalService.getAllRequiredIndividuals(this.firmId).pipe(
       tap((types) => {
         this.allRequiredIndividuals = types.response;
+        console.log('allRequiredIndividuals: ' + this.allRequiredIndividuals)
       })
     );
   }
@@ -478,15 +497,11 @@ export class JournalViewDetailsComponent implements OnInit {
     return this.journalService.getAllApprovedIndividuals(this.firmId).pipe(
       tap((types) => {
         this.allApprovedIndividuals = types.response;
-      }),
-      catchError((error) => {
-        console.error('Error fetching approved individuals:', error);
-        // Assign an empty array to continue execution
-        this.allApprovedIndividuals = [];
-        return of({ response: [] }); // Return an empty response to continue execution
+        console.log('allApprovedIndividuals: ' + this.allApprovedIndividuals)
       })
     );
   }
+
 
 
   populateJournalExternalAuditors() {
@@ -717,6 +732,7 @@ export class JournalViewDetailsComponent implements OnInit {
         });
         this.reloadJournal.emit(); // recalls the loadJournal() function in journal component
         this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
+        this.closeJournalPopup.emit();
       },
       error => {
         console.error('Error saving data:', error);
