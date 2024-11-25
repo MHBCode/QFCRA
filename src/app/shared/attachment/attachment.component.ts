@@ -138,7 +138,7 @@ export class AttachmentComponent implements OnInit {
     }
   }
   
-  private uploadSingleFile(file: File, isLastFile: boolean) {
+   uploadSingleFile(file: File, isLastFile: boolean) {
     const strfileName = file.name;
     debugger;
     this.sharepointService.uploadFileToSharepoint(
@@ -179,8 +179,8 @@ export class AttachmentComponent implements OnInit {
   
 
   deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number) {
-    if (this.fileLocation) {
-
+    if (this.fileLocation) {  
+      this.isLoading = true;
       this.sharepointService.deleteFileFromSharepoint(this.intranetSitePath, this.fileLocation).subscribe({
         next: () => {
           console.log('File deleted from SharePoint successfully');
@@ -189,21 +189,23 @@ export class AttachmentComponent implements OnInit {
             next: (response) => {
               console.log('Document deleted from database successfully:', response);
 
-              if (this.loadDocuments) {
-                this.loadDocuments();
-              }
+              this.loadDocuments();
+              this.isLoading = false;
             },
             error: (err) => {
               console.error('Error occurred while deleting the document from the database:', err);
+              this.isLoading = false;
             }
           });
         },
         error: (err) => {
           console.error('Error deleting file from SharePoint:', err);
+          this.isLoading = false;
         }
       });
     } else {
       console.error('No file location available for SharePoint deletion');
+      this.isLoading = false;
     }
   }
 

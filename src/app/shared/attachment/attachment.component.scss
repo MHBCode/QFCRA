@@ -7,6 +7,9 @@
 
 .file-table-container {
     width: 100%;
+    thead tr th {
+        text-align: center;
+    }
 }
 
 .btns-container button {

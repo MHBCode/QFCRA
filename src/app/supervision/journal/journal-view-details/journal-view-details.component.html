@@ -151,7 +151,7 @@
                             [editor]="Editor" [config]="config"></ckeditor>
                     </div>
                     <ng-template #notes>
-                        <p [innerHTML]="sanitizeHtml(journalDetails[0].EntryNotes)">
+                        <p class="notes-text" [innerHTML]="sanitizeHtml(journalDetails[0].EntryNotes)">
                         </p>
                     </ng-template>
                 </div>
@@ -178,22 +178,25 @@
             </div>
 
             <!-- Attachment Section -->
-
-            <div *ngIf="journalDoc.length > 0" class="attachment">
+            
+            <div *ngIf="(journalDoc?.length !== 0 && !isCreateJournal) || isEditModeJournal" class="attachment">
                 <div class="popup-header">
                     <h3>Attachment (if any)</h3>
                 </div>
                 <ng-container *ngIf="fetchedDocumentTypes">
                     <app-attachment 
                       [documentObj]="documentObj" 
-                      [tableDoc]="journalDoc" 
+                      [tableDoc]="journalDoc"
+                      [pageName]="Page.SupervisionJournal"
+                      [param1]="journal.SupervisionJournalID" 
+                      [param2]="1"
                       [isEdit]="isEditModeJournal || isCreateJournal" 
-                      [ismultiple]="true" 
+                      [ismultiple]="false" 
                       [documentTypes]="fetchedDocumentTypes" 
                       [loadDocuments]="loadDocuments.bind(this)"
                       (documentUploaded)="onDocumentUploaded($event)" 
-                      [selectedFiles]="selectedFiles"
-                      (selectedFilesChange)="handleSelectedFilesChange($event)">
+                      [selectedFile]="selectedFile"
+                      (selectedFileChange)="selectedFile = $event">
                     </app-attachment>
                   </ng-container>
             </div>

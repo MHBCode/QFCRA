@@ -23,7 +23,8 @@
       </select>
     </div>
 
-    <div class="input-field" *ngIf="documentTypes">
+    <!-- Journal -->
+    <div class="input-field" *ngIf="pageName == Page.SupervisionJournal">
       <label>Document Type</label>
       <select name="documentTypes" id="documentTypes" [(ngModel)]="documentTypes.DocSubTypeID">
         <option selected>Select</option>

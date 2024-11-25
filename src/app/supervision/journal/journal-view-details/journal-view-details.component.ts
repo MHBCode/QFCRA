@@ -11,6 +11,7 @@ import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';
 import { SafeHtml } from '@angular/platform-browser';
 import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
+import { LogformService } from 'src/app/ngServices/logform.service';
 
 @Component({
   selector: 'app-journal-view-details',
@@ -41,10 +42,13 @@ export class JournalViewDetailsComponent implements OnInit {
 
   currentDate = new Date();
 
-  journalDoc: any = {};
+  journalDoc: any[] = [];
   documentObj:any;
   selectedFiles: File[] = [];
   fetchedDocumentTypes : any = [];
+  newfileNum: number;
+  selectedFile: File | null = null;
+  fileError: string = '';
 
   // dropdowns
   alljournalEntryTypes: any = [];
@@ -129,6 +133,7 @@ export class JournalViewDetailsComponent implements OnInit {
     private dateUtilService: DateUtilService,
     private sanitizerService: SanitizerService,
     private objectWF: ObjectwfService,
+    private logForm: LogformService
   ) {
   }
 
@@ -244,7 +249,6 @@ export class JournalViewDetailsComponent implements OnInit {
     this.loadDocuments();
     this.populateJournalEntryTypes();
     this.populateJournalExternalAuditors();
-    this.loadDocuments();
 
     if(this.isCreateJournal){
       this.getDocumentTypes();
@@ -599,7 +603,7 @@ export class JournalViewDetailsComponent implements OnInit {
       delete this.errorMessages['EntryType'];
     }
 
-    const entryDate = this.isCreateJournal ? this.createJournalObj.JournalEntryTypeID : this.journalDetails[0].EntryDate;
+    const entryDate = this.isCreateJournal ? this.createJournalObj.EntryDate : this.journalDetails[0].EntryDate;
 
     // Validate Entry Date
     if (this.supervisionService.isNullOrEmpty(entryDate)) {
@@ -736,11 +740,11 @@ export class JournalViewDetailsComponent implements OnInit {
         if (this.isCreateJournal) {
           this.closeJournalPopup.emit();
         }
-        this.loadJournalDetails(this.journal.SupervisionJournalID);
-        this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.subjectData).subscribe(() => {
+        this.reloadJournal.emit(); // recalls the loadJournal() function in journal component
+        this.loadJournalDetails(this.journal?.SupervisionJournalID);
+        this.loadSupJournalSubjectData(this.journal?.SupervisionJournalID, this.subjectData).subscribe(() => {
           console.log('Journal Subject Data Updated:', this.subjectData);
         });
-        this.reloadJournal.emit(); // recalls the loadJournal() function in journal component
         this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
         this.closeJournalPopup.emit();
       },
@@ -855,7 +859,7 @@ export class JournalViewDetailsComponent implements OnInit {
 
   // Documents
   loadDocuments() {
-    this.objectWF.getDocument(this.Page.SupervisionJournal, this.journalDetails[0].SupervisionJournalID, 1).pipe(
+    this.objectWF.getDocument(this.Page.SupervisionJournal, this.journal?.SupervisionJournalID, 1).pipe(
     ).subscribe(
       data => {
         this.journalDoc = data.response;
@@ -870,20 +874,86 @@ export class JournalViewDetailsComponent implements OnInit {
   }
 
 
-  handleSelectedFilesChange(files: File | File[] | null): void {
-    if (Array.isArray(files)) {
-      this.selectedFiles = files; // Assign directly if it's an array
-    } else if (files) {
-      this.selectedFiles = [files]; // Wrap single file into an array
-    } else {
-      this.selectedFiles = []; // Reset if null
+  // handleSelectedFilesChange(files: File | File[] | null): void {
+  //   if (Array.isArray(files)) {
+  //     this.selectedFiles = files; // Assign directly if it's an array
+  //   } else if (files) {
+  //     this.selectedFiles = [files]; // Wrap single file into an array
+  //   } else {
+  //     this.selectedFiles = []; // Reset if null
+  //   }
+  // }
+
+
+  async onDocumentUploaded(uploadedDocument: any) {
+    this.isLoading = true;
+
+    try {
+      // Call getNewFileNumber and wait for it to complete
+      await this.getNewFileNumber().toPromise();
+
+      // Continue with the rest of the code after getNewFileNumber completes
+      const { fileLocation, intranetGuid } = uploadedDocument;
+      this.documentObj = this.prepareDocumentObject(
+        this.userId,
+        fileLocation,
+        intranetGuid,
+        constants.DocType.JournalAttachment,
+        this.Page.SupervisionJournal,
+        this.fetchedDocumentTypes.DocSubTypeID,
+        this.journal?.SupervisionJournalID,
+        1 // constant
+      );
+
+      this.objectWF.insertDocument(this.documentObj).subscribe(
+        response => {
+          console.log('journal attachment saved successfully:', response);
+          this.loadDocuments();
+          this.isLoading = false;
+        },
+        error => {
+          console.error('Error updating journal attachment:', error);
+          this.isLoading = false;
+        }
+      );
+    } catch (error) {
+      console.error('Error in getNewFileNumber:', error);
+      this.isLoading = false;
     }
   }
-  
-  onDocumentUploaded(uploadedFiles: { fileLocation: string; intranetGuid: string }[]) {
-    debugger;
-    console.log('Uploaded files:', uploadedFiles);
-    // Handle the uploaded file details here
+
+  prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number, objectId: number, docSubTypeID: number, objectInstanceID: number, objectInstanceRevNum: number) {
+    return {
+      userId: userId,
+      docID: null,
+      referenceNumber: null,
+      fileName: this.selectedFile.name,
+      fileNumber: this.newfileNum.toString(),
+      firmId: this.firmId,
+      otherFirm: null,
+      docTypeID: docType,
+      loggedBy: userId,
+      loggedDate: this.currentDate,
+      receivedBy: userId,
+      receivedDate: this.currentDate,
+      docRecieptMethodID: constants.LogFormRecieptMethods.InternalDocument,
+      checkPrimaryDocID: true,
+      fileLocation: fileLocation,
+      docAttributeID: null,
+      intranetGuid: intranetGuid,
+      objectID: objectId,
+      objectInstanceID: objectInstanceID,
+      objectInstanceRevNum: objectInstanceRevNum,
+      docSubType: docSubTypeID
+    };
+  }
+
+  getNewFileNumber() {
+    return this.logForm.getNewFileNumber(this.firmId, this.currentDate.toISOString()).pipe(
+      tap(data => {
+        this.newfileNum = data.response.Column1;
+      })
+    );
   }
 
   getDocumentTypes(){
@@ -916,4 +986,5 @@ export class JournalViewDetailsComponent implements OnInit {
   sanitizeHtml(html: string): SafeHtml {
     return this.sanitizerService.sanitizeHtml(html);
   }
+  
 }
