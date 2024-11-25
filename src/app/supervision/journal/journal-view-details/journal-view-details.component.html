@@ -60,8 +60,8 @@
                 <div class="input-field">
                     <label for="entryDate">Entry Date <span *ngIf="isEditModeJournal || isCreate"
                             style="color: red;">*</span></label>
-                    <input [disabled]="!isEditModeJournal && !isCreate" [(ngModel)]="journalDetails[0].EntryDate" type="text"
-                        id="entryDate" name="entryDate" #dateInputs [ngClass]="{
+                    <input [disabled]="!isEditModeJournal && !isCreate" [(ngModel)]="journalDetails[0].EntryDate"
+                        type="text" id="entryDate" name="entryDate" #dateInputs [ngClass]="{
                             'error-border': errorMessages['EntryDate']}" />
                 </div>
 
@@ -80,8 +80,8 @@
                 <div class="input-field">
                     <label for="lastmodifiedBy">Title <span *ngIf="isEditModeJournal || isCreate"
                             style="color: red;">*</span></label>
-                    <input [disabled]="!isEditModeJournal && !isCreate" [(ngModel)]="journalDetails[0].EntryTitle" type="text"
-                        id="lastmodifiedBy" name="lastmodifiedBy" [ngClass]="{
+                    <input [disabled]="!isEditModeJournal && !isCreate" [(ngModel)]="journalDetails[0].EntryTitle"
+                        type="text" id="lastmodifiedBy" name="lastmodifiedBy" [ngClass]="{
                             'error-border': errorMessages['EntryTitle']}" />
                 </div>
 
@@ -97,8 +97,8 @@
                             [hidden]="!isEditModeJournal && !subject.isSelected && !isCreate">
                             <!-- Checkbox column -->
                             <td class="checkbox-column">
-                                <input type="checkbox" [disabled]="!isEditModeJournal && !isCreate" [checked]="subject.isSelected"
-                                    (change)="toggleSelection(subject, $event)" />
+                                <input type="checkbox" [disabled]="!isEditModeJournal && !isCreate"
+                                    [checked]="subject.isSelected" (change)="toggleSelection(subject, $event)" />
                             </td>
 
                             <!-- Description column -->
@@ -147,8 +147,8 @@
                 <div class="input-field notes">
                     <label for="notes">Notes</label>
                     <div>
-                        <ckeditor *ngIf="isEditModeJournal || isCreate; else notes" [(ngModel)]="journalDetails[0].EntryNotes"
-                            [editor]="Editor" [config]="config"></ckeditor>
+                        <ckeditor *ngIf="isEditModeJournal || isCreate; else notes"
+                            [(ngModel)]="journalDetails[0].EntryNotes" [editor]="Editor" [config]="config"></ckeditor>
                     </div>
                     <ng-template #notes>
                         <p [innerHTML]="sanitizeHtml(journalDetails[0].EntryNotes)">
@@ -183,6 +183,19 @@
                 <div class="popup-header">
                     <h3>Attachment (if any)</h3>
                 </div>
+                <ng-container *ngIf="fetchedDocumentTypes">
+                    <app-attachment 
+                      [documentObj]="documentObj" 
+                      [tableDoc]="journalDoc" 
+                      [isEdit]="isEditModeJournal" 
+                      [ismultiple]="true" 
+                      [documentTypes]="fetchedDocumentTypes" 
+                      [loadDocuments]="loadDocuments.bind(this)"
+                      (documentUploaded)="onDocumentUploaded($event)" 
+                      [selectedFiles]="selectedFiles"
+                      (selectedFilesChange)="handleSelectedFilesChange($event)">
+                    </app-attachment>
+                  </ng-container>
             </div>
 
             <!-- Action Buttons -->

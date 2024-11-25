@@ -27,8 +27,11 @@ export class AttachmentComponent implements OnInit {
   @Input() param1;
   @Input() param2;
   @Input() selectedFile: File | null = null;
+  @Input() selectedFiles: File[] = [];
   @Input() newfileNum: number;
-
+  @Input() documentTypes: any = [];
+  @Input() ismultiple : boolean = false;
+  
   intranetSitePath = 'https://ictmds.sharepoint.com/sites/QFCRA';
   filePathAfterDocLib = "";
   strUserEmailAddress = 'k.thomas@ictmds.onmicrosoft.com';
@@ -46,7 +49,7 @@ export class AttachmentComponent implements OnInit {
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   @Output() documentUploaded = new EventEmitter<any>();
   @Output() selectedFileChange = new EventEmitter<File | null>();
-
+  @Output() selectedFilesChange = new EventEmitter<File | File[] | null>(); 
 
   constructor(
     private router: Router,
@@ -65,94 +68,119 @@ export class AttachmentComponent implements OnInit {
   }
 
   confirmOkUpload() {
-    if (this.selectedFile) {
-      const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
-      if (uploadedDocumentsDiv) {
-        uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
-      }
-      this.callUploadDoc = false;
-      const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
-      setTimeout(() => {
-        if (popupWrapper) {
-          popupWrapper.style.display = 'none';
-        } else {
-          console.error('Element with class not found');
+    if (this.ismultiple) {
+      if (Array.isArray(this.selectedFiles) && this.selectedFiles.length > 0) {
+        const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
+        if (uploadedDocumentsDiv) {
+          uploadedDocumentsDiv.textContent = this.selectedFiles.map(file => file.name).join(', ');
         }
-      }, 0);
+        this.closeUploadPopup();
+      } else {
+        console.error('No valid PDF files selected.');
+      }
     } else {
-      console.error('No valid PDF file selected.');
+      if (this.selectedFile) {
+        const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
+        if (uploadedDocumentsDiv) {
+          uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
+        }
+        this.closeUploadPopup();
+      } else {
+        console.error('No valid PDF file selected.');
+      }
     }
   }
-
+  
+  private closeUploadPopup() {
+    this.callUploadDoc = false;
+    const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
+    setTimeout(() => {
+      if (popupWrapper) {
+        popupWrapper.style.display = 'none';
+      } else {
+        console.error('Element with class not found');
+      }
+    }, 0);
+  }
+  
   uploadDocument() {
     this.hasValidationErrors = false;
     this.isLoading = true;
-
-    if (!this.selectedFile) {
-      this.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
-      this.hasValidationErrors = true;
+  
+    if (this.ismultiple) {
+      if (!this.selectedFiles.length) {
+        this.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['uploadDocument'];
+      }
     } else {
-      delete this.errorMessages['uploadDocument'];
+      if (!this.selectedFile) {
+        this.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['uploadDocument'];
+      }
     }
-
+  
     if (this.hasValidationErrors) {
       this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       this.isLoading = false;
       return;
     }
-
-    if (this.selectedFile) {
-      const strfileName = this.selectedFile.name;
-
-      this.sharepointService.uploadFileToSharepoint(
-        this.selectedFile,
-        this.intranetSitePath,
-        this.filePathAfterDocLib,
-        strfileName,
-        this.strUserEmailAddress
-      ).subscribe({
-        next: (response: SharePointUploadResponse) => {
-          console.log('File uploaded successfully', response);
-
-          const [fileLocation, intranetGuid] = response.result.split(';');
-          this.fileLocation = fileLocation;
-          this.documentUploaded.emit({ fileLocation, intranetGuid });
-
-          const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
-          if (uploadedDocumentsDiv) {
-            uploadedDocumentsDiv.textContent = `${this.selectedFile.name}`;
-          }
-
-          this.callUploadDoc = false;
-          const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
-          setTimeout(() => {
-            if (popupWrapper) {
-              popupWrapper.style.display = 'none';
-            } else {
-              console.error('Element with class not found');
-            }
-          }, 0);
-
-          this.uploadFileSuccess(constants.DocumentAttechment.saveDocument);
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Error occurred during file upload', err);
-          this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ERROR_UPLOADING_FILE);
-          this.isLoading = false;
-        }
+  
+    if (this.ismultiple) {
+      this.selectedFiles.forEach((file, index) => {
+        this.uploadSingleFile(file, index === this.selectedFiles.length - 1); // Ensure the last file toggles the loading flag
       });
-    } else {
-      console.error('No valid PDF file selected.');
-      this.isLoading = false;
+    } else if (this.selectedFile) {
+      this.uploadSingleFile(this.selectedFile, true); // Single file case
     }
   }
-
-
+  
+  private uploadSingleFile(file: File, isLastFile: boolean) {
+    const strfileName = file.name;
+    debugger;
+    this.sharepointService.uploadFileToSharepoint(
+      file,
+      this.intranetSitePath,
+      this.filePathAfterDocLib,
+      strfileName,
+      this.strUserEmailAddress
+    ).subscribe({
+      next: (response: SharePointUploadResponse) => {
+        console.log('File uploaded successfully', response);
+  
+        const [fileLocation, intranetGuid] = response.result.split(';');
+        this.fileLocation = fileLocation;
+        this.documentUploaded.emit({ fileLocation, intranetGuid });
+  
+        const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
+        if (uploadedDocumentsDiv) {
+          const currentFiles = uploadedDocumentsDiv.textContent || '';
+          uploadedDocumentsDiv.textContent = this.ismultiple
+            ? `${currentFiles}${currentFiles ? ', ' : ''}${file.name}`
+            : file.name;
+        }
+  
+        if (isLastFile) {
+          this.closeUploadPopup();
+          this.uploadFileSuccess(constants.DocumentAttechment.saveDocument);
+          this.isLoading = false;
+        }
+      },
+      error: (err) => {
+        console.error('Error occurred during file upload', err);
+        this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ERROR_UPLOADING_FILE);
+        if (isLastFile) this.isLoading = false;
+      },
+    });
+  }
+  
 
   deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number) {
     if (this.fileLocation) {
-    
+
       this.sharepointService.deleteFileFromSharepoint(this.intranetSitePath, this.fileLocation).subscribe({
         next: () => {
           console.log('File deleted from SharePoint successfully');
@@ -178,7 +206,6 @@ export class AttachmentComponent implements OnInit {
       console.error('No file location available for SharePoint deletion');
     }
   }
-
 
 
   showUploadConfirmation(documentObj: any) {
@@ -258,14 +285,36 @@ export class AttachmentComponent implements OnInit {
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
-      const file = input.files[0];
-      if (file.type === 'application/pdf') {
-        this.selectedFile = file; // Update only if the file is valid
-        this.fileError = ''; // Clear any previous error message
-        this.selectedFileChange.emit(this.selectedFile);
+      if (this.ismultiple) {
+        const validFiles: File[] = [];
+        const invalidFiles: string[] = [];
+
+        Array.from(input.files).forEach(file => {
+          if (file.type === 'application/pdf') {
+            validFiles.push(file);
+          } else {
+            invalidFiles.push(file.name);
+          }
+        });
+
+        if (validFiles.length > 0) {
+          this.fileError = invalidFiles.length
+            ? `Some files are not valid PDFs: ${invalidFiles.join(', ')}`
+            : '';
+          this.selectedFilesChange.emit(validFiles); // Emit array of valid files
+        } else {
+          this.fileError = 'Please select valid PDF files.';
+          this.selectedFilesChange.emit(null); // Emit null for no valid files
+        }
       } else {
-        this.fileError = 'Please select a valid PDF file.';
-        this.selectedFileChange.emit(null);
+        const file = input.files[0]; // Single file
+        if (file.type === 'application/pdf') {
+          this.fileError = '';
+          this.selectedFileChange.emit(file); // Emit the single valid file
+        } else {
+          this.fileError = 'Please select a valid PDF file.';
+          this.selectedFileChange.emit(null); // Emit null for invalid file
+        }
       }
     }
   }

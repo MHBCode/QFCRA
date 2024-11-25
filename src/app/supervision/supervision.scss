@@ -305,3 +305,7 @@
 .btn.justify-content-end {
     gap: 20px;
 }
+
+::ng-deep .ck-rounded-corners .ck.ck-editor__main > .ck-editor__editable,::ng-deep .ck.ck-editor__main > .ck-editor__editable.ck-rounded-corners {
+    min-height: 130px;
+}
