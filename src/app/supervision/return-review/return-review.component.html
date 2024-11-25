@@ -46,7 +46,7 @@
             <td class="text-center">{{ReturnreView.ReviewStatusDate}}</td>
           </tr>
         </tbody>
-        <tfoot>
+        <tfoot *ngIf="paginatedFirms.length > 0">
           <tr>
             <td [attr.colspan]="10">
               <div class="pagination"

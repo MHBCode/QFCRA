@@ -47,7 +47,7 @@
                         </tr>
                     </tbody>
                 </ng-template>
-                <tfoot>
+                <tfoot *ngIf="journaldata.length > 0">
                     <tr>
                         <td [attr.colspan]="12">
                             <app-pagination [items]="journaldata" [pageSize]="pageSize"

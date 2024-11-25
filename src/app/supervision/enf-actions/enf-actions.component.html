@@ -42,7 +42,7 @@
                         <td>{{ enf?.Published }}</td>
                     </tr>
                 </tbody>
-                <tfoot>
+                <tfoot *ngIf="enfActions.length > 0">
                     <tr>
                         <td [attr.colspan]="12">
                             <app-pagination [items]="enfActions" [pageSize]="pageSize"
