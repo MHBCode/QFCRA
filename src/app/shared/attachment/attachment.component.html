@@ -1,75 +1,88 @@
 <app-loader *ngIf="isLoading"></app-loader>
 <div class="error-messages">
   <p *ngIf="errorMessages['uploadDocument']">
-      {{ errorMessages['uploadDocument'] }}
+    {{ errorMessages['uploadDocument'] }}
   </p>
 </div>
 <div class="inputs-row">
-<div class="file-container" *ngIf="isEdit && !tableDoc?.DocSubTypeDesc">
+  <div class="file-container" *ngIf="isEdit && !tableDoc?.DocSubTypeDesc">
 
-  <!-- Press Release -->
-  <div class="input-field" *ngIf="pageName == Page.CoreDetail">
-    <label for="documentType"> Document Type </label>
-    <select [disabled]="!isEdit" class="document-type-select" name="documentType" id="documentType">
-      <option value="263">Press Releases</option>
-    </select>
-  </div>
+    <!-- Press Release -->
+    <div class="input-field" *ngIf="pageName == Page.CoreDetail">
+      <label for="documentType"> Document Type </label>
+      <select [disabled]="!isEdit" class="document-type-select" name="documentType" id="documentType">
+        <option value="263">Press Releases</option>
+      </select>
+    </div>
 
-  <!-- Scope of Authorisation -->
-  <div class="input-field" *ngIf="pageName == Page.Scope">
-    <label>Document Type</label>
-    <select [(ngModel)]="DocSubTypeID.DocSubTypeID">
-      <option [value]="DocSubTypeID.DocSubTypeID">Scope of Authorisation</option>
-    </select>
-  </div>
+    <!-- Scope of Authorisation -->
+    <div class="input-field" *ngIf="pageName == Page.Scope">
+      <label>Document Type</label>
+      <select [(ngModel)]="DocSubTypeID.DocSubTypeID">
+        <option [value]="DocSubTypeID.DocSubTypeID">Scope of Authorisation</option>
+      </select>
+    </div>
 
-  <div class="input-field" style="flex-direction: row;" *ngIf="!tableDoc?.DocSubTypeDesc">
-    <label id="uploaded-documents"></label>
-  </div>
-  <div class="input-field" *ngIf="!tableDoc?.DocSubTypeDesc">
-    <div class="btns-container">
-      <div class="upload-container">
-        <button class="choose-document-btn" (click)="selectDocument()">
-          Choose Document
+    <div class="input-field" *ngIf="documentTypes">
+      <label>Document Type</label>
+      <select name="documentTypes" id="documentTypes" [(ngModel)]="documentTypes.DocSubTypeID">
+        <option selected>Select</option>
+        <option *ngFor="let type of documentTypes" [value]="type.DocSubTypeID">
+          {{ type.DocSubTypeDesc }}
+        </option>
+      </select>
+    </div>
+
+
+    <div class="input-field" style="flex-direction: row;" *ngIf="!tableDoc?.DocSubTypeDesc">
+      <label id="uploaded-documents"></label>
+    </div>
+    <div class="input-field" *ngIf="!tableDoc?.DocSubTypeDesc">
+      <div class="btns-container">
+        <div class="upload-container">
+          <button class="choose-document-btn" (click)="selectDocument()">
+            Choose Document
+          </button>
+        </div>
+        <button class="upload-document-btn" (click)="uploadDocument()">
+          Upload the Document
         </button>
       </div>
-      <button class="upload-document-btn" (click)="uploadDocument()">
-        Upload the Document
-      </button>
     </div>
   </div>
-</div>
-<div class="file-table-container">
-  <table>
-    <thead>
-      <tr>
-        <th>Document Type</th>
-        <th>File Name</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="text-align: left">
-          <span [style.color]="tableDoc?.DocSubTypeDesc ? 'inherit' : 'red'">
-            {{ tableDoc?.DocSubTypeDesc || 'No documents attached' }}
-          </span>
-        </td>
-        <td style="text-align: left">
-          <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{
+
+
+
+  <div class="file-table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Document Type</th>
+          <th>File Name</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: left">
+            <span [style.color]="tableDoc?.DocSubTypeDesc ? 'inherit' : 'red'">
+              {{ tableDoc?.DocSubTypeDesc || 'No documents attached' }}
+            </span>
+          </td>
+          <td style="text-align: left">
+            <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{
               tableDoc?.FileLoc
             }}" target="_blank">{{ tableDoc?.FileName }}</a>
-        </td>
-        <td *ngIf="isEdit" style="text-align: center">
-          <button class="delete-action" *ngIf="tableDoc?.DocSubTypeDesc"
-            (click)="showAlertDeleteFile()">
-            Delete
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+          </td>
+          <td *ngIf="isEdit" style="text-align: center">
+            <button class="delete-action" *ngIf="tableDoc?.DocSubTypeDesc" (click)="showAlertDeleteFile()">
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 <!--Select Document PopUp-->
 <div *ngIf="callUploadDoc" class="overlay show"></div>
@@ -79,14 +92,15 @@
   </button>
   <div class="popup-info-place upload-container">
     <div class="popup-header">
-      <h3>Upload Document</h3>
+      <h3>Upload {{ ismultiple ? 'Documents' : 'Document' }}</h3>
     </div>
     <div class="upload-document-body">
-      <p>Please browse and upload/attach document:</p>
-      <input type="file" accept=".pdf" #fileInput (change)="onFileSelected($event)" />
+      <p>Please browse and upload/attach {{ ismultiple ? 'documents' : 'a document' }}:</p>
+      <input type="file" accept=".pdf" [multiple]="ismultiple" #fileInput (change)="onFileSelected($event)" />
     </div>
     <small style="color: red" *ngIf="fileError">{{ fileError }}</small>
   </div>
+
   <div class="popup-operations-place">
     <button style="margin-right: 5px" class="subbutton" (click)="confirmOkUpload()">
       Ok

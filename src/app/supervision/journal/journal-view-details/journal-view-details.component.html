@@ -183,6 +183,19 @@
                 <div class="popup-header">
                     <h3>Attachment (if any)</h3>
                 </div>
+                <ng-container *ngIf="fetchedDocumentTypes">
+                    <app-attachment 
+                      [documentObj]="documentObj" 
+                      [tableDoc]="journalDoc" 
+                      [isEdit]="isEditModeJournal || isCreateJournal" 
+                      [ismultiple]="true" 
+                      [documentTypes]="fetchedDocumentTypes" 
+                      [loadDocuments]="loadDocuments.bind(this)"
+                      (documentUploaded)="onDocumentUploaded($event)" 
+                      [selectedFiles]="selectedFiles"
+                      (selectedFilesChange)="handleSelectedFilesChange($event)">
+                    </app-attachment>
+                  </ng-container>
             </div>
 
             <!-- Action Buttons -->

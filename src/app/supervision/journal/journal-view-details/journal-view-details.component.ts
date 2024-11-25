@@ -41,7 +41,10 @@ export class JournalViewDetailsComponent implements OnInit {
 
   currentDate = new Date();
 
-  journalDoc: any = [];
+  journalDoc: any = {};
+  documentObj:any;
+  selectedFiles: File[] = [];
+  fetchedDocumentTypes : any = [];
 
   // dropdowns
   alljournalEntryTypes: any = [];
@@ -193,6 +196,7 @@ export class JournalViewDetailsComponent implements OnInit {
 
           // Apply security after all data is loaded
           this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
+        
         },
         error: (err) => {
           console.error('Error initializing page:', err);
@@ -240,6 +244,11 @@ export class JournalViewDetailsComponent implements OnInit {
     this.loadDocuments();
     this.populateJournalEntryTypes();
     this.populateJournalExternalAuditors();
+    this.loadDocuments();
+
+    if(this.isCreateJournal){
+      this.getDocumentTypes();
+    }
   }
 
 
@@ -349,6 +358,7 @@ export class JournalViewDetailsComponent implements OnInit {
     this.hideExportBtn = true;
     this.hideEditBtn = true;
     this.registerMasterPageControlEvents();
+    this.getDocumentTypes();
     this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes).subscribe(() => {
       console.log('Journal Subject Data Loaded:', this.journalSubjectTypes);
     });
@@ -857,6 +867,38 @@ export class JournalViewDetailsComponent implements OnInit {
 
       }
     );
+  }
+
+
+  handleSelectedFilesChange(files: File | File[] | null): void {
+    if (Array.isArray(files)) {
+      this.selectedFiles = files; // Assign directly if it's an array
+    } else if (files) {
+      this.selectedFiles = [files]; // Wrap single file into an array
+    } else {
+      this.selectedFiles = []; // Reset if null
+    }
+  }
+  
+  onDocumentUploaded(uploadedFiles: { fileLocation: string; intranetGuid: string }[]) {
+    debugger;
+    console.log('Uploaded files:', uploadedFiles);
+    // Handle the uploaded file details here
+  }
+
+  getDocumentTypes(){
+    const docTypeId = constants.FrimsObject.SupervisionJournal;
+    this.objectWF.getDocumentType(docTypeId).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.fetchedDocumentTypes = res.response;
+        console.log("DocumentTypeList",this.fetchedDocumentTypes)
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error deleting RegisteredFund', error);
+      },
+    });
   }
 
   loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
