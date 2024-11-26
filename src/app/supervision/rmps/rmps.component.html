@@ -33,7 +33,7 @@
                         <td>{{ rmp?.SignOffDate }}</td>
                     </tr>
                 </tbody>
-                <tfoot *ngIf="FIRMRMP.length > 0">
+                <tfoot *ngIf="FIRMRMP?.length > 0">
                     <tr>
                         <td  [attr.colspan]="12">
                             <app-pagination [items]="FIRMRMP" [pageSize]="pageSize" (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>   

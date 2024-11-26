@@ -45,7 +45,7 @@
                         <td>{{breach.LastUpdatedBy}}</td>
                     </tr>
                 </tbody>
-                <tfoot *ngIf="filteredBreaches.length > 0">
+                <tfoot *ngIf="filteredBreaches?.length > 0">
                     <tr>
                         <td  [attr.colspan]="12">
                             <app-pagination [items]="filteredBreaches" [pageSize]="pageSize" (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>   

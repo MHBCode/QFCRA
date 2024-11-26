@@ -34,7 +34,7 @@
                         <td>{{ reg?.RegisteredFundStatusDate }}</td>
                     </tr>
                 </tbody>
-                <tfoot *ngIf="regFunds.length > 0">
+                <tfoot *ngIf="regFunds?.length > 0">
                     <tr>
                         <td [attr.colspan]="12">
                             <app-pagination [items]="regFunds" [pageSize]="pageSize"

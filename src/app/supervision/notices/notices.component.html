@@ -51,7 +51,7 @@
                         <td>{{ notice?.ResponseProvidedDate }}</td>
                     </tr>
                 </tbody>
-                <tfoot *ngIf="filteredNotices.length > 0">
+                <tfoot *ngIf="filteredNotices?.length > 0">
                     <tr>
                       <td  [attr.colspan]="12">
                         <app-pagination [items]="filteredNotices" [pageSize]="pageSize" (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>      
