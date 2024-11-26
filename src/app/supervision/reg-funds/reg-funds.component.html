@@ -25,7 +25,7 @@
                         <th>Status Date</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody *ngIf="paginatedItems?.length > 0; else RegFunds">
                     <tr *ngFor="let reg of paginatedItems" (click)="openRegisteredFundPopup(reg,firmDetails)">
                         <td>{{ reg?.RegisteredFundNumber }}</td>
                         <td>{{ reg?.FundName }}</td>
@@ -34,6 +34,13 @@
                         <td>{{ reg?.RegisteredFundStatusDate }}</td>
                     </tr>
                 </tbody>
+                <ng-template #RegFunds>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" class="norecords" style="color: red">No Records Found</td>
+                        </tr>
+                    </tbody>
+                </ng-template>
                 <tfoot *ngIf="regFunds?.length > 0">
                     <tr>
                         <td [attr.colspan]="12">

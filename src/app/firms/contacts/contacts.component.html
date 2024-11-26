@@ -288,27 +288,30 @@
             </div>
           </div>
           <!-- DNFBP Functions Section -->
-          <div class="functions-row" *ngFor="let ContactFunctionType of ContactFunctionTypeList">
+          <div class="functions-row" *ngFor="let ContactFunctionType of ContactFunctionTypeList; let i = index">
             <!-- Checkbox for selecting contact function -->
             <div style="width: 20%;" class="input-field">
               <label>
                 <input type="checkbox" [(ngModel)]="ContactFunctionType.isSelected"
-                  (change)="onFunctionCheckboxChangeCreate(ContactFunctionType)" />
+                  (change)="onFunctionCheckboxChangeCreate(ContactFunctionType, i)" />
                 {{ ContactFunctionType.contactFunctionTypeDesc }}
               </label>
             </div>
-
+          
             <!-- Effective Date Input -->
             <div style="width: 20%;" class="input-field">
-              <input type="text" #dateInputs placeholder placeholder="Effective Date"
-                [(ngModel)]="ContactFunctionType.effectiveDate" [disabled]="!ContactFunctionType.isSelected" />
+              <input type="text" #dateInputs placeholder
+                [(ngModel)]="ContactFunctionType.effectiveDate" [disabled]="!ContactFunctionType.isSelected" 
+                (blur)="updateFunctionDatesCreate(i, 'effectiveDate', ContactFunctionType.effectiveDate)" />
             </div>
+          
             <!-- End Date Input -->
             <div style="width: 20%;" class="input-field">
-              <input type="text" #dateInputs placeholder placeholder="End Date"
-                [(ngModel)]="ContactFunctionType.endDate" [disabled]="!ContactFunctionType.isSelected" />
+              <input type="text" #dateInputs placeholder
+                [(ngModel)]="ContactFunctionType.endDate" [disabled]="!ContactFunctionType.isSelected" 
+                (blur)="updateFunctionDatesCreate(i, 'endDate', ContactFunctionType.endDate)" />
             </div>
-
+          
             <!-- Review Status Input -->
             <div style="width: 20%;" class="input-field">
               <input type="text" [(ngModel)]="ContactFunctionType.reviewStatus" disabled placeholder="Review Status" />
@@ -320,7 +323,7 @@
               <label for="ResidentStatus">Is the individual a Resident or Non-Resident of Qatar?</label>
               <select name="ResidentStatus" id="ResidentStatus" [(ngModel)]="createResidentStateObj.attributeValue"
                 (change)="onResidentStatusChange($event)">
-                <option value="0">select</option>
+                <option value=" ">select</option>
                 <option value="Resident">Resident</option>
                 <option value="Non-Resident">Non-Resident</option>
               </select>
@@ -467,42 +470,14 @@
         <div class="popup-header">
           <h3>Additional Informations</h3>
         </div>
-        <!-- <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-          <label>
-            <input type="checkbox" name="VIP" [value]="1" (change)="updateAdditionalInfo($event, 'VIP')" /> VIP
-          </label>
-          <label>
-            <input type="checkbox" name="AnnualReport" [value]="3" (change)="updateAdditionalInfo($event, 'Annual Report')" /> Annual Report
-          </label>
-          <label>
-            <input type="checkbox" name="ChristmasNewYear" [value]="4" (change)="updateAdditionalInfo($event, 'Christmas/New Year')" /> Christmas/New Year
-          </label>
-          <label>
-            <input type="checkbox" name="EidCards" [value]="5" (change)="updateAdditionalInfo($event, 'Eid Cards')" /> Eid Cards
-          </label>
-          <label>
-            <input type="checkbox" name="Publications" [value]="6" (change)="updateAdditionalInfo($event, 'Publications')" /> Publications
-          </label>
-        </div> -->
         <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-          <label>
-            <input type="checkbox" name="VIP" [value]="1" (change)="updateAdditionalInfoCreate($event, 'VIP')" /> VIP
-          </label>
-          <label>
-            <input type="checkbox" name="AnnualReport" [value]="3"
-              (change)="updateAdditionalInfoCreate($event, 'Annual Report')" /> Annual Report
-          </label>
-          <label>
-            <input type="checkbox" name="ChristmasNewYear" [value]="4"
-              (change)="updateAdditionalInfoCreate($event, 'Christmas/New Year')" /> Christmas/New Year
-          </label>
-          <label>
-            <input type="checkbox" name="EidCards" [value]="5"
-              (change)="updateAdditionalInfoCreate($event, 'Eid Cards')" /> Eid Cards
-          </label>
-          <label>
-            <input type="checkbox" name="Publications" [value]="6"
-              (change)="updateAdditionalInfoCreate($event, 'Publications')" /> Publications
+          <label *ngFor="let label of getInfoTypeLabels()">
+            <input             
+              type="checkbox"
+              [checked]="selectedInfoTypes[infoTypeMapping[label]]"
+              (change)="updateAdditionalInfoEdit($event, label)"
+            />
+            {{ label }}
           </label>
         </div>
       </div>
@@ -676,7 +651,7 @@
           <input name="BusinessEmail" id="BusinessEmail" type="text" [(ngModel)]="selectedContact.busEmail"
             [readonly]="isBusinessEmailReadOnly" [disabled]="isBusinessEmailEnabled || !isEditContact" (click)="onBusinessEmailChange()"/>
         </div>
-        <div class="input-field">
+        <div class="input-field"> 
           <label for="OtherEmail">Other Email</label>
           <input name="OtherEmail" id="OtherEmail" type="text" [(ngModel)]="selectedContact.otherEmail"
             [disabled]="!isEditContact" />
@@ -942,86 +917,23 @@
         <div class="popup-header">
           <h3>Additional Informations</h3>
         </div>
-        <!-- <div style="display: flex; flex-wrap: wrap; gap: 15px;" *ngIf="isEditContact">
-          <label>
-            <input type="checkbox" name="VIP" [value]="1" (change)="updateAdditionalInfo($event, 'VIP')" /> VIP
+     
+        <div *ngIf="isEditContact" style="display: flex; flex-wrap: wrap; gap: 15px;">
+          <label *ngFor="let label of getInfoTypeLabels()">
+            <input
+              [disabled]="!isEditContact"
+              type="checkbox"
+              [checked]="selectedInfoTypes[infoTypeMapping[label]]"
+              (change)="updateAdditionalInfoEdit($event, label)"
+            />
+            {{ label }}
           </label>
-          <label>
-            <input type="checkbox" name="AnnualReport" [value]="3" (change)="updateAdditionalInfo($event, 'Annual Report')" /> Annual Report
-          </label>
-          <label>
-            <input type="checkbox" name="ChristmasNewYear" [value]="4" (change)="updateAdditionalInfo($event, 'Christmas/New Year')" /> Christmas/New Year
-          </label>
-          <label>
-            <input type="checkbox" name="EidCards" [value]="5" (change)="updateAdditionalInfo($event, 'Eid Cards')" /> Eid Cards
-          </label>
-          <label>
-            <input type="checkbox" name="Publications" [value]="6" (change)="updateAdditionalInfo($event, 'Publications')" /> Publications
-          </label>
-        </div> -->
-        <!-- <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-          <label>
-            <input [disabled]="!isEditContact"
-                   type="checkbox"
-                   [value]="1"
-                   [(ngModel)]="selectedInfoTypes['1']"
-                   (change)="updateAdditionalInfo($event, 'VIP')"
-            /> VIP
-          </label>
-          <label>
-            <input [disabled]="!isEditContact"
-                   type="checkbox"
-                   [value]="3"
-                   [(ngModel)]="selectedInfoTypes['3']"
-                   (change)="updateAdditionalInfo($event, 'Annual Report')"
-            /> Annual Report
-          </label>
-          <label>
-            <input [disabled]="!isEditContact"
-                   type="checkbox"
-                   [value]="4"
-                   [(ngModel)]="selectedInfoTypes['4']"
-                   (change)="updateAdditionalInfo($event, 'Christmas/New Year')"
-            /> Christmas/New Year
-          </label>
-          <label>
-            <input [disabled]="!isEditContact"
-                   type="checkbox"
-                   [value]="5"
-                   [(ngModel)]="selectedInfoTypes['5']"
-                   (change)="updateAdditionalInfo($event, 'Eid Cards')"
-            /> Eid Cards
-          </label>
-          <label>
-            <input [disabled]="!isEditContact"
-                   type="checkbox"
-                   [value]="6"
-                   [(ngModel)]="selectedInfoTypes['6']"
-                   (change)="updateAdditionalInfo($event, 'Publications')"
-            /> Publications
-          </label>
-        </div> -->
-        <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-          <label>
-            <input [disabled]="!isEditContact" type="checkbox" [value]="1" [(ngModel)]="selectedInfoTypes['1']"
-              (change)="updateAdditionalInfoEdit($event, 'VIP')" /> VIP
-          </label>
-          <label>
-            <input [disabled]="!isEditContact" type="checkbox" [value]="3" [(ngModel)]="selectedInfoTypes['3']"
-              (change)="updateAdditionalInfoEdit($event, 'Annual Report')" /> Annual Report
-          </label>
-          <label>
-            <input [disabled]="!isEditContact" type="checkbox" [value]="4" [(ngModel)]="selectedInfoTypes['4']"
-              (change)="updateAdditionalInfoEdit($event, 'Christmas/New Year')" /> Christmas/New Year
-          </label>
-          <label>
-            <input [disabled]="!isEditContact" type="checkbox" [value]="5" [(ngModel)]="selectedInfoTypes['5']"
-              (change)="updateAdditionalInfoEdit($event, 'Eid Cards')" /> Eid Cards
-          </label>
-          <label>
-            <input [disabled]="!isEditContact" type="checkbox" [value]="6" [(ngModel)]="selectedInfoTypes['6']"
-              (change)="updateAdditionalInfoEdit($event, 'Publications')" /> Publications
-          </label>
+         
+        </div>
+        <div *ngIf="!isEditContact" style="display: flex; flex-wrap: wrap; gap: 15px;">
+          <span *ngFor="let label of selectedLabels">
+            {{ label }}
+          </span>
         </div>
       </div>
       <div class="btn justify-content-end">
@@ -1124,25 +1036,3 @@
     </div>
   </div>
 </div>
-<!-- <div *ngIf="isHistoryPopupVisible" class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header custom-modal-header">
-      <h3>Functions History</h3>
-      <button class="close-button custom-close-button" (click)="closeHistoryPopup()">✕</button>
-    </div>
-    <div class="functions-table">
-      <div class="functions-row header">
-        <div style="width: 20%;" class="input-field"><strong>Function</strong></div>
-        <div style="width: 20%;" class="input-field"><strong>Effective Date</strong></div>
-        <div style="width: 20%;" class="input-field"><strong>End Date</strong></div>
-        <div style="width: 20%;" class="input-field"><strong>Review Status</strong></div>
-      </div>
-      <div *ngFor="let func of FunctionsHistoryList" class="functions-row">
-        <div style="width: 20%;" class="input-field">{{ func.FunctionTypeDesc }}</div>
-        <div style="width: 20%;" class="input-field">{{ func.EffectiveDate || 'N/A' }}</div>
-        <div style="width: 20%;" class="input-field">{{ func.EndDate || 'N/A' }}</div>
-        <div style="width: 20%;" class="input-field">{{ func.ReviewStatus || 'Pending' }}</div>
-      </div>
-    </div>
-  </div>
-</div> -->

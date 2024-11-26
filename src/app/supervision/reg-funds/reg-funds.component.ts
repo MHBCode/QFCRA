@@ -52,11 +52,13 @@ export class RegFundsComponent {
   }
 
   loadRegFunds() {
+    this.isLoading = true;
     this.registeredFundService.getFIRMRegisteredFund(this.userId,this.firmId).subscribe(
       data => {
         this.regFunds = data.response;
         this.applySearchAndPagination();
         console.log("regFunds", this.regFunds)
+        this.isLoading = false;
       },
       error => {
         console.error('Error fetching Firm regFunds ', error);
