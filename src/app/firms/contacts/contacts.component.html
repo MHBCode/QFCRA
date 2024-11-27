@@ -475,7 +475,7 @@
             <input             
               type="checkbox"
               [checked]="selectedInfoTypes[infoTypeMapping[label]]"
-              (change)="updateAdditionalInfoEdit($event, label)"
+              (change)="updateAdditionalInfoCreate($event, label)"
             />
             {{ label }}
           </label>
@@ -622,7 +622,7 @@
         <div class="input-field" *ngIf="firmDetails.FirmTypeID === 2">
           <label for="country"> Nationality </label>
           <select [(ngModel)]="selectedContact.nationality" [disabled]="!isEditContact"
-            (change)="onNationalityChange($event)">
+            (change)="onNationalityChangeEdit($event)">
             <option [value]="0">Select</option>
             <option *ngFor="let option of allCountries" [value]="option.CountryID">
               {{ option?.CountryName }}
@@ -931,7 +931,7 @@
          
         </div>
         <div *ngIf="!isEditContact" style="display: flex; flex-wrap: wrap; gap: 15px;">
-          <span *ngFor="let label of selectedLabels">
+          <span *ngFor="let label of selectedAdditionalInfoLabels">
             {{ label }}
           </span>
         </div>

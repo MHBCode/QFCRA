@@ -461,8 +461,9 @@ export class ContactsComponent {
   UpdateContactPopupChange() {
     this.closeContactPopup();
   }
-
+  isCreatingContact: boolean = false;
   createContact() {
+    this.isCreatingContact = true;
     this.showCreateContactSection = true;
     this.disableAddressFieldOnCreate = false;
     this.createContactObj.aIsContactTypeID = null;
@@ -472,6 +473,7 @@ export class ContactsComponent {
     this.canAddNewAddressOnCreate = false;
     this.Column2 = "select"
     this.showMLROSection = false;
+    this.initializeAdditionalInfo();
   }
 
   closeCreateContactPopup() {
@@ -2146,7 +2148,21 @@ export class ContactsComponent {
         this.firmDetailsService.showErrorAlert(6503);
       }
     }
+  }
+  onNationalityChangeEdit(event: Event): void {
+    const selectedNationality = Number((event.target as HTMLSelectElement).value);
 
+    const residentStatus = this.EditResidentStateObj.attributeValue;
+    if (selectedNationality !== 0) {
+      if (residentStatus === 'Resident' && selectedNationality !== this.getQatarCountryID()) {
+        this.selectedContact.nationality = "0"
+        this.firmDetailsService.showErrorAlert(6503);
+      }
+
+      if (residentStatus === 'Non-Resident' && selectedNationality === this.getQatarCountryID()) {
+        this.firmDetailsService.showErrorAlert(6503);
+      }
+    }
   }
   ///////////// Resident State  && Counrty
   onCountryChange(event: Event): void {
@@ -2369,6 +2385,7 @@ export class ContactsComponent {
       });
     }
     console.log('Loaded from DB:', this.selectedInfoTypes);
+    console.log('Labels Loaded from DB:',this.selectedLabels)
   }
 
   updateAdditionalInfoLabels(): void {
@@ -2446,7 +2463,7 @@ export class ContactsComponent {
   getInfoTypeLabels(): string[] {
     return Object.keys(this.infoTypeMapping);
   }
-
+  
 
 }
 
