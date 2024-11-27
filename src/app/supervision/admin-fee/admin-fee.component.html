@@ -30,7 +30,7 @@
                         <td>{{ fee?.ObjectWFStatusTypeDesc }}</td>
                     </tr>
                 </tbody>
-                <tfoot>
+                <tfoot *ngIf="FirmAdminFees?.length > 0">
                     <tr>
                         <td  [attr.colspan]="12">
                             <app-pagination [items]="FirmAdminFees" [pageSize]="pageSize" (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>   

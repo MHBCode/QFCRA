@@ -1,4 +1,4 @@
-<div class="pagination">
+<div *ngIf="items?.length > 0" class="pagination">
     <button (click)="previousPage()" [disabled]="currentPage === 1">
         <span>&lt;</span>
     </button>

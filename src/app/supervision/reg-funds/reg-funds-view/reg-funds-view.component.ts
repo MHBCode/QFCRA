@@ -26,12 +26,13 @@ export class RegFundsViewComponent {
   @Output() closeRegPopup = new EventEmitter<void>();
   @Output() fundDeleted = new EventEmitter<void>();
   isEditable: boolean = false;
-  isLoading: boolean = false;
+  isLoading: boolean = true;
   userId = 30;
   RegisteredFundDetials:any =[];
   RegisteredFundStatusDetials:any = [];
   TypeOfFunddropdown : any ;
   RFFundStatusdropdown : any ;
+  SubFundData : any;
   now = new Date();
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
@@ -91,7 +92,6 @@ export class RegFundsViewComponent {
       },
       error: (error) => {
         console.error('Error fetching return review details:', error);
-        this.isLoading=false;
       },
     });
   }
@@ -105,11 +105,10 @@ export class RegFundsViewComponent {
       },
       error: (error) => {
         console.error('Error fetching return review details:', error);
-        this.isLoading=false;
       },
     });
   }
-  SubFundData : any;
+  
   getSubFundData() {
     const RegisteredFundID = this.reg.RegisteredFundID;
     this.registeredFundService.getSubFundData(RegisteredFundID).subscribe({
@@ -119,7 +118,6 @@ export class RegFundsViewComponent {
       },
       error: (error) => {
         console.error('Error fetching sub-fund data:', error);
-        this.isLoading = false;
       },
     });
   }
@@ -217,6 +215,7 @@ deleteRegisteredFund() {
     licenseKey: ''
   };
   getTypeOfFunddropdown(){
+    this.isLoading = true
     const userId = this.userId;
     const dropdown = constants.TypeOfFund;
     const OpTypeId = constants.ObjectOpType.Create;
@@ -226,11 +225,10 @@ deleteRegisteredFund() {
         // Assign full response to firmRevDetails
         this.TypeOfFunddropdown = res.response;
         console.log("TypeOfFunddropdown",this.TypeOfFunddropdown)
-        this.isLoading=false;
       },
       error: (error) => {
         console.error('Error fetching return review details:', error);
-        this.isLoading=false;
+
       },
     });
   }
@@ -244,11 +242,9 @@ deleteRegisteredFund() {
         // Assign full response to firmRevDetails
         this.RFFundStatusdropdown = res.response;
         console.log("RFFundStatusdropdown",this.RFFundStatusdropdown)
-        this.isLoading=false;
       },
       error: (error) => {
         console.error('Error fetching return review details:', error);
-        this.isLoading=false;
       },
     });
   }
@@ -273,6 +269,7 @@ deleteRegisteredFund() {
   //        otherEntities: this..otherEntities,
   //        rfNotes: this..rfNotes,
   SaveUpdateRegFunds(){
+    this.isLoading = true;
     const saveUpdateRegisteredFundObj = {
        objRF: {
          registeredFundID: this.RegisteredFundDetials[0].RegisteredFundID,
@@ -300,19 +297,17 @@ deleteRegisteredFund() {
        lstSubFunds: this.SubFundData
      }
      console.log("RegisteredFund object to be save",saveUpdateRegisteredFundObj)
-     this.isLoading = true;
+     
      this.registeredFundService.saveUpdateRegisteredFund(saveUpdateRegisteredFundObj).subscribe({
        next: (res) => {
          
          console.log("Registered Fund saved successfully")
-         this.isLoading=false;
          this.firmDetailsService.showSaveSuccessAlert(constants.RegisteredFund_Messages.RegisteredFund_Saved_SUCCESSFULLY);
          this.onClose();
          this.fundDeleted.emit();
        },
        error: (error) => {
          console.error('Error saving Registered Fund:', error);
-         this.isLoading=false;
        },
      });
    }
@@ -380,12 +375,10 @@ getDocumentType(){
   const docTypeId = constants.FrimsObject.RegisteredFunds;
   this.objectwfService.getDocumentType(docTypeId).subscribe({
     next: (res) => {
-      this.isLoading = false;
       this.DocumentTypeList = res.response;
       console.log("DocumentTypeList",this.DocumentTypeList)
     },
     error: (error) => {
-      this.isLoading = false;
       console.error('Error deleting RegisteredFund', error);
     },
   });
@@ -396,11 +389,10 @@ getDocument(){
   const objectInstanceId = this.RegisteredFundDetials[0].RegisteredFundID
   this.TheDocument.getDocument(objectId,objectInstanceId).subscribe({
     next: (res) => {
-      this.isLoading = false;
       this.TheDocument = res.response;
     },
     error: (error) => {
-      this.isLoading = false;
+
       console.error('Error deleting RegisteredFund', error);
     },
   });

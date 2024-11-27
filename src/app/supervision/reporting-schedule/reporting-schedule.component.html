@@ -30,7 +30,7 @@
                         <td>{{rpt.FirmRptTo}}</td>
                     </tr>
                 </tbody>
-                <tfoot>
+                <tfoot *ngIf="rptSchedule?.length > 0">
                     <tr>
                         <td  [attr.colspan]="12">
                             <app-pagination [items]="rptSchedule" [pageSize]="pageSize" (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>   

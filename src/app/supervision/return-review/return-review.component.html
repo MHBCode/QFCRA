@@ -33,7 +33,7 @@
             <th>Review Status Date</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody *ngIf="paginatedFirms?.length > 0; else ReturnreView">
           <tr *ngFor="let ReturnreView of paginatedFirms" (click)="openReturnreViewPopup(ReturnreView,firmDetails)">
             <td (click)="getReturnReviewRevision(ReturnreView,$event)" class="clickable-cell text-center">
               {{ReturnreView.RptReviewRevNum}}
@@ -46,26 +46,31 @@
             <td class="text-center">{{ReturnreView.ReviewStatusDate}}</td>
           </tr>
         </tbody>
-        <tfoot>
-          <tr>
-            <td [attr.colspan]="10">
-              <div class="pagination"
-                style="display: flex; align-items: center; justify-content: center; gap: 15px; padding: 10px 0;">
-                <button (click)="previousPage()" [disabled]="currentPage === 1"
-                  style="background-color: #f1f1f1; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; border-radius: 4px; color: #333;">
-                  <span>&lt;</span>
-                </button>
-                <span style="font-weight: 500; color: #333;">Page {{ currentPage }} of {{ totalPages }}</span>
-                <button (click)="nextPage()" [disabled]="currentPage === totalPages"
-                  style="background-color: #f1f1f1; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; border-radius: 4px; color: #333;">
-                  <span>&gt;</span>
-                </button>
-                <span style="color: #555; font-size: 14px;">Showing {{ startRow }} to {{ endRow }} of {{ totalRows }}
-                  rows</span>
-              </div>
-            </td>
-          </tr>
-        </tfoot>
+        <ng-template #ReturnreView>
+          <tbody>
+              <tr>
+                  <td colspan="4" class="norecords" style="color: red">No Records Found</td>
+              </tr>
+          </tbody>
+      </ng-template>
+      <tfoot *ngIf="paginatedFirms?.length > 0">
+        <tr>
+          <td [attr.colspan]="10">
+            <div class="pagination">
+              <button class="pagination-btn" (click)="previousPage()" [disabled]="currentPage === 1">
+                <span>&lt;</span>
+              </button>
+              <span class="pagination-info">Page {{ currentPage }} of {{ totalPages }}</span>
+              <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                <span>&gt;</span>
+              </button>
+              <span class="pagination-summary">
+                Showing {{ startRow }} to {{ endRow }} of {{ totalRows }} rows
+              </span>
+            </div>
+          </td>
+        </tr>
+      </tfoot>
       </table>
     </div>
   </div>

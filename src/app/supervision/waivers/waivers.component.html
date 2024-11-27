@@ -42,7 +42,7 @@
             <td>{{ waiver?.WaiverExpirationDate }}</td>
           </tr>
         </tbody>
-        <tfoot>
+        <tfoot *ngIf="FirmWaivers?.length > 0">
           <tr>
             <td [attr.colspan]="12" *ngIf="FirmWaivers?.length > 0">
               <app-pagination [items]="FirmWaivers" [pageSize]="pageSize"

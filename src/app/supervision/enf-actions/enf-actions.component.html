@@ -9,7 +9,7 @@
                 </h2>
                 <div class="btn">
                     <button>
-                        <i class="bi bi-pen"></i>
+                        <i class="bi bi-plus"></i>
                         Create
                     </button>
                 </div>
@@ -31,7 +31,7 @@
                         <th>Published</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody *ngIf="paginatedItems.length > 0; else noEnfActions">
                     <tr *ngFor="let enf of paginatedItems">
                         <td>{{ enf?.EnforcementActionOnTypeDesc }}</td>
                         <td>{{ enf?.EnforcementType }}</td>
@@ -42,7 +42,14 @@
                         <td>{{ enf?.Published }}</td>
                     </tr>
                 </tbody>
-                <tfoot>
+                <ng-template #noEnfActions>
+                    <tbody>
+                      <tr>
+                        <td colspan="7" class="norecords" style="color: red">No Records Found</td>
+                      </tr>
+                    </tbody>
+                  </ng-template>
+                <tfoot *ngIf="enfActions?.length > 0">
                     <tr>
                         <td [attr.colspan]="12">
                             <app-pagination [items]="enfActions" [pageSize]="pageSize"
