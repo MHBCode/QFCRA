@@ -108,7 +108,10 @@ export class NoticesComponent implements OnInit {
   }
 
   loadNotices(): void {
-    this.noticeService.getNoticesList(this.firmId).subscribe(data => {
+    const params = {
+      firmID: this.firmId
+    }
+    this.noticeService.getNoticesList(params).subscribe(data => {
       this.filteredNotices = data.response; // Full data
       this.applySearchAndPagination(); // Initialize pagination
     });

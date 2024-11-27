@@ -1,122 +1,174 @@
 <div class="overlay">
-    <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
-        <!-- <div class="error-messages">
+  <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+    <!-- <div class="error-messages">
         <p *ngIf="errorMessages['OtherEntityName']">
           {{ errorMessages['OtherEntityName'] }}
         </p>
       </div> -->
-        <!-- Title -->
-        <div class="popup-title-btn-row">
-            <div class="popup-header">
-                <h3>
-                    Reporting Schedule For {{ firmDetails?.FirmName }}
-                </h3>
-            </div>
-            <button class="close-button  close-icon" (click)="onClose()">
-                <i class="bi bi-x-circle"></i>
-            </button>
-        </div>
-
-
-        <div class="reporting-schedule-form">
-            <div class="notice-list">
-                <div class="popup-header">
-                    <h3>Reports List</h3>
-                </div>
-
-                <div class="inputs-row notice-details">
-                    <div class="input-field">
-                      <label for="typeOfNotice">Type of Notice</label>
-                      <input type="text" id="typeOfNotice" name="typeOfNotice" [(ngModel)]="notice.noticeTypeDesc" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="noticeName">Notice Name</label>
-                      <input type="text" id="noticeName" name="noticeName" [(ngModel)]="notice.noticeName" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="internalRefNumber">Internal Reference Number</label>
-                      <input type="text" id="internalRefNumber" name="internalRefNumber" [(ngModel)]="notice.internalReferenceNumber" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="correspondenceRefNumber">Correspondence Reference Number</label>
-                      <input type="text" id="correspondenceRefNumber" name="correspondenceRefNumber" [(ngModel)]="notice.cmsReferenceNumber" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="noticeIssuer">Notice Issued By</label>
-                      <input type="text" id="noticeIssuer" name="noticeIssuer" [(ngModel)]="notice.noticeIssuerShortName" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="noticeIssuedDate">Notice Issued Date</label>
-                      <input type="date" id="noticeIssuedDate" name="noticeIssuedDate" [(ngModel)]="notice.noticeIssuedDate" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="issuersRefNumber">Issuer's Reference Number</label>
-                      <input type="text" id="issuersRefNumber" name="issuersRefNumber" [(ngModel)]="notice.issuersReferenceNumber" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="subject">Subject</label>
-                      <input type="text" id="subject" name="subject" [(ngModel)]="notice.subject" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="references">Reference(s) (if any)</label>
-                      <input type="text" id="references" name="references" [(ngModel)]="notice.references" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="linkToNotice">Link to Notice (if any)</label>
-                      <input type="url" id="linkToNotice" name="linkToNotice" [(ngModel)]="notice.linkToNotice" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="additionalAttachments">Additional Attachment(s) (if any)</label>
-                      <input type="text" id="additionalAttachments" name="additionalAttachments" [(ngModel)]="notice.additionalAttachments" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="noticeFinalizedBy">Notice Finalized By</label>
-                      <input type="text" id="noticeFinalizedBy" name="noticeFinalizedBy" [(ngModel)]="notice.noticeFinalizedBy" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="noticeFinalizedDate">Notice Finalized Date</label>
-                      <input type="datetime-local" id="noticeFinalizedDate" name="noticeFinalizedDate" [(ngModel)]="notice.noticeFinalizedDate" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="publishedBy">Published on Website By</label>
-                      <input type="text" id="publishedBy" name="publishedBy" [(ngModel)]="notice.publishedOnWebsiteBy" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="datePublished">Date Published on Website</label>
-                      <input type="datetime-local" id="datePublished" name="datePublished" [(ngModel)]="notice.datePublishedonWebsite" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="notificationSentDate">Notification Sent Date</label>
-                      <input type="datetime-local" id="notificationSentDate" name="notificationSentDate" [(ngModel)]="notice.notificationSentDate" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="responseDueDate">Response Due Date</label>
-                      <input type="date" id="responseDueDate" name="responseDueDate" [(ngModel)]="notice.responseDueDate" [disabled]="!notice.editableWhenUsed" />
-                    </div>
-                    <div class="input-field">
-                      <label for="noticeDetails">Notice Details</label>
-                      <a [routerLink]="['/view-notice-details']" target="_blank">View Notice Details</a>
-                    </div>
-                    <div class="input-field">
-                      <label for="emailNotification">Link to Email Notification</label>
-                      <a [routerLink]="['/view-email-notification']" target="_blank">View Email Notification</a>
-                    </div>
-                  </div>
-                  
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="btn justify-content-end">
-                <button *ngIf="!isEditable">
-                    <i class="bi bi-pen"></i> Edit
-                </button>
-                <button *ngIf="isEditable">
-                    <i></i> Save
-                </button>
-                <button>
-                    <i class="bi bi-trash"></i> Delete
-                </button>
-            </div>
-        </div>
+    <!-- Title -->
+    <div class="popup-title-btn-row">
+      <div class="popup-header">
+        <h3>
+          Notice Details For {{ firmDetails?.FirmName }}
+        </h3>
+      </div>
+      <button class="close-button  close-icon" (click)="onClose()">
+        <i class="bi bi-x-circle"></i>
+      </button>
     </div>
+    <div class="reporting-schedule-form" *ngIf="noticeDetails">
+      <div class="notice-list">
+        <div class="inputs-row notice-details">
+          <div class="input-field">
+            <label for="typeOfNotice">Type of Notice</label>
+            <input type="text" id="typeOfNotice" name="typeOfNotice" [(ngModel)]="noticeDetails.TypeOfNotice"
+              [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="noticeName">Notice Name</label>
+            <input type="text" id="noticeName" name="noticeName" [(ngModel)]="noticeDetails.NoticeName"
+              [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="internalRefNumber">Internal Reference Number</label>
+            <input type="text" id="internalRefNumber" name="internalRefNumber"
+              [(ngModel)]="noticeDetails.InternalReferenceNumber" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="correspondenceRefNumber">Correspondence Reference Number</label>
+            <input type="text" id="correspondenceRefNumber" name="correspondenceRefNumber"
+              [(ngModel)]="noticeDetails.CMSReferenceNumber" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="noticeIssuer">Notice Issued By</label>
+            <input type="text" id="noticeIssuer" name="noticeIssuer" [(ngModel)]="noticeDetails.NoticeIssuedBy"
+              [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="noticeIssuedDate">Notice Issued Date</label>
+            <input type="text" id="noticeIssuedDate" name="noticeIssuedDate"
+              [(ngModel)]="noticeDetails.NoticeIssuedDate" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="issuersRefNumber">Issuer's Reference Number</label>
+            <input type="text" id="issuersRefNumber" name="issuersRefNumber"
+              [(ngModel)]="noticeDetails.IssuersReferenceNumber" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" [(ngModel)]="noticeDetails.Subject"
+              [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="references">Reference(s) (if any)</label>
+            <input type="text" id="references" name="references" [(ngModel)]="noticeDetails.References"
+              [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="linkToNotice">Link to Notice (if any)</label>
+            <input type="url" id="linkToNotice" name="linkToNotice" [(ngModel)]="noticeDetails.linkToNotice"
+              [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="additionalAttachments">Additional Attachment(s) (if any)</label>
+            <input type="text" id="additionalAttachments" name="additionalAttachments"
+              [(ngModel)]="noticeDetails.additionalAttachments" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="noticeFinalizedBy">Notice Finalized By</label>
+            <input type="text" id="noticeFinalizedBy" name="noticeFinalizedBy"
+              [(ngModel)]="noticeDetails.NoticeFinalizedBy" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="noticeFinalizedDate">Notice Finalized Date</label>
+            <input type="text" id="noticeFinalizedDate" name="noticeFinalizedDate"
+              [(ngModel)]="noticeDetails.NoticeFinalizedDate" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field" *ngIf="noticeDetails.PublishOnWebsite">
+            <label for="publishedBy">Published on Website By</label>
+            <input type="text" id="publishedBy" name="publishedBy" [(ngModel)]="noticeDetails.PublishedOnWebsiteBy"
+              [disabled]="!isEditable" />
+          </div>
+          <div class="input-field" *ngIf="noticeDetails.PublishOnWebsite">
+            <label for="datePublished">Date Published on Website</label>
+            <input type="text" id="datePublished" name="datePublished"
+              [(ngModel)]="noticeDetails.DatePublishedonWebsite" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="notificationSentDate">Notification Sent Date</label>
+            <input type="text" id="notificationSentDate" name="notificationSentDate"
+              [(ngModel)]="noticeDetails.NotificationSentDate" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="responseDueDate">Response Due Date</label>
+            <input type="text" id="responseDueDate" name="responseDueDate" [(ngModel)]="noticeDetails.ResponseDueDate"
+              [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="noticeDetails">Notice Details</label>
+            <a [routerLink]="['/view-notice-details']" target="_blank">View Notice Details</a>
+          </div>
+          <div class="input-field">
+            <label for="emailNotification">Link to Email Notification</label>
+            <a [routerLink]="['/view-email-notification']" target="_blank">View Email Notification</a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="popup-title-btn-row" *ngIf="questionnaireDetails && noticeDetails?.NoticeTypeID != 2">
+      <div class="popup-header">
+        <h3>
+          Questionnaire Details For {{ firmDetails?.FirmName }}
+        </h3>
+      </div>
+    </div>
+    <div class="reporting-schedule-form"  *ngIf="questionnaireDetails && noticeDetails?.NoticeTypeID != 2">
+      <div class="notice-list">
+        <div class="inputs-row notice-details">
+          <div *ngFor="let question of questionnaireDetails" class="input-field fullwidth">
+            <label [for]="'question' + question.NoticeQuestionNumber">{{ question.NoticeQuestion }}</label>
+            <input type="text" 
+                   [id]="'question' + question.NoticeQuestionNumber" 
+                   [name]="'question' + question.NoticeQuestionNumber"
+                   [(ngModel)]="question.Responses" 
+                   [disabled]="!isEditable" />
+          </div>
+    
+          <!-- <div *ngIf="question.ExplanationRequired > 0" class="input-field">
+            <label for="explanation">Explanation</label>
+            <input type="text" 
+                   id="explanation" 
+                   name="explanation" 
+                   [(ngModel)]="question.Explanation" 
+                   [disabled]="!isEditable" />
+          </div>
+     -->
+
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="popup-title-btn-row" *ngIf="noticeDetails?.Notes && noticeDetails?.NoticeTypeID != 2">
+      <div class="popup-header">
+        <h3>
+          Notes
+        </h3>
+      </div>
+    </div>
+    <div class="reporting-schedule-form"  *ngIf="noticeDetails?.Notes && noticeDetails?.NoticeTypeID != 2">
+      <div class="notice-list">
+        <div class="inputs-row notice-details">
+          <div class="input-field fullwidth">
+            <label for="notes">Notes</label>
+            <textarea [(ngModel)]="noticeDetails.Notes" [disabled]="!isEditable" name="notes"></textarea>
+        </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
 </div>
