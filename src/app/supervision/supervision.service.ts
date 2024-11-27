@@ -38,13 +38,19 @@ export class SupervisionService {
       }
     );
   }
+
   getErrorMessages(fieldName: string, msgKey: number, customMessage?: string, placeholderValue?: string): Observable<void> {
     return new Observable(observer => {
       this.logForm.errorMessages(msgKey).subscribe(
         response => {
           let errorMessage = (customMessage ? customMessage + " " : "") + response.response;
 
-          // Store in the errorMessages object and the provided activity
+          if (placeholderValue) {
+            errorMessage = errorMessage.replace("##DateFieldLabel##", placeholderValue)
+              .replace("#", placeholderValue)
+          }
+
+          // Store the updated error message
           this.errorMessages[fieldName] = errorMessage;
 
           observer.next();
@@ -57,10 +63,11 @@ export class SupervisionService {
     });
   }
 
+
   // Supervision
   populateFirmRptClassificationTypes(userId: number, OpTypeId: number): Observable<any[]> {
     return new Observable(observer => {
-      this.securityService.getObjectTypeTable(userId, constants.firmRptClassificationTypes,OpTypeId).subscribe(
+      this.securityService.getObjectTypeTable(userId, constants.firmRptClassificationTypes, OpTypeId).subscribe(
         data => {
           observer.next(data.response);
         },
@@ -130,11 +137,86 @@ export class SupervisionService {
     });
   }
 
+  // Enforcement Actions
+  populateEnfActionsAuth(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.enfActionsAuth, OpTypeId).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Enf Actions Auth options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  populateEnfActionsDNFBP(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.enfActionsDNFBP, OpTypeId).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Enf Actions DNFBP options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  populateFirmTypes(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.firmTypes, OpTypeId).subscribe(
+        data => {
+          // Filter out the option with FirmTypeDesc "Licensed"
+          const filteredResponse = data.response.filter(item => item.FirmTypeDesc !== "Licensed");
+
+          observer.next(filteredResponse);
+        },
+        error => {
+          console.error('Error Fetching Firm Types options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  populateFirmNamesAuthorised(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.authorisedFirmNames, OpTypeId).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Firm Names Authorised options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  populateFirmNamesDNFBP(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.dnfbpsFirmNames, OpTypeId).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Firm Names DNFBP options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+
   isUserHasRestrictedAccess(userId: number, firmId: number, objectID: number): Observable<boolean> {
     return new Observable(observer => {
       this.userService.isUserHasRestrictedAccess(userId, firmId, objectID).subscribe(
         response => {
-          observer.next(response.response.Column1); 
+          observer.next(response.response.Column1);
           observer.complete();
         },
         error => {

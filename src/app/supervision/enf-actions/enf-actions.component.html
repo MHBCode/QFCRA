@@ -8,7 +8,8 @@
                     List Of Enforcement & Disciplinary Actions > <span>{{ firmDetails?.FirmName }}</span>
                 </h2>
                 <div class="btn">
-                    <button>
+                    <button *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn"
+                        [disabled]="!getControlEnablement('imgBtnCreate')">
                         <i class="bi bi-plus"></i>
                         Create
                     </button>
@@ -19,7 +20,7 @@
                 <label for="deletedRecords">Display Deleted Records</label>
             </span>
 
-            <table>
+            <table class="enf-list">
                 <thead>
                     <tr>
                         <th>Action On</th>
@@ -32,14 +33,17 @@
                     </tr>
                 </thead>
                 <tbody *ngIf="paginatedItems.length > 0; else noEnfActions">
-                    <tr *ngFor="let enf of paginatedItems">
-                        <td>{{ enf?.EnforcementActionOnTypeDesc }}</td>
+                    <tr *ngFor="let enf of paginatedItems" (click)="openEnfActionPopup(enf,firmDetails,false)">
+                        <td>
+                            {{ enf?.EnforcementActionOnTypeDesc }}
+                            <span *ngIf="enf.IsDeleted" style="color: red;">(Deleted)</span>
+                        </td>
                         <td>{{ enf?.EnforcementType }}</td>
                         <td>{{ enf?.FirmName }}</td>
                         <td>{{ enf?.AppIndividualName }}</td>
                         <td>{{ enf?.EnforcementActionFromDate }}</td>
                         <td>{{ enf?.EnforcementActionToDate }}</td>
-                        <td>{{ enf?.Published }}</td>
+                        <td>{{ enf?.Published ? 'Yes' : 'No'}}</td>
                     </tr>
                 </tbody>
                 <ng-template #noEnfActions>
@@ -61,3 +65,7 @@
         </div>
     </div>
 </div>
+
+<app-enf-actions-view-details (reloadEnf)="loadEnfActions()" *ngIf="showPopup" [enf]="selectedEnf" [firmId]="firmId" [isCreateEnf]="isCreateEnf"
+        [firmDetails]="firmDetails" (closeEnfPopup)="closePopup()">
+</app-enf-actions-view-details>

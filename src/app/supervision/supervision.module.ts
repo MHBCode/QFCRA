@@ -20,6 +20,7 @@ import { JournalViewDetailsComponent } from './journal/journal-view-details/jour
 import { NoticesDetailsComponent } from './notices/notices-details/notices-details.component';
 import { RegFundsViewComponent } from './reg-funds/reg-funds-view/reg-funds-view.component';
 import { RegFundsCreateComponent } from './reg-funds/reg-funds-create/reg-funds-create.component';
+import { EnfActionsViewDetailsComponent } from './enf-actions/enf-actions-view-details/enf-actions-view-details.component';
 
 
 
@@ -42,7 +43,8 @@ import { RegFundsCreateComponent } from './reg-funds/reg-funds-create/reg-funds-
     JournalViewDetailsComponent,
     NoticesDetailsComponent,
     RegFundsViewComponent,
-    RegFundsCreateComponent
+    RegFundsCreateComponent,
+    EnfActionsViewDetailsComponent
   ],
   imports: [
     CommonModule,

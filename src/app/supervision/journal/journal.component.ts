@@ -91,7 +91,6 @@ export class JournalComponent {
     this.isLoading = true;
     const currentOpType = ObjectOpType.List;
 
-    // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
     this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
 
       this.hideCreateBtn = false;

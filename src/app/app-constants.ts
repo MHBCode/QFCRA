@@ -41,6 +41,12 @@ export const externalAuditors = "V_Firm_AuditorName";
 // Reg.Funds
 export const TypeOfFund = "V_RegisteredFundTypes" ;
 export const RFFundStatus = "V_RegisteredFundStatusTypes";
+// Enf Action
+export const enfActionsAuth = "V_EnforcementActionOnTypes_Auth"
+export const enfActionsDNFBP = "V_EnforcementActionOnTypes_DNFBP"
+export const firmTypes = "V_FirmTypes";
+export const authorisedFirmNames = "V_All_Firms_Authorised";
+export const dnfbpsFirmNames = "V_All_Firms_DNFBPs";
 //Query String Parameter for FS Reporting
 export const QUERYSTRING_FSRPTDATAID = "fsRptDataID";
 

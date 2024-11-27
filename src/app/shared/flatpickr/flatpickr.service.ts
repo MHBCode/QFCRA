@@ -14,8 +14,6 @@ export class FlatpickrService {
         allowInput: true,
         dateFormat: 'd/M/Y', // Adjust date format as needed
         onChange: (selectedDates, dateStr) => {
-          console.log('Selected Date:', selectedDates);
-          console.log('Formatted Date String:', dateStr);
           input.nativeElement.value = dateStr;
         }
       });
