@@ -33,10 +33,7 @@ export class JournalService {
   }
 
   getAllRequiredIndividuals(firmId: number,contactAssnId?: number) {
-    let url = `${this.baseUrlJournal}get_all_required_individuals?firmId=${firmId}`;
-    if (contactAssnId) {
-      url += `&contactAssnId=${contactAssnId}`;
-    }
+    let url = `${this.baseUrlJournal}get_all_required_individuals?firmId=${firmId}&includeContactAssn=${contactAssnId}`;
     return this.http.get<any>(url);
   }
 

@@ -190,7 +190,7 @@ export class JournalComponent {
         }
         this.applySearchAndPagination();
         error => {
-          console.error('Error fetching Firm regFunds ', error);
+          console.error('Error fetching Journal: ', error);
         }
       }
     );

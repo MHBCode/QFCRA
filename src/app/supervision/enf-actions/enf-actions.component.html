@@ -9,7 +9,7 @@
                 </h2>
                 <div class="btn">
                     <button *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn"
-                        [disabled]="!getControlEnablement('imgBtnCreate')">
+                        [disabled]="!getControlEnablement('imgBtnCreate')" (click)="openEnfActionPopup(null,firmDetails,true)">
                         <i class="bi bi-plus"></i>
                         Create
                     </button>

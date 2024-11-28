@@ -150,7 +150,6 @@ export class EnfActionsComponent implements OnInit {
           this.enfActions = this.allEnfActions.filter(item => !item.IsDeleted);
         }
         this.applySearchAndPagination();
-        console.log('Firm Enf Action details:', this.allEnfActions);
         this.isLoading = false;
       },
       error => {

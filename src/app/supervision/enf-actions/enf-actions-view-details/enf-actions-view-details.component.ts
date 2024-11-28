@@ -10,6 +10,9 @@ import { SupervisionService } from '../../supervision.service';
 import * as constants from 'src/app/app-constants';
 import { forkJoin, catchError, of, tap, Observable } from 'rxjs';
 import { JournalService } from 'src/app/ngServices/journal.service';
+import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
+import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
+import { LogformService } from 'src/app/ngServices/logform.service';
 
 @Component({
   selector: 'app-enf-actions-view-details',
@@ -30,6 +33,17 @@ export class EnfActionsViewDetailsComponent implements OnInit {
 
   isEditModeEnf: boolean = false;
   enfDetails: any = [{}];
+
+  //Documents
+  enfDoc: any[] = [];
+  fetchedDocumentTypes : any = [];
+  documentObj:any;
+  // selectedFiles: File[] = [];
+  newfileNum: number;
+  selectedFile: File | null = null;
+  fileError: string = '';
+
+
   reasonOfDeletion: string;
 
   isLoading: boolean = false;
@@ -84,7 +98,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     EnforcementActionOnTypeDesc: null,
     EnforcementActionFromDate: null,
     EnforcementActionToDate: null,
-    EnforcementType: null,
+    EnforcementType: '',
     FirmName: null,
     LastModifiedBy: null,
     IsDeleted: false,
@@ -130,7 +144,10 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     private firmDetailsService: FirmDetailsService,
     private enfService: EnforcementsActionsService,
     private supervisionService: SupervisionService,
-    private journalService: JournalService
+    private journalService: JournalService,
+    private dateUtilService: DateUtilService,
+    private objectWF: ObjectwfService,
+    private logForm: LogformService
   ) { }
 
   ngOnInit(): void {
@@ -141,7 +158,6 @@ export class EnfActionsViewDetailsComponent implements OnInit {
         levelUsers: this.firmDetailsService.loadAssignedLevelUsers(),
         isDirector: this.isUserDirector(),
         isSupervisor: this.isValidFirmSupervisor(),
-        //enforcementDetails: this.loadEnfDetails(this.enf.EnforcementAndDisciplinaryActnID)
 
       }).subscribe({
         next: ({
@@ -149,7 +165,6 @@ export class EnfActionsViewDetailsComponent implements OnInit {
           levelUsers,
           isDirector,
           isSupervisor,
-          //enforcementDetails
 
         }) => {
           // Assign data to component properties
@@ -157,10 +172,9 @@ export class EnfActionsViewDetailsComponent implements OnInit {
           this.assignedLevelUsers = levelUsers;
           this.UserDirector = isDirector;
           this.ValidFirmSupervisor = isSupervisor;
-          // this.enfDetails = enforcementDetails;
 
           // Apply security after all data is loaded
-
+          this.loadDocuments();
           this.loadEnfDetails(this.enf.EnforcementAndDisciplinaryActnID).subscribe({
             next: () => {
               this.applySecurityOnPage(this.Page.Enforcement, false);
@@ -171,6 +185,42 @@ export class EnfActionsViewDetailsComponent implements OnInit {
               this.isLoading = false;
             }
           });
+        },
+        error: (err) => {
+          console.error('Error initializing page:', err);
+          this.isLoading = false;
+        },
+      });
+    } else {
+      forkJoin({
+        userRoles: this.firmDetailsService.loadAssignedUserRoles(this.userId),
+        levelUsers: this.firmDetailsService.loadAssignedLevelUsers(),
+        isDirector: this.isUserDirector(),
+        isSupervisor: this.isValidFirmSupervisor(),
+
+      }).subscribe({
+        next: ({
+          userRoles,
+          levelUsers,
+          isDirector,
+          isSupervisor,
+
+        }) => {
+          // Assign data to component properties
+          this.assignedUserRoles = userRoles;
+          this.assignedLevelUsers = levelUsers;
+          this.UserDirector = isDirector;
+          this.ValidFirmSupervisor = isSupervisor;
+
+          // Apply security after all data is loaded
+          this.populateEnfActionsAuth();
+          this.populateEnfActionsDNFBP();
+          this.populateFirmNamesAuthorised();
+          this.populateFirmNamesDNFBP();
+
+          this.showIndividualsDropdown = false;
+
+          this.applySecurityOnPage(this.Page.Enforcement, true); // on create mode
         },
         error: (err) => {
           console.error('Error initializing page:', err);
@@ -206,7 +256,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
       this.hideCancelBtn = false;
     }
 
-    if (this.enfDetails[0].Published) {
+    if (this.enfDetails[0].Published && !(this.isCreateEnf)) {
       this.hideDeleteBtn = true;
     } else {
       this.hideDeleteBtn = false;
@@ -216,7 +266,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     //   this.hidePublishBtn = true;
     // }
 
-    if (this.enf.IsDeleted) {
+    if (this.enfDetails[0].IsDeleted && !(this.isCreateEnf)) {
       this.hideDeleteBtn = true;
       this.hideEditBtn = true;
       this.hidePublishBtn = true;
@@ -271,12 +321,108 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     return this.enfService.getEnforcementDetails(this.userId, enforcementId).pipe(
       tap((response) => {
         this.enfDetails = response.response; // Update the view
-        console.log('Enforcement Details Reloaded:', this.enfDetails);
       })
     );
   }
 
+  getDocumentTypes(){
+    const docTypeId = constants.FrimsObject.Enforcement;
+    this.objectWF.getDocumentType(docTypeId).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.fetchedDocumentTypes = res.response;
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error deleting RegisteredFund', error);
+      },
+    });
+  }
 
+  // Documents
+  loadDocuments() {
+    this.objectWF.getDocument(this.Page.Enforcement, this.enf?.EnforcementAndDisciplinaryActnID, 1).pipe(
+    ).subscribe(
+      data => {
+        this.enfDoc = data.response;
+      },
+      error => {
+        console.error('Error loading document:', error);
+        this.enfDoc = [];
+
+      }
+    );
+  }
+
+  async onDocumentUploaded(uploadedDocument: any) {
+    this.isLoading = true;
+
+    try {
+      // Call getNewFileNumber and wait for it to complete
+      await this.getNewFileNumber().toPromise();
+
+      // Continue with the rest of the code after getNewFileNumber completes
+      const { fileLocation, intranetGuid } = uploadedDocument;
+      this.documentObj = this.prepareDocumentObject(
+        this.userId,
+        fileLocation,
+        intranetGuid,
+        constants.DocType.EnforcementAttachment,
+        this.Page.Enforcement,
+        this.fetchedDocumentTypes.DocSubTypeID,
+        this.enf?.EnforcementAndDisciplinaryActnID,
+        1 // constant
+      );
+
+      this.objectWF.insertDocument(this.documentObj).subscribe(
+        response => {
+          this.loadDocuments();
+          this.isLoading = false;
+        },
+        error => {
+          console.error('Error updating enforcement attachment:', error);
+          this.isLoading = false;
+        }
+      );
+    } catch (error) {
+      console.error('Error in getNewFileNumber:', error);
+      this.isLoading = false;
+    }
+  }
+
+  prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number, objectId: number, docSubTypeID: number, objectInstanceID: number, objectInstanceRevNum: number) {
+    return {
+      userId: userId,
+      docID: null,
+      referenceNumber: null,
+      fileName: this.selectedFile.name,
+      fileNumber: this.newfileNum.toString(),
+      firmId: this.firmId,
+      otherFirm: null,
+      docTypeID: docType,
+      loggedBy: userId,
+      loggedDate: this.currentDate,
+      receivedBy: userId,
+      receivedDate: this.currentDate,
+      docRecieptMethodID: constants.LogFormRecieptMethods.InternalDocument,
+      checkPrimaryDocID: true,
+      fileLocation: fileLocation,
+      docAttributeID: null,
+      intranetGuid: intranetGuid,
+      objectID: objectId,
+      objectInstanceID: objectInstanceID,
+      objectInstanceRevNum: objectInstanceRevNum,
+      docSubType: docSubTypeID
+    };
+  }
+
+  getNewFileNumber() {
+    return this.logForm.getNewFileNumber(this.firmId, this.currentDate.toISOString()).pipe(
+      tap(data => {
+        this.newfileNum = data.response.Column1;
+      })
+    );
+  }
 
 
   //getters and setters
@@ -329,12 +475,12 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   }
 
   get firmName() {
-    return this.isCreateEnf ? this.createEnfObj.FirmID : this.enfDetails[0]?.FirmID;
+    return this.isCreateEnf ? this.firmId : this.enfDetails[0]?.FirmID;
   }
 
   set firmName(value: number) {
     if (this.isCreateEnf) {
-      this.createEnfObj.FirmID = value;
+      this.firmId = value;
     } else {
       this.enfDetails[0].FirmID = value;
     }
@@ -362,7 +508,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     } else {
       return '';
     }
-  }  
+  }
 
   publishEnf() {
     if (!this.supervisionService.isNullOrEmpty(this.enfDetails[0].EnforcementAndDisciplinaryActnID)) {
@@ -372,7 +518,6 @@ export class EnfActionsViewDetailsComponent implements OnInit {
 
       this.enfService.saveEnforcement(publishObj).subscribe({
         next: () => {
-          console.log('Published/Unpublished successfully: ', publishObj);
           this.reloadEnf.emit(); // Reload Enforcement
           this.loadEnfDetails(this.enf.EnforcementAndDisciplinaryActnID).subscribe({
             next: () => {
@@ -433,6 +578,11 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   }
 
   editEnf(): void {
+
+    if (this.isCreateEnf) {
+      this.closeEnfPopup.emit();
+    }
+
     this.isEditModeEnf = true;
 
     // Populate dropdowns for options
@@ -440,6 +590,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     this.populateEnfActionsDNFBP();
     this.populateFirmNamesAuthorised();
     this.populateFirmNamesDNFBP();
+    this.getDocumentTypes();
 
     // Set dropdown visibility and populate individuals based on action type
     const actionTypeID = this.enfDetails[0]?.EnforcementActionOnTypeID;
@@ -466,7 +617,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
       this.selectedIndividualId = this.enfDetails[0]?.ContactAssnID || 0;
       this.popuplateRequiredIndividuals(1).subscribe(() => {
         this.individuals = this.allRequiredIndividuals.map(ind => ({
-          id: ind.ContactID,
+          id: ind.ContactAssnID,
           name: ind.FullName
         }));
         this.showIndividualsDropdown = true;
@@ -500,11 +651,52 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     this.closeEnfPopup.emit();
   }
 
+  // onActionTypeChange(event: Event): void {
+  //   const selectedType = +(event.target as HTMLSelectElement).value; // Convert value to number
+  //   this.enfTypeID = selectedType; // Update enfTypeID explicitly
+  //   this.showIndividualsDropdown = false; // Reset visibility of dropdown
+  //   this.selectedIndividualId = 0; // Reset selected individual
+
+  //   if (this.enfTypeID === 2 && this.firmDetails.FirmTypeID === 1) { // Approved Individual
+  //     this.populateApprovedIndividuals().subscribe(() => {
+  //       this.individuals = this.allApprovedIndividuals.map(individual => ({
+  //         id: individual.AppIndividualID,
+  //         name: individual.FullName
+  //       }));
+  //       this.showIndividualsDropdown = true; // Show dropdown
+  //     });
+  //   } else if (this.enfTypeID === 3 || this.enfTypeID === 6) { // Related Individuals
+  //     this.populateRelatedIndividuals().subscribe(() => {
+  //       if (this.allRelatedIndividuals.length > 0) {
+  //         this.individuals = this.allRelatedIndividuals.map(individual => ({
+  //           id: individual.ContactAssnID,
+  //           name: individual.ContactName
+  //         }));
+  //       } else {
+  //         this.individuals = []; // Ensure individuals is empty if no data
+  //       }
+  //       this.showIndividualsDropdown = true; // Keep the dropdown visible
+  //     });
+  //   } else if (this.enfTypeID === 5 && this.firmDetails.FirmTypeID === 2) { // Registered or Required Individuals
+  //     this.popuplateRequiredIndividuals(1).subscribe(() => {
+  //       this.individuals = this.allRequiredIndividuals.map(individual => ({
+  //         id: individual.ContactID,
+  //         name: individual.FullName
+  //       }));
+  //       this.showIndividualsDropdown = true; // Show dropdown
+  //     });
+  //   } else if (this.enfTypeID === 1 || this.enfTypeID === 4) {
+  //     this.showIndividualsDropdown = false; // Hide dropdown
+  //   } else {
+  //     this.showIndividualsDropdown = false; // Hide dropdown
+  //   }
+  // }
+
   onActionTypeChange(event: Event): void {
     const selectedType = +(event.target as HTMLSelectElement).value; // Convert value to number
     this.enfTypeID = selectedType; // Update enfTypeID explicitly
-    this.showIndividualsDropdown = false; // Reset visibility of dropdown
     this.selectedIndividualId = 0; // Reset selected individual
+    this.individuals = []; // Reset individuals array
 
     if (this.enfTypeID === 2 && this.firmDetails.FirmTypeID === 1) { // Approved Individual
       this.populateApprovedIndividuals().subscribe(() => {
@@ -525,55 +717,55 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     } else if (this.enfTypeID === 5 && this.firmDetails.FirmTypeID === 2) { // Registered or Required Individuals
       this.popuplateRequiredIndividuals(1).subscribe(() => {
         this.individuals = this.allRequiredIndividuals.map(individual => ({
-          id: individual.ContactID,
+          id: individual.ContactAssnID,
           name: individual.FullName
         }));
         this.showIndividualsDropdown = true; // Show dropdown
       });
-    }
-    else {
-      this.showIndividualsDropdown = false; // Hide dropdown for other types
-      this.selectedIndividualId = this.enfDetails[0]?.EnforcementActionOnTypeID
+    } else if (this.enfTypeID === 1 || this.enfTypeID === 4) {
+      this.showIndividualsDropdown = false;
+      this.selectedIndividualId = null; 
+    } else {
+      this.showIndividualsDropdown = false; 
     }
   }
+
 
   async validateEnforcement(): Promise<boolean> {
     this.hasValidationErrors = false;
 
     // Validate Enf Entry Type
     if (this.enfTypeID === 0) {
-      this.loadErrorMessages('enfTypeID', 1200,'Action On');
+      this.loadErrorMessages('enfTypeID', 1200, 'Action On');
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['enfTypeID'];
     }
 
-    // const entryDate = this.isCreateJournal ? this.createJournalObj.EntryDate : this.journalDetails[0].EntryDate;
-
     // Validate Action Date From
     if (this.supervisionService.isNullOrEmpty(this.actionDateFrom)) {
-      this.loadErrorMessages('actionDateFrom', constants.InvoicesMessages.INVALID_DATA,'Action Effective From');
+      this.loadErrorMessages('actionDateFrom', constants.InvoicesMessages.INVALID_DATA, 'Action Effective From');
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['actionDateFrom'];
     }
 
     if (this.supervisionService.isNullOrEmpty(this.typeOfAction.trim())) {
-      this.loadErrorMessages('typeOfAction', 1200,'Type of Action');
+      this.loadErrorMessages('typeOfAction', 1200, 'Type of Action');
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['typeOfAction'];
     }
 
     if (this.firmName === 0) {
-      this.loadErrorMessages('firmName', 1200,'Firm Name');
+      this.loadErrorMessages('firmName', 1200, 'Firm Name');
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['firmName'];
     }
 
     if (this.selectedIndividualId === 0 && this.enfTypeID !== 0) {
-      this.loadErrorMessages('individual', 1200,'Individual');
+      this.loadErrorMessages('individual', 1200, 'Individual');
       this.hasValidationErrors = true;
     } else {
       delete this.errorMessages['individual'];
@@ -588,8 +780,6 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     // Validate before saving
     const isValid = await this.validateEnforcement();
 
-    console.log('Validation result:', isValid); // Debug log
-
     if (!isValid) {
       this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ENTER_REQUIREDFIELD_PRIORSAVING);
       this.isLoading = false;
@@ -600,8 +790,14 @@ export class EnfActionsViewDetailsComponent implements OnInit {
 
     this.enfService.saveEnforcement(enfObj).subscribe({
       next: () => {
-        console.log('saved successfully: ', enfObj);
+        if (this.isCreateEnf) {
+          this.firmDetailsService.showSaveSuccessAlert(18040);
+          this.reloadEnf.emit(); // Reload Enforcement
+          this.closeEnfPopup.emit();
+          return;
+        }
         this.isEditModeEnf = false;
+        this.isCreateEnf = false;
         this.reloadEnf.emit(); // Reload Enforcement
         this.loadEnfDetails(this.enf.EnforcementAndDisciplinaryActnID).subscribe({
           next: () => {
@@ -632,12 +828,12 @@ export class EnfActionsViewDetailsComponent implements OnInit {
       qfcNum: this.isCreateEnf ? null : this.enfDetails[0].QFCNum,
       appIndividualID: this.showIndividualsDropdown && (this.enfTypeID === 2) ? this.selectedIndividualId : null,
       contactAssnID: this.showIndividualsDropdown && (this.enfTypeID === 3 || this.enfTypeID === 6 || this.enfTypeID === 5) ? this.selectedIndividualId : null,
-      appIndividualName: this.enfDetails[0].AppIndividualName,
+      appIndividualName: this.isCreateEnf ? null : this.enfDetails[0].AppIndividualName,
       enforcementActionOnTypeID: this.enfTypeID,
-      enforcementActionOnTypeDesc: this.enfDetails[0].EnforcementActionOnTypeDesc,
+      enforcementActionOnTypeDesc: this.isCreateEnf ? null : this.enfDetails[0].EnforcementActionOnTypeDesc,
       enforcementActionOnDate: null,
-      enforcementActionFromDate: this.actionDateFrom,
-      enforcementActionToDate: this.actionDateTo,
+      enforcementActionFromDate: this.dateUtilService.convertDateToYYYYMMDD(this.actionDateFrom),
+      enforcementActionToDate: this.dateUtilService.convertDateToYYYYMMDD(this.actionDateTo),
       enforcementType: this.typeOfAction,
       enforcementNotes: this.enfNotes,
       isDeleted: false,
@@ -650,7 +846,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
       lastModifiedByName: null,
       lastModifiedDate: this.currentDate,
       userID: this.userId,
-      opType: "U",
+      opType: this.isCreateEnf ? null : "U",
       published: this.enfDetails[0].Published,
       publishedBy: this.userId,
       publisheByName: null,
@@ -693,7 +889,6 @@ export class EnfActionsViewDetailsComponent implements OnInit {
       publisheDate: null
     }
     this.enfService.saveEnforcement(deleteEnfObj).subscribe(() => {
-      console.log('Saved successfully: ', deleteEnfObj);
       this.isLoading = false;
       this.reloadEnf.emit();
       this.onClose();
@@ -789,9 +984,10 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   popuplateRequiredIndividuals(contactAssnId: number): Observable<any> {
     return this.journalService.getAllRequiredIndividuals(this.firmId, contactAssnId).pipe(
       tap((types) => {
-        this.allRequiredIndividuals = types.response;
+        this.allRequiredIndividuals = types.response || [];
       }, error => {
         console.error('Error Fetching Required Individuals: ', error);
+        this.allRequiredIndividuals = [];
       })
     );
   }
@@ -799,28 +995,33 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   populateApprovedIndividuals(): Observable<any> {
     return this.journalService.getAllApprovedIndividuals(this.firmId).pipe(
       tap((types) => {
-        this.allApprovedIndividuals = types.response;
+        this.allApprovedIndividuals = types.response || [];
       }, error => {
         console.error('Error Fetching Approved Individuals: ', error);
+        this.allApprovedIndividuals = [];
       })
     );
   }
 
   populateRelatedIndividuals(): Observable<any> {
     return this.enfService.getAllRelatedIndividuals(this.firmId, this.firmDetails.FirmTypeID).pipe(
-      tap((types) => {
-        this.allRelatedIndividuals = types.response;
-      }, error => {
-        console.error('Error Fetching Related Individuals: ', error);
-      })
+      tap(
+        (types) => {
+          this.allRelatedIndividuals = types.response || [];
+        },
+        (error) => {
+          console.error('Error Fetching Related Individuals: ', error);
+          this.allRelatedIndividuals = [];
+        }
+      )
     );
   }
+
 
   loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
     this.supervisionService.getErrorMessages(fieldName, msgKey, null, placeholderValue).subscribe(
       () => {
         this.errorMessages[fieldName] = this.supervisionService.errorMessages[fieldName];
-        console.log(`Error message for ${fieldName} loaded successfully`);
       },
       error => {
         console.error(`Error loading error message for ${fieldName}:`, error);
