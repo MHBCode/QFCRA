@@ -123,8 +123,8 @@ export class TaskListComponent implements OnInit {
         console.log('Detailed task data:', this.selectedTask);
 
         // If LongDescription exists, sanitize it for display
-        if (this.selectedTask[0]?.LongDescription) {
-          const updatedDescription = this.selectedTask[0].LongDescription.replace(/<BR\s*\/?>\s*<BR\s*\/?>/, ''); 
+        if (this.selectedTask[0]?.longDescription) {
+          const updatedDescription = this.selectedTask[0].longDescription.replace(/<BR\s*\/?>\s*<BR\s*\/?>/, ''); 
           this.safeHtmlDescription = this.sanitizer.bypassSecurityTrustHtml(updatedDescription);
         }
 
@@ -162,9 +162,9 @@ export class TaskListComponent implements OnInit {
 
   prepareNoteObject() {
     return {
-        objectID: this.selectedTask[0].ObjectID,
-        objectInstanceID: parseInt(this.selectedTask[0].ObjectInstanceID, 10),
-        objectInstanceRevNum: this.selectedTask[0].ObjectInstanceRevNum,
+        objectID: this.selectedTask[0].objectID,
+        objectInstanceID: parseInt(this.selectedTask[0].objectInstanceID, 10),
+        objectInstanceRevNum: this.selectedTask[0].objectInstanceRevNum,
         notes: this.noteText,
         createdBy: this.userId,
     };
