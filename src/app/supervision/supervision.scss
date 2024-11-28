@@ -309,3 +309,32 @@
 ::ng-deep .ck-rounded-corners .ck.ck-editor__main > .ck-editor__editable,::ng-deep .ck.ck-editor__main > .ck-editor__editable.ck-rounded-corners {
     min-height: 130px;
 }
+
+.btns-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    .butt {
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        border: 0;
+        border-radius: .25em;
+        color: #fff;
+        font-size: 1em;
+        margin: .3125em;
+        padding: .625em 1.1em;
+        transition: box-shadow .1s;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0);
+        font-weight: 500;
+    }
+    .ok-butt {
+        background-color: #a51e36;
+    }
+    
+    .cancel-butt {
+        background-color: #6e7881;
+    }
+}
+
+.delete-textarea {
+    width: 100% !important;
+}

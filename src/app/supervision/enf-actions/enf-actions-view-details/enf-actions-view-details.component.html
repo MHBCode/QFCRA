@@ -1,0 +1,261 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="overlay">
+    <div class="popupcontainer EnfActionpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+        <!-- Title -->
+        <div class="popup-title-btn-row">
+            <div class="popup-header">
+                <h3>
+                    Enforcement & Disciplinary Actions
+                </h3>
+            </div>
+            <button class="close-button  close-icon" (click)="onClose()">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+
+
+        <div class="enf-form">
+            <div class="error-messages">
+                <p *ngIf="errorMessages['enfTypeID']">
+                    {{ errorMessages['enfTypeID'] }}
+                </p>
+                <p *ngIf="errorMessages['actionDateFrom']">
+                    {{ errorMessages['actionDateFrom'] }}
+                </p>
+                <p *ngIf="errorMessages['typeOfAction']">
+                    {{ errorMessages['typeOfAction'] }}
+                </p>
+                <p *ngIf="errorMessages['firmName']">
+                    {{ errorMessages['firmName'] }}
+                </p>
+                <p *ngIf="errorMessages['individual']">
+                    {{ errorMessages['individual'] }}
+                </p>
+            </div>
+            <div class="inputs-row">
+                <div style="width: 100%;" class="input-field">
+                    <label for="enfTypeID">Action On <span *ngIf="isEditModeEnf || isCreateEnf"
+                            style="color: red;">*</span></label>
+                    <select style="width: 49%;" *ngIf="isEditModeEnf || isCreateEnf; else actionOnDropdown"
+                        [(ngModel)]="enfTypeID" (change)="onActionTypeChange($event)" name="enfTypeID" id="enfTypeID"
+                        [ngClass]="{
+                            'error-border': errorMessages['enfTypeID']}">
+                        <option [value]="0">Select</option>
+                        <option
+                            *ngFor="let option of (firmDetails.FirmTypeID === 1 ? allEnfActionAuth : allEnfActionDNFBP)"
+                            [value]="option.EnforcementActionOnTypeID">
+                            {{option.EnforcementActionOnTypeDesc}}</option>
+                    </select>
+                    <ng-template #actionOnDropdown>
+                        <input style="width: 49%;" disabled [(ngModel)]="enfDetails[0].EnforcementActionOnTypeDesc"
+                            type="text">
+                    </ng-template>
+                </div>
+
+                <div class="input-field">
+                    <label for="actionDateFrom">Action Effective From <span *ngIf="isEditModeEnf || isCreateEnf"
+                            style="color: red;">*</span></label>
+                    <input [disabled]="!isEditModeEnf && !isCreateEnf" [(ngModel)]="actionDateFrom" type="text"
+                        id="actionDateFrom" name="actionDateFrom" #dateInputs [ngClass]="{
+                            'error-border': errorMessages['actionDateFrom']}" />
+                </div>
+
+                <div class="input-field">
+                    <label for="actionDateTo">Action Effective Until</label>
+                    <input [disabled]="!isEditModeEnf && !isCreateEnf" [(ngModel)]="actionDateTo" type="text"
+                        id="actionDateTo" name="actionDateTo" #dateInputs />
+                </div>
+
+                <div class="input-field">
+                    <label for="typeOfAction">Type of Action<span *ngIf="isEditModeEnf || isCreateEnf"
+                            style="color: red;">*</span></label>
+                    <input [disabled]="!isEditModeEnf && !isCreateEnf" type="text" [(ngModel)]="typeOfAction"
+                        id="typeOfAction" name="typeOfAction" [ngClass]="{
+                            'error-border': errorMessages['typeOfAction']}"/>
+                </div>
+
+                <div class="input-field">
+                    <label for="firmName">Firm Name<span *ngIf="isEditModeEnf || isCreateEnf"
+                            style="color: red;">*</span></label>
+                    <select *ngIf="isEditModeEnf || isCreateEnf; else firmNameView" [disabled]="isEditModeEnf"
+                        [(ngModel)]="firmName" name="firmName" id="firmName" [ngClass]="{
+                            'error-border': errorMessages['firmName']}">
+                        <option [value]="0">Select</option>
+                        <option
+                            *ngFor="let option of (firmDetails.FirmTypeID === 1 ? allFirmNamesAuth : allFirmNamesDNFBP)"
+                            [value]="option.FirmID">
+                            {{option.FirmName}}</option>
+                    </select>
+
+                    <ng-template #firmNameView>
+                        <input disabled [(ngModel)]="enfDetails[0].FirmName" type="text">
+                    </ng-template>
+                </div>
+
+                <div *ngIf="(isEditModeEnf || isCreateEnf) && selectedIndividualId !== 1 && showIndividualsDropdown"
+                    class="input-field">
+                    <label>
+                        {{ individualLabel }}
+                        <span *ngIf="isEditModeEnf || isCreateEnf" style="color: red;">*</span>
+                    </label>
+                    <select [(ngModel)]="selectedIndividualId" [disabled]="!isEditModeEnf && !isCreateEnf" [ngClass]="{
+                            'error-border': errorMessages['individual']}">
+                        <option [value]="0">Select</option>
+                        <option *ngFor="let individual of individuals" [value]="individual.id">
+                            {{ individual.name }}
+                        </option>
+                    </select>
+                </div>
+
+
+                <div *ngIf="!isEditModeEnf && !(enfTypeID === 1 || enfTypeID === 4)" class="input-field">
+                    <label for="ind">{{ enfDetails[0]?.EnforcementActionOnTypeDesc }}</label>
+                    <input disabled type="text" [(ngModel)]="enfDetails[0].AppIndividualName" id="ind" name="ind" />
+                </div>
+
+
+
+
+                <div class="input-field">
+                    <label for="enteredBy">Entered By</label>
+                    <input disabled type="text" [(ngModel)]="enfDetails[0].CreatedBy" id="enteredBy" name="enteredBy" />
+                </div>
+
+                <div class="input-field">
+                    <label for="enteredOn">Entered On</label>
+                    <input disabled type="text" [(ngModel)]="enfDetails[0].CreatedDate" id="enteredOn"
+                        name="enteredOn" />
+                </div>
+
+                <div class="input-field">
+                    <label for="lastmodifiedBy">Last Modified By</label>
+                    <input disabled type="text" [(ngModel)]="enfDetails[0].LastModifiedBy" id="lastmodifiedBy"
+                        name="lastmodifiedBy" />
+                </div>
+
+                <div class="input-field">
+                    <label for="lastModifiedDate">Last Modified Date</label>
+                    <input disabled type="text" [(ngModel)]="enfDetails[0].LastModifiedDate" id="lastModifiedDate"
+                        name="lastModifiedDate" />
+                </div>
+
+                <div *ngIf="enfDetails[0].Published" class="input-field">
+                    <label for="publishedBy">Published By</label>
+                    <input disabled type="text" [(ngModel)]="enfDetails[0].PublishedBy" id="publishedBy"
+                        name="publishedBy" />
+                </div>
+
+                <div *ngIf="enfDetails[0].Published" class="input-field">
+                    <label for="publishedDate">Published Date</label>
+                    <input disabled type="text" [(ngModel)]="enfDetails[0].PublishedDate" id="publishedDate"
+                        name="publishedDate" />
+                </div>
+
+                <div class="input-field notes">
+                    <label for="notes">Notes</label>
+                    <div>
+                        <ckeditor *ngIf="isEditModeEnf || isCreateEnf; else notes"
+                            [(ngModel)]="enfNotes" [editor]="Editor" [config]="config"></ckeditor>
+                    </div>
+                    <ng-template #notes>
+                        <p class="notes-text" [innerHTML]="sanitizeHtml(enfDetails[0].EnforcementNotes)">
+                        </p>
+                    </ng-template>
+                </div>
+            </div>
+
+            <div *ngIf="enfDetails[0].IsDeleted" class="popup-header">
+                <h3>
+                    Deletion Details
+                </h3>
+            </div>
+            <div *ngIf="enfDetails[0].IsDeleted" class="inputs-row">
+                <div class="input-field">
+                    <label for="deletedBy">Deleted By</label>
+                    <input disabled type="text" [(ngModel)]="enfDetails[0].DeletedBy" id="deletedBy" name="deletedBy" />
+                </div>
+
+                <div class="input-field">
+                    <label for="deletedDate">Deleted Date</label>
+                    <input disabled type="text" [(ngModel)]="enfDetails[0].DeletedDate" id="deletedDate"
+                        name="deletedDate" />
+                </div>
+
+                <div class="input-field">
+                    <label for="reasonForDeletion">Reason for deletion</label>
+                    <input disabled type="text" [(ngModel)]="enfDetails[0].ReasonForDeletion" id="reasonForDeletion"
+                        name="reasonForDeletion" />
+                </div>
+            </div>
+            <!-- Attachment Section -->
+
+            <!-- <div *ngIf="(journalDoc?.length !== 0 && !isCreateJournal) || isEditModeJournal" class="attachment">
+                <div class="popup-header">
+                    <h3>Attachment (if any)</h3>
+                </div>
+                <ng-container *ngIf="fetchedDocumentTypes">
+                    <app-attachment 
+                      [documentObj]="documentObj" 
+                      [tableDoc]="journalDoc"
+                      [pageName]="Page.SupervisionJournal"
+                      [param1]="journal.SupervisionJournalID" 
+                      [param2]="1"
+                      [isEdit]="isEditModeJournal || isCreateJournal" 
+                      [ismultiple]="false" 
+                      [documentTypes]="fetchedDocumentTypes" 
+                      [loadDocuments]="loadDocuments.bind(this)"
+                      (documentUploaded)="onDocumentUploaded($event)" 
+                      [selectedFile]="selectedFile"
+                      (selectedFileChange)="selectedFile = $event">
+                    </app-attachment>
+                  </ng-container>
+            </div> -->
+
+            <!-- Action Buttons -->
+            <div class="btn justify-content-end">
+
+                <button (click)="editEnf()" *ngIf="getControlVisibility('imgBtnEdit') && !hideEditBtn"
+                    [disabled]="!getControlEnablement('imgBtnEdit')">
+                    <i class="bi bi-pen"></i> Edit
+                </button>
+
+                <button (click)="publishEnf()" *ngIf="!hidePublishBtn">
+                    <i class="bi bi-globe"></i> {{enfDetails[0].Published ? 'Unpublish' : 'Publish'}}
+                </button>
+
+                <button (click)="saveEnf()" *ngIf="getControlVisibility('imgBtnSave') && !hideSaveBtn"
+                    [disabled]="!getControlEnablement('imgBtnSave')">
+                    Save
+                </button>
+
+                <button (click)="cancelEnf()" class="cancel-btn" *ngIf="getControlVisibility('imgBtnCancel') && !hideCancelBtn"
+                    [disabled]="!getControlEnablement('imgBtnCancel')">
+                    Cancel
+                </button>
+
+                <button (click)="getEnfDeletePopup()" *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn"
+                    [disabled]="!getControlEnablement('imgBtnDelete')">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="callDeleteEnf" class="overlay show"></div>
+<div *ngIf="callDeleteEnf" class="enfDeletion popupcontainer">
+    <i class="bi bi-x-circle close-icon" (click)="closeDeleteEnfPopup()"></i>
+    <div class="popup-info-place">
+        <div class="popup-header">
+            <h3>Reason for Deletion</h3>
+        </div>
+        <div class="input-field delete-textarea">
+            <textarea [(ngModel)]="reasonOfDeletion" name="deleteReason" id="deleteReason">
+            </textarea>
+        </div>
+        <div class="btns-container">
+            <button class="butt ok-butt" (click)="deleteEnf()">Ok</button>
+            <button class="butt cancel-butt" (click)="closeDeleteEnfPopup()">Cancel</button>
+        </div>
+    </div>
+</div>

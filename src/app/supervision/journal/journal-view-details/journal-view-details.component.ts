@@ -249,10 +249,8 @@ export class JournalViewDetailsComponent implements OnInit {
     this.loadDocuments();
     this.populateJournalEntryTypes();
     this.populateJournalExternalAuditors();
-
-    if(this.isCreateJournal){
-      this.getDocumentTypes();
-    }
+    this.getDocumentTypes();
+ 
   }
 
 

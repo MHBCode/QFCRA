@@ -32,8 +32,11 @@ export class JournalService {
     return this.http.get<any>(url);
   }
 
-  getAllRequiredIndividuals(firmId: number) {
-    const url = `${this.baseUrlJournal}get_all_required_individuals?firmId=${firmId}`;
+  getAllRequiredIndividuals(firmId: number,contactAssnId?: number) {
+    let url = `${this.baseUrlJournal}get_all_required_individuals?firmId=${firmId}`;
+    if (contactAssnId) {
+      url += `&contactAssnId=${contactAssnId}`;
+    }
     return this.http.get<any>(url);
   }
 
