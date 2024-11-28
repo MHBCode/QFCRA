@@ -1,15 +1,14 @@
 <div *ngIf="isUserAllowed" class="brid-crump">
-    <div class="text"><span> Home > {{subsiteName}} > </span> {{ pageTitle }}</div>
+    <div class="text"><span> Home > {{ subsiteName }} > </span> {{ pageTitle }}</div>
 </div>
 
 <div *ngIf="isUserAllowed" class="page">
     <div class="menu" [ngStyle]="{ width: menuWidth }">
-        <i (click)="toggleFulMenu()" *ngIf="menuWidth.match(width1)"
-            class="menu-icons bi bi-arrow-left-square-fill"></i>
-        <i (click)="toggleFulMenu()" *ngIf="menuWidth.match(width2)"
-            class="menu-icons bi bi-arrow-right-square-fill"></i>
+        <i (click)="toggleFulMenu()" *ngIf="menuWidth === width1" class="menu-icons bi bi-arrow-left-square-fill"></i>
+        <i (click)="toggleFulMenu()" *ngIf="menuWidth === width2" class="menu-icons bi bi-arrow-right-square-fill"></i>
 
-        <div class="menu-item">
+        <!-- Firm Details Menu -->
+        <div class="menu-item" *ngIf="isMenuItemAllowed('hlFirmDetails')">
             <h3 id="1-item" [class.active]="activeMenu === 'firmDetails'" (click)="toggleMenu('firmDetails')"
                 *ngIf="!closedMenu">
                 FIRM Details
@@ -19,86 +18,110 @@
                 <a class="menu-sub-item" [routerLink]="['/firms/view', firmId]" routerLinkActive="active">
                     Firms Details
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/core-details', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/core-details', firmId]" routerLinkActive="active"
+                    *ngIf="isMenuItemAllowed('hlCoreDetails')">
                     Core Details
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/scope', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/scope', firmId]" routerLinkActive="active"
+                    *ngIf="isMenuItemAllowed('hlActivities')">
                     Scope
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/controllers', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/controllers', firmId]" routerLinkActive="active"
+                    *ngIf="isMenuItemAllowed('hlControllers')">
                     Controllers
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/auditors', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/auditors', firmId]" routerLinkActive="active"
+                    *ngIf="isMenuItemAllowed('hlAuditor')">
                     Auditors
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/firms/view/contacts', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/firms/view/contacts', firmId]" routerLinkActive="active"
+                    *ngIf="isMenuItemAllowed('hlContacts')">
                     Contacts
                 </a>
             </div>
         </div>
 
+        <!-- AML Menu -->
+        <div *ngIf="isMenuItemAllowed('hlAMLProcessing')" class="menu-item">
+            <h3 *ngIf="!closedMenu" [class.active]="activeMenu === 'aml'" (click)="toggleMenu('aml')">
+                AML
+            </h3>
+            <i class="menu-icons bi bi-shield-lock" *ngIf="closedMenu"></i>
+            <div class="sub-menu" *ngIf="!closedMenu && activeMenu === 'aml'">
+                <a class="menu-sub-item" routerLinkActive="active">
+                    AML
+                </a>
+            </div>
+        </div>
 
-        <div class="menu-item">
+        <!-- Individuals Menu -->
+        <div *ngIf="isMenuItemAllowed('hlAINoc')" class="menu-item">
             <h3 *ngIf="!closedMenu" [class.active]="activeMenu === 'individuals'" (click)="toggleMenu('individuals')">
                 Individuals
             </h3>
             <i class="menu-icons bi bi-people" *ngIf="closedMenu"></i>
             <div class="sub-menu" *ngIf="!closedMenu && activeMenu === 'individuals'">
-                <a class="menu-sub-item">
+                <a class="menu-sub-item" routerLinkActive="active">
                     Individual Details
                 </a>
             </div>
         </div>
 
-        <div class="menu-item">
+        <!-- Supervision Menu -->
+        <div *ngIf="isMenuItemAllowed('hlSupervision')" class="menu-item">
             <h3 *ngIf="!closedMenu" [class.active]="activeMenu === 'supervision'" (click)="toggleMenu('supervision')">
                 Supervision
             </h3>
             <i class="menu-icons bi bi-kanban" *ngIf="closedMenu"></i>
             <div class="sub-menu" *ngIf="!closedMenu && activeMenu === 'supervision'">
                 <a class="menu-sub-item" [routerLink]="['/supervision/view', firmId]" routerLinkActive="active">
-                    Supervision
+                    Supervision Overview
                 </a>
                 <a class="menu-sub-item" [routerLink]="['/supervision/view/reporting-schedule', firmId]"
-                    routerLinkActive="active">
+                    routerLinkActive="active" *ngIf="isMenuItemAllowed('hlReportingSch')">
                     Reporting Schedule
                 </a>
                 <a class="menu-sub-item" [routerLink]="['/supervision/view/return-review', firmId]"
-                    routerLinkActive="active">
+                    routerLinkActive="active" *ngIf="isMenuItemAllowed('hlReturnReview')">
                     Return Review
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/supervision/view/notices', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/notices', firmId]" routerLinkActive="active"
+                    *ngIf="isMenuItemAllowed('hlNotices')">
                     Notices
                 </a>
                 <a class="menu-sub-item" [routerLink]="['/supervision/view/admin-fee', firmId]"
-                    routerLinkActive="active">
+                    routerLinkActive="active" *ngIf="isMenuItemAllowed('hlAdminFee')">
                     Admin Fee
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/supervision/view/RMPs', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/RMPs', firmId]" routerLinkActive="active"
+                    *ngIf="isMenuItemAllowed('hlRMP')">
                     RMPs
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/supervision/view/breaches', firmId]"
-                    routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/breaches', firmId]" routerLinkActive="active"
+                    *ngIf="isMenuItemAllowed('lnkBtnFirmMenuBreaches')">
                     Breaches
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/supervision/view/waivers', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/waivers', firmId]" routerLinkActive="active"
+                    *ngIf="isMenuItemAllowed('lnkBtnFirmMenuWaivers')">
                     Waivers
                 </a>
                 <a class="menu-sub-item" [routerLink]="['/supervision/view/enforcement-actions', firmId]"
-                    routerLinkActive="active">
+                    routerLinkActive="active" *ngIf="isMenuItemAllowed('lnkBtnEnfActions')">
                     Enf. Actions
                 </a>
                 <a class="menu-sub-item" [routerLink]="['/supervision/view/registered-fund', firmId]"
-                    routerLinkActive="active">
+                    routerLinkActive="active" *ngIf="isMenuItemAllowed('lnkBtnRegisteredFunds')">
                     Reg. Funds
                 </a>
-                <a class="menu-sub-item" [routerLink]="['/supervision/view/journal', firmId]" routerLinkActive="active">
+                <a class="menu-sub-item" [routerLink]="['/supervision/view/journal', firmId]" routerLinkActive="active"
+                    *ngIf="isMenuItemAllowed('lnkBtnFirmMenuJournal')">
                     Journal
                 </a>
             </div>
         </div>
     </div>
-    <section [ngStyle]="{width: dataWidth}">
+
+    <section [ngStyle]="{ width: dataWidth }">
         <router-outlet></router-outlet>
     </section>
 </div>

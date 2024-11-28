@@ -1,20 +1,21 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { SecurityService } from '../ngServices/security.service';
-import { filter, switchMap } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
+import { FrimsObject } from '../app-constants';
 
 @Component({
   selector: 'app-details-layout-component',
   templateUrl: './details-layout-component.component.html',
   styleUrls: ['./details-layout-component.component.scss']
 })
-export class DetailsLayoutComponent implements OnInit{
+export class DetailsLayoutComponent implements OnInit {
   subsiteName: string = 'All Firms';
-  pageTitle: string;
+  pageTitle: string = '';
   isUserAllowed: boolean | null = null;
   isLoading: boolean = false;
   firmId: number = 0;
-  userId = 30;
+  userId = 124;
   menuWidth: string = '6%';
   dataWidth: string = '93%';
   width1: string = '14%';
@@ -23,64 +24,83 @@ export class DetailsLayoutComponent implements OnInit{
   widthData2: string = '85%';
   closedMenu: boolean = true;
   activeMenu: string | null = null;
+  securitySettings: any[] = [];
+  Page = FrimsObject;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private securityService: SecurityService
-  ) {
-  }
+  ) { }
 
   ngOnInit(): void {
     this.route.firstChild?.params.subscribe(params => {
       this.firmId = +params['id'];
       this.userAllowedToAccessFirm();
-    });
-
-    this.route.url.subscribe(() => {
-      this.activeMenu = this.router.url.includes('/firms') ? 'firmDetails' : null;
+      this.fetchMenuSecuritySettings();
     });
 
     this.router.events
-    .pipe(filter(event => event instanceof NavigationEnd))
-    .subscribe(() => {
-      this.updateRouteData();
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.setActiveMenuBasedOnRoute();
+      });
+
+    this.route.firstChild?.data.subscribe(data => {
+      this.subsiteName = data['subsiteName'] || 'All Firms';
+      this.pageTitle = data['pageTitle'] || 'Default Page Title';
     });
-
-    this.route.firstChild.data.subscribe(data => {
-      this.subsiteName = data['subsiteName'];
-      this.pageTitle = data['pageTitle'];
-    });
-
-
   }
 
+  fetchMenuSecuritySettings() {
+    this.isLoading = true;
+    this.securityService.getAppRoleAccess(this.userId, this.Page.FrimsMenu).subscribe({
+      next: response => {
+        this.securitySettings = response.response || [];
+        this.isLoading = false;
+      },
+      error: err => {
+        console.error('Error fetching menu security settings:', err);
+        this.isLoading = false;
+      }
+    });
+  }
 
-  private updateRouteData() {
-    let currentRoute = this.route.firstChild;
-    while (currentRoute?.firstChild) {
-      currentRoute = currentRoute.firstChild;
+  setActiveMenuBasedOnRoute(): void {
+    const currentUrl = this.router.url;
+
+    if (currentUrl.includes('/firms')) {
+      this.activeMenu = 'firmDetails';
+    } else if (currentUrl.includes('/individuals')) {
+      this.activeMenu = 'individuals';
+    } else if (currentUrl.includes('/supervision')) {
+      this.activeMenu = 'supervision';
+    } else if (currentUrl.includes('/aml')) {
+      this.activeMenu = 'aml';
+    } else {
+      this.activeMenu = null; // Default to no active menu
     }
-    if (currentRoute) {
-      currentRoute.data.subscribe(data => {
-        this.subsiteName = data['subsiteName'] || 'All Firms'; // Default value
-        this.pageTitle = data['pageTitle'] || 'Default Page Title'; // Default value
-      });
-    }
+  }
+
+  isMenuItemAllowed(controlName: string): boolean {
+    return this.securitySettings.some(control => control.ControlName === controlName && control.ShowProperty === 1);
   }
 
   userAllowedToAccessFirm() {
     this.isLoading = true;
-    this.securityService.isUserAllowedToAccessFirm(this.userId, this.firmId).subscribe(data => {
-      this.isUserAllowed = data.response;
-      this.isLoading = false;
-      if (!this.isUserAllowed) {
-        this.router.navigate(['error/FirmAccessDenied'])
+    this.securityService.isUserAllowedToAccessFirm(this.userId, this.firmId).subscribe({
+      next: data => {
+        this.isUserAllowed = data.response;
+        this.isLoading = false;
+        if (!this.isUserAllowed) {
+          this.router.navigate(['error/FirmAccessDenied']);
+        }
+      },
+      error: err => {
+        console.error('Error checking firm access permissions:', err);
+        this.isLoading = false;
       }
-    }, error => {
-      console.error('Error loading is user allowed to access firm: ', error);
-      this.isLoading = false;
-    })
+    });
   }
 
   toggleFulMenu() {
@@ -97,5 +117,4 @@ export class DetailsLayoutComponent implements OnInit{
   toggleMenu(menu: string) {
     this.activeMenu = this.activeMenu === menu ? null : menu;
   }
-
 }

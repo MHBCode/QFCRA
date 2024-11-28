@@ -14,15 +14,15 @@ export class SecurityService {
     const url = `${this.baseUrlSecurity}get_user_roles?userId=${userId}`
     return this.http.get<any>(url);
   }
-  isValidFirmAMLSupervisor(firmId: number,userId: number) {
+  isValidFirmAMLSupervisor(firmId: number, userId: number) {
     const url = `${this.baseUrlSecurity}is_valid_firm_aml_supervisor?FirmID=${firmId}&UserID=${userId}`
     return this.http.get<any>(url);
   }
-  isValidFirmSupervisor(firmId: number,userId: number) {
+  isValidFirmSupervisor(firmId: number, userId: number) {
     const url = `${this.baseUrlSecurity}is_firm_supervisor?FirmID=${firmId}&UserID=${userId}`
     return this.http.get<any>(url);
   }
-  isValidSupervisor(firmId: number,userId: number) {
+  isValidSupervisor(firmId: number, userId: number) {
     const url = `${this.baseUrlSecurity}is_valid_supervisor?FirmID=${firmId}&UserID=${userId}`
     return this.http.get<any>(url);
   }
@@ -30,11 +30,14 @@ export class SecurityService {
     const url = `${this.baseUrlSecurity}is_director_user?userID=${userId}`
     return this.http.get<any>(url);
   }
-  getAppRoleAccess(userId: number,objectId: number,OpType: number) {
-    const url = `${this.baseUrlSecurity}get_app_role_access?userId=${userId}&objectId=${objectId}&objectOpTypeId=${OpType}`;
+  getAppRoleAccess(userId: number, objectId: number, OpType?: number) {
+    let url = `${this.baseUrlSecurity}get_app_role_access?userId=${userId}&objectId=${objectId}`;
+    if (objectId !== 80) {
+      url += `&objectOpTypeId=${OpType}`;
+    }
     return this.http.get<any>(url);
   }
-  isUserAllowedToAccessFirm(userId: number,firmId: number) {
+  isUserAllowedToAccessFirm(userId: number, firmId: number) {
     const url = `${this.baseUrlSecurity}is_user_allowed_to_browse_firm_detail?userID=${userId}&FirmID=${firmId}&objectID=523`
     return this.http.get<any>(url);
   }
