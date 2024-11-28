@@ -20,13 +20,17 @@ export class DateUtilService {
 
 
   convertStringToDate(dateStr: string): Date | null {
+    if (!dateStr) {
+      return null; // Return early if the dateStr is null, undefined, or empty
+    }
+
     const months = {
       Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
       Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
     };
   
     // Split the date string: "09/Nov/2022"
-    const parts = dateStr.split('/');
+    const parts = dateStr?.split('/');
     if (parts.length === 3) {
       const day = parseInt(parts[0], 10);
       const month = months[parts[1]]; // Convert "Nov" to "11"

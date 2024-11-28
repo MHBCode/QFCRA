@@ -31,11 +31,11 @@
                 </thead>
                 <tbody *ngIf="paginatedItems?.length > 0; else noJournal">
                     <tr *ngFor="let journal of paginatedItems" (click)="openJournalPopup(journal,firmDetails,false)">
-                        <td>{{ journal?.JournalEntryTypeDesc }}</td>
-                        <td>
+                        <td>                      
+                            {{ journal?.JournalEntryTypeDesc }}
                             <span *ngIf="journal.IsDeleted" style="color: red;">(Deleted)</span>
-                            {{ journal?.EntryTitle }}
                         </td>
+                        <td>{{ journal?.EntryTitle }}</td>
                         <td>{{ journal?.EntryDate }}</td>
                         <td>{{ journal?.LastModifiedBy }}</td>
                     </tr>

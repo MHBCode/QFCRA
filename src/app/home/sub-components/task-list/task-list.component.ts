@@ -90,6 +90,22 @@ export class TaskListComponent implements OnInit {
       }
     );
   }
+
+  redirectBasedOnLink(item: any, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const objActItmIdInLink = item.Link.includes('ObjActItmID');
+    if (objActItmIdInLink) {
+      const urlParams = new URLSearchParams(item.Link.split('?')[1]);
+      const objectActItmID = urlParams.get('ObjActItmID');
+  
+      this.router.navigate(['/home/tasks-page/create-reminder'], {
+        state: { objectActItmID }
+      });
+    } else {
+      window.open(item.Link, '_blank');
+    }
+  }
   
 
   toggleTaskPopup(selectedRow: any) {

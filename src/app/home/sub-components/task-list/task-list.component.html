@@ -118,9 +118,6 @@
               </div>
             </th>
             <th *ngIf="isMainView">Notes</th>
-            <!-- <th *ngIf="ShowExportButton && isMainView">
-              Export To Excel
-            </th> -->
           </tr>
         </thead>
 
@@ -143,7 +140,9 @@
               </span>
             </td>
             <td *ngIf="isMainView" style="text-align: center;">
-              <a (click)="$event.stopPropagation()" [href]="item.Link" target="_blank" style="text-decoration: none;">{{item.ObjectInstanceNum}}</a>
+              <a (click)="redirectBasedOnLink(item, $event)" href="#" style="text-decoration: none;">
+                {{ item.ObjectInstanceNum }}
+              </a>
             </td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">
               <div *ngIf="!isMainView else expandFirmName" class="expandable-text-container">
@@ -157,8 +156,8 @@
               </div>
               <ng-template #expandDesc>{{ item.ShortDescription }}</ng-template>
             </td>
-            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{ item.TaskDueDate }}</td>
-            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{ item.DaysOverDue }}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{ item?.TaskDueDate }}</td>
+            <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}">{{ item?.DaysOverDue }}</td>
             <td [ngClass]="{'overdue': isTaskOverdue(item.TaskDueDate)}" *ngIf="isMainView">{{ item.Comments }}</td>
             <!-- <td *ngIf="ShowExportButton" class="export-btn-col">
               <button (click)="exportRowToExcel(paginatedTasks, $event)" class="link-button">Export</button>

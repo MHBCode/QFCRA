@@ -297,7 +297,7 @@ export class JournalViewDetailsComponent implements OnInit {
     this.hideCancelBtn = true;
     this.hideEditBtn = false;
     this.hideDeleteBtn = false;
-    this.hideExportBtn = true;
+    this.hideExportBtn = false;
     if (this.journalDetails[0].IsDeleted) {
       this.hideDeleteBtn = true;
       this.hideEditBtn = true;
