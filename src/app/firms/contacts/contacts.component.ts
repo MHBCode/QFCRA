@@ -134,7 +134,6 @@ export class ContactsComponent {
       this.getContactFunctionType();
       this.initializeSelectedFunctions();
       //this.initializeCheckboxes();
-
       // Security
       forkJoin([
         this.firmDetailsService.loadAssignedUserRoles(this.userId),
@@ -2403,7 +2402,7 @@ export class ContactsComponent {
   
   // Displayed labels in view mode
   selectedLabels: string[] = [];
-
+  
   initializeAdditionalInfo(): void {
     const infoLabels = this.selectedContact.strContactAddnInfoTypes
       ?.split(',')

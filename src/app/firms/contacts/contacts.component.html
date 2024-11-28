@@ -686,9 +686,9 @@
           </div>
           <div *ngFor="let func of selectedContact.lstContactFunctions" class="functions-row">
             <div style="width: 20%;" class="input-field">{{ func.functionTypeDesc }}</div>
-            <div style="width: 20%;" class="input-field">{{ func.effectiveDate || 'N/A' }}</div>
-            <div style="width: 20%;" class="input-field">{{ func.endDate || 'N/A' }}</div>
-            <div style="width: 20%;" class="input-field">{{ func.reviewStatus || 'Pending' }}</div>
+            <div style="width: 20%;" class="input-field">{{ func.effectiveDate }}</div>
+            <div style="width: 20%;" class="input-field">{{ func.endDate }}</div>
+            <div style="width: 20%;" class="input-field">{{ func.reviewStatus }}</div>
           </div>
         </div>
         <!-- Additional Section for DNFBP MLRO Residency Status -->
@@ -730,9 +730,9 @@
           <!-- Loop through FunctionsHistoryList and display the data -->
           <div *ngFor="let func of FunctionsHistoryList" class="functions-row">
             <div style="width: 20%;" class="input-field">{{ func.FunctionTypeDesc }}</div>
-            <div style="width: 20%;" class="input-field">{{ func.EffectiveDate || 'N/A' }}</div>
-            <div style="width: 20%;" class="input-field">{{ func.EndDate || 'N/A' }}</div>
-            <div style="width: 20%;" class="input-field">{{ func.ReviewStatus || 'Pending' }}</div>
+            <div style="width: 20%;" class="input-field">{{ func.EffectiveDate }}</div>
+            <div style="width: 20%;" class="input-field">{{ func.EndDate }}</div>
+            <div style="width: 20%;" class="input-field">{{ func.ReviewStatus }}</div>
           </div>
         </div>
 
