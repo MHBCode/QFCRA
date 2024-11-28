@@ -15,7 +15,7 @@ export class DetailsLayoutComponent implements OnInit {
   isUserAllowed: boolean | null = null;
   isLoading: boolean = false;
   firmId: number = 0;
-  userId = 124;
+  userId = 30;
   menuWidth: string = '6%';
   dataWidth: string = '93%';
   width1: string = '14%';
