@@ -27,7 +27,18 @@
     <div class="input-field" *ngIf="pageName == Page.SupervisionJournal">
       <label>Document Type</label>
       <select name="documentTypes" id="documentTypes" [(ngModel)]="documentTypes.DocSubTypeID">
-        <option selected>Select</option>
+        <option [value]="0">Select</option>
+        <option *ngFor="let type of documentTypes" [value]="type.DocSubTypeID">
+          {{ type.DocSubTypeDesc }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Enforcement -->
+    <div class="input-field" *ngIf="pageName == Page.Enforcement">
+      <label>Document Type</label>
+      <select name="documentTypes" id="documentTypes" [(ngModel)]="documentTypes.DocSubTypeID">
+        <option [value]="0">Select</option>
         <option *ngFor="let type of documentTypes" [value]="type.DocSubTypeID">
           {{ type.DocSubTypeDesc }}
         </option>

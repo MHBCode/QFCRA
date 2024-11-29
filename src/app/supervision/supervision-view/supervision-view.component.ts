@@ -319,7 +319,6 @@ export class SupervisionViewComponent {
     this.firmsService.getClientClassification(this.firmId).subscribe(
       data => {
         this.clientClassification = data.response;
-        console.log('Firm FIRM clientClassification details:', this.clientClassification);
       },
       error => {
         console.error('Error fetching Firm clientClassification ', error);
@@ -332,7 +331,6 @@ export class SupervisionViewComponent {
     this.firmsService.getOperationalData(this.firmId).subscribe(
       data => {
         this.OperationalData = data.response;
-        console.log('Firm FIRM OperationalData details:', this.OperationalData);
       },
       error => {
         console.error('Error fetching Firm OperationalData ', error);
@@ -344,7 +342,6 @@ export class SupervisionViewComponent {
     this.firmsService.getRPTBasis(this.firmId).subscribe(
       data => {
         this.RPTBasis = data.response;
-        console.log('Firm FIRM RPTBasis details:', this.RPTBasis);
       },
       error => {
         console.error('Error fetching Firm RPTBasis ', error);
@@ -356,7 +353,6 @@ export class SupervisionViewComponent {
     this.firmsService.getSupervisionCategory(this.firmId).subscribe(
       data => {
         this.SupervisionCategory = data.response;
-        console.log('Supervision Category Data: ', this.SupervisionCategory)
       },
       error => {
         console.error('Error fetching Firm SupervisionCategory ', error);
@@ -438,8 +434,6 @@ export class SupervisionViewComponent {
               acc[agencyName] = Object.values(lastItemsPerGroup); // Convert to an array
               return acc;
             }, {} as CreditRatingsGrouped);
-
-            console.log('HistoryCreditRatingGrouped', this.HistoryCreditRatingGrouped);
 
           }
         } else {
@@ -532,7 +526,6 @@ export class SupervisionViewComponent {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
       data => {
         this.firmDetails = data.firmDetails;
-        console.log('firm details: ',this.firmDetails);
       },
       error => {
         console.error(error);
@@ -609,9 +602,8 @@ export class SupervisionViewComponent {
   getLegalStatusTypeID() {
     this.firmsService.getLegalStatusTypeID(this.firmId).subscribe(response => {
       this.legalStatusTypeID = response.LegalStatusTypeID
-      console.log('Legal Status Type ID: ' + this.legalStatusTypeID)
     }, error => {
-      console.log("Error Fetching LegalStatusTypeID: ", error)
+      console.error("Error Fetching LegalStatusTypeID: ", error)
     })
   }
 
@@ -732,8 +724,6 @@ export class SupervisionViewComponent {
     // Validate before saving
     const isValid = await this.validateSupervision();
 
-    console.log('Validation result:', isValid); // Debug log
-
     if (!isValid) {
       this.firmDetailsService.showErrorAlert(constants.SupervisionData_Messages.SUPERVISION_SAVE_ERROR);
       this.isLoading = false;
@@ -776,7 +766,6 @@ export class SupervisionViewComponent {
       saveSupCategory: this.firmsService.saveSupCategory(supCategoryDataObj)
     }).subscribe(
       response => {
-        console.log('Save successful:', response); // Debug log
         this.firmDetailsService.showSaveSuccessAlert(constants.SupervisionData_Messages.SUPERVISION_DATA_SAVED_SUCCESSFULLY);
         this.isEditModeSupervisor = false;
         this.isLoading = false;
@@ -864,7 +853,6 @@ export class SupervisionViewComponent {
     this.firmDetailsService.getErrorMessages(fieldName, msgKey, null, null, placeholderValue).subscribe(
       () => {
         this.errorMessages[fieldName] = this.firmDetailsService.errorMessages[fieldName];
-        console.log(`Error message for ${fieldName} loaded successfully`);
       },
       error => {
         console.error(`Error loading error message for ${fieldName}:`, error);

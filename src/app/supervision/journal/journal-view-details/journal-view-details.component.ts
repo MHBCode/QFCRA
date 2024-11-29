@@ -297,7 +297,7 @@ export class JournalViewDetailsComponent implements OnInit {
     this.hideCancelBtn = true;
     this.hideEditBtn = false;
     this.hideDeleteBtn = false;
-    this.hideExportBtn = true;
+    this.hideExportBtn = false;
     if (this.journalDetails[0].IsDeleted) {
       this.hideDeleteBtn = true;
       this.hideEditBtn = true;
@@ -362,7 +362,6 @@ export class JournalViewDetailsComponent implements OnInit {
     this.registerMasterPageControlEvents();
     this.getDocumentTypes();
     this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.journalSubjectTypes).subscribe(() => {
-      console.log('Journal Subject Data Loaded:', this.journalSubjectTypes);
     });
   }
 
@@ -374,7 +373,6 @@ export class JournalViewDetailsComponent implements OnInit {
     this.isEditModeJournal = false;
 
     this.loadSupJournalSubjectData(this.journal.SupervisionJournalID, this.subjectData).subscribe(() => {
-      console.log('Journal Subject Data Updated:', this.subjectData);
     });
     this.loadJournalDetails(this.journal.SupervisionJournalID);
     this.reloadJournal.emit(); // recalls the loadJournal() function in journal component
@@ -409,14 +407,12 @@ export class JournalViewDetailsComponent implements OnInit {
           );
 
           subject.isSelected = !!matchedSubject; // Mark as selected if it exists in the response
-          console.log(`Subject: ${subject.JournalSubjectTypeID}, isSelected: ${subject.isSelected}`);
           subject.ObjectInstanceDesc = matchedSubject?.ObjectInstanceDesc || null;
           subject.JournalSubjectOtherDesc = matchedSubject?.JournalSubjectOtherDesc || null;
 
           // Set selectedValue for dropdowns
           subject.selectedValue = matchedSubject?.ObjectInstanceID || 0; // Use ObjectInstanceID or default to 0
 
-          console.log('Updated Subject:', subject);
         });
       })
     );
@@ -500,7 +496,6 @@ export class JournalViewDetailsComponent implements OnInit {
     return this.journalService.getAllRequiredIndividuals(this.firmId).pipe(
       tap((types) => {
         this.allRequiredIndividuals = types.response;
-        console.log('allRequiredIndividuals: ' + this.allRequiredIndividuals)
       })
     );
   }
@@ -509,7 +504,6 @@ export class JournalViewDetailsComponent implements OnInit {
     return this.journalService.getAllApprovedIndividuals(this.firmId).pipe(
       tap((types) => {
         this.allApprovedIndividuals = types.response;
-        console.log('allApprovedIndividuals: ' + this.allApprovedIndividuals)
       })
     );
   }
@@ -717,7 +711,6 @@ export class JournalViewDetailsComponent implements OnInit {
     // Validate before saving
     const isValid = await this.validateJournal();
 
-    console.log('Validation result:', isValid); // Debug log
 
     if (!isValid) {
       this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ENTER_REQUIREDFIELD_PRIORSAVING);
@@ -731,7 +724,6 @@ export class JournalViewDetailsComponent implements OnInit {
 
     this.journalService.saveSupJournalData(journalDataObj).subscribe(
       response => {
-        console.log('Save successful:', response); // Debug log
         this.firmDetailsService.showSaveSuccessAlert(18025);
         this.isEditModeJournal = false;
         this.isLoading = false;
@@ -741,7 +733,6 @@ export class JournalViewDetailsComponent implements OnInit {
         this.reloadJournal.emit(); // recalls the loadJournal() function in journal component
         this.loadJournalDetails(this.journal?.SupervisionJournalID);
         this.loadSupJournalSubjectData(this.journal?.SupervisionJournalID, this.subjectData).subscribe(() => {
-          console.log('Journal Subject Data Updated:', this.subjectData);
         });
         this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
         this.closeJournalPopup.emit();
@@ -843,7 +834,6 @@ export class JournalViewDetailsComponent implements OnInit {
 
     this.journalService.deleteJournalData(deletePayload).subscribe(
       response => {
-        console.log('Delete successful:', response);
         this.firmDetailsService.showSaveSuccessAlert(18015);
         this.closeDeleteJournalPopup();
         this.reloadJournal.emit();
@@ -861,7 +851,6 @@ export class JournalViewDetailsComponent implements OnInit {
     ).subscribe(
       data => {
         this.journalDoc = data.response;
-        console.log('Document Data:', data);
       },
       error => {
         console.error('Error loading document:', error);
@@ -905,7 +894,6 @@ export class JournalViewDetailsComponent implements OnInit {
 
       this.objectWF.insertDocument(this.documentObj).subscribe(
         response => {
-          console.log('journal attachment saved successfully:', response);
           this.loadDocuments();
           this.isLoading = false;
         },
@@ -960,7 +948,6 @@ export class JournalViewDetailsComponent implements OnInit {
       next: (res) => {
         this.isLoading = false;
         this.fetchedDocumentTypes = res.response;
-        console.log("DocumentTypeList",this.fetchedDocumentTypes)
       },
       error: (error) => {
         this.isLoading = false;
@@ -973,7 +960,6 @@ export class JournalViewDetailsComponent implements OnInit {
     this.supervisionService.getErrorMessages(fieldName, msgKey, null, placeholderValue).subscribe(
       () => {
         this.errorMessages[fieldName] = this.supervisionService.errorMessages[fieldName];
-        console.log(`Error message for ${fieldName} loaded successfully`);
       },
       error => {
         console.error(`Error loading error message for ${fieldName}:`, error);
