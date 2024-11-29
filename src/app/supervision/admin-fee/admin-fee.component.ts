@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { FirmService } from 'src/app/ngServices/firm.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
+import { FirmRptAdminFeeService } from 'src/app/ngServices/firm-rpt-admin-fee.service';
 
 @Component({
   selector: 'app-admin-fee',
@@ -16,13 +17,15 @@ export class AdminFeeComponent {
   firmDetails:any;
   pageSize: number = 10; // Define pageSize here
   paginatedItems: any[] = []; 
-
+  showPopup: boolean = false;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private firmService: FirmService,
     public dateUtilService: DateUtilService,
-    private firmDetailsService: FirmDetailsService
+    private firmDetailsService: FirmDetailsService,
+    private firmRptAdminFeeService: FirmRptAdminFeeService,
+
   ) {
 
   }
@@ -49,7 +52,7 @@ export class AdminFeeComponent {
 
   loadAdminFees() {
     this.isLoading = true;
-    this.firmService.getFIRMAdminFees(this.firmId).subscribe(
+    this.firmRptAdminFeeService.getAdminFeeList(this.firmId).subscribe(
       data => {
         this.FirmAdminFees = data.response;
         this.isLoading = false;
@@ -68,6 +71,20 @@ export class AdminFeeComponent {
 
   updatePaginatedItems(paginatedItems: any[]): void {
     this.paginatedItems = paginatedItems; // Update current page items
+  }
+  selectedAdminFee : any;
+  openAdminFeePopup(fee: any,firmDetails : any): void {
+    this.selectedAdminFee = fee;
+    this.showPopup = true;
+    console.log("openRegisteredFundPopup")
+  }
+  closePopup(): void {
+    this.showPopup = false;
+    this.selectedAdminFee = null; // Reset the selected review
+  }
+  loadRegFunds() {
+    this.isLoading = true;
+    this.loadAdminFees();
   }
 
 }

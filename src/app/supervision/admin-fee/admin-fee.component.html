@@ -21,7 +21,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let fee of paginatedItems">
+                    <tr *ngFor="let fee of paginatedItems" (click)="openAdminFeePopup(fee,firmDetails)">
                         <td>{{ fee?.RptName }}</td>
                         <td>{{ dateUtilService.formatDateToCustomFormat(fee?.FirmRptDueDate) }}</td>
                         <td>{{ fee?.FirstMateriallyCompleteRptReceivedDate }}</td>
@@ -41,3 +41,11 @@
         </div>
     </div>
 </div>
+
+<app-admin-fee-popup
+*ngIf="showPopup"
+  [fee]="selectedAdminFee"
+  [firmDetails]="firmDetails"
+  (closeRegPopup)="closePopup()"
+  (fundDeleted)="loadRegFunds()">
+</app-admin-fee-popup>

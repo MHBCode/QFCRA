@@ -1,151 +1,265 @@
-<!-- <div class="overlay">
-    <div class="popupcontainer Rptpopupcontainer" (click)="$event.stopPropagation()">
-        <div class="popup-title-btn-row">
-            <div class="popup-header">
-                <h3>Submission Details</h3>
-            </div>
-            <button class="close-button close-icon" (click)="onClose()">
-                <i class="bi bi-x-circle"></i>
-            </button>
-        </div>
-
-        <div class="reporting-schedule-form">
-            <div class="inputs-row">
-                <div class="input-field">
-                    <label for="reportName">Report Name</label>
-                    <input type="text" id="reportName" [(ngModel)]="reportDetails.reportName"
-                        [disabled]="!isEditable" />
-                </div>
-                <div class="input-field">
-                    <label for="qfcNumber">QFC Number</label>
-                    <input type="text" id="qfcNumber" [(ngModel)]="reportDetails.qfcNumber" [disabled]="!isEditable" />
-                </div>
-                <div class="input-field">
-                    <label for="reportDate">Report Date</label>
-                    <input type="text" id="reportDate" [(ngModel)]="reportDetails.reportDate"
-                        [disabled]="!isEditable" />
-                </div>
-                <div class="input-field">
-                    <label for="reportingPeriodEnd">Reporting Period End Date</label>
-                    <input type="text" id="reportingPeriodEnd" [(ngModel)]="reportDetails.reportingPeriodEnd"
-                        [disabled]="!isEditable" />
-                </div>
-                <div class="input-field">
-                    <label for="materiallyComplete">Materially Complete</label>
-                    <input type="text" id="materiallyComplete" [(ngModel)]="reportDetails.materiallyComplete"
-                        [disabled]="!isEditable" />
-                </div>
-                <div class="input-field">
-                    <label for="linkToReturnReview">Link to Return Review</label>
-                    <a id="linkToReturnReview" href="{{reportDetails.linkToReturnReview}}" target="_blank">Link</a>
-                </div>
-            </div>
-
-            <div class="submission-history">
-                <h3>Submission History</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Submission Date</th>
-                            <th>Received Date</th>
-                            <th>Complete</th>
-                            <th>Requested By</th>
-                            <th>Comments</th>
-                            <th>Days Overdue</th>
-                            <th>Link</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let history of submissionHistory">
-                            <td>{{ history.submissionDate }}</td>
-                            <td>{{ history.receivedDate }}</td>
-                            <td>{{ history.complete }}</td>
-                            <td>{{ history.requestedBy }}</td>
-                            <td>{{ history.comments }}</td>
-                            <td>{{ history.daysOverdue }}</td>
-                            <td><a href="{{ history.link }}">Link</a></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="administrative-fee">
-                <h3>Administrative Fee</h3>
-                <div class="inputs-row">
-                    <div class="input-field">
-                        <label for="imposeFee">Impose an administrative fee</label>
-                        <input type="text" id="imposeFee" [(ngModel)]="feeDetails.imposeFee" [disabled]="!isEditable" />
-                    </div>
-                    <div class="input-field">
-                        <label for="rulesImposed">Rules under which fee is imposed</label>
-                        <input type="text" id="rulesImposed" [(ngModel)]="feeDetails.rulesImposed"
-                            [disabled]="!isEditable" />
-                    </div>
-                    <div class="input-field">
-                        <label for="recommendation">Recommendation</label>
-                        <input type="text" id="recommendation" [(ngModel)]="feeDetails.recommendation"
-                            [disabled]="!isEditable" />
-                    </div>
-                    <div class="input-field">
-                        <label for="calculatedFee">Calculated Fee</label>
-                        <input type="text" id="calculatedFee" [(ngModel)]="feeDetails.calculatedFee"
-                            [disabled]="!isEditable" />
-                    </div>
-                    <div class="input-field fullwidth">
-                        <label for="justification">Justification</label>
-                        <textarea id="justification" [(ngModel)]="feeDetails.justification"
-                            [disabled]="!isEditable"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="review-comments">
-                <h3>Review Comments</h3>
-                <div *ngFor="let review of reviewComments">
-                    <div class="review-entry">
-                        <div class="input-field">
-                            <label>Task</label>
-                            <input type="text" [(ngModel)]="review.task" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label>Role Assigned To</label>
-                            <input type="text" [(ngModel)]="review.roleAssignedTo" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label>User Assigned To</label>
-                            <input type="text" [(ngModel)]="review.userAssignedTo" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label>Email (CC)</label>
-                            <input type="text" [(ngModel)]="review.emailCC" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label>Assigned Date</label>
-                            <input type="text" [(ngModel)]="review.assignedDate" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label>Due Date</label>
-                            <input type="text" [(ngModel)]="review.dueDate" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label>Status</label>
-                            <input type="text" [(ngModel)]="review.status" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label>Task Initiated By</label>
-                            <input type="text" [(ngModel)]="review.taskInitiatedBy" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field">
-                            <label>Task Initiated Date</label>
-                            <input type="text" [(ngModel)]="review.taskInitiatedDate" [disabled]="!isEditable" />
-                        </div>
-                        <div class="input-field fullwidth">
-                            <label>Comments</label>
-                            <textarea [(ngModel)]="review.comments" [disabled]="!isEditable"></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<app-loader *ngIf="isLoading"></app-loader>
+<!-- view & Edit popup  -->
+<div class="overlay">
+  <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+    <!-- Title -->
+    <div class="popup-title-btn-row">
+      <div class="popup-header">
+        <h3>
+          Submission Details
+        </h3>
+      </div>
+      <!-- Save and Cancel Buttons -->
+      <button class="close-button  close-icon" (click)="onClose()">
+        <i class="bi bi-x-circle"></i>
+      </button>
     </div>
-</div> -->
+    <div class="reporting-schedule-form">
+      <div class="inputs-row" >
+        <div class="input-field">
+          <label for="FirmName">Firm Name</label>
+          <input type="text" id="FirmName"
+            name="FirmName" [(ngModel)]="AdminFeeDetials[0].FirmName" [disabled]="!isEditable"/>
+        </div>
+        <div class="input-field">
+          <label for="QFCNumber">QFC Number </label>
+        
+              <input type="text" id="QFCNumber"
+              name="QFCNumber" [(ngModel)]="AdminFeeDetials[0].QFCNum"
+              [disabled]="!isEditable" />
+
+            
+        </div>
+        <div class="input-field">
+          <label for="ReportName">Report Name</label>
+          <input type="text" id="ReportName"
+            name="ReportName" [(ngModel)]="AdminFeeDetials[0].RptName"
+            [disabled]="!isEditable" />
+        </div>
+        <div class="input-field">
+          <label for="ReportDueDate">Report Due Date</label>
+          <input type="text" id="ReportDueDate"
+            name="ReportDueDate" [(ngModel)]="AdminFeeDetials[0].FirmRptDueDate"
+            [disabled]="!isEditable" />
+        </div>
+        <div class="input-field">
+            <label for="ReportingPeriodStartDate">Reporting Period Start Date</label>
+            <input type="text" id="ReportingPeriodStartDate"
+              name="ReportingPeriodStartDate" [(ngModel)]="AdminFeeDetials[0].RptPeriodFromDate"
+              [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="ReportingPeriodEndDate">Reporting Period End Date</label>
+            <input type="text" id="ReportingPeriodEndDate"
+              name="ReportingPeriodEndDate" [(ngModel)]="AdminFeeDetials[0].RptPeriodToDate"
+              [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="MateriallyCompleteReportReceivedDate">Materially Complete Report Received Date</label>
+            <input type="text" id="MateriallyCompleteReportReceivedDate"
+              name="MateriallyCompleteReportReceivedDate" [(ngModel)]="AdminFeeDetials[0].FirstMateriallyCompleteRptReceivedDate"
+              [disabled]="!isEditable" />
+          </div>
+            
+
+          <div class="input-field">
+            <label for="LinkToReturnReview"> Link To Return Review </label>
+            <input *ngIf="isEditable"  name="LinkToReturnReview" id="LinkToReturnReview" type="text"
+            [(ngModel)]="AdminFeeDetials.LinkToReview"  />
+            <a  id="websiteLink" [href]="AdminFeeDetials[0].LinkToReview"
+              target="_blank" rel="noopener noreferrer">
+              {{ AdminFeeDetials[0].LinkToReview }}
+            </a>
+          </div>
+      </div>
+      <div class="rpt-list margin-top-10">
+        <div class="popup-header">
+          <h3>Administrative Fee</h3>
+        </div>
+        <ng-container>
+          <div class="inputs-row report-entry" >
+            <div class="input-field">
+            <label for="required">
+                Impose an administrative fee on the firm for late or materially incomplete submission?
+            </label>
+            <ng-container>
+                <div style="display: flex; align-items: center">
+                    <input type="radio" [(ngModel)]="AdminFeeDetials[0].feeImposed" id="isRequiredYes" 
+                    [disabled]="!isEditable"  name="IsRequired" [value]="true" style="margin-right: 10px; cursor: pointer" />
+                    <label for="isRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
+
+                    <input type="radio" [(ngModel)]="AdminFeeDetials[0].feeImposed" id="isRequiredNo" 
+                    [disabled]="!isEditable"  name="IsRequired" [value]="false" style="
+                        margin-left: 20px;
+                        margin-right: 10px;
+                        cursor: pointer;
+                      " />
+                    <label for="isRequiredNo"  style="margin-left: 5px; color: #413b3c">No</label>
+                </div>
+            </ng-container>
+            </div>
+      
+            <div class="input-field">
+              <label for="Rulesunderwhichfeeisbeingimposed">Rulesunderwhichfeeisbeingimposed</label>
+              <input type="text" [disabled]="!isEditable" id="Rulesunderwhichfeeisbeingimposed" name="Rulesunderwhichfeeisbeingimposed" 
+              [(ngModel)]="AdminFeeDetials[0].ruleDesc"
+              />
+            </div>
+      
+            <div class="input-field">
+                <label for="CalculatedFee">Calculated Fee</label>
+                <input 
+                  type="text" 
+                  [disabled]="!isEditable" 
+                  name="CalculatedFee" 
+                  [value]="AdminFeeDetials[0].CalculatedAmountCurrencyTypeDesc +' ' + AdminFeeDetials[0].CalculatedAmount" 
+                />
+              </div>
+      
+            <div class="input-field">
+            </div>
+            <div class="input-field notes">
+                <label for="notes">Recommendation :</label>
+                <div>
+                    <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="AdminFeeDetials[0].Recommendation"
+                        [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                </div>
+                <ng-template #notes>
+                    <p [innerHTML]="sanitizeHtml(AdminFeeDetials[0].Recommendation)">
+                    </p>
+                </ng-template>
+            </div>
+            <div class="input-field">
+                <label for="CalculatedFee">Fee to be imposed</label>
+                <input 
+                  type="text" 
+                  [disabled]="!isEditable" 
+                  name="CalculatedFee" 
+                  [value]="AdminFeeDetials[0].ImposedAmountCurrencyTypeDesc +' ' + AdminFeeDetials[0].ImposedAmount" 
+                />
+            </div>
+              <div class="input-field notes">
+                <label for="Justification">Justification for fee to be imposed (if different from calculated fee) :</label>
+                <p [innerHTML]="sanitizeHtml(AdminFeeDetials[0].Justification)">
+                </p>
+              </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- <div class="rpt-list margin-top-10">
+        <div class="popup-header">
+          <h3>Fund Status Details</h3>
+        </div>
+        <table class="fund-status-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Status Date</th>
+              <th>Last Modified By</th>
+              <th>Last Modified Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let statusDetail of RegisteredFundStatusDetials">
+              <td>{{ statusDetail.STATUS }}</td>
+              <td>{{ statusDetail.StatusDate }}</td>
+              <td>{{ statusDetail.LastModifiedByName }}</td>
+              <td>{{ statusDetail.LastModifiedDate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="rpt-list margin-top-10"> 
+        <div class="popup-header">
+          <h3></h3>
+        </div>
+        <ng-container>
+            <div class="inputs-row report-entry" *ngFor="let RegFundDetials of RegisteredFundDetials">
+              <div class="input-field">
+                <label for="PreviousName-{{RegFundDetials.RegisteredFundID}}">Previous Name(s)</label>
+                <input type="text" id="PreviousName-{{RegFundDetials.RegisteredFundID}}"
+                  name="PreviousName-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.PreviousNames" />
+              </div>
+
+              <div class="input-field">
+                <label for="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}">Other Related Entities</label>
+                <input type="text" id="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}"
+                  name="OtherRelatedEntities-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.OtherRelatedEntityName" />
+              </div>
+
+              <div class="input-field">
+                <label for="Status-{{RegFundDetials.RegisteredFundID}}">Status</label>
+              
+                  <ng-container *ngIf="isEditable; else ViewStatus">
+                    <select name="Status" id="Status" 
+                    [(ngModel)]="RegFundDetials.RegisteredFundStatusTypeDesc"
+                    (change)="onSatusTypeChange($event, RegFundDetials)"
+                    >
+                      <option *ngFor="let option of RFFundStatusdropdown" [value]="option.RegisteredFundStatusTypeDesc">
+                        {{ option.RegisteredFundStatusTypeDesc }}
+                      </option>
+                    </select>
+                  </ng-container>
+                  <ng-template #ViewStatus>
+                    <input type="text" id="Status-{{RegFundDetials.RegisteredFundID}}"
+                    name="Status-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                    [(ngModel)]="RegFundDetials.RegisteredFundStatusTypeDesc" />
+                  </ng-template>
+                 
+              </div>
+               
+              <div class="input-field">
+                <label for="statusDate-{{RegFundDetials.RegisteredFundID}}">Status Date</label>
+                <input type="text" #dateInputs placeholder id="statusDate-{{RegFundDetials.RegisteredFundID}}"
+                  name="statusDate-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
+                  [(ngModel)]="RegFundDetials.RegisteredFundStatusDate" />
+              </div>
+              <!-- <div class="input-field-notes">
+                
+                <label for="notes">Notes</label>
+                <div>
+                    <ckeditor [disabled]="!isEditable" [(ngModel)]="RegFundDetials.RegisteredFundNotes" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                </div>
+              </div> 
+
+              <div class="input-field notes">
+                <label for="notes">Notes</label>
+                <div>
+                    <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="RegFundDetials.RegisteredFundNotes"
+                        [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                </div>
+                <ng-template #notes>
+                    <p [innerHTML]="sanitizeHtml(RegFundDetials.RegisteredFundNotes)">
+                    </p>
+                </ng-template>
+               </div>
+            </div>
+            
+          </ng-container>
+      </div> -->
+      -->
+      <!-- <div class="rpt-list margin-top-10">
+        <div class="popup-header">
+          <h3>Attachments (if any)</h3>
+          <div class="add-sub-funds-btn-container">
+            <button class="addSubFunsdBtn" [disabled]="!isEditable" (click)="addSubFund()">Select Document</button>
+            <button class="addSubFunsdBtn" [disabled]="!isEditable" (click)="addSubFund()">Upload</button>
+          </div>
+        </div>
+        <div class="inputs-row report-entry">
+          <div class="input-field">
+            
+          </div>
+          <!-- <div class="input-field">
+            <label for="submissionStatus">File Name</label>
+            <input type="text" id="submissionStatus" name="submissionStatus" [disabled]="!isEditable" />
+          </div> 
+        </div>
+      </div> -->
+      
+   </div>
+  </div>    
+</div>

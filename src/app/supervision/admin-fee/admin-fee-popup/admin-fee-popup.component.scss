@@ -1,0 +1,74 @@
+.popupcontainer .input-field{
+    width: 31%;
+}
+.popupcontainer .fullwidth{
+    width: 100%;
+}
+.popupcontainer .inputs-row {
+    gap: 3.5%;
+    justify-content: flex-start;
+    padding: 0px;
+}
+.rpt-list {
+    margin: 10px 0px;
+}
+.rpt-list .inputs-row.report-entry.border-style {
+    margin-top: 10px;
+    border-top: 1px solid #a51e36;
+    padding-top: 10px !important;
+}
+
+.popupcontainer.Rptpopupcontainer {
+    max-height: 97vh;
+}
+.disabled {
+    background-color: #f9f9f9;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+.addSubFunsdBtn {
+    background-color: #A51E36;
+    color: white;
+    cursor: default;
+}
+.addSubFunsdBtn {
+    background: #ac112d;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px;
+    border-radius: 7px;
+    margin-right: 10px;
+}
+
+.add-sub-funds-btn-container {
+    width: 13%;
+    display: flex;
+    justify-content: flex-end;
+    ;
+    margin-bottom: 10px;
+}
+.del-address-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .RmvTrashBtn {
+    background: red;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px 10px;
+    border-radius: 7px;
+  }
+
+
+  .notes {
+    width: 100% !important;
+    margin-top: 10px;
+    padding: 10px;
+    > div{
+        width:100%;
+    }
+   }
