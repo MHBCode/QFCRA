@@ -13,6 +13,7 @@ import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';
 import { FirmRptAdminFeeService } from 'src/app/ngServices/firm-rpt-admin-fee.service';
 import { SafeHtml } from '@angular/platform-browser';
+import { WaiverService } from 'src/app/ngServices/waiver.service';
 @Component({
   selector: 'app-admin-fee-popup',
   templateUrl: './admin-fee-popup.component.html',
@@ -42,7 +43,7 @@ export class AdminFeePopupComponent {
     private flatpickrService: FlatpickrService,
     private sanitizerService: SanitizerService,
     private firmRptAdminFeeService: FirmRptAdminFeeService,
-
+    private waiverService : WaiverService,
   ) {
 
   }
@@ -53,6 +54,8 @@ export class AdminFeePopupComponent {
     });
     console.log(this.fee)
     this.getAdminFeeDetials();
+    this.getResubmissionHistoryList();
+    this.getRevisionCommentsByWaiver();
   }
   onClose(): void {
     this.closeRegPopup.emit();
@@ -63,10 +66,43 @@ export class AdminFeePopupComponent {
       next: (res) => {
         this.AdminFeeDetials = res.response;
         console.log("AdminFeeDetials",this.AdminFeeDetials)
+        
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error fitching AdminFeeDetials', error);
+      },
+    });
+  }
+  ResubmissionHistoryList : any
+  getResubmissionHistoryList(){
+    this.isLoading = true;
+    const firmRptSchItemId = this.fee.FirmRptSchItemID
+    const firmRptReviewId = this.fee.FirmRptReviewID
+    const firmRptReviewRevId = this.fee.FirmRptReviewRevNum
+    const firmRptAdminFeeID = this.fee.FirmrptAdminFeeID
+    this.firmRptAdminFeeService.getResubmissionHistoryList(firmRptSchItemId,firmRptReviewId,firmRptReviewRevId,firmRptAdminFeeID).subscribe({
+      next: (res) => {
+        this.ResubmissionHistoryList = res.response;
+        console.log("ResubmissionHistoryList",this.ResubmissionHistoryList)
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fitching ResubmissionHistoryList', error);
+      },
+    });
+  }
+  RevisionCommentsList : any;
+  getRevisionCommentsByWaiver(){
+    const objectWFStatusID = this.fee.ObjectWfStatusID;
+    this.waiverService.getRevisionCommentsByWaiver(objectWFStatusID).subscribe({
+      next: (res) => {
+        this.RevisionCommentsList = res.response;
+        console.log("RevisionCommentsList",this.RevisionCommentsList)
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fitching RevisionCommentsList', error);
       },
     });
   }

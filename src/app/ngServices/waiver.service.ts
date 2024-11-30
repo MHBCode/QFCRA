@@ -18,5 +18,10 @@ export class WaiverService {
     }${objectOpType !== null ? `&objectOpType=${objectOpType}` : ''}`;
     return this.http.get<any>(url);
   }
+  getRevisionCommentsByWaiver(objectWFStatusID: number): Observable<any> {
+    const url = `${this.baseUrlWaiver}get_revision_comments_by_waiver?objectWFStatusID=${objectWFStatusID}`;
+    return this.http.get<any>(url);
+    
+  }
   
 }
