@@ -40,5 +40,8 @@ export class ObjectwfService {
     const url = `${this.baseUrlObjectWF}get_document_type?docTypeID=${docTypeId}`
     return this.http.get<any>(url);
   }
-
+  getUserObjectWfTasks(ObjectWFStatusID: number): Observable<any> {
+    const url = `${this.baseUrlObjectWF}get_user_object_wf_tasks?ObjectWFStatusID=${ObjectWFStatusID}`
+    return this.http.get<any>(url);
+  }
 }

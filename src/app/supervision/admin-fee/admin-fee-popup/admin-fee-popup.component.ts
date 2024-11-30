@@ -54,29 +54,31 @@ export class AdminFeePopupComponent {
     });
     console.log(this.fee)
     this.getAdminFeeDetials();
-    this.getResubmissionHistoryList();
-    this.getRevisionCommentsByWaiver();
+   
   }
   onClose(): void {
     this.closeRegPopup.emit();
   }
   getAdminFeeDetials(){
+    this.isLoading = true
     const firmRptFeeID = this.fee.FirmrptAdminFeeID;
     this.firmRptAdminFeeService.getAdminFeeDetials(firmRptFeeID).subscribe({
       next: (res) => {
         this.AdminFeeDetials = res.response;
         console.log("AdminFeeDetials",this.AdminFeeDetials)
+        this.getResubmissionHistoryList();
+        this.getRevisionCommentsByWaiver();
+        this.getUserObjectWfTasks();
         
-        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error fitching AdminFeeDetials', error);
       },
     });
+    
   }
   ResubmissionHistoryList : any
   getResubmissionHistoryList(){
-    this.isLoading = true;
     const firmRptSchItemId = this.fee.FirmRptSchItemID
     const firmRptReviewId = this.fee.FirmRptReviewID
     const firmRptReviewRevId = this.fee.FirmRptReviewRevNum
@@ -85,7 +87,7 @@ export class AdminFeePopupComponent {
       next: (res) => {
         this.ResubmissionHistoryList = res.response;
         console.log("ResubmissionHistoryList",this.ResubmissionHistoryList)
-        this.isLoading = false;
+        
       },
       error: (error) => {
         console.error('Error fitching ResubmissionHistoryList', error);
@@ -99,10 +101,23 @@ export class AdminFeePopupComponent {
       next: (res) => {
         this.RevisionCommentsList = res.response;
         console.log("RevisionCommentsList",this.RevisionCommentsList)
-        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error fitching RevisionCommentsList', error);
+      },
+    });
+  }
+  UserObjectWfTasks : any;
+  getUserObjectWfTasks(){
+    const ObjectWFStatusID = this.fee.ObjectWfStatusID;
+    this.objectwfService.getUserObjectWfTasks(ObjectWFStatusID).subscribe({
+      next: (res) => {
+        this.UserObjectWfTasks = res.response;
+        console.log("UserObjectWfTasks",this.UserObjectWfTasks)
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fitching UserObjectWfTasks', error);
       },
     });
   }

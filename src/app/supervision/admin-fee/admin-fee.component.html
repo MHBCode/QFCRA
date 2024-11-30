@@ -20,7 +20,7 @@
                         <th>Review Status</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody  *ngIf="paginatedItems?.length > 0; else paginatedIt">
                     <tr *ngFor="let fee of paginatedItems" (click)="openAdminFeePopup(fee,firmDetails)">
                         <td>{{ fee?.RptName }}</td>
                         <td>{{ dateUtilService.formatDateToCustomFormat(fee?.FirmRptDueDate) }}</td>
@@ -30,6 +30,13 @@
                         <td>{{ fee?.ObjectWFStatusTypeDesc }}</td>
                     </tr>
                 </tbody>
+                <ng-template #paginatedIt>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" class="norecords" style="color: red">No Records Found</td>
+                        </tr>
+                    </tbody>
+                </ng-template>
                 <tfoot *ngIf="FirmAdminFees?.length > 0">
                     <tr>
                         <td  [attr.colspan]="12">

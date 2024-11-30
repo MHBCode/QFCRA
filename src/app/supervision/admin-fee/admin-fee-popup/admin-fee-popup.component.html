@@ -103,7 +103,7 @@
               <td></td>
               <td></td>
               <td>Total Days Overdue</td>
-              <td>{{ResubmissionHistoryList[0].noLateDaysForDisplay}}</td>
+              <td>{{ResubmissionHistoryList.noLateDaysForDisplay}}</td>
               <td></td>
             </tr>
           </tbody>
@@ -182,7 +182,7 @@
         <div class="popup-header">
           <h3>Review</h3>
         </div>
-        <div *ngFor="let RevisionComments of RevisionCommentsList ; let i = index">
+        <div *ngFor="let WfTask of UserObjectWfTasks ; let i = index">
           <div *ngIf="i != 0" class="popup-header">
             <h3></h3>
           </div>
@@ -199,33 +199,33 @@
             </thead>
             <tbody>
               <tr>
-                <td>{{ RevisionComments.resubmissionDueDate }}</td>
-                <td>{{ RevisionComments.reportRecivedDate }}</td>
-                <td>{{ RevisionComments.materiallyCompleteDesc }}</td>
-                <td>{{ RevisionComments.resubmissionRequestedDate }}</td>
-                <td>{{ RevisionComments.resubmissionRequestBy }}</td>
-                <td>{{ RevisionComments.wPublishedComments }}</td>
+                <td>{{ WfTask.ObjectOpTypeName }}</td>
+                <td>{{ WfTask.AppRoleDesc }}</td>
+                <td>{{ WfTask.AssignedToUserName }}</td>
+                <td>{{ WfTask.CompletionEmailCC }}</td>
+                <td>{{ WfTask.WFTaskAssignedDate }}</td>
+                <td>{{ WfTask.DueDate }}</td>
               </tr>
             </tbody>
           </table>
           <div class="inputs-row report-entry">
             <div class="input-field">
               <label for="TaskInitiatedBy">Task Initiated By</label>
-              <input type="text" id="TaskInitiatedBy" name="TaskInitiatedBy" [disabled]="!isEditable">
+              <input type="text" id="TaskInitiatedBy" [(ngModel)]="WfTask.CreatedByUserName" name="TaskInitiatedBy" [disabled]="!isEditable">
             </div>
 
             <div class="input-field">
               <label for="TaskInitiatedDate">Task Initiated Date</label>
-              <input type="text" id="TaskInitiatedDate" name="TaskInitiatedDate" [disabled]="!isEditable" />
+              <input type="text" id="TaskInitiatedDate" name="TaskInitiatedDate" [(ngModel)]="WfTask.TaskInitiatedDate" [disabled]="!isEditable" />
             </div>
             <div class="input-field notes">
               <label for="notes">Comments</label>
               <div>
-                <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="RevisionComments.WaiverComments"
+                <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="WfTask.ObjectWFComments"
                   [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
               </div>
               <ng-template #notes>
-                <p [innerHTML]="sanitizeHtml(RevisionComments.WaiverComments)">
+                <p [innerHTML]="sanitizeHtml(WfTask.ObjectWFComments)">
                 </p>
               </ng-template>
             </div>
@@ -233,17 +233,17 @@
             <div class="input-field">
               <label for="Status">Status</label>
               <input type="text" id="Status" name="Status" [disabled]="!isEditable" 
-              [(ngModel)]="RevisionComments.ObjectWFStatusTypeDesc"/>
+              [(ngModel)]="WfTask.ObjectWFStatusTypeDesc"/>
             </div>
             <div class="input-field">
               <label for="StatusSetBy">Status Set By</label>
               <input type="text" id="StatusSetBy" name="StatusSetBy" [disabled]="!isEditable" 
-              [(ngModel)]="RevisionComments.CommentorName" />
+              [(ngModel)]="WfTask.StatusSetBy" />
             </div>
             <div class="input-field">
               <label for="StatusSetDate">Status Set Date</label>
               <input type="text" #dateInputs placeholder id="StatusSetDate" name="StatusSetDate"
-                [disabled]="!isEditable" [(ngModel)]="RevisionComments.CommentDate"/>
+                [disabled]="!isEditable" [(ngModel)]="WfTask.CommentsDateTime"/>
             </div>
           </div>
         </div>
