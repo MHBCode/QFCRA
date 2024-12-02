@@ -92,21 +92,6 @@
                     </ng-template>
                 </div>
 
-                <!-- <div *ngIf="(isEditModeEnf || isCreateEnf) && selectedIndividualId !== 1 && showIndividualsDropdown"
-                    class="input-field">
-                    <label>
-                        {{ individualLabel }}
-                        <span *ngIf="isEditModeEnf || isCreateEnf" style="color: red;">*</span>
-                    </label>
-                    <select [(ngModel)]="selectedIndividualId" [disabled]="!isEditModeEnf && !isCreateEnf" [ngClass]="{
-                            'error-border': errorMessages['individual']}">
-                        <option [value]="0">Select</option>
-                        <option *ngFor="let individual of individuals" [value]="individual.id">
-                            {{ individual.name }}
-                        </option>
-                    </select>
-                </div> -->
-
                 <div *ngIf="(isEditModeEnf || isCreateEnf) && showIndividualsDropdown" class="input-field">
                     <label>
                       {{ individualLabel }}
@@ -221,7 +206,9 @@
                       [loadDocuments]="loadDocuments.bind(this)"
                       (documentUploaded)="onDocumentUploaded($event)" 
                       [selectedFile]="selectedFile"
-                      (selectedFileChange)="selectedFile = $event">
+                      (selectedFileChange)="selectedFile = $event"
+                      [FileLoc]="FileLoc"
+                      [fileLocation]="fileLocation">
                     </app-attachment>
                   </ng-container>
             </div>

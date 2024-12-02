@@ -43,12 +43,14 @@ export class JournalViewDetailsComponent implements OnInit {
   currentDate = new Date();
 
   journalDoc: any[] = [];
-  documentObj:any;
+  documentObj: any;
   selectedFiles: File[] = [];
-  fetchedDocumentTypes : any = [];
+  fetchedDocumentTypes: any = [];
   newfileNum: number;
   selectedFile: File | null = null;
   fileError: string = '';
+  fileLocation: string = '';
+  FileLoc: string = '';
 
   // dropdowns
   alljournalEntryTypes: any = [];
@@ -82,16 +84,16 @@ export class JournalViewDetailsComponent implements OnInit {
 
   createJournalObj = {
     JournalEntryTypeID: 0,
-    JournalEntryTypeDesc: null, 
+    JournalEntryTypeDesc: null,
     EntryTitle: null,
-    EntryDate: null, 
+    EntryDate: null,
     EntryBy: null,
     EntryByUser: null,
-    LastModifiedBy: null, 
-    IsDeleted: false, 
-    EntryNotes: null, 
+    LastModifiedBy: null,
+    IsDeleted: false,
+    EntryNotes: null,
     DeletedBy: null,
-    DeletedDate: null, 
+    DeletedDate: null,
     ReasonForDeletion: null,
   }
 
@@ -201,7 +203,7 @@ export class JournalViewDetailsComponent implements OnInit {
 
           // Apply security after all data is loaded
           this.applySecurityOnPage(this.Page.SupervisionJournal, this.isEditModeJournal);
-        
+
         },
         error: (err) => {
           console.error('Error initializing page:', err);
@@ -250,7 +252,7 @@ export class JournalViewDetailsComponent implements OnInit {
     this.populateJournalEntryTypes();
     this.populateJournalExternalAuditors();
     this.getDocumentTypes();
- 
+
   }
 
 
@@ -456,7 +458,7 @@ export class JournalViewDetailsComponent implements OnInit {
   toggleSelection(subject: any, event: Event): void {
     const checkbox = event.target as HTMLInputElement;
     subject.isSelected = checkbox.checked;
-  
+
     if (subject.isSelected) {
       // Ensure selectedValue is set to the default "Select" option (0) in create mode
       if (this.isCreateJournal && subject.selectedValue === undefined) {
@@ -469,7 +471,7 @@ export class JournalViewDetailsComponent implements OnInit {
       subject.ObjectInstanceDesc = null;
     }
   }
-  
+
 
 
 
@@ -525,7 +527,7 @@ export class JournalViewDetailsComponent implements OnInit {
   get entryTypeID() {
     return this.isCreateJournal ? this.createJournalObj.JournalEntryTypeID : this.journalDetails[0]?.JournalEntryTypeID;
   }
-  
+
   set entryTypeID(value: number) {
     if (this.isCreateJournal) {
       this.createJournalObj.JournalEntryTypeID = value;
@@ -533,11 +535,11 @@ export class JournalViewDetailsComponent implements OnInit {
       this.journalDetails[0].JournalEntryTypeID = value;
     }
   }
-  
+
   get entryDate() {
     return this.isCreateJournal ? this.createJournalObj.EntryDate : this.journalDetails[0]?.EntryDate;
   }
-  
+
   set entryDate(value: string) {
     if (this.isCreateJournal) {
       this.createJournalObj.EntryDate = value;
@@ -549,7 +551,7 @@ export class JournalViewDetailsComponent implements OnInit {
   get entryBy() {
     return this.isCreateJournal ? this.createJournalObj.EntryByUser : this.journalDetails[0]?.EntryByUser;
   }
-  
+
   set entryBy(value: number) {
     if (this.isCreateJournal) {
       this.createJournalObj.EntryBy = value;
@@ -561,7 +563,7 @@ export class JournalViewDetailsComponent implements OnInit {
   get entryTitle() {
     return this.isCreateJournal ? this.createJournalObj.EntryTitle : this.journalDetails[0]?.EntryTitle;
   }
-  
+
   set entryTitle(value: string) {
     if (this.isCreateJournal) {
       this.createJournalObj.EntryTitle = value;
@@ -573,7 +575,7 @@ export class JournalViewDetailsComponent implements OnInit {
   get entryNotes() {
     return this.isCreateJournal ? this.createJournalObj.EntryNotes : this.journalDetails[0].EntryNotes;
   }
-  
+
   set entryNotes(value: string) {
     if (this.isCreateJournal) {
       this.createJournalObj.EntryNotes = value;
@@ -850,16 +852,26 @@ export class JournalViewDetailsComponent implements OnInit {
     this.objectWF.getDocument(this.Page.SupervisionJournal, this.journal?.SupervisionJournalID, 1).pipe(
     ).subscribe(
       data => {
-        this.journalDoc = data.response;
+        this.journalDoc = Array.isArray(data.response) ? data.response : [data.response]; // Ensure it's an array
+        this.FileLoc = this.journalDoc[0].FileLoc;
+        // Call constructDocUrl and subscribe to it
+        this.logForm.constructDocUrl(this.journalDoc).subscribe(
+          response => {
+            if (response) {
+              this.fileLocation = response.response[0].fileLoc;
+            }
+          },
+          error => {
+            console.error('Error constructing document URL:', error);
+          }
+        );
       },
       error => {
         console.error('Error loading document:', error);
         this.journalDoc = [];
-
       }
     );
   }
-
 
   // handleSelectedFilesChange(files: File | File[] | null): void {
   //   if (Array.isArray(files)) {
@@ -942,7 +954,7 @@ export class JournalViewDetailsComponent implements OnInit {
     );
   }
 
-  getDocumentTypes(){
+  getDocumentTypes() {
     const docTypeId = constants.FrimsObject.SupervisionJournal;
     this.objectWF.getDocumentType(docTypeId).subscribe({
       next: (res) => {
@@ -970,5 +982,5 @@ export class JournalViewDetailsComponent implements OnInit {
   sanitizeHtml(html: string): SafeHtml {
     return this.sanitizerService.sanitizeHtml(html);
   }
-  
+
 }

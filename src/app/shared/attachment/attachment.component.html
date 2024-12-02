@@ -8,18 +8,24 @@
   <div class="file-container" *ngIf="isEdit && !tableDoc?.DocSubTypeDesc">
 
     <!-- Press Release -->
-    <div class="input-field" *ngIf="pageName == Page.CoreDetail">
+    <div class="input-field" *ngIf="shouldShowInputs() && pageName == Page.CoreDetail">
       <label for="documentType"> Document Type </label>
-      <select [disabled]="!isEdit" class="document-type-select" name="documentType" id="documentType">
-        <option value="263">Press Releases</option>
+      <option [value]="0">Select</option>
+      <select class="document-type-select" name="documentType" id="documentType" [(ngModel)]="documentTypes.DocSubTypeID">
+        <option *ngFor="let type of documentTypes" [value]="type.DocSubTypeID">
+          {{ type.DocSubTypeDesc }}
+        </option>
       </select>
     </div>
 
     <!-- Scope of Authorisation -->
-    <div class="input-field" *ngIf="pageName == Page.Scope">
+    <div class="input-field" *ngIf="shouldShowInputs() && pageName == Page.Scope">
       <label>Document Type</label>
-      <select [(ngModel)]="DocSubTypeID.DocSubTypeID">
-        <option [value]="DocSubTypeID.DocSubTypeID">Scope of Authorisation</option>
+      <select name="documentTypes" id="documentTypes" [(ngModel)]="documentTypes.DocSubTypeID">
+        <option [value]="0">Select</option>
+        <option *ngFor="let type of documentTypes" [value]="type.DocSubTypeID">
+          {{ type.DocSubTypeDesc }}
+        </option>
       </select>
     </div>
 
@@ -45,11 +51,22 @@
       </select>
     </div>
 
+    <!-- Enforcement -->
+    <div class="input-field" *ngIf="pageName == Page.RegisteredFunds">
+      <label>Document Type</label>
+      <select name="documentTypes" id="documentTypes" [(ngModel)]="documentTypes.DocSubTypeID">
+        <option [value]="0">Select</option>
+        <option *ngFor="let type of documentTypes" [value]="type.DocSubTypeID">
+          {{ type.DocSubTypeDesc }}
+        </option>
+      </select>
+    </div>
 
-    <div class="input-field" style="flex-direction: row;" *ngIf="!tableDoc?.DocSubTypeDesc">
+
+    <div class="input-field" style="flex-direction: row;" *ngIf="shouldShowButtons()">
       <label id="uploaded-documents"></label>
     </div>
-    <div class="input-field" *ngIf="!tableDoc?.DocSubTypeDesc">
+    <div class="input-field" *ngIf="shouldShowButtons()">
       <div class="btns-container">
         <div class="upload-container">
           <button class="choose-document-btn" (click)="selectDocument()">
@@ -75,19 +92,17 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
+        <tr *ngFor="let doc of tableDoc">
           <td style="text-align: left">
-            <span [style.color]="tableDoc?.DocSubTypeDesc ? 'inherit' : 'red'">
-              {{ tableDoc?.DocSubTypeDesc || 'No documents attached' }}
+            <span [style.color]="doc.DocSubTypeDesc ? 'inherit' : 'red'">
+              {{ doc.DocSubTypeDesc || 'No documents attached' }}
             </span>
           </td>
           <td style="text-align: left">
-            <a id="websiteLink" href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{
-              tableDoc?.FileLoc
-            }}" target="_blank">{{ tableDoc?.FileName }}</a>
+            <a [href]="fileLocation" target="_blank">{{ doc.FileName }}</a>
           </td>
           <td *ngIf="isEdit" style="text-align: center">
-            <button class="delete-action" *ngIf="tableDoc?.DocSubTypeDesc" (click)="showAlertDeleteFile()">
+            <button class="delete-action" *ngIf="doc.DocSubTypeDesc" (click)="showAlertDeleteFile(doc)">
               Delete
             </button>
           </td>
@@ -95,6 +110,7 @@
       </tbody>
     </table>
   </div>
+  
 </div>
 <!--Select Document PopUp-->
 <div *ngIf="callUploadDoc" class="overlay show"></div>

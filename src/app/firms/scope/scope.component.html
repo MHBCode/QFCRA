@@ -476,9 +476,11 @@
           <div class="inputs-row">
             <app-attachment [documentObj]="documentObj" [tableDoc]="scopeOfAuthTableDoc" [pageName]="Page.Scope"
               [param1]="ActivityAuth[0].FirmScopeID" [param2]="ActivityAuth[0].ScopeRevNum" [isEdit]="isEditModeAuth"
-              [DocSubTypeID]="fetchedScopeDocSubTypeID" [loadDocuments]="loadDocuments.bind(this)"
+              [documentTypes]="fetchedDocumentTypes" [loadDocuments]="loadDocuments.bind(this)"
               (documentUploaded)="onDocumentUploaded($event)" [selectedFile]="selectedFile"
-              (selectedFileChange)="selectedFile = $event" [newfileNum]="newfileNum">
+              (selectedFileChange)="selectedFile = $event" [newfileNum]="newfileNum"
+              [FileLoc]="FileLoc"
+              [fileLocation]="fileLocation">
             </app-attachment>
           </div>
         </div>

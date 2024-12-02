@@ -81,6 +81,9 @@ export class ScopeComponent implements OnInit {
   sectorDetails: any = [];
   islamicFinance: any = {};
   scopeOfAuthTableDoc: any = [];
+  fetchedDocumentTypes: any = [];
+  fileLocation: string = '';
+  FileLoc: string = '';
   hasValidationErrors: boolean = false;
   invalidActivity: boolean;
   existingActivities: any = [];
@@ -104,7 +107,6 @@ export class ScopeComponent implements OnInit {
   fileError: string = '';
   callUploadDoc: boolean = false;
   formReferenceDocs: any = [];
-  fetchedScopeDocSubTypeID: any = {};
   callRefForm: boolean = false;
   currentAuthRevisionNumber: number | null = null;
   lastAuthRevisionNumber: number | null = null;
@@ -138,7 +140,6 @@ export class ScopeComponent implements OnInit {
       this.populateAuthorisationCategoryTypes();
       this.populatePrudentialCategoryTypes();
       this.populateFirmScopeTypes();
-      this.loadDocuments();
 
       // Security
       forkJoin([
@@ -170,7 +171,7 @@ export class ScopeComponent implements OnInit {
       this.firmDetailsService.checkFirmAuthorisation(this.firmId);
     })
 
-    this.fetchSubTypeDocIDs();
+    this.getDocumentTypes();
   }
 
   ngAfterViewInit() {
@@ -412,7 +413,7 @@ export class ScopeComponent implements OnInit {
             this.loadPrudentialCategoryDetails(),
             this.loadSectorDetails(),
             this.loadIslamicFinance(),
-            this.loadScopeOfAuthDoc(),
+            this.loadDocuments(),
             this.loadFormReference(),
           ]).subscribe(
             () => {
@@ -521,28 +522,26 @@ export class ScopeComponent implements OnInit {
     );
   }
 
-  loadScopeOfAuthDoc() {
-    const firstActivity = this.ActivityAuth[0];
-    this.objectWF.getDocument(this.Page.Scope, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
-    ).subscribe(
-      data => {
-        this.scopeOfAuthTableDoc = data.response;
-        console.log('Document Data:', data);
+  // fetchSubTypeDocIDs() {
+  //   this.securityService.getObjectTypeTable(this.userId, constants.docSubTypes, constants.ObjectOpType.Edit).subscribe(data => {
+  //     // Scope Of Authorsation in Scope Authorised
+  //     this.fetchedScopeDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
+  //       item.DocSubTypeID === 262
+  //     );
+  //   });
+  // }
+
+  getDocumentTypes() {
+    const docTypeId = constants.FrimsObject.Scope;
+    this.objectWF.getDocumentType(docTypeId).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.fetchedDocumentTypes = res.response;
       },
-      error => {
-        console.error('Error loading document:', error);
-        this.scopeOfAuthTableDoc = [];
-
-      }
-    );
-  }
-
-  fetchSubTypeDocIDs() {
-    this.securityService.getObjectTypeTable(this.userId, constants.docSubTypes, constants.ObjectOpType.Edit).subscribe(data => {
-      // Scope Of Authorsation in Scope Authorised
-      this.fetchedScopeDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
-        item.DocSubTypeID === 262
-      );
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error deleting RegisteredFund', error);
+      },
     });
   }
 
@@ -562,7 +561,7 @@ export class ScopeComponent implements OnInit {
         intranetGuid,
         constants.DocType.SCOPE,
         this.Page.Scope,
-        this.fetchedScopeDocSubTypeID.DocSubTypeID,
+        this.fetchedDocumentTypes.DocSubTypeID,
         this.ActivityAuth[0].FirmScopeID,
         this.ActivityAuth[0].ScopeRevNum
       );
@@ -590,8 +589,18 @@ export class ScopeComponent implements OnInit {
     this.objectWF.getDocument(this.Page.Scope, firstActivity.FirmScopeID, firstActivity.ScopeRevNum).pipe(
     ).subscribe(
       data => {
-        this.scopeOfAuthTableDoc = data.response;
-        console.log('Document Data:', data);
+        this.scopeOfAuthTableDoc = Array.isArray(data.response) ? data.response : [data.response]; // Ensure it's an array
+        this.FileLoc = this.scopeOfAuthTableDoc[0].FileLoc;
+        this.logForm.constructDocUrl(this.scopeOfAuthTableDoc).subscribe(
+          response => {
+            if (response) {
+              this.fileLocation = response.response[0].fileLoc;
+            }
+          },
+          error => {
+            console.error('Error constructing document URL:', error);
+          }
+        );
       },
       error => {
         console.error('Error loading document:', error);
@@ -600,6 +609,7 @@ export class ScopeComponent implements OnInit {
       }
     );
   }
+
   prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number, objectId: number, docSubTypeID: number, objectInstanceID: number, objectInstanceRevNum: number) {
     return {
       userId: userId,
