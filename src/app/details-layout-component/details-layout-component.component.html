@@ -75,7 +75,7 @@
             <i class="menu-icons bi bi-kanban" *ngIf="closedMenu"></i>
             <div class="sub-menu" *ngIf="!closedMenu && activeMenu === 'supervision'">
                 <a class="menu-sub-item" [routerLink]="['/supervision/view', firmId]" routerLinkActive="active">
-                    Supervision Overview
+                    Supervision
                 </a>
                 <a class="menu-sub-item" [routerLink]="['/supervision/view/reporting-schedule', firmId]"
                     routerLinkActive="active" *ngIf="isMenuItemAllowed('hlReportingSch')">

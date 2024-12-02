@@ -30,12 +30,13 @@ export class AttachmentComponent implements OnInit {
   @Input() selectedFiles: File[] = [];
   @Input() newfileNum: number;
   @Input() documentTypes: any = [];
-  @Input() ismultiple : boolean = false;
-  
+  @Input() ismultiple: boolean = false;
+
   intranetSitePath = 'https://ictmds.sharepoint.com/sites/QFCRA';
   filePathAfterDocLib = "";
   strUserEmailAddress = 'k.thomas@ictmds.onmicrosoft.com';
-  fileLocation: string;
+  @Input() FileLoc: string = '';
+  @Input() fileLocation: string = '';
 
   Page = FrimsObject;
   fileError: string = '';
@@ -49,7 +50,7 @@ export class AttachmentComponent implements OnInit {
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   @Output() documentUploaded = new EventEmitter<any>();
   @Output() selectedFileChange = new EventEmitter<File | null>();
-  @Output() selectedFilesChange = new EventEmitter<File | File[] | null>(); 
+  @Output() selectedFilesChange = new EventEmitter<File | File[] | null>();
 
   constructor(
     private router: Router,
@@ -90,7 +91,7 @@ export class AttachmentComponent implements OnInit {
       }
     }
   }
-  
+
   private closeUploadPopup() {
     this.callUploadDoc = false;
     const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
@@ -102,11 +103,11 @@ export class AttachmentComponent implements OnInit {
       }
     }, 0);
   }
-  
+
   uploadDocument() {
     this.hasValidationErrors = false;
     this.isLoading = true;
-  
+
     if (this.ismultiple) {
       if (!this.selectedFiles.length) {
         this.getErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
@@ -122,13 +123,13 @@ export class AttachmentComponent implements OnInit {
         delete this.errorMessages['uploadDocument'];
       }
     }
-  
+
     if (this.hasValidationErrors) {
       this.firmDetailsService.showErrorAlert(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
       this.isLoading = false;
       return;
     }
-  
+
     if (this.ismultiple) {
       this.selectedFiles.forEach((file, index) => {
         this.uploadSingleFile(file, index === this.selectedFiles.length - 1); // Ensure the last file toggles the loading flag
@@ -137,8 +138,8 @@ export class AttachmentComponent implements OnInit {
       this.uploadSingleFile(this.selectedFile, true); // Single file case
     }
   }
-  
-   uploadSingleFile(file: File, isLastFile: boolean) {
+
+  uploadSingleFile(file: File, isLastFile: boolean) {
     const strfileName = file.name;
     debugger;
     this.sharepointService.uploadFileToSharepoint(
@@ -150,11 +151,11 @@ export class AttachmentComponent implements OnInit {
     ).subscribe({
       next: (response: SharePointUploadResponse) => {
         console.log('File uploaded successfully', response);
-  
+
         const [fileLocation, intranetGuid] = response.result.split(';');
         this.fileLocation = fileLocation;
         this.documentUploaded.emit({ fileLocation, intranetGuid });
-  
+
         const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
         if (uploadedDocumentsDiv) {
           const currentFiles = uploadedDocumentsDiv.textContent || '';
@@ -162,7 +163,7 @@ export class AttachmentComponent implements OnInit {
             ? `${currentFiles}${currentFiles ? ', ' : ''}${file.name}`
             : file.name;
         }
-  
+
         if (isLastFile) {
           this.closeUploadPopup();
           this.uploadFileSuccess(constants.DocumentAttechment.saveDocument);
@@ -176,12 +177,12 @@ export class AttachmentComponent implements OnInit {
       },
     });
   }
-  
+
 
   deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number) {
-    if (this.fileLocation) {  
+    if (this.FileLoc) {
       this.isLoading = true;
-      this.sharepointService.deleteFileFromSharepoint(this.intranetSitePath, this.fileLocation).subscribe({
+      this.sharepointService.deleteFileFromSharepoint(this.intranetSitePath, this.FileLoc).subscribe({
         next: () => {
           console.log('File deleted from SharePoint successfully');
 
@@ -240,6 +241,30 @@ export class AttachmentComponent implements OnInit {
     this.isLoading = false;
   }
 
+  shouldShowInputs(): boolean {
+    // Hide dropdown and buttons if files exist and the page is CoreDetail or Scope
+    return !(
+      (this.pageName === this.Page.Scope || this.pageName === this.Page.CoreDetail) &&
+      this.tableDoc?.length > 0
+    );
+  }
+
+  shouldShowButtons(): boolean {
+    if (this.pageName === this.Page.Scope || this.pageName === this.Page.CoreDetail) {
+      // Hide buttons if there's an uploaded file
+      return !this.tableDoc?.length;
+    } else if 
+    (
+      this.pageName === this.Page.Enforcement || this.pageName === this.Page.SupervisionJournal ||
+      this.pageName === this.Page.RegisteredFunds
+    ) {
+      // Always show buttons on these pages
+      return true;
+    }
+    return false; // Default to hiding if no condition is met
+  }
+  
+
   getErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
     this.logForm.errorMessages(msgKey).subscribe(
       (response) => {
@@ -254,7 +279,7 @@ export class AttachmentComponent implements OnInit {
 
 
 
-  showAlertDeleteFile() {
+  showAlertDeleteFile(doc: any) {
     Swal.fire({
       text: 'Do you really want to delete this attachment?',
       icon: 'warning',
@@ -263,13 +288,17 @@ export class AttachmentComponent implements OnInit {
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.deleteDocument(this.tableDoc.DocID, this.pageName, this.param1, this.param2);
+        // Use doc.DocID for the correct deletion logic
+        this.deleteDocument(doc.DocID, this.pageName, this.param1, this.param2);
+
+        // Reload documents after deletion
         this.loadDocuments();
       } else if (result.isDismissed) {
         return;
       }
     });
   }
+
 
 
   selectDocument() {

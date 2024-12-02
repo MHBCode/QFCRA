@@ -62,6 +62,7 @@ export class RegFundsComponent {
       },
       error => {
         console.error('Error fetching Firm regFunds ', error);
+        this.isLoading = false;
       }
     );
   }

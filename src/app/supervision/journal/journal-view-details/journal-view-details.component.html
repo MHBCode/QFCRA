@@ -196,7 +196,9 @@
                       [loadDocuments]="loadDocuments.bind(this)"
                       (documentUploaded)="onDocumentUploaded($event)" 
                       [selectedFile]="selectedFile"
-                      (selectedFileChange)="selectedFile = $event">
+                      (selectedFileChange)="selectedFile = $event"
+                      [FileLoc]="FileLoc"
+                      [fileLocation]="fileLocation">
                     </app-attachment>
                   </ng-container>
             </div>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output,ChangeDetectorRef, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectorRef, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { ReturnReviewService } from 'src/app/ngServices/return-review.service';
 import { SupervisionService } from '../../supervision.service';
 import { SecurityService } from 'src/app/ngServices/security.service';
@@ -9,15 +9,17 @@ import { ActivatedRoute } from '@angular/router';
 import { RegisteredfundService } from 'src/app/ngServices/registeredfund.service';
 import { Bold, ClassicEditor, Essentials, Font, FontColor, FontSize, Heading, Indent, IndentBlock, Italic, Link, List, MediaEmbed, Paragraph, Table, Undo } from 'ckeditor5';
 import Swal from 'sweetalert2';
-import {ObjectwfService} from 'src/app/ngServices/objectwf.service';
+import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';
 import { SafeHtml } from '@angular/platform-browser';
+import { tap } from 'rxjs';
+import { FrimsObject } from 'src/app/app-constants';
 
 @Component({
   selector: 'app-reg-funds-view',
   templateUrl: './reg-funds-view.component.html',
-  styleUrls: ['./reg-funds-view.component.scss' ,'../../../shared/popup.scss', '../../supervision.scss']
+  styleUrls: ['./reg-funds-view.component.scss', '../../../shared/popup.scss', '../../supervision.scss']
 })
 export class RegFundsViewComponent {
   @Input() reg: any;
@@ -28,21 +30,36 @@ export class RegFundsViewComponent {
   isEditable: boolean = false;
   isLoading: boolean = true;
   userId = 30;
-  RegisteredFundDetials:any =[];
-  RegisteredFundStatusDetials:any = [];
-  TypeOfFunddropdown : any ;
-  RFFundStatusdropdown : any ;
-  SubFundData : any;
+  RegisteredFundDetials: any = [];
+  RegisteredFundStatusDetials: any = [];
+  TypeOfFunddropdown: any;
+  RFFundStatusdropdown: any;
+  SubFundData: any;
   now = new Date();
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
+
+  //Documents
+  regFundsDoc: any[] = [];
+  fetchedDocumentTypes: any = [];
+  fileLocation: string = '';
+  FileLoc: string = '';
+  documentObj: any;
+  // selectedFiles: File[] = [];
+  newfileNum: number;
+  selectedFile: File | null = null;
+  fileError: string = '';
+
+  Page = FrimsObject;
+
+
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
   constructor(
     private returnReviewService: ReturnReviewService,
     private supervisionService: SupervisionService,
     private securityService: SecurityService,
     private route: ActivatedRoute,
-    private logForm : LogformService,
+    private logForm: LogformService,
     private registeredFundService: RegisteredfundService,
     private firmDetailsService: FirmDetailsService,
     private objectwfService: ObjectwfService,
@@ -62,8 +79,8 @@ export class RegFundsViewComponent {
     this.getTypeOfFunddropdown();
     this.getRFFundStatusdropdown();
     this.getRegisteredFundDetail();
-    this.getDocumentType();
     this.initializeDefaults();
+    this.loadDocuments();
   }
   ngAfterViewInit() {
     this.dateInputs.changes.subscribe(() => {
@@ -74,41 +91,47 @@ export class RegFundsViewComponent {
   onClose(): void {
     this.closeRegPopup.emit();
   }
-  getRegisteredFundDetail(){
-    this.isLoading=true;
-     
-    const  RegisteredFundID= this.reg.RegisteredFundID;
-    const  firmId= this.firmId;
-    const  userId= this.userId;
-  
-    this.registeredFundService.getFIRMRegisteredFundDetials(userId,firmId,RegisteredFundID).subscribe({
+
+  cancelReg() {
+    this.isEditable = false;
+    this.getRegisteredFundDetail();
+  }
+
+  getRegisteredFundDetail() {
+    this.isLoading = true;
+
+    const RegisteredFundID = this.reg.RegisteredFundID;
+    const firmId = this.firmId;
+    const userId = this.userId;
+
+    this.registeredFundService.getFIRMRegisteredFundDetials(userId, firmId, RegisteredFundID).subscribe({
       next: (res) => {
         // Assign full response to firmRevDetails
         this.RegisteredFundDetials = res.response;
-        console.log("RegisteredFundDetials",this.RegisteredFundDetials)
+        console.log("RegisteredFundDetials", this.RegisteredFundDetials)
         this.getRegisteredFundStatus();
         this.getSubFundData();
-        this.isLoading=false;
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error fetching return review details:', error);
       },
     });
   }
-  getRegisteredFundStatus(){
-    const  RegisteredFundID= this.reg.RegisteredFundID;
+  getRegisteredFundStatus() {
+    const RegisteredFundID = this.reg.RegisteredFundID;
     this.registeredFundService.getRegisteredFundStatus(RegisteredFundID).subscribe({
       next: (res) => {
         // Assign full response to firmRevDetails
         this.RegisteredFundStatusDetials = res.response;
-        console.log("RegisteredFundStatusDetials",this.RegisteredFundStatusDetials)
+        console.log("RegisteredFundStatusDetials", this.RegisteredFundStatusDetials)
       },
       error: (error) => {
         console.error('Error fetching return review details:', error);
       },
     });
   }
-  
+
   getSubFundData() {
     const RegisteredFundID = this.reg.RegisteredFundID;
     this.registeredFundService.getSubFundData(RegisteredFundID).subscribe({
@@ -132,57 +155,57 @@ export class RegFundsViewComponent {
       dateTo: "",
       FirmID: this.firmId,
       typeOfSubFund: "",
-       userID: this.userId,
+      userID: this.userId,
     });
   }
-  
+
   // Remove a Sub-Fund
   removeSubFund(index: number) {
     this.SubFundData.splice(index, 1);
   }
-confirmDeleteRegisteredFund() {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: "You won't be able to revert this!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, delete it!'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      this.deleteRegisteredFund();
-    }
-  });
-}
+  confirmDeleteRegisteredFund() {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteRegisteredFund();
+      }
+    });
+  }
 
-deleteRegisteredFund() {
-  const RegisteredFundID = this.reg.RegisteredFundID;
-  this.isLoading = true; // Optionally show a loader
-  this.registeredFundService.deleteRegisteredFund(RegisteredFundID).subscribe({
-    next: (res) => {
-      this.isLoading = false;
-      Swal.fire(
-        'Deleted!',
-        'Registered Fund has been deleted successfully.',
-        'success'
-      );
-      this.onClose();
-      this.fundDeleted.emit();
-    },
-    error: (error) => {
-      this.isLoading = false;
-      Swal.fire(
-        'Error!',
-        'Error occurred while deleting the Registered Fund details.',
-        'error'
-      );
-      console.error('Error deleting RegisteredFund', error);
-    },
-  });
-}
-  
- 
+  deleteRegisteredFund() {
+    const RegisteredFundID = this.reg.RegisteredFundID;
+    this.isLoading = true; // Optionally show a loader
+    this.registeredFundService.deleteRegisteredFund(RegisteredFundID).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        Swal.fire(
+          'Deleted!',
+          'Registered Fund has been deleted successfully.',
+          'success'
+        );
+        this.onClose();
+        this.fundDeleted.emit();
+      },
+      error: (error) => {
+        this.isLoading = false;
+        Swal.fire(
+          'Error!',
+          'Error occurred while deleting the Registered Fund details.',
+          'error'
+        );
+        console.error('Error deleting RegisteredFund', error);
+      },
+    });
+  }
+
+
 
 
   public Editor = ClassicEditor;
@@ -214,17 +237,17 @@ deleteRegisteredFund() {
     ],
     licenseKey: ''
   };
-  getTypeOfFunddropdown(){
+  getTypeOfFunddropdown() {
     this.isLoading = true
     const userId = this.userId;
     const dropdown = constants.TypeOfFund;
     const OpTypeId = constants.ObjectOpType.Create;
 
-    this.securityService.getObjectTypeTable(userId,dropdown,OpTypeId).subscribe({
+    this.securityService.getObjectTypeTable(userId, dropdown, OpTypeId).subscribe({
       next: (res) => {
         // Assign full response to firmRevDetails
         this.TypeOfFunddropdown = res.response;
-        console.log("TypeOfFunddropdown",this.TypeOfFunddropdown)
+        console.log("TypeOfFunddropdown", this.TypeOfFunddropdown)
       },
       error: (error) => {
         console.error('Error fetching return review details:', error);
@@ -232,26 +255,28 @@ deleteRegisteredFund() {
       },
     });
   }
-  getRFFundStatusdropdown(){
+  getRFFundStatusdropdown() {
     const userId = this.userId;
     const dropdown = constants.RFFundStatus;
     const OpTypeId = constants.ObjectOpType.Create;
 
-    this.securityService.getObjectTypeTable(userId,dropdown,OpTypeId).subscribe({
+    this.securityService.getObjectTypeTable(userId, dropdown, OpTypeId).subscribe({
       next: (res) => {
         // Assign full response to firmRevDetails
         this.RFFundStatusdropdown = res.response;
-        console.log("RFFundStatusdropdown",this.RFFundStatusdropdown)
+        console.log("RFFundStatusdropdown", this.RFFundStatusdropdown)
       },
       error: (error) => {
         console.error('Error fetching return review details:', error);
       },
     });
   }
+
   editRegFunds() {
-    
     this.isEditable = true
+    this.getDocumentTypes();
   }
+
   editlstSubFunds = {
     lstSubFunds: [
       {
@@ -268,51 +293,51 @@ deleteRegisteredFund() {
   //        previousName: this..previousName,
   //        otherEntities: this..otherEntities,
   //        rfNotes: this..rfNotes,
-  SaveUpdateRegFunds(){
+  SaveUpdateRegFunds() {
     this.isLoading = true;
     const saveUpdateRegisteredFundObj = {
-       objRF: {
-         registeredFundID: this.RegisteredFundDetials[0].RegisteredFundID,
-         FirmID: this.firmId,
-         firmName: this.firmDetails.firmName,
-         typeOfFundID: this.typeOfFundID || 1,
-         fundNumber: this.RegisteredFundDetials[0].RegisteredFundNumber,
-         typeOFFundDesc: "",
-         fundName : this.RegisteredFundDetials[0].FundName,
-         userID: this.userId,
-         createdByName: this.RegisteredFundDetials[0].CreatedByName,
-         createdByDate: "",
-         rfNotes: this.RegisteredFundDetials[0].RegisteredFundNotes,
-         previousName:this.RegisteredFundDetials[0].PreviousNames,
-         otherEntities:this.RegisteredFundDetials[0].OtherRelatedEntityName,
-         lastModifiedByName: this.RegisteredFundDetials[0].LastModifiedByName,
-         lastModifieDate: this.currentDate,
-         registeredFundStatusTypeID: this.registeredFundStatusTypeID || 1,
-         registeredFundStatusTypeDesc: this.RegisteredFundDetials[0].RegisteredFundStatusTypeDesc,
-         registeredFundStatusDate: this.RegisteredFundDetials[0].RegisteredFundStatusDate,
-         registeredFundStatusID: this.RegisteredFundDetials[0].RegisteredFundStatusID,
-         statusSetByName: "",
-         statusSetDate: ""
-       },
-       lstSubFunds: this.SubFundData
-     }
-     console.log("RegisteredFund object to be save",saveUpdateRegisteredFundObj)
-     
-     this.registeredFundService.saveUpdateRegisteredFund(saveUpdateRegisteredFundObj).subscribe({
-       next: (res) => {
-         
-         console.log("Registered Fund saved successfully")
-         this.firmDetailsService.showSaveSuccessAlert(constants.RegisteredFund_Messages.RegisteredFund_Saved_SUCCESSFULLY);
-         this.onClose();
-         this.fundDeleted.emit();
-       },
-       error: (error) => {
-         console.error('Error saving Registered Fund:', error);
-       },
-     });
-   }
+      objRF: {
+        registeredFundID: this.RegisteredFundDetials[0].RegisteredFundID,
+        FirmID: this.firmId,
+        firmName: this.firmDetails.firmName,
+        typeOfFundID: this.typeOfFundID || 1,
+        fundNumber: this.RegisteredFundDetials[0].RegisteredFundNumber,
+        typeOFFundDesc: "",
+        fundName: this.RegisteredFundDetials[0].FundName,
+        userID: this.userId,
+        createdByName: this.RegisteredFundDetials[0].CreatedByName,
+        createdByDate: "",
+        rfNotes: this.RegisteredFundDetials[0].RegisteredFundNotes,
+        previousName: this.RegisteredFundDetials[0].PreviousNames,
+        otherEntities: this.RegisteredFundDetials[0].OtherRelatedEntityName,
+        lastModifiedByName: this.RegisteredFundDetials[0].LastModifiedByName,
+        lastModifieDate: this.currentDate,
+        registeredFundStatusTypeID: this.registeredFundStatusTypeID || 1,
+        registeredFundStatusTypeDesc: this.RegisteredFundDetials[0].RegisteredFundStatusTypeDesc,
+        registeredFundStatusDate: this.RegisteredFundDetials[0].RegisteredFundStatusDate,
+        registeredFundStatusID: this.RegisteredFundDetials[0].RegisteredFundStatusID,
+        statusSetByName: "",
+        statusSetDate: ""
+      },
+      lstSubFunds: this.SubFundData
+    }
+    console.log("RegisteredFund object to be save", saveUpdateRegisteredFundObj)
 
-   initializeDefaults(): void {
+    this.registeredFundService.saveUpdateRegisteredFund(saveUpdateRegisteredFundObj).subscribe({
+      next: (res) => {
+
+        console.log("Registered Fund saved successfully")
+        this.firmDetailsService.showSaveSuccessAlert(constants.RegisteredFund_Messages.RegisteredFund_Saved_SUCCESSFULLY);
+        this.onClose();
+        this.fundDeleted.emit();
+      },
+      error: (error) => {
+        console.error('Error saving Registered Fund:', error);
+      },
+    });
+  }
+
+  initializeDefaults(): void {
     this.RegisteredFundDetials.forEach((detail) => {
       // Ensure RegisteredFundTypeID is set
       if (!detail.RegisteredFundTypeID && this.TypeOfFunddropdown.length > 0) {
@@ -321,7 +346,7 @@ deleteRegisteredFund() {
         );
         detail.RegisteredFundTypeID = defaultType?.RegisteredFundTypeID || this.TypeOfFunddropdown[0].RegisteredFundTypeID;
       }
-  
+
       // Ensure RegisteredFundStatusTypeID is set
       if (!detail.RegisteredFundStatusTypeID && this.RFFundStatusdropdown.length > 0) {
         const defaultStatus = this.RFFundStatusdropdown.find(
@@ -333,72 +358,156 @@ deleteRegisteredFund() {
     });
   }
 
-typeOfFundID: number | null = null; 
-onFundTypeChange(event: Event, RegFundDetials: any): void {
-  const selectedDesc = (event.target as HTMLSelectElement).value;
+  typeOfFundID: number | null = null;
+  onFundTypeChange(event: Event, RegFundDetials: any): void {
+    const selectedDesc = (event.target as HTMLSelectElement).value;
 
-  // Find the corresponding ID
-  const selectedOption = this.TypeOfFunddropdown.find(
-    (option) => option.RegisteredFundTypeDesc === selectedDesc
-  );
+    // Find the corresponding ID
+    const selectedOption = this.TypeOfFunddropdown.find(
+      (option) => option.RegisteredFundTypeDesc === selectedDesc
+    );
 
-  if (selectedOption) {
-    RegFundDetials.RegisteredFundTypeID = selectedOption.RegisteredFundTypeID;
-    this.typeOfFundID = selectedOption.RegisteredFundTypeID; // Store in typeOfFundID
-    console.log('Selected ID stored in typeOfFundID:', this.typeOfFundID);
-  } else {
-    console.warn('No matching ID found for description:', selectedDesc);
-    this.typeOfFundID = null; // Reset if no match
+    if (selectedOption) {
+      RegFundDetials.RegisteredFundTypeID = selectedOption.RegisteredFundTypeID;
+      this.typeOfFundID = selectedOption.RegisteredFundTypeID; // Store in typeOfFundID
+      console.log('Selected ID stored in typeOfFundID:', this.typeOfFundID);
+    } else {
+      console.warn('No matching ID found for description:', selectedDesc);
+      this.typeOfFundID = null; // Reset if no match
+    }
   }
-}
-registeredFundStatusTypeID: number | null = null; 
-onSatusTypeChange(event: Event, RegFundDetials: any): void {
-  const selectedDesc = (event.target as HTMLSelectElement).value;
+  registeredFundStatusTypeID: number | null = null;
+  onSatusTypeChange(event: Event, RegFundDetials: any): void {
+    const selectedDesc = (event.target as HTMLSelectElement).value;
 
-  // Find the corresponding ID
-  const selectedOption = this.RFFundStatusdropdown.find(
-    (option) => option.RegisteredFundStatusTypeDesc === selectedDesc
-  );
+    // Find the corresponding ID
+    const selectedOption = this.RFFundStatusdropdown.find(
+      (option) => option.RegisteredFundStatusTypeDesc === selectedDesc
+    );
 
-  if (selectedOption) {
-    RegFundDetials.RegisteredFundStatusTypeID = selectedOption.RegisteredFundStatusTypeID;
-    this.registeredFundStatusTypeID = selectedOption.RegisteredFundStatusTypeID; // Store in typeOfFundID
-    console.log('Selected ID stored in typeOfFundID:', this.registeredFundStatusTypeID);
-  } else {
-    console.warn('No matching ID found for description:', selectedDesc);
-    this.registeredFundStatusTypeID = null; // Reset if no match
+    if (selectedOption) {
+      RegFundDetials.RegisteredFundStatusTypeID = selectedOption.RegisteredFundStatusTypeID;
+      this.registeredFundStatusTypeID = selectedOption.RegisteredFundStatusTypeID; // Store in typeOfFundID
+      console.log('Selected ID stored in typeOfFundID:', this.registeredFundStatusTypeID);
+    } else {
+      console.warn('No matching ID found for description:', selectedDesc);
+      this.registeredFundStatusTypeID = null; // Reset if no match
+    }
   }
-}
-///// docs 
-DocumentTypeList :any;
-getDocumentType(){
-  const docTypeId = constants.FrimsObject.RegisteredFunds;
-  this.objectwfService.getDocumentType(docTypeId).subscribe({
-    next: (res) => {
-      this.DocumentTypeList = res.response;
-      console.log("DocumentTypeList",this.DocumentTypeList)
-    },
-    error: (error) => {
-      console.error('Error deleting RegisteredFund', error);
-    },
-  });
-}
-TheDocument : any;
-getDocument(){
-  const objectId = constants.FrimsObject.RegisteredFunds;
-  const objectInstanceId = this.RegisteredFundDetials[0].RegisteredFundID
-  this.TheDocument.getDocument(objectId,objectInstanceId).subscribe({
-    next: (res) => {
-      this.TheDocument = res.response;
-    },
-    error: (error) => {
+  ///// docs 
+  // Documents
+  loadDocuments() {
+    this.objectwfService.getDocument(this.Page.RegisteredFunds, this.reg?.RegisteredFundID, 1).pipe(
+    ).subscribe(
+      data => {
+        this.regFundsDoc = Array.isArray(data.response) ? data.response : [data.response]; // Ensure it's an array
+        this.FileLoc = this.regFundsDoc[0].FileLoc;
+        this.logForm.constructDocUrl(this.regFundsDoc).subscribe(
+          response => {
+            if (response) {
+              this.fileLocation = response.response[0].fileLoc;
+            }
+          },
+          error => {
+            console.error('Error constructing document URL:', error);
+          }
+        );
+      },
+      error => {
+        console.error('Error loading document:', error);
+        this.regFundsDoc = [];
 
-      console.error('Error deleting RegisteredFund', error);
-    },
-  });
-}
-sanitizeHtml(html: string): SafeHtml {
-  return this.sanitizerService.sanitizeHtml(html);
-}
+      }
+    );
+  }
+
+  getDocumentTypes() {
+    const docTypeId = constants.FrimsObject.RegisteredFunds;
+    this.objectwfService.getDocumentType(docTypeId).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.fetchedDocumentTypes = res.response;
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error deleting RegisteredFund', error);
+      },
+    });
+  }
+
+  async onDocumentUploaded(uploadedDocument: any) {
+    this.isLoading = true;
+
+    try {
+      // Call getNewFileNumber and wait for it to complete
+      await this.getNewFileNumber().toPromise();
+
+      // Continue with the rest of the code after getNewFileNumber completes
+      const { fileLocation, intranetGuid } = uploadedDocument;
+      this.documentObj = this.prepareDocumentObject(
+        this.userId,
+        fileLocation,
+        intranetGuid,
+        constants.DocType.RegisteredFund,
+        this.Page.RegisteredFunds,
+        this.fetchedDocumentTypes.DocSubTypeID,
+        this.reg?.RegisteredFundID,
+        1 // constant
+      );
+
+      this.objectwfService.insertDocument(this.documentObj).subscribe(
+        response => {
+          this.loadDocuments();
+          this.isLoading = false;
+        },
+        error => {
+          console.error('Error updating enforcement attachment:', error);
+          this.isLoading = false;
+        }
+      );
+    } catch (error) {
+      console.error('Error in getNewFileNumber:', error);
+      this.isLoading = false;
+    }
+  }
+
+  prepareDocumentObject(userId: number, fileLocation: string, intranetGuid: string, docType: number, objectId: number, docSubTypeID: number, objectInstanceID: number, objectInstanceRevNum: number) {
+    return {
+      userId: userId,
+      docID: null,
+      referenceNumber: null,
+      fileName: this.selectedFile.name,
+      fileNumber: this.newfileNum.toString(),
+      firmId: this.firmId,
+      otherFirm: null,
+      docTypeID: docType,
+      loggedBy: userId,
+      loggedDate: this.currentDate,
+      receivedBy: userId,
+      receivedDate: this.currentDate,
+      docRecieptMethodID: constants.LogFormRecieptMethods.InternalDocument,
+      checkPrimaryDocID: true,
+      fileLocation: fileLocation,
+      docAttributeID: null,
+      intranetGuid: intranetGuid,
+      objectID: objectId,
+      objectInstanceID: objectInstanceID,
+      objectInstanceRevNum: objectInstanceRevNum,
+      docSubType: docSubTypeID
+    };
+  }
+
+  getNewFileNumber() {
+    return this.logForm.getNewFileNumber(this.firmId, this.currentDate).pipe(
+      tap(data => {
+        this.newfileNum = data.response.Column1;
+      })
+    );
+  }
+
+
+  sanitizeHtml(html: string): SafeHtml {
+    return this.sanitizerService.sanitizeHtml(html);
+  }
 
 }

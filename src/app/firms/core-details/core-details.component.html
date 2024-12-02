@@ -266,10 +266,12 @@
         <!-- Aicha -->
         <div class="inputs-row">
             <app-attachment [documentObj]="documentObj" [isEdit]="isEditModeCore"
-                [DocSubTypeID]="fetchedCoreDetailDocSubTypeID" [loadDocuments]="loadDocuments.bind(this)"
+                [documentTypes]="fetchedDocumentTypes" [loadDocuments]="loadDocuments.bind(this)"
                 (documentUploaded)="onDocumentUploaded($event)" [selectedFile]="selectedFile"
                 (selectedFileChange)="selectedFile = $event" [tableDoc]="pressReleaseTableDoc"
-                [pageName]="Page.CoreDetail" [param1]="firmAppDetailsCurrentAuthorized?.FirmApplStatusID" [param2]="1">
+                [pageName]="Page.CoreDetail" [param1]="firmAppDetailsCurrentAuthorized?.FirmApplStatusID" [param2]="1"
+                [FileLoc]="FileLoc"
+                [fileLocation]="fileLocation">
             </app-attachment>
         </div>
 
@@ -798,31 +800,5 @@
     </div>
     <div class="popup-operations-place">
         <button class="subbutton" (click)="closeAddressTypeHistory()">Close</button>
-    </div>
-</div>
-
-
-<!--[Aicha] : Select Document PopUp-->
-<div *ngIf="callUploadDoc" class="overlay show"></div>
-<div *ngIf="callUploadDoc" class="selectDocumentPopUp popupcontainer">
-    <button type="button" (click)="closeSelectDocument()">
-        <i class="bi bi-x-circle close-icon"></i>
-    </button>
-    <i class="bi bi-x-circle close-icon" (click)="closeSelectDocument()"></i>
-    <div class="popup-info-place upload-container">
-        <div class="popup-header">
-            <h3>Upload Document</h3>
-        </div>
-        <div class="upload-document-body">
-            <p>Please browse and upload/attach document:</p>
-            <input type="file" accept=".pdf" #fileInput (change)="onFileSelected($event)" />
-        </div>
-        <small style="color: red" *ngIf="fileError">{{ fileError }}</small>
-    </div>
-    <div class="popup-operations-place">
-        <button style="margin-right: 5px" class="subbutton" (click)="confirmUpload()">
-            Ok
-        </button>
-        <button class="subbutton" (click)="closeSelectDocument()">Close</button>
     </div>
 </div>

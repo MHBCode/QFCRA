@@ -92,14 +92,13 @@ export class CoreDetailsComponent implements OnInit {
   allLegalStatus: any = [];
   newfileNum: number;
   pressReleaseTableDoc: any = [];
+  fileLocation: string = '';
+  FileLoc: string = '';
 
 
   // Aicha : Document 
-  callUploadDoc: boolean = false;
-  fileError: string = '';
   documentObj: any;
-  fetchedCoreDetailDocSubTypeID: any;
-  CoreDetailDocSubTypeID: any;
+  fetchedDocumentTypes: any = [];
 
   constructor(
     private securityService: SecurityService,
@@ -179,7 +178,7 @@ export class CoreDetailsComponent implements OnInit {
 
 
       // functions for documents
-      this.fetchSubTypeDocIDs();
+      this.getDocumentTypes();
     })
   }
 
@@ -1446,67 +1445,6 @@ export class CoreDetailsComponent implements OnInit {
     });
   }
 
-  // [Aicha] : Documents Functions to be moved to document component later
-  selectDocument() {
-    this.callUploadDoc = true;
-    setTimeout(() => {
-      const popupWrapper = document.querySelector('.selectDocumentPopUp') as HTMLElement;
-      if (popupWrapper) {
-        popupWrapper.style.display = 'flex';
-      } else {
-        console.error('Element with class .selectDocumentPopUp not found');
-      }
-    }, 0)
-  }
-
-  closeSelectDocument() {
-    this.callUploadDoc = false;
-    const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
-    setTimeout(() => {
-      if (popupWrapper) {
-        popupWrapper.style.display = 'none';
-      } else {
-        console.error('Element with class not found');
-      }
-    }, 0)
-  }
-
-  uploadDocument() {
-    if (!this.selectedFile) {
-      this.showError(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
-      this.loadErrorMessages('uploadDocument', constants.DocumentAttechment.selectDocument);
-    } else {
-      delete this.errorMessages['uploadDocument'];
-    }
-  }
-
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      const file = input.files[0];
-      if (file.type === 'application/pdf') {
-        this.selectedFile = file;
-        this.fileError = ''; // Clear any previous error message
-      } else {
-        this.fileError = 'Please select a valid PDF file.';
-        this.selectedFile = null;
-      }
-    }
-  }
-
-  confirmUpload() {
-    if (this.selectedFile) {
-      // Display the selected file name in the main section
-      const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
-      if (uploadedDocumentsDiv) {
-        uploadedDocumentsDiv.textContent = `Uploaded Document: ${this.selectedFile.name}`;
-      }
-      this.closeSelectDocument();
-    } else {
-      console.error('No valid PDF file selected.');
-    }
-  }
-
   loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
     this.firmDetailsService.getErrorMessages(fieldName, msgKey, null, null, placeholderValue).subscribe(
       () => {
@@ -1526,8 +1464,18 @@ export class CoreDetailsComponent implements OnInit {
     this.objectWF.getDocument(this.Page.CoreDetail, this.firmAppDetailsCurrentAuthorized.FirmApplStatusID, 1).pipe(
     ).subscribe(
       data => {
-        this.pressReleaseTableDoc = data.response;
-        console.log('Document Data:', data);
+        this.pressReleaseTableDoc = Array.isArray(data.response) ? data.response : [data.response]; // Ensure it's an array
+        this.FileLoc = this.pressReleaseTableDoc[0].FileLoc;
+        this.logForm.constructDocUrl(this.pressReleaseTableDoc).subscribe(
+          response => {
+            if (response) {
+              this.fileLocation = response.response[0].fileLoc;
+            }
+          },
+          error => {
+            console.error('Error constructing document URL:', error);
+          }
+        );
       },
       error => {
         console.error('Error loading document:', error);
@@ -1560,7 +1508,7 @@ export class CoreDetailsComponent implements OnInit {
         intranetGuid,
         constants.DocType.FIRM_DOCS,
         this.Page.CoreDetail,
-        this.fetchedCoreDetailDocSubTypeID.DocSubTypeID,
+        this.fetchedDocumentTypes.DocSubTypeID,
         this.firmAppDetailsCurrentAuthorized.FirmApplStatusID,
         1
       );
@@ -1603,11 +1551,17 @@ export class CoreDetailsComponent implements OnInit {
     };
   }
 
-  fetchSubTypeDocIDs() {
-    this.securityService.getObjectTypeTable(this.userId,constants.docSubTypes,constants.ObjectOpType.Edit).subscribe(data => {
-      this.fetchedCoreDetailDocSubTypeID = data.response.find((item: { DocSubTypeID: number }) =>
-        item.DocSubTypeID === 263
-      );
+  getDocumentTypes() {
+    const docTypeId = constants.FrimsObject.CoreDetail;
+    this.objectWF.getDocumentType(docTypeId).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.fetchedDocumentTypes = res.response;
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error deleting RegisteredFund', error);
+      },
     });
   }
 

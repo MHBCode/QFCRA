@@ -36,8 +36,10 @@ export class EnfActionsViewDetailsComponent implements OnInit {
 
   //Documents
   enfDoc: any[] = [];
-  fetchedDocumentTypes : any = [];
-  documentObj:any;
+  fetchedDocumentTypes: any = [];
+  fileLocation: string = '';
+  FileLoc: string = '';
+  documentObj: any;
   // selectedFiles: File[] = [];
   newfileNum: number;
   selectedFile: File | null = null;
@@ -325,7 +327,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     );
   }
 
-  getDocumentTypes(){
+  getDocumentTypes() {
     const docTypeId = constants.FrimsObject.Enforcement;
     this.objectWF.getDocumentType(docTypeId).subscribe({
       next: (res) => {
@@ -344,7 +346,18 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     this.objectWF.getDocument(this.Page.Enforcement, this.enf?.EnforcementAndDisciplinaryActnID, 1).pipe(
     ).subscribe(
       data => {
-        this.enfDoc = data.response;
+        this.enfDoc = Array.isArray(data.response) ? data.response : [data.response]; // Ensure it's an array
+        this.FileLoc = this.enfDoc[0].FileLoc;
+        this.logForm.constructDocUrl(this.enfDoc).subscribe(
+          response => {
+            if (response) {
+              this.fileLocation = response.response[0].fileLoc;
+            }
+          },
+          error => {
+            console.error('Error constructing document URL:', error);
+          }
+        );
       },
       error => {
         console.error('Error loading document:', error);
@@ -651,47 +664,6 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     this.closeEnfPopup.emit();
   }
 
-  // onActionTypeChange(event: Event): void {
-  //   const selectedType = +(event.target as HTMLSelectElement).value; // Convert value to number
-  //   this.enfTypeID = selectedType; // Update enfTypeID explicitly
-  //   this.showIndividualsDropdown = false; // Reset visibility of dropdown
-  //   this.selectedIndividualId = 0; // Reset selected individual
-
-  //   if (this.enfTypeID === 2 && this.firmDetails.FirmTypeID === 1) { // Approved Individual
-  //     this.populateApprovedIndividuals().subscribe(() => {
-  //       this.individuals = this.allApprovedIndividuals.map(individual => ({
-  //         id: individual.AppIndividualID,
-  //         name: individual.FullName
-  //       }));
-  //       this.showIndividualsDropdown = true; // Show dropdown
-  //     });
-  //   } else if (this.enfTypeID === 3 || this.enfTypeID === 6) { // Related Individuals
-  //     this.populateRelatedIndividuals().subscribe(() => {
-  //       if (this.allRelatedIndividuals.length > 0) {
-  //         this.individuals = this.allRelatedIndividuals.map(individual => ({
-  //           id: individual.ContactAssnID,
-  //           name: individual.ContactName
-  //         }));
-  //       } else {
-  //         this.individuals = []; // Ensure individuals is empty if no data
-  //       }
-  //       this.showIndividualsDropdown = true; // Keep the dropdown visible
-  //     });
-  //   } else if (this.enfTypeID === 5 && this.firmDetails.FirmTypeID === 2) { // Registered or Required Individuals
-  //     this.popuplateRequiredIndividuals(1).subscribe(() => {
-  //       this.individuals = this.allRequiredIndividuals.map(individual => ({
-  //         id: individual.ContactID,
-  //         name: individual.FullName
-  //       }));
-  //       this.showIndividualsDropdown = true; // Show dropdown
-  //     });
-  //   } else if (this.enfTypeID === 1 || this.enfTypeID === 4) {
-  //     this.showIndividualsDropdown = false; // Hide dropdown
-  //   } else {
-  //     this.showIndividualsDropdown = false; // Hide dropdown
-  //   }
-  // }
-
   onActionTypeChange(event: Event): void {
     const selectedType = +(event.target as HTMLSelectElement).value; // Convert value to number
     this.enfTypeID = selectedType; // Update enfTypeID explicitly
@@ -724,9 +696,9 @@ export class EnfActionsViewDetailsComponent implements OnInit {
       });
     } else if (this.enfTypeID === 1 || this.enfTypeID === 4) {
       this.showIndividualsDropdown = false;
-      this.selectedIndividualId = null; 
+      this.selectedIndividualId = null;
     } else {
-      this.showIndividualsDropdown = false; 
+      this.showIndividualsDropdown = false;
     }
   }
 
