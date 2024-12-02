@@ -2,6 +2,20 @@
 <!-- view & Edit popup  -->
 <div class="overlay">
   <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+    <div class="error-messages">
+      <p *ngIf="errorMessages['FundType']">
+          {{ errorMessages['FundType'] }}
+      </p>
+      <p *ngIf="errorMessages['FundName']">
+        {{ errorMessages['FundName'] }}
+      </p>
+      <p *ngIf="errorMessages['FundStatus']">
+        {{ errorMessages['FundStatus'] }}
+      </p>
+      <p *ngIf="errorMessages['StatusDate']">
+        {{ errorMessages['StatusDate'] }}
+      </p>
+  </div>
     <!-- Title -->
     <div class="popup-title-btn-row">
       <div class="popup-header">
@@ -163,25 +177,50 @@
                   name="statusDate-{{RegFundDetials.RegisteredFundID}}" [disabled]="!isEditable"
                   [(ngModel)]="RegFundDetials.RegisteredFundStatusDate" />
               </div>
-              <!-- <div class="input-field-notes">
-                
-                <label for="notes">Notes</label>
-                <div>
-                    <ckeditor [disabled]="!isEditable" [(ngModel)]="RegFundDetials.RegisteredFundNotes" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+        
+             
+            </div>
+            <div class="rpt-list margin-top-10">
+              <div class="popup-header">
+                <h3></h3>
+              </div>
+              <div class="inputs-row report-entry" *ngFor="let RegFundDetials of RegisteredFundDetials">
+                <div class="input-field">
+                  <label for="PreviousName-{{RegFundDetials.RegisteredFundID}}">Entered By</label>
+                  <input type="text" id="PreviousName-{{RegFundDetials.RegisteredFundID}}"
+                    name="PreviousName-{{RegFundDetials.RegisteredFundID}}" disabled
+                    [(ngModel)]="RegFundDetials.CreatedByName" />
                 </div>
-              </div> -->
-
-              <div class="input-field notes">
-                <label for="notes">Notes</label>
-                <div>
-                    <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="RegFundDetials.RegisteredFundNotes"
-                        [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                <div class="input-field">
+                  <label for="PreviousName-{{RegFundDetials.RegisteredFundID}}">Entered On</label>
+                  <input type="text" id="PreviousName-{{RegFundDetials.RegisteredFundID}}"
+                    name="PreviousName-{{RegFundDetials.RegisteredFundID}}" disabled
+                    [(ngModel)]="RegFundDetials.CreatedDate" />
                 </div>
-                <ng-template #notes>
-                    <p [innerHTML]="sanitizeHtml(RegFundDetials.RegisteredFundNotes)">
-                    </p>
-                </ng-template>
-               </div>
+                <div *ngIf="!isEditable" class="input-field">
+                  <label for="PreviousName-{{RegFundDetials.RegisteredFundID}}">Last Modified By</label>
+                  <input type="text" id="PreviousName-{{RegFundDetials.RegisteredFundID}}"
+                    name="PreviousName-{{RegFundDetials.RegisteredFundID}}" disabled
+                    [(ngModel)]="RegFundDetials.LastModifiedByName" />
+                </div>
+                <div *ngIf="!isEditable" class="input-field">
+                  <label for="PreviousName-{{RegFundDetials.RegisteredFundID}}">Last Modified Date</label>
+                  <input type="text" id="PreviousName-{{RegFundDetials.RegisteredFundID}}"
+                    name="PreviousName-{{RegFundDetials.RegisteredFundID}}" disabled
+                    [(ngModel)]="RegFundDetials.LastModifiedDate" />
+                </div>
+                <div class="input-field notes">
+                  <label for="notes">Notes</label>
+                  <div>
+                      <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="RegFundDetials.RegisteredFundNotes"
+                          [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                  </div>
+                  <ng-template #notes>
+                      <p [innerHTML]="sanitizeHtml(RegFundDetials.RegisteredFundNotes)">
+                      </p>
+                  </ng-template>
+                </div>
+              </div>
             </div>
             
           </ng-container>

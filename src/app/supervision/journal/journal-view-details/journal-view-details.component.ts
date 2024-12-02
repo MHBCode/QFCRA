@@ -582,7 +582,7 @@ export class JournalViewDetailsComponent implements OnInit {
     }
   }
 
-  async validateJournal(): Promise<boolean> {
+  async validateJournal(): Promise<boolean> { 
     this.hasValidationErrors = false;
 
     const entryType = this.isCreateJournal ? this.createJournalObj.JournalEntryTypeID : this.journalDetails[0].JournalEntryTypeID

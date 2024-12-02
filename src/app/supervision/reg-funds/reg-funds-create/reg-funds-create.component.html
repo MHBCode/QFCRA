@@ -3,6 +3,20 @@
 
  <div class="overlay">
     <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+      <div class="error-messages">
+        <p *ngIf="errorMessages['FundType']">
+            {{ errorMessages['FundType'] }}
+        </p>
+        <p *ngIf="errorMessages['FundName']">
+          {{ errorMessages['FundName'] }}
+        </p>
+        <p *ngIf="errorMessages['FundStatus']">
+          {{ errorMessages['FundStatus'] }}
+        </p>
+        <p *ngIf="errorMessages['StatusDate']">
+          {{ errorMessages['StatusDate'] }}
+        </p>
+    </div>
       <div class="popup-title-btn-row">
         <div class="popup-header">
           <h3>
@@ -15,7 +29,7 @@
       </div>
       <div class="reporting-schedule-form">
         <div class="inputs-row" >
-          <div class="input-field">
+          <!-- <div class="input-field">
             <label for="FundType">Type of Fund</label>
 
               <select name="fundType" id="fundType" (change)="onFundTypeChange($event,createRegFundsObj)" [(ngModel)]="createRegFundsObj.typeOfFundID">
@@ -24,6 +38,20 @@
                   {{ option.RegisteredFundTypeDesc }}
                 </option>
               </select>
+          </div> -->
+          <div class="input-field">
+            <label for="FundType">Type of Fund</label>
+            <select
+              name="fundType"
+              id="fundType"
+              (change)="onFundTypeChange($event, createRegFundsObj)"
+              [(ngModel)]="createRegFundsObj.typeOfFundID"
+            >
+              <option [value]="0">Select</option>
+              <option *ngFor="let option of TypeOfFunddropdown" [value]="option.RegisteredFundTypeID">
+                {{ option.RegisteredFundTypeDesc }}
+              </option>
+            </select>
           </div>
           <div class="input-field">
             <label for="operator">Operator</label>

@@ -29,6 +29,11 @@ export class RegFundsCreateComponent {
   now = new Date();
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
+
+   // Validations
+   hasValidationErrors: boolean = false;
+   errorMessages: { [key: string]: string } = {};
+
   constructor(
     private returnReviewService: ReturnReviewService,
     private supervisionService: SupervisionService,
@@ -162,7 +167,35 @@ export class RegFundsCreateComponent {
       },
     ],
   };
-  createUpdateRegFunds(){
+  async validateRegFunds(): Promise<boolean> {
+    this.hasValidationErrors = false;
+
+    if(this.typeOfFundID == null || this.typeOfFundID == undefined ||this.typeOfFundID == constants.TEXT_ZERO){
+      this.loadErrorMessages('FundType', constants.Specify_Valid_Response, 'Type of Fund');
+      this.hasValidationErrors = true;
+    }
+    if(this.createRegFundsObj.fundName == null || this.createRegFundsObj.fundName == '' || this.createRegFundsObj.fundName == undefined){
+      this.loadErrorMessages('FundName', constants.Specify_Valid_Response, 'Fund Name');
+      this.hasValidationErrors = true;
+    }
+    if(this.createRegFundsObj.registeredFundStatusTypeID == null || this.createRegFundsObj.registeredFundStatusTypeID == undefined ){
+      this.loadErrorMessages('FundStatus', constants.Specify_Valid_Response, 'Status');
+      this.hasValidationErrors = true;
+    }
+    if(this.createRegFundsObj.registeredFundStatusDate == null || this.createRegFundsObj.registeredFundStatusDate == ''){
+      this.loadErrorMessages('StatusDate', constants.InvoicesMessages.INVALID_DATA, 'StatusDate');
+      this.hasValidationErrors = true;
+    }
+    return !this.hasValidationErrors;
+  }
+ async createUpdateRegFunds(){
+    const isValid =  await this.validateRegFunds();
+
+    if (!isValid) {
+      this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ENTER_REQUIREDFIELD_PRIORSAVING);
+      this.isLoading = false;
+      return; 
+    }
    const saveUpdateRegisteredFundObj = {
       objRF: {
         registeredFundID: null,
@@ -221,22 +254,45 @@ export class RegFundsCreateComponent {
   removeSubFund(index: number) {
     this.createRegFundsObj.lstSubFunds.splice(index, 1);
   }
-  typeOfFundID: number | null = null; 
-onFundTypeChange(event: Event, RegFundDetials: any): void {
-  const selectedDesc = (event.target as HTMLSelectElement).value;
+//   typeOfFundID: number | null = null; 
+// onFundTypeChange(event: Event, RegFundDetials: any): void {
+//   const selectedDesc = (event.target as HTMLSelectElement).value;
 
-  // Find the corresponding ID
-  const selectedOption = this.TypeOfFunddropdown.find(
-    (option) => option.RegisteredFundTypeDesc === selectedDesc
-  );
+//   // Find the corresponding ID
+//   const selectedOption = this.TypeOfFunddropdown.find(
+//     (option) => option.RegisteredFundTypeDesc === selectedDesc
+//   );
 
-  if (selectedOption) {
-    RegFundDetials.RegisteredFundTypeID = selectedOption.RegisteredFundTypeID;
-    this.typeOfFundID = selectedOption.RegisteredFundTypeID; // Store in typeOfFundID
-    console.log('Selected ID stored in typeOfFundID:', this.typeOfFundID);
+//   if (selectedOption) {
+//     RegFundDetials.RegisteredFundTypeID = selectedOption.RegisteredFundTypeID;
+//     this.typeOfFundID = selectedOption.RegisteredFundTypeID; // Store in typeOfFundID
+//     console.log('Selected ID stored in typeOfFundID:', this.typeOfFundID);
+//   } else {
+//     console.warn('No matching ID found for description:', selectedDesc);
+//     this.typeOfFundID = null; // Reset if no match
+//   }
+// }
+typeOfFundID: number | null = null;
+
+onFundTypeChange(event: Event, createRegFundsObj: any): void {
+  const selectedID = +(event.target as HTMLSelectElement).value; // Get the selected ID as a number
+
+  if (selectedID) {
+    const selectedOption = this.TypeOfFunddropdown.find(
+      (option) => option.RegisteredFundTypeID === selectedID
+    );
+
+    if (selectedOption) {
+      createRegFundsObj.typeOfFundID = selectedOption.RegisteredFundTypeID;
+      createRegFundsObj.RegisteredFundTypeDesc = selectedOption.RegisteredFundTypeDesc;
+      this.typeOfFundID = selectedOption.RegisteredFundTypeID;
+      console.log('Selected ID stored in typeOfFundID:', this.typeOfFundID);
+    }
   } else {
-    console.warn('No matching ID found for description:', selectedDesc);
-    this.typeOfFundID = null; // Reset if no match
+    console.warn('No valid ID selected');
+    createRegFundsObj.typeOfFundID = null;
+    createRegFundsObj.RegisteredFundTypeDesc = null;
+    this.typeOfFundID = null; // Reset if no valid selection
   }
 }
 registeredFundStatusTypeID: number | null = null; 
@@ -256,6 +312,16 @@ onSatusTypeChange(event: Event, RegFundDetials: any): void {
     console.warn('No matching ID found for description:', selectedDesc);
     this.registeredFundStatusTypeID = null; // Reset if no match
   }
+}
+loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+  this.supervisionService.getErrorMessages(fieldName, msgKey, null, placeholderValue).subscribe(
+    () => {
+      this.errorMessages[fieldName] = this.supervisionService.errorMessages[fieldName];
+    },
+    error => {
+      console.error(`Error loading error message for ${fieldName}:`, error);
+    }
+  );
 }
 }
 

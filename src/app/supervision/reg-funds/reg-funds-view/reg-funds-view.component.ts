@@ -37,6 +37,12 @@ export class RegFundsViewComponent {
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
+   // Validations
+   hasValidationErrors: boolean = false;
+   errorMessages: { [key: string]: string } = {};
+
+
   constructor(
     private returnReviewService: ReturnReviewService,
     private supervisionService: SupervisionService,
@@ -64,6 +70,7 @@ export class RegFundsViewComponent {
     this.getRegisteredFundDetail();
     this.getDocumentType();
     this.initializeDefaults();
+
   }
   ngAfterViewInit() {
     this.dateInputs.changes.subscribe(() => {
@@ -86,6 +93,10 @@ export class RegFundsViewComponent {
         // Assign full response to firmRevDetails
         this.RegisteredFundDetials = res.response;
         console.log("RegisteredFundDetials",this.RegisteredFundDetials)
+        if (this.RegisteredFundDetials && this.RegisteredFundDetials[0].RegisteredFundTypeID) {
+          this.typeOfFundID = this.RegisteredFundDetials[0].RegisteredFundTypeID;
+          console.log('Initialized typeOfFundID with original ID:', this.typeOfFundID);
+        }
         this.getRegisteredFundStatus();
         this.getSubFundData();
         this.isLoading=false;
@@ -143,12 +154,11 @@ export class RegFundsViewComponent {
 confirmDeleteRegisteredFund() {
   Swal.fire({
     title: 'Are you sure?',
-    text: "You won't be able to revert this!",
+    text: 'Are you sure you want to delete this record ?',
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, delete it!'
+    confirmButtonText: 'Ok',
+    cancelButtonText: 'Cancel',
   }).then((result) => {
     if (result.isConfirmed) {
       this.deleteRegisteredFund();
@@ -264,12 +274,38 @@ deleteRegisteredFund() {
       },
     ],
   };
-  // fundName: this..fundName,
-  //        previousName: this..previousName,
-  //        otherEntities: this..otherEntities,
-  //        rfNotes: this..rfNotes,
-  SaveUpdateRegFunds(){
+
+ async validateRegFunds(): Promise<boolean> {
+    this.hasValidationErrors = false;
+
+    if(this.typeOfFundID == null || this.typeOfFundID == undefined ||this.typeOfFundID == constants.TEXT_ZERO){
+      this.loadErrorMessages('FundType', constants.Specify_Valid_Response, 'Type of Fund');
+      this.hasValidationErrors = true;
+    }
+    if(this.RegisteredFundDetials[0].FundName == null || this.RegisteredFundDetials[0].FundName == '' || this.RegisteredFundDetials[0].FundName == undefined){
+      this.loadErrorMessages('FundName', constants.Specify_Valid_Response, 'Fund Name');
+      this.hasValidationErrors = true;
+    }
+    if(this.RegisteredFundDetials[0].RegisteredFundStatusTypeDesc == '' || this.RegisteredFundDetials[0].RegisteredFundStatusTypeDesc == undefined || this.RegisteredFundDetials[0].RegisteredFundStatusTypeDesc == null){
+      this.loadErrorMessages('FundStatus', constants.Specify_Valid_Response, 'Status');
+      this.hasValidationErrors = true;
+    }
+    if(this.RegisteredFundDetials[0].RegisteredFundStatusDate == null || this.RegisteredFundDetials[0].RegisteredFundStatusDate == ''){
+      this.loadErrorMessages('StatusDate', constants.InvoicesMessages.INVALID_DATA, 'StatusDate');
+      this.hasValidationErrors = true;
+    }
+    return !this.hasValidationErrors;
+  }
+ async SaveUpdateRegFunds(){
     this.isLoading = true;
+    const isValid =  await this.validateRegFunds();
+
+    if (!isValid) {
+      this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ENTER_REQUIREDFIELD_PRIORSAVING);
+      this.isLoading = false;
+      return; // Prevent further action if validation fails or the user cancels
+    }
+
     const saveUpdateRegisteredFundObj = {
        objRF: {
          registeredFundID: this.RegisteredFundDetials[0].RegisteredFundID,
@@ -380,6 +416,7 @@ getDocumentType(){
     },
     error: (error) => {
       console.error('Error deleting RegisteredFund', error);
+      this.isLoading = false;
     },
   });
 }
@@ -394,11 +431,21 @@ getDocument(){
     error: (error) => {
 
       console.error('Error deleting RegisteredFund', error);
+      this.isLoading = false;
     },
   });
 }
 sanitizeHtml(html: string): SafeHtml {
   return this.sanitizerService.sanitizeHtml(html);
 }
-
+  loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+    this.supervisionService.getErrorMessages(fieldName, msgKey, null, placeholderValue).subscribe(
+      () => {
+        this.errorMessages[fieldName] = this.supervisionService.errorMessages[fieldName];
+      },
+      error => {
+        console.error(`Error loading error message for ${fieldName}:`, error);
+      }
+    );
+  }
 }

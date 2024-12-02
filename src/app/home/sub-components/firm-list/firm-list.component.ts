@@ -89,7 +89,7 @@ export class FirmListComponent implements OnInit, OnChanges {
   // Navigate to firm details
   viewFirm(firmId: number): void {
     if (firmId) {
-      this.router.navigate(['home/view-firm', firmId]);
+      this.router.navigate(['firms/view', firmId]);
     } else {
       console.error('Invalid firm ID:', firmId);
     }

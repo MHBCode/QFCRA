@@ -59,6 +59,17 @@ export class AdminFeePopupComponent {
   onClose(): void {
     this.closeRegPopup.emit();
   }
+  constructLink(): string {
+    if (this.AdminFeeDetials[0]) {
+      return this.AdminFeeDetials[0].LinkToReview +
+        this.firmId +
+        constants.AMPERSAND +
+        constants.QUERYSTRING_SCHEDULEITEMID +
+        constants.CHAR_EQUAL +
+        this.AdminFeeDetials[0].FirmRptSchItemID;
+    }
+    return '';
+  }
   getAdminFeeDetials(){
     this.isLoading = true
     const firmRptFeeID = this.fee.FirmrptAdminFeeID;

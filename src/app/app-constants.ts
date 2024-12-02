@@ -49,7 +49,7 @@ export const authorisedFirmNames = "V_All_Firms_Authorised";
 export const dnfbpsFirmNames = "V_All_Firms_DNFBPs";
 //Query String Parameter for FS Reporting
 export const QUERYSTRING_FSRPTDATAID = "fsRptDataID";
-
+export const Specify_Valid_Response = 1200;
 export const TEXT_MR = "Mr";
 export const TEXT_MS = "Ms";
 export const TEXT_MRS = "Mrs";
@@ -84,6 +84,88 @@ export const DataFieldLabel = "\"##DataFieldLable##\"";
 export const ContactTypes = "v_ContactTypes";
 export const PreferredMethodofContact = "ContactMethodTypes";
 
+export const  BREAK_LINE_TAG = "<br />";
+export const  HTML_SPACE = "&nbsp;";
+
+export const  SLASH_FORWORD = "/";
+export const  CHAR_SLASH_FORWORD = '/';
+export const  DOUBLE_FORWORDSLASH = "//";
+export const  BLANKSPACE = " ";
+export const  COMMA = ",";
+export const  AMPERSAND = "&";
+export const  NEWLINE = "\n";
+export const  PERCENTAGE = "%";
+export const  NOT_EQUAL = "!";
+export const  HASH = "#";
+export const  DOLLAR_SIGN = "$";
+export const  OR_SIGN = "|";
+export const  DOUBLE_BACKSLASH = "\\";
+export const  QUESTIONMARK = "?";
+export const  SEMICOLON = ";";
+export const  SEMICOLON_CHAR = ';';
+export const  COMMA_CHAR = ',';
+export const  PERCENTAGE20 = "%20";
+export const  EQUAL_SIGN = "=";
+export const  SINGLE_QUOTE = "'";
+export const  CURLYBRACE_OPEN = "{";
+export const  CURLYBRACE_CLOSE = "}";
+export const  BRACKET_OPEN = "(";
+export const  BRACKET_CLOSE = ")";
+export const  CHAR_HYPHEN = "-";
+export const  CHAR_DOT = ".";
+export const  CHAR_UNDERSCORE = "_";
+export const  CHAR_AT = "@";
+export const  CHAR_COLON = ":";
+export const  CHAR_COLON_WITH_SPACES = " : ";
+export const  CHAR_MULTIPLY = "*";
+export const  CHAR_PLUS = "+";
+export const  CHAR_EQUAL = "=";
+export const  CHAR_LIKEAPOSTROPHE = "`";
+export const  CHAR_TILT = "~";
+export const  CHAR_LESSTHAN = "<";
+export const  CHAR_GREATERTHAN = ">";
+export const  CHAR_COMMA = ',';
+
+ //Querystrings
+ export const  QUERYSTRING_BREACHID = "bId";
+ export const  QUERYSTRING_BREACHREVISION = "rvNo";
+ export const  QUERYSTRING_FIRMID = "fiD";
+ export const  QUERYSTRING_TABID = "tabId";
+ export const  QUERYSTRING_SCHEDULEITEMID = "rptSchItemID";
+ export const  QUERYSTRING_DOCID = "docID";
+ export const  QUERYSTRING_MSG = "msg";
+ export const  QUERYSTRING_MSG_HEADER = "msgHeader";
+ export const  QUERYSTRING_MSG_DESCRIPTION = "msgDescription";
+ export const  QUERYSTRING_WFSTATUS = "wfStatus";
+ export const  QUERYSTRING_CONTACTID = "cId";
+ export const  QUERYSTRING_CONTACTTYPEID = "ctId";
+ export const  QUERYSTRING_CONTACTSTATUS = "cStatus";
+ export const  QUERYSTRING_OTHERENTITYID = "oeId";
+ export const  QUERYSTRING_RELATEDENTITYID = "reId";
+ export const  QUERYSTRING_RELATEDENTITYTYPEID = "retId";
+ export const  QUERYSTRING_CONTACTASSNID = "caId";
+ export const  QUERYSTRING_FUNCTIONTYPEID = "ftId";
+
+ export const  QUERYSTRING_AINID = "ainId";
+ export const  QUERYSTRING_APPID = "appId";
+ export const  QUERYSTRING_AINUMBER = "aiNum";
+ export const  QUERTSTRING_FLAG = "flg";
+ export const  QUERYSTRING_INVOICES = "InId";
+ export const  QUERYSTRING_RPTREVIEWID = "rptId";
+ export const  QUERYSTRING_RPTREVISION = "rptRevId";
+ export const  QUERYSTRING_OPERATIONSTATUSID = "operationId";
+ export const  QUERYSTRING_CLIENTCLASSIFICATION = "clientId";
+ export const  QUERYSTRING_INVOICENUMBER = "Inv";
+ export const  QUERYSTRING_FIRMCROWAIVERID = "fcwId";
+ export const  QUERYSTRING_FIRMCROREPORTSCHEDULEID = "fcrsId";
+ export const  QUERYSTRING_PREV_WF_STATUSID = "prevWfSId";
+ export const  QUERYSTRING_LASTDATEOFMONTH = "lDate";
+ export const  QUERYSTRING_AINOCID = "nocID";
+ export const  QUERYSTRING_RSCCID = "rscID";
+ export const  QUERTSTRING_GENSUB = "genID";
+ export const  QUERTSTRING_GENSUBREVNUM = "genRID";
+ export const  QUERYSTRING_ENFID = "enfiD";
+ export const  QUERY_RFID = "rfiD";
 
 export enum FirmLicenseApplStatusType {
     Application = 4,
@@ -664,4 +746,4 @@ export enum RegisteredFund_Messages
 {
     RegisteredFund_Saved_SUCCESSFULLY = 18042,
     Error_deleting_RegisteredFund = 18045 ,
-}
+} 

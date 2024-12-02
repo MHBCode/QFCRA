@@ -56,12 +56,20 @@
         </div>
 
 
-        <div class="input-field">
+        <!-- <div class="input-field">
           <label for="LinkToReturnReview"> Link To Return Review </label>
           <input *ngIf="isEditable" name="LinkToReturnReview" id="LinkToReturnReview" type="text"
             [(ngModel)]="AdminFeeDetials.LinkToReview" />
           <a id="websiteLink" [href]="AdminFeeDetials[0].LinkToReview" target="_blank" rel="noopener noreferrer">
             {{ AdminFeeDetials[0].LinkToReview }}
+          </a>
+        </div> -->
+        <div class="input-field">
+          <label for="LinkToReturnReview">Link To Return Review</label>
+          <input *ngIf="isEditable" name="LinkToReturnReview" id="LinkToReturnReview" type="text"
+                 [(ngModel)]="AdminFeeDetials.LinkToReview" />
+          <a id="websiteLink" [href]="constructLink()" target="_blank" rel="noopener noreferrer">
+            {{ constructLink() }}
           </a>
         </div>
       </div>
