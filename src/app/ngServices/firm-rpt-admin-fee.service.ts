@@ -23,4 +23,8 @@ export class FirmRptAdminFeeService {
     const url = `${this.baseUrlAdminFee}get_resubmission_history_list?firmRptSchItemId=${firmRptSchItemId}&firmRptReviewId=${firmRptReviewId}&firmRptReviewRevId=${firmRptReviewRevId}&firmRptAdminFeeID=${firmRptAdminFeeID}`; 
     return this.http.get<any>(url);
   }
+  getCalculatedFee(adminFeeRateID:number,day:number): Observable<any> {
+    const url = `${this.baseUrlAdminFee}get_calculated_fee?adminFeeRateID=${adminFeeRateID}&day=${day}`; 
+    return this.http.get<any>(url);
+  }
 }

@@ -32,6 +32,7 @@ export class AdminFeePopupComponent {
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
   AdminFeeDetials: any;
+  showCalculatedFeePopup :boolean = false;
   constructor(
     private supervisionService: SupervisionService,
     private securityService: SecurityService,
@@ -54,7 +55,7 @@ export class AdminFeePopupComponent {
     });
     console.log(this.fee)
     this.getAdminFeeDetials();
-   
+    this.getMessageProperty()
   }
   onClose(): void {
     this.closeRegPopup.emit();
@@ -164,5 +165,38 @@ export class AdminFeePopupComponent {
   sanitizeHtml(html: string): SafeHtml {
     return this.sanitizerService.sanitizeHtml(html);
   }
-  
+  CalculatedFee :any;
+  getCalculatedFee(){
+    this.showCalculatedFeePopup = true
+    const adminFeeRateID = this.fee.AdminFeeRateID;
+   
+    const day = parseInt(this.dayCount, 10);
+    this.firmRptAdminFeeService.getCalculatedFee(adminFeeRateID,day).subscribe({
+      next: (res) => {
+        this.CalculatedFee = res.response;
+        console.log("CalculatedFee",this.CalculatedFee)
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fitching UserObjectWfTasks', error);
+      },
+    });
+  }
+  closeCalculatedFeePopup(){
+    this.showCalculatedFeePopup = false;
+  }
+  dayCount :any;
+  getMessageProperty(){
+    const messageKey = "LateAdminFee_day";
+    this.logForm.getMessageProperty(messageKey).subscribe({
+      next: (res) => {
+        this.dayCount = res.response;
+        console.log("dayCount",this.dayCount)
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fitching UserObjectWfTasks', error);
+      },
+    });
+  }
 }

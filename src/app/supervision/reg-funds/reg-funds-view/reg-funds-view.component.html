@@ -42,8 +42,7 @@
             <ng-container *ngIf="isEditable; else TypeOfFund">
               <select name="fundType" id="fundType" 
               [(ngModel)]="RegFundDetials.RegisteredFundTypeDesc"
-              (change)="onFundTypeChange($event, RegFundDetials)"
-              >
+              (change)="onFundTypeChange($event, RegFundDetials)">
                 <option *ngFor="let option of TypeOfFunddropdown" [value]="option.RegisteredFundTypeDesc">
                   {{ option.RegisteredFundTypeDesc }}
                 </option>

@@ -36,4 +36,8 @@ export class LogformService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrlLogForm}construct_doc_url`, rowData, { headers });
   }
+  getMessageProperty(messageKey: string): Observable<any> {
+    const url = `${this.baseUrlLogForm}get_message_property?messageKey=${messageKey}`
+    return this.http.get<any>(url);
+  }
 }

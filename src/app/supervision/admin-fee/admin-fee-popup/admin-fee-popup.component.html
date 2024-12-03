@@ -153,8 +153,17 @@
 
             <div class="input-field">
               <label for="CalculatedFee">Calculated Fee</label>
-              <input type="text" [disabled]="!isEditable" name="CalculatedFee"
+            <ng-container>
+              <div *ngIf="isEditable; else view">
+                <input type="text" [disabled]="!isEditable" name="CalculatedFee"
                 [value]="AdminFeeDetials[0].CalculatedAmountCurrencyTypeDesc +' ' + AdminFeeDetials[0].CalculatedAmount" />
+              </div>
+              
+              
+            </ng-container>
+            <ng-template #view>
+             <span>{{AdminFeeDetials[0].CalculatedAmountCurrencyTypeDesc +' ' + AdminFeeDetials[0].CalculatedAmount}}&nbsp;&nbsp;<a class="infocircle" (click)="getCalculatedFee()"><i class="bi bi-info-circle" style="font-size: 1.5rem; color: #0d6efd;"></i></a></span>
+            </ng-template>
             </div>
 
             <div class="input-field">
@@ -256,5 +265,17 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+  
+  <div *ngIf="showCalculatedFeePopup" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4>{{ CalculatedFee.CalculatedFeeFormula }}</h4>
+      </div>
+      <div class="btn">
+        <button class="close-button" (click)="closeCalculatedFeePopup()">Cancel</button>
+      </div>
+      
     </div>
   </div>

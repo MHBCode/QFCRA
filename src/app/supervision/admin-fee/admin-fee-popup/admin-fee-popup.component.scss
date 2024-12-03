@@ -72,3 +72,89 @@
         width:100%;
     }
    }
+
+
+   .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Darker overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: #ffffff; /* Brighter background */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); /* Add shadow for better focus */
+    border-radius: 12px; /* Smoother corners */
+    width: 40%; /* Slightly wider */
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 25px; /* Increased padding */
+    animation: fadeIn 0.3s ease-in-out; /* Add a fade-in animation */
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  
+    h3 {
+      font-size: 1.5rem; /* Larger heading */
+      font-weight: 600; /* Slightly bolder */
+      color: #333; /* Neutral color for contrast */
+    }
+  }
+  
+  .revisions-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Adjusted gap */
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+  }
+  
+  .btn {
+    display: flex; /* Flex for alignment */
+    justify-content: center; /* Center button */
+    margin-top: 10px;
+  }
+  
+  .revision-item {
+    cursor: pointer;
+    color: rgb(184, 57, 57);
+    text-decoration: underline;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  
+    &:hover {
+      color: darkred;
+      transform: scale(1.1); /* Slight zoom on hover */
+    }
+  }
+  
+  .close-button {
+    background-color: #a43030;
+    color: white;
+    border: none;
+    padding: 4px 8px; /* Smaller padding */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem; /* Smaller font size */
+    display: block;
+    text-align: center;
+    margin: 0 auto;
+    transition: background-color 0.3s ease;
+  
+    &:hover {
+      background-color: #871c1c; /* Darker shade on hover */
+    }
+  }
+  .infocircle{
+    cursor: pointer;
+  }
