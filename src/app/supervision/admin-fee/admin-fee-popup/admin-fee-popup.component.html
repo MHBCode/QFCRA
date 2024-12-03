@@ -263,6 +263,18 @@
                 [disabled]="!isEditable" [(ngModel)]="WfTask.CommentsDateTime"/>
             </div>
           </div>
+          <div *ngIf="i === UserObjectWfTasks.length - 1" class="popup-header">
+            <h3></h3>
+          </div>
+        </div>
+      </div>
+      <div class="rpt-list margin-top-10">
+        <div class="inputs-row report-entry">
+          <div class="input-field">
+            <span>
+              <a (click)="getRevisionCommentsByWaiver()" style="color:blue;">Show Previous Workflow Comments</a>
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -275,7 +287,42 @@
       </div>
       <div class="btn">
         <button class="close-button" (click)="closeCalculatedFeePopup()">Cancel</button>
-      </div>
-      
+      </div>     
     </div>
   </div>
+
+  <!-- Modal Popup for Showing Search Results -->
+<div *ngIf="showPreviousCommentsModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Previous Workflow Comments</h3>
+    </div>
+    <div class="modal-body">
+      <table class="contact-table">
+        <thead>
+          <tr>
+            <th>Version No.</th>
+            <th>Comments</th>
+            <th>Status</th>
+            <th>Status Set By</th>
+            <th>Status Set Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let RevisionComment of RevisionCommentsList">
+            <td>
+              {{ RevisionComment.ObjectInstanceRevNum }}
+            </td>
+            <td>{{ RevisionComment.WaiverComments }}</td>
+            <td>{{ RevisionComment.ObjectWFStatusTypeDesc }}</td>
+            <td>{{ RevisionComment.CommentorName }}</td>
+            <td>{{ RevisionComment.CommentDate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="btn">
+      <button class="close-button" (click)="closePreviousCommentsModal()">Cancel</button>
+    </div>  
+  </div>
+</div>

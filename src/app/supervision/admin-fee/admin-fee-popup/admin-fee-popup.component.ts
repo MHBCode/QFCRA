@@ -33,6 +33,7 @@ export class AdminFeePopupComponent {
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
   AdminFeeDetials: any;
   showCalculatedFeePopup :boolean = false;
+  showPreviousCommentsModal: boolean = false;
   constructor(
     private supervisionService: SupervisionService,
     private securityService: SecurityService,
@@ -79,7 +80,6 @@ export class AdminFeePopupComponent {
         this.AdminFeeDetials = res.response;
         console.log("AdminFeeDetials",this.AdminFeeDetials)
         this.getResubmissionHistoryList();
-        this.getRevisionCommentsByWaiver();
         this.getUserObjectWfTasks();
         
       },
@@ -108,6 +108,7 @@ export class AdminFeePopupComponent {
   }
   RevisionCommentsList : any;
   getRevisionCommentsByWaiver(){
+    this.showPreviousCommentsModal = true;
     const objectWFStatusID = this.fee.ObjectWfStatusID;
     this.waiverService.getRevisionCommentsByWaiver(objectWFStatusID).subscribe({
       next: (res) => {
@@ -198,5 +199,8 @@ export class AdminFeePopupComponent {
         console.error('Error fitching UserObjectWfTasks', error);
       },
     });
+  }
+  closePreviousCommentsModal(){
+    this.showPreviousCommentsModal = false;
   }
 }
