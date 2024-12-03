@@ -584,7 +584,7 @@ export class JournalViewDetailsComponent implements OnInit {
     }
   }
 
-  async validateJournal(): Promise<boolean> { 
+  async validateJournal(): Promise<boolean> {
     this.hasValidationErrors = false;
 
     const entryType = this.isCreateJournal ? this.createJournalObj.JournalEntryTypeID : this.journalDetails[0].JournalEntryTypeID
@@ -852,13 +852,16 @@ export class JournalViewDetailsComponent implements OnInit {
     this.objectWF.getDocument(this.Page.SupervisionJournal, this.journal?.SupervisionJournalID, 1).pipe(
     ).subscribe(
       data => {
-        this.journalDoc = Array.isArray(data.response) ? data.response : [data.response]; // Ensure it's an array
-        this.FileLoc = this.journalDoc[0].FileLoc;
-        // Call constructDocUrl and subscribe to it
+        this.journalDoc = data.response; 
+        this.FileLoc = ''; 
+  
         this.logForm.constructDocUrl(this.journalDoc).subscribe(
           response => {
             if (response) {
-              this.fileLocation = response.response[0].fileLoc;
+              this.journalDoc = this.journalDoc.map((doc, index) => ({
+                ...doc,
+                fileLoc: response.response[index]?.fileLoc || ''
+              }));
             }
           },
           error => {
@@ -872,16 +875,8 @@ export class JournalViewDetailsComponent implements OnInit {
       }
     );
   }
+  
 
-  // handleSelectedFilesChange(files: File | File[] | null): void {
-  //   if (Array.isArray(files)) {
-  //     this.selectedFiles = files; // Assign directly if it's an array
-  //   } else if (files) {
-  //     this.selectedFiles = [files]; // Wrap single file into an array
-  //   } else {
-  //     this.selectedFiles = []; // Reset if null
-  //   }
-  // }
 
 
   async onDocumentUploaded(uploadedDocument: any) {

@@ -36,7 +36,7 @@ export class AttachmentComponent implements OnInit {
   filePathAfterDocLib = "";
   strUserEmailAddress = 'k.thomas@ictmds.onmicrosoft.com';
   @Input() FileLoc: string = '';
-  @Input() fileLocation: string = '';
+  fileLocation: string = '';
 
   Page = FrimsObject;
   fileError: string = '';
@@ -179,10 +179,10 @@ export class AttachmentComponent implements OnInit {
   }
 
 
-  deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number) {
-    if (this.FileLoc) {
+  deleteDocument(docID: number, objectId: number, objectInstanceId: number, ObjectInstanceRevNum: number, fileLoc: string) {
+    if (fileLoc) {
       this.isLoading = true;
-      this.sharepointService.deleteFileFromSharepoint(this.intranetSitePath, this.FileLoc).subscribe({
+      this.sharepointService.deleteFileFromSharepoint(this.intranetSitePath, fileLoc).subscribe({
         next: () => {
           console.log('File deleted from SharePoint successfully');
 
@@ -289,7 +289,7 @@ export class AttachmentComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         // Use doc.DocID for the correct deletion logic
-        this.deleteDocument(doc.DocID, this.pageName, this.param1, this.param2);
+        this.deleteDocument(doc.DocID, this.pageName, this.param1, this.param2, doc.FileLoc);
 
         // Reload documents after deletion
         this.loadDocuments();

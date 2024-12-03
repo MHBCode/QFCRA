@@ -10,8 +10,8 @@
     <!-- Press Release -->
     <div class="input-field" *ngIf="shouldShowInputs() && pageName == Page.CoreDetail">
       <label for="documentType"> Document Type </label>
-      <option [value]="0">Select</option>
       <select class="document-type-select" name="documentType" id="documentType" [(ngModel)]="documentTypes.DocSubTypeID">
+        <option [value]="0">Select</option>
         <option *ngFor="let type of documentTypes" [value]="type.DocSubTypeID">
           {{ type.DocSubTypeDesc }}
         </option>
@@ -51,7 +51,7 @@
       </select>
     </div>
 
-    <!-- Enforcement -->
+    <!-- Registered Funds -->
     <div class="input-field" *ngIf="pageName == Page.RegisteredFunds">
       <label>Document Type</label>
       <select name="documentTypes" id="documentTypes" [(ngModel)]="documentTypes.DocSubTypeID">
@@ -99,10 +99,10 @@
             </span>
           </td>
           <td style="text-align: left">
-            <a [href]="fileLocation" target="_blank">{{ doc.FileName }}</a>
+            <a [href]="doc.fileLoc" target="_blank">{{ doc.FileName }}</a>
           </td>
-          <td *ngIf="isEdit" style="text-align: center">
-            <button class="delete-action" *ngIf="doc.DocSubTypeDesc" (click)="showAlertDeleteFile(doc)">
+          <td style="text-align: center">
+            <button class="delete-action" *ngIf="doc.DocSubTypeDesc && isEdit" (click)="showAlertDeleteFile(doc)">
               Delete
             </button>
           </td>

@@ -346,12 +346,16 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     this.objectWF.getDocument(this.Page.Enforcement, this.enf?.EnforcementAndDisciplinaryActnID, 1).pipe(
     ).subscribe(
       data => {
-        this.enfDoc = Array.isArray(data.response) ? data.response : [data.response]; // Ensure it's an array
-        this.FileLoc = this.enfDoc[0].FileLoc;
+        this.enfDoc = data.response; 
+        this.FileLoc = ''; 
+  
         this.logForm.constructDocUrl(this.enfDoc).subscribe(
           response => {
             if (response) {
-              this.fileLocation = response.response[0].fileLoc;
+              this.enfDoc = this.enfDoc.map((doc, index) => ({
+                ...doc,
+                fileLoc: response.response[index]?.fileLoc || ''
+              }));
             }
           },
           error => {
@@ -362,7 +366,6 @@ export class EnfActionsViewDetailsComponent implements OnInit {
       error => {
         console.error('Error loading document:', error);
         this.enfDoc = [];
-
       }
     );
   }

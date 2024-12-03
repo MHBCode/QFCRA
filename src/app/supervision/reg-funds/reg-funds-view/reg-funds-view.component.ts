@@ -55,9 +55,9 @@ export class RegFundsViewComponent {
 
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
-   // Validations
-   hasValidationErrors: boolean = false;
-   errorMessages: { [key: string]: string } = {};
+  // Validations
+  hasValidationErrors: boolean = false;
+  errorMessages: { [key: string]: string } = {};
 
 
   constructor(
@@ -114,7 +114,7 @@ export class RegFundsViewComponent {
       next: (res) => {
         // Assign full response to firmRevDetails
         this.RegisteredFundDetials = res.response;
-        console.log("RegisteredFundDetials",this.RegisteredFundDetials)
+        console.log("RegisteredFundDetials", this.RegisteredFundDetials)
         if (this.RegisteredFundDetials && this.RegisteredFundDetials[0].RegisteredFundTypeID) {
           this.typeOfFundID = this.RegisteredFundDetials[0].RegisteredFundTypeID;
           console.log('Initialized typeOfFundID with original ID:', this.typeOfFundID);
@@ -173,20 +173,20 @@ export class RegFundsViewComponent {
   removeSubFund(index: number) {
     this.SubFundData.splice(index, 1);
   }
-confirmDeleteRegisteredFund() {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'Are you sure you want to delete this record ?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Ok',
-    cancelButtonText: 'Cancel',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      this.deleteRegisteredFund();
-    }
-  });
-}
+  confirmDeleteRegisteredFund() {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to delete this record ?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteRegisteredFund();
+      }
+    });
+  }
 
   deleteRegisteredFund() {
     const RegisteredFundID = this.reg.RegisteredFundID;
@@ -299,30 +299,30 @@ confirmDeleteRegisteredFund() {
     ],
   };
 
- async validateRegFunds(): Promise<boolean> {
+  async validateRegFunds(): Promise<boolean> {
     this.hasValidationErrors = false;
 
-    if(this.typeOfFundID == null || this.typeOfFundID == undefined ||this.typeOfFundID == constants.TEXT_ZERO){
+    if (this.typeOfFundID == null || this.typeOfFundID == undefined || this.typeOfFundID == constants.TEXT_ZERO) {
       this.loadErrorMessages('FundType', constants.Specify_Valid_Response, 'Type of Fund');
       this.hasValidationErrors = true;
     }
-    if(this.RegisteredFundDetials[0].FundName == null || this.RegisteredFundDetials[0].FundName == '' || this.RegisteredFundDetials[0].FundName == undefined){
+    if (this.RegisteredFundDetials[0].FundName == null || this.RegisteredFundDetials[0].FundName == '' || this.RegisteredFundDetials[0].FundName == undefined) {
       this.loadErrorMessages('FundName', constants.Specify_Valid_Response, 'Fund Name');
       this.hasValidationErrors = true;
     }
-    if(this.RegisteredFundDetials[0].RegisteredFundStatusTypeDesc == '' || this.RegisteredFundDetials[0].RegisteredFundStatusTypeDesc == undefined || this.RegisteredFundDetials[0].RegisteredFundStatusTypeDesc == null){
+    if (this.RegisteredFundDetials[0].RegisteredFundStatusTypeDesc == '' || this.RegisteredFundDetials[0].RegisteredFundStatusTypeDesc == undefined || this.RegisteredFundDetials[0].RegisteredFundStatusTypeDesc == null) {
       this.loadErrorMessages('FundStatus', constants.Specify_Valid_Response, 'Status');
       this.hasValidationErrors = true;
     }
-    if(this.RegisteredFundDetials[0].RegisteredFundStatusDate == null || this.RegisteredFundDetials[0].RegisteredFundStatusDate == ''){
+    if (this.RegisteredFundDetials[0].RegisteredFundStatusDate == null || this.RegisteredFundDetials[0].RegisteredFundStatusDate == '') {
       this.loadErrorMessages('StatusDate', constants.InvoicesMessages.INVALID_DATA, 'StatusDate');
       this.hasValidationErrors = true;
     }
     return !this.hasValidationErrors;
   }
- async SaveUpdateRegFunds(){
+  async SaveUpdateRegFunds() {
     this.isLoading = true;
-    const isValid =  await this.validateRegFunds();
+    const isValid = await this.validateRegFunds();
 
     if (!isValid) {
       this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ENTER_REQUIREDFIELD_PRIORSAVING);
@@ -430,17 +430,20 @@ confirmDeleteRegisteredFund() {
     }
   }
   ///// docs 
-  // Documents
   loadDocuments() {
     this.objectwfService.getDocument(this.Page.RegisteredFunds, this.reg?.RegisteredFundID, 1).pipe(
     ).subscribe(
       data => {
-        this.regFundsDoc = Array.isArray(data.response) ? data.response : [data.response]; // Ensure it's an array
-        this.FileLoc = this.regFundsDoc[0].FileLoc;
+        this.regFundsDoc = data.response;
+        this.FileLoc = '';
+
         this.logForm.constructDocUrl(this.regFundsDoc).subscribe(
           response => {
             if (response) {
-              this.fileLocation = response.response[0].fileLoc;
+              this.regFundsDoc = this.regFundsDoc.map((doc, index) => ({
+                ...doc,
+                fileLoc: response.response[index]?.fileLoc || ''
+              }));
             }
           },
           error => {
@@ -451,7 +454,6 @@ confirmDeleteRegisteredFund() {
       error => {
         console.error('Error loading document:', error);
         this.regFundsDoc = [];
-
       }
     );
   }
