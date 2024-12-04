@@ -55,7 +55,8 @@ export class ReturnReviewViewComponent {
     //this.loadAssignedUserRoles();
  
       this.getReturnReviewDetail();
-
+      this.getUserObjectWfTasks();
+     
   }
 
   onClose(): void {
@@ -85,6 +86,7 @@ export class ReturnReviewViewComponent {
         }
         this.getReportingBasis();
         this.getRegulatorData();
+
         console.log('firmRevDetails:', this.firmRevDetails);
         //console.log('Extracted Reporting Basis:', this.reportingBasis);
         this.isLoading=false;
@@ -125,7 +127,7 @@ export class ReturnReviewViewComponent {
 
   UserObjectWfTasks : any[]=[];
   getUserObjectWfTasks(){
-    const ObjectWFStatusID = this.review.ObjectWfStatusID;
+    const ObjectWFStatusID = this.review.ObjectWFStatusID;
     this.objectwfService.getUserObjectWfTasks(ObjectWFStatusID).subscribe({
       next: (res) => {
         this.UserObjectWfTasks = res.response;
@@ -137,65 +139,101 @@ export class ReturnReviewViewComponent {
       },
     });
   }
-  /////// ask mosatafa abbas before doing any thing
-// DocumentFileServerPaths: any[] = []; 
-// getDocumentFileServerPaths() {
-//   if (this.review && this.review.firmRptReviewItems && this.review.firmRptReviewItems.length > 0) {
-//     this.DocumentFileServerPaths = []; 
-//     this.isLoading = true; 
-//     this.review.firmRptReviewItems.forEach((item, index) => {
-//       const rptDocID = item.rptDocID;
-//       this.logForm.getDocumentFileServerPathByDocId(rptDocID).subscribe({
-//         next: (res) => {
-//           this.DocumentFileServerPaths[index] = res.response; 
-//           console.log(`Document File Server Path for item ${index}:`, res.response);
-//           if (this.DocumentFileServerPaths.length === this.review.firmRptReviewItems.length) {
-//             this.isLoading = false; 
-//           }
-//         },
-//         error: (error) => {
-//           console.error(`Error fetching Document File Server Path for item ${index}:`, error);
-//           this.isLoading = false;
-//         },
-//       });
-//     });
-//   } else {
-//     console.error("No firmRptReviewItems to process");
-//   }
-// }
-// DocumentType: any[] = [];
-// getDocumentType(){
-//   if (this.review && this.review.firmRptReviewItems && this.review.firmRptReviewItems.length > 0){
-//      this.DocumentType = [];
-//      this.isLoading = true; 
-//      this.review.firmRptReviewItems.forEach((item, index) => {
-//       const docCategoryTypeID = constants.DocType_DocCategory.XBRLTYPES;
-//       this.logForm.getDocumentType(docCategoryTypeID).subscribe({
-//         next: (res) => {
-//           this.DocumentType[index] = res.response; 
-//           console.log(`Document Type  ${index}:`, res.response);
-//           if (this.DocumentType.length === this.review.firmRptReviewItems.length) {
-//             this.isLoading = false; 
-//           }
-//         },
-//         error: (error) => {
-//           console.error(`Error fetching Document Type for item ${index}:`, error);
-//           this.isLoading = false;
-//         },
-//       });
-//     });
-//   }else {
-//     console.error("No firmRptReviewItems to process");
-//   }
-// }
-// XbrlReportCheck : any[] = [];
-// CheckXbrlReportTypes(){
-//   if (this.review && this.review.firmRptReviewItems && this.review.firmRptReviewItems.length > 0){
-//     this.XbrlReportCheck = [];
-//     this.isLoading = true; 
-//     this.review.firmRptReviewItems.forEach((item, index) => {
-//     const Report = this.review.firmRptReviewItems.docTypeId;
-// }
+DocumentFileServerPaths: any; 
+openLinkToReport(item){
+  console.log(item.rptDocID,item.docTypeId)
+  this.logForm.getDocumentFileServerPathByDocId(item.rptDocID).subscribe({
+    next: (res) => {
+      this.DocumentFileServerPaths = res.response; 
+      console.log(`Document File Server Path for item :`, res.response);
+      this.getDocumentType(item);
+      
+    },
+    error: (error) => {
+      console.error(`Error fetching Document File Server Path for item :`, error);
+
+    },
+  });
+}
+
+
+DocumentType: any[] = [];
+getDocumentType(item){
+  if (this.firmRevDetails && this.firmRevDetails.firmRptReviewItems && this.firmRevDetails.firmRptReviewItems.length > 0){
+     this.DocumentType = [];
+     this.isLoading = true; 
+      const docCategoryTypeID = constants.DocType_DocCategory.XBRLTYPES;
+      this.logForm.getDocumentType(docCategoryTypeID).subscribe({
+        next: (res) => {
+          this.DocumentType = res.response; 
+          this.CheckXbrlReportTypes(item);
+          if (this.DocumentType.length === this.firmRevDetails.firmRptReviewItems.length) {
+            this.isLoading = false; 
+          }
+        },
+        error: (error) => {
+          console.error(`Error fetching Document Type for item :`, error);
+          this.isLoading = false;
+        },
+      });
+
+  }else {
+    console.error("No firmRptReviewItems to process");
+  }
+}
+CheckXbrlReportTypes(item): boolean {
+  if (this.firmRevDetails && this.firmRevDetails.firmRptReviewItems && this.firmRevDetails.firmRptReviewItems.length > 0) {
+    const documentTypeIds = this.DocumentType.map(doc => doc.DocTypeID);
+   
+   const exists = documentTypeIds.includes(item.docTypeId)
+   
+   console.log(`At least one Document Type exists: ${exists}`);
+    
+    if (exists) {
+      this.linkToXbrlReportMaker(item);
+    } else {
+      console.error("No docTypeId(s) match the DocumentType records.");
+      this.linkToReportMaker(item)
+      this.isLoading = false;
+    }
+    return exists;
+  } else {
+    console.error("No firmRptReviewItems to process or firmRevDetails is not defined");
+    
+    return false;
+  }
+}
+fullLinkToReport :any;
+linkToXbrlReportMaker(item) {
+  if (this.DocumentFileServerPaths && this.firmRevDetails && this.firmRevDetails.firmRptReviewItems) {
+    this.fullLinkToReport = this.DocumentFileServerPaths + constants.SLASH_FORWORD + item.reportLoc;
+    console.log("Generated fullLinkToXbrlReport:", this.fullLinkToReport);
+    this.isLoading = false;
+  } else {
+    console.error("Unable to generate link: Missing data in DocumentFileServerPaths or firmRptReviewItems.");
+    this.isLoading = false;
+  }
+}
+linkToReportMaker(item){
+  let fileLocation = item.reportLoc.split('/');
+  let filingId = '';
+  if (fileLocation.length > 1) {
+    if (fileLocation[3] && fileLocation[3].trim() !== '') {
+        filingId = fileLocation[3];
+    }
+
+    if (fileLocation[4] && fileLocation[4].trim() !== '') {
+        fileLocation[4] = constants.FileType.HTML.toString();
+    }
+  }
+  item.FilingID = filingId;
+  if (filingId && filingId.trim() !== '') {
+    this.fullLinkToReport = this.logForm.getMessageProperty(constants.ReportingScheduleMessages.XBRLService.toString()) +
+        constants.SLASH_FORWORD +
+        fileLocation.join(constants.SLASH_FORWORD);
+        console.log("fullLinkToReport",this.fullLinkToReport)
+  }
+}
 
 
 

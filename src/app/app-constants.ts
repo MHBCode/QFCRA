@@ -747,3 +747,9 @@ export enum RegisteredFund_Messages
     RegisteredFund_Saved_SUCCESSFULLY = 18042,
     Error_deleting_RegisteredFund = 18045 ,
 } 
+export enum FileType
+{
+    Instance = 1,
+    HTML = 2,
+    Excel_Attachment = 3
+}

@@ -27,11 +27,13 @@ export class ReviewComponent {
   @Input() firmId: any;
   @Input() firmDetails: any;
   @Input() isEditable : any;
-
+  @Input() addtlReviewRequired : any;
+  @Input() addtlReviewRequiredDecisionMadeByName : any;
+  @Input() addtlReviewRequiredDecisionMadeOn : any;
   @Input() pageName;
   @Input() index: number;
   @Input() Review: any[]=[];
- 
+
   Page = FrimsObject;
   @Output() closeRegPopup = new EventEmitter<void>();
   @Output() fundDeleted = new EventEmitter<void>();
