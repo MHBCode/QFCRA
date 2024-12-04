@@ -204,8 +204,19 @@
                              [disabled]="!isEditable" />
                     </div>
                 </div>
-                
             </div>
+             <div class="rpt-list margin-top-10" >
+              <div class="popup-header">
+                  <h3>Review</h3>
+              </div>
+              <app-review
+                [firmId]="firmId"
+                [firmDetails]="firmDetails"
+                [isEditable]="isEditable"
+                [pageName]="Page.ReturnsReview"
+                [Review]="UserObjectWfTasks" >
+                </app-review>
+            </div> 
         </div>
-    </div>
+    </div> 
 </div>

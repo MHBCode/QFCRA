@@ -1,0 +1,112 @@
+<div class="rpt-list margin-top-10">
+    <div class="popup-header">
+      <h3>Review</h3>
+    </div>
+    <div *ngFor="let WfTask of Review ; let i = index">
+      <div *ngIf="i != 0" class="popup-header">
+        <h3></h3>
+      </div>
+      <div *ngIf="pageName == Page.ReturnsReview" class="inputs-row report-entry" >
+        <div class="input-field">
+            <label for="required">Materially Complete</label>
+            <ng-container>
+                <div style="display: flex; align-items: center">
+                    <input type="radio"  id="isRequiredYes" 
+                    [disabled]="!isEditable"  name="IsRequired" [value]="true" style="margin-right: 10px; cursor: pointer" />
+                    <label for="isRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
+
+                    <input type="radio"  id="isRequiredNo" 
+                    [disabled]="!isEditable"  name="IsRequired" [value]="false" style="
+                        margin-left: 20px;
+                        margin-right: 10px;
+                        cursor: pointer;
+                      " />
+                    <label for="isRequiredNo"  style="margin-left: 5px; color: #413b3c">No</label>
+                    <input type="radio"  id="isRequiredNo" 
+                    [disabled]="!isEditable"  name="IsRequired" [value]="false" style="
+                        margin-left: 20px;
+                        margin-right: 10px;
+                        cursor: pointer;
+                      " />
+                    <label for="isRequiredNo" style="margin-left: 5px; color: #413b3c">Not Yet
+                    </label>
+                </div>
+            </ng-container>
+            <ng-template #FirmRptReqdBitValue>
+                <span style="margin-left: 10px; color: #413b3c">
+                    
+                </span>
+            </ng-template>
+        </div>
+        <div class="input-field">
+            <label for="submissionStatus">Additional Review Required Decision Made By</label>
+            <input type="text" id="submissionStatus"   name="submissionStatus"
+                 [disabled]="!isEditable" />
+        </div>
+        <div class="input-field">
+            <label for="submissionStatus">Additional Review Required Decision Made On</label>
+            <input type="text" id="submissionStatus" name="submissionStatus"
+                 [disabled]="!isEditable" />
+        </div>
+    </div>
+      <table class="fund-status-table">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Role Assigned To</th>
+            <th>User Assigned To</th>
+            <th>Email(CC)</th>
+            <th>Assigned Date</th>
+            <th>Due Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ WfTask.ObjectOpTypeName }}</td>
+            <td>{{ WfTask.AppRoleDesc }}</td>
+            <td>{{ WfTask.AssignedToUserName }}</td>
+            <td>{{ WfTask.CompletionEmailCC }}</td>
+            <td>{{ WfTask.WFTaskAssignedDate }}</td>
+            <td>{{ WfTask.DueDate }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="inputs-row report-entry">
+        <div class="input-field">
+          <label for="TaskInitiatedBy">Task Initiated By</label>
+          <input type="text" id="TaskInitiatedBy" [(ngModel)]="WfTask.CreatedByUserName" name="TaskInitiatedBy" [disabled]="!isEditable">
+        </div>
+
+        <div class="input-field">
+          <label for="TaskInitiatedDate">Task Initiated Date</label>
+          <input type="text" id="TaskInitiatedDate" name="TaskInitiatedDate" [(ngModel)]="WfTask.TaskInitiatedDate" [disabled]="!isEditable" />
+        </div>
+        <div class="input-field notes">
+          <label for="notes">Comments</label>
+
+            <p [innerHTML]="sanitizeHtml(WfTask.ObjectWFComments)">
+            </p>
+
+        </div>
+
+        <div class="input-field">
+          <label for="Status">Status</label>
+          <input type="text" id="Status" name="Status" [disabled]="!isEditable" 
+          [(ngModel)]="WfTask.ObjectWFStatusTypeDesc"/>
+        </div>
+        <div class="input-field">
+          <label for="StatusSetBy">Status Set By</label>
+          <input type="text" id="StatusSetBy" name="StatusSetBy" [disabled]="!isEditable" 
+          [(ngModel)]="WfTask.StatusSetBy" />
+        </div>
+        <div class="input-field">
+          <label for="StatusSetDate">Status Set Date</label>
+          <input type="text" #dateInputs placeholder id="StatusSetDate" name="StatusSetDate"
+            [disabled]="!isEditable" [(ngModel)]="WfTask.CommentsDateTime"/>
+        </div>
+      </div>
+      <div *ngIf="i === Review.length - 1" class="popup-header">
+        <h3></h3>
+      </div>
+    </div>
+  </div>

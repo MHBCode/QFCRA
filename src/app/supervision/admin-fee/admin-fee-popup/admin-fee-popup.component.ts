@@ -14,6 +14,8 @@ import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.serv
 import { FirmRptAdminFeeService } from 'src/app/ngServices/firm-rpt-admin-fee.service';
 import { SafeHtml } from '@angular/platform-browser';
 import { WaiverService } from 'src/app/ngServices/waiver.service';
+import { ReviewComponent } from 'src/app/shared/review/review.component';
+import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 @Component({
   selector: 'app-admin-fee-popup',
   templateUrl: './admin-fee-popup.component.html',
@@ -27,6 +29,7 @@ export class AdminFeePopupComponent {
   @Output() fundDeleted = new EventEmitter<void>();
   isEditable: boolean = false;
   isLoading: boolean = true;
+  Page = FrimsObject;
   now = new Date();
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
@@ -120,7 +123,7 @@ export class AdminFeePopupComponent {
       },
     });
   }
-  UserObjectWfTasks : any;
+  UserObjectWfTasks : any[]=[];
   getUserObjectWfTasks(){
     const ObjectWFStatusID = this.fee.ObjectWfStatusID;
     this.objectwfService.getUserObjectWfTasks(ObjectWFStatusID).subscribe({
