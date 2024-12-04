@@ -236,7 +236,7 @@
           [param1]="reg.RegisteredFundID" [param2]="1" [isEdit]="isEditable" [ismultiple]="false"
           [documentTypes]="fetchedDocumentTypes" [loadDocuments]="loadDocuments.bind(this)"
           (documentUploaded)="onDocumentUploaded($event)" [selectedFile]="selectedFile"
-          (selectedFileChange)="selectedFile = $event" [FileLoc]="FileLoc" [fileLocation]="fileLocation">
+          (selectedFileChange)="selectedFile = $event" [FileLoc]="FileLoc">
         </app-attachment>
       </ng-container>
     </div>
