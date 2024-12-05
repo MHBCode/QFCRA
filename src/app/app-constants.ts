@@ -757,3 +757,9 @@ export enum ResponseTypes
     List_of_values_Multiple_Response = 5,
     Explanation = 6,
 }
+export enum FileType
+{
+    Instance = 1,
+    HTML = 2,
+    Excel_Attachment = 3
+}

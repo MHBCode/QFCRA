@@ -40,4 +40,8 @@ export class LogformService {
     const url = `${this.baseUrlLogForm}get_message_property?messageKey=${messageKey}`
     return this.http.get<any>(url);
   }
+  getDocumentFileServerPathByDocId(docID : number): Observable<any> {
+    const url = `${this.baseUrlLogForm}get_document_file_server_path_by_doc_id?docID=${docID}`
+    return this.http.get<any>(url);
+  }
 }

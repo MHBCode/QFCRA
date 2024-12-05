@@ -11,13 +11,15 @@ import { AttachmentComponent } from './attachment/attachment.component';
 import { LoaderComponent } from './loader/loader.component';
 import { PaginationComponent } from './pagination/pagination.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { ReviewComponent } from './review/review.component';
 
 @NgModule({
   declarations: [
     DataPlaceComponent,
     AttachmentComponent,
     LoaderComponent,
-    PaginationComponent
+    PaginationComponent,
+    ReviewComponent
   ],
   imports: [
     CommonModule,
@@ -34,7 +36,8 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
     AttachmentComponent,
     LoaderComponent,
     PaginationComponent,
-    CKEditorModule
+    CKEditorModule,
+    ReviewComponent
   ]
 })
 export class SharedModule { }
