@@ -42,6 +42,7 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
 
   // popups
   showCondtionsPopup: boolean = false;
+  showEmailPopup: boolean = false;
 
   // Security
   hideEditBtn: boolean = false;
@@ -181,6 +182,24 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
 
       }
     );
+  }
+
+  openEmailNotifPopup() {
+    this.showEmailPopup = true;
+    
+
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.emailPopup') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .emailPopup not found');
+      }
+    }, 0);
+  }
+
+  closeEmailNotifPopup() {
+    this.showEmailPopup = false;
   }
 
   openConditionsPopup(noticeQuestionnaireItemID: number) {

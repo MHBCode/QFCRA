@@ -114,7 +114,7 @@
           </div>
           <div class="input-field">
             <label for="emailNotification">Link to Email Notification</label>
-            <a href="#">View Email Notification</a>
+            <a class="email-notification-link" (click)="openEmailNotifPopup()">View Email Notification</a>
           </div>
         </div>
 
@@ -284,5 +284,21 @@
   </div>
   <div class="popup-operations-place">
     <button class="subbutton" (click)="closeCondtionsPopup()">Close</button>
+  </div>
+</div>
+
+<!-- Email Popup -->
+<div *ngIf="showEmailPopup" class="overlay show"></div>
+<div *ngIf="showEmailPopup" class="emailPopup popupcontainer">
+  <i class="bi bi-x-circle close-icon" (click)="closeEmailNotifPopup()"></i>
+  <div class="popup-info-place">
+    <div class="popup-header">
+      <h3>Email Notification</h3>
+    </div>
+    <div class="email-body" [innerHTML]="getSanitizedHtml(noticeDetails.EmailNotificationSent)">
+    </div>
+  </div>
+  <div class="popup-operations-place">
+    <button class="subbutton" (click)="closeEmailNotifPopup()">Close</button>
   </div>
 </div>
