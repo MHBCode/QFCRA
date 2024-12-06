@@ -1,3 +1,4 @@
+<app-loader *ngIf="isLoading"></app-loader>
 <div class="overlay">
   <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
     <!-- <div class="error-messages">
@@ -66,13 +67,16 @@
           </div>
           <div class="input-field">
             <label for="linkToNotice">Link to Notice (if any)</label>
-            <input type="url" id="linkToNotice" name="linkToNotice" [(ngModel)]="noticeDetails.linkToNotice"
-              [disabled]="!isEditable" />
+            <a id="linkToNotice" name="linkToNotice"
+              [href]="noticeDetails.LinkToNotice">{{noticeDetails.LinkToNotice}}</a>
           </div>
           <div class="input-field">
             <label for="additionalAttachments">Additional Attachment(s) (if any)</label>
-            <input type="text" id="additionalAttachments" name="additionalAttachments"
-              [(ngModel)]="noticeDetails.additionalAttachments" [disabled]="!isEditable" />
+            <ul class="additionalAttachments-list">
+              <li *ngFor="let doc of attachmentNotice">
+                <a [href]="doc.fileLoc" target="_blank">{{doc.FileName}}</a>
+              </li>
+            </ul>
           </div>
           <div class="input-field">
             <label for="noticeFinalizedBy">Notice Finalized By</label>
@@ -99,7 +103,7 @@
             <input type="text" id="notificationSentDate" name="notificationSentDate"
               [(ngModel)]="noticeDetails.NotificationSentDate" [disabled]="!isEditable" />
           </div>
-          <div class="input-field">
+          <div *ngIf="noticeDetails.ResponseDueDate" class="input-field">
             <label for="responseDueDate">Response Due Date</label>
             <input type="text" id="responseDueDate" name="responseDueDate" [(ngModel)]="noticeDetails.ResponseDueDate"
               [disabled]="!isEditable" />
@@ -110,7 +114,7 @@
           </div>
           <div class="input-field">
             <label for="emailNotification">Link to Email Notification</label>
-            <a [routerLink]="['/view-email-notification']" target="_blank">View Email Notification</a>
+            <a class="email-notification-link" (click)="openEmailNotifPopup()">View Email Notification</a>
           </div>
         </div>
 
@@ -121,54 +125,180 @@
     <div class="popup-title-btn-row" *ngIf="questionnaireDetails && noticeDetails?.NoticeTypeID != 2">
       <div class="popup-header">
         <h3>
-          Questionnaire Details For {{ firmDetails?.FirmName }}
+          Questionnaire
         </h3>
       </div>
+      <p><span style="color: red;">*</span> - Explanation required condition(s) met; <span style="color: red;">#</span>
+        - Esclation condition(s) met </p>
+      <hr>
     </div>
-    <div class="reporting-schedule-form"  *ngIf="questionnaireDetails && noticeDetails?.NoticeTypeID != 2">
+    <div class="reporting-schedule-form" *ngIf="questionnaireDetails && noticeDetails?.NoticeTypeID != 2">
       <div class="notice-list">
         <div class="inputs-row notice-details">
           <div *ngFor="let question of questionnaireDetails" class="input-field fullwidth">
-            <label [for]="'question' + question.NoticeQuestionNumber">{{ question.NoticeQuestion }}</label>
-            <input type="text" 
-                   [id]="'question' + question.NoticeQuestionNumber" 
-                   [name]="'question' + question.NoticeQuestionNumber"
-                   [(ngModel)]="question.Responses" 
-                   [disabled]="!isEditable" />
+            <div class="question-container">
+              <label [for]="'question' + question.NoticeQuestionNumber">{{ 'Question ' + question.NoticeQuestionNumber +
+                ': ' + question.NoticeQuestion }}</label>
+              <div *ngIf="hasEscalationOrExplanationCriteria(question.NoticeQuestionnaireItemID)"
+                class="info-icon-container">
+                <i (click)="openConditionsPopup(question.NoticeQuestionnaireItemID)" class="bi bi-info"></i>
+              </div>
+            </div>
+            <hr class="fullwidth">
+            <ng-container *ngIf="question.ResponseTypeID && question.ResponseTypeID !== responseTypes.Explanation">
+              <label>Response: </label>
+              <!-- <p [name]="'question' + question.NoticeQuestionNumber" [id]="'question' + question.NoticeQuestionNumber"
+                [(ngModel)]="question.Responses">
+              </p> -->
+              <p [id]="'explanation' + question.Responses" [innerHTML]="getSanitizedHtml(question.Responses)">
+              </p>
+            </ng-container>
+            <hr class="fullwidth"
+              *ngIf="shouldShowHr(question.Responses, question.ResponseTypeID, question.ExplanationRequired)">
+            <ng-container
+              *ngIf="question.ExplanationRequired === 1 || question.ExplanationRequired === 3 || question.ResponseTypeID == responseTypes.Explanation">
+              <label>Explanation: </label>
+              <!-- <p [name]="'question' + question.NoticeQuestionNumber" [id]="'question' + question.NoticeQuestionNumber"
+                [(ngModel)]="question.Explanation">
+              </p> -->
+              <p [id]="'explanation' + question.Explanation" [innerHTML]="getSanitizedHtml(question.Explanation)">
+              </p>
+            </ng-container>
           </div>
-    
-          <!-- <div *ngIf="question.ExplanationRequired > 0" class="input-field">
-            <label for="explanation">Explanation</label>
-            <input type="text" 
-                   id="explanation" 
-                   name="explanation" 
-                   [(ngModel)]="question.Explanation" 
-                   [disabled]="!isEditable" />
-          </div>
-     -->
-
         </div>
       </div>
     </div>
-    
 
-    <div class="popup-title-btn-row" *ngIf="noticeDetails?.Notes && noticeDetails?.NoticeTypeID != 2">
+
+    <div class="popup-title-btn-row" *ngIf="noticeDetails?.NoticeTypeID != 2">
       <div class="popup-header">
         <h3>
           Notes
         </h3>
       </div>
     </div>
-    <div class="reporting-schedule-form"  *ngIf="noticeDetails?.Notes && noticeDetails?.NoticeTypeID != 2">
+    <div class="reporting-schedule-form" *ngIf="noticeDetails?.NoticeTypeID != 2">
       <div class="notice-list">
         <div class="inputs-row notice-details">
           <div class="input-field fullwidth">
-            <label for="notes">Notes</label>
             <textarea [(ngModel)]="noticeDetails.Notes" [disabled]="!isEditable" name="notes"></textarea>
-        </div>
+          </div>
         </div>
       </div>
     </div>
-    
+
+    <div class="popup-title-btn-row" *ngIf="noticeDetails?.NoticeTypeID != 2">
+      <div class="popup-header">
+        <h3>
+          Additional Documentation Provided By Firm
+        </h3>
+      </div>
+    </div>
+    <div class="reporting-schedule-form" *ngIf="noticeDetails?.NoticeTypeID != 2">
+      <div class="notice-list">
+        <div class="inputs-row notice-details">
+          <div class="input-field fullwidth">
+            <span class="attachmentbyFirm-container">
+              <label for="attachment">Attachment(s) (if any):</label>
+              <ng-container *ngIf="attachmentbyFirm.length > 0; else noAttachment">
+                <p *ngFor="let doc of attachmentbyFirm">
+                  <a [href]="doc.fileLoc">{{ doc.FileName }}</a>
+                </p>
+              </ng-container>
+              <ng-template #noAttachment>
+                <span style="color: red;">No Attachment provided by firm.</span>
+              </ng-template>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="popup-title-btn-row" *ngIf="noticeDetails?.NoticeTypeID != 2">
+      <div class="popup-header">
+        <h3>
+          Response Provider/Signatory Details
+        </h3>
+      </div>
+    </div>
+    <div class="reporting-schedule-form" *ngIf="noticeDetails?.NoticeTypeID != 2">
+      <div class="notice-list">
+        <div class="inputs-row notice-details">
+          <div class="input-field">
+            <label for="responseProvdedBy">Response Provided By</label>
+            <input type="text" id="responseProvdedBy" name="responseProvdedBy"
+              [(ngModel)]="noticeDetails.ResponseProvidedBy" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="responseProvdedDate">Response Provided Date</label>
+            <input type="text" id="responseProvdedDate" name="responseProvdedDate"
+              [(ngModel)]="noticeDetails.ResponseProvidedDate" [disabled]="!isEditable" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Questions Conditions-->
+<div *ngIf="showCondtionsPopup" class="overlay show"></div>
+<div *ngIf="showCondtionsPopup" class="conditionsPopup popupcontainer">
+  <i class="bi bi-x-circle close-icon" (click)="closeCondtionsPopup()"></i>
+  <div class="popup-info-place">
+    <div class="popup-header">
+      <h3>Conditions</h3>
+    </div>
+    <div class="conditions-body">
+      <!-- Explanation Conditions -->
+      <div class="c1-container" *ngIf="explanationConditions.length > 0">
+        <div class="c1-title">
+          <p>Conditions that determine when an explanation is required from the firm:</p>
+        </div>
+        <div>
+          <p>An explanation is required when response provided by firm
+            <span *ngFor="let condition of explanationConditions; let last = last">
+              <strong> {{ condition.EvaluationOperatorTypeDesc }} "{{ condition.ListValue || 0 }}"</strong>
+              <span *ngIf="!last"> or </span>
+            </span>
+          </p>
+        </div>
+      </div>
+
+
+      <!-- Escalation Conditions -->
+      <div class="c2-container" *ngIf="escalationConditions.length > 0">
+        <div class="c2-title">
+          <p>Conditions that determine when a copy of the firm's response needs to be escalated to the specified
+            individuals:</p>
+        </div>
+        <div>
+          <p>Escalation is required when response provided by firm
+            <span *ngFor="let condition of escalationConditions">
+              <strong> {{condition.EvaluationOperatorTypeDesc}} "{{ condition.ListValue || 0 }}" </strong>
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="popup-operations-place">
+    <button class="subbutton" (click)="closeCondtionsPopup()">Close</button>
+  </div>
+</div>
+
+<!-- Email Popup -->
+<div *ngIf="showEmailPopup" class="overlay show"></div>
+<div *ngIf="showEmailPopup" class="emailPopup popupcontainer">
+  <i class="bi bi-x-circle close-icon" (click)="closeEmailNotifPopup()"></i>
+  <div class="popup-info-place">
+    <div class="popup-header">
+      <h3>Email Notification</h3>
+    </div>
+    <div class="email-body" [innerHTML]="getSanitizedHtml(noticeDetails.EmailNotificationSent)">
+    </div>
+  </div>
+  <div class="popup-operations-place">
+    <button class="subbutton" (click)="closeEmailNotifPopup()">Close</button>
   </div>
 </div>

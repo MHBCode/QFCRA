@@ -747,6 +747,16 @@ export enum RegisteredFund_Messages
     RegisteredFund_Saved_SUCCESSFULLY = 18042,
     Error_deleting_RegisteredFund = 18045 ,
 } 
+
+export enum ResponseTypes
+{
+    Yes_No_NotApplicable = 1,
+    Date = 2,
+    Number = 3,
+    List_of_values_Single_Response = 4,
+    List_of_values_Multiple_Response = 5,
+    Explanation = 6,
+}
 export enum FileType
 {
     Instance = 1,
