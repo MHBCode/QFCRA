@@ -21,6 +21,7 @@ import { NoticesDetailsComponent } from './notices/notices-details/notices-detai
 import { RegFundsViewComponent } from './reg-funds/reg-funds-view/reg-funds-view.component';
 import { RegFundsCreateComponent } from './reg-funds/reg-funds-create/reg-funds-create.component';
 import { EnfActionsViewDetailsComponent } from './enf-actions/enf-actions-view-details/enf-actions-view-details.component';
+import { ReturnReviewCreateComponent } from './return-review/return-review-create/return-review-create.component';
 
 
 
@@ -44,7 +45,8 @@ import { EnfActionsViewDetailsComponent } from './enf-actions/enf-actions-view-d
     NoticesDetailsComponent,
     RegFundsViewComponent,
     RegFundsCreateComponent,
-    EnfActionsViewDetailsComponent
+    EnfActionsViewDetailsComponent,
+    ReturnReviewCreateComponent
   ],
   imports: [
     CommonModule,

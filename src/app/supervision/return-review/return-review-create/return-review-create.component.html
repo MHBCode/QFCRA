@@ -1,0 +1,140 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="overlay">
+    <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+        <!-- Title -->
+        <div class="popup-title-btn-row">
+            <div class="popup-header">
+                <h3>
+                    Return Review For {{ firmDetails?.FirmName }} ({{firmDetails.QFCNum}})
+                </h3>
+            </div>
+            <!-- Save and Cancel Buttons -->
+            <button class="close-button  close-icon" (click)="onClose()">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+        <div class="reporting-schedule-form">
+            <div class="inputs-row" >
+                <div class="input-field">
+                    <label for="QFCNumber">QFC Number</label>
+                    <input type="text" [(ngModel)]="firmDetails.QFCNum" id="QFCNumber" name="QFCNumber"
+                     />
+                </div>
+                <div class="input-field">
+                    <label for="prudentialCategory">Prudential Category</label>
+                    <input type="text" id="prudentialCategory" name="prudentialCategory"
+                    [(ngModel)]="firmDetails.PrudentialCategoryTypeDesc"   />
+                </div>
+                <div class="input-field">
+                    <label for="legalStatus">Legal Status</label>
+                    <input type="text" id="legalStatus" name="legalStatus"
+                    [(ngModel)]="firmDetails.LegalStatusTypeDesc"   />
+                </div>
+                <div class="input-field">
+                    <label for="reportingBasis">Reporting Basis</label>
+                    <input type="text" id="reportingBasis" name="reportingBasis" />
+                </div>
+                <div class="input-field">
+                    <label for="leadRegulator">Lead Regulator</label>
+                    <input type="text" id="leadRegulator" name="leadRegulator"  />
+                </div>
+            </div>
+            <div class="rpt-list margin-top-10" >
+                <div class="popup-header">
+                    <h3>Report Reviewed</h3>
+                </div>
+
+                <ng-container >
+                    <div class="inputs-row report-entry" >
+                        <div class="input-field">
+                          <label for="reportTypeEntry">Report to be Reviewed</label>
+                          <input
+                            type="text"
+                            id="reportTypeEntry"
+                            name="reportTypeEntry"
+                            
+                          />
+                        </div>
+                      
+                        <div class="input-field">
+                          <label for="submissionType">Report Due Date</label>
+                          <input
+                            type="text"
+                            id="submissionType"
+                            name="submissionType"
+                          />
+                        </div>
+                      
+                        <div class="input-field">
+                          <label for="reportingPeriodStartDate">Reporting Period Start Date</label>
+                          <input
+                            type="text"
+                            id="reportingPeriodStartDate"
+                            name="reportingPeriodStartDate"
+                          />
+                        </div>
+                      
+                        <div class="input-field">
+                          <label for="reportingPeriodEndDate">Reporting Period End Date</label>
+                          <input
+                            type="text"
+                            id="reportingPeriodEndDate"
+                            name="reportingPeriodEndDate"
+                          />
+                        </div>
+                         
+                        <div class="input-field">
+                          <label for="reportName">Link To Report</label>
+                          <a >Select/De-select document</a>
+                        </div>
+                        
+                        <div class="input-field">
+                          <label for="dueDate">Report Received Date</label>
+                          <input
+                            type="text"
+                            id="dueDate"
+                            name="dueDate"
+                          />
+                        </div>
+                      
+                        <div class="input-field">
+                          <label for="materiallyComplete">Materially Complete</label>
+                          <ng-container>
+                            <div style="display: flex; align-items: center">
+                              <input
+                                type="radio"
+                                id="materiallyCompleteYes"
+                                name="materiallyComplete"
+                                [value]="true"
+                               
+                                style="margin-right: 10px; cursor: pointer"
+                              />
+                              <label for="materiallyCompleteYes" style="margin-left: 5px; color: #413b3c">Yes</label>
+                      
+                              <input
+                                type="radio"
+                                id="materiallyCompleteNo"
+                                name="materiallyComplete"
+                                [value]="false"
+                                
+                                style="margin-left: 20px; margin-right: 10px; cursor: pointer;"
+                              />
+                              <label for="materiallyCompleteNo" style="margin-left: 5px; color: #413b3c">No</label>
+                            </div>
+                          </ng-container>
+                        </div>
+                      
+                        <div class="input-field-notes">
+                            <label for="notes">Comments/Findings :</label>
+                            <div>
+                                <ckeditor [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                            </div>
+                          </div>
+                    </div>
+                </ng-container>
+            </div>
+            
+        </div>
+    </div> 
+</div>
+

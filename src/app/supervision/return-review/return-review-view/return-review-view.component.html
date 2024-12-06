@@ -103,9 +103,9 @@
                             rel="noopener noreferrer" >
                             {{ item.report }}
                           </a> -->
-                          <button (click)="openLinkToReport(item)">Open Link</button>
+                          <a (click)="openLinkToReport(item)">{{ item.report }}</a>
                         </div>
-                      
+                        
                         <div class="input-field">
                           <label for="dueDate-{{ i }}">Report Received Date</label>
                           <input

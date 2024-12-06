@@ -3,11 +3,17 @@
 <div class="form-section">
   <div class="inputs-field-set">
     <div class="section">
-      <div class="form-section-title">
+      <div class="form-section-title space-between">
         <h2 class="edit-firm-header">
           <!-- Reporting Schedule > <span>{{ firmDetails?.FirmName }}</span> -->
           Return Review > <span>{{ firmDetails?.FirmName }} </span>
         </h2>
+        <div class="btn">
+          <button (click)="openCreatePopup()">
+              <i class="bi bi-plus"></i> 
+              Create
+          </button>
+      </div>
       </div>
       <!-- Filter Dropdown -->
       <div style="margin-bottom: 1rem;">
@@ -103,4 +109,8 @@
   [firmDetails]="firmDetails"
   (closeRevPopup)="closePopup()">
 </app-return-review-view>
-
+<app-return-review-create
+*ngIf="showCreatePopup"
+  [firmDetails]="firmDetails"
+  (closeCreatePopup)="closeCreatePopup()">
+</app-return-review-create>
