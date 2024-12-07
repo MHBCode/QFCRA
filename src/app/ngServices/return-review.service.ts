@@ -41,6 +41,12 @@ export class ReturnReviewService {
     const url = `${this.returnViewUrl}get_regulator_data?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
+
+  SaveNewRevisonNum(rptObjectId,rptReviewID,rptReviewRevNum,userId,roleId): Observable<any> {
+    const url = `${this.returnViewUrl}SaveNewRevisonNum?rptObjectId=${rptObjectId}&rptReviewID=${rptReviewID}
+    &rptReviewRevNum=${rptReviewRevNum}&userId=${userId}&roleId=${roleId}`;
+    return this.http.get<any>(url);
+  }
 }
 
 

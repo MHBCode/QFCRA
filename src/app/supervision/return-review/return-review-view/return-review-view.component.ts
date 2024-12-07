@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectorRef, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { ReturnReviewService } from 'src/app/ngServices/return-review.service';
 import { SupervisionService } from '../../supervision.service';
 import { SecurityService } from 'src/app/ngServices/security.service';
@@ -9,7 +9,11 @@ import { ActivatedRoute } from '@angular/router';
 import { Bold, ClassicEditor, Essentials, Font, FontColor, FontSize, Heading, Indent, IndentBlock, Italic, Link, List, MediaEmbed, Paragraph, Table, Undo } from 'ckeditor5';
 import { ReviewComponent } from 'src/app/shared/review/review.component';
 import {ObjectwfService} from 'src/app/ngServices/objectwf.service';
+import {ActionItemsService} from 'src/app/ngServices/action-items.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
+import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';
+import { SafeHtml } from '@angular/platform-browser';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-return-review-view',
   templateUrl: './return-review-view.component.html',
@@ -34,6 +38,9 @@ export class ReturnReviewViewComponent {
   reportingBasis: string = '';
   reportReceivedDate: string='';
   RegulatorData:any;
+  ActionItems :any;
+  NewVerision:any;
+  isReviseMode : boolean = false;
   constructor(
     private returnReviewService: ReturnReviewService,
     private supervisionService: SupervisionService,
@@ -41,6 +48,8 @@ export class ReturnReviewViewComponent {
     private route: ActivatedRoute,
     private logForm : LogformService,
     private objectwfService: ObjectwfService,
+    private actionItemsService: ActionItemsService,
+    private sanitizerService: SanitizerService,
 
   ) {
 
@@ -55,7 +64,9 @@ export class ReturnReviewViewComponent {
     //this.loadAssignedUserRoles();
  
       this.getReturnReviewDetail();
-      this.getUserObjectWfTasks();
+      this.getObjectActionItems();
+      
+      this.getObjectWorkflow();
      
   }
 
@@ -86,7 +97,7 @@ export class ReturnReviewViewComponent {
         }
         this.getReportingBasis();
         this.getRegulatorData();
-
+        this.getUserObjectWfTasks();
         console.log('firmRevDetails:', this.firmRevDetails);
         //console.log('Extracted Reporting Basis:', this.reportingBasis);
         this.isLoading=false;
@@ -235,8 +246,40 @@ linkToReportMaker(item){
   }
 }
 
+getObjectActionItems() {
+  const objectId = constants.FrimsObject.ReturnsReview;
+  const objectInstanceId = this.review.RptReviewID;
+  const objectInstanceRevNum = this.review.RptReviewRevNum;
+  const objectOpTypeId = constants.ObjectOpType.View;
 
+  this.actionItemsService.getObjectActionItems(objectId, objectInstanceId, objectInstanceRevNum, objectOpTypeId)
+  .subscribe({
+    next: (res) => {
+      this.ActionItems = res.response; 
+      console.log(`Document File Server Path for item :`, res.response);
+      console.log("ActionItems",this.ActionItems)
+    },
+    error: (error) => {
+      console.error(`Error fetching ActionItem :`, error);
 
+    },
+  });
+}
+WorkflowStatus: any;
+getObjectWorkflow(){
+  const objectId = constants.FrimsObject.ReturnsReview;
+  const objectInstanceId = this.review.RptReviewID;
+  const objectInstanceRevNum = this.review.RptReviewRevNum;
+  this.objectwfService.getObjectWorkflow(objectId, objectInstanceId, objectInstanceRevNum).subscribe({
+    next: (res) => {   
+        this.WorkflowStatus = res.response;
+        console.log("WorkflowStatus",this.WorkflowStatus)
+    },
+    error: (error) => {
+      console.error(`Error fetching ActionItem:`, error);
+    },
+  });
+}
   public Editor = ClassicEditor;
 
   public config = {
@@ -266,5 +309,49 @@ linkToReportMaker(item){
     ],
     licenseKey: ''
   };
+  sanitizeHtml(html: string): SafeHtml {
+    return this.sanitizerService.sanitizeHtml(html || '');
+  }
 
+
+  /// Revise Section
+
+  CreateNewVerisionConfirmation() {
+    Swal.fire({
+      title: 'Alert!',
+      text: 'Do you want to create a new version of this record?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Call the function to create a new version
+        this.CreateNewVerision();
+      }
+    });
+  }
+  
+  CreateNewVerision(){
+    this.isLoading = true;
+    const rptObjectId = constants.FrimsObject.ReturnsReview;
+    const rptReviewID = this.review.RptReviewID;
+    const rptReviewRevNum = this.review.RptReviewRevNum;
+    const objectOpTypeId = constants.ObjectOpType.View;
+    const userId = 55;
+    const roleId = 702
+    this.returnReviewService.SaveNewRevisonNum(rptObjectId,rptReviewID,rptReviewRevNum,userId,roleId).subscribe({
+      next: (res) => {   
+          this.NewVerision = res.response;
+          console.log("NewVerision",this.NewVerision)
+          this.isLoading = false;
+          this.isReviseMode = true;
+      },
+      error: (error) => {
+        console.error(`Error creating NewVerision:`, error);
+        this.isLoading = false;
+      },
+    });
+  }
 }

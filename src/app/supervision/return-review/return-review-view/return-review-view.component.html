@@ -79,7 +79,7 @@
                             type="text"
                             id="reportingPeriodStartDate-{{ i }}"
                             name="reportingPeriodStartDate"
-                            [disabled]="!isEditable"
+                            [disabled]="!isReviseMode"
                           />
                         </div>
                       
@@ -89,7 +89,7 @@
                             type="text"
                             id="reportingPeriodEndDate-{{ i }}"
                             name="reportingPeriodEndDate"
-                            [disabled]="!isEditable"
+                            [disabled]="!isReviseMode"
                           />
                         </div>
                          
@@ -124,7 +124,7 @@
                               <input
                                 type="radio"
                                 id="materiallyCompleteYes-{{ i }}"
-                                [disabled]="!isEditable"
+                                [disabled]="!isReviseMode"
                                 name="materiallyComplete-{{ i }}"
                                 [value]="true"
                                 [(ngModel)]="item.materiallyComplete"
@@ -135,7 +135,7 @@
                               <input
                                 type="radio"
                                 id="materiallyCompleteNo-{{ i }}"
-                                [disabled]="!isEditable"
+                                [disabled]="!isReviseMode"
                                 name="materiallyComplete-{{ i }}"
                                 [value]="false"
                                 [(ngModel)]="item.materiallyComplete"
@@ -146,16 +146,41 @@
                           </ng-container>
                         </div>
                       
-                        <div class="input-field fullwidth">
+                        <div class="input-field fullwidth" *ngFor="let ReviewFindings of  item.firmRptReviewFindings">
                           <label for="notes-{{ i }}">Comments/Findings :</label>
-                          <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="item.firmRptReviewFindings[i].firmRptReviewFindings" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                          <ckeditor *ngIf="isReviseMode || isEditable; else notes" [(ngModel)]="ReviewFindings.firmRptReviewFindings" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
                           <ng-template #notes>
-                            <p class="comments" [innerHTML]="item.firmRptReviewFindings[i].firmRptReviewFindings">
+                            <p class="comments" [innerHTML]="ReviewFindings.firmRptReviewFindings">
                             </p>
                           </ng-template>
                         </div>
                     </div>
                 </ng-container>
+            </div>
+            <div class="rpt-list margin-top-10" *ngIf="ActionItems.length != 0">
+              <div class="popup-header">
+                  <h3> Items Requiring Follow-Up/Action</h3>
+              </div>
+              <table class="fund-status-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Action To Be Taken</th>
+                    <th>Due Date</th>
+                    <th>Closed Date</th>
+                    <th>Resolution</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ActionItem of ActionItems">
+                    <td>{{ ActionItem.actionItemDesc }}</td>
+                     <td></td> 
+                    <td>{{ ActionItem.createdDate }}</td>
+                    <td>{{ ActionItem.completionDate }}</td>
+                    <td>{{ ActionItem.resolution }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
                 <app-review
                 [firmId]="firmId"
@@ -167,6 +192,24 @@
                 [addtlReviewRequiredDecisionMadeByName]="firmRevDetails.addtlReviewRequiredDecisionMadeByName"
                 [addtlReviewRequiredDecisionMadeOn]="firmRevDetails.addtlReviewRequiredDecisionMadeOn">               
               </app-review>
+              <div class="btn justify-content-end">
+                <button *ngIf="!isEditable">
+                  <i class="bi bi-pen"></i> Edit
+                </button>
+                <button (click)="CreateNewVerisionConfirmation()" *ngIf="!isEditable">
+                  <i class="bi bi-pencil-square"></i> Revise
+                </button>
+                <button *ngIf="!isEditable">
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+
+                <button *ngIf="isEditable">
+                  Save
+                </button>
+                <button class="cancel-btn" *ngIf="isEditable">
+                  Cancel
+                </button>
+              </div>
         </div>
     </div> 
 </div>
