@@ -2,11 +2,76 @@
     <div class="popup-header">
       <h3>Review</h3>
     </div>
+    <div *ngIf="pageName == Page.ReturnsReview" class="inputs-row report-entry" >
+      <div class="input-field">
+        <label for="required">Additional Review Required?</label>
+        <ng-container>
+          <div style="display: flex; align-items: center">
+              <input type="radio" (change)="AddFirstReview()"  id="isRequiredYes" 
+              [disabled]="!isReviseMode"  name="IsRequired" [(ngModel)]="addtlReviewRequired" [value]="true" style="margin-right: 10px; cursor: pointer" />
+              <label for="isRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
+
+              <input type="radio"  id="isRequiredNo" 
+              [disabled]="!isReviseMode" [(ngModel)]="addtlReviewRequired" name="IsRequired" [value]="false" style="
+                  margin-left: 20px;
+                  margin-right: 10px;
+                  cursor: pointer;
+                " />
+              <label for="isRequiredNo"  style="margin-left: 5px; color: #413b3c">No</label>
+              <input type="radio"  [(ngModel)]="addtlReviewRequired"  id="isRequiredNo" 
+              [disabled]="!isReviseMode"  name="IsRequired" [value]="false" style="
+                  margin-left: 20px;
+                  margin-right: 10px;
+                  cursor: pointer;
+                " />
+              <label for="isRequiredNo"  style="margin-left: 5px; color: #413b3c">Not Yet
+              </label>
+          </div>
+      </ng-container>
+      </div>
+        <div *ngIf="showFirstReview" class="input-field notes">
+          <label for="notes">Reason for Escalation/Review :</label>
+          <ckeditor [editor]="Editor" [config]="config" style="height: 200px; min-width: 100%;"></ckeditor>    
+        </div>
+        <div *ngIf="showFirstReview" class="input-field">
+          <label for="task">Task</label>
+          <input type="text" value="Review" id="task" disabled name="task" />
+        </div>
+        <div *ngIf="showFirstReview" class="input-field">
+          <label for="roleassignedTo">Role Assigned To</label>
+          <select  name="roleassignedTo" id="roleassignedTo" [(ngModel)]="selectedAppRoleID"
+          (change)="onRoleChange($event)">
+             <option [value]="0">Select</option>
+             <option *ngForm="let option of taskRolesList" [value]="option.AppRoleID">
+              {{option.AppRoleDesc}}
+            </option>
+          </select>
+        </div>
+        <div *ngIf="showFirstReview" class="input-field">
+          <label for="userAssignedTo">User Assigned To</label>
+          <select  name="userAssignedTo" id="userAssignedTo">
+             <option [value]="0">Select</option>
+             <option *ngForm="let option of UsersInRoleList" [value]="option.UserId">
+              {{option.UserName}}
+            </option>
+          </select>
+        </div>
+        <div *ngIf="showFirstReview" class="input-field">
+          <label for="userAssignedTo">Email(CC)</label>
+          <a (click)="openEmailCCPopup()">Add Recipients</a>
+        </div>
+        <div *ngIf="showFirstReview" class="input-field">
+          <label for="dueDate">Due Date</label>
+          <input  type="text" id="dueDate" name="dueDate" #dateInputs  />
+        </div>
+        
+    </div>
     <div *ngFor="let WfTask of Review ; let i = index">
       <div *ngIf="i != 0" class="popup-header">
         <h3></h3>
       </div>
-      <div *ngIf="pageName == Page.ReturnsReview" class="inputs-row report-entry" >
+      
+      <div *ngIf="pageName == Page.LateAdminFee" class="inputs-row report-entry" >
         <div class="input-field">
             <label for="required">Materially Complete</label>
             <ng-container>
@@ -49,7 +114,7 @@
                  [disabled]="!isEditable" />
         </div>
     </div>
-      <table class="fund-status-table">
+      <table *ngIf="pageName == Page.LateAdminFee" class="fund-status-table">
         <thead>
           <tr>
             <th>Task</th>
@@ -71,7 +136,7 @@
           </tr>
         </tbody>
       </table>
-      <div class="inputs-row report-entry">
+      <div *ngIf="pageName == Page.LateAdminFee" class="inputs-row report-entry">
         <div class="input-field">
           <label for="TaskInitiatedBy">Task Initiated By</label>
           <input type="text" id="TaskInitiatedBy" [(ngModel)]="WfTask.CreatedByUserName" name="TaskInitiatedBy" [disabled]="!isEditable">
@@ -91,18 +156,18 @@
 
         <div class="input-field">
           <label for="Status">Status</label>
-          <input type="text" id="Status" name="Status" [disabled]="!isEditable" 
+          <input type="text" id="Status" name="Status" [disabled]="!isEditable && WfTask.ObjectWFStatusTypeID != 2" 
           [(ngModel)]="WfTask.ObjectWFStatusTypeDesc"/>
         </div>
         <div class="input-field">
           <label for="StatusSetBy">Status Set By</label>
-          <input type="text" id="StatusSetBy" name="StatusSetBy" [disabled]="!isEditable" 
+          <input type="text" id="StatusSetBy" name="StatusSetBy" [disabled]="!isEditable && WfTask.ObjectWFStatusTypeID != 2" 
           [(ngModel)]="WfTask.StatusSetBy" />
         </div>
         <div class="input-field">
           <label for="StatusSetDate">Status Set Date</label>
           <input type="text" #dateInputs placeholder id="StatusSetDate" name="StatusSetDate"
-            [disabled]="!isEditable" [(ngModel)]="WfTask.CommentsDateTime"/>
+            [disabled]="!isEditable && WfTask.ObjectWFStatusTypeID != 2" [(ngModel)]="WfTask.CommentsDateTime "/>
         </div>
       </div>
       <div *ngIf="i === Review.length - 1" class="popup-header">

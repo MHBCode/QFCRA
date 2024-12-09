@@ -42,7 +42,7 @@
                 </div>
                 <div class="input-field">
                     <label for="leadRegulator">Lead Regulator</label>
-                    <input type="text" id="leadRegulator" name="leadRegulator" [(ngModel)]="RegulatorData"                         [disabled]="!isEditable" />
+                    <input type="text" id="leadRegulator" name="leadRegulator" [(ngModel)]="RegulatorData" [disabled]="!isEditable" />
                 </div>
             </div>
             <div class="rpt-list margin-top-10" *ngIf="firmRevDetails.firmRptReviewItems">
@@ -79,7 +79,7 @@
                             type="text"
                             id="reportingPeriodStartDate-{{ i }}"
                             name="reportingPeriodStartDate"
-                            [disabled]="!isEditable"
+                            [disabled]="!isReviseMode"
                           />
                         </div>
                       
@@ -89,7 +89,7 @@
                             type="text"
                             id="reportingPeriodEndDate-{{ i }}"
                             name="reportingPeriodEndDate"
-                            [disabled]="!isEditable"
+                            [disabled]="!isReviseMode"
                           />
                         </div>
                          
@@ -103,9 +103,9 @@
                             rel="noopener noreferrer" >
                             {{ item.report }}
                           </a> -->
-                          <button (click)="openLinkToReport(item)">Open Link</button>
+                          <a (click)="openLinkToReport(item)">{{ item.report }}</a>
                         </div>
-                      
+                        
                         <div class="input-field">
                           <label for="dueDate-{{ i }}">Report Received Date</label>
                           <input
@@ -124,7 +124,7 @@
                               <input
                                 type="radio"
                                 id="materiallyCompleteYes-{{ i }}"
-                                [disabled]="!isEditable"
+                                [disabled]="!isReviseMode"
                                 name="materiallyComplete-{{ i }}"
                                 [value]="true"
                                 [(ngModel)]="item.materiallyComplete"
@@ -135,7 +135,7 @@
                               <input
                                 type="radio"
                                 id="materiallyCompleteNo-{{ i }}"
-                                [disabled]="!isEditable"
+                                [disabled]="!isReviseMode"
                                 name="materiallyComplete-{{ i }}"
                                 [value]="false"
                                 [(ngModel)]="item.materiallyComplete"
@@ -145,19 +145,68 @@
                             </div>
                           </ng-container>
                         </div>
-                      
-                        <div class="input-field fullwidth">
-                          <label for="notes-{{ i }}">Comments/Findings :</label>
-                          <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="item.firmRptReviewFindings[i].firmRptReviewFindings" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
-                          <ng-template #notes>
-                            <p class="comments" [innerHTML]="item.firmRptReviewFindings[i].firmRptReviewFindings">
-                            </p>
-                          </ng-template>
+
+                        <div class="add-address-btn-container">
+                          <button class="addAddressBtn" (click)="addNewCommentsOnReviseMode()" *ngIf="isReviseMode">
+                            Add Comment
+                          </button>
+                        </div>
+                        
+                        <div *ngFor="let reviewItem of newComments; let itemIndex = index">
+                          <div *ngFor="let finding of reviewItem.firmRptReviewFindings; let commentIndex = index" class="input-field fullwidth">
+                            <div *ngIf="isReviseMode" class="del-address-container">
+                              <button class="RmvTrashBtn bi-trash" (click)="removeComment(itemIndex, commentIndex)"> </button>
+                            </div>
+                            <label for="notes-{{ commentIndex }}">Comments/Findings :</label>
+                            
+                            <!-- CKEditor in revise mode -->
+                            <div style="min-width: 100%;" *ngIf="isReviseMode; else notes">
+                              <ckeditor [(ngModel)]="finding.firmRptReviewFindings" [editor]="Editor" [config]="config" style="height: 200px; min-width: 100%;"></ckeditor>
+                              
+
+                            </div>
+                            
+                            <!-- Read-only mode -->
+                            <ng-template #notes>
+                              <p class="comments" [innerHTML]="finding.firmRptReviewFindings"></p>
+                            </ng-template>
+                          </div>
+                        </div>
+                        
+                        <div class="add-address-btn-container" *ngIf="isReviseMode">
+                          <button class="addAddressBtn" (click)="saveComments()">
+                            Save Comments
+                          </button>
                         </div>
                     </div>
                 </ng-container>
             </div>
-                <app-review
+            <div class="rpt-list margin-top-10" *ngIf="ActionItems.length != 0">
+              <div class="popup-header">
+                  <h3> Items Requiring Follow-Up/Action</h3>
+              </div>
+              <table class="fund-status-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Action To Be Taken</th>
+                    <th>Due Date</th>
+                    <th>Closed Date</th>
+                    <th>Resolution</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ActionItem of ActionItems">
+                    <td>{{ ActionItem.actionItemDesc }}</td>
+                     <td></td> 
+                    <td>{{ ActionItem.createdDate }}</td>
+                    <td>{{ ActionItem.completionDate }}</td>
+                    <td>{{ ActionItem.resolution }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+              <app-review
                 [firmId]="firmId"
                 [firmDetails]="firmDetails"
                 [isEditable]="isEditable"
@@ -165,8 +214,32 @@
                 [Review]="UserObjectWfTasks" 
                 [addtlReviewRequired]="firmRevDetails.addtlReviewRequired"
                 [addtlReviewRequiredDecisionMadeByName]="firmRevDetails.addtlReviewRequiredDecisionMadeByName"
-                [addtlReviewRequiredDecisionMadeOn]="firmRevDetails.addtlReviewRequiredDecisionMadeOn">               
+                [addtlReviewRequiredDecisionMadeOn]="firmRevDetails.addtlReviewRequiredDecisionMadeOn"
+                [isReviseMode]="isReviseMode"
+                [UserObjectWfTasks]="UserObjectWfTasks"
+                > 
+                             
               </app-review>
+              <div class="btn justify-content-end">
+                <button *ngIf="!isEditable">
+                  <i class="bi bi-pen"></i> Edit
+                </button>
+                <button (click)="CreateNewVerisionConfirmation()" *ngIf="!isReviseMode && firmRevDetails.maxRevisionNum == review.RptReviewRevNum">
+                  <i class="bi bi-pencil-square"></i> Revise
+                </button>
+                <button *ngIf="isReviseMode">
+                  <i class="bi bi-arrow-clockwise"></i> Start Workflow 
+                </button>
+                <button *ngIf="!isEditable">
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+                <button *ngIf="isEditable">
+                  Save
+                </button>
+                <button class="cancel-btn" *ngIf="isEditable">
+                  Cancel
+                </button>
+              </div>
         </div>
     </div> 
 </div>

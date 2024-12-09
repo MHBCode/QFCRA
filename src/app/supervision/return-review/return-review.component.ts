@@ -32,6 +32,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
   showReturnReviewRevision: boolean = false;
   selectedReviewRevision: any = null;
   documentTypeList:any = [];
+  showCreatePopup: boolean = false;
   constructor(
     private firmService: FirmService,
     private route: ActivatedRoute,
@@ -240,5 +241,11 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     this.showPopup = false;
     this.selectedReviewRevision = null; // Reset the selected review
   }
-
+  closeCreatePopup(){
+    this.showCreatePopup = false;
+  }
+  openCreatePopup(): void {
+    
+    this.showCreatePopup = true;
+  }
 }
