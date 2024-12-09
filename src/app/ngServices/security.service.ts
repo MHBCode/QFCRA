@@ -37,8 +37,8 @@ export class SecurityService {
     }
     return this.http.get<any>(url);
   }
-  isUserAllowedToAccessFirm(userId: number, firmId: number) {
-    const url = `${this.baseUrlSecurity}is_user_allowed_to_browse_firm_detail?userID=${userId}&FirmID=${firmId}&objectID=523`
+  isUserAllowedToAccessFirm(userId: number, firmId: number, objectId: number) {
+    const url = `${this.baseUrlSecurity}is_user_allowed_to_browse_firm_detail?userID=${userId}&FirmID=${firmId}&objectID=${objectId}`
     return this.http.get<any>(url);
   }
   getObjectTypeTable(userId: number, dropdown: string, OpTypeId: number): Observable<any> {

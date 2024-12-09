@@ -4479,7 +4479,7 @@ export class ViewFirmPageComponent implements OnInit {
 
   userAllowedToAccessFirm() {
     this.isLoading = true;
-    this.securityService.isUserAllowedToAccessFirm(this.userId, this.firmId).subscribe(data => {
+    this.securityService.isUserAllowedToAccessFirm(this.userId, this.firmId,523).subscribe(data => {
       this.isUserAllowed = data.response;
       this.isLoading = false;
       if (!this.isUserAllowed) {

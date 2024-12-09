@@ -45,5 +45,5 @@
 <app-reporting-schedule-view
   *ngIf="showPopup"
   [report]="selectedReport" [firmId]="firmId" [firmDetails]="firmDetails"
-  (closeRptPopup)="closePopup()">
+  (reloadReportSch)="loadReportingSchedule()" (closeRptPopup)="closePopup()">
 </app-reporting-schedule-view>

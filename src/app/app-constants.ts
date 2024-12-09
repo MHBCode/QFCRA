@@ -47,6 +47,9 @@ export const enfActionsDNFBP = "V_EnforcementActionOnTypes_DNFBP"
 export const firmTypes = "V_FirmTypes";
 export const authorisedFirmNames = "V_All_Firms_Authorised";
 export const dnfbpsFirmNames = "V_All_Firms_DNFBPs";
+// Reporting Schedule
+export const firmRptSubmissionTypes = "V_FirmRptSubmissionTypes";
+export const reportDocTypes = "v_Get_DocType";
 //Query String Parameter for FS Reporting
 export const QUERYSTRING_FSRPTDATAID = "fsRptDataID";
 export const Specify_Valid_Response = 1200;
@@ -762,4 +765,17 @@ export enum FileType
     Instance = 1,
     HTML = 2,
     Excel_Attachment = 3
+}
+
+export enum MessageLogFormReport
+{
+    SELECT_FROM_DATE = 1300,
+    SELECT_TO_DATE = 1301,
+    INVALID_DATES = 1302
+}
+
+export enum GenerateReportType
+{
+    New = 1,
+    FromPrevious = 2
 }

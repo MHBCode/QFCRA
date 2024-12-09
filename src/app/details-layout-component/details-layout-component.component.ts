@@ -88,7 +88,7 @@ export class DetailsLayoutComponent implements OnInit {
 
   userAllowedToAccessFirm() {
     this.isLoading = true;
-    this.securityService.isUserAllowedToAccessFirm(this.userId, this.firmId).subscribe({
+    this.securityService.isUserAllowedToAccessFirm(this.userId, this.firmId,523).subscribe({
       next: data => {
         this.isUserAllowed = data.response;
         this.isLoading = false;

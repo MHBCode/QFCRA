@@ -39,7 +39,7 @@ export class SupervisionService {
     );
   }
 
-  getErrorMessages(fieldName: string, msgKey: number, customMessage?: string, placeholderValue?: string): Observable<void> {
+  getErrorMessages(fieldName: string, msgKey: number, customMessage?: string, placeholderValue?: string, rpt?: any): Observable<void> {
     return new Observable(observer => {
       this.logForm.errorMessages(msgKey).subscribe(
         response => {
@@ -52,6 +52,11 @@ export class SupervisionService {
 
           // Store the updated error message
           this.errorMessages[fieldName] = errorMessage;
+
+          this.errorMessages[fieldName] = errorMessage;
+          if (rpt) {
+            rpt.errorMessages[fieldName] = errorMessage;
+          }
 
           observer.next();
         },
@@ -211,6 +216,35 @@ export class SupervisionService {
     });
   }
 
+
+  // Reporting Schedule
+  populateFirmRptSubmissionTypes(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.firmRptSubmissionTypes, OpTypeId).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Submission Types options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  populateReportTypes(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.reportDocTypes, OpTypeId).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Report Types options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
 
   isUserHasRestrictedAccess(userId: number, firmId: number, objectID: number): Observable<boolean> {
     return new Observable(observer => {

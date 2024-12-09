@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FirmService } from 'src/app/ngServices/firm.service';
 import { ReportScheduleService } from 'src/app/ngServices/report-schedule.service';
@@ -39,7 +39,6 @@ export class ReportingScheduleComponent {
 
   FirmAMLSupervisor: boolean = false;
   ValidFirmSupervisor: boolean = false;
-  UserDirector: boolean = false;
 
   assignedUserRoles: any = [];
   assignedLevelUsers: any = [];
@@ -61,7 +60,6 @@ export class ReportingScheduleComponent {
       this.isFirmAuthorised();
       this.isUserHasRestrictedAccess();
       forkJoin([
-        this.isUserDirector(),
         this.isValidFirmSupervisor(),
         this.isValidFirmAMLSupervisor(),
         this.firmDetailsService.loadAssignedUserRoles(this.userId),
@@ -138,11 +136,6 @@ export class ReportingScheduleComponent {
     );
   }
 
-  isUserDirector() {
-    return this.firmDetailsService.isUserDirector(this.userId).pipe(
-      tap(response => this.UserDirector = response)
-    );
-  }
 
   getControlVisibility(controlName: string): boolean {
     return this.firmDetailsService.getControlVisibility(controlName);

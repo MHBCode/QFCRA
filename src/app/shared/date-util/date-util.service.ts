@@ -10,11 +10,11 @@ export class DateUtilService {
   isOverdue(dueDate: string): boolean {
     const today = new Date();
     const taskDueDate = this.convertStringToDate(dueDate);
-  
+
     if (!taskDueDate) {
       return false; // If date is invalid, assume it's not overdue
     }
-  
+
     return taskDueDate < today; // Compare the two Date objects
   }
 
@@ -28,14 +28,14 @@ export class DateUtilService {
       Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
       Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
     };
-  
+
     // Split the date string: "09/Nov/2022"
     const parts = dateStr?.split('/');
     if (parts.length === 3) {
       const day = parseInt(parts[0], 10);
       const month = months[parts[1]]; // Convert "Nov" to "11"
       const year = parseInt(parts[2], 10);
-  
+
       // Create a new Date object from the parsed parts
       const formattedDate = `${year}-${month}-${String(day).padStart(2, '0')}`;
       const date = new Date(formattedDate); // This creates a valid Date object in "YYYY-MM-DD" format
@@ -74,7 +74,7 @@ export class DateUtilService {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   }
-  
+
   convertDateToYYYYMMDD(dateStr: string | Date): string | null {
 
     if (!dateStr) {
@@ -95,4 +95,24 @@ export class DateUtilService {
 
     return formattedDate;
   }
+
+  addYears(date: string | Date, years: number): Date {
+    const newDate = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(newDate.getTime())) {
+      throw new Error(`Invalid date: ${date}`);
+    }
+    newDate.setFullYear(newDate.getFullYear() + years);
+    return newDate;
+  }
+
+  addDays(date: string | Date, days: number): Date {
+    const newDate = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(newDate.getTime())) {
+      throw new Error(`Invalid date: ${date}`);
+    }
+    newDate.setDate(newDate.getDate() + days);
+    return newDate;
+  }
+
+
 }
