@@ -45,4 +45,8 @@ export class SecurityService {
     const url = `${this.baseUrlSecurity}get_object_type_table?userId=${userId}&objectTypeTable=${dropdown}&objectOpTypeId=${OpTypeId}&objectID=9999`
     return this.http.get<any>(url);
   }
+  getUsersInRole(objectId: number,roleId:number): Observable<any> {
+    const url = `${this.baseUrlSecurity}get_users_in_role?objectId=${objectId}&roleId=${roleId}`
+    return this.http.get<any>(url);
+  }
 }

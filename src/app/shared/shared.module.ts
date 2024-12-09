@@ -26,7 +26,8 @@ import { ReviewComponent } from './review/review.component';
     SharedRoutingModule,
     ReactiveFormsModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    CKEditorModule
   ],
   exports: [
     DataPlaceComponent,

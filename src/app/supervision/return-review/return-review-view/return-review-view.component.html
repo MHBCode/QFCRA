@@ -42,7 +42,7 @@
                 </div>
                 <div class="input-field">
                     <label for="leadRegulator">Lead Regulator</label>
-                    <input type="text" id="leadRegulator" name="leadRegulator" [(ngModel)]="RegulatorData"                         [disabled]="!isEditable" />
+                    <input type="text" id="leadRegulator" name="leadRegulator" [(ngModel)]="RegulatorData" [disabled]="!isEditable" />
                 </div>
             </div>
             <div class="rpt-list margin-top-10" *ngIf="firmRevDetails.firmRptReviewItems">
@@ -145,14 +145,38 @@
                             </div>
                           </ng-container>
                         </div>
-                      
-                        <div class="input-field fullwidth" *ngFor="let ReviewFindings of  item.firmRptReviewFindings">
-                          <label for="notes-{{ i }}">Comments/Findings :</label>
-                          <ckeditor *ngIf="isReviseMode || isEditable; else notes" [(ngModel)]="ReviewFindings.firmRptReviewFindings" [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
-                          <ng-template #notes>
-                            <p class="comments" [innerHTML]="ReviewFindings.firmRptReviewFindings">
-                            </p>
-                          </ng-template>
+
+                        <div class="add-address-btn-container">
+                          <button class="addAddressBtn" (click)="addNewCommentsOnReviseMode()" *ngIf="isReviseMode">
+                            Add Comment
+                          </button>
+                        </div>
+                        
+                        <div *ngFor="let reviewItem of newComments; let itemIndex = index">
+                          <div *ngFor="let finding of reviewItem.firmRptReviewFindings; let commentIndex = index" class="input-field fullwidth">
+                            <div *ngIf="isReviseMode" class="del-address-container">
+                              <button class="RmvTrashBtn bi-trash" (click)="removeComment(itemIndex, commentIndex)"> </button>
+                            </div>
+                            <label for="notes-{{ commentIndex }}">Comments/Findings :</label>
+                            
+                            <!-- CKEditor in revise mode -->
+                            <div style="min-width: 100%;" *ngIf="isReviseMode; else notes">
+                              <ckeditor [(ngModel)]="finding.firmRptReviewFindings" [editor]="Editor" [config]="config" style="height: 200px; min-width: 100%;"></ckeditor>
+                              
+
+                            </div>
+                            
+                            <!-- Read-only mode -->
+                            <ng-template #notes>
+                              <p class="comments" [innerHTML]="finding.firmRptReviewFindings"></p>
+                            </ng-template>
+                          </div>
+                        </div>
+                        
+                        <div class="add-address-btn-container" *ngIf="isReviseMode">
+                          <button class="addAddressBtn" (click)="saveComments()">
+                            Save Comments
+                          </button>
                         </div>
                     </div>
                 </ng-container>
@@ -182,7 +206,7 @@
                 </tbody>
               </table>
             </div>
-                <app-review
+              <app-review
                 [firmId]="firmId"
                 [firmDetails]="firmDetails"
                 [isEditable]="isEditable"
@@ -190,19 +214,25 @@
                 [Review]="UserObjectWfTasks" 
                 [addtlReviewRequired]="firmRevDetails.addtlReviewRequired"
                 [addtlReviewRequiredDecisionMadeByName]="firmRevDetails.addtlReviewRequiredDecisionMadeByName"
-                [addtlReviewRequiredDecisionMadeOn]="firmRevDetails.addtlReviewRequiredDecisionMadeOn">               
+                [addtlReviewRequiredDecisionMadeOn]="firmRevDetails.addtlReviewRequiredDecisionMadeOn"
+                [isReviseMode]="isReviseMode"
+                [UserObjectWfTasks]="UserObjectWfTasks"
+                > 
+                             
               </app-review>
               <div class="btn justify-content-end">
                 <button *ngIf="!isEditable">
                   <i class="bi bi-pen"></i> Edit
                 </button>
-                <button (click)="CreateNewVerisionConfirmation()" *ngIf="!isEditable">
+                <button (click)="CreateNewVerisionConfirmation()" *ngIf="!isReviseMode && firmRevDetails.maxRevisionNum == review.RptReviewRevNum">
                   <i class="bi bi-pencil-square"></i> Revise
+                </button>
+                <button *ngIf="isReviseMode">
+                  <i class="bi bi-arrow-clockwise"></i> Start Workflow 
                 </button>
                 <button *ngIf="!isEditable">
                   <i class="bi bi-trash"></i> Delete
                 </button>
-
                 <button *ngIf="isEditable">
                   Save
                 </button>

@@ -32,8 +32,9 @@ export class ReviewComponent {
   @Input() addtlReviewRequiredDecisionMadeOn : any;
   @Input() pageName;
   @Input() index: number;
-  @Input() Review: any[]=[];
-
+  @Input() Review: any;
+  @Input() isReviseMode : any;
+  @Input() UserObjectWfTasks: any;
   Page = FrimsObject;
   @Output() closeRegPopup = new EventEmitter<void>();
   @Output() fundDeleted = new EventEmitter<void>();
@@ -41,6 +42,10 @@ export class ReviewComponent {
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
+  taskRolesList: any
+  selectedAppRoleID: number = 0;
+  UsersInRoleList : any;
+  isShowEmailCCPopup:boolean = false;
   constructor(
     private supervisionService: SupervisionService,
     private securityService: SecurityService,
@@ -65,7 +70,7 @@ export class ReviewComponent {
     console.log(this.fee)
     if (!Array.isArray(this.Review)) {
       console.error('Review is not an array:', this.Review);
-      this.Review = []; // Fallback to an empty array
+      this.Review = null; // Fallback to an empty array
     }
   }
   onClose(): void {
@@ -103,5 +108,52 @@ export class ReviewComponent {
   };
   sanitizeHtml(html: string): SafeHtml {
     return this.sanitizerService.sanitizeHtml(html);
+  }
+  showFirstReview: boolean = false
+  AddFirstReview(){
+    this.showFirstReview = true;
+  } 
+  
+  getWorkflowTaskRoles(){
+    const objectTaskTypeID = this.UserObjectWfTasks.ObjectTaskTypeID;
+    const objectID = constants.FrimsObject.ReturnsReview;
+    const notificationFlag = 0;
+    const objectWFTaskDefID = this.UserObjectWfTasks.ObjectWFTaskDefID;
+    this.objectwfService.getWorkflowTaskRoles(objectTaskTypeID,objectID,notificationFlag,objectWFTaskDefID).subscribe({
+      next: (res) => {
+        this.taskRolesList = res.response;
+        console.log("taskRolesList",this.taskRolesList)
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fitching taskRolesList', error);
+        this.isLoading = false;
+      },
+    });
+  }
+  onRoleChange(event: Event) {
+    console.log('Selected AppRoleID:', this.selectedAppRoleID);
+  
+    this.getUsersInRole(this.selectedAppRoleID);
+  }
+  
+  getUsersInRole(selectedAppRoleID){
+    const objectID = constants.FrimsObject.ReturnsReview;
+    const roleId = selectedAppRoleID;
+    this.securityService.getUsersInRole(objectID,roleId).subscribe({
+      next: (res) => {
+        this.UsersInRoleList = res.response;
+        console.log("UsersInRoleList",this.UsersInRoleList)
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fitching UsersInRoleList', error);
+        this.isLoading = false;
+      },
+    });
+  }
+  
+  openEmailCCPopup(){
+    this.isShowEmailCCPopup = true;
   }
 }

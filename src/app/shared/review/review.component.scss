@@ -72,3 +72,16 @@
         width:100%;
     }
    }
+   a {
+    color: rgb(161, 48, 48);
+   }
+   .rpt-list .inputs-row.report-entry.border-style {
+    margin-top: 10px;
+    border-top: 1px solid #a51e36;
+    padding-top: 10px !important;
+}
+.popupcontainer .inputs-row {
+    gap: 3.5%;
+    justify-content: flex-start;
+    padding: 0px;
+}

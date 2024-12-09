@@ -39,8 +39,9 @@ export class ReturnReviewViewComponent {
   reportReceivedDate: string='';
   RegulatorData:any;
   ActionItems :any;
-  NewVerision:any;
+  NewVersion:any;
   isReviseMode : boolean = false;
+  newComments: any[] = [];
   constructor(
     private returnReviewService: ReturnReviewService,
     private supervisionService: SupervisionService,
@@ -67,7 +68,6 @@ export class ReturnReviewViewComponent {
       this.getObjectActionItems();
       
       this.getObjectWorkflow();
-     
   }
 
   onClose(): void {
@@ -76,18 +76,17 @@ export class ReturnReviewViewComponent {
   
   getReturnReviewDetail() {
     this.isLoading=true;
-    const params = {
-      firmRptReviewId: this.review.RptReviewID,
-      firmRptReviewRevNum: this.review.RptReviewRevNum,
-      roleId: 5001,
-      objectOpTypeId: constants.ObjectOpType.View,
-    };
+    const firmRptReviewId= this.review.RptReviewID;
+    const firmRptReviewRevNum= this.review.RptReviewRevNum;
+    const roleId= 5001;
+    const objectOpTypeId= constants.ObjectOpType.View;
+
   
-    this.returnReviewService.getReturnReviewDetilas(params).subscribe({
+    this.returnReviewService.getReturnReviewDetilas(firmRptReviewId,firmRptReviewRevNum,roleId,objectOpTypeId).subscribe({
       next: (res) => {
         // Assign full response to firmRevDetails
         this.firmRevDetails = res.response;
-  
+        console.log("firmRevDetails:", this.firmRevDetails);
         // Extract the `reportReceivedDesc` and parse `reportingBasis`
         const reportDesc = this.firmRevDetails?.firmRptReviewItems?.[0]?.reportReceivedDesc;
         this.reportReceivedDate = this.firmRevDetails?.firmRptReviewItems?.[0]?.receivedDate;
@@ -97,9 +96,16 @@ export class ReturnReviewViewComponent {
         }
         this.getReportingBasis();
         this.getRegulatorData();
+        this.newComments = this.firmRevDetails.firmRptReviewItems.map(item => ({
+          firmRptReviewFindings: [...item.firmRptReviewFindings]
+        }));
+        console.log("Initial newComments:", this.newComments);
+
+        console.log("newComments", this.newComments);
         this.getUserObjectWfTasks();
         console.log('firmRevDetails:', this.firmRevDetails);
         //console.log('Extracted Reporting Basis:', this.reportingBasis);
+        
         this.isLoading=false;
       },
       error: (error) => {
@@ -147,6 +153,7 @@ export class ReturnReviewViewComponent {
       },
       error: (error) => {
         console.error('Error fitching UserObjectWfTasks', error);
+        this.isLoading = false;
       },
     });
   }
@@ -328,30 +335,67 @@ getObjectWorkflow(){
     }).then((result) => {
       if (result.isConfirmed) {
         // Call the function to create a new version
-        this.CreateNewVerision();
+        this.CreateNewVersion();
       }
     });
   }
   
-  CreateNewVerision(){
+  CreateNewVersion() {
     this.isLoading = true;
-    const rptObjectId = constants.FrimsObject.ReturnsReview;
-    const rptReviewID = this.review.RptReviewID;
-    const rptReviewRevNum = this.review.RptReviewRevNum;
-    const objectOpTypeId = constants.ObjectOpType.View;
-    const userId = 55;
-    const roleId = 702
-    this.returnReviewService.SaveNewRevisonNum(rptObjectId,rptReviewID,rptReviewRevNum,userId,roleId).subscribe({
-      next: (res) => {   
-          this.NewVerision = res.response;
-          console.log("NewVerision",this.NewVerision)
+    this.isReviseMode = true;
+  
+    const rptObjectId = Number(constants.FrimsObject.ReturnsReview);
+    const rptReviewID = Number(this.review.RptReviewID);
+    const rptReviewRevNum = Number(this.review.RptReviewRevNum);
+    const userId = Number(30);
+    const roleId = Number(5001);
+  
+    this.returnReviewService
+      .SaveNewRevisonNum(rptObjectId, rptReviewID, rptReviewRevNum, userId, roleId)
+      .subscribe({
+        next: (res) => {
+          this.NewVersion = res.response;
+          console.log('NewVersion', this.NewVersion);
           this.isLoading = false;
-          this.isReviseMode = true;
-      },
-      error: (error) => {
-        console.error(`Error creating NewVerision:`, error);
-        this.isLoading = false;
-      },
+        },
+        error: (error) => {
+          console.error(`Error creating NewVersion:`, error);
+          this.isLoading = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to create a new version. Please try again later.',
+          });
+        },
+      });
+  }
+  
+  addNewCommentsOnReviseMode() {
+    // Add a new empty comment to the first review item's findings for simplicity
+    const newComment = { firmRptReviewFindings: '' };
+    
+    if (this.newComments.length > 0) {
+      this.newComments[0].firmRptReviewFindings.push(newComment);
+    } else {
+      this.newComments.push({ firmRptReviewFindings: [newComment] });
+    }
+    
+    console.log("After adding a new comment:", this.newComments);
+  }
+  
+  removeComment(itemIndex: number, commentIndex: number) {
+    if (this.newComments[itemIndex]?.firmRptReviewFindings) {
+      this.newComments[itemIndex].firmRptReviewFindings.splice(commentIndex, 1);
+    }
+    
+    console.log("After removing a comment:", this.newComments);
+  }
+  
+  saveComments() {
+    this.firmRevDetails.firmRptReviewItems.forEach((item, index) => {
+      item.firmRptReviewFindings = [...this.newComments[index].firmRptReviewFindings];
     });
+  
+    console.log('Updated firmRptReviewItems:', this.firmRevDetails.firmRptReviewItems);
   }
 }
