@@ -17,26 +17,26 @@
             <div class="inputs-row" >
                 <div class="input-field">
                     <label for="QFCNumber">QFC Number</label>
-                    <input type="text" [(ngModel)]="firmDetails.QFCNum" id="QFCNumber" name="QFCNumber"
+                    <input type="text" disabled [(ngModel)]="firmDetails.QFCNum" id="QFCNumber" name="QFCNumber"
                      />
                 </div>
                 <div class="input-field">
                     <label for="prudentialCategory">Prudential Category</label>
-                    <input type="text" id="prudentialCategory" name="prudentialCategory"
+                    <input disabled type="text" id="prudentialCategory" name="prudentialCategory"
                     [(ngModel)]="firmDetails.PrudentialCategoryTypeDesc"   />
                 </div>
                 <div class="input-field">
                     <label for="legalStatus">Legal Status</label>
-                    <input type="text" id="legalStatus" name="legalStatus"
+                    <input disabled type="text" id="legalStatus" name="legalStatus"
                     [(ngModel)]="firmDetails.LegalStatusTypeDesc"   />
                 </div>
                 <div class="input-field">
                     <label for="reportingBasis">Reporting Basis</label>
-                    <input type="text" id="reportingBasis" name="reportingBasis" />
+                    <input disabled type="text" [(ngModel)]="ReportingBasis.FirmRptBasisTypeDesc" id="reportingBasis" name="reportingBasis" />
                 </div>
                 <div class="input-field">
                     <label for="leadRegulator">Lead Regulator</label>
-                    <input type="text" id="leadRegulator" name="leadRegulator"  />
+                    <input disabled type="text" id="leadRegulator" name="leadRegulator" [(ngModel)]="RegulatorData" />
                 </div>
             </div>
             <div class="rpt-list margin-top-10" >
@@ -46,17 +46,41 @@
 
                 <ng-container >
                     <div class="inputs-row report-entry" >
-                        <div class="input-field">
-                          <label for="reportTypeEntry">Report to be Reviewed</label>
-                          <input
-                            type="text"
-                            id="reportTypeEntry"
-                            name="reportTypeEntry"
-                            
-                          />
-                        </div>
+                      <div class="input-field">
+                        <label for="reportRev">Report to be Reviewed</label>
+                        <!-- Main Dropdown -->
+                        <select
+                          (change)="SelectedReportReviewed($event)"
+                          name="reportRev"
+                          id="reportRev"
+                          [(ngModel)]="ReportReviewed"
+                        >
+                          <option [value]="''" [selected]>Select</option>
+                          <option
+                            *ngFor="let option of ReportsReceivedList"
+                            [value]="option.RptSchID_RptRecivedID"
+                          >
+                            {{ option.Reports }}
+                          </option>
+                          <option [value]="'Other'">Other ad-hoc report; not part of standard reporting schedule</option>
+                        </select>
                       
-                        <div class="input-field">
+                        <!-- Secondary Dropdown (conditionally shown) -->
+                        <select *ngIf="showOtherDropdown"
+                          
+                        name="otherReportRev"
+                        id="otherReportRev"
+                        
+                      >
+                        <option [value]="'0'">Select</option>
+                        <option >
+                          
+                        </option>
+                      </select>
+                   
+                      </div>
+
+                        <div *ngIf="!showOtherDropdown || ReportReviewed != ''"  class="input-field">
                           <label for="submissionType">Report Due Date</label>
                           <input
                             type="text"
@@ -97,7 +121,7 @@
                           />
                         </div>
                         
-                        <div class="input-field">
+                        <div *ngIf="!showOtherDropdown" class="input-field">
                           <label for="materiallyComplete">Materially Complete</label>
                           <ng-container>
                             <div style="display: flex; align-items: center">
@@ -123,18 +147,322 @@
                             </div>
                           </ng-container>
                         </div>
+                        <div class="input-field">
+                          <label for="dueDate">Submission Status</label>
+                          <input
+                            type="text"
+                            id="dueDate"
+                            name="dueDate"
+                          />
+                        </div>
+                        <div class="input-field">
+                          <label for="materiallyComplete">Resubmission Required</label>
+                          <ng-container>
+                            <div style="display: flex; align-items: center">
+                              <input
+                                type="radio"
+                                id="materiallyCompleteYes"
+                                name="materiallyComplete"
+                                [value]="true"
+                               
+                                style="margin-right: 10px; cursor: pointer"
+                              />
+                              <label for="materiallyCompleteYes" style="margin-left: 5px; color: #413b3c">Yes</label>
                       
+                              <input
+                                type="radio"
+                                id="materiallyCompleteNo"
+                                name="materiallyComplete"
+                                [value]="false"
+                                
+                                style="margin-left: 20px; margin-right: 10px; cursor: pointer;"
+                              />
+                              <label for="materiallyCompleteNo" style="margin-left: 5px; color: #413b3c">No</label>
+                            </div>
+                          </ng-container>
+                        </div>
+                        <div *ngIf="!showOtherDropdown || ReportReviewed != ''" class="input-field">
+                          <label for="dueDate">Material Completeness Decision Made By</label>
+                          <input
+                            type="text"
+                            id="dueDate"
+                            name="dueDate"
+                          />
+                        </div>
+                        <div *ngIf="!showOtherDropdown || ReportReviewed != ''" class="input-field">
+                          <label for="dueDate">Resubmission Required Decision Made By</label>
+                          <input
+                            type="text"
+                            id="dueDate"
+                            name="dueDate"
+                          />
+                        </div>
+                        <div *ngIf="!showOtherDropdown || ReportReviewed != ''" class="input-field">
+                          <label for="dueDate">Material Completeness Decision Made On</label>
+                          <input
+                            type="text"
+                            id="dueDate"
+                            name="dueDate"
+                          />
+                        </div>
+                        <div *ngIf="!showOtherDropdown || ReportReviewed != ''" class="input-field">
+                          <label for="dueDate">Resubmission Required Decision Made On</label>
+                          <input
+                            type="text"
+                            id="dueDate"
+                            name="dueDate"
+                          />
+                        </div>
+                        <div class="popup-header">
+                          <h3></h3>
+                      </div>
                         <div class="input-field-notes">
-                            <label for="notes">Comments/Findings</label>
-                            <div>
-                                <ckeditor [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                            <div class="add-address-btn-container">
+                              <button class="addAddressBtn" (click)="addNewCommentsOnReviseMode()" >
+                                Add Comment
+                              </button>
+                            </div>
+                            
+                            <div *ngFor="let reviewItem of newComments; let itemIndex = index">
+                              <div *ngFor="let finding of reviewItem.firmRptReviewFindings; let commentIndex = index" class="input-field fullwidth">
+                                <div  class="del-address-container">
+                                  <button class="RmvTrashBtn bi-trash" (click)="removeComment(itemIndex, commentIndex)"> </button>
+                                </div>
+                                <label for="notes-{{ commentIndex }}">Comments/Findings :</label>
+                                
+                                <!-- CKEditor in revise mode -->
+                                <div style="min-width: 100%;" >
+                                  <ckeditor [(ngModel)]="finding.firmRptReviewFindings" [editor]="Editor" [config]="config" style="height: 200px; min-width: 100%;"></ckeditor>
+                                  
+    
+                                </div>
+                              
+                              </div>
+                            </div>
+                            
+                            <div *ngIf="newComments.length > 0" class="add-address-btn-container" >
+                              <button class="addAddressBtn" (click)="saveComments()">
+                                Save Comments
+                              </button>
                             </div>
                         </div>
                     </div>
                 </ng-container>
             </div>
+            <div class="rpt-list margin-top-10" >
+              <div class="popup-header">
+                  <h3>Items Requiring Follow-Up/Action</h3>
+              </div>
+              <div class="add-address-btn-container">
+                <button class="addAddressBtn" (click)="addFollowUpItem()" >
+                  Add Action
+                </button>
+              </div>
+              <div class="inputs-row report-entry" *ngFor="let followUp of followUpItems; let i = index">
+                <div  class="del-address-container">
+                  <button class="RmvTrashBtn bi-trash" (click)="removeFollowUpItem(i)"> </button>
+                </div>
+                <div class="input-field">
+                  <label for="item-{{ i }}">Item</label>
+                  <input
+                    type="text"
+                    id="item-{{ i }}"
+                    name="item"
+                    [(ngModel)]="followUp.item"
+                  />
+                </div>
             
-        </div>
-    </div> 
+                <div class="input-field-notes">
+                  <label for="actionsTaken-{{ i }}">Actions To Be Taken</label>
+                  <ckeditor
+                    [(ngModel)]="followUp.actionsTaken"
+                    [editor]="Editor"
+                    [config]="config"
+                    style="height: 200px; min-width: 100%;"
+                  ></ckeditor>
+                </div>
+            
+                <div class="input-field">
+                  <label for="dueDate-{{ i }}">Due Date</label>
+                  <input
+                    type="text"
+                    id="dueDate-{{ i }}"
+                    name="dueDate"
+                    [(ngModel)]="followUp.dueDate"
+                  />
+                </div>
+            
+                <div class="input-field">
+                  <label for="closedDate-{{ i }}">Closed Date</label>
+                  <input
+                    type="text"
+                    id="closedDate-{{ i }}"
+                    name="closedDate"
+                    [(ngModel)]="followUp.closedDate"
+                  />
+                </div>
+            
+                <div class="input-field-notes">
+                  <label for="resolution-{{ i }}">Resolution</label>
+                  <ckeditor
+                    [(ngModel)]="followUp.resolution"
+                    [editor]="Editor"
+                    [config]="config"
+                    style="height: 200px; min-width: 100%;"
+                  ></ckeditor>
+                </div>
+              </div>
+              <div *ngIf="followUpItems.length > 0" class="add-address-btn-container" >
+                <button class="addAddressBtn" (click)="saveComments()">
+                  Save Action
+                </button>
+              </div>
+           </div>
+           <!-- <div class="rpt-list margin-top-10">
+            <div class="popup-header">
+              <h3>Review</h3>
+            </div>
+            <div class="inputs-row report-entry" >
+              <div class="input-field">
+                <label for="required">Additional Review Required?</label>
+                <ng-container>
+                  <div style="display: flex; align-items: center">
+                    
+                    <input
+                      type="radio"
+                      (change)="AddFirstReview()"
+                      id="isRequiredYes"
+                      name="IsRequired"                      
+                      [value]="true"
+                      style="margin-right: 10px; cursor: pointer"
+                    />
+                    <label for="isRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
+              
+                    
+                    <input
+                      type="radio"                     
+                      id="isRequiredNo"
+                      name="IsRequired"
+                      [value]="'no'"
+                      style="margin-left: 20px; margin-right: 10px; cursor: pointer"
+                    />
+                    <label for="isRequiredNo" style="margin-left: 5px; color: #413b3c">No</label>
+              
+                    
+                    <input
+                      type="radio"
+                      id="isRequiredNotYet" 
+                      name="IsRequired"
+                      [value]="'notYet'"
+                      style="margin-left: 20px; margin-right: 10px; cursor: pointer"
+                    />
+                    <label for="isRequiredNotYet" style="margin-left: 5px; color: #413b3c">Not Yet</label>
+                  </div>
+                </ng-container>
+              </div>
+              <div  class="input-field notes">
+                <label for="notes">Reason for Escalation/Review :</label>
+                <ckeditor [editor]="Editor" [config]="config" style="height: 200px; min-width: 100%;"></ckeditor>    
+              </div>
+              <div class="input-field">
+                <label for="task">Task</label>
+                <input type="text" value="Review" id="task" disabled name="task" />
+              </div>
+              <div  class="input-field">
+                <label for="roleassignedTo">Role Assigned To</label>
+                <select  name="roleassignedTo" id="roleassignedTo" [(ngModel)]="selectedAppRoleID"
+                (change)="onRoleChange($event)">
+                   <option [value]="0">Select</option>
+                   <option *ngFor="let option of taskRolesList" [value]="option.AppRoleID">
+                    {{option.AppRoleDesc}}
+                  </option>
+                </select>
+              </div>
+              <div  class="input-field">
+                <label for="userAssignedTo">User Assigned To</label>
+                <select  name="userAssignedTo" id="userAssignedTo">
+                   <option [value]="0">Select</option>
+                   <option *ngFor="let option of UsersInRoleList" [value]="option.UserId">
+                    {{option.UserName}}
+                  </option>
+                </select>
+              </div>
+              <div  class="input-field">
+                <label for="userAssignedTo">Email(CC)</label>
+                <a>Add Recipients</a>
+              </div>
+              <div  class="input-field">
+                <label for="dueDate">Due Date</label>
+                <input  type="text" id="dueDate" name="dueDate" #dateInputs  />
+              </div>
+            </div>
+           </div> -->
+           <div class="rpt-list margin-top-10" >
+            <div class="popup-header">
+              <h3>Review</h3>
+            </div>
+              
+            <div class="add-address-btn-container">
+              <button class="addAddressBtn" (click)="addNewReview()" >
+                Additional Review Required ? 
+              </button>
+            </div>
+              <div *ngFor="let review of reviews; let i = index" class="inputs-row report-entry">
+                <div  class="del-address-container">
+                  <button class="RmvTrashBtn bi-trash" (click)="removeReview(i)"> </button>
+                </div>
+                <div class="input-field">
+                  <label for="task-{{ i }}">Task</label>
+                  <input type="text" id="task-{{ i }}" value="Review" disabled name="task" />
+                </div>
+            
+                <div class="input-field notes">
+                  <label for="reason-{{ i }}">Reason for Escalation/Review:</label>
+                  <ckeditor [(ngModel)]="review.reason" [editor]="Editor" [config]="config" style="height: 200px; min-width: 100%;"></ckeditor>
+                </div>
+            
+                <div class="input-field">
+                  <label for="roleassignedTo-{{ i }}">Role Assigned To</label>
+                  <select
+                    [(ngModel)]="review.roleAssignedTo"
+                    name="roleassignedTo-{{ i }}"
+                    id="roleassignedTo-{{ i }}"
+                    (change)="onRoleChange($event, i)"
+                  >
+                    <option [value]="0">Select</option>
+                    <option *ngFor="let option of taskRolesList" [value]="option.AppRoleID">
+                      {{ option.AppRoleDesc }}
+                    </option>
+                  </select>
+                </div>
+            
+                <div class="input-field">
+                  <label for="userAssignedTo-{{ i }}">User Assigned To</label>
+                  <select [(ngModel)]="review.userAssignedTo" name="userAssignedTo-{{ i }}" id="userAssignedTo-{{ i }}">
+                    <option [value]="0">Select</option>
+                    <option *ngFor="let option of UsersInRoleList" [value]="option.UserId">
+                      {{ option.UserName }}
+                    </option>
+                  </select>
+                </div>
+            
+                <div class="input-field">
+                  <label for="email-{{ i }}">Email (CC)</label>
+                  <input type="text" [(ngModel)]="review.email" name="email-{{ i }}" />
+                </div>
+            
+                <div class="input-field">
+                  <label for="dueDate-{{ i }}">Due Date</label>
+                  <input type="text" [(ngModel)]="review.dueDate" id="dueDate-{{ i }}" name="dueDate" />
+                </div>
+                <div *ngIf="i != reviews.length" class="popup-header">
+                  <h3></h3>
+                </div>
+            </div>
+            
+          </div>
+          
+
+          </div> 
 </div>
 

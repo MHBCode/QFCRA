@@ -37,4 +37,8 @@ export class UsersService {
     const url = `${this.baseUrl}is_user_has_restricted_access?userId=${userId}&firmId=${firmId}&objectID=${objectID}`;
     return this.http.get<any>(url);
   }
+  getUsers():Observable<any> {
+    const url = `${this.baseUrl}get_users`
+    return this.http.get<any>(url);
+  }
 }

@@ -2,3 +2,57 @@
     width: 100%;
     min-height: 250px;
   }
+  .add-address-btn-container,
+  .add-regulator-btn-container {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      ;
+      margin-bottom: 10px;
+  }
+
+  .addAddressBtn,
+  .addRegulatorBtn {
+      background: #A51E36;
+      color: white;
+      border: none;
+      font-size: 15px;
+      padding: 5px;
+      border-radius: 7px;
+      margin-right: 10px;
+  }
+  
+  .addAddressBtn:disabled {
+      background-color: #A51E36;
+      color: white;
+      cursor: default;
+      opacity: 0.6;
+  }
+  .del-address-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+.popupcontainer .fullwidth{
+  width: 100%;
+}
+.RmvTrashBtn {
+  background: red;
+  color: white;
+  border: none;
+  font-size: 15px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  
+}
+.notes {
+  width: 100% !important;
+  margin-top: 10px;
+  padding: 10px;
+  > div{
+      width:100%;
+  }
+ }
+ a {
+  color: rgb(161, 48, 48);
+ }

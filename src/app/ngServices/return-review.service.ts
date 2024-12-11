@@ -28,8 +28,8 @@ export class ReturnReviewService {
     const url =`${this.returnViewUrl}get_rpt_review_details?firmRptReviewId=${firmRptReviewId}&firmRptReviewRevNum=${firmRptReviewRevNum}&roleId=${roleId}&objectOpTypeId=${objectOpTypeId}`
     return this.http.get<any>(url);
   }
-  getReportingBasis(firmId:number,firmRptShcItemID:number): Observable<any> {
-    const url = `${this.returnViewUrl}get_reporting_basis?firmId=${firmId}&firmRptShcItemID=${firmRptShcItemID}`;
+  getReportingBasis(firmId:number): Observable<any> {
+    const url = `${this.returnViewUrl}get_reporting_basis?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
   getRegulatorData(firmId:number): Observable<any> {
@@ -44,10 +44,13 @@ export class ReturnReviewService {
     userId: number,
     roleId: number
   ): Observable<any> {
-    // Construct the URL with query parameters
     const url = `${this.returnViewUrl}SaveNewRevisonNum?rptObjectId=${rptObjectId}&rptReviewID=${rptReviewID}&rptReviewRevNum=${rptReviewRevNum}&userId=${userId}&roleId=${roleId}`;
     console.log('Request URL:', url);
-    return this.http.post<any>(url, {}); // Send an empty body for POST
+    return this.http.post<any>(url, {}); 
+  }
+  getReportsReceived(firmId: number,userId:number): Observable<any> {
+    const url = `${this.returnViewUrl}get_reports_received?firmId=${firmId}&userId=${userId}`;
+    return this.http.get<any>(url); 
   }
 }
 

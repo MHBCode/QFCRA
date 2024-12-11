@@ -15,6 +15,7 @@ import { FirmRptAdminFeeService } from 'src/app/ngServices/firm-rpt-admin-fee.se
 import { SafeHtml } from '@angular/platform-browser';
 import { WaiverService } from 'src/app/ngServices/waiver.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
+import {UsersService} from 'src/app/ngServices/users.service'
 @Component({
   selector: 'app-review',
   templateUrl: './review.component.html',
@@ -46,6 +47,7 @@ export class ReviewComponent {
   selectedAppRoleID: number = 0;
   UsersInRoleList : any;
   isShowEmailCCPopup:boolean = false;
+  UsersList :any;
   constructor(
     private supervisionService: SupervisionService,
     private securityService: SecurityService,
@@ -58,6 +60,7 @@ export class ReviewComponent {
     private sanitizerService: SanitizerService,
     private firmRptAdminFeeService: FirmRptAdminFeeService,
     private waiverService : WaiverService,
+    private usersService : UsersService,
     
   ) {
 
@@ -153,7 +156,40 @@ export class ReviewComponent {
     });
   }
   
-  openEmailCCPopup(){
-    this.isShowEmailCCPopup = true;
+
+  CancleFirstReview(){
+    Swal.fire({
+      text: "Your selection of 'No' for the 'Additional Review Required' field indicates that your review of this submission is complete and that you intend to close-out this review without any additional reviews. Any further changes to this review will have to be made by creating a new revision of this review by clicking on the 'Revise' button. If your review of this report has not been completed, please select 'Not Yet' and save your changes.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#982B1C',
+      cancelButtonColor: '#982B1C',
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.showFirstReview = false;
+      }
+    });
   }
+
+ // selected user
+ openEmailCCPopup(){
+  this.isShowEmailCCPopup = true;
+  this.getUsers();
+}
+
+getUsers(){
+  this.usersService.getUsers().subscribe({
+    next: (res) => {
+      this.UsersList = res.response;
+      console.log("UsersList",this.UsersList)
+      this.isLoading = false;
+    },
+    error: (error) => {
+      console.error('Error fitching UsersList', error);
+      this.isLoading = false;
+    },
+  });
+}
 }

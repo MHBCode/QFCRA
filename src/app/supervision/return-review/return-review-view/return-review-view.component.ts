@@ -115,9 +115,8 @@ export class ReturnReviewViewComponent {
     });
   }
   getReportingBasis(){
-    const firmRptShcItemID = this.review.FirmRptSchItemID;
     const firmId = this.firmId;
-    this.returnReviewService.getReportingBasis(firmId,firmRptShcItemID).subscribe({
+    this.returnReviewService.getReportingBasis(firmId).subscribe({
       next: (res) => {
           this.ReportingBasis = res.response;
           console.log("Reporting Basis",this.ReportingBasis)
