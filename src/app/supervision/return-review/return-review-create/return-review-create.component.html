@@ -58,7 +58,7 @@
                           <option [value]="''" [selected]>Select</option>
                           <option
                             *ngFor="let option of ReportsReceivedList"
-                            [value]="option.RptSchID_RptRecivedID"
+                            [value]="option.firmRptSchItemId + ',' + option.docTypeId"
                           >
                             {{ option.Reports }}
                           </option>
@@ -66,23 +66,28 @@
                         </select>
                       
                         <!-- Secondary Dropdown (conditionally shown) -->
-                        <select *ngIf="showOtherDropdown"
-                          
-                        name="otherReportRev"
-                        id="otherReportRev"
-                        
-                      >
-                        <option [value]="'0'">Select</option>
-                        <option >
-                          
-                        </option>
-                      </select>
-                   
+                        <select *ngIf="showOtherDropdown" name="otherReportRev"id="otherReportRev" (change)="onDropdownChange($event)">
+                          <option [value]="'0'">Select</option>
+                          <option *ngFor="let option of OtherReportTypeList" [value]="option.DocTypeID"> 
+                           {{option.DocTypeDesc}}
+                          </option>
+                        </select>
+                        <div *ngIf="DocSubTypesList && DocSubTypesList.length > 0" class="checkbox-container">
+                          <label *ngFor="let subType of DocSubTypesList" class="checkbox-item">
+                            <input
+                              type="checkbox"
+                              [value]="subType.DocSubTypeID"
+                              [(ngModel)]="subType.checked"
+                            />
+                            {{ subType.DocSubTypeDesc }}
+                          </label>
+                        </div>
                       </div>
 
                         <div *ngIf="!showOtherDropdown || ReportReviewed != ''"  class="input-field">
                           <label for="submissionType">Report Due Date</label>
                           <input
+                          [()]
                             type="text"
                             id="submissionType"
                             name="submissionType"
@@ -92,6 +97,7 @@
                         <div class="input-field">
                           <label for="reportingPeriodStartDate">Reporting Period Start Date</label>
                           <input
+                          [(ngModel)]="reportingPeriodStartDate"
                             type="text"
                             id="reportingPeriodStartDate"
                             name="reportingPeriodStartDate"
@@ -241,7 +247,7 @@
                             </div>
                             
                             <div *ngIf="newComments.length > 0" class="add-address-btn-container" >
-                              <button class="addAddressBtn" (click)="saveComments()">
+                              <button class="addAddressBtn" (click)="saveCommentsToPublish()">
                                 Save Comments
                               </button>
                             </div>
@@ -311,11 +317,6 @@
                     style="height: 200px; min-width: 100%;"
                   ></ckeditor>
                 </div>
-              </div>
-              <div *ngIf="followUpItems.length > 0" class="add-address-btn-container" >
-                <button class="addAddressBtn" (click)="saveComments()">
-                  Save Action
-                </button>
               </div>
            </div>
            <!-- <div class="rpt-list margin-top-10">

@@ -12,6 +12,7 @@ import { LoaderComponent } from './loader/loader.component';
 import { PaginationComponent } from './pagination/pagination.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { ReviewComponent } from './review/review.component';
+import { WorkflowComponent } from './Workflow/workflow/workflow.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { ReviewComponent } from './review/review.component';
     AttachmentComponent,
     LoaderComponent,
     PaginationComponent,
-    ReviewComponent
+    ReviewComponent,
+    WorkflowComponent
   ],
   imports: [
     CommonModule,

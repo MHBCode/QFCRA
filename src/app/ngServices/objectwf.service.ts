@@ -47,7 +47,7 @@ export class ObjectwfService {
   getObjectWorkflow(objectId:number,objectInstanceId:number,objectInstanceRevNum:number): Observable<any> {
     const url = `${this.baseUrlObjectWF}get_object_workflow?objectId=${objectId}&objectInstanceId=${objectInstanceId}&objectInstanceRevNum=${objectInstanceRevNum}`
     return this.http.get<any>(url);
-  }
+  } 
   getWorkflowTaskRoles(objectTaskTypeID:number,objectID:number,notificationFlag:number,objectWFTaskDefID:number): Observable<any> {
       const url = `${this.baseUrlObjectWF}get_workflow_task_roles?objectTaskTypeID=${objectTaskTypeID}&objectID=${objectID}&notificationFlag=${notificationFlag}&objectWFTaskDefID=${objectWFTaskDefID}`
       return this.http.get<any>(url); 

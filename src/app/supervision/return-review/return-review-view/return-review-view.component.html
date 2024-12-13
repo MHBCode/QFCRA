@@ -230,6 +230,12 @@
                 <button *ngIf="isReviseMode">
                   <i class="bi bi-arrow-clockwise"></i> Start Workflow 
                 </button>
+                <app-workflow
+                [firmId]="firmId"
+                [firmDetails]="firmDetails"
+                >
+
+                </app-workflow>
                 <button *ngIf="!isEditable">
                   <i class="bi bi-trash"></i> Delete
                 </button>

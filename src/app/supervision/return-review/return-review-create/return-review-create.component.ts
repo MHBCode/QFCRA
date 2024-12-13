@@ -9,6 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Bold, ClassicEditor, Essentials, Font, FontColor, FontSize, Heading, Indent, IndentBlock, Italic, Link, List, MediaEmbed, Paragraph, Table, Undo } from 'ckeditor5';
 import { ReviewComponent } from 'src/app/shared/review/review.component';
 import {ObjectwfService} from 'src/app/ngServices/objectwf.service';
+import { ReportScheduleService } from 'src/app/ngServices/report-schedule.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
@@ -29,7 +30,7 @@ export class ReturnReviewCreateComponent {
   ReportingBasis:any;
   RegulatorData:any;
   selectedAppRoleID: number = 0;
-
+  UsersRoleList: any;
   now = new Date();
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
@@ -47,11 +48,11 @@ export class ReturnReviewCreateComponent {
     private route: ActivatedRoute,
     private logForm : LogformService,
     private objectwfService: ObjectwfService,
-
+    private reportSchedule: ReportScheduleService,
   ) {
 
   }
-
+  
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
@@ -62,8 +63,11 @@ export class ReturnReviewCreateComponent {
     this.getReportingBasis();
     this.getRegulatorData();
     this.getReportsReceived();
-    this.getUserRoles();
-    this.getDocumentType();
+    //this.getUserRoles();
+    //this.getDocumentType();
+    this.getUserRoles(() => {
+      this.getDocumentType();
+    });
   }
   onClose(): void {
     this.closeCreatePopup.emit();
@@ -171,12 +175,14 @@ export class ReturnReviewCreateComponent {
       },
     }) 
   }
-  ReportReviewed : any;
-  showOtherDropdown : boolean = false;
-  ReportReviewedStartWithNum : boolean = false;
+  ReportReviewed: any;
+  showOtherDropdown: boolean = false;
+  firmRptSchItemId: number | null = null; // To store the selected firmRptSchItemId
+  docTypeId: number | null = null; // To store the selected docTypeId
+  
   SelectedReportReviewed(event: Event): void {
     const selectedValue = (event.target as HTMLSelectElement).value;
-
+  
     if (selectedValue === 'Other') {
       this.showOtherDropdown = true; // Show the secondary dropdown
       this.ReportReviewed = selectedValue; // Set the "Other" value
@@ -184,10 +190,15 @@ export class ReturnReviewCreateComponent {
     } else {
       this.showOtherDropdown = false; // Hide the secondary dropdown
       this.ReportReviewed = selectedValue; // Set the selected report
-      console.log('Selected Report:', selectedValue);
-    }
-    if (/^\d/.test(selectedValue)){
-      this.ReportReviewedStartWithNum = true;
+  
+      // Split the concatenated value to get firmRptSchItemId and docTypeId
+      const [firmRptSchItemId, docTypeId] = selectedValue.split(',').map(Number);
+  
+      this.firmRptSchItemId = firmRptSchItemId;
+      this.docTypeId = docTypeId;
+  
+      console.log('Selected firmRptSchItemId:', this.firmRptSchItemId);
+      console.log('Selected docTypeId:', this.docTypeId);
     }
   }
 
@@ -246,18 +257,16 @@ export class ReturnReviewCreateComponent {
     console.log('After removing an item:', this.followUpItems);
   }
 
-  saveFollowUpItems() {
-    // Logic to save follow-up items (e.g., send to backend or update database)
-    console.log('Saved follow-up items:', this.followUpItems);
-  }
-  UsersRoleList: any;
-  getUserRoles(){
+
+  
+  getUserRoles(callback: () => void){
     const userId = this.userId;
     this.securityService.getUserRoles(userId).subscribe({
       next: (res) => {
         this.UsersRoleList = res.response;
         console.log("UsersRoleList",this.UsersRoleList)
         this.isLoading = false;
+        callback();
       },
       error: (error) => {
         console.error('Error fitching UsersRoleList', error);
@@ -270,48 +279,117 @@ export class ReturnReviewCreateComponent {
     console.log('Filtered Roles:', filteredRoles);
     return filteredRoles;
   }
-  OtherReportTypeList : any;
-  getDocumentType() {
-    // Observables for fetching document types
-    const objAMLDictionary = this.logForm.getDocumentType(constants.DocType_DocCategory.AMLMLROReports);
-    const objSUPDictionary = this.logForm.getDocumentType(constants.DocType_DocCategory.RptSchedule);
-  
-    // Log the observables
-    console.log("objAMLDictionary :", objAMLDictionary);
-    console.log("objSUPDictionary :", objSUPDictionary);
-  
-    // Combine both observables using forkJoin
-    forkJoin([objAMLDictionary, objSUPDictionary]).subscribe({
-      next: ([amlDictionary, supDictionary]) => {
-        console.log("AML Dictionary Data:", amlDictionary);
-        console.log("SUP Dictionary Data:", supDictionary);
-  
-        const firmTypeId = this.firmDetails.FirmTypeID;
-        const filteredRoles = this.getFilteredUserRoles(3009);
-  
-        if (filteredRoles.length > 0) {
-          console.log("Filtered Roles exist:", filteredRoles);
-          this.OtherReportTypeList = [...amlDictionary]; 
-          console.log("this.OtherReportTypeList",this.OtherReportTypeList)
-        } else {
-          if(firmTypeId == 1){
-            this.OtherReportTypeList = Array.from(
-              new Set([...amlDictionary, ...supDictionary]) // Combine data
-            );
-            console.log("this.OtherReportTypeList",this.OtherReportTypeList)
-          }
-          
-        }
-  
-        console.log("OtherReportTypeList:", this.OtherReportTypeList);
+  objAMLDictionary:any;
+  getAMLDocumentType(resolve: Function, reject: Function) {
+    const docCategoryTypeID = constants.DocType_DocCategory.AMLMLROReports;
+    this.logForm.getDocumentType(docCategoryTypeID).subscribe({
+      next: (res) => {
+        this.objAMLDictionary = res.response;
+        resolve();
       },
-      error: (err) => {
-        console.error("Error fetching document types:", err);
+      error: (error) => {
+        console.error("Error fetching objAMLDictionary:", error);
+        reject(error);
       },
     });
   }
+  objSUPDictionary:any;
+  getSUPDocumentType(resolve: Function, reject: Function) {
+    const docCategoryTypeID = constants.DocType_DocCategory.RptSchedule;
+    this.logForm.getDocumentType(docCategoryTypeID).subscribe({
+      next: (res) => {
+        this.objSUPDictionary = res.response;
+        resolve();
+      },
+      error: (error) => {
+        console.error("Error fetching objSUPDictionary:", error);
+        reject(error);
+      },
+    });
+  }
+  OtherReportTypeList : any;
+  getDocumentType() {
+    this.OtherReportTypeList = [];
+    const amlPromise = new Promise((resolve, reject) => {
+      this.getAMLDocumentType(resolve, reject);
+    }); 
+    const supPromise = new Promise((resolve, reject) => {
+      this.getSUPDocumentType(resolve, reject);
+    });
+    Promise.all([amlPromise, supPromise]).then(() => {
+      const firmTypeId = this.firmDetails.FirmTypeID;
+      const filteredRoles = this.getFilteredUserRoles(3009);
+      const amlDictionary = Array.isArray(this.objAMLDictionary) ? this.objAMLDictionary : [];
+      const supDictionary = Array.isArray(this.objSUPDictionary) ? this.objSUPDictionary : []; 
+      if (filteredRoles.length > 0) {
+        this.OtherReportTypeList = amlDictionary;
+      } else {
+        const mergedList = [...amlDictionary];
+        supDictionary.forEach((itemSUP: any) => {
+          const isDuplicate = mergedList.some(
+            (itemAML: any) => itemAML.DocTypeID === itemSUP.DocTypeID
+          );
+          if (!isDuplicate) {
+            mergedList.push(itemSUP);
+          }
+        }); 
+        this.OtherReportTypeList = mergedList;
+      } 
+      console.log("OtherReportTypeList:", this.OtherReportTypeList);
+    }).catch((error) => {
+      console.error("Error fetching document types:", error);
+    });
+  }
+  onDropdownChange(event: Event) {
+    const selectElement = event.target as HTMLSelectElement; // Cast to HTMLSelectElement
+    const selectedDocTypeId = parseInt(selectElement.value, 10); // Get the value and parse it to an integer
+    if (selectedDocTypeId && selectedDocTypeId !== 0) {
+      this.getReportsReceivedDocSubTypes(selectedDocTypeId);
+    } else {
+      console.warn("Invalid DocTypeID selected");
+    }
+  }
+  
+  DocSubTypesList: any[] = []; // Initialize as an empty array
 
-  //// Review 
+  getReportsReceivedDocSubTypes(docTypeId: number) {
+    this.returnReviewService.getReportsReceivedDocSubTypes(docTypeId).subscribe({
+      next: (res) => {
+        // Add a `checked` property to track the checkbox state
+        this.DocSubTypesList = res.response.map((item: any) => ({
+          ...item,
+          checked: false,
+        }));
+        console.log("DocSubTypesList:", this.DocSubTypesList);
+      },
+      error: (error) => {
+        console.error("Error fetching DocSubTypesList:", error);
+      },
+    });
+  }
+getSelectedSubTypes() {
+  return this.DocSubTypesList.filter((subType) => subType.checked);
+}
+ReportScheduleItem:any;
+reportingPeriodStartDate = '';
+reportingPeriodEndDate = '';
+getFirmReportScheduleItem(){
+  const firmRptSchItemID = this.review.FirmRptSchItemID;
+  this.reportSchedule.getFirmReportScheduleItem(firmRptSchItemID).subscribe({
+    next: (res) => {
+       this.ReportScheduleItem = res.response;
+    },
+    error: (error) => {
+      console.error("Error fetching DocSubTypesList:", error);
+    },
+  });
+  if(this.ReportScheduleItem != null){
+    this.reportingPeriodStartDate = this.ReportScheduleItem.RptPeriodFromDate;
+    this.reportingPeriodEndDate = this.ReportScheduleItem.RptPeriodToDate;
+  }
+}
+
+//// Review 
   
   onRoleChange(event: Event, index: number) {
     const selectedAppRoleID = this.reviews[index].roleAssignedTo;
@@ -354,6 +432,7 @@ export class ReturnReviewCreateComponent {
       },
     });
   }
+  
   UserObjectWfTasks : any;
   getUserObjectWfTasks(){
     const ObjectWFStatusID = this.review.ObjectWFStatusID;
@@ -419,6 +498,153 @@ export class ReturnReviewCreateComponent {
       }
     });
   }
+  
+  /////// save create Frim Report Review 
+   CreateReportReviewObject = {
+    firmRptReviewId: 0,
+    firmRptReviewRevNum: 0,
+    firmId: 0,
+    objectWfstatusId: 0,
+    createdBy: this.userId,
+    createdDate:this.currentDate ,
+    lastModifiedBy: 0,
+    lastModifiedDate: "2024-12-11T13:02:54.081Z",
+    addtlReviewRequired: true,
+    maxRevisionNum: 0,
+    addtlReviewRequiredDecisionMadeBy: this.userId,
+    addtlReviewRequiredDecisionMadeByName: "string",
+    addtlReviewRequiredDecisionMadeOn: "2024-12-11T13:02:54.081Z",
+    returnReviewWFStatusId: 0,
+    firmRptReviewItems: [
+      {
+        actionItemDesc: "string",
+        firmID: 0,
+        firmName: "string",
+        firmRptReviewItemId: 0,
+        firmRptReviewId: 0,
+        lateFeeImposed: true,
+        firmRptReviewRevNum: 0,
+        firmRptFrequency: "string",
+        objectStatusTypeID: 0,
+        objectStatusTypeDesc: "string",
+        dDocTypeesc: "string",
+        firmRptSchItemId: 0,
+        showAdminFee: true,
+        showAdminPanel: 0,
+        showException: true,
+        docTypeId: 0,
+        rptDocID: 0,
+        rptDocReferenceID: 0,
+        rptPeriodFrom: "2024-12-11T13:02:54.081Z",
+        rptPeriodTo: "2024-12-11T13:02:54.081Z",
+        rptDueDate: "2024-12-11T13:02:54.081Z",
+        createdBy: 0,
+        createdDate: "2024-12-11T13:02:54.081Z",
+        lastModifiedBy: 0,
+        lastModifiedDate: "2024-12-11T13:02:54.081Z",
+        wfirmRptPublishCommentId: 0,
+        materiallyComplete: true,
+        materiallyCompleteDate: "2024-12-11T13:02:54.081Z",
+        materiallyCompleteCheckedBy: 0,
+        resubmissionRequired: true,
+        resubmissionRequestedDate: "2024-12-11T13:02:54.081Z",
+        resubmissionRequestedBy: 0,
+        firmRptAdminFeeId: 0,
+        contraventionExists: true,
+        resubmissionDueDate: "2024-12-11T13:02:54.081Z",
+        docConsistency: true,
+        docConsistencyMessage: "string",
+        wFileAttached: true,
+        resubmissionRequestedByName: "string",
+        dueOrResubmissionDueDate: "string",
+        reportReceivedDesc: "string",
+        strRptSchID_RptRecivedID: "string",
+        showRptReceivedEnabled: true,
+        intranetGUID: "string",
+        strDocSubType: "string",
+        isReportTypeDue: 0,
+        wPublishedComments: "string",
+        wPublishedBy: 0,
+        wPublishedByUserName: "string",
+        wPublishedDate: "string",
+        canPublishComments: true,
+        wAllowResubmit: true,
+        actionItemRefPublishCommentID: 0,
+        objectActionItemID: 0,
+        commentsAsActionItemFlag: true,
+        reportLoc: "string",
+        maxRevisionNum: 0,
+        report: "string",
+        receivedDate: "string",
+        reportReviewState: 0,
+        isUpdate: true,
+        isWFileAttachedUpdate: true,
+        firmRptReviewFindings: [
+          {
+            firmRptReviewFindingId: 0,
+            firmRptReviewFindings: "string",
+            firmRptReviewItemId: 0,
+            createdBy: 0,
+            reportCommentState: 0,
+            firmRptReviewFindingDesc: "string",
+          },
+        ],
+        firmRptReviewSubItems: [
+          {
+            firmRptReviewSubItemId: 0,
+            firmRptReviewItemId: 0,
+            docSubTypeId: 0,
+            docSubTypeDesc: "string",
+            createdBy: 0,
+          },
+        ],
+      },
+    ],
+  }
+  saveUpdateFirmReportReview(){
+    
+  }
+  CreateCommitObject = {
 
+      wFirmRptPublishCommentID: 0,
+      firmRptReviewItemID: 0,
+      wPublishedComments: "string",
+      wPublishedBy: 0,
+      wPublishedDate: "2024-12-11T13:16:04.481Z",
+      firmRptSchItemID: 0,
+      wAllowResubmit: true,
+      objectActionItemID: 0,
+      commentAsActionItemFlag: true
+
+  }
+  saveCommentsToPublish() {
+    const commitListDetails = this.newComments.flatMap((reviewItem, reviewItemIndex) =>
+      reviewItem.firmRptReviewFindings.map((finding, findingIndex) => ({
+        wFirmRptPublishCommentID: 0, 
+        firmRptReviewItemID: this.firmRevDetails.firmRptReviewItems[reviewItemIndex]?.firmRptReviewItemId || 0, 
+        wPublishedComments: finding.firmRptReviewFindings, 
+        wPublishedBy: this.userId, 
+        wPublishedDate: new Date().toISOString(), 
+        firmRptSchItemID: this.firmRevDetails.firmRptReviewItems[reviewItemIndex]?.firmRptSchItemId || 0, 
+        wAllowResubmit: true, 
+        objectActionItemID: 0, 
+        commentAsActionItemFlag: false, 
+      }))
+    );
+  
+    console.log("Prepared Commit List Details:", commitListDetails);
+  
+    // Call the service to save the comments
+    this.returnReviewService.saveCommentsToPublish(commitListDetails).subscribe({
+      next: (response) => {
+        console.log('Save Comments to Publish Response:', response);
+        alert('Comments have been saved successfully!');
+      },
+      error: (error) => {
+        console.error('Error saving comments to publish:', error);
+        alert('An error occurred while saving comments.');
+      },
+    });
+  }
 
 }
