@@ -1,0 +1,10 @@
+<div class="btn justify-content-end" *ngIf="isReviseMode">
+    <button (click)="ConfirmstartWorkflow()">
+      <i class="bi bi-arrow-clockwise"></i> Start Workflow
+    </button>
+    <button *ngIf="showCancelWorkflow">
+      <i class="bi bi-arrow-counterclockwise"></i> Cancel Workflow
+    </button>
+</div>
+
+

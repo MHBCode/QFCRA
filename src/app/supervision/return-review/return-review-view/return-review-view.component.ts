@@ -326,11 +326,11 @@ getObjectWorkflow(){
     Swal.fire({
       title: 'Alert!',
       text: 'Do you want to create a new version of this record?',
-      icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Ok',
       cancelButtonText: 'Cancel',
-      
+      confirmButtonColor: 'hsl(345.9deg 100% 35.88%)',
+      cancelButtonColor: 'hsl(345.9deg 100% 35.88%)'
     }).then((result) => {
       if (result.isConfirmed) {
         // Call the function to create a new version

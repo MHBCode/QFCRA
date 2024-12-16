@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output,QueryList,ViewChildren } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output,QueryList,ViewChildren,ChangeDetectorRef  } from '@angular/core';
 import { ReturnReviewService } from 'src/app/ngServices/return-review.service';
 import { SupervisionService } from '../../supervision.service';
 import { SecurityService } from 'src/app/ngServices/security.service';
@@ -13,6 +13,7 @@ import { ReportScheduleService } from 'src/app/ngServices/report-schedule.servic
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
+import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 @Component({
   selector: 'app-return-review-create',
   templateUrl: './return-review-create.component.html',
@@ -39,6 +40,7 @@ export class ReturnReviewCreateComponent {
     { firmRptReviewFindings: [{ firmRptReviewFindings: '' }] } // Default comment
   ];
   Page = FrimsObject;
+  DocSubTypesList: Array<{ DocSubTypeID: number; DocSubTypeDesc: string; checked?: boolean }> = [];
 
 
   constructor(
@@ -49,6 +51,8 @@ export class ReturnReviewCreateComponent {
     private logForm : LogformService,
     private objectwfService: ObjectwfService,
     private reportSchedule: ReportScheduleService,
+    private flatpickrService: FlatpickrService,
+    private cdr: ChangeDetectorRef
   ) {
 
   }
@@ -68,6 +72,12 @@ export class ReturnReviewCreateComponent {
     this.getUserRoles(() => {
       this.getDocumentType();
     });
+  }
+  ngAfterViewInit() {
+    this.dateInputs.changes.subscribe(() => {
+      this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+    });
+    this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
   }
   onClose(): void {
     this.closeCreatePopup.emit();
@@ -113,27 +123,7 @@ export class ReturnReviewCreateComponent {
     );
   }
   
-  // getReturnReviewDetail() {
-  //   this.isLoading=true;
-  //   const firmRptReviewId= this.review.RptReviewID;
-  //   const firmRptReviewRevNum= this.review.RptReviewRevNum;
-  //   const roleId= 5001;
-  //   const objectOpTypeId= constants.ObjectOpType.View;
-
-  //   this.returnReviewService.getReturnReviewDetilas(firmRptReviewId,firmRptReviewRevNum,roleId,objectOpTypeId).subscribe({
-  //     next: (res) => {
-  //       // Assign full response to firmRevDetails
-  //       this.firmRevDetails = res.response;
-  //       console.log("firmRevDetails:", this.firmRevDetails);
-        
-  //       this.isLoading=false;
-  //     },
-  //     error: (error) => {
-  //       console.error('Error fetching return review details:', error);
-  //       this.isLoading=false;
-  //     },
-  //   });
-  // }
+ 
   getReportingBasis(){
     const firmId = this.firmId;
     this.returnReviewService.getReportingBasis(firmId).subscribe({
@@ -181,29 +171,116 @@ export class ReturnReviewCreateComponent {
   docTypeId: number | null = null; // To store the selected docTypeId
   
   SelectedReportReviewed(event: Event): void {
-    const selectedValue = (event.target as HTMLSelectElement).value;
+    const selectedValue = (event.target as HTMLSelectElement)?.value;
+  
+    if (selectedValue === '') {
+      console.log('No value selected');
+      this.ReportReviewed = ''; // Explicitly reset
+      this.showOtherDropdown = false;
+      this.firmRptSchItemId = undefined;
+      this.docTypeId = undefined;
+      return;
+    }
   
     if (selectedValue === 'Other') {
       this.showOtherDropdown = true; // Show the secondary dropdown
       this.ReportReviewed = selectedValue; // Set the "Other" value
+      this.firmRptSchItemId = undefined; // Clear previous selections
+      this.docTypeId = undefined;
+  
+      // Reset dDocTypeesc and docTypeId in firmRptReviewItems
+      const currentItem = this.firmRptReviewItems;
+      if (currentItem) {
+        currentItem[0].dDocTypeesc = '';
+        currentItem[0].docTypeId = null;
+      }
+     
       console.log('Other report option selected');
-    } else {
-      this.showOtherDropdown = false; // Hide the secondary dropdown
-      this.ReportReviewed = selectedValue; // Set the selected report
+      return;
+    }
   
-      // Split the concatenated value to get firmRptSchItemId and docTypeId
-      const [firmRptSchItemId, docTypeId] = selectedValue.split(',').map(Number);
+    this.showOtherDropdown = false; // Hide the secondary dropdown
+    this.ReportReviewed = selectedValue; // Set the selected report
+    this.firmRptReviewItems[0].strRptSchID_RptRecivedID = selectedValue;
+    // Split the concatenated value to get firmRptSchItemId and docTypeId
+    const [firmRptSchItemId, docTypeId] = selectedValue.split(',').map(Number);
   
+    if (firmRptSchItemId && docTypeId) {
       this.firmRptSchItemId = firmRptSchItemId;
       this.docTypeId = docTypeId;
   
+      // Bind to firmRptReviewItems
+      const currentItem = this.firmRptReviewItems;
+      if (currentItem) {
+        currentItem[0].dDocTypeesc = 'Selected from UI'; // Replace with actual description if available
+        currentItem[0].docTypeId = this.docTypeId;
+        
+      }
+  
+      // Call the method to handle firmRptSchItemId
+      this.getFirmReportScheduleItem(this.firmRptSchItemId);
       console.log('Selected firmRptSchItemId:', this.firmRptSchItemId);
       console.log('Selected docTypeId:', this.docTypeId);
+    } else {
+      console.error('Invalid selection value:', selectedValue);
     }
   }
-
-  /// commit section 
-  addNewCommentsOnReviseMode() {
+  ReportScheduleItem:any;
+  reportingPeriodStartDate = '';
+  reportingPeriodEndDate = '';
+  getFirmReportScheduleItem(firmRptSchItemId){
+    //const firmRptSchItemID = this.review.FirmRptSchItemID;
+    this.reportSchedule.getFirmReportScheduleItem(firmRptSchItemId).subscribe({
+      next: (res) => {
+         this.ReportScheduleItem = res.response;
+         console.log("ReportScheduleItem",this.ReportScheduleItem)
+         if(this.ReportScheduleItem != null){
+          this.reportingPeriodStartDate = this.ReportScheduleItem[0].RptPeriodFromDate;
+          this.reportingPeriodEndDate = this.ReportScheduleItem[0].RptPeriodToDate;
+        }
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error("Error fetching DocSubTypesList:", error);
+      },
+    });
+    
+  }
+  OtherReportTypeList : any;
+  getDocumentType() {
+    this.OtherReportTypeList = [];
+    const amlPromise = new Promise((resolve, reject) => {
+      this.getAMLDocumentType(resolve, reject);
+    }); 
+    const supPromise = new Promise((resolve, reject) => {
+      this.getSUPDocumentType(resolve, reject);
+    });
+    Promise.all([amlPromise, supPromise]).then(() => {
+      const firmTypeId = this.firmDetails.FirmTypeID;
+      const filteredRoles = this.getFilteredUserRoles(3009);
+      const amlDictionary = Array.isArray(this.objAMLDictionary) ? this.objAMLDictionary : [];
+      const supDictionary = Array.isArray(this.objSUPDictionary) ? this.objSUPDictionary : []; 
+      if (filteredRoles.length > 0) {
+        this.OtherReportTypeList = amlDictionary;
+      } else {
+        const mergedList = [...amlDictionary];
+        supDictionary.forEach((itemSUP: any) => {
+          const isDuplicate = mergedList.some(
+            (itemAML: any) => itemAML.DocTypeID === itemSUP.DocTypeID
+          );
+          if (!isDuplicate) {
+            mergedList.push(itemSUP);
+          }
+        }); 
+        this.OtherReportTypeList = mergedList;
+      } 
+      console.log("OtherReportTypeList:", this.OtherReportTypeList);
+    }).catch((error) => {
+      console.error("Error fetching document types:", error);
+    });
+  }
+  /////// commit section 
+  addNewComments() {
     // Add a new empty comment to the first review item's findings for simplicity
     const newComment = { firmRptReviewFindings: '' };
     
@@ -224,14 +301,6 @@ export class ReturnReviewCreateComponent {
     console.log("After removing a comment:", this.newComments);
   }
   
-  saveComments() {
-    this.firmRevDetails.firmRptReviewItems.forEach((item, index) => {
-      item.firmRptReviewFindings = [...this.newComments[index].firmRptReviewFindings];
-    });
-  
-    console.log('Updated firmRptReviewItems:', this.firmRevDetails.firmRptReviewItems);
-  }
-
   // folowUp Items
 
   followUpItems: Array<{
@@ -257,8 +326,6 @@ export class ReturnReviewCreateComponent {
     console.log('After removing an item:', this.followUpItems);
   }
 
-
-  
   getUserRoles(callback: () => void){
     const userId = this.userId;
     this.securityService.getUserRoles(userId).subscribe({
@@ -307,50 +374,38 @@ export class ReturnReviewCreateComponent {
       },
     });
   }
-  OtherReportTypeList : any;
-  getDocumentType() {
-    this.OtherReportTypeList = [];
-    const amlPromise = new Promise((resolve, reject) => {
-      this.getAMLDocumentType(resolve, reject);
-    }); 
-    const supPromise = new Promise((resolve, reject) => {
-      this.getSUPDocumentType(resolve, reject);
-    });
-    Promise.all([amlPromise, supPromise]).then(() => {
-      const firmTypeId = this.firmDetails.FirmTypeID;
-      const filteredRoles = this.getFilteredUserRoles(3009);
-      const amlDictionary = Array.isArray(this.objAMLDictionary) ? this.objAMLDictionary : [];
-      const supDictionary = Array.isArray(this.objSUPDictionary) ? this.objSUPDictionary : []; 
-      if (filteredRoles.length > 0) {
-        this.OtherReportTypeList = amlDictionary;
-      } else {
-        const mergedList = [...amlDictionary];
-        supDictionary.forEach((itemSUP: any) => {
-          const isDuplicate = mergedList.some(
-            (itemAML: any) => itemAML.DocTypeID === itemSUP.DocTypeID
-          );
-          if (!isDuplicate) {
-            mergedList.push(itemSUP);
-          }
-        }); 
-        this.OtherReportTypeList = mergedList;
-      } 
-      console.log("OtherReportTypeList:", this.OtherReportTypeList);
-    }).catch((error) => {
-      console.error("Error fetching document types:", error);
-    });
-  }
-  onDropdownChange(event: Event) {
+
+
+  onDropdownChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement; // Cast to HTMLSelectElement
     const selectedDocTypeId = parseInt(selectElement.value, 10); // Get the value and parse it to an integer
+  
     if (selectedDocTypeId && selectedDocTypeId !== 0) {
+      // Call the method to fetch subtypes for the selected document type
       this.getReportsReceivedDocSubTypes(selectedDocTypeId);
+  
+      // Find the selected document type from the list
+      const selectedDocType = this.OtherReportTypeList.find(item => item.DocTypeID === selectedDocTypeId);
+  
+      if (selectedDocType) {
+        // Bind the selected DocTypeID and description to firmRptReviewItems
+        const currentItem = this.firmRptReviewItems;
+        if (currentItem) {
+          currentItem[0].dDocTypeesc = selectedDocType.DocTypeDesc;
+          currentItem[0].docTypeId = selectedDocType.DocTypeID;
+          console.log('Updated firmRptReviewItems:', currentItem);
+        } else {
+          console.warn('No matching firmRptReviewItem found for firmRptSchItemId:', this.firmRptSchItemId);
+        }
+      } else {
+        console.error('Selected DocTypeID not found in OtherReportTypeList:', selectedDocTypeId);
+      }
     } else {
       console.warn("Invalid DocTypeID selected");
     }
   }
-  
-  DocSubTypesList: any[] = []; // Initialize as an empty array
+
+ // DocSubTypesList: any[] = []; // Initialize as an empty array
 
   getReportsReceivedDocSubTypes(docTypeId: number) {
     this.returnReviewService.getReportsReceivedDocSubTypes(docTypeId).subscribe({
@@ -370,24 +425,7 @@ export class ReturnReviewCreateComponent {
 getSelectedSubTypes() {
   return this.DocSubTypesList.filter((subType) => subType.checked);
 }
-ReportScheduleItem:any;
-reportingPeriodStartDate = '';
-reportingPeriodEndDate = '';
-getFirmReportScheduleItem(){
-  const firmRptSchItemID = this.review.FirmRptSchItemID;
-  this.reportSchedule.getFirmReportScheduleItem(firmRptSchItemID).subscribe({
-    next: (res) => {
-       this.ReportScheduleItem = res.response;
-    },
-    error: (error) => {
-      console.error("Error fetching DocSubTypesList:", error);
-    },
-  });
-  if(this.ReportScheduleItem != null){
-    this.reportingPeriodStartDate = this.ReportScheduleItem.RptPeriodFromDate;
-    this.reportingPeriodEndDate = this.ReportScheduleItem.RptPeriodToDate;
-  }
-}
+
 
 //// Review 
   
@@ -498,7 +536,91 @@ getFirmReportScheduleItem(){
       }
     });
   }
-  
+  firmRptReviewItems= [
+      {
+        actionItemDesc: "",
+        firmID: 0,
+        firmName: "",
+        firmRptReviewItemId: 0,
+        firmRptReviewId: 0,
+        lateFeeImposed: true,
+        firmRptReviewRevNum: 0,
+        firmRptFrequency: "",
+        objectStatusTypeID: 0,
+        objectStatusTypeDesc: "",
+        dDocTypeesc: '',
+        firmRptSchItemId: 0,
+        showAdminFee: true,
+        showAdminPanel: 0,
+        showException: true,
+        docTypeId: 0,
+        rptDocID: 0, // from the selected doc popup
+        rptDocReferenceID: 0,  
+        rptPeriodFrom: "11/Dec/2015",  //this.reportingPeriodStartDate,
+        rptPeriodTo: "31/Dec/2015", //this.reportingPeriodEndDate,
+        rptDueDate: "",
+        createdBy: 0,
+        createdDate: "",
+        lastModifiedBy: 0,
+        lastModifiedDate: "",
+        wfirmRptPublishCommentId: 0,
+        materiallyComplete: null,
+        materiallyCompleteDate: "",
+        materiallyCompleteCheckedBy: null,
+        resubmissionRequired: null,
+        resubmissionRequestedDate: "",
+        resubmissionRequestedBy: null,
+        firmRptAdminFeeId: 0,
+        contraventionExists: true,
+        resubmissionDueDate: "",
+        docConsistency: true,
+        docConsistencyMessage: "",
+        wFileAttached: true,
+        resubmissionRequestedByName: "",
+        dueOrResubmissionDueDate: "",
+        reportReceivedDesc: "",
+        strRptSchID_RptRecivedID: "",
+        showRptReceivedEnabled: true,
+        intranetGUID: "",
+        strDocSubType: "",
+        isReportTypeDue: 0,
+        wPublishedComments: "",
+        wPublishedBy: 0,
+        wPublishedByUserName: "",
+        wPublishedDate: "",
+        canPublishComments: true,
+        wAllowResubmit: true,
+        actionItemRefPublishCommentID: 0,
+        objectActionItemID: 0,
+        commentsAsActionItemFlag: true,
+        reportLoc: "",
+        maxRevisionNum: 0,
+        report: "",
+        receivedDate: "",
+        reportReviewState: 2,
+        isUpdate: true,
+        isWFileAttachedUpdate: true,
+      }
+    ]
+      firmRptReviewFindings= [
+        {
+          firmRptReviewFindingId: 0,
+          firmRptReviewFindings: "",
+          firmRptReviewItemId: 0,
+          createdBy: 0,
+          reportCommentState: 0,
+          firmRptReviewFindingDesc: "",
+        },
+      ];
+      firmRptReviewSubItems= [
+        {
+          firmRptReviewSubItemId: 0,
+          firmRptReviewItemId: 0,
+          docSubTypeId: 0,
+          docSubTypeDesc: "string",
+          createdBy: 0,
+        },
+      ];
   /////// save create Frim Report Review 
    CreateReportReviewObject = {
     firmRptReviewId: 0,
@@ -515,136 +637,95 @@ getFirmReportScheduleItem(){
     addtlReviewRequiredDecisionMadeByName: "string",
     addtlReviewRequiredDecisionMadeOn: "2024-12-11T13:02:54.081Z",
     returnReviewWFStatusId: 0,
-    firmRptReviewItems: [
-      {
-        actionItemDesc: "string",
-        firmID: 0,
-        firmName: "string",
-        firmRptReviewItemId: 0,
-        firmRptReviewId: 0,
-        lateFeeImposed: true,
-        firmRptReviewRevNum: 0,
-        firmRptFrequency: "string",
-        objectStatusTypeID: 0,
-        objectStatusTypeDesc: "string",
-        dDocTypeesc: "string",
-        firmRptSchItemId: 0,
-        showAdminFee: true,
-        showAdminPanel: 0,
-        showException: true,
-        docTypeId: 0,
-        rptDocID: 0,
-        rptDocReferenceID: 0,
-        rptPeriodFrom: "2024-12-11T13:02:54.081Z",
-        rptPeriodTo: "2024-12-11T13:02:54.081Z",
-        rptDueDate: "2024-12-11T13:02:54.081Z",
-        createdBy: 0,
-        createdDate: "2024-12-11T13:02:54.081Z",
-        lastModifiedBy: 0,
-        lastModifiedDate: "2024-12-11T13:02:54.081Z",
-        wfirmRptPublishCommentId: 0,
-        materiallyComplete: true,
-        materiallyCompleteDate: "2024-12-11T13:02:54.081Z",
-        materiallyCompleteCheckedBy: 0,
-        resubmissionRequired: true,
-        resubmissionRequestedDate: "2024-12-11T13:02:54.081Z",
-        resubmissionRequestedBy: 0,
-        firmRptAdminFeeId: 0,
-        contraventionExists: true,
-        resubmissionDueDate: "2024-12-11T13:02:54.081Z",
-        docConsistency: true,
-        docConsistencyMessage: "string",
-        wFileAttached: true,
-        resubmissionRequestedByName: "string",
-        dueOrResubmissionDueDate: "string",
-        reportReceivedDesc: "string",
-        strRptSchID_RptRecivedID: "string",
-        showRptReceivedEnabled: true,
-        intranetGUID: "string",
-        strDocSubType: "string",
-        isReportTypeDue: 0,
-        wPublishedComments: "string",
-        wPublishedBy: 0,
-        wPublishedByUserName: "string",
-        wPublishedDate: "string",
-        canPublishComments: true,
-        wAllowResubmit: true,
-        actionItemRefPublishCommentID: 0,
-        objectActionItemID: 0,
-        commentsAsActionItemFlag: true,
-        reportLoc: "string",
-        maxRevisionNum: 0,
-        report: "string",
-        receivedDate: "string",
-        reportReviewState: 0,
-        isUpdate: true,
-        isWFileAttachedUpdate: true,
-        firmRptReviewFindings: [
-          {
-            firmRptReviewFindingId: 0,
-            firmRptReviewFindings: "string",
-            firmRptReviewItemId: 0,
-            createdBy: 0,
-            reportCommentState: 0,
-            firmRptReviewFindingDesc: "string",
-          },
-        ],
-        firmRptReviewSubItems: [
-          {
-            firmRptReviewSubItemId: 0,
-            firmRptReviewItemId: 0,
-            docSubTypeId: 0,
-            docSubTypeDesc: "string",
-            createdBy: 0,
-          },
-        ],
-      },
-    ],
+  };
+  getSelectedSubItems(): Array<{
+    firmRptReviewSubItemId: number;
+    firmRptReviewItemId: number;
+    docSubTypeId: number;
+    docSubTypeDesc: string;
+    createdBy: number;
+  }> {
+    return this.DocSubTypesList.filter((subType) => subType.checked).map((subType) => ({
+      firmRptReviewSubItemId: 0, // Default ID
+      firmRptReviewItemId: 0, // Update if required based on business logic
+      docSubTypeId: subType.DocSubTypeID,
+      docSubTypeDesc: subType.DocSubTypeDesc,
+      createdBy: this.userId,
+    }));
   }
   saveUpdateFirmReportReview(){
-    
-  }
-  CreateCommitObject = {
-
-      wFirmRptPublishCommentID: 0,
-      firmRptReviewItemID: 0,
-      wPublishedComments: "string",
-      wPublishedBy: 0,
-      wPublishedDate: "2024-12-11T13:16:04.481Z",
-      firmRptSchItemID: 0,
-      wAllowResubmit: true,
-      objectActionItemID: 0,
-      commentAsActionItemFlag: true
-
-  }
-  saveCommentsToPublish() {
-    const commitListDetails = this.newComments.flatMap((reviewItem, reviewItemIndex) =>
+    this.isLoading = true;
+    const firmRptReviewFindings = this.newComments.flatMap((reviewItem, reviewItemIndex) =>
       reviewItem.firmRptReviewFindings.map((finding, findingIndex) => ({
-        wFirmRptPublishCommentID: 0, 
-        firmRptReviewItemID: this.firmRevDetails.firmRptReviewItems[reviewItemIndex]?.firmRptReviewItemId || 0, 
-        wPublishedComments: finding.firmRptReviewFindings, 
-        wPublishedBy: this.userId, 
-        wPublishedDate: new Date().toISOString(), 
-        firmRptSchItemID: this.firmRevDetails.firmRptReviewItems[reviewItemIndex]?.firmRptSchItemId || 0, 
-        wAllowResubmit: true, 
-        objectActionItemID: 0, 
-        commentAsActionItemFlag: false, 
+        firmRptReviewFindingId: 0, // Default ID
+        firmRptReviewItemID: this.firmRevDetails?.firmRptReviewItems?.[reviewItemIndex]?.firmRptReviewItemId || 0,
+        firmRptReviewFindingDesc: finding.firmRptReviewFindings, // Bind the CKEditor input
+        firmRptReviewFindings: finding.firmRptReviewFindings, // Bind the CKEditor input
+        createdBy: this.userId,
+        reportCommentState: 2, // Assuming this is the default state
       }))
     );
-  
-    console.log("Prepared Commit List Details:", commitListDetails);
-  
-    // Call the service to save the comments
-    this.returnReviewService.saveCommentsToPublish(commitListDetails).subscribe({
-      next: (response) => {
-        console.log('Save Comments to Publish Response:', response);
-        alert('Comments have been saved successfully!');
+    const firmRptReviewSubItems = this.getSelectedSubItems();
+   const ReportReviewObject = {
+    firmRptReviewId: 0,
+    firmRptReviewRevNum: 0,
+    firmId: this.firmId,
+    objectWfstatusId: 0,
+    createdBy: this.userId,
+    createdDate: this.currentDate ,
+    lastModifiedBy: this.userId,
+    lastModifiedDate: this.currentDate,
+    addtlReviewRequired: true,
+    maxRevisionNum: 0,
+    addtlReviewRequiredDecisionMadeBy: this.userId,
+    addtlReviewRequiredDecisionMadeByName: "",
+    addtlReviewRequiredDecisionMadeOn: this.currentDate,
+    returnReviewWFStatusId: null,
+    firmRptReviewItems: this.firmRptReviewItems,
+    firmRptReviewFindings: firmRptReviewFindings,
+    firmRptReviewSubItems: firmRptReviewSubItems,
+    }
+    console.log("ReportReviewObjectToBeSaved",ReportReviewObject)
+    this.returnReviewService.saveUpdateFirmReportReview(ReportReviewObject).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        // SweetAlert success
+        Swal.fire({
+          icon: 'success',
+          title: 'Saved Successfully',
+          text: 'The firm report review has been saved successfully!',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#B8001F',
+        });
       },
       error: (error) => {
-        console.error('Error saving comments to publish:', error);
-        alert('An error occurred while saving comments.');
+        this.isLoading = false;
+        console.error('Error Saving Report Review', error);
+        // SweetAlert error
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'An error occurred while saving the report review.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#B8001F',
+        });
       },
     });
   }
 
+  callRefForm: boolean = false;
+  ////////// call Form Reference
+
+  OpenDocumentPopup(){
+    this.callRefForm = true;
+  }
+  closeFormReference(){
+    this.callRefForm = false;
+  }
+  deSelectDocument(){
+
+  }
+  replaceDocument(){
+
+  }
 }

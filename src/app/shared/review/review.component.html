@@ -2,38 +2,12 @@
     <div class="popup-header">
       <h3>Review</h3>
     </div>
-    <div *ngIf="pageName == Page.ReturnsReview" class="inputs-row report-entry" >
-      <!-- <div class="input-field">
-        <label for="required">Additional Review Required?</label>
-        <ng-container>
-          <div style="display: flex; align-items: center">
-              <input type="radio" (change)="AddFirstReview()"  id="isRequiredYes" 
-              [disabled]="!isReviseMode"  name="IsRequired" [(ngModel)]="addtlReviewRequired" [value]="true" style="margin-right: 10px; cursor: pointer" />
-              <label for="isRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
-
-              <input type="radio"  id="isRequiredNo" 
-              [disabled]="!isReviseMode" [(ngModel)]="addtlReviewRequired" name="IsRequired" [value]="false" style="
-                  margin-left: 20px;
-                  margin-right: 10px;
-                  cursor: pointer;
-                " />
-              <label for="isRequiredNotYet" (click)="CancleFirstReview()"  style="margin-left: 5px; color: #413b3c">No</label>
-              <input type="radio"  [(ngModel)]="addtlReviewRequired"  id="isRequiredNotYet" 
-              [disabled]="!isReviseMode"  name="IsRequired" [value]="false" style="
-                  margin-left: 20px;
-                  margin-right: 10px;
-                  cursor: pointer;
-                " />
-              <label for="isRequiredNotYet"  style="margin-left: 5px; color: #413b3c">Not Yet
-              </label>
-          </div>
-      </ng-container>
-      </div> -->
+    <!-- <div *ngIf="pageName == Page.ReturnsReview" class="inputs-row report-entry" >
       <div class="input-field">
         <label for="required">Additional Review Required?</label>
         <ng-container>
           <div style="display: flex; align-items: center">
-            <!-- Yes Option -->
+            
             <input
               type="radio"
               (change)="AddFirstReview()"
@@ -46,7 +20,7 @@
             />
             <label for="isRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
       
-            <!-- No Option -->
+           
             <input
               type="radio"
               (change)="CancleFirstReview()"
@@ -59,7 +33,7 @@
             />
             <label for="isRequiredNo" style="margin-left: 5px; color: #413b3c">No</label>
       
-            <!-- Not Yet Option -->
+            
             <input
               type="radio"
               id="isRequiredNotYet"
@@ -110,6 +84,53 @@
           <input  type="text" id="dueDate" name="dueDate" #dateInputs  />
         </div>
         
+    </div> -->
+    <div *ngIf="pageName == Page.ReturnsReview" >
+      <div class="add-address-btn-container">
+        <button class="addAddressBtn" (click)="AddFirstReview()" [disabled]="!isReviseMode">
+          Additional Review Required?
+        </button>
+      </div>
+      <div class="inputs-row report-entry" *ngFor="let review of reviewsArray; let i = index" >
+        <div *ngIf="isReviseMode" class="del-address-container">
+          <button class="RmvTrashBtn bi-trash" (click)="CancelFirstReview(i)"></button>
+        </div>
+        <div class="input-field notes">
+          <label for="notes">Reason for Escalation/Review :</label>
+          <ckeditor [(ngModel)]="ReviewObj.review" [editor]="Editor" [config]="config" style="height: 200px; min-width: 100%;"></ckeditor>
+        </div>
+        <div class="input-field">
+          <label for="task">Task</label>
+          <input type="text" value="Review" id="task" disabled name="task" />
+        </div>
+        <div class="input-field">
+          <label for="roleassignedTo">Role Assigned To</label>
+          <select [(ngModel)]="ReviewObj.roleassignedToId" name="roleassignedTo" id="roleassignedTo" [(ngModel)]="review.selectedAppRoleID" (change)="onRoleChange($event, i)">
+            <option [value]="0">Select</option>
+            <option *ngFor="let option of taskRolesList" [value]="option.AppRoleID">
+              {{ option.AppRoleDesc }}
+            </option>
+          </select>
+        </div>
+        <div class="input-field">
+          <label for="userAssignedTo">User Assigned To</label>
+          <select [(ngModel)]="ReviewObj.userAssignedToId" name="userAssignedTo" id="userAssignedTo" [(ngModel)]="review.selectedUserID">
+            <option [value]="0">Select</option>
+            <option *ngFor="let option of UsersInRoleList" [value]="option.UserId">
+              {{ option.UserName }}
+            </option>
+          </select>
+        </div>
+        <div class="input-field">
+          <label for="userAssignedTo">Email(CC)</label>
+          <a (click)="openEmailCCPopup()">Add Recipients</a>
+        </div>
+        <div class="input-field">
+          <label for="dueDate">Due Date</label>
+          <input [(ngModel)]="ReviewObj.dueDate"  type="text" id="dueDate" name="dueDate" [(ngModel)]="review.dueDate" />
+        </div>
+
+      </div>
     </div>
     <div *ngFor="let WfTask of Review ; let i = index">
       <div *ngIf="i != 0" class="popup-header">

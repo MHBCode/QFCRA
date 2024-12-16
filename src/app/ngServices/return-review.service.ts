@@ -56,7 +56,7 @@ export class ReturnReviewService {
     const url = `${this.returnViewUrl}get_reports_received_doc_sub_types?docTypeId=${docTypeId}`;
     return this.http.get<any>(url); 
   }
-
+  
   saveUpdateFirmReportReview(ReportReviewDetails: any): Observable<any> {
     const url = `${this.returnViewUrl}save_update_firm_report_review`
     return this.http.post<any>(url, ReportReviewDetails);

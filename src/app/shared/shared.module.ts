@@ -12,8 +12,7 @@ import { LoaderComponent } from './loader/loader.component';
 import { PaginationComponent } from './pagination/pagination.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { ReviewComponent } from './review/review.component';
-import { WorkflowComponent } from './Workflow/workflow/workflow.component';
-
+import { WorkflowComponent } from './workflow/workflow.component';
 @NgModule({
   declarations: [
     DataPlaceComponent,
@@ -40,7 +39,8 @@ import { WorkflowComponent } from './Workflow/workflow/workflow.component';
     LoaderComponent,
     PaginationComponent,
     CKEditorModule,
-    ReviewComponent
+    ReviewComponent,
+    WorkflowComponent
   ]
 })
 export class SharedModule { }

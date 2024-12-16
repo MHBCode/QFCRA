@@ -69,8 +69,8 @@ export class ReportScheduleService {
     const url = `${this.baseUrlRpt}get_firm_standard_report_scheduled_item_detail?firmID=${firmId}&reportingScheduleFrom=${reportScheduleFrom}&reportingScheduleTo=${reportScheduleTo}&rptScheduleType=${rptScheduleType}&financialYearEndTypeID=${financialYearEndTypeID}`;
     return this.http.get<any>(url);
   }
-  getFirmReportScheduleItem(firmRptSchItemID:number): Observable<any> {
-    const url = `${this.baseUrlRpt}get_firm_report_schedule_item?firmRptSchItemID=${firmRptSchItemID}`;
+  getFirmReportScheduleItem(firmRptSchItemId:number): Observable<any> {
+    const url = `${this.baseUrlRpt}get_firm_report_schedule_item?firmRptSchItemID=${firmRptSchItemId}`;
     return this.http.get<any>(url);
   }
 

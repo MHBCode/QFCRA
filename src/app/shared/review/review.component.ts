@@ -39,6 +39,7 @@ export class ReviewComponent {
   Page = FrimsObject;
   @Output() closeRegPopup = new EventEmitter<void>();
   @Output() fundDeleted = new EventEmitter<void>();
+  
   now = new Date();
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
@@ -48,6 +49,7 @@ export class ReviewComponent {
   UsersInRoleList : any;
   isShowEmailCCPopup:boolean = false;
   UsersList :any;
+ @Output() reviewsArray: any[] = [];
   constructor(
     private supervisionService: SupervisionService,
     private securityService: SecurityService,
@@ -75,6 +77,12 @@ export class ReviewComponent {
       console.error('Review is not an array:', this.Review);
       this.Review = null; // Fallback to an empty array
     }
+  }
+  ngAfterViewInit() {
+    this.dateInputs.changes.subscribe(() => {
+      this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
+    });
+    this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
   }
   onClose(): void {
     this.closeRegPopup.emit();
@@ -113,10 +121,19 @@ export class ReviewComponent {
     return this.sanitizerService.sanitizeHtml(html);
   }
   showFirstReview: boolean = false
-  AddFirstReview(){
-    this.showFirstReview = true;
-  } 
-  
+  // AddFirstReview(){
+  //   this.showFirstReview = true;
+  // } 
+  ReviewObj = {
+    review:'',
+    task: 'Review',
+    roleassignedToId:0,
+    userAssignedToId:0,
+    dueDate: '',
+  }
+  AddFirstReview() {
+    this.reviewsArray.push({ ...this.ReviewObj });
+  }
   getWorkflowTaskRoles(){
     const objectTaskTypeID = this.UserObjectWfTasks.ObjectTaskTypeID;
     const objectID = constants.FrimsObject.ReturnsReview;
@@ -134,9 +151,10 @@ export class ReviewComponent {
       },
     });
   }
-  onRoleChange(event: Event) {
+  onRoleChange(event: Event,index: number) {
     console.log('Selected AppRoleID:', this.selectedAppRoleID);
-  
+    const target = event.target as HTMLSelectElement;
+    this.reviewsArray[index].roleassignedToId = parseInt(target.value, 10);
     this.getUsersInRole(this.selectedAppRoleID);
   }
   
@@ -157,29 +175,43 @@ export class ReviewComponent {
   }
   
 
-  CancleFirstReview(){
+  // CancleFirstReview(){
+  //   Swal.fire({
+  //     text: "Your selection of 'No' for the 'Additional Review Required' field indicates that your review of this submission is complete and that you intend to close-out this review without any additional reviews. Any further changes to this review will have to be made by creating a new revision of this review by clicking on the 'Revise' button. If your review of this report has not been completed, please select 'Not Yet' and save your changes.",
+  //     icon: 'warning',
+  //     showCancelButton: true,
+  //     confirmButtonColor: '#982B1C',
+  //     cancelButtonColor: '#982B1C',
+  //     confirmButtonText: 'Ok',
+  //     cancelButtonText: 'Cancel'
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       this.showFirstReview = false;
+  //     }
+  //   });
+  // }
+  CancelFirstReview(index: number) {
     Swal.fire({
       text: "Your selection of 'No' for the 'Additional Review Required' field indicates that your review of this submission is complete and that you intend to close-out this review without any additional reviews. Any further changes to this review will have to be made by creating a new revision of this review by clicking on the 'Revise' button. If your review of this report has not been completed, please select 'Not Yet' and save your changes.",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#982B1C',
       cancelButtonColor: '#982B1C',
-      confirmButtonText: 'Ok',
+      confirmButtonText: 'Yes, Remove',
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.showFirstReview = false;
+        this.reviewsArray.splice(index, 1);
       }
     });
   }
-
  // selected user
  openEmailCCPopup(){
   this.isShowEmailCCPopup = true;
   this.getUsers();
-}
+ }
 
-getUsers(){
+ getUsers(){
   this.usersService.getUsers().subscribe({
     next: (res) => {
       this.UsersList = res.response;
@@ -191,5 +223,5 @@ getUsers(){
       this.isLoading = false;
     },
   });
-}
+ }
 }

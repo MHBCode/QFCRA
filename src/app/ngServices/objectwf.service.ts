@@ -52,4 +52,9 @@ export class ObjectwfService {
       const url = `${this.baseUrlObjectWF}get_workflow_task_roles?objectTaskTypeID=${objectTaskTypeID}&objectID=${objectID}&notificationFlag=${notificationFlag}&objectWFTaskDefID=${objectWFTaskDefID}`
       return this.http.get<any>(url); 
   }
+  getUserWorkFlowDetails(ObjectWFStatusID:number): Observable<any> {
+    const url = `${this.baseUrlObjectWF}get_user_workflow_details?ObjectWFStatusID=${ObjectWFStatusID}`
+    return this.http.get<any>(url); 
+  }
+
 }

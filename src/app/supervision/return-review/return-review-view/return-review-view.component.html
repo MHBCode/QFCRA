@@ -217,8 +217,7 @@
                 [addtlReviewRequiredDecisionMadeOn]="firmRevDetails.addtlReviewRequiredDecisionMadeOn"
                 [isReviseMode]="isReviseMode"
                 [UserObjectWfTasks]="UserObjectWfTasks"
-                > 
-                             
+                >                         
               </app-review>
               <div class="btn justify-content-end">
                 <button *ngIf="!isEditable">
@@ -227,15 +226,15 @@
                 <button (click)="CreateNewVerisionConfirmation()" *ngIf="!isReviseMode && firmRevDetails.maxRevisionNum == review.RptReviewRevNum">
                   <i class="bi bi-pencil-square"></i> Revise
                 </button>
-                <button *ngIf="isReviseMode">
-                  <i class="bi bi-arrow-clockwise"></i> Start Workflow 
-                </button>
-                <app-workflow
-                [firmId]="firmId"
-                [firmDetails]="firmDetails"
-                >
-
-                </app-workflow>
+                
+                 <app-workflow
+                 [firmId]="firmId"
+                 [firmDetails]="firmDetails"
+                 [pageName]="Page.ReturnsReview"
+                 [review]="UserObjectWfTasks"
+                 [isReviseMode]="isReviseMode"
+                 >
+                 </app-workflow>
                 <button *ngIf="!isEditable">
                   <i class="bi bi-trash"></i> Delete
                 </button>
