@@ -13,6 +13,17 @@
                 <i class="bi bi-x-circle"></i>
             </button>
         </div>
+        <div class="error-messages">
+          <p *ngIf="errorMessages['RptReviewed']">
+            {{ errorMessages['RptReviewed'] }}
+          </p>
+          <p *ngIf="errorMessages['rptPeriodFrom']">
+            {{ errorMessages['rptPeriodFrom'] }}
+          </p>
+          <p *ngIf="errorMessages['rptPeriodTo']">
+            {{ errorMessages['rptPeriodTo'] }}
+          </p>
+        </div>
         <div class="reporting-schedule-form">
             <div class="inputs-row" >
                 <div class="input-field">
@@ -55,7 +66,7 @@
                           [(ngModel)]="ReportReviewed"
                         >
                           <!-- Default Option -->
-                          <option [value]="''" selected>Select</option>
+                          <option [value]="0" selected>Select</option>
                           
                           <!-- Dynamic Options -->
                           <option
@@ -76,7 +87,7 @@
                            {{option.DocTypeDesc}}
                           </option>
                         </select>
-                        <div *ngIf="DocSubTypesList && DocSubTypesList.length > 0" class="checkbox-container">
+                        <div *ngIf="DocSubTypesList && DocSubTypesList.length > 0 && ReportReviewed == 'Other'" class="checkbox-container">
                           <label *ngFor="let subType of DocSubTypesList" class="checkbox-item">
                             <input
                               type="checkbox"
@@ -88,14 +99,14 @@
                         </div>
                       </div>
 
-                        <div *ngIf="!showOtherDropdown || ReportReviewed != ''"  class="input-field">
-                          <label for="submissionType">Report Due Date</label>
+                        <div *ngIf="ReportReviewed !== '0' && ReportReviewed !== 'Other'"  class="input-field">
+                          <label for="rptDueDate">Report Due Date</label>
                           <input
-                          [(ngModel)]="firmRptReviewItems[0].rptDueDate"
+                          [(ngModel)]="RptReviewDates.RptDueDate"
                           #dateInputs placeholder
                             type="text"
-                            id="submissionType"
-                            name="submissionType"
+                            id="rptDueDate"
+                            name="rptDueDate"
                           />
                         </div>
                       
@@ -103,7 +114,7 @@
                           <label for="reportingPeriodStartDate">Reporting Period Start Date</label>
                           <input
                           #dateInputs placeholder
-                          [(ngModel)]="reportingPeriodStartDate"
+                          [(ngModel)]="RptReviewDates.reportingPeriodStartDate"
                             type="text"
                             id="reportingPeriodStartDate"
                             name="reportingPeriodStartDate"
@@ -114,14 +125,14 @@
                           <label for="reportingPeriodEndDate">Reporting Period End Date</label>
                           <input
                           #dateInputs placeholder
-                          [(ngModel)]="reportingPeriodEndDate"
+                          [(ngModel)]="RptReviewDates.reportingPeriodEndDate"
                             type="text"
                             id="reportingPeriodEndDate"
                             name="reportingPeriodEndDate"
                           />
                         </div>
                          
-                        <div class="input-field">
+                        <div  class="input-field">
                           <label for="reportName">Link To Report</label>
                           <a (click)="OpenDocumentPopup()">Select/De-select document</a>
                         </div>
@@ -129,7 +140,7 @@
                         <div class="input-field">
                           <label for="dueDate">Report Received Date</label>
                           <input
-                          [(ngModel)]="firmRptReviewItems[0].receivedDate"
+                          [(ngModel)]="firmRptReviewItem.receivedDate"
                           #dateInputs placeholder
                             type="text"
                             id="dueDate"
@@ -137,7 +148,7 @@
                           />
                         </div>
                         
-                        <div *ngIf="!showOtherDropdown" class="input-field">
+                        <div *ngIf="ReportReviewed !== '0' && ReportReviewed !== 'Other'" class="input-field">
                           <label for="materiallyComplete">Materially Complete</label>
                           <ng-container>
                             <div style="display: flex; align-items: center">
@@ -146,7 +157,7 @@
                                 id="materiallyCompleteYes"
                                 name="materiallyComplete"
                                 [value]="true"
-                                [(ngModel)]="firmRptReviewItems[0].materiallyComplete"
+                                [(ngModel)]="firmRptReviewItem.materiallyComplete"
                                 style="margin-right: 10px; cursor: pointer"
                               />
                               <label for="materiallyCompleteYes" style="margin-left: 5px; color: #413b3c">Yes</label>
@@ -156,7 +167,7 @@
                                 id="materiallyCompleteNo"
                                 name="materiallyComplete"
                                 [value]="false"
-                                [(ngModel)]="firmRptReviewItems[0].materiallyComplete"
+                                [(ngModel)]="firmRptReviewItem.materiallyComplete"
                                 style="margin-left: 20px; margin-right: 10px; cursor: pointer;"
                               />
                               <label for="materiallyCompleteNo" style="margin-left: 5px; color: #413b3c">No</label>
@@ -171,7 +182,7 @@
                             name="dueDate"
                           />
                         </div>
-                        <div class="input-field">
+                        <div *ngIf="ReportReviewed !== '0' && ReportReviewed !== 'Other'" class="input-field">
                           <label for="ResubmissionRequired">Resubmission Required</label>
                           <ng-container>
                             <div style="display: flex; align-items: center">
@@ -180,7 +191,7 @@
                                 id="ResubmissionRequired"
                                 name="ResubmissionRequired"
                                 [value]="true"
-                                [(ngModel)]="firmRptReviewItems[0].resubmissionRequired"
+                                [(ngModel)]="firmRptReviewItem.resubmissionRequired"
                                 style="margin-right: 10px; cursor: pointer"
                               />
                               <label for="ResubmissionRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
@@ -190,48 +201,80 @@
                                 id="ResubmissionRequired"
                                 name="ResubmissionRequired"
                                 [value]="false"
-                                [(ngModel)]="firmRptReviewItems[0].resubmissionRequired"
+                                [(ngModel)]="firmRptReviewItem.resubmissionRequired"
                                 style="margin-left: 20px; margin-right: 10px; cursor: pointer;"
                               />
                               <label for="ResubmissionRequiredNo" style="margin-left: 5px; color: #413b3c">No</label>
                             </div>
                           </ng-container>
                         </div>
-                        <div *ngIf="!showOtherDropdown || ReportReviewed != ''" class="input-field">
+                        <div *ngIf="ReportReviewed !== '0' && ReportReviewed !== 'Other'" class="input-field">
                           <label for="dueDate">Material Completeness Decision Made By</label>
                           <input
-                          [(ngModel)]="firmRptReviewItems[0].materiallyCompleteCheckedBy"
+                          [(ngModel)]="firmRptReviewItem.materiallyCompleteCheckedBy"
                             type="text"
                             id="dueDate"
                             name="dueDate"
                           />
                         </div>
-                        <div *ngIf="!showOtherDropdown || ReportReviewed != ''" class="input-field">
+                        <div *ngIf="ReportReviewed !== '0' && ReportReviewed !== 'Other'" class="input-field">
                           <label for="dueDate">Resubmission Required Decision Made By</label>
                           <input
-                          [(ngModel)]="firmRptReviewItems[0].resubmissionRequestedBy"
+                          [(ngModel)]="firmRptReviewItem.resubmissionRequestedBy"
                             type="text"
                             id="dueDate"
                             name="dueDate"
                           />
                         </div>
-                        <div *ngIf="!showOtherDropdown || ReportReviewed != ''" class="input-field">
+                        <div *ngIf="ReportReviewed !== '0' && ReportReviewed !== 'Other'" class="input-field">
                           <label for="dueDate">Material Completeness Decision Made On</label>
                           <input
-                          [(ngModel)]="firmRptReviewItems[0].materiallyCompleteDate"
+                          [(ngModel)]="RptReviewDates.materiallyCompleteDate"
+                          #dateInputs placeholder
                             type="text"
                             id="dueDate"
                             name="dueDate"
                           />
                         </div>
-                        <div *ngIf="!showOtherDropdown || ReportReviewed != ''" class="input-field">
-                          <label for="dueDate">Resubmission Required Decision Made On</label>
+                        <div *ngIf="ReportReviewed !== '0' && ReportReviewed !== 'Other'" class="input-field">
+                          <label for="resubmissionRequestedDate">Resubmission Required Decision Made On</label>
                           <input
-                          [(ngModel)]="firmRptReviewItems[0].resubmissionRequestedDate"
+                          [(ngModel)]="RptReviewDates.resubmissionRequestedDate"
+                          #dateInputs placeholder
                             type="text"
-                            id="dueDate"
-                            name="dueDate"
+                            id="resubmissionRequestedDate"
+                            name="resubmissionRequestedDate"
                           />
+                        </div>
+                        <div *ngIf="ReportReviewed !== '0' && ReportReviewed !== 'Other'" class="input-field">
+                          <label for="resubmissionDueDate">Resubmission Due Date</label>
+                          <input
+                          [(ngModel)]="RptReviewDates.resubmissionDueDate"
+                          #dateInputs placeholder
+                            type="text"
+                            id="resubmissionDueDate"
+                            name="resubmissionDueDate"
+                          />
+                        </div>
+                        <div *ngIf="ReportReviewed !== '0' && ReportReviewed !== 'Other'" class="input-field" >
+                          <input 
+                          type="checkbox" 
+                          id="createActionItem"
+                          [(ngModel)]="createActionFromComment" 
+                          style="cursor: pointer;" 
+                          (click)="FlagcreateActionFromComment()"
+                        />
+                        <label 
+                          for="createActionItem" 
+                          style="cursor: pointer;">
+                          Create action item from comment
+                        </label>
+                        </div>
+                        <div *ngIf="firmRptReviewItem.resubmissionRequired" class="input-field fullwidth">
+                          <label for="commetToBepublished">Enter comments to be published on website:</label>
+                          <div style="min-width: 100%;" >
+                            <ckeditor [(ngModel)]="CommentsToPublishObject.wPublishedComments" [editor]="Editor" [config]="config" style="height: 200px; min-width: 100%;"></ckeditor>
+                          </div>
                         </div>
                         <div class="popup-header">
                           <h3></h3>
@@ -400,28 +443,69 @@
           </div> 
 </div>
 <!--Reference Form Popup-->
-<!-- <div *ngIf="callRefForm" class="overlay show"></div>
-<div *ngIf="callRefForm" class="ReferenceFormPopUp popupcontainer">
-  <i class="bi bi-x-circle close-icon" (click)="closeFormReference()"></i>
-  <div>
-    <div class="popup-header">
+
+
+<div *ngIf="callRefForm" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
       <h3>Select Document</h3>
+      <i class="bi bi-x-circle close-icon" (click)="closeFormReference()"></i>
     </div>
-    <div class="popup-body">
-      <ul>
-        <li >
-          <input type="radio" name="documentSelection"  >
-           :
-          <a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/" target="_blank"></a>
-        </li>
-      </ul>
-      <p >There are no documents to select from. Please upload the relevant
-        document and return for selection.</p>
-    </div>
+   
+        <div class="popup-body">
+          <ul>
+            <li >
+              <input type="radio" name="documentSelection" >
+               :
+              <a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/" target="_blank"></a>
+            </li>
+          </ul>
+          <p >There are no documents to select from. Please upload the relevant
+            document and return for selection.</p>
+        </div>
+
+      <div class="popup-buttons-container">
+        <button class="subbutton" (click)="deSelectDocument()">De-Select</button>
+        <button class="subbutton" (click)="replaceDocument()">Ok</button>
+        <button class="subbutton" (click)="closeFormReference()">Cancel</button>
+      </div>
   </div>
-  <div class="popup-buttons-container">
-    <button class="subbutton" (click)="deSelectDocument()">De-Select</button>
-    <button class="subbutton" (click)="replaceDocument()">Ok</button>
-    <button class="subbutton" (click)="closeFormReference()">Cancel</button>
+</div>
+
+<!-- <div *ngIf="callRefForm" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Contact Search Results</h3>
+      <i class="bi bi-x-circle close-icon" (click)="closeFormReference()"></i>
+    </div>
+    <div class="modal-body">
+      <table class="contact-table">
+        <thead>
+          <tr>
+            <th>Select</th>
+            <th>Full Name</th>
+            <th>Mobile Number</th>
+            <th>Email</th>
+            <th>Country</th>
+            <th>Passport Number</th>
+            <th>Date of Birth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let contact of ContactDetailsByPassingParam">
+            <td>
+              <button style="color: #a41e36; text-decoration: none;"
+                (click)="ShowselectContact(contact)">Select</button>
+            </td>
+            <td>{{ contact.FullName }}</td>
+            <td>{{ contact.MobileNum || 'N/A' }}</td>
+            <td>{{ contact.BusEmail || 'N/A' }}</td>
+            <td>{{ contact.CountryName || 'N/A' }}</td>
+            <td>{{ contact.PassportNum || 'N/A' }}</td>
+            <td>{{ contact.DateOfBirth || 'N/A' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div> -->

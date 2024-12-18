@@ -56,5 +56,8 @@ export class ObjectwfService {
     const url = `${this.baseUrlObjectWF}get_user_workflow_details?ObjectWFStatusID=${ObjectWFStatusID}`
     return this.http.get<any>(url); 
   }
-
+  saveUpdateObjectWfTaskStatus(WfTaskDetailsList : any): Observable<any> {
+    const url = `${this.baseUrlObjectWF}save_update_object_wf_task_status`
+    return this.http.post<any>(url, WfTaskDetailsList);
+  }
 }

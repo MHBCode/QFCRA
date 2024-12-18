@@ -95,7 +95,30 @@ export class DateUtilService {
 
     return formattedDate;
   }
-
+  convertDateToYYYYMMDDAndTime(dateStr: string | Date): string | null {
+    if (!dateStr) {
+      return null; // Return null if the input is invalid or empty
+    }
+  
+    const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+  
+    if (isNaN(date.getTime())) {
+      console.error('Invalid date format:', dateStr);
+      return null;
+    }
+  
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+  
+    // Return the date and time in YYYY-MM-DD HH:mm:ss format
+    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  
+    return formattedDateTime;
+  }
   addYears(date: string | Date, years: number): Date {
     const newDate = typeof date === 'string' ? new Date(date) : date;
     if (isNaN(newDate.getTime())) {
@@ -113,6 +136,12 @@ export class DateUtilService {
     newDate.setDate(newDate.getDate() + days);
     return newDate;
   }
-
+  formatToISO(dateString: string): string {
+    const parsedDate = new Date(dateString);
+    if (isNaN(parsedDate.getTime())) {
+      throw new Error('Invalid date string provided');
+    }
+    return parsedDate.toISOString();
+  }
 
 }
