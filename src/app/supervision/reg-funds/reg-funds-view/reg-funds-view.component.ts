@@ -325,7 +325,7 @@ export class RegFundsViewComponent {
     const isValid = await this.validateRegFunds();
 
     if (!isValid) {
-      this.firmDetailsService.showErrorAlert(constants.MessagesLogForm.ENTER_REQUIREDFIELD_PRIORSAVING);
+      this.supervisionService.showErrorAlert(constants.MessagesLogForm.ENTER_REQUIREDFIELD_PRIORSAVING, 'error');
       this.isLoading = false;
       return; // Prevent further action if validation fails or the user cancels
     }

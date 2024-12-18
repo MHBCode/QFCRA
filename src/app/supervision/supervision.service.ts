@@ -19,12 +19,12 @@ export class SupervisionService {
     private userService: UsersService,
   ) { }
 
-  showErrorAlert(messageKey: number, isLoading?: boolean) {
+  showErrorAlert(messageKey: number, icon: any, isLoading?: boolean) {
     this.logForm.errorMessages(messageKey).subscribe(
       response => {
         Swal.fire({
           text: response.response,
-          icon: 'error',
+          icon: icon,
           confirmButtonText: 'Ok',
         });
 
@@ -53,7 +53,6 @@ export class SupervisionService {
           // Store the updated error message
           this.errorMessages[fieldName] = errorMessage;
 
-          this.errorMessages[fieldName] = errorMessage;
           if (rpt) {
             rpt.errorMessages[fieldName] = errorMessage;
           }
@@ -246,6 +245,20 @@ export class SupervisionService {
     });
   }
 
+  populateNotRequiredTypes(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.firmRptNReqReasonTypes, OpTypeId).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Not Required Types options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
   isUserHasRestrictedAccess(userId: number, firmId: number, objectID: number): Observable<boolean> {
     return new Observable(observer => {
       this.userService.isUserHasRestrictedAccess(userId, firmId, objectID).subscribe(
@@ -263,6 +276,30 @@ export class SupervisionService {
 
 
   isNullOrEmpty(value: any): boolean {
-    return value === null || value === '';
+    return value === null || value === '' || value === "";
   }
+
+  showPopupAlert(msgKey: number, isLoading: boolean, replacementText?: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      this.logForm.errorMessages(msgKey).subscribe((response) => {
+        let message = response.response;
+        if (replacementText) {
+          message = message.replace('#REPLACEMENTEXT#', replacementText);
+        }
+
+        Swal.fire({
+          html: message,
+          showCancelButton: true,
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+        }).then((result) => {
+          isLoading = false;
+          resolve(result.isConfirmed);
+        });
+      });
+    });
+  }
+
+
+
 }

@@ -50,13 +50,12 @@
 
 
         <div class="reporting-schedule-form">
-            <div class="inputs-row" *ngIf="financialReportingPeriod">
+            <div class="inputs-row">
                 <div class="input-field">
                     <label for="financialYearEnd">Financial year end selected to generate this reporting
-                        schedule <span *ngIf="isEditModeReportingSch" style="color: red;">*</span></label>
-                    <select *ngIf="isEditModeReportingSch; else financialYearEnd"
-                        [(ngModel)]="financialReportingPeriod.FirmFinYearEndTypeID" [disabled]="DisableField">
-                        <option [value]="0">Select</option>
+                        schedule <span *ngIf="isEditModeReportingSch || isCreateReportingSch" style="color: red;">*</span></label>
+                    <select *ngIf="isEditModeReportingSch || isCreateReportingSch; else financialYearEnd"
+                        [(ngModel)]="firmFinYearEndTypeID" [disabled]="DisableField">
                         <option *ngFor="let option of financialYearEndTypes" [value]="option.FirmFinYearEndTypeID">
                             {{option.FirmFinYearEnd}}
                         </option>
@@ -64,24 +63,24 @@
                     <ng-template #financialYearEnd>
                         <input type="text" id="financialYearEnd" name="financialYearEnd"
                             [(ngModel)]="financialReportingPeriod.FirmFinYearEndTypeDesc"
-                            [disabled]="!isEditModeReportingSch || DisableField" />
+                            [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || DisableField" />
                     </ng-template>
                 </div>
                 <div class="input-field">
-                    <label for="reportingScheduleFrom">Reporting Schedule From <span *ngIf="isEditModeReportingSch"
+                    <label for="reportingScheduleFrom">Reporting Schedule From <span *ngIf="isEditModeReportingSch || isCreateReportingSch"
                             style="color: red;">*</span></label>
                     <input type="text" id="reportingScheduleFrom" name="reportingScheduleFrom"
-                        [(ngModel)]="financialReportingPeriod.FirmRptFrom"
-                        [disabled]="!isEditModeReportingSch || DisableField" #dateInputs />
+                        [(ngModel)]="firmRptFrom"
+                        [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || DisableField" #dateInputs />
                 </div>
                 <div class="input-field">
-                    <label for="reportingScheduleTo">Reporting Schedule To <span *ngIf="isEditModeReportingSch"
+                    <label for="reportingScheduleTo">Reporting Schedule To <span *ngIf="isEditModeReportingSch || isCreateReportingSch"
                             style="color: red;">*</span></label>
                     <input type="text" id="reportingScheduleTo" name="reportingScheduleTo"
-                        [(ngModel)]="financialReportingPeriod.FirmRptTo"
-                        [disabled]="!isEditModeReportingSch || DisableField" #dateInputs />
+                        [(ngModel)]="firmRptTo"
+                        [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || DisableField" #dateInputs />
                 </div>
-                <div *ngIf="!isEditModeReportingSch" class="input-field">
+                <div *ngIf="!isEditModeReportingSch && !isCreateReportingSch" class="input-field">
                     <label for="reportType">Report Type</label>
                     <select id="reportType" [(ngModel)]="reportType" (change)="filterReports($event)">
                         <option value="1" selected>
@@ -96,10 +95,10 @@
                     </select>
                 </div>
 
-                <div *ngIf="isEditModeReportingSch" class="input-field">
+                <div *ngIf="isEditModeReportingSch || isCreateReportingSch" class="input-field">
                     <label for="generate">Generate</label>
                     <div class="radio-wrapper">
-                        
+
                         <input [(ngModel)]="rptScheduleType" [disabled]="DisableField" type="radio" name="generate"
                             [value]="1" /> New
 
@@ -108,12 +107,44 @@
                     </div>
                 </div>
 
-                <div *ngIf="isEditModeReportingSch" class="input-field">
+                <div *ngIf="isEditModeReportingSch || isCreateReportingSch" class="input-field">
                     <button (click)="generateReportSch()" [disabled]="DisableField" class="generate-btn">Generate
                         Reporting Schedule</button>
                 </div>
             </div>
-            <div class="rpt-list margin-top-10 table">
+
+            <div *ngIf="!isEditModeReportingSch && !isCreateReportingSch" class="rpt-list margin-top-10 table">
+                <div class="popup-header">
+                    <h3>Publish Reporting Schedule</h3>
+                </div>
+                <ng-container *ngIf="publishDetails">
+                    <div class="inputs-row">
+                        <div class="input-field">
+                            <label for="publishedBy">Published By</label>
+                            <input disabled type="text" [(ngModel)]="report.PublishedByUserName" />
+                        </div>
+                        <div class="input-field">
+                            <label for="publishedDate">Published Date</label>
+                            <input disabled type="text" [(ngModel)]="report.WPublishedDate" />
+                        </div>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngIf="publishButtons">
+                    <div class="btn justify-content-end">
+                        <button (click)="selectAllUnpublishedCheckbox()">
+                            Select Un-published Reports
+                        </button>
+
+                        <button (click)="publishReports()">
+                            {{publishBtnText}}
+                        </button>
+                    </div>
+                </ng-container>
+
+            </div>
+
+            <div *ngIf="isCreateReportingSch ? reportsGenerated : true" class="rpt-list margin-top-10 table">
                 <div class="popup-header">
                     <h3>Reports List</h3>
 
@@ -198,11 +229,26 @@
                         </tr>
                     </tfoot>
                 </table> -->
+                <div *ngIf="isEditModeReportingSch || isCreateReportingSch" class="add-rpt-btn-container">
+                    <button class="addRptBtn" (click)="addNewReport()">
+                      Add Report
+                    </button>
+                  </div>
                 <ng-container *ngFor="let rpt of displayedItems; let i = index">
                     <div class="inputs-row report-entry" [ngClass]="{ 'border-style': i !== 0 }">
+                        <div *ngIf="rpt?.errorMessages?.['rptTypeChanged']" class="error-messages">
+                            <p>
+                                {{ rpt.errorMessages['rptTypeChanged'] }}
+                            </p>
+                        </div>
+                          <div *ngIf="isEditModeReportingSch || isCreateReportingSch" class="del-rpt-container">
+                            <button *ngIf="displayedItems.length > 1" (click)="removeReport(i)"
+                              class="RmvTrashBtn bi-trash"></button>
+                          </div>
                         <div class="input-field">
                             <label for="reportTypeEntry">Report Type</label>
-                            <select *ngIf="isEditModeReportingSch; else reportType" [(ngModel)]="rpt.DocTypeID"
+                            <select *ngIf="isEditModeReportingSch || isCreateReportingSch; else reportType" [(ngModel)]="rpt.DocTypeID"
+                                (change)="onReportTypeChange(rpt)"
                                 [disabled]="(!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)">
                                 <option [value]="0">Select</option>
                                 <option *ngFor="let option of allReportTypes" [value]="option.DocTypeID">
@@ -216,9 +262,11 @@
 
                         <div class="input-field">
                             <label for="submissionType">Submission Type</label>
-                            <select *ngIf="isEditModeReportingSch; else FirmRptSubmissionTypes"
+                            <select *ngIf="isEditModeReportingSch || isCreateReportingSch; else FirmRptSubmissionTypes"
                                 [(ngModel)]="rpt.FirmRptSubmissionTypeID"
-                                [disabled]="(!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)">
+                                [disabled]="(!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
+                                (change)="onSubmissionTypeChange(rpt)">
+                                <option [value]="0">Select</option>
                                 <option *ngFor="let option of allRptSubmissionTypes"
                                     [value]="option.FirmRptSubmissionTypeID">
                                     {{option.SubmissionTypeDesc}}
@@ -234,18 +282,16 @@
                         <div class="input-field">
                             <label for="publish">Publish</label>
                             <input type="checkbox" id="publish" name="publish" [(ngModel)]="rpt.WPublished"
-                                [disabled]="!isEditModeReportingSch || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)" />
+                                [disabled]="rpt.WFileAttached" />
                         </div>
 
                         <div class="input-field">
                             <label for="reportingPeriodType">Reporting Period Type</label>
-                            <select *ngIf="isEditModeReportingSch else reportingPeriodType" id="reportingPeriodType"
-                                [(ngModel)]="rpt.RptPeriodTypeID"
+                            <select *ngIf="isEditModeReportingSch || isCreateReportingSch; else reportingPeriodType" id="reportingPeriodType"
+                                [(ngModel)]="rpt.RptPeriodTypeID" (change)="onRptPeriodTypeChange(rpt)"
                                 [disabled]="(!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)">
                                 <option [value]="0">Select</option>
-                                <option
-                                    *ngFor="let option of (rpt.FirmRptSubmissionTypeID === 1 ? regulatorPeriodTypes : reportPeriodTypes)"
-                                    [value]="option.RptPeriodTypeID">
+                                <option *ngFor="let option of rpt.periodTypes" [value]="option.RptPeriodTypeID">
                                     {{ option?.RptPeriodShortDesc }}
                                 </option>
                             </select>
@@ -257,31 +303,31 @@
                             <label for="reportingPeriodStartDate">Reporting Period Start Date</label>
                             <input type="text" id="reportingPeriodStartDate" name="reportingPeriodStartDate"
                                 [(ngModel)]="rpt.RptPeriodFromDate"
-                                [disabled]="!isEditModeReportingSch || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
+                                [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
                                 #dateInputs />
                         </div>
                         <div class="input-field">
                             <label for="reportingPeriodEndDate">Reporting Period End Date</label>
                             <input type="text" id="reportingPeriodEndDate" name="reportingPeriodEndDate"
                                 [(ngModel)]="rpt.RptPeriodToDate"
-                                [disabled]="!isEditModeReportingSch || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
+                                [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
                                 #dateInputs />
                         </div>
                         <div class="input-field">
                             <label for="reportName">Report Name</label>
                             <input type="text" id="reportName" name="reportName" [(ngModel)]="rpt.ReportName"
-                                [disabled]="!isEditModeReportingSch || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)" />
+                                [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)" />
                         </div>
                         <div class="input-field">
                             <label for="dueDate">Due Date</label>
                             <input type="text" id="dueDate" name="dueDate" [(ngModel)]="rpt.FirmRptDueDate"
-                                [disabled]="!isEditModeReportingSch || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
+                                [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
                                 #dateInputs />
                         </div>
                         <div class="input-field">
                             <label for="required">Required</label>
-                            <ng-container *ngIf="isEditModeReportingSch; else FirmRptReqdBitValue">
-                                <select [(ngModel)]="rpt.FirmRptReqdBit"
+                            <ng-container *ngIf="isEditModeReportingSch || isCreateReportingSch; else FirmRptReqdBitValue">
+                                <select (change)="onRequiredChange(rpt)" [(ngModel)]="rpt.FirmRptReqdBit"
                                     [disabled]="(!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)">
                                     <option [value]="true">Yes</option>
                                     <option [value]="false">No</option>
@@ -291,19 +337,38 @@
                                 <input disabled [value]="rpt.FirmRptReqdBit ? 'Yes' : 'No'">
                             </ng-template>
                         </div>
+                        <div *ngIf="rpt.FirmRptReqdBit === 'false'" class="input-field">
+                            <label for="notRequired">Not Required Reason</label>
+                            <select [(ngModel)]="rpt.FirmRptNReqReasonTypeID">
+                                <option [value]="0">Select</option>
+                                <option *ngFor="let option of allNotRequiredTypes"
+                                    [value]="option.FirmRptNReqReasonTypeID">
+                                    {{option.FirmRptNReqReasonTypeDesc}}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div *ngIf="!isValueNullOrEmpty(rpt.AdditionalSheets) && isXBRLTypeForReport(rpt.DocTypeID)"
+                            class="input-field">
+                            <label for="additionalSheets">Additional Forms Requested</label>
+                            <input disabled [(ngModel)]="rpt.AdditionalSheets">
+                        </div>
+
                         <div class="input-field">
                             <label for="reportLink">Link to Report</label>
-                            <span>{{rpt.DocTypeDesc}} : </span>
-                            <a id="websiteLink" [href]="rpt.DocFileLocation" target="_blank" rel="noopener noreferrer">
-                                {{rpt.documentDetails?.FileName}}
-                            </a>
-
+                            <span *ngIf="rpt.documentDetails?.FileName">{{rpt.DocTypeDesc}} : <a id="websiteLink"
+                                    [href]="rpt.DocFileLocation" target="_blank" rel="noopener noreferrer">
+                                    {{rpt.documentDetails?.FileName}}
+                                </a></span>
+                            <a *ngIf="(isEditModeReportingSch || isCreateReportingSch) && !rpt.DocID" class="form-ref-btn" href="#">Select/De-select document</a>
                         </div>
 
                         <div class="input-field">
                             <label for="reportGivenBy">Report Given By</label>
-                            <input type="text" id="reportGivenBy" name="reportGivenBy"
-                                [(ngModel)]="rpt.WPublishedByUserName" disabled />
+                            <ul class="signatories-list">
+                                <li *ngFor="let userName of signatories[rpt.FirmRptSchItemID]">
+                                    {{userName.WSignOffByUserName}} on {{userName.WSignOffDate}}</li>
+                            </ul>
                         </div>
 
                         <div class="input-field">
@@ -314,10 +379,14 @@
 
                         <div class="input-field">
                             <label for="linkToReview">Link to Review</label>
-                            <a [routerLink]="['/supervision/view/return-review', firmId]"
-                                [queryParams]="{ firmRptSchID: rpt.firmRptSchID }" target="_blank">
-                                Link to Review
-                            </a>
+                            <span><a *ngIf="rptItemExists[rpt.FirmRptSchItemID] && rptItemExists[rpt.FirmRptSchItemID] !== 0"
+                                    [routerLink]="['/supervision/view/return-review', firmId]"
+                                    [queryParams]="{ firmRptSchID: rpt.firmRptSchID }" target="_blank">
+                                    Link to Review
+                                </a>
+                                <!-- - <a href="#">Warnings</a> 
+                                - <a href="#">MI Report</a> -->
+                            </span>
                         </div>
 
 
@@ -336,10 +405,19 @@
                         <div class="input-field fullwidth">
                             <label for="notes">Notes</label>
                             <textarea [(ngModel)]="rpt.FirmRptNotes" name="notes" id="notes"
-                                [disabled]="!isEditModeReportingSch"></textarea>
+                                [disabled]="!isEditModeReportingSch && !isCreateReportingSch"></textarea>
                         </div>
                         <!-- Validation Errors -->
                         <div *ngIf="isEditModeReportingSch || isCreateReportingSch" class="error-messages">
+                            <p *ngIf="rpt?.errorMessages?.['reportType']">
+                                {{ rpt.errorMessages['reportType'] }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['submissionType']">
+                                {{ rpt.errorMessages['submissionType'] }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['rptPeriodType']">
+                                {{ rpt.errorMessages['rptPeriodType'] }}
+                            </p>
                             <p *ngIf="rpt?.errorMessages?.['RptPeriodFromDate']">
                                 {{ rpt.errorMessages['RptPeriodFromDate'] }}
                             </p>
@@ -348,6 +426,15 @@
                             </p>
                             <p *ngIf="rpt?.errorMessages?.['RptPeriodFromDateGreaterThanRptPeriodDateTo']">
                                 {{ rpt.errorMessages['RptPeriodFromDateGreaterThanRptPeriodDateTo'] }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['reportName']">
+                                {{ rpt.errorMessages['reportName'] }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['dueDate']">
+                                {{ rpt.errorMessages['dueDate'] }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['notRequired']">
+                                {{ rpt.errorMessages['notRequired'] }}
                             </p>
                         </div>
                     </div>

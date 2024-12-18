@@ -74,6 +74,7 @@ export class DateUtilService {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   }
+  
 
   convertDateToYYYYMMDD(dateStr: string | Date): string | null {
 

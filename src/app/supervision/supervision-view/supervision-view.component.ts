@@ -725,7 +725,7 @@ export class SupervisionViewComponent {
     const isValid = await this.validateSupervision();
 
     if (!isValid) {
-      this.firmDetailsService.showErrorAlert(constants.SupervisionData_Messages.SUPERVISION_SAVE_ERROR);
+      this.supervisionService.showErrorAlert(constants.SupervisionData_Messages.SUPERVISION_SAVE_ERROR, 'error');
       this.isLoading = false;
       return; // Prevent further action if validation fails or the user cancels
     }
@@ -736,7 +736,7 @@ export class SupervisionViewComponent {
     ) {
       if (this.savedSupEffectiveDate === this.SupervisionCategory[0].EffectiveFromDate) {
         this.isLoading = false;
-        const isConfirmed = await this.showPopupAlert(8613);
+        const isConfirmed = await this.supervisionService.showPopupAlert(8613, this.isLoading);
         if (!isConfirmed) {
           // If user cancels, stop the process
           this.isLoading = false;
@@ -749,7 +749,7 @@ export class SupervisionViewComponent {
       const effectiveFromDate = this.supervisionService.isNullOrEmpty(this.savedSupEffectiveDate) ? this.currentDate : this.savedSupEffectiveDate;
       if (this.dateUtilService.convertDateToYYYYMMDD(effectiveFromDate) > this.dateUtilService.convertDateToYYYYMMDD(this.SupervisionCategory[0].EffectiveFromDate)) {
         this.isLoading = false;
-        const isConfirmed = await this.showPopupAlert(3919);
+        const isConfirmed = await this.supervisionService.showPopupAlert(3919, this.isLoading);
         if (!isConfirmed) {
           this.isLoading = false;
           return;
@@ -831,23 +831,6 @@ export class SupervisionViewComponent {
       createdBy: userId,
     }
   }
-
-  showPopupAlert(msgKey: number): Promise<boolean> {
-    return new Promise((resolve) => {
-      this.logForm.errorMessages(msgKey).subscribe((response) => {
-        Swal.fire({
-          html: response.response,
-          showCancelButton: true,
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-        }).then((result) => {
-          this.isLoading = false;
-          resolve(result.isConfirmed); // Resolve the promise with the user's choice
-        });
-      });
-    });
-  }
-
 
   loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
     this.firmDetailsService.getErrorMessages(fieldName, msgKey, null, null, placeholderValue).subscribe(

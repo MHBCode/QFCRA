@@ -9,7 +9,7 @@
                     Reporting Schedule > <span>{{firmDetails?.FirmName}} </span>
                 </h2>
                 <div class="btn">
-                    <button
+                    <button (click)="openReportSchedulePopup(null,firmDetails, true)"
                     *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn"
                     [disabled]="!getControlEnablement('imgBtnCreate')">
                       <i class="bi bi-plus"></i>
@@ -25,7 +25,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let rpt of paginatedItems" (click)="openReportSchedulePopup(rpt,firmDetails)">
+                    <tr *ngFor="let rpt of paginatedItems" (click)="openReportSchedulePopup(rpt,firmDetails, false)">
                         <td>{{rpt.FirmRptFrom}}</td>
                         <td>{{rpt.FirmRptTo}}</td>
                     </tr>
@@ -45,5 +45,5 @@
 <app-reporting-schedule-view
   *ngIf="showPopup"
   [report]="selectedReport" [firmId]="firmId" [firmDetails]="firmDetails"
-  (reloadReportSch)="loadReportingSchedule()" (closeRptPopup)="closePopup()">
+  (reloadReportSch)="loadReportingSchedule()" (closeRptPopup)="closePopup()" [isCreateReportingSch]="isCreateRptSch">
 </app-reporting-schedule-view>

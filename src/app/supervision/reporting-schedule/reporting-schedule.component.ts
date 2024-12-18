@@ -25,6 +25,7 @@ export class ReportingScheduleComponent {
   firmDetails: any;
   selectedReport: any = null;
   showPopup: boolean = false;
+  isCreateRptSch: boolean = false;
 
   pageSize: number = 10; // Define pageSize here
   paginatedItems: any[] = [];
@@ -180,7 +181,7 @@ export class ReportingScheduleComponent {
         this.rptSchedule = data.response;
         this.isLoading = false;
         if (!this.isAuthorise) {
-          this.supervisionService.showErrorAlert(constants.ReportingScheduleMessages.REPORTINGSCHEDULECANTBECREATED_FIRMSTATUS);
+          this.supervisionService.showErrorAlert(constants.ReportingScheduleMessages.REPORTINGSCHEDULECANTBECREATED_FIRMSTATUS, 'error');
         }
         this.applySearchAndPagination(); // Initialize pagination
       },
@@ -208,8 +209,11 @@ export class ReportingScheduleComponent {
       }
     );
   }
-  openReportSchedulePopup(rpt: any, firmDetails: any): void {
+  openReportSchedulePopup(rpt: any, firmDetails: any, isCreate: boolean): void {
+    this.isCreateRptSch = isCreate;
+    if (rpt) {
     this.selectedReport = rpt;
+    }
     this.showPopup = true;
   }
 

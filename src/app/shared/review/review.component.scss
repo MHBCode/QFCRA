@@ -1,17 +1,21 @@
-.popupcontainer .input-field{
+.popupcontainer .input-field {
     width: 31%;
 }
-.popupcontainer .fullwidth{
+
+.popupcontainer .fullwidth {
     width: 100%;
 }
+
 .popupcontainer .inputs-row {
     gap: 3.5%;
     justify-content: flex-start;
     padding: 0px;
 }
+
 .rpt-list {
     margin: 10px 0px;
 }
+
 .rpt-list .inputs-row.report-entry.border-style {
     margin-top: 10px;
     border-top: 1px solid #a51e36;
@@ -21,17 +25,19 @@
 .popupcontainer.Rptpopupcontainer {
     max-height: 97vh;
 }
+
 .disabled {
     background-color: #f9f9f9;
     pointer-events: none;
     opacity: 0.6;
-  }
+}
 
 .addSubFunsdBtn {
     background-color: #A51E36;
     color: white;
     cursor: default;
 }
+
 .addSubFunsdBtn {
     background: #ac112d;
     color: white;
@@ -49,37 +55,43 @@
     ;
     margin-bottom: 10px;
 }
+
 .del-address-container {
     width: 100%;
     display: flex;
     justify-content: flex-end;
-  }
-  .RmvTrashBtn {
+}
+
+.RmvTrashBtn {
     background: red;
     color: white;
     border: none;
     font-size: 15px;
     padding: 5px 10px;
     border-radius: 7px;
-  }
+}
 
 
-  .notes {
+.notes {
     width: 100% !important;
     margin-top: 10px;
     padding: 10px;
-    > div{
-        width:100%;
+
+    >div {
+        width: 100%;
     }
-   }
-   a {
+}
+
+a {
     color: rgb(161, 48, 48);
-   }
-   .rpt-list .inputs-row.report-entry.border-style {
+}
+
+.rpt-list .inputs-row.report-entry.border-style {
     margin-top: 10px;
     border-top: 1px solid #a51e36;
     padding-top: 10px !important;
 }
+
 .popupcontainer .inputs-row {
     gap: 3.5%;
     justify-content: flex-start;
@@ -124,4 +136,11 @@
     padding: 5px 10px;
     border-radius: 7px;
     
+}
+
+
+.margin-space {
+    margin-left: 20px;
+    margin-right: 10px;
+    cursor: pointer;
 }
