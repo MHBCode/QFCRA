@@ -50,6 +50,11 @@ export const dnfbpsFirmNames = "V_All_Firms_DNFBPs";
 // Reporting Schedule
 export const firmRptSubmissionTypes = "V_FirmRptSubmissionTypes";
 export const reportDocTypes = "v_Get_DocType";
+export const firmRptNReqReasonTypes = "FirmRptNReqReasonTypes";
+export const Q100_PRUDENTIALRETURN = "10";
+export const Q200_PRUDENTIALRETURN = "11";
+export const Q300_PRUDENTIALRETURN = "12";
+export const Q400_PRUDENTIALRETURN = "29";
 //Query String Parameter for FS Reporting
 export const QUERYSTRING_FSRPTDATAID = "fsRptDataID";
 export const Specify_Valid_Response = 1200;

@@ -70,6 +70,30 @@ export class ReportScheduleService {
     return this.http.get<any>(url);
   }
 
+  getReportNameForAdditionalSchedules(docTypeID: number, rptPeriodTypeID: number, rptPeriodFromDate: string, rptPeriodToDate: string, rptDueDate: string) {
+    const url = `${this.baseUrlRpt}get_report_name_for_additional_schedules?docTypeID=${docTypeID}&rptPeriodTypeID=${rptPeriodTypeID}&rptPeriodFromDate=${rptPeriodFromDate}&rptPeriodToDate=${rptPeriodToDate}&rptDueDate=${rptDueDate}`;
+    return this.http.get<any>(url);
+  }
+
+  getObjectSignatories(rptItemID: number, docID: number) {
+    const url = `${this.baseUrlRpt}get_object_signatories?objectInstanceID=${rptItemID}&docID=${docID}`;
+    return this.http.get<any>(url);
+  }
+
+  publishRptSch(reports: any) {
+    const url = `${this.baseUrlRpt}publish_reporting_schedule`;
+    return this.http.post<any>(url, reports);
+  }
+
+  saveReportSchedule(rptObj: any) {
+    const url = `${this.baseUrlRpt}save_update_firm_reporting_schedule`;
+    return this.http.post<any>(url, rptObj);
+  }
+
+  deleteRptSch(obj: any) {
+    const url = `${this.baseUrlRpt}delete_reporting_schedule`;
+    return this.http.delete<any>(url, obj);
+  }
 
 }
 

@@ -37,6 +37,11 @@ export class ReturnReviewService {
     return this.http.get<any>(url);
   }
 
+  isFirmRptSchExists(rptSchItemID: number): Observable<any> {
+    const url = `${this.returnViewUrl}is_firm_rptSchItem_exists?rptSchItemID=${rptSchItemID}`;
+    return this.http.get<any>(url);
+  }
+
   SaveNewRevisonNum(
     rptObjectId: number,
     rptReviewID: number,

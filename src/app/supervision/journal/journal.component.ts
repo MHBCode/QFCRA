@@ -29,7 +29,7 @@ export class JournalComponent {
   alljournaldata: any;
   showPopup: boolean = false;
   selectedJournal: any = null;
-  isCreateJournal:boolean = false;
+  isCreateJournal: boolean = false;
 
   // Security
   hideEditBtn: boolean = false;

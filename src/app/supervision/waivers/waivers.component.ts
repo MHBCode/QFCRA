@@ -90,7 +90,7 @@ export class WaiversComponent {
         this.isAuthorisedForWaivers = data.response;
         this.isLoading = false;
         if(!this.isAuthorisedForWaivers){
-          this.supervisionService.showErrorAlert(constants.MessagesWaiverList.FIRMEXIST);
+          this.supervisionService.showErrorAlert(constants.MessagesWaiverList.FIRMEXIST, 'error');
         }
       },
       error => {

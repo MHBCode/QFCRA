@@ -6,24 +6,16 @@
       <div class="input-field">
         <label for="required">Additional Review Required?</label>
         <ng-container>
-          <div style="display: flex; align-items: center">
+          <div style="display: flex; align-items: center;white-space: nowrap;">
               <input type="radio" (change)="AddFirstReview()"  id="isRequiredYes" 
               [disabled]="!isReviseMode"  name="IsRequired" [(ngModel)]="addtlReviewRequired" [value]="true" style="margin-right: 10px; cursor: pointer" />
               <label for="isRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
 
-              <input type="radio"  id="isRequiredNo" 
-              [disabled]="!isReviseMode" [(ngModel)]="addtlReviewRequired" name="IsRequired" [value]="false" style="
-                  margin-left: 20px;
-                  margin-right: 10px;
-                  cursor: pointer;
-                " />
+              <input type="radio" class="margin-space" id="isRequiredNo" 
+              [disabled]="!isReviseMode" [(ngModel)]="addtlReviewRequired" name="IsRequired" [value]="false" />
               <label for="isRequiredNo"  style="margin-left: 5px; color: #413b3c">No</label>
-              <input type="radio"  [(ngModel)]="addtlReviewRequired"  id="isRequiredNo" 
-              [disabled]="!isReviseMode"  name="IsRequired" [value]="false" style="
-                  margin-left: 20px;
-                  margin-right: 10px;
-                  cursor: pointer;
-                " />
+              <input type="radio" class="margin-space" [(ngModel)]="addtlReviewRequired"  id="isRequiredNo" 
+              [disabled]="!isReviseMode"  name="IsRequired" [value]="false" />
               <label for="isRequiredNo"  style="margin-left: 5px; color: #413b3c">Not Yet
               </label>
           </div>
@@ -75,24 +67,16 @@
         <div class="input-field">
             <label for="required">Materially Complete</label>
             <ng-container>
-                <div style="display: flex; align-items: center">
+                <div style="display: flex; align-items: center;white-space: nowrap;">
                     <input type="radio"  id="isRequiredYes" 
                     [disabled]="!isEditable"  name="IsRequired" [(ngModel)]="addtlReviewRequired" [value]="true" style="margin-right: 10px; cursor: pointer" />
                     <label for="isRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
 
-                    <input type="radio"  id="isRequiredNo" 
-                    [disabled]="!isEditable" [(ngModel)]="addtlReviewRequired" name="IsRequired" [value]="false" style="
-                        margin-left: 20px;
-                        margin-right: 10px;
-                        cursor: pointer;
-                      " />
+                    <input type="radio" class="margin-space" id="isRequiredNo" 
+                    [disabled]="!isEditable" [(ngModel)]="addtlReviewRequired" name="IsRequired" [value]="false"/>
                     <label for="isRequiredNo"  style="margin-left: 5px; color: #413b3c">No</label>
-                    <input type="radio"  [(ngModel)]="addtlReviewRequired"  id="isRequiredNo" 
-                    [disabled]="!isEditable"  name="IsRequired" [value]="false" style="
-                        margin-left: 20px;
-                        margin-right: 10px;
-                        cursor: pointer;
-                      " />
+                    <input type="radio" class="margin-space"  [(ngModel)]="addtlReviewRequired"  id="isRequiredNo" 
+                    [disabled]="!isEditable"  name="IsRequired" [value]="false"/>
                     <label for="isRequiredNo"  style="margin-left: 5px; color: #413b3c">Not Yet
                     </label>
                 </div>

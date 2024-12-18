@@ -62,3 +62,39 @@
 .radio-wrapper {
     white-space: nowrap;
 }
+
+.signatories-list {
+    list-style-type: none;
+}
+
+.add-rpt-btn-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.del-rpt-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.RmvTrashBtn {
+    background: red;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px 10px;
+    border-radius: 7px;
+}
+
+.addRptBtn {
+    background: #A51E36;
+    color: white;
+    border: none;
+    font-size: 15px;
+    padding: 5px;
+    border-radius: 7px;
+    margin-right: 10px;
+}
