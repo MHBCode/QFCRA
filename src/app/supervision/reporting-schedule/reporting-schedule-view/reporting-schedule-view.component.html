@@ -35,6 +35,18 @@
             <p *ngIf="errorMessages['financialPeriodMonthIsDifferent']">
                 {{ errorMessages['financialPeriodMonthIsDifferent'] }}
             </p>
+            <p *ngIf="errorMessages['fileAttached']">
+                {{ errorMessages['fileAttached'] }}
+            </p>
+            <p *ngIf="errorMessages['scheduleItemRef']">
+                {{ errorMessages['scheduleItemRef'] }}
+            </p>
+            <p *ngIf="errorMessages['rptScheduleReferenced']">
+                {{ errorMessages['rptScheduleReferenced'] }}
+            </p>
+            <p *ngIf="errorMessages['docLinked']">
+                {{ errorMessages['docLinked'] }}
+            </p>
         </div>
         <!-- Title -->
         <div class="popup-title-btn-row">
@@ -113,7 +125,7 @@
                 </div>
             </div>
 
-            <div *ngIf="!isEditModeReportingSch && !isCreateReportingSch" class="rpt-list margin-top-10 table">
+            <div *ngIf="!isEditModeReportingSch && !isCreateReportingSch && pnlPublishReportingSch" class="rpt-list margin-top-10 table">
                 <div class="popup-header">
                     <h3>Publish Reporting Schedule</h3>
                 </div>
@@ -168,7 +180,7 @@
                             Cancel
                         </button>
 
-                        <button *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
+                        <button (click)="deleteReport()" *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
                             <i class="bi bi-trash"></i> Delete
                         </button>
                     </div>
@@ -242,7 +254,7 @@
                             </p>
                         </div>
                           <div *ngIf="isEditModeReportingSch || isCreateReportingSch" class="del-rpt-container">
-                            <button *ngIf="displayedItems.length > 1" (click)="removeReport(i)"
+                            <button [disabled]="rpt.WFileAttached" *ngIf="displayedItems.length > 1" (click)="removeReport(i)"
                               class="RmvTrashBtn bi-trash"></button>
                           </div>
                         <div class="input-field">
@@ -302,14 +314,14 @@
                         <div class="input-field">
                             <label for="reportingPeriodStartDate">Reporting Period Start Date</label>
                             <input type="text" id="reportingPeriodStartDate" name="reportingPeriodStartDate"
-                                [(ngModel)]="rpt.RptPeriodFromDate"
+                                (blur)="onRptPeriodTypeChange(rpt)" [(ngModel)]="rpt.RptPeriodFromDate"
                                 [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
                                 #dateInputs />
                         </div>
                         <div class="input-field">
                             <label for="reportingPeriodEndDate">Reporting Period End Date</label>
                             <input type="text" id="reportingPeriodEndDate" name="reportingPeriodEndDate"
-                                [(ngModel)]="rpt.RptPeriodToDate"
+                            (blur)="onRptPeriodTypeChange(rpt)" [(ngModel)]="rpt.RptPeriodToDate"
                                 [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
                                 #dateInputs />
                         </div>
@@ -321,7 +333,7 @@
                         <div class="input-field">
                             <label for="dueDate">Due Date</label>
                             <input type="text" id="dueDate" name="dueDate" [(ngModel)]="rpt.FirmRptDueDate"
-                                [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
+                                (blur)="onRptPeriodTypeChange(rpt)" [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
                                 #dateInputs />
                         </div>
                         <div class="input-field">
@@ -379,13 +391,14 @@
 
                         <div class="input-field">
                             <label for="linkToReview">Link to Review</label>
-                            <span><a *ngIf="rptItemExists[rpt.FirmRptSchItemID] && rptItemExists[rpt.FirmRptSchItemID] !== 0"
+                            <span>
+                                <a *ngIf="rptItemExists[rpt.FirmRptSchItemID] && rptItemExists[rpt.FirmRptSchItemID] !== 0"
                                     [routerLink]="['/supervision/view/return-review', firmId]"
-                                    [queryParams]="{ firmRptSchID: rpt.firmRptSchID }" target="_blank">
+                                    [queryParams]="{ firmRptSchItemID: rpt.FirmRptSchItemID }" target="_blank">
                                     Link to Review
                                 </a>
                                 <!-- - <a href="#">Warnings</a> 
-                                - <a href="#">MI Report</a> -->
+                                - <a href="#" *ngIf="rpt.showMIReport">MI Report</a> -->
                             </span>
                         </div>
 

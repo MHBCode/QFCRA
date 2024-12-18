@@ -129,7 +129,7 @@
           <div class="input-field">
             <label for="licenseDate"> Licensed Date </label>
             <input disabled name="licenseDate" id="licenseDate" type="text"
-              [value]="isCreateModeLicense ? firmDetails?.LicensedDate : ''" />
+              [value]="isCreateModeLicense ? firmDetails?.LicensedDate : ''" #dateInputs/>
           </div>
           <div class="input-field" *ngIf="
               (ActivityLicensed[0].ScopeRevNum !== null ||
@@ -156,12 +156,12 @@
           <div class="input-field">
             <label for="modDate"> Modification Date </label>
             <input disabled name="modDate" id="modDate" type="text"
-              value="{{ ActivityLicensed[0]?.LastModifiedDate }}" />
+              value="{{ ActivityLicensed[0]?.LastModifiedDate }}" #dateInputs/>
           </div>
           <div class="input-field">
             <label for="createdDate"> Creation Date </label>
             <input disabled name="createdDate" id="createdDate" type="text"
-              value="{{ ActivityLicensed[0]?.ScopeCreatedDate }}" />
+              value="{{ ActivityLicensed[0]?.ScopeCreatedDate }}" #dateInputs/>
           </div>
           <div *ngIf="isEditModeLicense && !hideReviseBtn" class="vary-scope">
             <button (click)="varyLicenseScope()">Vary Scope</button>
@@ -416,12 +416,12 @@
           <div class="input-field">
             <label for="incorporationDate"> Incorporation Date </label>
             <input disabled name="incorporationDate" id="incorporationDate" type="text"
-              [value]="isCreateModeAuth ? firmDetails?.DateOfIncorporation : '' " />
+              [value]="isCreateModeAuth ? firmDetails?.DateOfIncorporation : '' " #dateInputs/>
           </div>
           <div class="input-field">
             <label for="authorisedDate"> Authorised Date </label>
             <input disabled name="authorisedDate" id="authorisedDate" type="text"
-              value="{{ ActivityAuth[0]?.ScopeLicensedOrAuthorisedDate }}" />
+              value="{{ ActivityAuth[0]?.ScopeLicensedOrAuthorisedDate }}" #dateInputs/>
           </div>
           <div class="input-field" *ngIf="
               (ActivityAuth[0].ScopeRevNum !== null ||
@@ -442,11 +442,11 @@
           </div>
           <div class="input-field">
             <label for=""> Last Modified Date </label>
-            <input disabled name="" id="" type="text" value="{{ ActivityAuth[0]?.LastModifiedDate }}" />
+            <input disabled name="" id="" type="text" value="{{ ActivityAuth[0]?.LastModifiedDate }}" #dateInputs/>
           </div>
           <div class="input-field">
             <label for=""> Creation Date </label>
-            <input disabled name="" id="" type="text" value="{{ ActivityAuth[0]?.CreatedDate }}" />
+            <input disabled name="" id="" type="text" value="{{ ActivityAuth[0]?.CreatedDate }}" #dateInputs/>
           </div>
           <div *ngIf="isEditModeAuth && !hideReviseBtn" class="vary-scope">
             <button (click)="varyAuthScope()">Vary Scope</button>

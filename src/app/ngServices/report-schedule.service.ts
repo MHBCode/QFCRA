@@ -31,6 +31,11 @@ export class ReportScheduleService {
     return this.http.get<any>(url);
   }
 
+  getFirmReportScheduleItem(firmRptSchItemId:number): Observable<any> {
+    const url = `${this.baseUrlRpt}get_firm_report_schedule_item?firmRptSchItemID=${firmRptSchItemId}`;
+    return this.http.get<any>(url);
+  }
+
   getFirmReportScheduledItemDetail(firmId: number, firmRptSchID: number, constructDocUrl: boolean): Observable<any> {
     const url = `${this.baseUrlRpt}get_firm_report_schedule_item_detail?firmId=${firmId}&reportSchID=${firmRptSchID}&constructDocUrl=${constructDocUrl}`;
     return this.http.get<any>(url);
@@ -69,10 +74,7 @@ export class ReportScheduleService {
     const url = `${this.baseUrlRpt}get_firm_standard_report_scheduled_item_detail?firmID=${firmId}&reportingScheduleFrom=${reportScheduleFrom}&reportingScheduleTo=${reportScheduleTo}&rptScheduleType=${rptScheduleType}&financialYearEndTypeID=${financialYearEndTypeID}`;
     return this.http.get<any>(url);
   }
-  getFirmReportScheduleItem(firmRptSchItemId:number): Observable<any> {
-    const url = `${this.baseUrlRpt}get_firm_report_schedule_item?firmRptSchItemID=${firmRptSchItemId}`;
-    return this.http.get<any>(url);
-  }
+
   getReportNameForAdditionalSchedules(docTypeID: number, rptPeriodTypeID: number, rptPeriodFromDate: string, rptPeriodToDate: string, rptDueDate: string) {
     const url = `${this.baseUrlRpt}get_report_name_for_additional_schedules?docTypeID=${docTypeID}&rptPeriodTypeID=${rptPeriodTypeID}&rptPeriodFromDate=${rptPeriodFromDate}&rptPeriodToDate=${rptPeriodToDate}&rptDueDate=${rptDueDate}`;
     return this.http.get<any>(url);
@@ -80,6 +82,11 @@ export class ReportScheduleService {
 
   getObjectSignatories(rptItemID: number, docID: number) {
     const url = `${this.baseUrlRpt}get_object_signatories?objectInstanceID=${rptItemID}&docID=${docID}`;
+    return this.http.get<any>(url);
+  }
+
+  isFirmRptSchItemReferenced(strFirmRptSchItemIds: string) {
+    const url = `${this.baseUrlRpt}is_firm_report_schedule_item_referenced?strFirmRptSchItemIds=${strFirmRptSchItemIds}`;
     return this.http.get<any>(url);
   }
 
@@ -93,10 +100,10 @@ export class ReportScheduleService {
     return this.http.post<any>(url, rptObj);
   }
 
-  deleteRptSch(obj: any) {
-    const url = `${this.baseUrlRpt}delete_reporting_schedule`;
-    return this.http.delete<any>(url, obj);
-  }
+  deleteRptSch(firmId: number, firmRptSchID: number) {
+    const url = `${this.baseUrlRpt}delete_reporting_schedule?firmId=${firmId}&firmRptSchID=${firmRptSchID}`;
+    return this.http.delete<any>(url);
+}
 
 }
 

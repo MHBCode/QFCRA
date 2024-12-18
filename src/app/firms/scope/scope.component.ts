@@ -2414,31 +2414,6 @@ export class ScopeComponent implements OnInit {
     });
   }
 
-  // [Aicha] : Documents Functions to be moved to document component later
-  selectDocument() {
-    this.callUploadDoc = true;
-    setTimeout(() => {
-      const popupWrapper = document.querySelector('.selectDocumentPopUp') as HTMLElement;
-      if (popupWrapper) {
-        popupWrapper.style.display = 'flex';
-      } else {
-        console.error('Element with class .selectDocumentPopUp not found');
-      }
-    }, 0)
-  }
-
-  closeSelectDocument() {
-    this.callUploadDoc = false;
-    const popupWrapper = document.querySelector(".selectDocumentPopUp") as HTMLElement;
-    setTimeout(() => {
-      if (popupWrapper) {
-        popupWrapper.style.display = 'none';
-      } else {
-        console.error('Element with class not found');
-      }
-    }, 0)
-  }
-
   uploadDocument() {
     if (!this.selectedFile) {
       this.showError(constants.Firm_CoreDetails_Messages.FIRMSAVEERROR);
@@ -2461,20 +2436,6 @@ export class ScopeComponent implements OnInit {
       }
     }
   }
-
-  confirmUpload() {
-    if (this.selectedFile) {
-      // Display the selected file name in the main section
-      const uploadedDocumentsDiv = document.getElementById('uploaded-documents');
-      if (uploadedDocumentsDiv) {
-        uploadedDocumentsDiv.textContent = `Uploaded Document: ${this.selectedFile.name}`;
-      }
-      this.closeSelectDocument();
-    } else {
-      console.error('No valid PDF file selected.');
-    }
-  }
-
 
   getFormReferenceDocuments() {
     this.isLoading = true;

@@ -211,6 +211,9 @@ export class ReportingScheduleComponent {
   }
   openReportSchedulePopup(rpt: any, firmDetails: any, isCreate: boolean): void {
     this.isCreateRptSch = isCreate;
+    if (isCreate) {
+      this.selectedReport = null;
+    }
     if (rpt) {
     this.selectedReport = rpt;
     }
