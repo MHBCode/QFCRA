@@ -203,4 +203,29 @@ export class FirmService {
     const url = `${this.baseUrlFirms}is_firm_authorised_for_waivers?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
+
+  getFirmUserSearch(firmId: number, assnLevelId: number, UserID: number, displayHistory: boolean, userId: number){
+    const url = `${this.baseUrlFirms}get_firm_user_search?firmId=${firmId}&assnLevelId=${assnLevelId}&userId=${UserID}&displayHistory=${displayHistory}&loginuserId=${userId}`;
+    return this.http.get<any>(url);
+  }
+
+  saveUpdateFirmUser(rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlFirms}insert_update_firm_users`, rowData, { headers: headers });
+  }
+
+  deleteFirmUser(deletefirmUserObj: any): Observable<any> {
+    const url = `${this.baseUrlFirms}delete_firm_users`;
+    const options = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      body: deletefirmUserObj,
+    };
+    return this.http.delete<any>(url, options);
+  }
+
+  isRoleExist(firmId: string, newRoleID: string) {
+    const url = `${this.baseUrlFirms}is_role_exist?firmId=${firmId}&role=${newRoleID}`;
+    return this.http.get<any>(url);
+  }
+  
 }

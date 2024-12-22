@@ -35,6 +35,18 @@
             <p *ngIf="errorMessages['financialPeriodMonthIsDifferent']">
                 {{ errorMessages['financialPeriodMonthIsDifferent'] }}
             </p>
+            <p *ngIf="errorMessages['fileAttached']">
+                {{ errorMessages['fileAttached'] }}
+            </p>
+            <p *ngIf="errorMessages['scheduleItemRef']">
+                {{ errorMessages['scheduleItemRef'] }}
+            </p>
+            <p *ngIf="errorMessages['rptScheduleReferenced']">
+                {{ errorMessages['rptScheduleReferenced'] }}
+            </p>
+            <p *ngIf="errorMessages['docLinked']">
+                {{ errorMessages['docLinked'] }}
+            </p>
         </div>
         <!-- Title -->
         <div class="popup-title-btn-row">
@@ -113,7 +125,7 @@
                 </div>
             </div>
 
-            <div *ngIf="!isEditModeReportingSch && !isCreateReportingSch" class="rpt-list margin-top-10 table">
+            <div *ngIf="!isEditModeReportingSch && !isCreateReportingSch && pnlPublishReportingSch" class="rpt-list margin-top-10 table">
                 <div class="popup-header">
                     <h3>Publish Reporting Schedule</h3>
                 </div>
@@ -168,67 +180,12 @@
                             Cancel
                         </button>
 
-                        <button *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
+                        <button (click)="deleteReport()" *ngIf="getControlVisibility('imgBtnDelete') && !hideDeleteBtn">
                             <i class="bi bi-trash"></i> Delete
                         </button>
                     </div>
                 </div>
 
-                <!-- <table>
-                    <thead>
-                        <tr>
-                            <th>Report Type</th>
-                            <th>Publish</th>
-                            <th>Submission Type</th>
-                            <th>Reporting Period Start</th>
-                            <th>Reporting Period End</th>
-                            <th>Report Name</th>
-                            <th>Due Date</th>
-                            <th>Required</th>
-                            <th>Link to Report</th>
-                            <th>Report Given By</th>
-                            <th>Received Date</th>
-                            <th>Submission Status</th>
-                            <th>Return Review Status</th>
-                            <th>Notes</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let rpt of paginatedItems">
-                            <td>{{ rpt.DocTypeDesc }}</td>
-                            <td>{{ rpt.WPublished ? 'Yes' : 'No' }}</td>
-                            <td>{{ rpt.FirmRptSubmissionTypeDesc }}</td>
-                            <td>{{ rpt.RptPeriodFromDate }}</td>
-                            <td>{{ rpt.RptPeriodToDate }}</td>
-                            <td>{{ rpt.ReportName }}</td>
-                            <td>{{ rpt.FirmRptDueDate }}</td>
-                            <td>{{ rpt.FirmRptReqdBit ? 'Yes' : 'No' }}</td>
-                            <td>
-                                <a *ngIf="rpt.DocFileLocation" [href]="rpt.DocFileLocation" target="_blank">
-                                    {{ rpt.documentDetails?.FileName }}
-                                </a>
-                            </td>
-                            <td>{{ rpt.WPublishedByUserName }}</td>
-                            <td>{{ rpt.DocReceivedDate }}</td>
-                            <td>{{ rpt.ObjectStatusTypeDesc }}</td>
-                            <td>{{ rpt.ReviewStatusDesc }}</td>
-                            <td>{{ rpt.FirmRptNotes }}</td>
-                            <td class="btn">
-                                <button (click)="editReport(rpt)">Edit</button>
-                                <button (click)="deleteReport(rpt)">Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td [attr.colspan]="15" style="text-align: center;">
-                                <app-pagination [items]="filteredFirmRptDetails" [pageSize]="pageSize"
-                                    (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table> -->
                 <div *ngIf="isEditModeReportingSch || isCreateReportingSch" class="add-rpt-btn-container">
                     <button class="addRptBtn" (click)="addNewReport()">
                       Add Report
@@ -242,7 +199,7 @@
                             </p>
                         </div>
                           <div *ngIf="isEditModeReportingSch || isCreateReportingSch" class="del-rpt-container">
-                            <button *ngIf="displayedItems.length > 1" (click)="removeReport(i)"
+                            <button [disabled]="rpt.WFileAttached" *ngIf="displayedItems.length > 1" (click)="removeReport(i)"
                               class="RmvTrashBtn bi-trash"></button>
                           </div>
                         <div class="input-field">
@@ -302,14 +259,14 @@
                         <div class="input-field">
                             <label for="reportingPeriodStartDate">Reporting Period Start Date</label>
                             <input type="text" id="reportingPeriodStartDate" name="reportingPeriodStartDate"
-                                [(ngModel)]="rpt.RptPeriodFromDate"
+                                (blur)="onRptPeriodTypeChange(rpt)" [(ngModel)]="rpt.RptPeriodFromDate"
                                 [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
                                 #dateInputs />
                         </div>
                         <div class="input-field">
                             <label for="reportingPeriodEndDate">Reporting Period End Date</label>
                             <input type="text" id="reportingPeriodEndDate" name="reportingPeriodEndDate"
-                                [(ngModel)]="rpt.RptPeriodToDate"
+                            (blur)="onRptPeriodTypeChange(rpt)" [(ngModel)]="rpt.RptPeriodToDate"
                                 [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
                                 #dateInputs />
                         </div>
@@ -321,7 +278,7 @@
                         <div class="input-field">
                             <label for="dueDate">Due Date</label>
                             <input type="text" id="dueDate" name="dueDate" [(ngModel)]="rpt.FirmRptDueDate"
-                                [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
+                                (blur)="onRptPeriodTypeChange(rpt)" [disabled]="(!isEditModeReportingSch && !isCreateReportingSch) || (!isValueNullOrEmpty(rpt.DocReceivedDate) || rpt.WFileAttached)"
                                 #dateInputs />
                         </div>
                         <div class="input-field">
@@ -379,13 +336,14 @@
 
                         <div class="input-field">
                             <label for="linkToReview">Link to Review</label>
-                            <span><a *ngIf="rptItemExists[rpt.FirmRptSchItemID] && rptItemExists[rpt.FirmRptSchItemID] !== 0"
+                            <span>
+                                <a *ngIf="rptItemExists[rpt.FirmRptSchItemID] && rptItemExists[rpt.FirmRptSchItemID] !== 0"
                                     [routerLink]="['/supervision/view/return-review', firmId]"
-                                    [queryParams]="{ firmRptSchID: rpt.firmRptSchID }" target="_blank">
+                                    [queryParams]="{ firmRptSchItemID: rpt.FirmRptSchItemID }" target="_blank">
                                     Link to Review
                                 </a>
                                 <!-- - <a href="#">Warnings</a> 
-                                - <a href="#">MI Report</a> -->
+                                - <a href="#" *ngIf="rpt.showMIReport">MI Report</a> -->
                             </span>
                         </div>
 
@@ -435,6 +393,24 @@
                             </p>
                             <p *ngIf="rpt?.errorMessages?.['notRequired']">
                                 {{ rpt.errorMessages['notRequired'] }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['duplicateReport']">
+                                {{ rpt.errorMessages['duplicateReport'] }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['DUEDATE_SHOULDBE_BETWEEN_REPSCHFROM_TODATE']">
+                                {{ rpt.errorMessages['DUEDATE_SHOULDBE_BETWEEN_REPSCHFROM_TODATE'] }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['DUEDATE_GREATERTHAN_TODATE']">
+                                {{ rpt.errorMessages['DUEDATE_GREATERTHAN_TODATE'] }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['REPORTINGSTARTDATE_FIRSTDAY']">
+                                {{ rpt.errorMessages['REPORTINGSTARTDATE_FIRSTDAY'] }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['REPORTINGENDDATE_LASTDAY']">
+                                {{ rpt.errorMessages['REPORTINGENDDATE_LASTDAY'] }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['REPORTINGDATESINVALIDFORSELECTEDFREQUENCY']">
+                                {{ rpt.errorMessages['REPORTINGDATESINVALIDFORSELECTEDFREQUENCY'] + ' ' + rpt.RptFreqDesc }}
                             </p>
                         </div>
                     </div>

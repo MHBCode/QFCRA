@@ -13,6 +13,7 @@ import { PaginationComponent } from './pagination/pagination.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { ReviewComponent } from './review/review.component';
 import { WorkflowComponent } from './workflow/workflow.component';
+import { ReferenceFormComponent } from './reference-form/reference-form.component';
 @NgModule({
   declarations: [
     DataPlaceComponent,
@@ -20,7 +21,8 @@ import { WorkflowComponent } from './workflow/workflow.component';
     LoaderComponent,
     PaginationComponent,
     ReviewComponent,
-    WorkflowComponent
+    WorkflowComponent,
+    ReferenceFormComponent
   ],
   imports: [
     CommonModule,
@@ -40,7 +42,8 @@ import { WorkflowComponent } from './workflow/workflow.component';
     PaginationComponent,
     CKEditorModule,
     ReviewComponent,
-    WorkflowComponent
+    WorkflowComponent,
+    ReferenceFormComponent
   ]
 })
 export class SharedModule { }

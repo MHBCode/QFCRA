@@ -2,7 +2,7 @@ import { Component, Input, SimpleChanges, OnInit, OnChanges } from '@angular/cor
 import { FirmService } from 'src/app/ngServices/firm.service';
 import { ActivatedRoute } from '@angular/router';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
-import { LogformService } from 'src/app/ngServices/logform.service'; 
+import { LogformService } from 'src/app/ngServices/logform.service';
 import { SupervisionService } from '../supervision.service';
 import * as constants from 'src/app/app-constants';
 import { ReturnReviewService } from 'src/app/ngServices/return-review.service';
@@ -15,6 +15,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
   allReturnreView: any[] = [];
   filteredReturnreView: any[] = [];
   firmId: number = 0;
+  firmRptSchItemID: number;
   isAuthorise: boolean = true;
   isLoading: boolean = false;
   currentPage: number = 1;
@@ -22,6 +23,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
   totalRows: number = 0;
   paginatedFirms: any[] = [];
   selectedReturnreView: any = null;
+  rptReturnReview: any = null;
   startRow: number = 0;
   endRow: number = 0;
   showPopup: boolean = false;
@@ -31,18 +33,21 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
   ReturnReviewRevisionList: any = [];
   showReturnReviewRevision: boolean = false;
   selectedReviewRevision: any = null;
-  documentTypeList:any = [];
+  documentTypeList: any = [];
   showCreatePopup: boolean = false;
   constructor(
     private firmService: FirmService,
     private route: ActivatedRoute,
     private firmDetailsService: FirmDetailsService,
     private logformService: LogformService,
-    private supervisionService : SupervisionService,
+    private supervisionService: SupervisionService,
     private returnReviewService: ReturnReviewService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.firmRptSchItemID = params['firmRptSchItemID']; console.log('firmRptSchID:', this.firmRptSchItemID);
+    });
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
       this.isFirmAuthorised();
@@ -80,7 +85,13 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
         this.currentPage = 1;
         this.updatePagination();
         this.isLoading = false;
-        console.log("this.allReturnreView",this.allReturnreView)
+        console.log("this.allReturnreView", this.allReturnreView)
+        if (this.firmRptSchItemID) {
+          this.rptReturnReview = this.allReturnreView.filter(item => {
+            return item.FirmRptSchItemID == this.firmRptSchItemID
+          });
+         this.openReturnreViewPopup(this.rptReturnReview[0],this.firmDetails);
+        }
       },
       error => {
         console.error('Error fetching rptSchedule', error);
@@ -89,7 +100,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     );
   }
 
-  
+
 
   updatePagination(): void {
     if (this.filteredReturnreView.length > 0) {
@@ -126,7 +137,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     this.firmDetailsService.loadFirmDetails(firmId).subscribe(
       data => {
         this.firmDetails = data.firmDetails;
-        console.log("firmDetails",this.firmDetails)
+        console.log("firmDetails", this.firmDetails)
       },
       error => {
         console.error(error);
@@ -134,12 +145,12 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     );
   }
 
-  
-  getDocumentType(docCategoryTypeID:number){
+
+  getDocumentType(docCategoryTypeID: number) {
     this.logformService.getDocumentType(docCategoryTypeID).subscribe(
       data => {
         this.documentTypeList = data.response;
-        console.log("this.documentTypeList",this.documentTypeList)
+        console.log("this.documentTypeList", this.documentTypeList)
       },
       error => {
         console.error(error);
@@ -148,30 +159,30 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
   }
   filterReports(event: Event): void {
     const filterValue = (event.target as HTMLSelectElement).value;
-  
+
     switch (filterValue) {
       case '1': // All
         this.filteredReturnreView = [...this.allReturnreView];
         break;
-  
+
       case '2': // Non - AML Reports
         // Filter reports where ReportTypeID does not match any DocTypeID in documentTypeList
-        this.filteredReturnreView = this.allReturnreView.filter(item => 
+        this.filteredReturnreView = this.allReturnreView.filter(item =>
           !this.documentTypeList.some(docType => docType.DocTypeID === item.ReportTypeID)
         );
         break;
-  
+
       case '3': // AML Reports
         // Filter reports where ReportTypeID matches any DocTypeID in documentTypeList
-        this.filteredReturnreView = this.allReturnreView.filter(item => 
+        this.filteredReturnreView = this.allReturnreView.filter(item =>
           this.documentTypeList.some(docType => docType.DocTypeID === item.ReportTypeID)
         );
         break;
-  
+
       default:
         this.filteredReturnreView = [...this.allReturnreView];
     }
-  
+
     // Check if the filtered list is empty and load the error message
     if (this.filteredReturnreView.length === 0) {
       this.loadErrorMessages('ReturnreViewList', constants.ReturnReviewMessages.RPT_REVIEWNOTFOUND);
@@ -179,7 +190,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
       // Clear the error message if there are results
       this.errorMessages['ReturnreViewList'] = '';
     }
-  
+
     // Update pagination
     this.totalRows = this.filteredReturnreView.length;
     this.totalPages = Math.ceil(this.totalRows / this.pageSize);
@@ -199,31 +210,33 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     );
   }
 
-  getReturnReviewRevision(ReturnreView: any,event:Event){
+  getReturnReviewRevision(ReturnreView: any, event: Event) {
     event.stopPropagation();
     const objectId = constants.FrimsObject.ReturnsReview;
     const objectInstanceId = ReturnreView.RptReviewID;
     this.selectedReturnreView = ReturnreView;
-    this.returnReviewService.getReturnReviewRevision(objectId,objectInstanceId).subscribe(
+    this.returnReviewService.getReturnReviewRevision(objectId, objectInstanceId).subscribe(
       data => {
         this.ReturnReviewRevisionList = data.response;
-        console.log("this.ReturnReviewRevisionList",this.ReturnReviewRevisionList)
-        if(this.ReturnReviewRevisionList.length > 0){
+        console.log("this.ReturnReviewRevisionList", this.ReturnReviewRevisionList)
+        if (this.ReturnReviewRevisionList.length > 0) {
           this.showReturnReviewRevision = true
         }
       },
       error => {
         console.error(error);
-      } 
+      }
     )
 
   }
-  openReturnreViewPopup(ReturnreView: any,firmDetails : any): void {
+
+  openReturnreViewPopup(ReturnreView: any, firmDetails: any): void {
     this.selectedReturnreView = ReturnreView;
     this.showPopup = true;
     console.log("openReturnreViewPopup")
   }
-  closeReturnReviewRevisionModal(){
+
+  closeReturnReviewRevisionModal() {
     this.showReturnReviewRevision = false;
     this.ReturnReviewRevisionList = [];
   }
@@ -233,19 +246,19 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     this.selectedReviewRevision = ReviewRevision;
     this.selectedReturnreView = ReturnreView;
     this.showPopup = true;
-    console.log("this.selectedReviewRevision",this.selectedReviewRevision)
+    console.log("this.selectedReviewRevision", this.selectedReviewRevision)
     this.closeReturnReviewRevisionModal()
   }
-  
+
   closePopup(): void {
     this.showPopup = false;
     this.selectedReviewRevision = null; // Reset the selected review
   }
-  closeCreatePopup(){
+  closeCreatePopup() {
     this.showCreatePopup = false;
   }
   openCreatePopup(): void {
-    
+
     this.showCreatePopup = true;
   }
 }

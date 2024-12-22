@@ -1,0 +1,28 @@
+<!-- Reference Form Popup -->
+<div *ngIf="callRefForm" class="overlay show"></div>
+<div *ngIf="callRefForm" class="ReferenceFormPopUp popupcontainer">
+    <i class="bi bi-x-circle close-icon" (click)="closeFormReference()"></i>
+    <div>
+        <div class="popup-header">
+            <h3>Select Document</h3>
+        </div>
+        <div class="popup-body">
+            <ul>
+                <li *ngFor="let doc of formReferenceDocs">
+                    <input type="radio" name="documentSelection" [value]="doc.DocID" [(ngModel)]="selectedDocId" />
+                    {{ doc.DocTypeDesc }} :
+                    <a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/{{ doc.FileLoc }}" target="_blank">{{
+                        doc.FILENAME }}</a>
+                </li>
+            </ul>
+            <p *ngIf="formReferenceDocs.length === 0">
+                There are no documents to select from. Please upload the relevant document and return for selection.
+            </p>
+        </div>
+    </div>
+    <div class="popup-buttons-container">
+        <button class="subbutton" (click)="deSelectDocument()">De-Select</button>
+        <button class="subbutton" (click)="replaceDocument()">Ok</button>
+        <button class="subbutton" (click)="closeFormReference()">Cancel</button>
+    </div>
+</div>
