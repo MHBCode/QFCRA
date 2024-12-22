@@ -274,8 +274,10 @@
               <td>{{data.FirmUserAssnDateTo}}</td>
               <td>{{data.FirmUserAssnReasonTypeDesc}}</td>
               <td class="buttons">
-                <button (click)="onEditRecord(data)" class="edit-btn">Edit</button>
-                <button (click)="getEndAssignment(data)" class="end-btn">End</button>
+                <span>
+                  <button (click)="onEditRecord(data)" class="edit-btn">Edit</button>
+                  <button (click)="getEndAssignment(data)" class="end-btn">End</button>
+                </span>
               </td>
             </tr>
           </tbody>
@@ -375,7 +377,7 @@
             Function/Role <span style="color: red;">*</span>
           </label>
           <select name="role" id="role" [(ngModel)]="newRoleID" (change)="filterUsersByFunctionRole()"
-          [ngClass]="{'error-border': errorMessages['newRoleID']}">
+            [ngClass]="{'error-border': errorMessages['newRoleID']}">
             <option [value]="0">Select</option>
             <option [value]="role.FirmUserAssnTypeID" *ngFor="let role of allFunctionRoles">
               {{role.FirmUserAssnTypeDesc}}
@@ -388,7 +390,7 @@
             Name <span style="color: red;">*</span>
           </label>
           <select name="user" id="user" [(ngModel)]="newUserID"
-          [ngClass]="{'error-border': errorMessages['newUserID']}">
+            [ngClass]="{'error-border': errorMessages['newUserID']}">
             <option [value]="0">Select</option>
             <option [value]="assignedlvlUser.UserID" *ngFor="let assignedlvlUser of filteredRoleNames">
               {{assignedlvlUser.UserName}}
@@ -401,7 +403,7 @@
             Date From <span style="color: red;">*</span>
           </label>
           <input type="text" [(ngModel)]="newDateFrom" #dateInputs
-          [ngClass]="{'error-border': errorMessages['newDateFrom']}">
+            [ngClass]="{'error-border': errorMessages['newDateFrom']}">
         </div>
 
         <div class="input-field">
