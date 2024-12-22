@@ -1,4 +1,4 @@
-<section class="edit-firm-section">
+<!-- <section class="edit-firm-section">
   <div class="inputs-field-set">
     <div class="edit-firm-actions">
       <h2 class="edit-firm-header">Firms Data</h2>
@@ -35,7 +35,6 @@
   
     <div class="search-button-section">
       <div class="edit-btn">
-        <!-- Bind the click event to the showPersonnelSection() method -->
         <button class="save-btn" (click)="showPersonnelSection()">Search</button>
       </div>
     </div>
@@ -131,7 +130,6 @@
 
 </section>
 
-<!-- Modal -->
 <div class="modal" [class.show]="isModalVisible">
   <div class="modal-content" id="draggableModal">
       <p class="modal-header" id="modalHeader">End Assignment</p>
@@ -183,5 +181,338 @@
           </div>
       </div>
      
+  </div>
+</div> -->
+<app-loader *ngIf="isLoading"></app-loader>
+<section class="edit-firm-section">
+  <div class="inputs-field-set">
+    <div class="edit-firm-actions">
+      <h2 class="edit-firm-header">
+        Firms Data
+      </h2>
+    </div>
+    <div class="edit-firms-inputs">
+      <div class="input-field">
+        <label for="firmName">
+          Firm Name
+        </label>
+        <select name="firmName" id="firmName" [(ngModel)]="firmID">
+          <option [value]="0">All</option>
+          <option [value]="firm.FirmID" *ngFor="let firm of allfirms">
+            {{firm.FirmName}}
+          </option>
+        </select>
+      </div>
+
+      <div class="input-field">
+        <label for="role">
+          Function/Role
+        </label>
+        <select name="role" id="role" [(ngModel)]="roleID">
+          <option [value]="0">All</option>
+          <option [value]="role.FirmUserAssnTypeID" *ngFor="let role of allFunctionRoles">
+            {{role.FirmUserAssnTypeDesc}}
+          </option>
+        </select>
+      </div>
+
+      <div class="input-field">
+        <label for="user">
+          User Name
+        </label>
+        <select name="user" id="user" [(ngModel)]="UserID">
+          <option [value]="0">All</option>
+          <option [value]="cosuper.UserID" *ngFor="let cosuper of allCoSupervisors">
+            {{cosuper.UserName}}
+          </option>
+        </select>
+      </div>
+
+      <div class="input-field">
+        <label for="history">
+          Display History
+        </label>
+        <input type="checkbox" [(ngModel)]="history">
+      </div>
+    </div>
+
+    <div class="search-btn-container">
+      <button (click)="searchFirmUsers()" class="search-btn">Search</button>
+    </div>
+
+  </div>
+
+  <div *ngIf="showRAPersonalAssigned" class="inputs-field-set">
+    <div class="section">
+
+      <div class="title-container">
+        <h2 class="ra-personal-title">
+          RA Personal Assigned
+        </h2>
+        <button (click)="addUserAssign()" *ngIf="firmIdFlag !== '0' && isSearchClicked" class="add-btn">Add</button>
+      </div>
+
+      <div class="scrollable-table-container">
+        <table *ngIf="firmUserSearchResults?.length > 0; else nosupervisors">
+          <thead>
+            <tr>
+              <th>Firm Name</th>
+              <th>Function / Role</th>
+              <th>Name</th>
+              <th style="width: 10%;">Date From</th>
+              <th style="width: 10%;">Date To</th>
+              <th>Reason for Change</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of firmUserSearchResults">
+              <td>{{data.FirmName}}</td>
+              <td>{{data.FirmUserAssnTypeDesc}}</td>
+              <td>{{data.Name}}</td>
+              <td>{{data.FirmUserAssnDateFrom}}</td>
+              <td>{{data.FirmUserAssnDateTo}}</td>
+              <td>{{data.FirmUserAssnReasonTypeDesc}}</td>
+              <td class="buttons">
+                <button (click)="onEditRecord(data)" class="edit-btn">Edit</button>
+                <button (click)="getEndAssignment(data)" class="end-btn">End</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #nosupervisors>
+          <div class="error-messages">
+            <p *ngIf="errorMessages['NoSupervisors']">
+              {{errorMessages['NoSupervisors']}}
+            </p>
+            <p *ngIf="errorMessages['NoActiveAssignments']">
+              {{errorMessages['NoActiveAssignments']}}
+            </p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <div class="inputs-field-set" *ngIf="isEditSectionVisible">
+    <div class="edit-firm-actions">
+      <h2 class="edit-firm-header">Edit Individually</h2>
+    </div>
+    <div class="error-messages">
+      <p *ngIf="errorMessages['replaceUser']">
+        {{errorMessages['replaceUser']}}
+      </p>
+      <p *ngIf="errorMessages['DateFrom']">
+        {{errorMessages['DateFrom']}}
+      </p>
+    </div>
+    <div class="edit-individually">
+      <div class="edit-individually1">
+        <p>
+          Replace <span class="burgundy-color">{{ selectedRecord.Name }}</span>
+          (as <span class="burgundy-color">{{ selectedRecord.FirmUserAssnTypeDesc }}</span>) with <span
+            style="color: red;">* </span>
+          <select class="replace" name="firmName" id="firmName" [(ngModel)]="replaceUserID"
+            [ngClass]="{'error-border': errorMessages['replaceUser']}">
+            <option [value]="0">Select</option>
+            <option *ngFor="let user of filteredAssignedLevelUsers" [value]="user.UserID">
+              {{ user.UserName }}
+            </option>
+          </select>
+          for <span class="burgundy-color">{{ selectedRecord.FirmName }}</span> from <span style="color: red;">* </span>
+          <input class="date-from" name="noticeIssuedDate" id="noticeIssuedDate" type="date"
+            [(ngModel)]="selectedRecord.FirmUserAssnDateFrom" #dateInputs
+            [ngClass]="{'error-border': errorMessages['DateFrom']}" />
+          onwards.
+        </p>
+      </div>
+      <div class="edit-individually2">
+        <p>
+          Reason for change:
+          <select class="reason-for-change" name="reason" id="reason" [(ngModel)]="reasonID">
+            <option [value]="0">Select</option>
+            <option *ngFor="let reason of allReasons" [value]="reason.FirmUserAssnReasonTypeID">
+              {{ reason.FirmUserAssnReasonTypeDesc }}
+            </option>
+          </select>
+        </p>
+      </div>
+    </div>
+    <div class="btns-container">
+      <button class="update-btn" (click)="updateRecord()">Update</button>
+      <button class="cancel-btn" (click)="isEditSectionVisible = false">Cancel</button>
+    </div>
+  </div>
+
+  <div *ngIf="addNewSectionVisibility" class="inputs-field-set">
+    <div class="section">
+
+      <div class="title-container">
+        <h2 class="add-new-title">
+          Add New
+        </h2>
+      </div>
+
+      <div class="error-messages">
+        <p *ngIf="errorMessages['newDateFrom']">
+          {{errorMessages['newDateFrom']}}
+        </p>
+        <p *ngIf="errorMessages['newUserID']">
+          {{errorMessages['newUserID']}}
+        </p>
+        <p *ngIf="errorMessages['newRoleID']">
+          {{errorMessages['newRoleID']}}
+        </p>
+        <p *ngIf="errorMessages['roleExist']">
+          {{errorMessages['roleExist']}}
+        </p>
+      </div>
+
+      <div class="edit-firms-inputs add-new-section">
+
+        <div class="input-field">
+          <label for="role">
+            Function/Role <span style="color: red;">*</span>
+          </label>
+          <select name="role" id="role" [(ngModel)]="newRoleID" (change)="filterUsersByFunctionRole()"
+          [ngClass]="{'error-border': errorMessages['newRoleID']}">
+            <option [value]="0">Select</option>
+            <option [value]="role.FirmUserAssnTypeID" *ngFor="let role of allFunctionRoles">
+              {{role.FirmUserAssnTypeDesc}}
+            </option>
+          </select>
+        </div>
+
+        <div class="input-field">
+          <label for="user">
+            Name <span style="color: red;">*</span>
+          </label>
+          <select name="user" id="user" [(ngModel)]="newUserID"
+          [ngClass]="{'error-border': errorMessages['newUserID']}">
+            <option [value]="0">Select</option>
+            <option [value]="assignedlvlUser.UserID" *ngFor="let assignedlvlUser of filteredRoleNames">
+              {{assignedlvlUser.UserName}}
+            </option>
+          </select>
+        </div>
+
+        <div class="input-field">
+          <label for="dateFrom">
+            Date From <span style="color: red;">*</span>
+          </label>
+          <input type="text" [(ngModel)]="newDateFrom" #dateInputs
+          [ngClass]="{'error-border': errorMessages['newDateFrom']}">
+        </div>
+
+        <div class="input-field">
+          <label for="reason">
+            Reason
+          </label>
+          <select class="reason-for-change" name="reason" id="reason" [(ngModel)]="newReasonID">
+            <option [value]="0">Select</option>
+            <option *ngFor="let reason of allReasons" [value]="reason.FirmUserAssnReasonTypeID">
+              {{ reason.FirmUserAssnReasonTypeDesc }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btns-container">
+        <button (click)="insertNewUser()" class="add-btn">Add</button>
+        <button (click)="cancelNewRecord()" class="cancel-btn">Cancel</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div *ngIf="history && firmUserSearchResultsHistory.length > 0" class="inputs-field-set">
+    <div class="section">
+
+      <div class="title-container">
+        <h2 class="personal-title">
+          Personnel Assignment History
+        </h2>
+      </div>
+
+      <div class="scrollable-table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Firm Name</th>
+              <th>Function / Role</th>
+              <th>Name</th>
+              <th style="width: 10%;">Date From</th>
+              <th style="width: 10%;">Date To</th>
+              <th>Reason for Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of firmUserSearchResultsHistory">
+              <td>{{data.FirmName}}</td>
+              <td>{{data.FirmUserAssnTypeDesc}}</td>
+              <td>{{data.Name}}</td>
+              <td>{{data.FirmUserAssnDateFrom}}</td>
+              <td>{{data.FirmUserAssnDateTo}}</td>
+              <td>{{data.FirmUserAssnReasonTypeDesc}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!--End Assignment Popup-->
+<div *ngIf="callEndAssignment" class="overlay show"></div>
+<div *ngIf="callEndAssignment" class="endAssignmentPopup popupcontainer">
+  <i class="bi bi-x-circle close-icon close-icon-prev-revisions" (click)="closeEndAssignmentPopup()"></i>
+
+  <div class="popup-header">
+    <h3>End Assignment</h3>
+  </div>
+
+  <div class="error-msgs">
+    <p *ngIf="errorMessages['dateTo']">
+      {{errorMessages['dateTo']}}
+    </p>
+    <p *ngIf="errorMessages['dateFromGreaterThanDateTo']">
+      {{errorMessages['dateFromGreaterThanDateTo']}}
+    </p>
+  </div>
+
+  <div class="popup-info-place">
+    <table>
+      <tr>
+        <td>Firm Name: </td>
+        <td>{{selectedRecord.FirmName}}</td>
+      </tr>
+
+      <tr>
+        <td>Function/Role: </td>
+        <td>{{selectedRecord.FirmUserAssnTypeDesc}}</td>
+      </tr>
+
+      <tr>
+        <td>Supervisor Name: </td>
+        <td>{{selectedRecord.Name}}</td>
+      </tr>
+
+      <tr>
+        <td>Date From: </td>
+        <td>{{selectedRecord.FirmUserAssnDateFrom}}</td>
+      </tr>
+
+      <tr>
+        <td>Date To: </td>
+        <td><input [ngClass]="{'error-border': errorMessages['dateTo']}" class="date-to" type="text"
+            [(ngModel)]="selectedRecord.FirmUserAssnDateTo" #dateInputs></td>
+      </tr>
+    </table>
+
+    <div class="btns-container">
+      <button (click)="saveRecord()" class="update-btn">Save</button>
+      <button class="cancel-btn" (click)="callEndAssignment = false">Cancel</button>
+    </div>
   </div>
 </div>

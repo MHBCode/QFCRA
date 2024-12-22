@@ -48,7 +48,8 @@ export class ReportingScheduleViewComponent {
 
   rptItemExists: { [key: number]: number } = {};
   signatories: { [key: number]: any[] } = {};
-  documentTypeList: any = [];
+  amlReports: any = [];
+  prudentialTypes: any = [];
   rptScheduleType: number = 1; // Default value
   successOrErrorCode: number = 0;
   additionalSchedules: any = {};
@@ -63,6 +64,13 @@ export class ReportingScheduleViewComponent {
   // Validations
   hasValidationErrors: boolean = false;
   errorMessages: { [key: string]: string } = {};
+  rptPeriodNotValid: boolean = false;
+  isValidReportingPeriodFrom: boolean = true;
+  isValidReportingPeriodTo: boolean = true;
+  isValidDueDate: boolean = true;
+  isValidPeriodType: boolean = true;
+  DateValid: boolean = false;
+
 
   //dropdowns
   financialYearEndTypes: any = [];
@@ -140,7 +148,8 @@ export class ReportingScheduleViewComponent {
       financialYearEnd: of(this.getFinancialYearEnd()),
       firmRptSubmissionTypes: of(this.populateFirmRptSubmissionTypes()),
       notRequiredTypes: of(this.populateNotRequiredTypes()),
-      documentType: of(this.getDocumentType(constants.DocType_DocCategory.AMLMLROReports)),
+      amlReports: of(this.getAMLReports()),
+      prudentialTypes: of(this.getPrudentialTypes()),
       xbrlDocTypes: of(this.getXBRLDocTypes()),
       licensedOrAuthorisedDate: of(this.getLicensedOrAuthorisedDate()),
     };
@@ -195,6 +204,12 @@ export class ReportingScheduleViewComponent {
             this.populateReportTypes(constants.ObjectOpType.Edit);
           }
         }
+
+        this.filteredFirmRptDetails.forEach(report => {
+          let rptEndDate = `${this.dateUtilService.convertDateToYYYYMMDD(report.RptPeriodToDate)}T00:00:00`;
+          
+          this.isReportingToDateValid(report.DocTypeID,rptEndDate);
+        });
 
         const opType = this.isEditModeReportingSch ? this.isEditModeReportingSch : this.isCreateReportingSch;
         this.applySecurityOnPage(opType);
@@ -508,17 +523,62 @@ export class ReportingScheduleViewComponent {
     return this.firmDetailsService.getControlEnablement(controlName);
   }
 
-  getDocumentType(docCategoryTypeID: number) {
-    this.logForm.getDocumentType(docCategoryTypeID).subscribe(
+  getAMLReports() {
+    this.logForm.getDocumentType(constants.DocType_DocCategory.AMLMLROReports).subscribe(
       data => {
-        this.documentTypeList = data.response;
-        console.log("this.documentTypeList", this.documentTypeList)
+        this.amlReports = data.response;
+        console.log("this.documentTypeList", this.amlReports)
       },
       error => {
         console.error(error);
       }
     )
   }
+
+  getXBRLDocTypes() {
+    const docCategoryTypeID = constants.DocType_DocCategory.XBRLTYPES;
+    this.logForm.getDocumentType(docCategoryTypeID).subscribe({
+      next: (data) => {
+        this.reportDocTypes = data.response;
+      }, error: (error) => {
+        console.error(`Error fetching Document Types:`, error);
+        this.isLoading = false;
+      },
+    },)
+  }
+
+  getPrudentialTypes() {
+    this.logForm.getDocumentType(constants.DocType_DocCategory.PrudReturn).subscribe(
+      data => {
+        this.prudentialTypes = data.response;
+        console.log('Prudential Types:', this.prudentialTypes);
+      },
+      error => {
+        console.error('Error fetching Prudential types:', error);
+      }
+    );
+  }
+
+  isXBRLTypeForReport(DocTypeID: any): boolean {
+    return this.reportDocTypes.some(
+      docType => docType.DocTypeID === parseInt(DocTypeID)
+    );
+  }
+
+  isPrudentialType(DocTypeID: any): boolean {
+    return this.prudentialTypes.some(
+      docType => docType.DocTypeID === parseInt(DocTypeID)
+    );
+  }
+
+  addTypeFlagsToReports(reports: any[]): any[] {
+    return reports.map(report => ({
+      ...report,
+      IsPrudentialType: this.isPrudentialType(report.DocTypeID),
+      IsXBRLType: this.isXBRLTypeForReport(report.DocTypeID),
+    }));
+  }
+
 
   filterReports(event: Event): void {
     const selectedFilter = (event.target as HTMLSelectElement).value;
@@ -531,13 +591,13 @@ export class ReportingScheduleViewComponent {
 
       case '2': // Non - AML Reports
         this.filteredFirmRptDetails = this.firmRptDetails.filter(item =>
-          !this.documentTypeList.some(docType => docType.DocTypeID === item.DocTypeID)
+          !this.amlReports.some(docType => docType.DocTypeID === item.DocTypeID)
         );
         break;
 
       case '3': // AML Reports
         this.filteredFirmRptDetails = this.firmRptDetails.filter(item =>
-          this.documentTypeList.some(docType => docType.DocTypeID === item.DocTypeID)
+          this.amlReports.some(docType => docType.DocTypeID === item.DocTypeID)
         );
         break;
 
@@ -611,6 +671,8 @@ export class ReportingScheduleViewComponent {
 
   addNewReport() {
     const newReport = {
+      FirmRptFrom: this.report.FirmRptFrom,
+      FirmRptTo: this.report.FirmRptTo,
       DocTypeID: 0,
       FirmRptSubmissionTypeID: 0,
       WPublished: false,
@@ -627,13 +689,23 @@ export class ReportingScheduleViewComponent {
       documentDetails: null,
       ObjectStatusTypeDesc: '',
       ReviewStatusDesc: '',
-      errorMessages: {} // For validation errors
+      errorMessages: {},
+      IsPrudentialType: false,
+      IsXBRLType: false,
     };
 
-    // Add the new report to the top of the list
-    this.filteredFirmRptDetails.unshift(newReport);
+    this.filteredFirmRptDetails.unshift(this.updateReportFlags(newReport));
     this.updatePaginationComponent();
   }
+
+  updateReportFlags(report: any): any {
+    return {
+      ...report,
+      IsPrudentialType: this.isPrudentialType(report.DocTypeID),
+      IsXBRLType: this.isXBRLTypeForReport(report.DocTypeID),
+    };
+  }
+
 
   removeReport(index: number) {
     return Swal.fire({
@@ -800,6 +872,7 @@ export class ReportingScheduleViewComponent {
           this.loadErrorMessages('RptPeriodFromDate', constants.ReturnReviewMessages.ENTER_PERIODFROM, null, null, rpt);
           this.loadErrorMessages('CorrectReportingSchItem', constants.ReportingScheduleMessages.CORRECT_REPORTLIST)
           this.hasValidationErrors = false;
+          this.isValidReportingPeriodFrom = false;
         } else if (rpt.errorMessages['RptPeriodFromDate']) {
           delete rpt.errorMessages['RptPeriodFromDate'];
           delete this.errorMessages['CorrectReportingSchItem'];
@@ -810,6 +883,7 @@ export class ReportingScheduleViewComponent {
           this.loadErrorMessages('RptPeriodFromTo', constants.ReturnReviewMessages.ENTER_PERIODTO, null, null, rpt);
           this.loadErrorMessages('CorrectReportingSchItem', constants.ReportingScheduleMessages.CORRECT_REPORTLIST)
           this.hasValidationErrors = false;
+          this.isValidReportingPeriodTo = false;
         } else if (rpt.errorMessages['RptPeriodFromTo']) {
           delete rpt.errorMessages['RptPeriodFromTo'];
           delete this.errorMessages['CorrectReportingSchItem'];
@@ -992,6 +1066,7 @@ export class ReportingScheduleViewComponent {
   onReportTypeChange(report: any) {
     report.errorMessages = {};
     report.RptPeriodTypeID = 0;
+    Object.assign(report, this.updateReportFlags(report));
     if (report.DocTypeID === constants.Q100_PRUDENTIALRETURN || report.DocTypeID === constants.Q200_PRUDENTIALRETURN || report.DocTypeID === constants.Q300_PRUDENTIALRETURN) {
       this.loadErrorMessages('rptTypeChanged', constants.ReportingScheduleMessages.DONOTCHANGED_REPORTTYPE, null, null, report)
     } else {
@@ -1070,24 +1145,6 @@ export class ReportingScheduleViewComponent {
     if (this.isXBRLTypeForReport(report.DocTypeID)) {
 
     }
-  }
-
-  isXBRLTypeForReport(DocTypeID: any): boolean {
-    return this.reportDocTypes.some(
-      docType => docType.DocTypeID === parseInt(DocTypeID)
-    );
-  }
-
-  getXBRLDocTypes() {
-    const docCategoryTypeID = constants.DocType_DocCategory.XBRLTYPES;
-    this.logForm.getDocumentType(docCategoryTypeID).subscribe({
-      next: (data) => {
-        this.reportDocTypes = data.response;
-      }, error: (error) => {
-        console.error(`Error fetching Document Types:`, error);
-        this.isLoading = false;
-      },
-    },)
   }
 
   deleteReport() {
@@ -1216,6 +1273,7 @@ export class ReportingScheduleViewComponent {
       if (this.isValueNullOrEmpty(rpt.FirmRptDueDate)) {
         this.loadErrorMessages('dueDate', constants.ReportingScheduleMessages.ENTER_DUEDATE, null, null, rpt);
         this.hasValidationErrors = true;
+        this.isValidDueDate = false;
       } else {
         delete rpt.errorMessages['dueDate'];
       }
@@ -1230,6 +1288,7 @@ export class ReportingScheduleViewComponent {
       if (parseInt(rpt.RptPeriodTypeID) === 0) {
         this.loadErrorMessages('rptPeriodType', constants.ReportingScheduleMessages.SELECT_REPORTINGPERIODTYPE, null, null, rpt);
         this.hasValidationErrors = true;
+        this.isValidPeriodType = false;
       } else {
         delete rpt.errorMessages['rptPeriodType'];
       }
@@ -1247,13 +1306,136 @@ export class ReportingScheduleViewComponent {
       } else {
         delete rpt.errorMessages['notRequired'];
       }
+
+      if (this.isValidDueDate && this.isValidReportingPeriodFrom && this.isValidReportingPeriodTo) {
+        const startDate = new Date(rpt.RptPeriodFromDate);
+        const endDate = new Date(rpt.RptPeriodToDate);
+        const dueDate = new Date(rpt.FirmRptDueDate);
+        const finStartDate = new Date(rpt.FirmRptFrom);
+        const finEndDate = new Date(rpt.FirmRptTo);
+
+        if (dueDate > finEndDate || dueDate < finStartDate) {
+          this.loadErrorMessages('DUEDATE_SHOULDBE_BETWEEN_REPSCHFROM_TODATE', constants.CROMessages.DUEDATE_SHOULDBE_BETWEEN_REPSCHFROM_TODATE, null, null, rpt);
+          this.hasValidationErrors = true;
+        } else {
+          delete rpt.errorMessages['DUEDATE_SHOULDBE_BETWEEN_REPSCHFROM_TODATE'];
+        }
+
+        if (dueDate <= endDate) {
+          this.loadErrorMessages('DUEDATE_GREATERTHAN_TODATE', constants.ReportingScheduleMessages.DUEDATE_GREATERTHAN_TODATE, null, null, rpt);
+          this.hasValidationErrors = true;
+        } else {
+          delete rpt.errorMessages['DUEDATE_GREATERTHAN_TODATE'];
+        }
+
+        if (rpt.IsXBRLType || rpt.IsPrudentialType) {
+          if (this.isValidReportingPeriodFrom) {
+            if (rpt.IsXBRLType && parseInt(rpt.FirmRptSubmissionTypeID) === 1) {
+              if (startDate.getDate() !== 1) {
+                this.loadErrorMessages('REPORTINGSTARTDATE_FIRSTDAY', constants.ReportingScheduleMessages.REPORTINGSTARTDATE_FIRSTDAY, null, null, rpt);
+                this.hasValidationErrors = true;
+              } else {
+                delete rpt.errorMessages['REPORTINGSTARTDATE_FIRSTDAY']
+              }
+            }
+          }
+
+          if (this.isValidReportingPeriodFrom) {
+            if (rpt.IsXBRLType && parseInt(rpt.FirmRptSubmissionTypeID) === 1) {
+              const lastDayOfMonth = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
+              if (endDate.getDate() !== lastDayOfMonth) {
+                this.loadErrorMessages('REPORTINGENDDATE_LASTDAY', constants.ReportingScheduleMessages.REPORTINGENDDATE_LASTDAY, null, null, rpt);
+                this.hasValidationErrors = true;
+              } else {
+                delete rpt.errorMessages['REPORTINGENDDATE_LASTDAY']
+              }
+            }
+          }
+
+          if (rpt.IsXBRLType) {
+            if (this.isValidReportingPeriodFrom && this.isValidReportingPeriodTo && this.isValidPeriodType && !this.isValueNullOrEmpty(rpt.RptFreqDesc)) {
+              if (this.isReportingPeriodValid(rpt.RptFreqDesc, startDate, endDate)) {
+                this.loadErrorMessages('REPORTINGDATESINVALIDFORSELECTEDFREQUENCY', constants.ReportingScheduleMessages.REPORTINGDATESINVALIDFORSELECTEDFREQUENCY, null, null, rpt);
+                this.hasValidationErrors = true;
+              } else {
+                delete rpt.errorMessages['REPORTINGDATESINVALIDFORSELECTEDFREQUENCY']
+              }
+
+
+              if (!this.DateValid) {
+                this.loadErrorMessages('EFFECTIVEREPORTTYPEDATE', constants.ReportingScheduleMessages.EFFECTIVEREPORTTYPEDATE, null, null, rpt);
+                this.hasValidationErrors = true;
+              } else {
+                delete rpt.errorMessages['EFFECTIVEREPORTTYPEDATE']
+              }
+            }
+          }
+        }
+
+      }
     })
 
     return !this.hasValidationErrors;
   }
 
+  isReportingPeriodValid(rptFreqDesc: string, startDate: Date, endDate: Date): boolean {
+    this.rptPeriodNotValid;
+
+    switch (rptFreqDesc) {
+      case constants.MONTHLY:
+        if (startDate.getMonth() !== endDate.getMonth() || startDate.getFullYear() !== endDate.getFullYear()) {
+          this.rptPeriodNotValid = true;
+        }
+        break;
+
+      case constants.QUARTERLY:
+        if (
+          startDate.getMonth() !== new Date(endDate.setMonth(endDate.getMonth() - 2)).getMonth() ||
+          startDate.getFullYear() !== new Date(endDate).getFullYear()
+        ) {
+          this.rptPeriodNotValid = true;
+        }
+        break;
+
+      case constants.SEMI_ANNUALLY:
+        if (
+          startDate.getMonth() !== new Date(endDate.setMonth(endDate.getMonth() - 5)).getMonth() ||
+          startDate.getFullYear() !== new Date(endDate).getFullYear()
+        ) {
+          this.rptPeriodNotValid = true;
+        }
+        break;
+
+      case constants.ANNUAL:
+        if (
+          startDate.getMonth() !== new Date(endDate.setMonth(endDate.getMonth() - 11)).getMonth() ||
+          startDate.getFullYear() !== new Date(endDate).getFullYear()
+        ) {
+          this.rptPeriodNotValid = true;
+        }
+        break;
+
+      default:
+        this.rptPeriodNotValid = false;
+        break;
+    }
+
+    return this.rptPeriodNotValid;
+  }
+
+  isReportingToDateValid(DocTypeID: number, rptPeriodToDate: string) {
+    this.reportScheduleService.isReportingToDateValid(DocTypeID,rptPeriodToDate).subscribe(data => {
+      this.DateValid = data.response.IsValid;
+    }, error => {
+      console.error(error);
+    })
+  }
+
+
   async saveReport() {
     this.isLoading = true;
+
+    this.filteredFirmRptDetails = this.addTypeFlagsToReports(this.filteredFirmRptDetails);
 
     // Validate before saving
     let flag = 1;
@@ -1270,6 +1452,12 @@ export class ReportingScheduleViewComponent {
       return;
     }
 
+    if (await this.isRptItemDuplicate()) {
+      this.supervisionService.showErrorAlert(constants.ReportingScheduleMessages.DUPLICATEREPORTSCHEDULEITEMSPRESENTONPAGE, 'error', false);
+      this.isLoading = false;
+      return;
+    }
+
     const rptSchDataObj = this.prepareRptSchObject(this.userId);
 
     this.reportScheduleService.saveReportSchedule(rptSchDataObj).subscribe({
@@ -1282,6 +1470,59 @@ export class ReportingScheduleViewComponent {
       }
     })
   }
+
+  async isRptItemDuplicate(): Promise<boolean> {
+
+    // Step 1: Group by detailed criteria and identify duplicates
+    const groupedDuplicates: Record<string, any[]> = this.filteredFirmRptDetails.reduce((groups, item) => {
+      const key = `${item.DocTypeID}-${this.dateUtilService.convertDateToYYYYMMDD(item.FirmRptDueDate)}-${item.FirmRptSubmissionTypeID}-${this.dateUtilService.convertDateToYYYYMMDD(item.RptPeriodFromDate)}-${this.dateUtilService.convertDateToYYYYMMDD(item.RptPeriodToDate)}-${item.ReportName}-${item.RptFreqDesc}`;
+      groups[key] = groups[key] || [];
+      groups[key].push(item);
+      return groups;
+    }, {} as Record<string, any[]>);
+
+    const duplicateItems: any[] = Object.values(groupedDuplicates).filter((group) => group.length > 1).flat();
+
+    // Step 2: Apply error messages only to duplicate items
+    if (duplicateItems.length > 0) {
+      const errorMessage = constants.ReportingScheduleMessages.DUPLICATEREPORTSCHEDULEITEM;
+      const correctionMessage = constants.ReportingScheduleMessages.CORRECT_REPORTLIST;
+
+      this.filteredFirmRptDetails.forEach((item) => {
+        item.errorMessages = {}; // Reset errors for each item
+
+        // Check if the current item matches any duplicate
+        const isDuplicate = duplicateItems.some((dup) =>
+          dup.DocTypeID === item.DocTypeID &&
+          this.dateUtilService.convertDateToYYYYMMDD(dup.FirmRptDueDate) === this.dateUtilService.convertDateToYYYYMMDD(item.FirmRptDueDate) &&
+          dup.FirmRptSubmissionTypeID === item.FirmRptSubmissionTypeID &&
+          this.dateUtilService.convertDateToYYYYMMDD(dup.RptPeriodFromDate) === this.dateUtilService.convertDateToYYYYMMDD(item.RptPeriodFromDate) &&
+          this.dateUtilService.convertDateToYYYYMMDD(dup.RptPeriodToDate) === this.dateUtilService.convertDateToYYYYMMDD(item.RptPeriodToDate) &&
+          dup.ReportName === item.ReportName &&
+          dup.RptFreqDesc === item.RptFreqDesc
+        );
+
+        if (isDuplicate) {
+          this.loadErrorMessages('duplicateReport', errorMessage, null, null, item);
+          this.loadErrorMessages('CorrectReportingSchItem', correctionMessage, null, null, item);
+        } else {
+          delete item.errorMessages['duplicateReport'];
+          delete item.errorMessages['CorrectReportingSchItem'];
+        }
+      });
+
+      return true; // Duplicates exist
+    }
+
+    return false; // No duplicates found
+  }
+
+
+
+
+
+
+
 
   prepareRptSchObject(userId: number) {
     return {

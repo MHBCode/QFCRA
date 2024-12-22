@@ -31,7 +31,7 @@ export class ReportScheduleService {
     return this.http.get<any>(url);
   }
 
-  getFirmReportScheduleItem(firmRptSchItemId:number): Observable<any> {
+  getFirmReportScheduleItem(firmRptSchItemId: number): Observable<any> {
     const url = `${this.baseUrlRpt}get_firm_report_schedule_item?firmRptSchItemID=${firmRptSchItemId}`;
     return this.http.get<any>(url);
   }
@@ -54,7 +54,7 @@ export class ReportScheduleService {
     const url = `${this.baseUrlRpt}is_reporting_schedule_generated?firmId=${firmId}&firmReportingFrom=${firmReportingFrom}&firmReportingTo=${firmReportingTo}&ValidateFlag=${flag}`;
 
     return this.http.get<any>(url).pipe(
-      map((response: any) => response.response.Column1 === 1) 
+      map((response: any) => response.response.Column1 === 1)
     ).toPromise();
   }
 
@@ -70,7 +70,7 @@ export class ReportScheduleService {
     );
   }
 
-  getfirmStandardReportScheduledItemDetail(firmId: number,reportScheduleFrom: string, reportScheduleTo: string, rptScheduleType: number, financialYearEndTypeID: number) {
+  getfirmStandardReportScheduledItemDetail(firmId: number, reportScheduleFrom: string, reportScheduleTo: string, rptScheduleType: number, financialYearEndTypeID: number) {
     const url = `${this.baseUrlRpt}get_firm_standard_report_scheduled_item_detail?firmID=${firmId}&reportingScheduleFrom=${reportScheduleFrom}&reportingScheduleTo=${reportScheduleTo}&rptScheduleType=${rptScheduleType}&financialYearEndTypeID=${financialYearEndTypeID}`;
     return this.http.get<any>(url);
   }
@@ -90,6 +90,11 @@ export class ReportScheduleService {
     return this.http.get<any>(url);
   }
 
+  isReportingToDateValid(DocTypeID: number, rptPeriodToDate: string) {
+    const url = `${this.baseUrlRpt}is_reporting_to_date_valid?docTypeId=${DocTypeID}&reportingPeriodTo=${rptPeriodToDate}`;
+    return this.http.get<any>(url);
+  }
+
   publishRptSch(reports: any) {
     const url = `${this.baseUrlRpt}publish_reporting_schedule`;
     return this.http.post<any>(url, reports);
@@ -103,7 +108,7 @@ export class ReportScheduleService {
   deleteRptSch(firmId: number, firmRptSchID: number) {
     const url = `${this.baseUrlRpt}delete_reporting_schedule?firmId=${firmId}&firmRptSchID=${firmRptSchID}`;
     return this.http.delete<any>(url);
-}
+  }
 
 }
 

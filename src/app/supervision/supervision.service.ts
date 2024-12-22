@@ -259,6 +259,49 @@ export class SupervisionService {
     });
   }
 
+  // Co-Supervisors (Top menu)
+  getFunctionRoles(userId: number,OpType: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.firmUserAssnTypes, OpType).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Firm User Assn Types dropdown:', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  getCoSupervisorsUsers(userId: number,OpType: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.CoSupervisorsUsers, OpType).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Co-Supervisors users dropdown:', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  getReasons(userId: number,OpType: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.firmUserAssnReasonTypes, OpType).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Reasons dropdown:', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
   isUserHasRestrictedAccess(userId: number, firmId: number, objectID: number): Observable<boolean> {
     return new Observable(observer => {
       this.userService.isUserHasRestrictedAccess(userId, firmId, objectID).subscribe(
