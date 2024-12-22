@@ -14,45 +14,43 @@
         <i class="bi bi-x-circle"></i>
       </button>
     </div>
-    <div class="reporting-schedule-form">
+    <div class="reporting-schedule-form" *ngIf="AdminFeeDetials?.length > 0">
       <div class="inputs-row">
         <div class="input-field">
           <label for="FirmName">Firm Name</label>
           <input type="text" id="FirmName" name="FirmName" [(ngModel)]="AdminFeeDetials[0].FirmName"
-            [disabled]="!isEditable" />
+            disabled />
         </div>
         <div class="input-field">
           <label for="QFCNumber">QFC Number </label>
 
           <input type="text" id="QFCNumber" name="QFCNumber" [(ngModel)]="AdminFeeDetials[0].QFCNum"
-            [disabled]="!isEditable" />
-
-
+          disabled />
         </div>
         <div class="input-field">
           <label for="ReportName">Report Name</label>
           <input type="text" id="ReportName" name="ReportName" [(ngModel)]="AdminFeeDetials[0].RptName"
-            [disabled]="!isEditable" />
+          disabled />
         </div>
         <div class="input-field">
           <label for="ReportDueDate">Report Due Date</label>
           <input type="text" id="ReportDueDate" name="ReportDueDate" [(ngModel)]="AdminFeeDetials[0].FirmRptDueDate"
-            [disabled]="!isEditable" />
+          disabled />
         </div>
         <div class="input-field">
           <label for="ReportingPeriodStartDate">Reporting Period Start Date</label>
           <input type="text" id="ReportingPeriodStartDate" name="ReportingPeriodStartDate"
-            [(ngModel)]="AdminFeeDetials[0].RptPeriodFromDate" [disabled]="!isEditable" />
+            [(ngModel)]="AdminFeeDetials[0].RptPeriodFromDate" disabled />
         </div>
         <div class="input-field">
           <label for="ReportingPeriodEndDate">Reporting Period End Date</label>
           <input type="text" id="ReportingPeriodEndDate" name="ReportingPeriodEndDate"
-            [(ngModel)]="AdminFeeDetials[0].RptPeriodToDate" [disabled]="!isEditable" />
+            [(ngModel)]="AdminFeeDetials[0].RptPeriodToDate" disabled />
         </div>
         <div class="input-field">
           <label for="MateriallyCompleteReportReceivedDate">Materially Complete Report Received Date</label>
           <input type="text" id="MateriallyCompleteReportReceivedDate" name="MateriallyCompleteReportReceivedDate"
-            [(ngModel)]="AdminFeeDetials[0].FirstMateriallyCompleteRptReceivedDate" [disabled]="!isEditable" />
+            [(ngModel)]="AdminFeeDetials[0].FirstMateriallyCompleteRptReceivedDate" disabled/>
         </div>
 
 
@@ -66,14 +64,15 @@
         </div> -->
         <div class="input-field">
           <label for="LinkToReturnReview">Link To Return Review</label>
-          <input *ngIf="isEditable" name="LinkToReturnReview" id="LinkToReturnReview" type="text"
-                 [(ngModel)]="AdminFeeDetials.LinkToReview" />
-          <a id="websiteLink" [href]="constructLink()" target="_blank" rel="noopener noreferrer">
-            {{ constructLink() }}
-          </a>
+          <span>
+            <a [routerLink]="['/supervision/view/return-review', firmId]"
+              [queryParams]="{ firmRptSchItemID: AdminFeeDetials[0].FirmRptSchItemID }" target="_blank">
+              Link to Review
+            </a>
+          </span>
         </div>
       </div>
-      <div class="rpt-list margin-top-10">
+      <div class="rpt-list margin-top-10" *ngIf="ResubmissionHistoryList?.length">
         <div class="popup-header">
           <h3>Submission History</h3>
         </div>
@@ -111,7 +110,7 @@
               <td></td>
               <td></td>
               <td>Total Days Overdue</td>
-              <td>{{ResubmissionHistoryList.noLateDaysForDisplay}}</td>
+              <td>{{totalLateDays}}</td>
               <td></td>
             </tr>
           </tbody>
@@ -146,27 +145,26 @@
             </div>
 
             <div class="input-field">
-              <label for="Rulesunderwhichfeeisbeingimposed">Rulesunderwhichfeeisbeingimposed</label>
+              <label for="Rulesunderwhichfeeisbeingimposed">Rules under which fee is being imposed</label>
               <input type="text" [disabled]="!isEditable" id="Rulesunderwhichfeeisbeingimposed"
                 name="Rulesunderwhichfeeisbeingimposed" [(ngModel)]="AdminFeeDetials[0].ruleDesc" />
             </div>
 
             <div class="input-field">
               <label for="CalculatedFee">Calculated Fee</label>
-            <ng-container>
-              <div *ngIf="isEditable; else view">
-                <input type="text" [disabled]="!isEditable" name="CalculatedFee"
-                [value]="AdminFeeDetials[0].CalculatedAmountCurrencyTypeDesc +' ' + AdminFeeDetials[0].CalculatedAmount" />
-              </div>
-              
-              
-            </ng-container>
-            <ng-template #view>
-             <span>{{AdminFeeDetials[0].CalculatedAmountCurrencyTypeDesc +' ' + AdminFeeDetials[0].CalculatedAmount}}&nbsp;&nbsp;<a class="infocircle" (click)="getCalculatedFee()"><i class="bi bi-info-circle" style="font-size: 1.5rem; color: #0d6efd;"></i></a></span>
-            </ng-template>
-            </div>
+              <ng-container>
+                <div *ngIf="isEditable; else view">
+                  <input type="text" [disabled]="!isEditable" name="CalculatedFee"
+                    [value]="AdminFeeDetials[0].CalculatedAmountCurrencyTypeDesc +' ' + AdminFeeDetials[0].CalculatedAmount" />
+                </div>
 
-            <div class="input-field">
+
+              </ng-container>
+              <ng-template #view>
+                <span>{{AdminFeeDetials[0].CalculatedAmountCurrencyTypeDesc +' ' +
+                  AdminFeeDetials[0].CalculatedAmount}}&nbsp;&nbsp;<a class="infocircle" (click)="getCalculatedFee()"><i
+                      class="bi bi-info-circle" style="font-size: 1.5rem; color: #0d6efd;"></i></a></span>
+              </ng-template>
             </div>
             <div class="input-field notes">
               <label for="notes">Recommendation :</label>
@@ -193,20 +191,14 @@
           </div>
         </ng-container>
       </div>
-      
-        <app-review
-          [fee]="fee"
-          [firmId]="firmId"
-          [firmDetails]="firmDetails"
-          [isEditable]="isEditable"
-          [pageName]="Page.LateAdminFee"
-          [Review]="UserObjectWfTasks"
-        >
-        </app-review>
-      
-      
 
-       <!-- <div class="rpt-list margin-top-10">
+      <app-review [fee]="fee" [firmId]="firmId" [firmDetails]="firmDetails" [isEditable]="isEditable"
+        [pageName]="Page.LateAdminFee" [Review]="UserObjectWfTasks">
+      </app-review>
+
+
+
+      <!-- <div class="rpt-list margin-top-10">
         <div class="popup-header">
           <h3>Review</h3>
         </div>
@@ -288,9 +280,25 @@
           </div>
         </div>
       </div>
+
+      <!-- Action Buttons -->
+      <div class="btn justify-content-end">
+        <button *ngIf="!hideExportBtn">
+          <i class="bi bi-file-earmark-text"></i> Export to word
+        </button>
+
+        <button (click)="editFee()" *ngIf="!hideEditBtn">
+          <i class="bi bi-pen"></i> Edit
+        </button>
+
+        <button (click)="saveFee()" *ngIf="!hideSaveBtn">
+          Save
+        </button>
+
+      </div>
     </div>
   </div>
-  
+
   <div *ngIf="showCalculatedFeePopup" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
@@ -298,42 +306,42 @@
       </div>
       <div class="btn">
         <button class="close-button" (click)="closeCalculatedFeePopup()">Cancel</button>
-      </div>     
+      </div>
     </div>
   </div>
 
   <!-- Modal Popup for Showing Search Results -->
-<div *ngIf="showPreviousCommentsModal" class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Previous Workflow Comments</h3>
+  <div *ngIf="showPreviousCommentsModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Previous Workflow Comments</h3>
+      </div>
+      <div class="modal-body">
+        <table class="contact-table">
+          <thead>
+            <tr>
+              <th>Version No.</th>
+              <th>Comments</th>
+              <th>Status</th>
+              <th>Status Set By</th>
+              <th>Status Set Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let RevisionComment of RevisionCommentsList">
+              <td>
+                {{ RevisionComment.ObjectInstanceRevNum }}
+              </td>
+              <td>{{ RevisionComment.WaiverComments }}</td>
+              <td>{{ RevisionComment.ObjectWFStatusTypeDesc }}</td>
+              <td>{{ RevisionComment.CommentorName }}</td>
+              <td>{{ RevisionComment.CommentDate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="btn">
+        <button class="close-button" (click)="closePreviousCommentsModal()">Cancel</button>
+      </div>
     </div>
-    <div class="modal-body">
-      <table class="contact-table">
-        <thead>
-          <tr>
-            <th>Version No.</th>
-            <th>Comments</th>
-            <th>Status</th>
-            <th>Status Set By</th>
-            <th>Status Set Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let RevisionComment of RevisionCommentsList">
-            <td>
-              {{ RevisionComment.ObjectInstanceRevNum }}
-            </td>
-            <td>{{ RevisionComment.WaiverComments }}</td>
-            <td>{{ RevisionComment.ObjectWFStatusTypeDesc }}</td>
-            <td>{{ RevisionComment.CommentorName }}</td>
-            <td>{{ RevisionComment.CommentDate }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="btn">
-      <button class="close-button" (click)="closePreviousCommentsModal()">Cancel</button>
-    </div>  
   </div>
-</div>
