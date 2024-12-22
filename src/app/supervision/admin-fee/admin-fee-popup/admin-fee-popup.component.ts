@@ -31,12 +31,23 @@ export class AdminFeePopupComponent {
   isLoading: boolean = true;
   Page = FrimsObject;
   now = new Date();
+  totalLateDays : number = 0;
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
   AdminFeeDetials: any;
   showCalculatedFeePopup :boolean = false;
   showPreviousCommentsModal: boolean = false;
+
+    // Security
+    hideEditBtn: boolean = false;
+    hideSaveBtn: boolean = false;
+    hideCancelBtn: boolean = false;
+    hideCreateBtn: boolean = false;
+    hideDeleteBtn: boolean = false;
+  
+    hideExportBtn: boolean = false;
+
   constructor(
     private supervisionService: SupervisionService,
     private securityService: SecurityService,
@@ -102,7 +113,7 @@ export class AdminFeePopupComponent {
       next: (res) => {
         this.ResubmissionHistoryList = res.response;
         console.log("ResubmissionHistoryList",this.ResubmissionHistoryList)
-        
+        this.totalLateDays = this.ResubmissionHistoryList.reduce((sum, item) => sum + parseInt(item.noLateDaysForDisplay, 10), 0);
       },
       error: (error) => {
         console.error('Error fitching ResubmissionHistoryList', error);
@@ -205,5 +216,12 @@ export class AdminFeePopupComponent {
   }
   closePreviousCommentsModal(){
     this.showPreviousCommentsModal = false;
+  }
+
+  editFee(){
+    this.isEditable = true
+  }
+  saveFee(){
+    
   }
 }

@@ -47,6 +47,9 @@ export const enfActionsDNFBP = "V_EnforcementActionOnTypes_DNFBP"
 export const firmTypes = "V_FirmTypes";
 export const authorisedFirmNames = "V_All_Firms_Authorised";
 export const dnfbpsFirmNames = "V_All_Firms_DNFBPs";
+// Admin Fee
+export const firmRptAdminFeeRates = "V_FirmRptAdminFeeRates";
+
 // Reporting Schedule
 export const firmRptSubmissionTypes = "V_FirmRptSubmissionTypes";
 export const reportDocTypes = "v_Get_DocType";
