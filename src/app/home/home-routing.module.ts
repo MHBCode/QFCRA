@@ -12,7 +12,6 @@ import { IndividualPendingAiAppsComponent } from './sub-pages/individualPages/in
 import { UserAccessComponent } from './sub-pages/adminPages/user-access/user-access.component';
 import { ReAssignTasksComponent } from './sub-pages/adminPages/re-assign-tasks/re-assign-tasks.component';
 import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm-reports.component';
-import { NoticesAndResponsesComponent } from './sub-pages/notices-and-responses/notices-and-responses.component';
 import { CreateIndividualComponent } from './sub-pages/individualPages/create-individual/create-individual.component';
 import { ViewIndividualComponent } from './sub-pages/individualPages/view-individual/view-individual.component';
 import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages/view-individual-status-change/view-individual-status-change.component';
@@ -33,6 +32,8 @@ import { TasksIAssignedComponent } from './sub-components/tasks-i-assigned/tasks
 import { MyTeamTasksComponent } from './sub-components/my-team-tasks/my-team-tasks.component';
 import { CreateReminderComponent } from './sub-components/create-reminder/create-reminder.component';
 import { TaskListComponent } from './sub-components/task-list/task-list.component';
+import { NoticesComponent } from '../supervision/notices/notices.component';
+
 const routes: Routes = [
   { path: '', component: MainPageComponent},
   { path: 'firms-page', component: FirmsPageComponent},
@@ -46,7 +47,7 @@ const routes: Routes = [
   { path: 'firm-reports', component: FirmReportsComponent},
   { path: 'userAccess', component: UserAccessComponent},
   { path: 're-assign-tasks', component: ReAssignTasksComponent},
-  { path: 'notices-and-responses', component: NoticesAndResponsesComponent},
+  { path: 'notices-and-responses', component: NoticesComponent},
   { path: 'create-individual', component: CreateIndividualComponent},
   { path: 'view-individual', component: ViewIndividualComponent},
   {
@@ -73,7 +74,6 @@ const routes: Routes = [
       { path: 'create-reminder', component: CreateReminderComponent },
     ]
   },
-  { path: 'notices-and-responses', component: NoticesAndResponsesComponent},
   { path: 'create-notices' , component: CreateNoticesComponent},
   { path: 'enforcement-and-disciplinary' , component:EnforcementAndDisciplinaryActionComponent},
   { path: 'co-supervisors' , component:CoSupervisorsComponent},

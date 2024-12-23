@@ -923,17 +923,6 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     );
   }
 
-  populateFirmTypes() {
-    this.supervisionService.populateFirmTypes(this.userId, constants.ObjectOpType.Create).subscribe(
-      firmTypes => {
-        this.allFirmTypes = firmTypes;
-      },
-      error => {
-        console.error('Error fetching Firm Types: ', error);
-      }
-    );
-  }
-
   populateFirmNamesAuthorised() {
     this.supervisionService.populateFirmNamesAuthorised(this.userId, constants.ObjectOpType.Create).subscribe(
       firmNamesAuthorised => {

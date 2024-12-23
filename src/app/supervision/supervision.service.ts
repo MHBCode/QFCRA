@@ -187,6 +187,20 @@ export class SupervisionService {
     });
   }
 
+  populateFirmStatus(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.firmStatus, OpTypeId).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Firm Types options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
   populateFirmNamesAuthorised(userId: number, OpTypeId: number): Observable<any[]> {
     return new Observable(observer => {
       this.securityService.getObjectTypeTable(userId, constants.authorisedFirmNames, OpTypeId).subscribe(

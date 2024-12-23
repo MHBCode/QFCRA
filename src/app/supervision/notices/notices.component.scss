@@ -1,3 +1,22 @@
 .notices-list {
     border-radius: 15px;
 }
+
+.custom-checkbox {
+    margin: 0px;
+    font-size: 0.9rem;
+}
+
+.checkbox-options {
+    display: inline-flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.form-section.isMainNoticeListing {
+    margin: 1rem 0px;
+}
+
+.fullwidth{
+    flex: 1 1 100% !important;
+}
