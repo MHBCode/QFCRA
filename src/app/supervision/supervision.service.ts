@@ -174,7 +174,6 @@ export class SupervisionService {
     return new Observable(observer => {
       this.securityService.getObjectTypeTable(userId, constants.firmTypes, OpTypeId).subscribe(
         data => {
-          // Filter out the option with FirmTypeDesc "Licensed"
           const filteredResponse = data.response.filter(item => item.FirmTypeDesc !== "Licensed");
 
           observer.next(filteredResponse);

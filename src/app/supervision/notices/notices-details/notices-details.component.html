@@ -71,14 +71,6 @@
               [href]="noticeDetails.LinkToNotice">{{noticeDetails.LinkToNotice}}</a>
           </div>
           <div class="input-field">
-            <label for="additionalAttachments">Additional Attachment(s) (if any)</label>
-            <ul class="additionalAttachments-list">
-              <li *ngFor="let doc of attachmentNotice">
-                <a [href]="doc.fileLoc" target="_blank">{{doc.FileName}}</a>
-              </li>
-            </ul>
-          </div>
-          <div class="input-field">
             <label for="noticeFinalizedBy">Notice Finalized By</label>
             <input type="text" id="noticeFinalizedBy" name="noticeFinalizedBy"
               [(ngModel)]="noticeDetails.NoticeFinalizedBy" [disabled]="!isEditable" />
@@ -97,6 +89,14 @@
             <label for="datePublished">Date Published on Website</label>
             <input type="text" id="datePublished" name="datePublished"
               [(ngModel)]="noticeDetails.DatePublishedonWebsite" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="additionalAttachments">Additional Attachment(s) (if any)</label>
+            <ul class="additionalAttachments-list">
+              <li *ngFor="let doc of attachmentNotice">
+                <a [href]="doc.fileLoc" target="_blank">{{doc.FileName}}</a>
+              </li>
+            </ul>
           </div>
           <div class="input-field">
             <label for="notificationSentDate">Notification Sent Date</label>
