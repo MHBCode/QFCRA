@@ -45,6 +45,7 @@ export const RFFundStatus = "V_RegisteredFundStatusTypes";
 export const enfActionsAuth = "V_EnforcementActionOnTypes_Auth"
 export const enfActionsDNFBP = "V_EnforcementActionOnTypes_DNFBP"
 export const firmTypes = "V_FirmTypes";
+export const firmStatus = "V_FirmStatusTypes";
 export const authorisedFirmNames = "V_All_Firms_Authorised";
 export const dnfbpsFirmNames = "V_All_Firms_DNFBPs";
 // Admin Fee
