@@ -174,10 +174,23 @@ export class SupervisionService {
     return new Observable(observer => {
       this.securityService.getObjectTypeTable(userId, constants.firmTypes, OpTypeId).subscribe(
         data => {
-          // Filter out the option with FirmTypeDesc "Licensed"
           const filteredResponse = data.response.filter(item => item.FirmTypeDesc !== "Licensed");
 
           observer.next(filteredResponse);
+        },
+        error => {
+          console.error('Error Fetching Firm Types options: ', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  populateFirmStatus(userId: number, OpTypeId: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.firmStatus, OpTypeId).subscribe(
+        data => {
+          observer.next(data.response);
         },
         error => {
           console.error('Error Fetching Firm Types options: ', error);

@@ -294,15 +294,21 @@
                                 <input disabled [value]="rpt.FirmRptReqdBit ? 'Yes' : 'No'">
                             </ng-template>
                         </div>
-                        <div *ngIf="rpt.FirmRptReqdBit === 'false'" class="input-field">
+                        <div *ngIf="rpt.FirmRptReqdBit === 'false' || rpt.FirmRptReqdBit === false" class="input-field">
                             <label for="notRequired">Not Required Reason</label>
-                            <select [(ngModel)]="rpt.FirmRptNReqReasonTypeID">
-                                <option [value]="0">Select</option>
-                                <option *ngFor="let option of allNotRequiredTypes"
-                                    [value]="option.FirmRptNReqReasonTypeID">
-                                    {{option.FirmRptNReqReasonTypeDesc}}
-                                </option>
-                            </select>
+                            <ng-container *ngIf="isEditModeReportingSch || isCreateReportingSch; else FirmRptNReqdReason">
+                                <select [(ngModel)]="rpt.FirmRptNReqReasonTypeID">
+                                    <option [value]="0">Select</option>
+                                    <option *ngFor="let option of allNotRequiredTypes"
+                                        [value]="option.FirmRptNReqReasonTypeID">
+                                        {{option.FirmRptNReqReasonTypeDesc}}
+                                    </option>
+                                </select>
+                            </ng-container>
+                            
+                            <ng-template #FirmRptNReqdReason>
+                                <input disabled [(ngModel)]="rpt.FirmRptNReqReasonTypeDesc">
+                            </ng-template>
                         </div>
 
                         <div *ngIf="!isValueNullOrEmpty(rpt.AdditionalSheets) && isXBRLTypeForReport(rpt.DocTypeID)"
@@ -411,6 +417,9 @@
                             </p>
                             <p *ngIf="rpt?.errorMessages?.['REPORTINGDATESINVALIDFORSELECTEDFREQUENCY']">
                                 {{ rpt.errorMessages['REPORTINGDATESINVALIDFORSELECTEDFREQUENCY'] + ' ' + rpt.RptFreqDesc }}
+                            </p>
+                            <p *ngIf="rpt?.errorMessages?.['EFFECTIVEREPORTTYPEDATE']">
+                                {{ rpt.errorMessages['EFFECTIVEREPORTTYPEDATE'] }}
                             </p>
                         </div>
                     </div>

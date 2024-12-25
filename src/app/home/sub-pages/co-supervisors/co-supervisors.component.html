@@ -191,6 +191,11 @@
         Firms Data
       </h2>
     </div>
+    <div class="error-messages">
+      <p *ngIf="errorMessages['noRARecordsSelected']">
+        {{errorMessages['noRARecordsSelected']}}
+      </p>
+    </div>
     <div class="edit-firms-inputs">
       <div class="input-field">
         <label for="firmName">
@@ -249,24 +254,35 @@
         <h2 class="ra-personal-title">
           RA Personal Assigned
         </h2>
-        <button (click)="addUserAssign()" *ngIf="firmIdFlag !== '0' && isSearchClicked" class="add-btn">Add</button>
+        <button (click)="addUserAssign()" *ngIf="firmIdFlag != '0' && isSearchClicked" class="add-btn">Add</button>
       </div>
 
       <div class="scrollable-table-container">
         <table *ngIf="firmUserSearchResults?.length > 0; else nosupervisors">
           <thead>
             <tr>
+              <th class="text-center" *ngIf="userIdFlag !== 0">
+                <input type="checkbox" title="Select all" [(ngModel)]="selectAllRecords" (change)="toggleAllCheckboxes()">
+              </th>
               <th>Firm Name</th>
               <th>Function / Role</th>
               <th>Name</th>
               <th style="width: 10%;">Date From</th>
               <th style="width: 10%;">Date To</th>
               <th>Reason for Change</th>
-              <th></th>
+              <th class="buttons">
+                <span *ngIf="userIdFlag !== 0">
+                  <button (click)="onEditAllRecords()" class="edit-btn" title="Edit Selected Roles">Edit Selected</button>
+                  <button (click)="getEndAllAssignments()" class="end-btn" title="End Selected Assingment">End Selected</button>
+                </span>
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let data of firmUserSearchResults">
+              <td class="text-center" *ngIf="userIdFlag !== 0">
+                <input type="checkbox" [(ngModel)]="data.selected" (change)="checkIfAllSelected()">
+              </td>
               <td>{{data.FirmName}}</td>
               <td>{{data.FirmUserAssnTypeDesc}}</td>
               <td>{{data.Name}}</td>
@@ -274,8 +290,10 @@
               <td>{{data.FirmUserAssnDateTo}}</td>
               <td>{{data.FirmUserAssnReasonTypeDesc}}</td>
               <td class="buttons">
-                <button (click)="onEditRecord(data)" class="edit-btn">Edit</button>
-                <button (click)="getEndAssignment(data)" class="end-btn">End</button>
+                <span>
+                  <button (click)="onEditRecord(data)" class="edit-btn">Edit</button>
+                  <button (click)="getEndAssignment(data)" class="end-btn">End</button>
+                </span>
               </td>
             </tr>
           </tbody>
@@ -344,6 +362,55 @@
     </div>
   </div>
 
+  <div class="inputs-field-set" *ngIf="isEditAllSectionVisible">
+    <div class="edit-firm-actions">
+      <h2 class="edit-firm-header">Edit All</h2>
+    </div>
+    <div class="error-messages">
+      <p *ngIf="errorMessages['replaceUser']">
+        {{errorMessages['replaceUser']}}
+      </p>
+      <p *ngIf="errorMessages['DateFrom']">
+        {{errorMessages['DateFrom']}}
+      </p>
+    </div>
+    <div class="edit-individually">
+      <div class="edit-individually1">
+        <p>
+          Replace <span class="burgundy-color">{{ selectedRecords[0].Name }}</span> with <span
+            style="color: red;">* </span>
+          <select class="replace" name="firmName" id="firmName" [(ngModel)]="replaceUserID"
+            [ngClass]="{'error-border': errorMessages['replaceUser']}">
+            <option [value]="0">Select</option>
+            <option *ngFor="let user of filteredAssignedLevelUsers" [value]="user.UserID">
+              {{ user.UserName }}
+            </option>
+          </select>
+          for the firm(s) selected above from <span style="color: red;">* </span>
+          <input class="date-from" name="noticeIssuedDate" id="noticeIssuedDate" type="date"
+            [(ngModel)]="formattedCurrentDate" #dateInputs
+            [ngClass]="{'error-border': errorMessages['DateFrom']}" />
+          onwards.
+        </p>
+      </div>
+      <div class="edit-individually2">
+        <p>
+          Reason for change:
+          <select class="reason-for-change" name="reason" id="reason" [(ngModel)]="reasonID">
+            <option [value]="0">Select</option>
+            <option *ngFor="let reason of allReasons" [value]="reason.FirmUserAssnReasonTypeID">
+              {{ reason.FirmUserAssnReasonTypeDesc }}
+            </option>
+          </select>
+        </p>
+      </div>
+    </div>
+    <div class="btns-container">
+      <button class="update-btn" (click)="updateRecord()">Update</button>
+      <button class="cancel-btn" (click)="isEditAllSectionVisible = false">Cancel</button>
+    </div>
+  </div>
+
   <div *ngIf="addNewSectionVisibility" class="inputs-field-set">
     <div class="section">
 
@@ -375,7 +442,7 @@
             Function/Role <span style="color: red;">*</span>
           </label>
           <select name="role" id="role" [(ngModel)]="newRoleID" (change)="filterUsersByFunctionRole()"
-          [ngClass]="{'error-border': errorMessages['newRoleID']}">
+            [ngClass]="{'error-border': errorMessages['newRoleID']}">
             <option [value]="0">Select</option>
             <option [value]="role.FirmUserAssnTypeID" *ngFor="let role of allFunctionRoles">
               {{role.FirmUserAssnTypeDesc}}
@@ -388,7 +455,7 @@
             Name <span style="color: red;">*</span>
           </label>
           <select name="user" id="user" [(ngModel)]="newUserID"
-          [ngClass]="{'error-border': errorMessages['newUserID']}">
+            [ngClass]="{'error-border': errorMessages['newUserID']}">
             <option [value]="0">Select</option>
             <option [value]="assignedlvlUser.UserID" *ngFor="let assignedlvlUser of filteredRoleNames">
               {{assignedlvlUser.UserName}}
@@ -401,7 +468,7 @@
             Date From <span style="color: red;">*</span>
           </label>
           <input type="text" [(ngModel)]="newDateFrom" #dateInputs
-          [ngClass]="{'error-border': errorMessages['newDateFrom']}">
+            [ngClass]="{'error-border': errorMessages['newDateFrom']}">
         </div>
 
         <div class="input-field">
@@ -472,7 +539,7 @@
     <h3>End Assignment</h3>
   </div>
 
-  <div class="error-msgs">
+  <div class="error-msgs" *ngIf="hasErrorMessages()">
     <p *ngIf="errorMessages['dateTo']">
       {{errorMessages['dateTo']}}
     </p>
@@ -511,8 +578,47 @@
     </table>
 
     <div class="btns-container">
-      <button (click)="saveRecord()" class="update-btn">Save</button>
-      <button class="cancel-btn" (click)="callEndAssignment = false">Cancel</button>
+      <button (click)="saveEndAssignRecord()" class="update-btn">Save</button>
+      <button (click)="closeEndAssignmentPopup()" class="cancel-btn" >Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!--End All Assignment Popup-->
+<div *ngIf="callEndAllAssignment" class="overlay show"></div>
+<div *ngIf="callEndAllAssignment" class="endAllAssignmentPopup popupcontainer">
+  <i class="bi bi-x-circle close-icon close-icon-prev-revisions" (click)="closeEndAllAssignmentPopup()"></i>
+
+  <div class="popup-header">
+    <h3>End Assignment</h3>
+  </div>
+
+  <div class="error-msgs" *ngIf="hasErrorMessages()">
+    <p *ngIf="errorMessages['dateTo']">
+      {{errorMessages['dateTo']}}
+    </p>
+    <p *ngIf="errorMessages['dateFromGreaterThanDateTo']">
+      {{errorMessages['dateFromGreaterThanDateTo']}}
+    </p>
+  </div>
+
+  <div class="popup-info-place">
+    <table>
+      <tr>
+        <td>Supervisor Name: </td>
+        <td>{{selectedRecords[0].Name}}</td>
+      </tr>
+
+      <tr>
+        <td>Date To: </td>
+        <td><input [ngClass]="{'error-border': errorMessages['dateTo']}" class="date-to" type="text"
+            [(ngModel)]="formattedCurrentDate" #dateInputs></td>
+      </tr>
+    </table>
+
+    <div class="btns-container">
+      <button (click)="saveEndAssignRecord()" class="update-btn">Save</button>
+      <button (click)="closeEndAllAssignmentPopup()" class="cancel-btn" >Cancel</button>
     </div>
   </div>
 </div>

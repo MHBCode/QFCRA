@@ -214,6 +214,11 @@ export class FirmService {
     return this.http.post<any>(`${this.baseUrlFirms}insert_update_firm_users`, rowData, { headers: headers });
   }
 
+  saveUpdateAllFirmUser(rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlFirms}insert_update_all_firm_user`, rowData, { headers: headers });
+  }
+
   deleteFirmUser(deletefirmUserObj: any): Observable<any> {
     const url = `${this.baseUrlFirms}delete_firm_users`;
     const options = {

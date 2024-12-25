@@ -7,6 +7,7 @@ import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import * as constants from 'src/app/app-constants';
 import { PaginationComponent } from 'src/app/shared/pagination/pagination.component';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
+import { SupervisionService } from '../supervision.service';
 
 @Component({
   selector: 'app-notices',
@@ -18,14 +19,14 @@ export class NoticesComponent implements OnInit {
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   userId = 30;
-
+  isMainNoticeListing = false;
   pageSize: number = 10; // Define pageSize here
   filteredNotices: any[] = []; // Full list of notices
-  paginatedItems: any[] = []; 
+  paginatedItems: any[] = [];
 
   selectedNotice: any = null;
   showViewPopup: boolean = false;
-
+  payloadparams = {};
   firmDetails: any;
   FIRMNotices: any;
   paginatedNotices: any = [];
@@ -34,6 +35,8 @@ export class NoticesComponent implements OnInit {
   isLoading: boolean = false;
   notices: any;
   noticeTypes: any[] = [];
+  allFirmTypes:any[] = [];
+  allFirmStatus:any[] = [];
   noticeNames: any[] = [];
   noticeIssuedBy: any[] = [];
   // Form search fields with defaults
@@ -66,6 +69,7 @@ export class NoticesComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private noticeService: NoticeService,
+    private supervisionService : SupervisionService,
     private firmDetailsService: FirmDetailsService,
     public dateUtilService: DateUtilService,
     private securityService: SecurityService,
@@ -77,6 +81,14 @@ export class NoticesComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
+      if (!this.firmId) {
+        this.firmId = null;
+        this.isMainNoticeListing = true;
+        this.getFirmTypes();
+        this.getFirmStatus();
+      }
+
+      console.log('isMainNoticeListing', this.isMainNoticeListing);
       this.loadNotices();
       this.getNoticeTypes();
       this.loadFirmDetails(this.firmId);
@@ -108,10 +120,13 @@ export class NoticesComponent implements OnInit {
   }
 
   loadNotices(): void {
-    const params = {
-      firmID: this.firmId
+    if (!this.isMainNoticeListing) {
+      this.payloadparams = {
+        firmID: this.firmId
+      }
     }
-    this.noticeService.getNoticesList(params).subscribe(data => {
+
+    this.noticeService.getNoticesList(this.payloadparams).subscribe(data => {
       this.filteredNotices = data.response; // Full data
       this.applySearchAndPagination(); // Initialize pagination
     });
@@ -169,7 +184,6 @@ export class NoticesComponent implements OnInit {
     this.noticeService.getNoticeTypes().subscribe(
       data => {
         this.noticeTypes = data.response;
-        console.log('getNoticeTypes', this.noticeTypes);
       },
       error => {
         console.error('Error fetching noticeTypes ', error);
@@ -203,6 +217,112 @@ export class NoticesComponent implements OnInit {
   onNoticeTypeChange() {
     if (this.NoticeTypeID) {
       this.getNoticeNames(this.NoticeTypeID);
+    }
+  }
+
+
+  getFirmTypes() {
+    this.supervisionService.populateFirmTypes(this.userId, constants.ObjectOpType.Create).subscribe(
+      firmTypes => {
+        this.allFirmTypes = firmTypes;
+      },
+      error => {
+        console.error('Error fetching Firm Types: ', error);
+      }
+    );
+  }
+
+
+  
+  getFirmStatus() {
+    this.supervisionService.populateFirmStatus(this.userId, constants.ObjectOpType.List).subscribe(
+      firmStatus => {
+        this.allFirmStatus = firmStatus;
+        debugger;
+      },
+      error => {
+        console.error('Error fetching Firm Types: ', error);
+      }
+    );
+  }
+
+
+  // Convert CSV string to array
+  private getSelectedIds(): number[] {
+    return this.CSVFirmTypeIDs
+      ? this.CSVFirmTypeIDs.split(',').map(id => parseInt(id, 10))
+      : [];
+  }
+
+  isSelected(id: number): boolean {
+    return this.getSelectedIds().includes(id);
+  }
+
+  toggleOption(id: number, event: Event): void {
+    const selectedIds = this.getSelectedIds();
+    const checked = (event.target as HTMLInputElement).checked;
+
+    if (checked) {
+      selectedIds.push(id);
+    } else {
+      const index = selectedIds.indexOf(id);
+      if (index !== -1) {
+        selectedIds.splice(index, 1);
+      }
+    }
+
+    this.CSVFirmTypeIDs = selectedIds.join(',');
+  }
+
+  isAllSelected(): boolean {
+    return this.getSelectedIds().length === this.allFirmTypes.length;
+  }
+
+  toggleAllOptions(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (checked) {
+      this.CSVFirmTypeIDs = this.allFirmTypes.map(type => type.FirmTypeID).join(',');
+    } else {
+      this.CSVFirmTypeIDs = '';
+    }
+  }
+
+  private getselectedStatusIds(): number[] {
+    return this.CSVFirmStatusTypeIDs
+      ? this.CSVFirmStatusTypeIDs.split(',').map(id => parseInt(id, 10))
+      : [];
+  }
+
+  isStatusSelected(id: number): boolean {
+    return this.getselectedStatusIds().includes(id);
+  }
+
+  toggleStatusOption(id: number, event: Event): void {
+    const selectedStatusIds = this.getselectedStatusIds();
+    const checkedStatus = (event.target as HTMLInputElement).checked;
+
+    if (checkedStatus) {
+      selectedStatusIds.push(id);
+    } else {
+      const index = selectedStatusIds.indexOf(id);
+      if (index !== -1) {
+        selectedStatusIds.splice(index, 1);
+      }
+    }
+
+    this.CSVFirmStatusTypeIDs = selectedStatusIds.join(',');
+  }
+
+  isAllStatusSelected(): boolean {
+    return this.getselectedStatusIds().length === this.allFirmStatus.length;
+  }
+
+  toggleAllStatusOptions(event: Event): void {
+    const checkedStatus = (event.target as HTMLInputElement).checked;
+    if (checkedStatus) {
+      this.CSVFirmStatusTypeIDs = this.allFirmStatus.map(type => type.FirmTypeID).join(',');
+    } else {
+      this.CSVFirmStatusTypeIDs = '';
     }
   }
 

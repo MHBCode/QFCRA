@@ -77,17 +77,19 @@
     border: none;
     border-radius: 10px;
     color: white;
-    min-width: 5rem;
-    min-height: 2.5rem;
+    min-width: 4rem;
+    min-height: 1.5rem;
 }
 
 .buttons {
     text-align: center;
-    width: 20%;
+    .buttons span {
+        display: inline-flex;
+    }
 }
 
 .buttons button {
-    margin: 0 5px;
+    margin: 5px;
 }
 
 .scrollable-table-container {
@@ -133,7 +135,7 @@
     margin: 5px 1rem;
 }
 
-.endAssignmentPopup {
+.endAssignmentPopup, .endAllAssignmentPopup {
     width: 50vw;
     align-items: baseline;
 }
