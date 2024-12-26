@@ -244,7 +244,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     this.isLoading = true;
     const currentOpType = Mode ? ObjectOpType.Create : ObjectOpType.View;
 
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
       this.registerMasterPageControlEvents();
     });
   }

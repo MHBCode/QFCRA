@@ -191,6 +191,7 @@
             </label>
             <select name="auditorName" id="auditorName" [(ngModel)]="CreateAuditorObj.OtherEntityName"
               (change)="onAuditorChange($event)">
+              <option [value]="0">Select</option>
               <option *ngFor="let name of firmAuditorName" [value]="name.OtherEntityName">
                 {{ name.OtherEntityName }}
               </option>

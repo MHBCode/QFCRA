@@ -29,8 +29,8 @@ export class FirmService {
   getAllFirms(): Observable<any> {
     const url = `${this.baseUrlFirms}get_firms`;
     return this.http.get<any>(url);
-  } 
-  isQFCNumExist(qfcNum:string, firmId: number,): Observable<any> {
+  }
+  isQFCNumExist(qfcNum: string, firmId: number,): Observable<any> {
     const url = `${this.baseUrlFirms}is_existing_qfc?qfcNum=${qfcNum}&firmId=${firmId}`;
     return this.http.get<any>(url);
   }
@@ -42,7 +42,7 @@ export class FirmService {
     const url = `${this.baseUrlFirms}is_exist_firm_name?firmName=${firmName}`;
     return this.http.get<any>(url);
   }
-  isQFCNumExistForNewFirm(qfcNum:string): Observable<any> {
+  isQFCNumExistForNewFirm(qfcNum: string): Observable<any> {
     const url = `${this.baseUrlFirms}is_existing_qfc?qfcNum=${qfcNum}`; // NO FIRM ID
     return this.http.get<any>(url);
   }
@@ -61,25 +61,25 @@ export class FirmService {
   /// Yazan 
 
   getFirmsAlphabetically(filterDataObj: any): Observable<any> {
-    
+
     let params = new HttpParams()
       .set('firmId', filterDataObj.FirmID)
       .set('AuthorisationCaseOfficerId', filterDataObj.AuthorisationCaseOfficerId.toString())
-      .set('SupervisionCaseOfficerId',filterDataObj.SupervisionCaseOfficerId.toString())
+      .set('SupervisionCaseOfficerId', filterDataObj.SupervisionCaseOfficerId.toString())
       .set('QFCNumber', filterDataObj.QFCNumber)
       .set('CSVAuthorisationStatus', filterDataObj.CSVAuthorisationStatus.toString())
       .set('userId', 0)
       .set('RelevantPerson', filterDataObj.RelevantPerson)
       .set('CSVLicenseStatus', filterDataObj.CSVLicenseStatus.toString())
-      .set('CSVLegalStatus',filterDataObj.CSVLegalStatus.toString())
-      .set('CSVPrudentialCategory',filterDataObj.CSVPrudentialCategory)
+      .set('CSVLegalStatus', filterDataObj.CSVLegalStatus.toString())
+      .set('CSVPrudentialCategory', filterDataObj.CSVPrudentialCategory)
       .set('CSVSectorTypes', filterDataObj.CSVSectorTypes.toString())
       .set('LoginuserId', 30)
       .set('CSVSupCategories', filterDataObj.CSVSupCategories.toString())
       .set('CSVFirmTypes', filterDataObj.CSVFirmTypes.toString())
       .set('CSVFirmStatus', filterDataObj.CSVFirmStatus.toString())
       .set('startChar', filterDataObj.startChar.toString())
-      console.log('HTTP Params:', params.toString());
+    console.log('HTTP Params:', params.toString());
     return this.http.get<any>(`${this.baseUrlFirms}get_firms_alphabetically`, { params });
   }
   getAccountingStandardsHistory(firmId: number): Observable<any> {
@@ -90,7 +90,7 @@ export class FirmService {
     const url = `${this.baseUrlFirms}get_inactive_firm_users?firmId=${firmId}`;  // Construct full URL https://localhost:7091/api/Firms/get_inactive_firm_users?firmId=66
     return this.http.get<any>(url);
   }
-  
+
   getAssignLevelUsers() {
     const url = `${this.baseUrlFirms}get_assign_level_users`;
     return this.http.get<any>(url);
@@ -114,12 +114,12 @@ export class FirmService {
     const url = `${this.baseUrlFirms}get_firm_user?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
-  
+
   //////// Yazan Auditors  
   savefirmauditors(firmAuditorsObj): Observable<any> {
     const url = `${this.baseUrlFirms}save_firm_auditors`;
     return this.http.post<any>(url, firmAuditorsObj);
-  }  
+  }
 
   getFIRMAdminFees(firmId: number): Observable<any> {
     const url = `${this.baseUrlFirms}get_admin_fee_list?firmId=${firmId}`;  //https://localhost:7091/api/Firms/get_admin_fee_list?firmId=66
@@ -128,7 +128,7 @@ export class FirmService {
 
   getFirmsList(criteria: any): Observable<any> {
     let params = new HttpParams();
-     console.log("foim-service getFirmsList", )
+    console.log("foim-service getFirmsList",)
     if (criteria.firmName && criteria.firmName !== 'all') {
       params = params.append('FirmName', criteria.firmName);
     }
@@ -136,22 +136,22 @@ export class FirmService {
       params = params.append('QFCNumber', criteria.qfcNumber);
     }
     if (criteria.firmType !== undefined) {
-      params = params.append('CSVFirmTypes', criteria.firmType.toString()); 
+      params = params.append('CSVFirmTypes', criteria.firmType.toString());
     }
     if (criteria.firmStatus !== undefined) {
-      params = params.append('CSVFirmStatus', criteria.firmStatus.toString()); 
+      params = params.append('CSVFirmStatus', criteria.firmStatus.toString());
     }
     if (criteria.legalStatus && criteria.legalStatus !== 'all') {
-      params = params.append('CSVLegalStatus', criteria.legalStatus); 
+      params = params.append('CSVLegalStatus', criteria.legalStatus);
     }
     if (criteria.prudentialCategory !== undefined) {
-      params = params.append('CSVPrudentialCategory', criteria.prudentialCategory.toString()); 
+      params = params.append('CSVPrudentialCategory', criteria.prudentialCategory.toString());
     }
     if (criteria.sectors !== undefined) {
-      params = params.append('CSVSectorTypes', criteria.sectors.toString()); 
+      params = params.append('CSVSectorTypes', criteria.sectors.toString());
     }
     if (criteria.authorisationStatus && criteria.authorisationStatus !== 'all') {
-      params = params.append('CSVAuthorisationStatus', criteria.authorisationStatus); 
+      params = params.append('CSVAuthorisationStatus', criteria.authorisationStatus);
     }
     console.log("foim-service getFirmsList", params)
     return this.http.get<any>(`${this.baseUrlFirms}get_firms_list`, { params });
@@ -179,11 +179,11 @@ export class FirmService {
     return this.http.get<any>(url);
   }
 
-  getLegalStatusTypeID(firmId: number) {  
+  getLegalStatusTypeID(firmId: number) {
     const url = `${this.baseUrlFirms}get_firm_legal_status_type_by_firm_id?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
-  
+
   saveSupervision(rowData: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<any>(`${this.baseUrlFirms}insert_update_supervision_data`, rowData, { headers: headers });
@@ -198,13 +198,13 @@ export class FirmService {
     const url = `${this.baseUrlFirms}is_firm_authorised?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
-  
-  isFirmAuthorisedForWaivers(firmId: number){
+
+  isFirmAuthorisedForWaivers(firmId: number) {
     const url = `${this.baseUrlFirms}is_firm_authorised_for_waivers?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
 
-  getFirmUserSearch(firmId: number, assnLevelId: number, UserID: number, displayHistory: boolean, userId: number){
+  getFirmUserSearch(firmId: number, assnLevelId: number, UserID: number, displayHistory: boolean, userId: number) {
     const url = `${this.baseUrlFirms}get_firm_user_search?firmId=${firmId}&assnLevelId=${assnLevelId}&userId=${UserID}&displayHistory=${displayHistory}&loginuserId=${userId}`;
     return this.http.get<any>(url);
   }
@@ -232,5 +232,27 @@ export class FirmService {
     const url = `${this.baseUrlFirms}is_role_exist?firmId=${firmId}&role=${newRoleID}`;
     return this.http.get<any>(url);
   }
+
+  isUserSupervisorForTheFirm(firmId: number, userId: number) {
+    const url = `${this.baseUrlFirms}is_user_supervisor_for_the_firm?firmId=${firmId}&userId=${userId}`;
+    return this.http.get<any>(url);
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  isNullOrEmpty(value: any): boolean {
+    return value === null || value === '';
+  }
   
+  removeHtmlTags(input: string | null | undefined): string {
+    // Check if input is null or undefined
+    if (!input) {
+      return ''; // Return an empty string if input is null or undefined
+    }
+    // This regex will remove all HTML tags
+    return input.replace(/<[^>]*>/g, '');
+  }
+
 }

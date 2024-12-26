@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SecurityService } from 'src/app/ngServices/security.service';
-import { FirmService } from '../firm.service';
+import { FirmService } from 'src/app/ngServices/firm.service';
 import { FirmDetailsService } from '../firmsDetails.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { ContactService } from 'src/app/ngServices/contact.service';
@@ -169,8 +169,7 @@ export class ContactsComponent {
     this.isLoading = true;
     const currentOpType = Mode ? ObjectOpType.Edit : ObjectOpType.ListView;
 
-    // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
       let firmType = this.firmDetails?.FirmTypeID;
 
 

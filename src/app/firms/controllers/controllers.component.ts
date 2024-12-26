@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { EntityType, FrimsObject, FunctionType, ObjectOpType } from 'src/app/app-constants';
-import { FirmService } from '../firm.service';
+import { FirmService } from 'src/app/ngServices/firm.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
@@ -176,8 +176,7 @@ export class ControllersComponent implements OnInit {
     this.isLoading = true;
     const currentOpType = Mode ? ObjectOpType.Edit : ObjectOpType.ListView;
 
-    // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
       let firmType = this.firmDetails?.FirmTypeID;
 
 

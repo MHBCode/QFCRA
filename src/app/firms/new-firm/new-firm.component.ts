@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { LogformService } from 'src/app/ngServices/logform.service';
-import { FirmService } from '../firm.service';
+import { FirmService } from 'src/app/ngServices/firm.service';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 import { FirmDetailsService } from '../firmsDetails.service';
 

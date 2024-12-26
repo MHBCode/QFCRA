@@ -2,13 +2,13 @@ import { Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import Swal from 'sweetalert2';
-import { FirmService } from '../firm.service';
 import { FirmDetailsService } from '../firmsDetails.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import * as constants from 'src/app/app-constants';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import { forkJoin, Observable, tap } from 'rxjs';
+import { FirmService } from 'src/app/ngServices/firm.service';
 
 @Component({
   selector: 'app-auditors',
@@ -115,8 +115,7 @@ export class AuditorsComponent {
     this.isLoading = true;
     const currentOpType = ObjectOpType.ListView;
 
-    // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
       // let firmType = this.firmDetails?.FirmTypeID;
 
 
@@ -473,7 +472,7 @@ export class AuditorsComponent {
     RelatedEntityEntityID: null,
     MyState: 2,
     LastModifiedByOfOtherEntity: this.userId,
-    OtherEntityName: "",
+    OtherEntityName: "0",
     DateOfIncorporation: null,
     LegalStatusTypeID: null,
     PlaceOfIncorporation: null,
