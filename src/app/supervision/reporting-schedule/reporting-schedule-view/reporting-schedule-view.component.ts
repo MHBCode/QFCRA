@@ -121,6 +121,11 @@ export class ReportingScheduleViewComponent {
     FirmRptTo: `31/Dec/${this.currentYear}`,
   };
 
+  showReferencePopup: boolean = false;
+  currentRpt: any = {};
+  currentDocumentDetails: any = {};
+  currentDocTypeID: string;
+
   constructor(
     private firmDetailsService: FirmDetailsService,
     private reportScheduleService: ReportScheduleService,
@@ -208,7 +213,7 @@ export class ReportingScheduleViewComponent {
         this.reportScheduleService.getReportPeriodTypes().subscribe({
           next: (reportPeriodTypes) => {
             this.reportPeriodTypes = reportPeriodTypes.response;
-    
+
             // Loop through each report and fetch regulator period types based on DocTypeID
             this.filteredFirmRptDetails.forEach(report => {
               this.loadRptPeriodTypesForReport(report);
@@ -1800,7 +1805,7 @@ export class ReportingScheduleViewComponent {
 
     currentOpType = isWritableMode ? (this.isCreateReportingSch ? ObjectOpType.Create : ObjectOpType.Edit) : ObjectOpType.ListView;
 
-    this.firmDetailsService.applyAppSecurity(this.userId, this.Page.ReportingSchedule, currentOpType,null,null).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, this.Page.ReportingSchedule, currentOpType, null, null).then(() => {
       if (this.firmType == constants.TEXT_TWO) {
         if (!this.isFirmAMLSupervisor) {
           this.hideActionButton();
@@ -1820,27 +1825,6 @@ export class ReportingScheduleViewComponent {
 
       this.registerMasterPageControlEvents();
       this.userHasRestrictedAccess();
-      // if (this.firmType === constants.TEXT_TWO) {
-      //   if (this.isFirmAMLSupervisor) {
-
-      //     this.reportType = constants.TEXT_THREE;
-      //   }
-      //   if ((this.isFirmAMLSupervisor) == false) {
-      //     this.canPublish = false;
-      //   }
-      // }
-      // else {
-      //   if (this.isFirmSupervisor == false) {
-      //     this.canPublish = false;
-      //   }
-      //   if (this.firmDetailsService.isValidAMLSupervisor()) {
-      //     this.reportType = constants.TEXT_THREE;
-      //   }
-      //   else {
-      //     this.reportType = constants.TEXT_ONE;
-      //   }
-      // }
-      // this.isLoading = false;
     });
   }
 
@@ -1896,6 +1880,43 @@ export class ReportingScheduleViewComponent {
     this.hideExportBtn = false;
     this.isLoading = false;
   }
+
+  openReferencePopup(rpt: any): void {
+    this.currentRpt = rpt;
+    this.currentDocTypeID = rpt.DocTypeID;
+    this.currentDocumentDetails = rpt.documentDetails;
+    this.showReferencePopup = true;
+  }
+
+  onDocumentSelected(selectedDoc: any): void {
+    if (this.currentRpt) {
+      this.currentRpt.documentDetails = {
+        FileName: selectedDoc.FILENAME,
+        DocFileLocation: selectedDoc.FileLoc
+      };
+      this.currentRpt.DocTypeDesc = selectedDoc.DocTypeDesc;
+      this.currentRpt.DocID = selectedDoc.DocID;
+    }
+    this.closeReferencePopup();
+  }
+  
+
+  onDocumentDeselected(): void {
+    if (this.currentRpt) {
+      this.currentRpt.documentDetails = {
+        FileName: '',
+        DocFileLocation: ''
+      };
+      this.currentRpt.DocTypeDesc = '';
+    }
+    this.closeReferencePopup();
+  }
+
+
+  closeReferencePopup(): void {
+    this.showReferencePopup = false;
+  }
+
 
   loadErrorMessages(fieldName: string, msgKey: number, customMessage?: string, placeholderValue?: string, rpt?: any) {
     this.supervisionService.getErrorMessages(fieldName, msgKey, customMessage, placeholderValue, rpt).subscribe(

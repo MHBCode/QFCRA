@@ -32,7 +32,7 @@ export class AdminFeePopupComponent {
   @Output() fundDeleted = new EventEmitter<void>();
 
   userId: number = 10044;
-  isEditable: boolean = false;
+  isEditModeJournal: boolean = false;
   isLoading: boolean = true;
   Page = FrimsObject;
   now = new Date();
@@ -441,7 +441,7 @@ export class AdminFeePopupComponent {
   }
 
   editFee() {
-    this.isEditable = true
+    this.isEditModeJournal = true
   }
   saveFee() {
 

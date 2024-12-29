@@ -5543,50 +5543,50 @@ export class ViewFirmPageComponent implements OnInit {
     }
   }
 
-  getFormReferenceDocuments() {
-    this.isLoading = true;
-    let DocType: number[] = [];
-    if (this.tabIndex === 0) { //Licensed tab
-      if (this.ActivityLicensed[0].ScopeRevNum > 1) {
-        DocType.push(constants.DocumentType.Q13);
-      } else {
-        DocType.push(constants.DocumentType.Q01);
-        DocType.push(constants.DocumentType.Q02);
-      }
-    } else if (this.tabIndex === 1) {
-      if (this.ActivityAuth[0].ScopeRevNum > 1) {
-        DocType.push(constants.DocumentType.Q13);
-      } else {
-        DocType.push(constants.DocumentType.Q02);
-      }
-    }
+  // getFormReferenceDocuments() {
+  //   this.isLoading = true;
+  //   let DocType: number[] = [];
+  //   if (this.tabIndex === 0) { //Licensed tab
+  //     if (this.ActivityLicensed[0].ScopeRevNum > 1) {
+  //       DocType.push(constants.DocumentType.Q13);
+  //     } else {
+  //       DocType.push(constants.DocumentType.Q01);
+  //       DocType.push(constants.DocumentType.Q02);
+  //     }
+  //   } else if (this.tabIndex === 1) {
+  //     if (this.ActivityAuth[0].ScopeRevNum > 1) {
+  //       DocType.push(constants.DocumentType.Q13);
+  //     } else {
+  //       DocType.push(constants.DocumentType.Q02);
+  //     }
+  //   }
 
-    const docTypeString = DocType.join(',');
-    this.logForm.getDocListByFirmDocType(this.firmId, docTypeString).subscribe(data => {
-      this.formReferenceDocs = data.response;
+  //   const docTypeString = DocType.join(',');
+  //   this.logForm.getDocListByFirmDocType(this.firmId, docTypeString).subscribe(data => {
+  //     this.formReferenceDocs = data.response;
 
-      const existingDoc = this.formReferenceDocs.find(doc => doc.FILENAME === this.documentDetails?.FileName);
-      if (existingDoc) {
-        this.selectedDocId = existingDoc.DocID;
-      }
+  //     const existingDoc = this.formReferenceDocs.find(doc => doc.FILENAME === this.documentDetails?.FileName);
+  //     if (existingDoc) {
+  //       this.selectedDocId = existingDoc.DocID;
+  //     }
 
-      console.log('Form Reference Docs: ', this.formReferenceDocs);
-      this.isLoading = false;
-    }, error => {
-      this.formReferenceDocs = []; //reintalize the array if it doesn't exist
-      console.error('Error Fetching Form Reference Docs: ', error);
-      this.isLoading = false;
-    })
-    this.callRefForm = true;
-    setTimeout(() => {
-      const popupWrapper = document.querySelector('.ReferenceFormPopUp') as HTMLElement;
-      if (popupWrapper) {
-        popupWrapper.style.display = 'flex';
-      } else {
-        console.error('Element with class .ReferenceFormPopUp not found');
-      }
-    }, 0)
-  }
+  //     console.log('Form Reference Docs: ', this.formReferenceDocs);
+  //     this.isLoading = false;
+  //   }, error => {
+  //     this.formReferenceDocs = []; //reintalize the array if it doesn't exist
+  //     console.error('Error Fetching Form Reference Docs: ', error);
+  //     this.isLoading = false;
+  //   })
+  //   this.callRefForm = true;
+  //   setTimeout(() => {
+  //     const popupWrapper = document.querySelector('.ReferenceFormPopUp') as HTMLElement;
+  //     if (popupWrapper) {
+  //       popupWrapper.style.display = 'flex';
+  //     } else {
+  //       console.error('Element with class .ReferenceFormPopUp not found');
+  //     }
+  //   }, 0)
+  // }
 
 
   closeFormReference() {

@@ -2360,7 +2360,7 @@ export class ScopeComponent implements OnInit {
     }
 
     const docTypeString = DocType.join(',');
-    this.logForm.getDocListByFirmDocType(this.firmId, docTypeString).subscribe(data => {
+    this.logForm.getDocListByFirmDocType(this.firmId, docTypeString, this.Page.Scope).subscribe(data => {
       this.formReferenceDocs = data.response;
 
       const existingDoc = this.formReferenceDocs.find(doc => doc.FILENAME === this.documentDetails?.FileName);
