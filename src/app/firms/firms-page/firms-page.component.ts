@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import * as constants from 'src/app/app-constants';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
-import { FirmService } from '../firm.service';
+import { FirmService } from 'src/app/ngServices/firm.service';
 
 @Component({
   selector: 'firms-page',
@@ -608,12 +608,12 @@ getauthorisationStatus(): void {
 
   applySecurityOnPage(objectId: FrimsObject) {
     const currentOpType = ObjectOpType.Create;
-    this.applyAppSecurity(this.userId, objectId, currentOpType);
+    this.applyAppSecurity(this.userId, objectId, currentOpType,null,null);
   }
 
-  applyAppSecurity(userId: number, objectId: number, OpType: number): Promise<void> {
+  applyAppSecurity(userId: number, objectId: number, OpType: number, WfStatus?: number, objectInstanceId?: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.securityService.getAppRoleAccess(userId, objectId, OpType).subscribe(
+      this.securityService.getAppRoleAccess(userId, objectId, OpType, WfStatus, objectInstanceId).subscribe(
         (response) => {
           this.controlsPermissions = response.response;
           resolve(); // Resolve the promise after fetching data

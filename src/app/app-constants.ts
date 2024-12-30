@@ -941,3 +941,11 @@ export enum FirmUserMessages
     FirmUser_Updated = 8209,
     FirmUser_Deleted = 8210
 }
+
+export enum WorkFlowStatusType
+{
+    InProgress = 1,
+    Completed = 2,
+    Returned = 3,
+    Cancelled=4,
+}

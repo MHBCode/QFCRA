@@ -1,6 +1,6 @@
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
-import { FirmService } from '../firm.service';
+import { FirmService } from 'src/app/ngServices/firm.service';
 
 @Component({
   selector: 'firms-list',

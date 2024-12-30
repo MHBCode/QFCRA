@@ -44,13 +44,10 @@
 
 
 .subject-table {
-    border-radius: 15px;
-}
-
-.subject-table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
+    border-radius: 0px;
 }
 
 .subject-table td {

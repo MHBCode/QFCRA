@@ -1,7 +1,8 @@
 <app-loader *ngIf="isLoading"></app-loader>
 <!-- view & Edit popup  -->
 <div class="overlay">
-  <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+  <div class="popupcontainer Rptpopupcontainer NoAnimationPopup" style="display:block" (click)="$event.stopPropagation()">
+
     <!-- Title -->
     <div class="popup-title-btn-row">
       <div class="popup-header">
@@ -9,33 +10,30 @@
           Submission Details
         </h3>
       </div>
-      <!-- Save and Cancel Buttons -->
       <button class="close-button  close-icon" (click)="onClose()">
         <i class="bi bi-x-circle"></i>
       </button>
     </div>
+
     <div class="reporting-schedule-form" *ngIf="AdminFeeDetials?.length > 0">
       <div class="inputs-row">
         <div class="input-field">
           <label for="FirmName">Firm Name</label>
-          <input type="text" id="FirmName" name="FirmName" [(ngModel)]="AdminFeeDetials[0].FirmName"
-            disabled />
+          <input type="text" id="FirmName" name="FirmName" [(ngModel)]="AdminFeeDetials[0].FirmName" disabled />
         </div>
         <div class="input-field">
           <label for="QFCNumber">QFC Number </label>
 
-          <input type="text" id="QFCNumber" name="QFCNumber" [(ngModel)]="AdminFeeDetials[0].QFCNum"
-          disabled />
+          <input type="text" id="QFCNumber" name="QFCNumber" [(ngModel)]="AdminFeeDetials[0].QFCNum" disabled />
         </div>
         <div class="input-field">
           <label for="ReportName">Report Name</label>
-          <input type="text" id="ReportName" name="ReportName" [(ngModel)]="AdminFeeDetials[0].RptName"
-          disabled />
+          <input type="text" id="ReportName" name="ReportName" [(ngModel)]="AdminFeeDetials[0].RptName" disabled />
         </div>
         <div class="input-field">
           <label for="ReportDueDate">Report Due Date</label>
           <input type="text" id="ReportDueDate" name="ReportDueDate" [(ngModel)]="AdminFeeDetials[0].FirmRptDueDate"
-          disabled />
+            disabled />
         </div>
         <div class="input-field">
           <label for="ReportingPeriodStartDate">Reporting Period Start Date</label>
@@ -50,7 +48,7 @@
         <div class="input-field">
           <label for="MateriallyCompleteReportReceivedDate">Materially Complete Report Received Date</label>
           <input type="text" id="MateriallyCompleteReportReceivedDate" name="MateriallyCompleteReportReceivedDate"
-            [(ngModel)]="AdminFeeDetials[0].FirstMateriallyCompleteRptReceivedDate" disabled/>
+            [(ngModel)]="AdminFeeDetials[0].FirstMateriallyCompleteRptReceivedDate" disabled />
         </div>
 
 
@@ -109,8 +107,8 @@
               <td></td>
               <td></td>
               <td></td>
-              <td>Total Days Overdue</td>
-              <td>{{totalLateDays}}</td>
+              <td class="bold-text">Total Days Overdue</td>
+              <td class="bold-text">{{totalLateDays}}</td>
               <td></td>
             </tr>
           </tbody>
@@ -123,38 +121,37 @@
         <ng-container>
           <div class="inputs-row report-entry">
             <div class="input-field">
-              <label for="required">
+              <label class="bold-text" for="required">
                 Impose an administrative fee on the firm for late or materially incomplete submission?
               </label>
-              <ng-container>
-                <div style="display: flex; align-items: center">
+              <ng-container *ngIf="isEditModeJournal; else required">
+                <div class="required-container">
                   <input type="radio" [(ngModel)]="AdminFeeDetials[0].feeImposed" id="isRequiredYes"
-                    [disabled]="!isEditable" name="IsRequired" [value]="true"
-                    style="margin-right: 10px; cursor: pointer" />
-                  <label for="isRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
+                    [disabled]="!isEditModeJournal" name="IsRequired" [value]="true" />
+                  <label for="isRequiredYes">Yes</label>
 
                   <input type="radio" [(ngModel)]="AdminFeeDetials[0].feeImposed" id="isRequiredNo"
-                    [disabled]="!isEditable" name="IsRequired" [value]="false" style="
-                        margin-left: 20px;
-                        margin-right: 10px;
-                        cursor: pointer;
-                      " />
-                  <label for="isRequiredNo" style="margin-left: 5px; color: #413b3c">No</label>
+                    [disabled]="!isEditModeJournal" name="IsRequired" [value]="false" />
+                  <label for="isRequiredNo">No</label>
                 </div>
               </ng-container>
+
+              <ng-template #required>
+                <p>{{AdminFeeDetials[0].feeImposed ? 'Yes' : 'No'}}</p>
+              </ng-template>
             </div>
 
             <div class="input-field">
               <label for="Rulesunderwhichfeeisbeingimposed">Rules under which fee is being imposed</label>
-              <input type="text" [disabled]="!isEditable" id="Rulesunderwhichfeeisbeingimposed"
+              <input type="text" [disabled]="!isEditModeJournal" id="Rulesunderwhichfeeisbeingimposed"
                 name="Rulesunderwhichfeeisbeingimposed" [(ngModel)]="AdminFeeDetials[0].ruleDesc" />
             </div>
 
             <div class="input-field">
-              <label for="CalculatedFee">Calculated Fee</label>
+              <label class="bold-text" for="CalculatedFee">Calculated Fee</label>
               <ng-container>
-                <div *ngIf="isEditable; else view">
-                  <input type="text" [disabled]="!isEditable" name="CalculatedFee"
+                <div *ngIf="isEditModeJournal; else view">
+                  <input type="text" [disabled]="!isEditModeJournal" name="CalculatedFee"
                     [value]="AdminFeeDetials[0].CalculatedAmountCurrencyTypeDesc +' ' + AdminFeeDetials[0].CalculatedAmount" />
                 </div>
 
@@ -167,9 +164,9 @@
               </ng-template>
             </div>
             <div class="input-field notes">
-              <label for="notes">Recommendation :</label>
+              <label class="bold-text" for="notes">Recommendation</label>
               <div>
-                <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="AdminFeeDetials[0].Recommendation"
+                <ckeditor *ngIf="isEditModeJournal; else notes" [(ngModel)]="AdminFeeDetials[0].Recommendation"
                   [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
               </div>
               <ng-template #notes>
@@ -178,21 +175,19 @@
               </ng-template>
             </div>
             <div class="input-field">
-              <label for="CalculatedFee">Fee to be imposed</label>
-              <input type="text" [disabled]="!isEditable" name="CalculatedFee"
-                [value]="AdminFeeDetials[0].ImposedAmountCurrencyTypeDesc +' ' + AdminFeeDetials[0].ImposedAmount" />
+              <label class="bold-text" for="CalculatedFee">Fee to be imposed</label>
+              <p>{{AdminFeeDetials[0].ImposedAmountCurrencyTypeDesc + ' ' + AdminFeeDetials[0].ImposedAmount}}</p>
             </div>
             <div class="input-field notes">
-              <label for="Justification">Justification for fee to be imposed (if different from calculated fee)
-                :</label>
-              <p [innerHTML]="sanitizeHtml(AdminFeeDetials[0].Justification)">
-              </p>
+              <label class="bold-text" for="Justification">Justification for fee to be imposed (if different from
+                calculated fee)</label>
+              <p [innerHTML]="sanitizeHtml(AdminFeeDetials[0].Justification)"></p>
             </div>
           </div>
         </ng-container>
       </div>
 
-      <app-review [fee]="fee" [firmId]="firmId" [firmDetails]="firmDetails" [isEditable]="isEditable"
+      <app-review [fee]="fee" [firmId]="firmId" [firmDetails]="firmDetails" [isEditable]="isEditModeJournal"
         [pageName]="Page.LateAdminFee" [Review]="UserObjectWfTasks">
       </app-review>
 
@@ -287,26 +282,47 @@
           <i class="bi bi-file-earmark-text"></i> Export to word
         </button>
 
-        <button (click)="editFee()" *ngIf="!hideEditBtn">
+        <button (click)="editFee()" *ngIf="!hideEditBtn && getControlVisibility('imgBtnEdit')"
+        [disabled]="getControlEnablement('imgBtnEdit')">
           <i class="bi bi-pen"></i> Edit
         </button>
 
-        <button (click)="saveFee()" *ngIf="!hideSaveBtn">
+        <button *ngIf="!hideDeleteBtn">
+          Delete
+        </button>
+
+        <button (click)="saveFee()" *ngIf="!hideSaveBtn && getControlVisibility('imgBtnSave')"
+        [disabled]="getControlEnablement('imgBtnSave')">
           Save
+        </button>
+
+        <button *ngIf="!hideCancelBtn && getControlVisibility('imgBtnCancel')"
+        [disabled]="getControlEnablement('imgBtnCancel')">
+          Cancel
+        </button>
+
+        <button *ngIf="!hideStartWfBtn && getControlVisibility('imgBtnStartWF')"
+        [disabled]="getControlEnablement('imgBtnStartWF')">
+          Start Workflow
+        </button>
+
+        <button *ngIf="!hideCancelWfBtn && getControlVisibility('imgBtnCancelWF')"
+        [disabled]="getControlEnablement('imgBtnCancelWF')">
+          Cancel Workflow
         </button>
 
       </div>
     </div>
   </div>
 
-  <div *ngIf="showCalculatedFeePopup" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4>{{ CalculatedFee.CalculatedFeeFormula }}</h4>
-      </div>
-      <div class="btn">
-        <button class="close-button" (click)="closeCalculatedFeePopup()">Cancel</button>
-      </div>
+  <div *ngIf="showCalculatedFeePopup" class="overlay show"></div>
+  <div *ngIf="showCalculatedFeePopup" class="calculatedFeePopup popupcontainer">
+    <i class="bi bi-x-circle close-icon" (click)="closeCalculatedFeePopup()"></i>
+    <div class="popup-content">
+      <h3>{{ CalculatedFee.CalculatedFeeFormula }}</h3>
+    </div>
+    <div class="popup-operations-place">
+      <button class="subbutton" (click)="closeCalculatedFeePopup()">Close</button>
     </div>
   </div>
 

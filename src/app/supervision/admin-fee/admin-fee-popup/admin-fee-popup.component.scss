@@ -1,209 +1,253 @@
-.popupcontainer .input-field{
-    width: 31%;
+.popupcontainer .fullwidth {
+  width: 100%;
 }
-.popupcontainer .fullwidth{
-    width: 100%;
-}
+
 .popupcontainer .inputs-row {
-    gap: 3.5%;
-    justify-content: flex-start;
-    padding: 0px;
+  padding: 0px;
 }
+
+.popup-header {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #a51e36;
+}
+
+.popup-header h3 {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  border-bottom: 0 !important;
+  width: auto !important;
+}
+
 .rpt-list {
-    margin: 10px 0px;
+  margin: 10px 0px;
 }
+
 .rpt-list .inputs-row.report-entry.border-style {
-    margin-top: 10px;
-    border-top: 1px solid #a51e36;
-    padding-top: 10px !important;
+  margin-top: 10px;
+  border-top: 1px solid #a51e36;
+  padding-top: 10px !important;
 }
 
 .popupcontainer.Rptpopupcontainer {
-    max-height: 97vh;
+  max-height: 97vh;
+  width: 95vw;
 }
+
 .disabled {
-    background-color: #f9f9f9;
-    pointer-events: none;
-    opacity: 0.6;
-  }
+  background-color: #f9f9f9;
+  pointer-events: none;
+  opacity: 0.6;
+}
 
 .addSubFunsdBtn {
-    background-color: #A51E36;
-    color: white;
-    cursor: default;
+  background-color: #A51E36;
+  color: white;
+  cursor: default;
 }
+
 .addSubFunsdBtn {
-    background: #ac112d;
-    color: white;
-    border: none;
-    font-size: 15px;
-    padding: 5px;
-    border-radius: 7px;
-    margin-right: 10px;
+  background: #ac112d;
+  color: white;
+  border: none;
+  font-size: 15px;
+  padding: 5px;
+  border-radius: 7px;
+  margin-right: 10px;
 }
 
 .add-sub-funds-btn-container {
-    width: 13%;
-    display: flex;
-    justify-content: flex-end;
-    ;
-    margin-bottom: 10px;
+  width: 13%;
+  display: flex;
+  justify-content: flex-end;
+  ;
+  margin-bottom: 10px;
 }
+
 .del-address-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.RmvTrashBtn {
+  background: red;
+  color: white;
+  border: none;
+  font-size: 15px;
+  padding: 5px 10px;
+  border-radius: 7px;
+}
+
+
+.notes {
+  width: 100% !important;
+
+  >div {
     width: 100%;
-    display: flex;
-    justify-content: flex-end;
   }
-  .RmvTrashBtn {
-    background: red;
-    color: white;
-    border: none;
-    font-size: 15px;
-    padding: 5px 10px;
-    border-radius: 7px;
+}
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  /* Darker overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  /* Brighter background */
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+  /* Add shadow for better focus */
+  border-radius: 12px;
+  /* Smoother corners */
+  width: 40%;
+  /* Slightly wider */
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 25px;
+  /* Increased padding */
+  animation: fadeIn 0.3s ease-in-out;
+  /* Add a fade-in animation */
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h3 {
+    font-size: 1.5rem;
+    /* Larger heading */
+    font-weight: 600;
+    /* Slightly bolder */
+    color: #333;
+    /* Neutral color for contrast */
+  }
+}
+
+.revisions-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  /* Adjusted gap */
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  /* Allow wrapping for smaller screens */
+}
+
+.revision-item {
+  cursor: pointer;
+  color: rgb(184, 57, 57);
+  text-decoration: underline;
+  font-weight: bold;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: darkred;
+    transform: scale(1.1);
+    /* Slight zoom on hover */
+  }
+}
+
+
+.infocircle {
+  cursor: pointer;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.contact-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.contact-table th,
+.contact-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.contact-table th {
+  background-color: #f4f4f4;
+}
+
+.fund-status-table th {
+  text-align: center;
+}
+
+.required-container {
+  display: flex;
+  gap: 1rem;
+}
+
+.bold-text {
+  font-weight: bold;
+}
+
+.overlay {
+  z-index: 101!important;
+}
+
+.calculatedFeePopup {
+  width: 40vw !important;
+  z-index: 101!important;
+  .popup-operations-place {
+    text-align: center!important;
   }
 
-
-  .notes {
-    width: 100% !important;
-    > div{
-        width:100%;
-    }
-   }
-
-
-   .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7); /* Darker overlay */
+  .popup-content {
     display: flex;
     justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    background-color: #ffffff; /* Brighter background */
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); /* Add shadow for better focus */
-    border-radius: 12px; /* Smoother corners */
-    width: 40%; /* Slightly wider */
-    max-height: 80vh;
-    overflow-y: auto;
-    padding: 25px; /* Increased padding */
-    animation: fadeIn 0.3s ease-in-out; /* Add a fade-in animation */
-  }
-  
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  
-    h3 {
-      font-size: 1.5rem; /* Larger heading */
-      font-weight: 600; /* Slightly bolder */
-      color: #333; /* Neutral color for contrast */
-    }
-  }
-  
-  .revisions-container {
-    display: flex;
-    justify-content: center;
-    gap: 30px; /* Adjusted gap */
-    margin-bottom: 20px;
-    flex-wrap: wrap; /* Allow wrapping for smaller screens */
-  }
-  
-  .btn {
-    display: flex; /* Flex for alignment */
-    justify-content: center; /* Center button */
-    margin-top: 10px;
-  }
-  
-  .revision-item {
-    cursor: pointer;
-    color: rgb(184, 57, 57);
-    text-decoration: underline;
-    font-weight: bold;
-    transition: color 0.3s ease;
-  
-    &:hover {
-      color: darkred;
-      transform: scale(1.1); /* Slight zoom on hover */
-    }
-  }
-  
-  .close-button {
-    background-color: #a43030;
-    color: white;
-    border: none;
-    padding: 4px 8px; /* Smaller padding */
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85rem; /* Smaller font size */
-    display: block;
     text-align: center;
-    margin: 0 auto;
-    transition: background-color 0.3s ease;
-  
-    &:hover {
-      background-color: #871c1c; /* Darker shade on hover */
-    }
-  }
-  .infocircle{
-    cursor: pointer;
   }
 
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-  
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .close-button {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-  }
-  
-  .contact-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .contact-table th, .contact-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
-  .contact-table th {
-    background-color: #f4f4f4;
-  }
+}
+
+
+

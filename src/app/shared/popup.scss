@@ -17,6 +17,7 @@
     display: none;
     z-index: 100;
     border-radius: 10px;
+    animation: fadeIn 0.3s ease-in-out;
 
 
     .popup-info-place {
@@ -79,4 +80,8 @@
 
 .fullwidth {
     width: 100%;
+}
+
+.NoAnimationPopup {
+    animation: none!important;
 }

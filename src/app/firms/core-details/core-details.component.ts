@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SecurityService } from 'src/app/ngServices/security.service';
-import { FirmService } from '../firm.service';
+import { FirmService } from 'src/app/ngServices/firm.service';
 import { AddressesService } from 'src/app/ngServices/addresses.service';
 import * as constants from 'src/app/app-constants';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
@@ -309,7 +309,6 @@ export class CoreDetailsComponent implements OnInit {
     this.isLoading = true;
     const currentOpType = Mode ? ObjectOpType.Edit : ObjectOpType.View;
 
-    // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
     this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
       let firmType = this.firmDetails?.FirmTypeID;
 
@@ -1560,7 +1559,7 @@ export class CoreDetailsComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
-        console.error('Error deleting RegisteredFund', error);
+        console.error('Error Fetching Document Types for core', error);
       },
     });
   }

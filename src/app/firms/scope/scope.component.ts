@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildr
 import { LogformService } from 'src/app/ngServices/logform.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { FirmDetailsService } from '../firmsDetails.service';
-import { FirmService } from '../firm.service';
+import { FirmService } from 'src/app/ngServices/firm.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
@@ -92,6 +92,7 @@ export class ScopeComponent implements OnInit {
   activityCategories: any[] = [];
   activityTypes: any[] = [];
   subActivities: any[] = [];
+  currentParentActivity: any;
   existingRegulatedActivites: any = [];
   callLicScopePrev: boolean = false;
   callAuthScopePrev: boolean = false;
@@ -236,8 +237,7 @@ export class ScopeComponent implements OnInit {
       currentOpType = isWritableMode ? (this.isCreateModeAuth ? ObjectOpType.Create : ObjectOpType.Edit) : ObjectOpType.View;
     }
 
-    // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
       let firmType = this.firmDetails.FirmTypeID;
 
       if (this.ValidFirmSupervisor) {
@@ -1662,8 +1662,11 @@ export class ScopeComponent implements OnInit {
     }
   }
 
-  showSubActivitiesPopup(subActivities: any) {
-    this.callSubActivity = true;
+  showSubActivitiesPopup(subActivities: any[], parentActivity: any) {
+    this.subActivities = subActivities; // Assign the sub-activities
+    this.currentParentActivity = parentActivity; // Store the parent activity
+    this.callSubActivity = true; // Show the popup
+
     setTimeout(() => {
       const popupWrapper = document.querySelector('.SubActivitiesPopUp') as HTMLElement;
       if (popupWrapper) {
@@ -2179,133 +2182,39 @@ export class ScopeComponent implements OnInit {
     }
   }
 
-  // onActivityChange(activity: any) {
-  //   const activityTypeID = activity.ActivityTypeID;
-
-  //   this.parentsWithSubActivities = []; // Reset to avoid duplication
-  //   this.tempSelectedSubActivities = {}; // Clear temporary selections for the new activity
-
-  //   if (activityTypeID) {
-  //     console.log('Selected Activity ID:', activityTypeID);
-
-  //     // Check if the activity is a parent
-  //     this.activityService.isParentActivity(activityTypeID).subscribe(response => {
-  //       this.isParentActivity = response.response.Column1;
-
-  //       if (this.isParentActivity) {
-  //         this.selectedSubActivityID = activityTypeID;
-
-  //         // Fetch sub-activities for parent activities
-  //         this.activityService.getSubActivities(activityTypeID).subscribe(subActivityData => {
-  //           this.subActivities = subActivityData.response;
-  //           console.log('Loaded Sub-Activities:', this.subActivities);
-
-  //           if (this.subActivities.length > 0) {
-  //             // Only add to selectedSubActivities if sub-activities are present
-  //             this.selectedSubActivities[activityTypeID] = null; // Initialize for current activity
-
-  //             // Organize parents and children sub-activities
-  //             const parents = this.subActivities.filter(activity => activity.ParentActivityTypeID === null);
-  //             parents.forEach(parent => {
-  //               parent.isExpanded = false; // Control to expand/collapse sub-activities
-  //               parent.subActivities = this.subActivities.filter(
-  //                 sub => sub.ParentActivityTypeID === parent.ActivityTypeID
-  //               );
-  //               this.parentsWithSubActivities.push(parent);
-  //             });
-
-  //             // Display the sub-activities in a popup
-  //             this.showSubActivitiesPopup(this.subActivities);
-  //           }
-  //         }, error => {
-  //           console.error('Error fetching sub-activities:', error);
-  //         });
-  //       }
-
-  //       // Fetch products for the selected activity
-  //       this.activityService.getAllProducts(activityTypeID).subscribe(
-  //         data => {
-  //           const products = data.response;
-
-  //           // If no products are returned, set categorizedProducts to null
-  //           if (!products || products.length === 0) {
-  //             activity.categorizedProducts = null;
-  //             console.log('No products found for the selected activity.');
-  //             return;
-  //           }
-
-  //           // Reset categorizedProducts to load new products
-  //           activity.categorizedProducts = [];
-  //           let currentCategory = null;
-
-  //           // Iterate through the products and categorize them
-  //           products.forEach(product => {
-  //             if (product.ID === 0) {
-  //               // If it's a main category, start a new group
-  //               currentCategory = {
-  //                 mainCategory: product.ProductCategoryTypeDesc,
-  //                 subProducts: []
-  //               };
-  //               activity.categorizedProducts.push(currentCategory);
-  //             } else if (currentCategory) {
-  //               const subProduct = { ...product }; // Copy product details
-
-  //               // Uncheck the product by default when loading
-  //               subProduct.isChecked = false;
-  //               subProduct.firmScopeTypeID = 1; // Default firmScopeTypeID
-
-  //               // Add the subProduct to the current category
-  //               currentCategory.subProducts.push(subProduct);
-  //             }
-  //           });
-
-  //           console.log('Loaded Products for Activity:', activity.categorizedProducts);
-  //         },
-  //         error => {
-  //           // If an error occurs, set categorizedProducts to null
-  //           console.error('Error fetching products for ActivityTypeID', error);
-  //           activity.categorizedProducts = null;
-  //         }
-  //       );
-  //     });
-  //   } else {
-  //     // If no activity is selected, clear the products
-  //     activity.categorizedProducts = null;
-  //   }
-  // }
 
   onActivityChange(activity: any) {
     const activityTypeID = activity.ActivityTypeID;
-  
+
     if (activityTypeID) {
       console.log('Selected Activity ID:', activityTypeID);
-  
-      // Clear previous data
+
+      // Clear existing products and sub-activity selection
       activity.categorizedProducts = [];
       activity.selectedSubActivity = null;
-  
-      // Check if the activity is a parent or not
+
+      // Check if the activity is a parent
       this.activityService.isParentActivity(activityTypeID).pipe(
         switchMap(response => {
           this.isParentActivity = response.response.Column1;
-  
+
           if (this.isParentActivity) {
-            // If it's a parent, load sub-activities
+            // If parent activity, fetch sub-activities
             return this.activityService.getSubActivities(activityTypeID);
           } else {
-            // If it's not a parent, load products
+            // If not a parent, fetch products
             return this.activityService.getAllProducts(activityTypeID);
           }
         })
       ).subscribe(
         data => {
           if (this.isParentActivity) {
-            // Handle parent activity by showing sub-activities
+            // Show sub-activities in a popup
             this.subActivities = data.response.map(sub => ({ ...sub, isSelected: false }));
             console.log('Loaded Sub-Activities:', this.subActivities);
-            this.showSubActivitiesPopup(this.subActivities);
+            this.showSubActivitiesPopup(this.subActivities, activity);
           } else {
-            // Handle non-parent activity by loading and categorizing products
+            // Display products for non-parent activity
             activity.categorizedProducts = this.categorizeProducts(data.response);
             console.log('Categorized Products:', activity.categorizedProducts);
           }
@@ -2317,30 +2226,7 @@ export class ScopeComponent implements OnInit {
       );
     }
   }
-  
 
-  // Fetch and categorize products in a single function
-  // fetchAndCategorizeProducts(activityTypeID: number, activity: any) {
-  //   this.activityService.getAllProducts(activityTypeID).subscribe(
-  //     data => {
-  //       const products = data.response;
-  //       if (!products || products.length === 0) {
-  //         activity.categorizedProducts = [];
-  //         console.log('No products found.');
-  //         return;
-  //       }
-  //       setTimeout(() => {
-  //         activity.categorizedProducts = this.categorizeProducts(products);
-  //         console.log("Updated activity.categorizedProducts with timeout:", activity.categorizedProducts);
-  //       }, 0);
-  //       console.log("Updated activity.categorizedProducts:", activity.categorizedProducts); // Confirm update here
-  //     },
-  //     error => {
-  //       console.error('Error fetching products:', error);
-  //       activity.categorizedProducts = [];
-  //     }
-  //   );
-  // }
 
 
   // Helper function to categorize products
@@ -2361,31 +2247,49 @@ export class ScopeComponent implements OnInit {
         currentCategory.subProducts.push(subProduct);
       }
     });
+
     console.log('Categorized Products:', categorizedProducts);
     return categorizedProducts;
   }
+
 
   selectSubActivity(sub: any) {
     this.subActivities.forEach(activity => activity.isSelected = false); // Clear previous selection
     sub.isSelected = true; // Mark selected sub-activity
     this.selectedSubActivityID = sub.ActivityTypeID; // Track selected sub-activity ID
   }
-  
 
-  confirmSelection(activity: any) {
+
+  confirmSelection() {
     const selectedSubActivity = this.subActivities.find(sub => sub.isSelected);
-  
+
     if (selectedSubActivity) {
-      activity.selectedSubActivity = selectedSubActivity; // Attach the selected sub-activity to the activity
       console.log('Confirmed Sub-Activity:', selectedSubActivity);
-  
-      // Use the `onActivityChange` method to fetch products for the selected sub-activity
-      this.onActivityChange({ ActivityTypeID: selectedSubActivity.ActivityTypeID, ...activity });
+
+      // Fetch products for the selected sub-activity
+      this.activityService.getAllProducts(selectedSubActivity.ActivityTypeID).subscribe(
+        data => {
+          // Update the parent activity with the selected sub-activity and products
+          this.currentParentActivity.selectedSubActivity = selectedSubActivity;
+          this.currentParentActivity.categorizedProducts = this.categorizeProducts(data.response);
+
+          console.log('Updated Parent Activity:', this.currentParentActivity);
+        },
+        error => {
+          console.error('Error fetching products for Sub-Activity:', error);
+          this.currentParentActivity.categorizedProducts = [];
+        }
+      );
     }
-  
-    this.closeSubActivity(); // Close the sub-activity popup
+
+    this.closeSubActivity(); // Close the popup
   }
-  
+
+
+
+
+
+
 
 
 
@@ -2456,7 +2360,7 @@ export class ScopeComponent implements OnInit {
     }
 
     const docTypeString = DocType.join(',');
-    this.logForm.getDocListByFirmDocType(this.firmId, docTypeString).subscribe(data => {
+    this.logForm.getDocListByFirmDocType(this.firmId, docTypeString, this.Page.Scope).subscribe(data => {
       this.formReferenceDocs = data.response;
 
       const existingDoc = this.formReferenceDocs.find(doc => doc.FILENAME === this.documentDetails?.FileName);

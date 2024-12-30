@@ -158,8 +158,7 @@ export class SupervisionViewComponent {
     this.isLoading = true;
     const currentOpType = Mode ? ObjectOpType.Edit : ObjectOpType.View;
 
-    // Apply backend permissions for the current object (e.g., CoreDetail or Scope)
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
       let firmType = this.firmDetails?.FirmTypeID;
 
 
