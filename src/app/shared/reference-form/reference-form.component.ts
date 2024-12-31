@@ -7,17 +7,17 @@ import { LogformService } from 'src/app/ngServices/logform.service';
   styleUrls: ['./reference-form.component.scss', '../../shared/popup.scss']
 })
 export class ReferenceFormComponent implements OnInit {
-  @Input() firmId: number = 0; 
-  @Input() documentDetails: any = {}; 
-  @Input() docTypes: string; 
+  @Input() firmId: number = 0;
+  @Input() documentDetails: any = {};
+  @Input() docTypes: string;
   @Input() Page: number = 0;
   @Output() documentSelected = new EventEmitter<any>();
   @Output() documentDeselected = new EventEmitter<void>();
   @Output() close = new EventEmitter<void>();
 
   selectedDocId: string | null = null;
-  formReferenceDocs: any[] = []; 
-  isLoading: boolean = false; 
+  formReferenceDocs: any[] = [];
+  isLoading: boolean = false;
 
   constructor(private logForm: LogformService) { }
 
@@ -29,25 +29,27 @@ export class ReferenceFormComponent implements OnInit {
     this.isLoading = true;
 
     const docTypeString = this.docTypes;
+    if (docTypeString != "0") {
+      this.logForm.getDocListByFirmDocType(this.firmId, docTypeString, this.Page).subscribe(
+        (data) => {
+          this.formReferenceDocs = data.response || [];
 
-    this.logForm.getDocListByFirmDocType(this.firmId, docTypeString, this.Page).subscribe(
-      (data) => {
-        this.formReferenceDocs = data.response || [];
-
-        const existingDoc = this.formReferenceDocs.find(
-          (doc) => doc.FILENAME === this.documentDetails?.FileName
-        );
-        if (existingDoc) {
-          this.selectedDocId = existingDoc.DocID;
+          const existingDoc = this.formReferenceDocs.find(
+            (doc) => doc.FILENAME === this.documentDetails?.FileName
+          );
+          if (existingDoc) {
+            this.selectedDocId = existingDoc.DocID;
+          }
+          this.isLoading = false;
+        },
+        (error) => {
+          console.error('Error Fetching Form Reference Docs:', error);
+          this.formReferenceDocs = [];
+          this.isLoading = false;
         }
-        this.isLoading = false;
-      },
-      (error) => {
-        console.error('Error Fetching Form Reference Docs:', error);
-        this.formReferenceDocs = [];
-        this.isLoading = false;
-      }
-    );
+      );
+
+    }
     setTimeout(() => {
       const popupWrapper = document.querySelector('.ReferenceFormPopUp') as HTMLElement;
       if (popupWrapper) {
@@ -64,7 +66,7 @@ export class ReferenceFormComponent implements OnInit {
         (doc) => doc.DocID === this.selectedDocId
       );
       if (selectedDoc) {
-        this.documentSelected.emit(selectedDoc); 
+        this.documentSelected.emit(selectedDoc);
         this.closeFormReference();
       } else {
         console.error('Selected document not found.');
@@ -77,12 +79,12 @@ export class ReferenceFormComponent implements OnInit {
 
   deSelectDocument(): void {
     this.selectedDocId = null;
-    this.documentDeselected.emit(); 
+    this.documentDeselected.emit();
     this.closeFormReference();
   }
 
   closeFormReference(): void {
-    this.close.emit(); 
+    this.close.emit();
     const popupWrapper = document.querySelector('.ReferenceFormPopUp') as HTMLElement;
     if (popupWrapper) {
       popupWrapper.style.display = 'none';

@@ -194,4 +194,7 @@ export class WorkflowComponent {
         });
     }
   }
+  StartNextWfTask(){
+    
+  }
 }

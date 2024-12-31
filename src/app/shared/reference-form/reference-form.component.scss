@@ -12,6 +12,10 @@
     padding: 10px;
 }
 
+.overlay {
+    z-index: 100!important ;
+}
+
 .popup-body ul {
     list-style-type: none;
     display: flex;

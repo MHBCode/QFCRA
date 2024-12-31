@@ -107,11 +107,13 @@
   [ReviewRevision]="selectedReviewRevision"
   [review]="selectedReturnreView"
   [firmDetails]="firmDetails"
+  [firmId]="firmId"
   (closeRevPopup)="closePopup()">
 </app-return-review-view>
 <app-return-review-create
 *ngIf="showCreatePopup"
   [firmDetails]="firmDetails"
   [review]="selectedReturnreView"
+  [firmId]="firmId"
   (closeCreatePopup)="closeCreatePopup()">
 </app-return-review-create>

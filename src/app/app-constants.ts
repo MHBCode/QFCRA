@@ -195,6 +195,10 @@ export const  CHAR_COMMA = ',';
  export const  QUERYSTRING_ENFID = "enfiD";
  export const  QUERY_RFID = "rfiD";
  
+ // sharePoint Url 
+ export const sharePointUrl = "https://qfcra365.sharepoint.com/sites/FIRMSUAT/";
+ 
+
 
 export enum FirmLicenseApplStatusType {
     Application = 4,
