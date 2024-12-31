@@ -1,7 +1,8 @@
 <app-loader *ngIf="isLoading"></app-loader>
 <!-- view & Edit popup  -->
 <div class="overlay">
-  <div class="popupcontainer Rptpopupcontainer NoAnimationPopup" style="display:block" (click)="$event.stopPropagation()">
+  <div class="popupcontainer Rptpopupcontainer NoAnimationPopup" style="display:block"
+    (click)="$event.stopPropagation()">
 
     <!-- Title -->
     <div class="popup-title-btn-row">
@@ -124,15 +125,15 @@
               <label class="bold-text" for="required">
                 Impose an administrative fee on the firm for late or materially incomplete submission?
               </label>
-              <ng-container *ngIf="isEditModeJournal; else required">
+              <ng-container *ngIf="isEditModeAdminFee; else required">
                 <div class="required-container">
-                  <input type="radio" [(ngModel)]="AdminFeeDetials[0].feeImposed" id="isRequiredYes"
-                    [disabled]="!isEditModeJournal" name="IsRequired" [value]="true" />
-                  <label for="isRequiredYes">Yes</label>
+                  <input type="radio" [(ngModel)]="AdminFeeDetials[0].feeImposed" id="feeImposedYes"
+                    [disabled]="!isEditModeAdminFee" name="feeImposed" [value]="true" (change)="imposeAnAdministrativeonChange()"/>
+                  <label for="feeImposed">Yes</label>
 
-                  <input type="radio" [(ngModel)]="AdminFeeDetials[0].feeImposed" id="isRequiredNo"
-                    [disabled]="!isEditModeJournal" name="IsRequired" [value]="false" />
-                  <label for="isRequiredNo">No</label>
+                  <input type="radio" [(ngModel)]="AdminFeeDetials[0].feeImposed" id="feeImposedNo"
+                    [disabled]="!isEditModeAdminFee" name="feeImposed" [value]="false" (change)="imposeAnAdministrativeonChange()"/>
+                  <label for="feeImposed">No</label>
                 </div>
               </ng-container>
 
@@ -142,52 +143,68 @@
             </div>
 
             <div class="input-field">
-              <label for="Rulesunderwhichfeeisbeingimposed">Rules under which fee is being imposed</label>
-              <input type="text" [disabled]="!isEditModeJournal" id="Rulesunderwhichfeeisbeingimposed"
-                name="Rulesunderwhichfeeisbeingimposed" [(ngModel)]="AdminFeeDetials[0].ruleDesc" />
+              <label for="imposedRules">Rules under which fee is being imposed</label>
+              <select *ngIf="isEditModeAdminFee; else rules" name="rules" id="rules">
+                <option [value]="0"></option>
+                <option [value]="option.AdminFeeRateID" *ngFor="let option of allAdminFeeRates">{{option.RuleDesc}}
+                </option>
+              </select>
+
+              <ng-template #rules>
+                <input disabled type="text" id="imposedRules" name="imposedRules"
+                  [value]="AdminFeeDetials[0].ruleDesc" />
+              </ng-template>
             </div>
 
             <div class="input-field">
               <label class="bold-text" for="CalculatedFee">Calculated Fee</label>
-              <ng-container>
-                <div *ngIf="isEditModeJournal; else view">
-                  <input type="text" [disabled]="!isEditModeJournal" name="CalculatedFee"
-                    [value]="AdminFeeDetials[0].CalculatedAmountCurrencyTypeDesc +' ' + AdminFeeDetials[0].CalculatedAmount" />
-                </div>
-
-
-              </ng-container>
-              <ng-template #view>
-                <span>{{AdminFeeDetials[0].CalculatedAmountCurrencyTypeDesc +' ' +
-                  AdminFeeDetials[0].CalculatedAmount}}&nbsp;&nbsp;<a class="infocircle" (click)="getCalculatedFee()"><i
-                      class="bi bi-info-circle" style="font-size: 1.5rem; color: #0d6efd;"></i></a></span>
-              </ng-template>
+              <span>{{AdminFeeDetials[0].CalculatedAmountCurrencyTypeDesc +' ' +
+                AdminFeeDetials[0].CalculatedAmount}}&nbsp;&nbsp;<a class="infocircle" (click)="getCalculatedFee()"><i
+                    class="bi bi-info-circle" style="font-size: 1.5rem; color: #0d6efd;"></i></a></span>
             </div>
             <div class="input-field notes">
               <label class="bold-text" for="notes">Recommendation</label>
               <div>
-                <ckeditor *ngIf="isEditModeJournal; else notes" [(ngModel)]="AdminFeeDetials[0].Recommendation"
-                  [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+                <ckeditor *ngIf="isEditModeAdminFee; else recommendation"
+                  [(ngModel)]="AdminFeeDetials[0].Recommendation" [editor]="Editor" style="height: 200px;"
+                  [config]="config"></ckeditor>
               </div>
-              <ng-template #notes>
+              <ng-template #recommendation>
                 <p [innerHTML]="sanitizeHtml(AdminFeeDetials[0].Recommendation)">
                 </p>
               </ng-template>
             </div>
             <div class="input-field">
               <label class="bold-text" for="CalculatedFee">Fee to be imposed</label>
-              <p>{{AdminFeeDetials[0].ImposedAmountCurrencyTypeDesc + ' ' + AdminFeeDetials[0].ImposedAmount}}</p>
+              <ng-container *ngIf="isEditModeAdminFee; else imposedFee">
+                <span>
+                  <select [disabled]="!selectedImposedRadio" name="currency" id="currency" [(ngModel)]="AdminFeeDetials[0].ImposedAmountCurrencyTypeID">
+                    <option *ngFor="let option of allCurrencyTypes" [value]="option.CurrencyTypeID">{{option.CurrencyCode}}</option>
+                  </select>
+                  <input [disabled]="!selectedImposedRadio" class="amount" type="text" [(ngModel)]="AdminFeeDetials[0].ImposedAmount">
+                </span>
+              </ng-container>
+
+              <ng-template #imposedFee>
+                <p>{{AdminFeeDetials[0].ImposedAmountCurrencyTypeDesc + ' ' + AdminFeeDetials[0].ImposedAmount}}</p>
+              </ng-template>
             </div>
             <div class="input-field notes">
               <label class="bold-text" for="Justification">Justification for fee to be imposed (if different from
                 calculated fee)</label>
-              <p [innerHTML]="sanitizeHtml(AdminFeeDetials[0].Justification)"></p>
+              <div>
+                <ckeditor *ngIf="isEditModeAdminFee; else justification" [(ngModel)]="AdminFeeDetials[0].Justification"
+                  [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
+              </div>
+              <ng-template #justification>
+                <p [innerHTML]="sanitizeHtml(AdminFeeDetials[0].Justification)"></p>
+              </ng-template>
             </div>
           </div>
         </ng-container>
       </div>
 
-      <app-review [fee]="fee" [firmId]="firmId" [firmDetails]="firmDetails" [isEditable]="isEditModeJournal"
+      <app-review [fee]="fee" [firmId]="firmId" [firmDetails]="firmDetails" [isEditable]="isEditModeAdminFee"
         [pageName]="Page.LateAdminFee" [Review]="UserObjectWfTasks">
       </app-review>
 
@@ -283,7 +300,7 @@
         </button>
 
         <button (click)="editFee()" *ngIf="!hideEditBtn && getControlVisibility('imgBtnEdit')"
-        [disabled]="getControlEnablement('imgBtnEdit')">
+          [disabled]="!getControlEnablement('imgBtnEdit')">
           <i class="bi bi-pen"></i> Edit
         </button>
 
@@ -292,22 +309,22 @@
         </button>
 
         <button (click)="saveFee()" *ngIf="!hideSaveBtn && getControlVisibility('imgBtnSave')"
-        [disabled]="getControlEnablement('imgBtnSave')">
+          [disabled]="!getControlEnablement('imgBtnSave')">
           Save
         </button>
 
-        <button *ngIf="!hideCancelBtn && getControlVisibility('imgBtnCancel')"
-        [disabled]="getControlEnablement('imgBtnCancel')">
+        <button (click)="cancelFee()" class="cancel-btn" *ngIf="!hideCancelBtn && getControlVisibility('imgBtnCancel')"
+          [disabled]="!getControlEnablement('imgBtnCancel')">
           Cancel
         </button>
 
-        <button *ngIf="!hideStartWfBtn && getControlVisibility('imgBtnStartWF')"
-        [disabled]="getControlEnablement('imgBtnStartWF')">
+        <button class="bi bi-arrow-clockwise" *ngIf="!hideStartWfBtn && getControlVisibility('imgBtnStartWF')"
+          [disabled]="!getControlEnablement('imgBtnStartWF')">
           Start Workflow
         </button>
 
         <button *ngIf="!hideCancelWfBtn && getControlVisibility('imgBtnCancelWF')"
-        [disabled]="getControlEnablement('imgBtnCancelWF')">
+          [disabled]="!getControlEnablement('imgBtnCancelWF')">
           Cancel Workflow
         </button>
 

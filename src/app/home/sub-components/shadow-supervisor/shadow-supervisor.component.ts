@@ -16,7 +16,7 @@ import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
   styleUrls: ['./shadow-supervisor.component.scss']
 })
 export class ShadowSupervisorComponent implements OnInit {
-  userId = 30 // must be dynamic
+  userId = 10044 // must be dynamic
   @Input() pageSize: number = 10;
   isLoading: boolean = true;
   ShadowSupervisorTasks: any[] = [];

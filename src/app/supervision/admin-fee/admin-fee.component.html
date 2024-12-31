@@ -53,6 +53,6 @@
 *ngIf="showPopup"
   [fee]="selectedAdminFee"
   [firmDetails]="firmDetails"
-  (closeRegPopup)="closePopup()"
-  (fundDeleted)="loadRegFunds()">
+  (closeAdminFeePopup)="closePopup()"
+  (reloadAdminFee)="loadAdminFees()">
 </app-admin-fee-popup>
