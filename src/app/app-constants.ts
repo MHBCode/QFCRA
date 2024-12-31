@@ -50,6 +50,7 @@ export const authorisedFirmNames = "V_All_Firms_Authorised";
 export const dnfbpsFirmNames = "V_All_Firms_DNFBPs";
 // Admin Fee
 export const firmRptAdminFeeRates = "V_FirmRptAdminFeeRates";
+export const currencyTypes = "V_CurrencyTypes"
 
 // Reporting Schedule
 export const firmRptSubmissionTypes = "V_FirmRptSubmissionTypes";

@@ -170,7 +170,7 @@ export class AdminFeeComponent {
   }
 
   updatePaginatedItems(paginatedItems: any[]): void {
-    this.paginatedItems = paginatedItems; // Update current page items
+    this.paginatedItems = paginatedItems; 
   }
   selectedAdminFee: any;
   openAdminFeePopup(fee: any, firmDetails: any): void {
@@ -180,11 +180,6 @@ export class AdminFeeComponent {
   }
   closePopup(): void {
     this.showPopup = false;
-    this.selectedAdminFee = null; // Reset the selected review
+    this.selectedAdminFee = null; 
   }
-  loadRegFunds() {
-    this.isLoading = true;
-    this.loadAdminFees();
-  }
-
 }

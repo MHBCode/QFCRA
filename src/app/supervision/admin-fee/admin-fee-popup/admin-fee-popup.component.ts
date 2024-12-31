@@ -17,6 +17,7 @@ import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { tap, switchMap, forkJoin } from 'rxjs';
 import { isNullOrUndef } from 'chart.js/dist/helpers/helpers.core';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-admin-fee-popup',
   templateUrl: './admin-fee-popup.component.html',
@@ -28,11 +29,11 @@ export class AdminFeePopupComponent {
   @Input() fee: any;
   @Input() firmId: any;
   @Input() firmDetails: any;
-  @Output() closeRegPopup = new EventEmitter<void>();
-  @Output() fundDeleted = new EventEmitter<void>();
+  @Output() closeAdminFeePopup = new EventEmitter<void>();
+  @Output() reloadAdminFee = new EventEmitter<void>();
 
   userId: number = 10044;
-  isEditModeJournal: boolean = false;
+  isEditModeAdminFee: boolean = false;
   isLoading: boolean = true;
   Page = FrimsObject;
   now = new Date();
@@ -49,6 +50,11 @@ export class AdminFeePopupComponent {
   dayCount: any;
   rptWFStatus: number = 0;
   fetchedDocumentTypes: any[] = [];
+  selectedImposedRadio: boolean = false;
+
+  //dropdowns
+  allAdminFeeRates: any[] = [];
+  allCurrencyTypes: any[] = [];
 
   // Security
   hideEditBtn: boolean = false;
@@ -96,10 +102,8 @@ export class AdminFeePopupComponent {
 
   constructor(
     private supervisionService: SupervisionService,
-    private securityService: SecurityService,
     private route: ActivatedRoute,
     private logForm: LogformService,
-    private registeredFundService: RegisteredfundService,
     private firmDetailsService: FirmDetailsService,
     private objectwfService: ObjectwfService,
     private flatpickrService: FlatpickrService,
@@ -125,6 +129,8 @@ export class AdminFeePopupComponent {
         this.getAdminFeeDetials();
         this.getDocumentTypes();
         this.getMessageProperty();
+        this.populateAdminFeeRates();
+        this.populateCurrencyTypes();
       },
       error: (err) => {
         console.error('Error executing supervisor checks:', err);
@@ -134,7 +140,7 @@ export class AdminFeePopupComponent {
 
 
   onClose(): void {
-    this.closeRegPopup.emit();
+    this.closeAdminFeePopup.emit();
   }
 
   constructLink(): string {
@@ -151,9 +157,11 @@ export class AdminFeePopupComponent {
 
   applySecurityOnPage(objectId: FrimsObject) {
     this.isLoading = true;
-    const currentOpType = ObjectOpType.View;
+    const currentOpType = this.isEditModeAdminFee ? ObjectOpType.Edit : ObjectOpType.View;
     this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType, this.rptWFStatus, this.fee.FirmrptAdminFeeID).then(() => {
-      this.hideButtonAccordinttoUsers();
+      if (!this.isEditModeAdminFee) {
+        this.hideButtonAccordinttoUsers();
+      }
       this.registerMasterPageControlEvents();
     })
     this.isLoading = false;
@@ -230,14 +238,19 @@ export class AdminFeePopupComponent {
   }
 
   registerMasterPageControlEvents() {
-    this.hideDeleteBtn = true;
-    this.hideCancelBtn = true;
-    const firmuser = this.UserSupervisorToTheFirm;
+    if (!this.isEditModeAdminFee) {
+      this.hideDeleteBtn = true;
+      this.hideCancelBtn = true;
+      const firmuser = this.UserSupervisorToTheFirm;
 
-    if (!this.supervisionService.isNullOrEmpty(this.firmId)) {
-      if (this.rptWFStatus == constants.WorkFlowStatusType.InProgress && firmuser) {
-        this.hideCancelWfBtn = false;
+      if (!this.supervisionService.isNullOrEmpty(this.firmId) && !this.isEditModeAdminFee) {
+        if (this.rptWFStatus == constants.WorkFlowStatusType.InProgress && firmuser) {
+          this.hideCancelWfBtn = false;
+        }
       }
+    } else {
+      this.hideExportBtn = true;
+      this.hideCancelBtn = false;
     }
   }
 
@@ -441,9 +454,49 @@ export class AdminFeePopupComponent {
   }
 
   editFee() {
-    this.isEditModeJournal = true
+    this.isEditModeAdminFee = true;
+    this.applySecurityOnPage(this.Page.LateAdminFee);
   }
+
+  cancelFee() {
+    Swal.fire({
+      text: 'Are you sure you want to cancel your changes ?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isEditModeAdminFee = false;
+        this.closeAdminFeePopup.emit();
+        this.applySecurityOnPage(this.Page.LateAdminFee);
+      }
+    });
+  }
+
+  imposeAnAdministrativeonChange(): void {
+    this.selectedImposedRadio = this.AdminFeeDetials[0].feeImposed;
+  }
+
+  populateAdminFeeRates() {
+    this.supervisionService.populateAdminFeeRates(this.userId, constants.ObjectOpType.Create).subscribe(adminFeeRates => {
+      this.allAdminFeeRates = adminFeeRates;
+    }, error => {
+      console.error(error);
+    })
+  }
+
+  populateCurrencyTypes() {
+    this.supervisionService.populateCurrenyTypes(this.userId, constants.ObjectOpType.Create).subscribe(currencyTypes => {
+      this.allCurrencyTypes = currencyTypes;
+    }, error => {
+      console.error(error);
+    })
+  }
+
   saveFee() {
 
   }
+
 }
