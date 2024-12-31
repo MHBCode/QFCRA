@@ -64,4 +64,12 @@ export class ObjectwfService {
     const url = `${this.baseUrlObjectWF}save_update_object_wf_task_status`
     return this.http.post<any>(url, WfTaskDetailsList);
   }
+  updateWfTaskStartStatus(review : any):Observable<any> {
+    const url = `${this.baseUrlObjectWF}update_wf_task_start_status`
+    return this.http.post<any>(url, review);
+  }
+  StartNextWfTask(task : any):Observable<any> {
+    const url = `${this.baseUrlObjectWF}start_next_wf_task`
+    return this.http.post<any>(url, task);
+  }
 }
