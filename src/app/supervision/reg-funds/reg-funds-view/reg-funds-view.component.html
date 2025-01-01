@@ -1,7 +1,7 @@
 <app-loader *ngIf="isLoading"></app-loader>
 <!-- view & Edit popup  -->
 <div class="overlay">
-  <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+  <div class="popupcontainer Rptpopupcontainer NoAnimationPopup" style="display:block" (click)="$event.stopPropagation()">
     <div class="error-messages">
       <p *ngIf="errorMessages['FundType']">
           {{ errorMessages['FundType'] }}

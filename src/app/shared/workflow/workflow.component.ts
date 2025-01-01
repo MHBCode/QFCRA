@@ -35,12 +35,18 @@ export class WorkflowComponent {
   wfTaskList:any;
   ObjectWorkflow:any;
   showCancelWorkflow: boolean = false;
+  wfStartedFlag: boolean = false;
+  now = new Date();
+  currentDate = this.now.toISOString();
+  currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
+  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
       //this.isFirmAuthorised();
     });
     this.initializeWorkflow();
+    console.log("review that send to workflow component", this.review)
   }
   constructor(
     private supervisionService: SupervisionService,
@@ -151,7 +157,44 @@ export class WorkflowComponent {
       }
     });
   }
+  IsNewTask : boolean = false;
   getWorkflowTaskList(){
-       
+       for(let task of this.review){
+         if(this.wfStartedFlag){
+          if(task.objectWFTaskStatusID == 0){
+            this.IsNewTask = true;
+          }
+          if(task.objectWFTaskStatusID != 0){
+            this.wfStartedFlag = true;
+          }
+         }
+       }
+       return this.review
+  }
+  BtnStartWFStartOk_Click(){
+    try{
+
+    }
+    catch(error ){
+
+    }
+  }
+  updateTaskStartStatus(){
+    for(let task of this.review){
+        task.TaskInitiatedBy = this.userId;
+        task.TaskInitiatedDate = this.currentDate;
+        this.objectwfService.updateWfTaskStartStatus(task).subscribe({
+          next: (res) => {
+            console.log("Workflow Updated Successfuly")
+            
+          },
+          error: (error) => {
+            console.error('Error Updating Workflow', error);
+          },
+        });
+    }
+  }
+  StartNextWfTask(){
+    
   }
 }

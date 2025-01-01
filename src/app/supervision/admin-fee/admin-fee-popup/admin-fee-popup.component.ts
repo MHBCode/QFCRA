@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output,ChangeDetectorRef, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectorRef, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { SupervisionService } from '../../supervision.service';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import { LogformService } from 'src/app/ngServices/logform.service';
@@ -7,147 +7,69 @@ import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { ActivatedRoute } from '@angular/router';
 import { RegisteredfundService } from 'src/app/ngServices/registeredfund.service';
 import { Bold, ClassicEditor, Essentials, Font, FontColor, FontSize, Heading, Indent, IndentBlock, Italic, Link, List, MediaEmbed, Paragraph, Table, Undo } from 'ckeditor5';
-import Swal from 'sweetalert2';
-import {ObjectwfService} from 'src/app/ngServices/objectwf.service';
+import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
 import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';
 import { FirmRptAdminFeeService } from 'src/app/ngServices/firm-rpt-admin-fee.service';
 import { SafeHtml } from '@angular/platform-browser';
 import { WaiverService } from 'src/app/ngServices/waiver.service';
-import { ReviewComponent } from 'src/app/shared/review/review.component';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
+import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
+import { tap, switchMap, forkJoin } from 'rxjs';
+import { isNullOrUndef } from 'chart.js/dist/helpers/helpers.core';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-admin-fee-popup',
   templateUrl: './admin-fee-popup.component.html',
-  styleUrls: ['./admin-fee-popup.component.scss','../../../shared/popup.scss', '../../supervision.scss']
+  styleUrls: ['./admin-fee-popup.component.scss', '../../supervision.scss']
 })
 export class AdminFeePopupComponent {
+  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   @Input() fee: any;
   @Input() firmId: any;
   @Input() firmDetails: any;
-  @Output() closeRegPopup = new EventEmitter<void>();
-  @Output() fundDeleted = new EventEmitter<void>();
-  isEditable: boolean = false;
+  @Output() closeAdminFeePopup = new EventEmitter<void>();
+  @Output() reloadAdminFee = new EventEmitter<void>();
+
+  userId: number = 10044;
+  isEditModeAdminFee: boolean = false;
   isLoading: boolean = true;
   Page = FrimsObject;
   now = new Date();
-  totalLateDays : number = 0;
+  totalLateDays: number = 0;
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
-  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
   AdminFeeDetials: any;
-  showCalculatedFeePopup :boolean = false;
+  showCalculatedFeePopup: boolean = false;
   showPreviousCommentsModal: boolean = false;
+  UserObjectWfTasks: any[] = [];
+  ResubmissionHistoryList: any;
+  RevisionCommentsList: any;
+  CalculatedFee: any;
+  dayCount: any;
+  rptWFStatus: number = 0;
+  fetchedDocumentTypes: any[] = [];
+  selectedImposedRadio: boolean = false;
 
-    // Security
-    hideEditBtn: boolean = false;
-    hideSaveBtn: boolean = false;
-    hideCancelBtn: boolean = false;
-    hideCreateBtn: boolean = false;
-    hideDeleteBtn: boolean = false;
-  
-    hideExportBtn: boolean = false;
+  //dropdowns
+  allAdminFeeRates: any[] = [];
+  allCurrencyTypes: any[] = [];
 
-  constructor(
-    private supervisionService: SupervisionService,
-    private securityService: SecurityService,
-    private route: ActivatedRoute,
-    private logForm : LogformService,
-    private registeredFundService: RegisteredfundService,
-    private firmDetailsService: FirmDetailsService,
-    private objectwfService: ObjectwfService,
-    private flatpickrService: FlatpickrService,
-    private sanitizerService: SanitizerService,
-    private firmRptAdminFeeService: FirmRptAdminFeeService,
-    private waiverService : WaiverService,
-  ) {
+  // Security
+  hideEditBtn: boolean = false;
+  hideSaveBtn: boolean = false;
+  hideCancelBtn: boolean = false;
+  hideCreateBtn: boolean = false;
+  hideDeleteBtn: boolean = false;
+  hideStartWfBtn: boolean = false;
+  hideCancelWfBtn: boolean = false;
 
-  }
-  ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.firmId = +params['id'];
-      //this.isFirmAuthorised();
-    });
-    console.log(this.fee)
-    this.getAdminFeeDetials();
-    this.getMessageProperty()
-  }
-  onClose(): void {
-    this.closeRegPopup.emit();
-  }
-  constructLink(): string {
-    if (this.AdminFeeDetials[0]) {
-      return this.AdminFeeDetials[0].LinkToReview +
-        this.firmId +
-        constants.AMPERSAND +
-        constants.QUERYSTRING_SCHEDULEITEMID +
-        constants.CHAR_EQUAL +
-        this.AdminFeeDetials[0].FirmRptSchItemID;
-    }
-    return '';
-  }
-  getAdminFeeDetials(){
-    this.isLoading = true
-    const firmRptFeeID = this.fee.FirmrptAdminFeeID;
-    this.firmRptAdminFeeService.getAdminFeeDetials(firmRptFeeID).subscribe({
-      next: (res) => {
-        this.AdminFeeDetials = res.response;
-        console.log("AdminFeeDetials",this.AdminFeeDetials)
-        this.getResubmissionHistoryList();
-        this.getUserObjectWfTasks();
-        
-      },
-      error: (error) => {
-        console.error('Error fitching AdminFeeDetials', error);
-      },
-    });
-    
-  }
-  ResubmissionHistoryList : any
-  getResubmissionHistoryList(){
-    const firmRptSchItemId = this.fee.FirmRptSchItemID
-    const firmRptReviewId = this.fee.FirmRptReviewID
-    const firmRptReviewRevId = this.fee.FirmRptReviewRevNum
-    const firmRptAdminFeeID = this.fee.FirmrptAdminFeeID
-    this.firmRptAdminFeeService.getResubmissionHistoryList(firmRptSchItemId,firmRptReviewId,firmRptReviewRevId,firmRptAdminFeeID).subscribe({
-      next: (res) => {
-        this.ResubmissionHistoryList = res.response;
-        console.log("ResubmissionHistoryList",this.ResubmissionHistoryList)
-        this.totalLateDays = this.ResubmissionHistoryList.reduce((sum, item) => sum + parseInt(item.noLateDaysForDisplay, 10), 0);
-      },
-      error: (error) => {
-        console.error('Error fitching ResubmissionHistoryList', error);
-      },
-    });
-  }
-  RevisionCommentsList : any;
-  getRevisionCommentsByWaiver(){
-    this.showPreviousCommentsModal = true;
-    const objectWFStatusID = this.fee.ObjectWfStatusID;
-    this.waiverService.getRevisionCommentsByWaiver(objectWFStatusID).subscribe({
-      next: (res) => {
-        this.RevisionCommentsList = res.response;
-        console.log("RevisionCommentsList",this.RevisionCommentsList)
-      },
-      error: (error) => {
-        console.error('Error fitching RevisionCommentsList', error);
-      },
-    });
-  }
-  UserObjectWfTasks : any[]=[];
-  getUserObjectWfTasks(){
-    const ObjectWFStatusID = this.fee.ObjectWfStatusID;
-    this.objectwfService.getUserObjectWfTasks(ObjectWFStatusID).subscribe({
-      next: (res) => {
-        this.UserObjectWfTasks = res.response;
-        console.log("UserObjectWfTasks",this.UserObjectWfTasks)
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error fitching UserObjectWfTasks', error);
-      },
-    });
-  }
+  hideExportBtn: boolean = false;
+
+  FirmAMLSupervisor: boolean = false;
+  UserSupervisorToTheFirm: boolean = false;
+
   public Editor = ClassicEditor;
 
   public config = {
@@ -177,36 +99,348 @@ export class AdminFeePopupComponent {
     ],
     licenseKey: ''
   };
-  sanitizeHtml(html: string): SafeHtml {
-    return this.sanitizerService.sanitizeHtml(html);
+
+  constructor(
+    private supervisionService: SupervisionService,
+    private route: ActivatedRoute,
+    private logForm: LogformService,
+    private firmDetailsService: FirmDetailsService,
+    private objectwfService: ObjectwfService,
+    private flatpickrService: FlatpickrService,
+    private sanitizerService: SanitizerService,
+    private firmRptAdminFeeService: FirmRptAdminFeeService,
+    private waiverService: WaiverService,
+    private dateUtilService: DateUtilService
+  ) {
+
   }
-  CalculatedFee :any;
-  getCalculatedFee(){
-    this.showCalculatedFeePopup = true
-    const adminFeeRateID = this.fee.AdminFeeRateID;
-   
-    const day = parseInt(this.dayCount, 10);
-    this.firmRptAdminFeeService.getCalculatedFee(adminFeeRateID,day).subscribe({
+
+  ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      this.firmId = +params['id'];
+    });
+
+    forkJoin({
+      isUserSupervisor: this.isUserSupervisorToTheFirm(),
+      isValidAMLSupervisor: this.isValidFirmAMLSupervisor()
+    }).subscribe({
+      next: () => {
+        this.loadFirmDetails(this.firmId);
+        this.getAdminFeeDetials();
+        this.getDocumentTypes();
+        this.getMessageProperty();
+        this.populateAdminFeeRates();
+        this.populateCurrencyTypes();
+      },
+      error: (err) => {
+        console.error('Error executing supervisor checks:', err);
+      }
+    });
+  }
+
+
+  onClose(): void {
+    this.closeAdminFeePopup.emit();
+  }
+
+  constructLink(): string {
+    if (this.AdminFeeDetials[0]) {
+      return this.AdminFeeDetials[0].LinkToReview +
+        this.firmId +
+        constants.AMPERSAND +
+        constants.QUERYSTRING_SCHEDULEITEMID +
+        constants.CHAR_EQUAL +
+        this.AdminFeeDetials[0].FirmRptSchItemID;
+    }
+    return '';
+  }
+
+  applySecurityOnPage(objectId: FrimsObject) {
+    this.isLoading = true;
+    const currentOpType = this.isEditModeAdminFee ? ObjectOpType.Edit : ObjectOpType.View;
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType, this.rptWFStatus, this.fee.FirmrptAdminFeeID).then(() => {
+      if (!this.isEditModeAdminFee) {
+        this.hideButtonAccordinttoUsers();
+      }
+      this.registerMasterPageControlEvents();
+    })
+    this.isLoading = false;
+  }
+
+  hideButtonAccordinttoUsers() {
+    let isUserTaskInProgress: boolean = false;
+    const objectWfStatusID = this.AdminFeeDetials[0].ObjectWfStatusID;
+    const docTypeID = this.AdminFeeDetials[0].DocTypeID;
+    const firmTypeID = this.firmDetails.FirmTypeID;
+    let firmuser = this.UserSupervisorToTheFirm;
+    let bShowButton = false;
+
+    if (!this.supervisionService.isNullOrEmpty(objectWfStatusID)) {
+      const obj = this.UserObjectWfTasks.filter(item => item.wfTaskAssignedToUser === this.userId && item.objectWFStatusTypeID === 1);
+      if (obj !== null && obj.length > 0) {
+        isUserTaskInProgress = true;
+      }
+    }
+
+    if (!this.supervisionService.isNullOrEmpty(docTypeID)) {
+      if (this.FirmAMLSupervisor) {
+        if (this.fetchedDocumentTypes.length > 0 && this.fetchedDocumentTypes.hasOwnProperty(docTypeID)) {
+          bShowButton = true;
+          firmuser = true;
+        } else {
+          bShowButton = false;
+        }
+
+        if (!bShowButton && isUserTaskInProgress) {
+          this.hideActionButton();
+        }
+      }
+      else if (firmuser && firmTypeID == 2) {
+        if (this.fetchedDocumentTypes.length > 0 && this.fetchedDocumentTypes.hasOwnProperty(docTypeID)) {
+          bShowButton = false;
+        } else {
+          bShowButton = true;
+        }
+
+        if (!bShowButton && !isUserTaskInProgress) {
+          this.hideActionButton();
+        }
+      } else if (firmuser == false) {
+        if (!this.supervisionService.isNullOrEmpty(objectWfStatusID)) {
+          if (isUserTaskInProgress) {
+
+          } else if (firmuser) {
+
+          } else {
+            this.hideActionButton();
+          }
+        } else {
+          this.hideActionButton();
+        }
+      }
+    } else if (firmuser === false) {
+      if (!this.supervisionService.isNullOrEmpty(objectWfStatusID)) {
+        if (isUserTaskInProgress) {
+
+        } else if (firmuser) {
+
+        } else {
+          this.hideActionButton();
+        }
+      } else {
+        this.hideActionButton();
+      }
+    }
+
+    if (this.rptWFStatus == constants.WorkFlowStatusType.InProgress && firmuser) {
+      this.hideCancelWfBtn = false;
+    }
+  }
+
+  registerMasterPageControlEvents() {
+    if (!this.isEditModeAdminFee) {
+      this.hideDeleteBtn = true;
+      this.hideCancelBtn = true;
+      const firmuser = this.UserSupervisorToTheFirm;
+
+      if (!this.supervisionService.isNullOrEmpty(this.firmId) && !this.isEditModeAdminFee) {
+        if (this.rptWFStatus == constants.WorkFlowStatusType.InProgress && firmuser) {
+          this.hideCancelWfBtn = false;
+        }
+      }
+    } else {
+      this.hideExportBtn = true;
+      this.hideCancelBtn = false;
+    }
+  }
+
+  isValidFirmAMLSupervisor() {
+    return this.firmDetailsService.isValidFirmAMLSupervisor(this.firmId, this.userId).pipe(
+      tap(response => this.FirmAMLSupervisor = response)
+    );
+  }
+
+  isUserSupervisorToTheFirm() {
+    return this.firmDetailsService.isUserSupervisorToTheFirm(this.firmId, this.userId).pipe(
+      tap(response => this.UserSupervisorToTheFirm = response)
+    );
+  }
+
+  getControlVisibility(controlName: string): boolean {
+    return this.firmDetailsService.getControlVisibility(controlName);
+  }
+
+  getControlEnablement(controlName: string): boolean {
+    return this.firmDetailsService.getControlEnablement(controlName);
+  }
+
+  hideActionButton() {
+    this.hideEditBtn = true;
+    this.hideSaveBtn = true;
+    this.hideCancelBtn = true;
+    this.hideCreateBtn = true;
+    this.hideDeleteBtn = true;
+    this.hideStartWfBtn = true;
+    this.hideCancelWfBtn = true;
+  }
+
+  loadFirmDetails(firmId: number) {
+    this.firmDetailsService.loadFirmDetails(firmId).subscribe(
+      data => {
+        this.firmDetails = data.firmDetails;
+      },
+      error => {
+        console.error(error);
+      }
+    );
+  }
+
+  getAdminFeeDetials() {
+    this.isLoading = true;
+    const firmRptFeeID = this.fee.FirmrptAdminFeeID;
+
+    this.firmRptAdminFeeService.getAdminFeeDetials(firmRptFeeID).pipe(
+      tap(res => {
+        this.AdminFeeDetials = res.response;
+        this.AdminFeeDetials.forEach(data => {
+          data.FirmRptDueDate = this.dateUtilService.formatDateToCustomFormat(data.FirmRptDueDate);
+          data.RptPeriodFromDate = this.dateUtilService.formatDateToCustomFormat(data.RptPeriodFromDate);
+          data.RptPeriodToDate = this.dateUtilService.formatDateToCustomFormat(data.RptPeriodToDate);
+        });
+        this.getResubmissionHistoryList();
+        this.getUserObjectWfTasks();
+      }),
+      switchMap(() => {
+        return this.objectwfService.getObjectInstanceWorkflowStatus(
+          this.Page.LateAdminFee,
+          this.fee.FirmrptAdminFeeID,
+          constants.TEXT_ONE
+        );
+      })
+    ).subscribe({
+      next: data => {
+        this.rptWFStatus = data.response;
+        this.applySecurityOnPage(this.Page.LateAdminFee);
+      },
+      error: error => {
+        console.error('Error in processing workflow or applying security:', error);
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
+  }
+
+  // getObjectWorkFlow() {
+  //   const firmRptAdminFeeID = this.AdminFeeDetials[0].FirmrptAdminFeeID;
+  //   const firmRptReviewRevNum = this.AdminFeeDetials[0].FirmRptReviewRevNum;
+  //   this.objectwfService.getObjectWorkflow(this.Page.LateAdminFee, firmRptAdminFeeID, firmRptReviewRevNum).subscribe(data => {
+  //     this.objWorkFlow = data.response;
+  //   })
+  // }
+
+  getObjectInstanceWorkflowStatus() {
+
+  }
+
+  getResubmissionHistoryList() {
+    const firmRptSchItemId = this.fee.FirmRptSchItemID
+    const firmRptReviewId = this.fee.FirmRptReviewID
+    const firmRptReviewRevId = this.fee.FirmRptReviewRevNum
+    const firmRptAdminFeeID = this.fee.FirmrptAdminFeeID
+    this.firmRptAdminFeeService.getResubmissionHistoryList(firmRptSchItemId, firmRptReviewId, firmRptReviewRevId, firmRptAdminFeeID).subscribe({
       next: (res) => {
-        this.CalculatedFee = res.response;
-        console.log("CalculatedFee",this.CalculatedFee)
+        this.ResubmissionHistoryList = res.response;
+        console.log("ResubmissionHistoryList", this.ResubmissionHistoryList)
+        this.totalLateDays = this.ResubmissionHistoryList.reduce((sum, item) => sum + parseInt(item.noLateDaysForDisplay, 10), 0);
+      },
+      error: (error) => {
+        console.error('Error fitching ResubmissionHistoryList', error);
+      },
+    });
+  }
+
+  getRevisionCommentsByWaiver() {
+    this.showPreviousCommentsModal = true;
+    const objectWFStatusID = this.fee.ObjectWfStatusID;
+    this.waiverService.getRevisionCommentsByWaiver(objectWFStatusID).subscribe({
+      next: (res) => {
+        this.RevisionCommentsList = res.response;
+        console.log("RevisionCommentsList", this.RevisionCommentsList)
+      },
+      error: (error) => {
+        console.error('Error fitching RevisionCommentsList', error);
+      },
+    });
+  }
+
+  getUserObjectWfTasks() {
+    const ObjectWFStatusID = this.fee.ObjectWfStatusID;
+    this.objectwfService.getUserObjectWfTasks(ObjectWFStatusID).subscribe({
+      next: (res) => {
+        this.UserObjectWfTasks = res.response;
+        console.log("UserObjectWfTasks", this.UserObjectWfTasks)
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error fitching UserObjectWfTasks', error);
+        this.isLoading = false;
       },
     });
   }
-  closeCalculatedFeePopup(){
+
+  getDocumentTypes() {
+    const docTypeId = constants.DocType_DocCategory.AMLMLROReports;
+    this.objectwfService.getDocumentType(docTypeId).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.fetchedDocumentTypes = res.response;
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error Fetching Document Types For Admin Fee', error);
+      },
+    });
+  }
+
+  sanitizeHtml(html: string): SafeHtml {
+    return this.sanitizerService.sanitizeHtml(html);
+  }
+
+  getCalculatedFee() {
+    this.showCalculatedFeePopup = true
+    const adminFeeRateID = this.fee.AdminFeeRateID;
+
+    const day = parseInt(this.dayCount, 10);
+    this.firmRptAdminFeeService.getCalculatedFee(adminFeeRateID, day).subscribe({
+      next: (res) => {
+        this.CalculatedFee = res.response;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fetching calculated fee', error);
+      },
+    });
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.calculatedFeePopup') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .calculatedFeePopup not found');
+      }
+    }, 0);
+  }
+
+  closeCalculatedFeePopup() {
     this.showCalculatedFeePopup = false;
   }
-  dayCount :any;
-  getMessageProperty(){
+
+  getMessageProperty() {
     const messageKey = "LateAdminFee_day";
     this.logForm.getMessageProperty(messageKey).subscribe({
       next: (res) => {
         this.dayCount = res.response;
-        console.log("dayCount",this.dayCount)
+        console.log("dayCount", this.dayCount)
         this.isLoading = false;
       },
       error: (error) => {
@@ -214,14 +448,55 @@ export class AdminFeePopupComponent {
       },
     });
   }
-  closePreviousCommentsModal(){
+
+  closePreviousCommentsModal() {
     this.showPreviousCommentsModal = false;
   }
 
-  editFee(){
-    this.isEditable = true
+  editFee() {
+    this.isEditModeAdminFee = true;
+    this.applySecurityOnPage(this.Page.LateAdminFee);
   }
-  saveFee(){
-    
+
+  cancelFee() {
+    Swal.fire({
+      text: 'Are you sure you want to cancel your changes ?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ok',
+      cancelButtonText: 'Cancel',
+      reverseButtons: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isEditModeAdminFee = false;
+        this.closeAdminFeePopup.emit();
+        this.applySecurityOnPage(this.Page.LateAdminFee);
+      }
+    });
   }
+
+  imposeAnAdministrativeonChange(): void {
+    this.selectedImposedRadio = this.AdminFeeDetials[0].feeImposed;
+  }
+
+  populateAdminFeeRates() {
+    this.supervisionService.populateAdminFeeRates(this.userId, constants.ObjectOpType.Create).subscribe(adminFeeRates => {
+      this.allAdminFeeRates = adminFeeRates;
+    }, error => {
+      console.error(error);
+    })
+  }
+
+  populateCurrencyTypes() {
+    this.supervisionService.populateCurrenyTypes(this.userId, constants.ObjectOpType.Create).subscribe(currencyTypes => {
+      this.allCurrencyTypes = currencyTypes;
+    }, error => {
+      console.error(error);
+    })
+  }
+
+  saveFee() {
+
+  }
+
 }

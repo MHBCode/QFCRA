@@ -608,12 +608,12 @@ getauthorisationStatus(): void {
 
   applySecurityOnPage(objectId: FrimsObject) {
     const currentOpType = ObjectOpType.Create;
-    this.applyAppSecurity(this.userId, objectId, currentOpType);
+    this.applyAppSecurity(this.userId, objectId, currentOpType,null,null);
   }
 
-  applyAppSecurity(userId: number, objectId: number, OpType: number): Promise<void> {
+  applyAppSecurity(userId: number, objectId: number, OpType: number,objectOpTypeId?: number, WfStatus?: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.securityService.getAppRoleAccess(userId, objectId, OpType).subscribe(
+      this.securityService.getAppRoleAccess(userId, objectId, OpType,objectOpTypeId,WfStatus).subscribe(
         (response) => {
           this.controlsPermissions = response.response;
           resolve(); // Resolve the promise after fetching data

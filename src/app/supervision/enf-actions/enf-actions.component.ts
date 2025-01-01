@@ -88,7 +88,7 @@ export class EnfActionsComponent implements OnInit {
     this.isLoading = true;
     const currentOpType = ObjectOpType.List;
 
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
 
       if (!this.supervisionService.isNullOrEmpty(this.firmId)) {
         if (this.ValidFirmSupervisor) {

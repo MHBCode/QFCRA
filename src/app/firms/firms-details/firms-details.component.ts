@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FirmService } from '../firm.service';
+import { FirmService } from 'src/app/ngServices/firm.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { ApplicationService } from 'src/app/ngServices/application.service';
 import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';

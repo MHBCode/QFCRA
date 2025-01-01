@@ -108,7 +108,7 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
     this.isLoading = true;
     const currentOpType = ObjectOpType.List;
 
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
       this.registerMasterPageControlEvents();
     });
   }

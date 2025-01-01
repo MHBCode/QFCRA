@@ -174,7 +174,6 @@ export class SupervisionService {
     return new Observable(observer => {
       this.securityService.getObjectTypeTable(userId, constants.firmTypes, OpTypeId).subscribe(
         data => {
-          // Filter out the option with FirmTypeDesc "Licensed"
           const filteredResponse = data.response.filter(item => item.FirmTypeDesc !== "Licensed");
 
           observer.next(filteredResponse);
@@ -310,6 +309,35 @@ export class SupervisionService {
         },
         error => {
           console.error('Error Fetching Reasons dropdown:', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  // Admin Fee
+  populateAdminFeeRates(userId: number,OpType: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.firmRptAdminFeeRates, OpType).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Admin Fee Rates:', error);
+          observer.error(error);
+        }
+      );
+    });
+  }
+
+  populateCurrenyTypes(userId: number,OpType: number): Observable<any[]> {
+    return new Observable(observer => {
+      this.securityService.getObjectTypeTable(userId, constants.currencyTypes, OpType).subscribe(
+        data => {
+          observer.next(data.response);
+        },
+        error => {
+          console.error('Error Fetching Currency Types:', error);
           observer.error(error);
         }
       );

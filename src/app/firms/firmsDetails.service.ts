@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
-import { FirmService } from './firm.service'; // Assuming FirmService makes the HTTP call
+
 import { DateUtilService } from '../shared/date-util/date-util.service';
 import { LogformService } from '../ngServices/logform.service';
 import Swal from 'sweetalert2';
@@ -8,6 +8,7 @@ import { SecurityService } from '../ngServices/security.service';
 import * as constants from 'src/app/app-constants';
 import { ApplicationService } from '../ngServices/application.service';
 import { AddressesService } from '../ngServices/addresses.service';
+import { FirmService } from '../ngServices/firm.service';
 
 @Injectable({
   providedIn: 'root',
@@ -440,10 +441,10 @@ export class FirmDetailsService {
   }
 
   // Security
-  applyAppSecurity(userId: number, objectId: number, OpType: number): Promise<void> {
+  applyAppSecurity(userId: number, objectId: number, OpType: number, WfStatus?: number, objectInstanceId?: number): Promise<void> {
     return new Promise((resolve, reject) => {
       setTimeout(() => { // Brief delay to let Angular apply display updates
-        this.securityService.getAppRoleAccess(userId, objectId, OpType).subscribe(
+        this.securityService.getAppRoleAccess(userId, objectId, OpType, WfStatus, objectInstanceId).subscribe(
           (response) => {
             this.controlsPermissions = response.response;
             resolve();
@@ -467,6 +468,12 @@ export class FirmDetailsService {
 
   isValidFirmAMLSupervisor(firmId: number, userId: number): Observable<boolean> {
     return this.securityService.isValidFirmAMLSupervisor(firmId, userId).pipe(
+      map(response => response.response)
+    );
+  }
+
+  isValidRSGAndSupervisor(firmId: number, userId: number): Observable<boolean> {
+    return this.securityService.isValidRSGAndSupervisor(firmId, userId).pipe(
       map(response => response.response)
     );
   }
@@ -505,6 +512,12 @@ export class FirmDetailsService {
       );
     }
     return false;
+  }
+
+  isUserSupervisorToTheFirm(firmId: number,userId: number): Observable<boolean> {
+    return this.firmService.isUserSupervisorForTheFirm(firmId,userId).pipe(
+      map(response => response.response)
+    );
   }
 
   getControlVisibility(controlName: string): boolean {
@@ -696,6 +709,19 @@ export class FirmDetailsService {
         }
       );
     });
+  }
+
+  isNullOrEmpty(value: any): boolean {
+    return value === null || value === '';
+  }
+  
+  removeHtmlTags(input: string | null | undefined): string {
+    // Check if input is null or undefined
+    if (!input) {
+      return ''; // Return an empty string if input is null or undefined
+    }
+    // This regex will remove all HTML tags
+    return input.replace(/<[^>]*>/g, '');
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////

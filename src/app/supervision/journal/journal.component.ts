@@ -91,7 +91,7 @@ export class JournalComponent {
     this.isLoading = true;
     const currentOpType = ObjectOpType.List;
 
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
 
       this.hideCreateBtn = false;
 

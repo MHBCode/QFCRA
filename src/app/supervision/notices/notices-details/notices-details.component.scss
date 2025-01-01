@@ -46,6 +46,7 @@
     }
 }
 
+
 .additionalAttachments-list {
     margin: 0px 25px;
 }
@@ -77,4 +78,7 @@
     column-count: 3;
     padding-inline-start: 2rem;
     font-size: 0.9rem;
+}
+::ng-deep .email-body table tr:nth-child(even) {
+    background-color: white !important;
 }

@@ -9,7 +9,7 @@
                     Admin Fee > <span>{{ firmDetails?.FirmName }} </span>
                 </h2>
             </div>
-            <table>
+            <table class="admin-fee-list">
                 <thead>
                     <tr>
                         <th> Report Name</th>
@@ -53,6 +53,6 @@
 *ngIf="showPopup"
   [fee]="selectedAdminFee"
   [firmDetails]="firmDetails"
-  (closeRegPopup)="closePopup()"
-  (fundDeleted)="loadRegFunds()">
+  (closeAdminFeePopup)="closePopup()"
+  (reloadAdminFee)="loadAdminFees()">
 </app-admin-fee-popup>

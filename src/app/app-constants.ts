@@ -50,6 +50,7 @@ export const authorisedFirmNames = "V_All_Firms_Authorised";
 export const dnfbpsFirmNames = "V_All_Firms_DNFBPs";
 // Admin Fee
 export const firmRptAdminFeeRates = "V_FirmRptAdminFeeRates";
+export const currencyTypes = "V_CurrencyTypes"
 
 // Notices
 export const controlledFunctionTypes = "v_ControlledFunctionTypes";
@@ -199,6 +200,10 @@ export const  CHAR_COMMA = ',';
  export const  QUERYSTRING_ENFID = "enfiD";
  export const  QUERY_RFID = "rfiD";
  
+ // sharePoint Url 
+ export const sharePointUrl = "https://qfcra365.sharepoint.com/sites/FIRMSUAT/";
+ 
+
 
 export enum FirmLicenseApplStatusType {
     Application = 4,
@@ -948,4 +953,12 @@ export enum FirmUserMessages
     RAPersonnel_Exception = 8208,
     FirmUser_Updated = 8209,
     FirmUser_Deleted = 8210
+}
+
+export enum WorkFlowStatusType
+{
+    InProgress = 1,
+    Completed = 2,
+    Returned = 3,
+    Cancelled=4,
 }

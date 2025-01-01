@@ -57,7 +57,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     this.loadFirmDetails(this.firmId);
     this.getDocumentType(constants.DocType_DocCategory.AMLMLROReports);
   }
-
+  
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['pageSize'] && !changes['pageSize'].firstChange) {
       this.updatePagination(); // Update pagination if pageSize input changes

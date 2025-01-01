@@ -1,6 +1,6 @@
 <app-loader *ngIf="isLoading"></app-loader>
 <div class="overlay">
-    <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+    <div class="popupcontainer Rptpopupcontainer NoAnimationPopup" style="display:block" (click)="$event.stopPropagation()">
         <!-- Title -->
         <div class="popup-title-btn-row">
             <div class="popup-header">
@@ -81,7 +81,7 @@
                         </select>
                       
                         <!-- Secondary Dropdown (conditionally shown) -->
-                        <select *ngIf="showOtherDropdown" name="otherReportRev"id="otherReportRev" (change)="onDropdownChange($event)">
+                        <select *ngIf="showOtherDropdown" name="otherReportRev"id="otherReportRev" [(ngModel)]="selectedOtherDocTypeID" (change)="onDropdownChange($event)">
                           <option [value]="'0'">Select</option>
                           <option *ngFor="let option of OtherReportTypeList" [value]="option.DocTypeID"> 
                            {{option.DocTypeDesc}}
@@ -134,7 +134,13 @@
                          
                         <div  class="input-field">
                           <label for="reportName">Link To Report</label>
-                          <a (click)="OpenDocumentPopup()">Select/De-select document</a>
+                          <a (click)="openReferencePopup(firmRptReviewItem)">Select/De-select document</a>
+                          <span *ngIf="currentReturnReview.documentDetails?.FileName">{{currentReturnReview.DocTypeDesc}} : 
+                            <a id="websiteLink"
+                            [href]="sharePointUrl + currentReturnReview.documentDetails?.DocFileLocation" target="_blank" rel="noopener noreferrer">
+                            {{currentReturnReview.documentDetails?.FileName}}
+                            </a>
+                          </span>
                         </div>
                         
                         <div class="input-field">
@@ -445,67 +451,7 @@
 <!--Reference Form Popup-->
 
 
-<div *ngIf="callRefForm" class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Select Document</h3>
-      <i class="bi bi-x-circle close-icon" (click)="closeFormReference()"></i>
-    </div>
-   
-        <div class="popup-body">
-          <ul>
-            <li >
-              <input type="radio" name="documentSelection" >
-               :
-              <a href="https://qfcra365.sharepoint.com/sites/FIRMSUAT/" target="_blank"></a>
-            </li>
-          </ul>
-          <p >There are no documents to select from. Please upload the relevant
-            document and return for selection.</p>
-        </div>
+<app-reference-form *ngIf="showReferencePopup" [firmId]="firmId" [Page]="Page.ReturnsReview"
+    (close)="closeReferencePopup()" [docTypes]="currentDocTypeID" [documentDetails]="currentDocumentDetails"
+    (documentSelected)="onDocumentSelected($event)" (documentDeselected)="onDocumentDeselected()"></app-reference-form>
 
-      <div class="popup-buttons-container">
-        <button class="subbutton" (click)="deSelectDocument()">De-Select</button>
-        <button class="subbutton" (click)="replaceDocument()">Ok</button>
-        <button class="subbutton" (click)="closeFormReference()">Cancel</button>
-      </div>
-  </div>
-</div>
-
-<!-- <div *ngIf="callRefForm" class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Contact Search Results</h3>
-      <i class="bi bi-x-circle close-icon" (click)="closeFormReference()"></i>
-    </div>
-    <div class="modal-body">
-      <table class="contact-table">
-        <thead>
-          <tr>
-            <th>Select</th>
-            <th>Full Name</th>
-            <th>Mobile Number</th>
-            <th>Email</th>
-            <th>Country</th>
-            <th>Passport Number</th>
-            <th>Date of Birth</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let contact of ContactDetailsByPassingParam">
-            <td>
-              <button style="color: #a41e36; text-decoration: none;"
-                (click)="ShowselectContact(contact)">Select</button>
-            </td>
-            <td>{{ contact.FullName }}</td>
-            <td>{{ contact.MobileNum || 'N/A' }}</td>
-            <td>{{ contact.BusEmail || 'N/A' }}</td>
-            <td>{{ contact.CountryName || 'N/A' }}</td>
-            <td>{{ contact.PassportNum || 'N/A' }}</td>
-            <td>{{ contact.DateOfBirth || 'N/A' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div> -->

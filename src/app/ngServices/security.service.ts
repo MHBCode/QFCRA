@@ -30,9 +30,23 @@ export class SecurityService {
     const url = `${this.baseUrlSecurity}is_director_user?userID=${userId}`
     return this.http.get<any>(url);
   }
-  getAppRoleAccess(userId: number, objectId: number, OpType?: number) {
+  isValidRSGAndSupervisor(firmId: number, userId: number) {
+    const url = `${this.baseUrlSecurity}is_valid_rsg_and_supervisior?firmID=${firmId}&userID=${userId}`
+    return this.http.get<any>(url);
+  }
+  getAppRoleAccess(userId: number, objectId: number, OpType?: number, WfStatus?: number, objectInstanceId?: number) {
     let url = `${this.baseUrlSecurity}get_app_role_access?userId=${userId}&objectId=${objectId}`;
     if (objectId !== 80) {
+      url += `&objectOpTypeId=${OpType}`;
+    }
+    if (WfStatus != null) {
+      url += `&instanceWFStatus=${WfStatus}`;
+    }
+    if (objectInstanceId != null) {
+      url += `&objectInstanceId=${objectInstanceId}`;
+    }
+  
+    if (objectId !== 80 && OpType != null) {
       url += `&objectOpTypeId=${OpType}`;
     }
     return this.http.get<any>(url);

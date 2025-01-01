@@ -121,6 +121,15 @@
 
 table {
     border-radius: 0;
+    td {
+        border-top-left-radius: 0!important;
+        border-top-right-radius: 0!important;
+    }
+
+    th {
+        border-top-left-radius: 0!important;
+        border-top-right-radius: 0!important;
+    }
 }
 
 .modal-overlay {

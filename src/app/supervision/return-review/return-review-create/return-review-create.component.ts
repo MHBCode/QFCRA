@@ -25,6 +25,7 @@ export class ReturnReviewCreateComponent {
   @Input() firmDetails: any;
   userId = 30;
   isLoading: boolean = false;
+  Id : number = 0;
   @Output() closeCreatePopup = new EventEmitter<void>();
   errorMessages: { [key: string]: string } = {};
   @Input() review: any;
@@ -33,6 +34,12 @@ export class ReturnReviewCreateComponent {
   RegulatorData:any;
   selectedAppRoleID: number = 0;
   UsersRoleList: any;
+  showReferencePopup: boolean = false;
+  currentReturnReview: any = {};
+  currentDocumentDetails: any = {};
+  currentDocTypeID: string;
+  selectedOtherDocTypeID: any;
+  sharePointUrl = constants.sharePointUrl; 
   now = new Date();
   currentDate = this.now.toISOString();
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
@@ -62,10 +69,8 @@ export class ReturnReviewCreateComponent {
   }
   
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.firmId = +params['id'];
-      //this.isFirmAuthorised();
-    });
+
+    this.Id = this.firmId
     console.log("firmDetails",this.firmDetails)
     console.log("review",this.review)
     this.getReportingBasis();
@@ -78,6 +83,7 @@ export class ReturnReviewCreateComponent {
     });
     this.ReportReviewed = '0';
   }
+
   ngAfterViewInit() {
     this.dateInputs.changes.subscribe(() => {
       this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
@@ -636,22 +642,22 @@ getSelectedSubTypes() {
         },
       ];
   /////// save create Frim Report Review 
-   CreateReportReviewObject = {
-    firmRptReviewId: null,
-    firmRptReviewRevNum: null,
-    firmId: 0,
-    objectWfstatusId: 0,
-    createdBy: this.userId,
-    createdDate:this.currentDate ,
-    lastModifiedBy: 0,
-    lastModifiedDate: this.currentDate,
-    addtlReviewRequired: true,
-    maxRevisionNum: 0,
-    addtlReviewRequiredDecisionMadeBy: this.userId,
-    addtlReviewRequiredDecisionMadeByName: "string",
-    addtlReviewRequiredDecisionMadeOn: "",
-    returnReviewWFStatusId: 0,
-  };
+  //  CreateReportReviewObject = {
+  //   firmRptReviewId: null,
+  //   firmRptReviewRevNum: null,
+  //   firmId: this.firmId,
+  //   objectWfstatusId: 0,
+  //   createdBy: this.userId,
+  //   createdDate:this.currentDate ,
+  //   lastModifiedBy: 0,
+  //   lastModifiedDate: this.currentDate,
+  //   addtlReviewRequired: true,
+  //   maxRevisionNum: 0,
+  //   addtlReviewRequiredDecisionMadeBy: this.userId,
+  //   addtlReviewRequiredDecisionMadeByName: "string",
+  //   addtlReviewRequiredDecisionMadeOn: "",
+  //   returnReviewWFStatusId: 0,
+  // };
   getSelectedSubItems(): Array<{
     firmRptReviewSubItemId: number;
     firmRptReviewItemId: number;
@@ -678,9 +684,10 @@ getSelectedSubTypes() {
     resubmissionDueDate:"",
   }
   firmRptReviewItems: any[] = [];
+   
   firmRptReviewItem = {
     actionItemDesc: "",
-    firmID: 0,
+    firmID: this.Id,
     firmName: "",
     firmRptReviewItemId: 0,
     firmRptReviewId: 0,
@@ -741,6 +748,7 @@ getSelectedSubTypes() {
     reportReviewState: 2,
     isUpdate: true,
     isWFileAttachedUpdate: true,
+    documentDetails: null,
   };
   hasValidationErrors: boolean = false;
   validationsaveUpdateFirmReportReview(){
@@ -890,6 +898,8 @@ getSelectedSubTypes() {
     objectWFLastModifiedByDate: ""
   }
 
+  
+
 
 
   callRefForm: boolean = false;
@@ -905,6 +915,44 @@ getSelectedSubTypes() {
 
   }
   replaceDocument(){
+
+  }
+  
+  /////////////// select / deselect section 
+  onDocumentSelected(selectedDoc: any): void {
+    if (this.currentReturnReview) {
+      this.currentReturnReview.documentDetails = {
+        FileName: selectedDoc.FILENAME,
+        DocFileLocation: selectedDoc.FileLoc
+      };
+      this.currentReturnReview.DocTypeDesc = selectedDoc.DocTypeDesc;
+      this.currentReturnReview.DocID = selectedDoc.DocID;
+    }
+    this.closeReferencePopup();
+  }
+ 
+  onDocumentDeselected(): void {
+    if (this.currentReturnReview) {
+      this.currentReturnReview.documentDetails = {
+        FileName: '',
+        DocFileLocation: ''
+      };
+      this.currentReturnReview.DocTypeDesc = '';
+    }
+    this.closeReferencePopup();
+  }
+ 
+  closeReferencePopup(): void {
+    this.showReferencePopup = false;
+
+  }
+  openReferencePopup(returnReview: any){
+    returnReview.firmID = this.firmId
+    console.log("returnReview",returnReview)
+    this.showReferencePopup = true;
+    this.currentReturnReview = returnReview 
+    this.currentDocTypeID = this.selectedOtherDocTypeID;
+    this.currentDocumentDetails = returnReview.documentDetails;
 
   }
 }

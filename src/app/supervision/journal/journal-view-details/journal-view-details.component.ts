@@ -271,7 +271,7 @@ export class JournalViewDetailsComponent implements OnInit {
     this.isLoading = true;
     const currentOpType = Mode ? ObjectOpType.Create : ObjectOpType.List;
 
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
       this.registerMasterPageControlEvents();
     });
   }

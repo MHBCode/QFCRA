@@ -1,7 +1,6 @@
 <app-loader *ngIf="isLoading"></app-loader>
 <div class="overlay">
-  <div class="popupcontainer Rptpopupcontainer" *ngIf="noticeDetails" style="display:block"
-    (click)="$event.stopPropagation()">
+  <div class="popupcontainer Rptpopupcontainer NoAnimationPopup" style="display:block" (click)="$event.stopPropagation()">
     <!-- <div class="error-messages">
         <p *ngIf="errorMessages['OtherEntityName']">
           {{ errorMessages['OtherEntityName'] }}
@@ -213,6 +212,14 @@
             <label for="datePublished">Date Published on Website</label>
             <input type="text" id="datePublished" name="datePublished"
               [(ngModel)]="noticeDetails.datePublishedonWebsite" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field">
+            <label for="additionalAttachments">Additional Attachment(s) (if any)</label>
+            <ul class="additionalAttachments-list">
+              <li *ngFor="let doc of attachmentNotice">
+                <a [href]="doc.fileLoc" target="_blank">{{doc.FileName}}</a>
+              </li>
+            </ul>
           </div>
           <div class="input-field">
             <label for="notificationSentDate">Notification Sent Date</label>

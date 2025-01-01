@@ -89,7 +89,7 @@
 }
 
 .buttons button {
-    margin: 0 5px;
+    margin: 5px;
 }
 
 .scrollable-table-container {
@@ -135,7 +135,7 @@
     margin: 5px 1rem;
 }
 
-.endAssignmentPopup {
+.endAssignmentPopup, .endAllAssignmentPopup {
     width: 50vw;
     align-items: baseline;
 }
