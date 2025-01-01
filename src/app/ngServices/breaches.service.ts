@@ -31,9 +31,15 @@ export class BreachesService {
     return this.http.get<any>(url, { params: httpParams });
   }
 
-  getEnfData(userId: number,firmId: number, enforcementAndDisciplinaryActnID: number | null = null): Observable<any> {
-    const url = `${this.baseUrlBreaches}get_enforcement_data?userId=${userId}&firmId=${firmId}${enforcementAndDisciplinaryActnID !== null ? `&enforcementAndDisciplinaryActnID=${enforcementAndDisciplinaryActnID}` : ''}`;
+
+  
+  getBreachDetails(breachID: number,breachrevNum:number, roleId: number | null = null, objectOpType: number | null = null): Observable<any> {
+    const url = `${this.baseUrlBreaches}get_breach_details?breachID=${breachID}&breachrevNum=${breachrevNum}${roleId !== null ? `&roleId=${roleId}` : ''}${objectOpType !== null ? `&objectOpType=${objectOpType}` : ''}`; 
     return this.http.get<any>(url);
   }
   
+  getBreachProvisionGroup(breachID: number,breachrevNum:number, roleId: number | null = null, objectOpType: number | null = null): Observable<any> {
+    const url = `${this.baseUrlBreaches}get_breach_provision_group?breachID=${breachID}&breachRevNumber=${breachrevNum}${roleId !== null ? `&roleId=${roleId}` : ''}${objectOpType !== null ? `&objectOpType=${objectOpType}` : ''}`; 
+    return this.http.get<any>(url);
+  }
 }

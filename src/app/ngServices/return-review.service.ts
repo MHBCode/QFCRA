@@ -20,10 +20,7 @@ export class ReturnReviewService {
     const url = `${this.returnViewUrl}get_report_reviewed_list?firmId=${firmId}`;
     return this.http.get<any>(url);
   }
-  getReturnReviewRevision(objectId: number,objectInstanceId: number): Observable<any> {
-    const url = `${this.objectWFUrl}get_revision?objectId=${objectId}&objectInstanceId=${objectInstanceId}`;
-    return this.http.get<any>(url);
-  }
+
   getReturnReviewDetilas(firmRptReviewId: number, firmRptReviewRevNum: number, roleId: number, objectOpTypeId: number ): Observable<any> {
     const url =`${this.returnViewUrl}get_rpt_review_details?firmRptReviewId=${firmRptReviewId}&firmRptReviewRevNum=${firmRptReviewRevNum}&roleId=${roleId}&objectOpTypeId=${objectOpTypeId}`
     return this.http.get<any>(url);

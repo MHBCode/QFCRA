@@ -35,8 +35,8 @@ export class NoticesComponent implements OnInit {
   isLoading: boolean = false;
   notices: any;
   noticeTypes: any[] = [];
-  allFirmTypes:any[] = [];
-  allFirmStatus:any[] = [];
+  allFirmTypes: any[] = [];
+  allFirmStatus: any[] = [];
   noticeNames: any[] = [];
   noticeIssuedBy: any[] = [];
   // Form search fields with defaults
@@ -69,7 +69,7 @@ export class NoticesComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private noticeService: NoticeService,
-    private supervisionService : SupervisionService,
+    private supervisionService: SupervisionService,
     private firmDetailsService: FirmDetailsService,
     public dateUtilService: DateUtilService,
     private securityService: SecurityService,
@@ -87,11 +87,13 @@ export class NoticesComponent implements OnInit {
         this.getFirmTypes();
         this.getFirmStatus();
       }
-
+      else {
+        this.loadFirmDetails(this.firmId);
+      }
       console.log('isMainNoticeListing', this.isMainNoticeListing);
       this.loadNotices();
       this.getNoticeTypes();
-      this.loadFirmDetails(this.firmId);
+
       this.getNoticeIssuedBy();
     })
   }
@@ -233,12 +235,11 @@ export class NoticesComponent implements OnInit {
   }
 
 
-  
+
   getFirmStatus() {
     this.supervisionService.populateFirmStatus(this.userId, constants.ObjectOpType.List).subscribe(
       firmStatus => {
         this.allFirmStatus = firmStatus;
-        debugger;
       },
       error => {
         console.error('Error fetching Firm Types: ', error);

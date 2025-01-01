@@ -1,0 +1,114 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="overlay">
+    <div class="popupcontainer Rptpopupcontainer" style="display:block" (click)="$event.stopPropagation()">
+        <!-- Title -->
+        <div class="popup-title-btn-row">
+            <div class="popup-header">
+                <h3>
+                    Breaches Details For {{ firmDetails?.FirmName }}
+                </h3>
+            </div>
+            <button class="close-button  close-icon" (click)="onClose()">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+        <div class="reporting-schedule-form" *ngIf="breachDetails">
+            <div class="notice-list">
+                <div class="inputs-row notice-details">
+                    <div class="input-field">
+                        <label for="firmName">Firm Name</label>
+                        <input type="text" id="firmName" name="firmName" [(ngModel)]="breachDetails.FirmName"
+                            [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="qfcNumber">QFC Number</label>
+                        <input type="text" id="qfcNumber" name="qfcNumber" [(ngModel)]="breachDetails.QFCNumber"
+                            [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="breachNumber">Breach Number</label>
+                        <input type="text" id="breachNumber" name="breachNumber"
+                            [(ngModel)]="breachDetails.BreachNumber" [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="revisionNumber">Revision Number</label>
+                        <input type="text" id="revisionNumber" name="revisionNumber"
+                            [(ngModel)]="breachDetails.BreachRevNum" [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="breachType">Breach Type</label>
+                        <input type="text" id="breachType" name="breachType" [(ngModel)]="breachDetails.BreachType"
+                            [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="breachLevel">Breach Level</label>
+                        <input type="text" id="breachLevel" name="breachLevel"
+                            [(ngModel)]="breachDetails.BreachLevelType" [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="breachCategory">Breach Category</label>
+                        <input type="text" id="breachCategory" name="breachCategory"
+                            [(ngModel)]="breachDetails.BreachCategory" [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="detectionMethod">Detection Method</label>
+                        <input type="text" id="detectionMethod" name="detectionMethod"
+                            [(ngModel)]="breachDetails.BreachDetectionMethod" [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="breachDate">Date of Breach</label>
+                        <input type="text" id="breachDate" name="breachDate" [(ngModel)]="breachDetails.BreachDate"
+                            [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="dateNotified">Date Notified</label>
+                        <input type="text" id="dateNotified" name="dateNotified"
+                            [(ngModel)]="breachDetails.BreachNotifiedDate" [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="linkToForm">Link to Form</label>
+                        <a id="linkToForm" name="linkToForm" [href]="breachDetails.LinkToForm">{{
+                            breachDetails.LinkToForm }}</a>
+                    </div>
+
+
+                    <div class="input-field">
+                        <label for="createdDate">Created Date</label>
+                        <input type="text" id="createdDate" name="createdDate" [(ngModel)]="breachDetails.CreatedDate"
+                            [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field">
+                        <label for="breachStatus">Breach Status</label>
+                        <input type="text" id="breachStatus" name="breachStatus"
+                            [(ngModel)]="breachDetails.BreachStatus" [disabled]="!isEditable" />
+                    </div>
+                    <div class="input-field" *ngIf="isBreachClosed">
+                        <label for="dateRectified">Date Rectified/Closed</label>
+                        <input type="text" id="dateRectified" name="dateRectified"
+                            [(ngModel)]="breachDetails.BreachRectifiedDate" [disabled]="!isEditable" />
+                    </div>
+                </div>
+            </div>
+            <div class="breachProvision" *ngIf="provisionBreachGroup">
+                <div class="popup-header">
+                    <h3>Breach Details</h3>
+                </div>
+                <div class="inputs-row">
+                    <app-provision-table class="fullwidth margin-bottom-20"  [provisions]="provisionBreachGroup"></app-provision-table>
+                    <div class="fullwidth input-field">
+                        <label for="summary">Breach Summary</label>
+                        <div style="min-width: 100%;" *ngIf="isEditable; else summary">
+                            <ckeditor [(ngModel)]="breachDetails.BreachSummery" [editor]="Editor" [config]="config"
+                                style="height: 200px; min-width: 100%;"></ckeditor>
+                        </div>
+
+                        <ng-template #summary>
+                            <p class="comments" [innerHTML]="breachDetails.BreachSummery"></p>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

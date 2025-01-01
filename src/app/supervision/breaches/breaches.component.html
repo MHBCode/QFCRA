@@ -8,7 +8,7 @@
                     Breaches> <span>{{ firmDetails?.FirmName }}</span>
                 </h2>
                 <div class="buttons-section">
-                    <button (click)="togglePopup()" class="button-style">
+                    <button (click)="toggleSearchPopup()" class="button-style">
                         <i style="font-size: 1.2rem;" class="bi bi-funnel-fill"></i>
                         <span class="button-text">Filter</span>
                     </button>
@@ -33,9 +33,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let breach of paginatedItems">
+                    <tr *ngFor="let breach of paginatedItems" (click)="openViewPopup(breach)">
                         <td>{{breach.Column1}}</td>
-                        <td>{{breach.BreachRevNum}}</td>
+                        <td (click)="getRevision(breach,$event)">{{breach.BreachRevNum}}</td>
                         <td>{{breach.BreachType}}</td>
                         <td>{{breach.BreachCategory}}</td>
                         <td>{{breach.BreachLevel}}</td>
@@ -47,8 +47,9 @@
                 </tbody>
                 <tfoot *ngIf="filteredBreaches?.length > 0">
                     <tr>
-                        <td  [attr.colspan]="12">
-                            <app-pagination [items]="filteredBreaches" [pageSize]="pageSize" (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>   
+                        <td [attr.colspan]="12">
+                            <app-pagination [items]="filteredBreaches" [pageSize]="pageSize"
+                                (paginatedItemsChange)="updatePaginatedItems($event)"></app-pagination>
                         </td>
                     </tr>
                 </tfoot>
@@ -59,11 +60,11 @@
 
 
 <!-- Search Popup -->
-<div class="popup-overlay" *ngIf="showPopup" (click)="togglePopup()">
+<div class="popup-overlay" *ngIf="showSearchPopup" (click)="toggleSearchPopup()">
     <div class="popup-container" (click)="$event.stopPropagation()">
         <div class="popup-header">
-            <h2>Notices Search</h2>
-            <button class="close-button" (click)="togglePopup()"><i class="bi bi-x-circle close-icon"></i></button>
+            <h2>Breaches Search</h2>
+            <button class="close-button" (click)="toggleSearchPopup()"><i class="bi bi-x-circle close-icon"></i></button>
         </div>
 
         <div class="popup-content">
@@ -71,9 +72,8 @@
                 <div class="dropdown-column">
                     <div class="input-field">
                         <label for="breachNumber">Breach Number</label>
-                        <input name="breachNumber" id="breachNumber" type="text"
-                            [(ngModel)]="breachNumber" />
-                    </div>  
+                        <input name="breachNumber" id="breachNumber" type="text" [(ngModel)]="breachNumber" />
+                    </div>
 
                     <div class="input-field">
                         <label for="breachType">Breach Type</label>
@@ -92,7 +92,8 @@
                         <div class="select-wrapper">
                             <select name="breachCategories" id="breachCategories" [(ngModel)]="breachCategory">
                                 <option value="">Select</option>
-                                <option *ngFor="let category of breachCategories" [value]="category.BreachCategoryID">{{ category.BreachCategoryDesc }}</option>
+                                <option *ngFor="let category of breachCategories" [value]="category.BreachCategoryID">{{
+                                    category.BreachCategoryDesc }}</option>
                             </select>
                         </div>
                     </div>
@@ -102,7 +103,8 @@
                         <div class="select-wrapper">
                             <select name="breachLevel" id="breachLevel" [(ngModel)]="breachLevel">
                                 <option value="">Select</option>
-                                <option *ngFor="let level of breachLevels" [value]="level.BreachLevelTypeDesc">{{ level.BreachLevelTypeDesc }}</option>
+                                <option *ngFor="let level of breachLevels" [value]="level.BreachLevelTypeDesc">{{
+                                    level.BreachLevelTypeDesc }}</option>
                             </select>
                         </div>
                     </div>
@@ -112,7 +114,8 @@
                         <div class="select-wrapper">
                             <select name="breachStatus" id="breachStatus" [(ngModel)]="breachStatus">
                                 <option value="">Select</option>
-                                <option *ngFor="let status of breachAllStatus" [value]="status.BreachStatusTypeDesc">{{ status.BreachStatusTypeDesc }}</option>
+                                <option *ngFor="let status of breachAllStatus" [value]="status.BreachStatusTypeDesc">{{
+                                    status.BreachStatusTypeDesc }}</option>
                             </select>
                         </div>
                     </div>
@@ -127,3 +130,27 @@
         </div>
     </div>
 </div>
+
+
+<div *ngIf="showRevision" class="overlay show"></div>
+<div *ngIf="showRevision" class="PreviousVersionsPopup popupcontainer" style="display:flex">
+    <i class="bi bi-x-circle close-icon close-icon-prev-revisions" (click)="closeRevisionModal()"></i>
+
+    <div class="popup-header">
+        <h3>Revisions for Breach No.</h3>
+    </div>
+
+    <div style="width: 80%" class="popup-info-place">
+        <ul class="revision-list">
+            <li *ngFor="let rev of revisionList" (click)="openRevisionDetails(rev, selectedBreach)">
+                {{ rev.BreachRevNum }}
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+
+<app-breaches-details *ngIf="showPopup" [breach]="selectedBreach" [firmId]="firmId" [firmDetails]="firmDetails"
+    (closeBreachPopup)="closePopup()">
+</app-breaches-details>

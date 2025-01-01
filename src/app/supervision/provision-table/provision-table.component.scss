@@ -1,0 +1,24 @@
+.info {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+}
+
+.infoTd {
+    position: relative;
+}
+
+.info i {
+    color: #a51e36;
+    font-size: 20px;
+}
+
+.form-container.showDetailsForm.popupcontainer {
+    width: 95%;
+    left: 0px;
+    transform: none;
+    top: 80%;
+}
+.overlay.showDetails {
+    height: 200vh;
+}

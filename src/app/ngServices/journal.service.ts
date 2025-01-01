@@ -37,7 +37,7 @@ export class JournalService {
     return this.http.get<any>(url);
   }
 
-  getAllApprovedIndividuals(firmId: number) {
+  getAllApprovedIndividuals(firmId: number | null = null) {
     const url = `${this.baseUrlJournal}get_all_approved_individuals?firmId=${firmId}`;
     return this.http.get<any>(url);
   }

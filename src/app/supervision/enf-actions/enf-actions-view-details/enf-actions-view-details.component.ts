@@ -24,16 +24,17 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   @Input() enf: any;
-  @Input() firmDetails: any;
-  @Input() firmId: any;
   @Input() isCreateEnf: boolean = false;
+  @Input() isMainEnfActionListing: boolean = false;
+  @Input() routeFirmId: number = null;
+  @Input() firmDeatailsFromParent: any = [];
 
   @Output() closeEnfPopup = new EventEmitter<void>();
   @Output() reloadEnf = new EventEmitter<void>();
 
   isEditModeEnf: boolean = false;
   enfDetails: any = [{}];
-
+  selectedFirmTypeID: number | null = null;
   //Documents
   enfDoc: any[] = [];
   fetchedDocumentTypes: any = [];
@@ -44,8 +45,8 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   newfileNum: number;
   selectedFile: File | null = null;
   fileError: string = '';
-
-
+  firmId: number = 0;
+  firmDetails: any;
   reasonOfDeletion: string;
 
   isLoading: boolean = false;
@@ -154,6 +155,11 @@ export class EnfActionsViewDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoading = true; // Start loading
+
+    if (this.isCreateEnf && !this.isMainEnfActionListing) {
+      this.firmDetails = this.firmDeatailsFromParent;
+    }
+
     if (!this.isCreateEnf) {
       forkJoin({
         userRoles: this.firmDetailsService.loadAssignedUserRoles(this.userId),
@@ -229,6 +235,10 @@ export class EnfActionsViewDetailsComponent implements OnInit {
           this.isLoading = false;
         },
       });
+    }
+
+    if (this.isMainEnfActionListing) {
+      this.getFirmTypes();
     }
   }
 
@@ -323,9 +333,26 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     return this.enfService.getEnforcementDetails(this.userId, enforcementId).pipe(
       tap((response) => {
         this.enfDetails = response.response; // Update the view
+        this.firmId = this.enfDetails[0].FirmID;
+        this.loadFirmDetails(this.firmId);
       })
     );
   }
+
+
+  loadFirmDetails(firmId: number) {
+    this.firmDetailsService.loadFirmDetails(firmId).subscribe(
+      data => {
+        this.firmDetails = data.firmDetails;
+        console.log('firmDetails', this.firmDetails)
+      },
+      error => {
+        console.error(error);
+      }
+    );
+
+  }
+
 
   getDocumentTypes() {
     const docTypeId = constants.FrimsObject.Enforcement;
@@ -346,9 +373,9 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     this.objectWF.getDocument(this.Page.Enforcement, this.enf?.EnforcementAndDisciplinaryActnID, 1).pipe(
     ).subscribe(
       data => {
-        this.enfDoc = data.response; 
-        this.FileLoc = ''; 
-  
+        this.enfDoc = data.response;
+        this.FileLoc = '';
+
         this.logForm.constructDocUrl(this.enfDoc).subscribe(
           response => {
             if (response) {
@@ -491,13 +518,14 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   }
 
   get firmName() {
-    return this.isCreateEnf ? this.firmId : this.enfDetails[0]?.FirmID;
+    return this.isCreateEnf ? this.routeFirmId : this.enfDetails[0]?.FirmID;
   }
 
   set firmName(value: number) {
     if (this.isCreateEnf) {
       this.firmId = value;
-    } else {
+    }
+    else {
       this.enfDetails[0].FirmID = value;
     }
   }
@@ -515,14 +543,27 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   }
 
   get individualLabel(): string {
-    if (this.enfTypeID === 2 && this.firmDetails?.FirmTypeID === 1) {
-      return 'Approved Individuals';
-    } else if (this.enfTypeID === 3 || this.enfTypeID === 6) {
-      return 'Related Individuals';
-    } else if (this.enfTypeID === 5 && this.firmDetails?.FirmTypeID === 2) {
-      return 'Required Individuals';
-    } else {
-      return '';
+    if (!this.isMainEnfActionListing) {
+      if (this.enfTypeID == 2 && this.firmDetails?.FirmTypeID == 1) {
+        return 'Approved Individuals';
+      } else if (this.enfTypeID == 3 || this.enfTypeID == 6) {
+        return 'Related Individuals';
+      } else if (this.enfTypeID == 5 && this.firmDetails?.FirmTypeID == 2) {
+        return 'Required Individuals';
+      } else {
+        return '';
+      }
+    }
+    else {
+      if (this.enfTypeID == 2 && this.selectedFirmTypeID == 1) {
+        return 'Approved Individuals';
+      } else if (this.enfTypeID == 3 || this.enfTypeID == 6) {
+        return 'Related Individuals';
+      } else if (this.enfTypeID == 5 && this.selectedFirmTypeID === 2) {
+        return 'Required Individuals';
+      } else {
+        return '';
+      }
     }
   }
 
@@ -611,7 +652,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     // Set dropdown visibility and populate individuals based on action type
     const actionTypeID = this.enfDetails[0]?.EnforcementActionOnTypeID;
 
-    if (actionTypeID === 2 && this.firmDetails.FirmTypeID === 1) { // Approved Individual
+    if (actionTypeID == 2 && this.firmDetails.FirmTypeID == 1) { // Approved Individual
       this.selectedIndividualId = this.enfDetails[0]?.AppIndividualID || 0;
       this.populateApprovedIndividuals().subscribe(() => {
         this.individuals = this.allApprovedIndividuals.map(ind => ({
@@ -620,7 +661,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
         }));
         this.showIndividualsDropdown = true;
       });
-    } else if (actionTypeID === 3 || actionTypeID === 6) { // Related Individuals
+    } else if (actionTypeID == 3 || actionTypeID == 6) { // Related Individuals
       this.selectedIndividualId = this.enfDetails[0]?.ContactAssnID || 0;
       this.populateRelatedIndividuals().subscribe(() => {
         this.individuals = this.allRelatedIndividuals.map(ind => ({
@@ -629,7 +670,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
         }));
         this.showIndividualsDropdown = true;
       });
-    } else if (actionTypeID === 5 && this.firmDetails.FirmTypeID === 2) { // Registered or Required Individuals
+    } else if (actionTypeID == 5 && this.firmDetails.FirmTypeID == 2) { // Registered or Required Individuals
       this.selectedIndividualId = this.enfDetails[0]?.ContactAssnID || 0;
       this.popuplateRequiredIndividuals(1).subscribe(() => {
         this.individuals = this.allRequiredIndividuals.map(ind => ({
@@ -667,21 +708,20 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     this.closeEnfPopup.emit();
   }
 
-  onActionTypeChange(event: Event): void {
-    const selectedType = +(event.target as HTMLSelectElement).value; // Convert value to number
-    this.enfTypeID = selectedType; // Update enfTypeID explicitly
-    this.selectedIndividualId = 0; // Reset selected individual
-    this.individuals = []; // Reset individuals array
+  onActionFirmTypeChange(): void {
+    this.selectedIndividualId = 0;
+    this.individuals = [];
+    
 
-    if (this.enfTypeID === 2 && this.firmDetails.FirmTypeID === 1) { // Approved Individual
+    if (this.enfTypeID == 2 && ((!this.isMainEnfActionListing && this.firmDetails.FirmTypeID == 1) || (this.isMainEnfActionListing && this.selectedFirmTypeID == 1))) {
       this.populateApprovedIndividuals().subscribe(() => {
         this.individuals = this.allApprovedIndividuals.map(individual => ({
           id: individual.AppIndividualID,
           name: individual.FullName
         }));
-        this.showIndividualsDropdown = true; // Show dropdown
+        this.showIndividualsDropdown = true;
       });
-    } else if (this.enfTypeID === 3 || this.enfTypeID === 6) { // Related Individuals
+    } else if (this.enfTypeID == 3 || this.enfTypeID == 6) { // Related Individuals
       this.populateRelatedIndividuals().subscribe(() => {
         this.individuals = this.allRelatedIndividuals.map(individual => ({
           id: individual.ContactAssnID,
@@ -689,7 +729,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
         }));
         this.showIndividualsDropdown = true; // Show dropdown
       });
-    } else if (this.enfTypeID === 5 && this.firmDetails.FirmTypeID === 2) { // Registered or Required Individuals
+    } else if (this.enfTypeID == 5 && ((!this.isMainEnfActionListing && this.firmDetails.FirmTypeID == 2) || (this.isMainEnfActionListing && this.selectedFirmTypeID == 2))) { // Registered or Required Individuals
       this.popuplateRequiredIndividuals(1).subscribe(() => {
         this.individuals = this.allRequiredIndividuals.map(individual => ({
           id: individual.ContactAssnID,
@@ -697,7 +737,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
         }));
         this.showIndividualsDropdown = true; // Show dropdown
       });
-    } else if (this.enfTypeID === 1 || this.enfTypeID === 4) {
+    } else if (this.enfTypeID == 1 || this.enfTypeID === 4) {
       this.showIndividualsDropdown = false;
       this.selectedIndividualId = null;
     } else {
@@ -798,7 +838,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   prepareEnfObj() {
     return {
       enforcementAndDisciplinaryActnID: this.isCreateEnf ? null : this.enfDetails[0].EnforcementAndDisciplinaryActnID,
-      firmID: this.firmName,
+      firmID: this.isMainEnfActionListing ? this.firmId : this.firmName,
       firmName: null,
       qfcNum: this.isCreateEnf ? null : this.enfDetails[0].QFCNum,
       appIndividualID: this.showIndividualsDropdown && (this.enfTypeID === 2) ? this.selectedIndividualId : null,
@@ -901,6 +941,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     return this.sanitizerService.sanitizeHtml(html);
   }
 
+
   populateEnfActionsAuth() {
     this.supervisionService.populateEnfActionsAuth(this.userId, constants.ObjectOpType.Create).subscribe(
       enfActionAuth => {
@@ -956,6 +997,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     );
   }
 
+
   populateApprovedIndividuals(): Observable<any> {
     return this.journalService.getAllApprovedIndividuals(this.firmId).pipe(
       tap((types) => {
@@ -968,7 +1010,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   }
 
   populateRelatedIndividuals(): Observable<any> {
-    return this.enfService.getAllRelatedIndividuals(this.firmId, this.firmDetails.FirmTypeID).pipe(
+    return this.enfService.getAllRelatedIndividuals(this.routeFirmId, this.firmDetails.FirmTypeID).pipe(
       tap(
         (types) => {
           this.allRelatedIndividuals = types.response || [];
@@ -992,4 +1034,26 @@ export class EnfActionsViewDetailsComponent implements OnInit {
       }
     );
   }
+
+
+  getFirmTypes() {
+    this.supervisionService.populateFirmTypes(this.userId, constants.ObjectOpType.Create).subscribe(
+      firmTypes => {
+        this.allFirmTypes = firmTypes;
+      },
+      error => {
+        console.error('Error fetching Firm Types: ', error);
+      }
+    );
+  }
+
+  onFirmTypeChange(firmTypeID: number) {
+    this.showIndividualsDropdown = false;
+    if (this.selectedFirmTypeID === firmTypeID) {
+      this.selectedFirmTypeID = null;
+    } else {
+      this.selectedFirmTypeID = firmTypeID;
+    }
+  }
+
 }

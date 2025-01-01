@@ -22,6 +22,8 @@ import { RegFundsViewComponent } from './reg-funds/reg-funds-view/reg-funds-view
 import { RegFundsCreateComponent } from './reg-funds/reg-funds-create/reg-funds-create.component';
 import { EnfActionsViewDetailsComponent } from './enf-actions/enf-actions-view-details/enf-actions-view-details.component';
 import { ReturnReviewCreateComponent } from './return-review/return-review-create/return-review-create.component';
+import { BreachesDetailsComponent } from './breaches/breaches-details/breaches-details.component';
+import { ProvisionTableComponent } from './provision-table/provision-table.component';
 
 
 
@@ -46,7 +48,9 @@ import { ReturnReviewCreateComponent } from './return-review/return-review-creat
     RegFundsViewComponent,
     RegFundsCreateComponent,
     EnfActionsViewDetailsComponent,
-    ReturnReviewCreateComponent
+    ReturnReviewCreateComponent,
+    BreachesDetailsComponent,
+    ProvisionTableComponent
   ],
   imports: [
     CommonModule,

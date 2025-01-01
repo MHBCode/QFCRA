@@ -18,8 +18,8 @@ export class SecurityService {
     const url = `${this.baseUrlSecurity}is_valid_firm_aml_supervisor?FirmID=${firmId}&UserID=${userId}`
     return this.http.get<any>(url);
   }
-  isValidFirmSupervisor(firmId: number, userId: number) {
-    const url = `${this.baseUrlSecurity}is_firm_supervisor?FirmID=${firmId}&UserID=${userId}`
+  isValidFirmSupervisor(firmId: number | null = null, userId: number) {
+    const url = `${this.baseUrlSecurity}is_firm_supervisor?UserID=${userId}${firmId !== null ? `&FirmID=${firmId}` : ''}`
     return this.http.get<any>(url);
   }
   isValidSupervisor(firmId: number, userId: number) {

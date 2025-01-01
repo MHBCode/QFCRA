@@ -5,6 +5,7 @@ import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { BreachesService } from 'src/app/ngServices/breaches.service';
 import { SupervisionService } from '../supervision.service';
 import { forkJoin, tap } from 'rxjs';
+import { EnforcementsActionsService } from 'src/app/ngServices/enforcements-actions.service';
 
 @Component({
   selector: 'app-enf-actions',
@@ -26,8 +27,8 @@ export class EnfActionsComponent implements OnInit {
   showDeletedEnf: boolean = false;
   showPopup: boolean = false;
   selectedEnf: any = null;
-  isCreateEnf:boolean = false;
-
+  isCreateEnf: boolean = false;
+  isMainEnfActionListing: boolean = false;
   // Security
   hideEditBtn: boolean = false;
   hideSaveBtn: boolean = false;
@@ -44,7 +45,7 @@ export class EnfActionsComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private breachesService: BreachesService,
+    private enfActionsService: EnforcementsActionsService,
     private firmDetailsService: FirmDetailsService,
     private supervisionService: SupervisionService
   ) {
@@ -54,7 +55,14 @@ export class EnfActionsComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
-      this.loadFirmDetails(this.firmId);
+      if (this.firmId) {
+        this.loadFirmDetails(this.firmId);
+      }
+      else {
+        this.firmId = null;
+        this.isMainEnfActionListing = true;
+      }
+
       this.loadEnfActions();
       forkJoin([
         this.isValidFirmSupervisor(),
@@ -93,6 +101,9 @@ export class EnfActionsComponent implements OnInit {
           this.hideActionButton();
           this.isLoading = false;
         }
+      }
+      else{
+        this.isLoading = false;
       }
     });
   }
@@ -140,7 +151,7 @@ export class EnfActionsComponent implements OnInit {
 
   loadEnfActions() {
     this.isLoading = true;
-    this.breachesService.getEnfData(this.userId, this.firmId).subscribe(
+    this.enfActionsService.getEnfData(this.userId, this.firmId).subscribe(
       data => {
         this.allEnfActions = data.response;
         if (this.showDeletedEnf) {
@@ -159,9 +170,9 @@ export class EnfActionsComponent implements OnInit {
     );
   }
 
-  openEnfActionPopup(enf: any, firmDetails: any, isCreate : boolean): void {
+  openEnfActionPopup(enf: any, firmDetails: any, isCreate: boolean): void {
     this.isCreateEnf = isCreate;
-    if(enf){
+    if (enf) {
       this.selectedEnf = enf;
     }
     this.showPopup = true;
