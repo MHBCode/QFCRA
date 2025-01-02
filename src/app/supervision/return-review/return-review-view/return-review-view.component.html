@@ -18,31 +18,31 @@
                 <div class="input-field">
                     <label for="revisionNumber">Revision Number</label>
                     <input type="text" id="revisionNumber" name="revisionNumber"
-                    [(ngModel)]="firmRevDetails.firmRptReviewRevNum"  [disabled]="!isEditable" />
+                    [(ngModel)]="firmRevDetails.firmRptReviewRevNum"  disabled />
                 </div>
                 <div class="input-field">
                     <label for="QFCNumber">QFC Number</label>
                     <input type="text" id="QFCNumber" name="QFCNumber"
-                    [(ngModel)]="firmDetails.QFCNum"   [disabled]="!isEditable" />
+                    [(ngModel)]="firmDetails.QFCNum" disabled />
                 </div>
                 <div class="input-field">
                     <label for="prudentialCategory">Prudential Category</label>
                     <input type="text" id="prudentialCategory" name="prudentialCategory"
-                    [(ngModel)]="firmDetails.PrudentialCategoryTypeDesc"  [disabled]="!isEditable" />
+                    [(ngModel)]="firmDetails.PrudentialCategoryTypeDesc" disabled />
                 </div>
                 <div class="input-field">
                     <label for="legalStatus">Legal Status</label>
                     <input type="text" id="legalStatus" name="legalStatus"
-                    [(ngModel)]="firmDetails.LegalStatusTypeDesc"   [disabled]="!isEditable" />
+                    [(ngModel)]="firmDetails.LegalStatusTypeDesc" disabled />
                 </div>
                 <div class="input-field">
                     <label for="reportingBasis">Reporting Basis</label>
                     <input type="text" id="reportingBasis" name="reportingBasis"
-                    [(ngModel)]="ReportingBasis.FirmRptBasisTypeDesc"  [disabled]="!isEditable" />
+                    [(ngModel)]="ReportingBasis.FirmRptBasisTypeDesc" disabled />
                 </div>
                 <div class="input-field">
                     <label for="leadRegulator">Lead Regulator</label>
-                    <input type="text" id="leadRegulator" name="leadRegulator" [(ngModel)]="RegulatorData" [disabled]="!isEditable" />
+                    <input type="text" id="leadRegulator" name="leadRegulator" [(ngModel)]="RegulatorData" disabled />
                 </div>
             </div>
             <div class="rpt-list margin-top-10" *ngIf="firmRevDetails.firmRptReviewItems">
@@ -58,8 +58,8 @@
                             type="text"
                             id="reportTypeEntry-{{ i }}"
                             name="reportTypeEntry"
-                            [disabled]="!isEditable"
                             [(ngModel)]="item.reportReceivedDesc"
+                            disabled
                           />
                         </div>
                       
@@ -69,7 +69,8 @@
                             type="text"
                             id="submissionType-{{ i }}"
                             name="submissionType"
-                            [disabled]="!isEditable"
+                            disabled
+                            [(ngModel)]="item.rptDueDate"
                           />
                         </div>
                       
@@ -79,7 +80,8 @@
                             type="text"
                             id="reportingPeriodStartDate-{{ i }}"
                             name="reportingPeriodStartDate"
-                            [disabled]="!isReviseMode"
+                            [(ngModel)]="reportingPeriodStartDate"
+                            [disabled]="!isReviseMode || !isEditable"
                           />
                         </div>
                       
@@ -89,7 +91,8 @@
                             type="text"
                             id="reportingPeriodEndDate-{{ i }}"
                             name="reportingPeriodEndDate"
-                            [disabled]="!isReviseMode"
+                            [disabled]="!isReviseMode || !isEditable"
+                            [(ngModel)]="reportingPeriodEndDate"
                           />
                         </div>
                          
@@ -112,8 +115,8 @@
                             type="text"
                             id="dueDate-{{ i }}"
                             name="dueDate"
-                            [disabled]="!isEditable"
                             [(ngModel)]="item.receivedDate"
+                            disabled
                           />
                         </div>
                       
@@ -145,24 +148,48 @@
                             </div>
                           </ng-container>
                         </div>
-
+                        <div class="input-field">
+                          <label for="ResubmissionRequired">Resubmission Required</label>
+                          <ng-container>
+                            <div style="display: flex; align-items: center">
+                              <input
+                                type="radio"
+                                id="ResubmissionRequired"
+                                name="ResubmissionRequired"
+                                [value]="true"
+                                [(ngModel)]="item.resubmissionRequired"
+                                style="margin-right: 10px; cursor: pointer"
+                              />
+                              <label for="ResubmissionRequiredYes" style="margin-left: 5px; color: #413b3c">Yes</label>
+                      
+                              <input
+                                type="radio"
+                                id="ResubmissionRequired"
+                                name="ResubmissionRequired"
+                                [value]="false"
+                                [(ngModel)]="item.resubmissionRequired"
+                                style="margin-left: 20px; margin-right: 10px; cursor: pointer;"
+                              />
+                              <label for="ResubmissionRequiredNo" style="margin-left: 5px; color: #413b3c">No</label>
+                            </div>
+                          </ng-container>
+                        </div>
                         <div class="add-address-btn-container">
                           <button class="addAddressBtn" (click)="addNewCommentsOnReviseMode()" *ngIf="isReviseMode">
                             Add Comment
                           </button>
                         </div>
                         
-                        <div *ngFor="let reviewItem of newComments; let itemIndex = index">
-                          <div *ngFor="let finding of reviewItem.firmRptReviewFindings; let commentIndex = index" class="input-field fullwidth">
+                        <div *ngFor="let reviewItem of newComments; let itemIndex = index" style="min-width: 100%;" class="input-field fullwidth">
+                          <div *ngFor="let finding of reviewItem.firmRptReviewFindings; let commentIndex = index" class="commit-container">
                             <div *ngIf="isReviseMode" class="del-address-container">
                               <button class="RmvTrashBtn bi-trash" (click)="removeComment(itemIndex, commentIndex)"> </button>
                             </div>
                             <label for="notes-{{ commentIndex }}">Comments/Findings :</label>
                             
                             <!-- CKEditor in revise mode -->
-                            <div style="min-width: 100%;" *ngIf="isReviseMode; else notes">
+                            <div style="min-width: 100%;" *ngIf="isReviseMode || isEditable; else notes">
                               <ckeditor [(ngModel)]="finding.firmRptReviewFindings" [editor]="Editor" [config]="config" style="height: 200px; min-width: 100%;"></ckeditor>
-                              
 
                             </div>
                             
@@ -181,11 +208,11 @@
                     </div>
                 </ng-container>
             </div>
-            <div class="rpt-list margin-top-10" *ngIf="ActionItems.length != 0">
+            <div class="rpt-list margin-top-10" >
               <div class="popup-header">
                   <h3> Items Requiring Follow-Up/Action</h3>
               </div>
-              <table class="fund-status-table">
+              <table *ngIf="ActionItems.length != 0" class="fund-status-table">
                 <thead>
                   <tr>
                     <th>Item</th>
@@ -205,6 +232,65 @@
                   </tr>
                 </tbody>
               </table>
+              <div class="add-address-btn-container">
+                <button class="addAddressBtn" *ngIf="!isEditable || !isReviseMode" (click)="addFollowUpItem()" >
+                  Add Action
+                </button>
+              </div>
+              <div class="inputs-row report-entry" *ngFor="let followUp of followUpItems; let i = index">
+                <div  class="del-address-container">
+                  <button class="RmvTrashBtn bi-trash" *ngIf="!isEditable || !isReviseMode" (click)="removeFollowUpItem(i)"> </button>
+                </div>
+                <div class="input-field">
+                  <label for="item-{{ i }}">Item</label>
+                  <input
+                    type="text"
+                    id="item-{{ i }}"
+                    name="item"
+                    [(ngModel)]="followUp.item"
+                  />
+                </div>
+            
+                <div class="input-field-notes">
+                  <label for="actionsTaken-{{ i }}">Actions To Be Taken</label>
+                  <ckeditor
+                    [(ngModel)]="followUp.actionsTaken"
+                    [editor]="Editor"
+                    [config]="config"
+                    style="height: 200px; min-width: 100%;"
+                  ></ckeditor>
+                </div>
+            
+                <div class="input-field">
+                  <label for="dueDate-{{ i }}">Due Date</label>
+                  <input
+                    type="text"
+                    id="dueDate-{{ i }}"
+                    name="dueDate"
+                    [(ngModel)]="followUp.dueDate"
+                  />
+                </div>
+            
+                <div class="input-field">
+                  <label for="closedDate-{{ i }}">Closed Date</label>
+                  <input
+                    type="text"
+                    id="closedDate-{{ i }}"
+                    name="closedDate"
+                    [(ngModel)]="followUp.closedDate"
+                  />
+                </div>
+            
+                <div class="input-field-notes">
+                  <label for="resolution-{{ i }}">Resolution</label>
+                  <ckeditor
+                    [(ngModel)]="followUp.resolution"
+                    [editor]="Editor"
+                    [config]="config"
+                    style="height: 200px; min-width: 100%;"
+                  ></ckeditor>
+                </div>
+              </div>
             </div>
               <app-review
                 [firmId]="firmId"
@@ -219,8 +305,9 @@
                 [UserObjectWfTasks]="UserObjectWfTasks"
               >                         
               </app-review>
+
               <div class="btn justify-content-end">
-                <button *ngIf="!isEditable">
+                <button (click)="EditMode()" *ngIf="!isEditable">
                   <i class="bi bi-pen"></i> Edit
                 </button>
                 <button (click)="CreateNewVerisionConfirmation()" *ngIf="!isReviseMode && firmRevDetails.maxRevisionNum == review.RptReviewRevNum">

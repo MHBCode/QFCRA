@@ -13,6 +13,7 @@ import {ActionItemsService} from 'src/app/ngServices/action-items.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';
 import { SafeHtml } from '@angular/platform-browser';
+import { ReportScheduleService } from 'src/app/ngServices/report-schedule.service'
 import Swal from 'sweetalert2';
 @Component({
   selector: 'app-return-review-view',
@@ -25,7 +26,6 @@ export class ReturnReviewViewComponent {
   @Input() firmId: any;
   @Input() firmDetails: any;
   @Output() closeRevPopup = new EventEmitter<void>();
-  isEditable: boolean = false;
   reportPeriodTypes: any;
   Page = FrimsObject;
   firmRevDetails : any;
@@ -51,6 +51,8 @@ export class ReturnReviewViewComponent {
     private objectwfService: ObjectwfService,
     private actionItemsService: ActionItemsService,
     private sanitizerService: SanitizerService,
+    private reportSchedule: ReportScheduleService,
+    private cdr: ChangeDetectorRef,
 
   ) {
 
@@ -68,6 +70,7 @@ export class ReturnReviewViewComponent {
       this.getObjectActionItems();
       
       this.getObjectWorkflow();
+      
   }
 
   onClose(): void {
@@ -94,6 +97,7 @@ export class ReturnReviewViewComponent {
           const match = reportDesc.match(/\(([^)]+)\)/);
           this.reportingBasis = match ? match[1] : '';
         }
+        this.getFirmReportScheduleItem(this.firmRevDetails.firmRptReviewItems[0].firmRptSchItemId)
         this.getReportingBasis();
         this.getRegulatorData();
         this.newComments = this.firmRevDetails.firmRptReviewItems.map(item => ({
@@ -396,5 +400,58 @@ getObjectWorkflow(){
     });
   
     console.log('Updated firmRptReviewItems:', this.firmRevDetails.firmRptReviewItems);
+  }
+
+
+
+  /////////// Edit section 
+  isEditable: boolean = false;
+  EditMode(){
+    this.isEditable = true;
+  }
+  ReportScheduleItem:any;
+  reportingPeriodStartDate:any;
+  reportingPeriodEndDate:any;
+  getFirmReportScheduleItem(firmRptSchItemId){
+    //const firmRptSchItemID = this.review.FirmRptSchItemID;
+    this.reportSchedule.getFirmReportScheduleItem(firmRptSchItemId).subscribe({
+      next: (res) => {
+         this.ReportScheduleItem = res.response;
+         console.log("ReportScheduleItem",this.ReportScheduleItem)
+         if(this.ReportScheduleItem != null){
+          this.reportingPeriodStartDate = this.ReportScheduleItem[0].RptPeriodFromDate;
+          this.reportingPeriodEndDate = this.ReportScheduleItem[0].RptPeriodToDate;
+        }
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error("Error fetching DocSubTypesList:", error);
+      },
+    });
+    
+  }
+  ////////////////////////// item Action 
+
+  followUpItems: Array<{
+    item: string;
+    actionsTaken: string;
+    dueDate: string;
+    closedDate: string;
+    resolution: string;
+  }> = [];
+  addFollowUpItem() {
+    this.followUpItems.push({
+      item: '',
+      actionsTaken: '',
+      dueDate: '',
+      closedDate: '',
+      resolution: '',
+    });
+    console.log('After adding a new item:', this.followUpItems);
+  }
+
+  removeFollowUpItem(index: number) {
+    this.followUpItems.splice(index, 1);
+    console.log('After removing an item:', this.followUpItems);
   }
 }
