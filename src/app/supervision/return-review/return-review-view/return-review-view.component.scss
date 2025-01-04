@@ -20,6 +20,7 @@
 
 .popupcontainer.Rptpopupcontainer {
     max-height: 97vh;
+    width: 85vw;
 }
 
 .disabled {
@@ -164,4 +165,22 @@
     width: 100%;
     display: flex;
     justify-content: flex-end;
+}
+
+.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+  
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.createActionItem-container{
+    display: flex;
+    align-items: center;
+    gap: 3.5px;
 }

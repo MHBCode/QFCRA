@@ -41,7 +41,16 @@ export class ReturnReviewViewComponent {
   ActionItems :any;
   NewVersion:any;
   isReviseMode : boolean = false;
+  isEditable: boolean = false;
   newComments: any[] = [];
+  DocSubTypesList: Array<{ DocSubTypeID: number; DocSubTypeDesc: string; checked?: boolean }> = [];
+  now = new Date();
+  currentDate = this.now.toISOString();
+  currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
+  @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
+  // newComments: Array<{ firmRptReviewFindings: Array<{ firmRptReviewFindings: string }> }> = [
+  //   { firmRptReviewFindings: [{ firmRptReviewFindings: '' }] } // Default comment
+  // ];
   constructor(
     private returnReviewService: ReturnReviewService,
     private supervisionService: SupervisionService,
@@ -98,6 +107,7 @@ export class ReturnReviewViewComponent {
           this.reportingBasis = match ? match[1] : '';
         }
         this.getFirmReportScheduleItem(this.firmRevDetails.firmRptReviewItems[0].firmRptSchItemId)
+        this.getReportsReceivedDocSubTypes(this.firmRevDetails.firmRptReviewItems[0].docTypeId)
         this.getReportingBasis();
         this.getRegulatorData();
         this.newComments = this.firmRevDetails.firmRptReviewItems.map(item => ({
@@ -405,7 +415,7 @@ getObjectWorkflow(){
 
 
   /////////// Edit section 
-  isEditable: boolean = false;
+  
   EditMode(){
     this.isEditable = true;
   }
@@ -430,6 +440,43 @@ getObjectWorkflow(){
     });
     
   }
+  ////////////////////////// sub Items
+  // getReportsReceivedDocSubTypes(docTypeId: number) {
+  //   this.returnReviewService.getReportsReceivedDocSubTypes(docTypeId).subscribe({
+  //     next: (res) => {
+  //       // Add a `checked` property to track the checkbox state
+  //       this.DocSubTypesList = res.response.map((item: any) => ({
+  //         ...item,
+  //         checked: false,
+  //       }));
+  //       console.log("DocSubTypesList:", this.DocSubTypesList);
+  //     },
+  //     error: (error) => {
+  //       console.error("Error fetching DocSubTypesList:", error);
+  //     },
+  //   });
+  // }
+  getReportsReceivedDocSubTypes(docTypeId: number) {
+    this.returnReviewService.getReportsReceivedDocSubTypes(docTypeId).subscribe({
+        next: (res) => {
+            // Add a `checked` property to reflect the selection state
+            this.DocSubTypesList = res.response.map((item: any) => ({
+                ...item,
+                checked: this.firmRevDetails?.firmRptReviewItems?.[0]?.firmRptReviewSubItems?.some(
+                    (subItem: any) => subItem.docSubTypeId === item.DocSubTypeID
+                ) || false,
+            }));
+            console.log("DocSubTypesList with check state:", this.DocSubTypesList);
+        },
+        error: (error) => {
+            console.error("Error fetching DocSubTypesList:", error);
+        },
+    });
+}
+getSelectedSubTypes() {
+  return this.DocSubTypesList.filter((subType) => subType.checked);
+}
+
   ////////////////////////// item Action 
 
   followUpItems: Array<{
@@ -453,5 +500,48 @@ getObjectWorkflow(){
   removeFollowUpItem(index: number) {
     this.followUpItems.splice(index, 1);
     console.log('After removing an item:', this.followUpItems);
+  }
+
+  createActionFromComment : boolean = false;
+  FlagcreateActionFromComment(){
+    this.createActionFromComment = true;
+  }
+
+    ///////////////////////////////////// Comment to be Publish
+    CommentsToPublishObject = {
+    
+      wFirmRptPublishCommentID: 0,
+      firmRptReviewItemID: 0,
+      wPublishedComments: "",
+      wPublishedBy: 0,
+      wPublishedDate: "",
+      firmRptSchItemID: 0,
+      wAllowResubmit: true,
+      objectActionItemID: 0,
+      commentAsActionItemFlag: true
+    
+  }
+  saveCommentsToPublish(){
+   const commitListDetails = {
+     wFirmRptPublishCommentID: 0,
+     wPublishedComments : this.CommentsToPublishObject.wPublishedComments,
+     wPublishedBy: this.userId,
+     wPublishedDate: this.currentDate,
+     firmRptSchItemID: 0,
+     wAllowResubmit: true,
+     objectActionItemID: 0,
+     commentAsActionItemFlag: true
+
+    }
+    this.returnReviewService.saveCommentsToPublish(commitListDetails).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+         console.log("Comment Published Successfully")
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error Comment Published', error);
+      },
+    });
   }
 }
