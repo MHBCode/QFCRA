@@ -52,6 +52,11 @@ export const dnfbpsFirmNames = "V_All_Firms_DNFBPs";
 export const firmRptAdminFeeRates = "V_FirmRptAdminFeeRates";
 export const currencyTypes = "V_CurrencyTypes"
 
+// Notices
+export const controlledFunctionTypes = "v_ControlledFunctionTypes";
+export const contactTypes = "v_ContactTypes";
+
+
 // Reporting Schedule
 export const firmRptSubmissionTypes = "V_FirmRptSubmissionTypes";
 export const reportDocTypes = "v_Get_DocType";
@@ -485,7 +490,10 @@ export enum FrimsObject {
 
 
 }
-
+export enum BreachStatus {
+    PassedToLrc = 3,
+    Closed =5,
+}
 export enum CRORegisterReports {
     ENTER_DATE = 3600,
     INVALID_DATE = 3601,

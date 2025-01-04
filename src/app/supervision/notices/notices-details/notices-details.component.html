@@ -8,87 +8,210 @@
       </div> -->
     <!-- Title -->
     <div class="popup-title-btn-row">
-      <div class="popup-header">
+      <div class="popup-header" *ngIf="firmId">
         <h3>
           Notice Details For {{ firmDetails?.FirmName }}
+        </h3>
+      </div>
+      <div class="popup-header" *ngIf="!firmId">
+        <h3>
+          Notice Details
         </h3>
       </div>
       <button class="close-button  close-icon" (click)="onClose()">
         <i class="bi bi-x-circle"></i>
       </button>
     </div>
-    <div class="reporting-schedule-form" *ngIf="noticeDetails">
+    <div class="reporting-schedule-form">
       <div class="notice-list">
         <div class="inputs-row notice-details">
           <div class="input-field">
             <label for="typeOfNotice">Type of Notice</label>
-            <input type="text" id="typeOfNotice" name="typeOfNotice" [(ngModel)]="noticeDetails.TypeOfNotice"
+            <input type="text" id="typeOfNotice" name="typeOfNotice" [(ngModel)]="noticeDetails.noticeTypeDesc"
               [disabled]="!isEditable" />
           </div>
           <div class="input-field">
             <label for="noticeName">Notice Name</label>
-            <input type="text" id="noticeName" name="noticeName" [(ngModel)]="noticeDetails.NoticeName"
-              [disabled]="!isEditable" />
+            <input type="text" id="noticeName" name="noticeName" [(ngModel)]="noticeDetails.noticeName"
+              [disabled]="!isEditable" *ngIf="noticeDetails.noticeTemplateID == 3" />
+            <input type="text" id="noticeName" name="noticeName" [(ngModel)]="noticeDetails.noticeTemplateName"
+              [disabled]="!isEditable" *ngIf="noticeDetails.noticeTemplateID !== 3" />
           </div>
           <div class="input-field">
             <label for="internalRefNumber">Internal Reference Number</label>
             <input type="text" id="internalRefNumber" name="internalRefNumber"
-              [(ngModel)]="noticeDetails.InternalReferenceNumber" [disabled]="!isEditable" />
+              [(ngModel)]="noticeDetails.internalReferenceNumber" [disabled]="!isEditable" />
           </div>
           <div class="input-field">
             <label for="correspondenceRefNumber">Correspondence Reference Number</label>
             <input type="text" id="correspondenceRefNumber" name="correspondenceRefNumber"
-              [(ngModel)]="noticeDetails.CMSReferenceNumber" [disabled]="!isEditable" />
+              [(ngModel)]="noticeDetails.cmsReferenceNumber" [disabled]="!isEditable" />
           </div>
           <div class="input-field">
             <label for="noticeIssuer">Notice Issued By</label>
-            <input type="text" id="noticeIssuer" name="noticeIssuer" [(ngModel)]="noticeDetails.NoticeIssuedBy"
+            <input type="text" id="noticeIssuer" name="noticeIssuer" [(ngModel)]="noticeDetails.noticeIssuerShortName"
               [disabled]="!isEditable" />
           </div>
           <div class="input-field">
             <label for="noticeIssuedDate">Notice Issued Date</label>
             <input type="text" id="noticeIssuedDate" name="noticeIssuedDate"
-              [(ngModel)]="noticeDetails.NoticeIssuedDate" [disabled]="!isEditable" />
+              [(ngModel)]="noticeDetails.noticeIssuedDate" [disabled]="!isEditable" />
           </div>
           <div class="input-field">
             <label for="issuersRefNumber">Issuer's Reference Number</label>
             <input type="text" id="issuersRefNumber" name="issuersRefNumber"
-              [(ngModel)]="noticeDetails.IssuersReferenceNumber" [disabled]="!isEditable" />
+              [(ngModel)]="noticeDetails.issuersReferenceNumber" [disabled]="!isEditable" />
           </div>
           <div class="input-field">
             <label for="subject">Subject</label>
-            <input type="text" id="subject" name="subject" [(ngModel)]="noticeDetails.Subject"
+            <input type="text" id="subject" name="subject" [(ngModel)]="noticeDetails.subject"
               [disabled]="!isEditable" />
           </div>
           <div class="input-field">
             <label for="references">Reference(s) (if any)</label>
-            <input type="text" id="references" name="references" [(ngModel)]="noticeDetails.References"
+            <input type="text" id="references" name="references" [(ngModel)]="noticeDetails.references"
               [disabled]="!isEditable" />
           </div>
           <div class="input-field">
             <label for="linkToNotice">Link to Notice (if any)</label>
             <a id="linkToNotice" name="linkToNotice"
-              [href]="noticeDetails.LinkToNotice">{{noticeDetails.LinkToNotice}}</a>
+              [href]="noticeDetails.linkToNotice">{{noticeDetails.linkToNotice}}</a>
           </div>
+          <div class="input-field">
+            <label for="additionalAttachments">Additional Attachment(s) (if any)</label>
+            <ul class="additionalAttachments-list">
+              <li *ngFor="let doc of attachmentNotice">
+                <a [href]="doc.fileLoc" target="_blank">{{doc.FileName}}</a>
+              </li>
+            </ul>
+          </div>
+          <div class="input-field" *ngIf="isNoticesAndResponsePage">
+            <label for="publishOnWebsite">Publish on Website?<span style="color: red">&nbsp;*</span></label>
+            <div class="radio-wrapper">
+              <input name="publishOnWebsite" id="yes" type="radio" [value]="true"
+                [(ngModel)]="noticeDetails.publishOnWebsite" [disabled]="!isEditable" />
+              Yes
+              <input name="publishOnWebsite" id="no" type="radio" [value]="false" [disabled]="!isEditable"
+                [(ngModel)]="noticeDetails.publishOnWebsite" />
+              No
+            </div>
+          </div>
+          <div class="input-field" *ngIf="isNoticesAndResponsePage">
+            <label for="publishOnESS">Publish on ESS?<span style="color: red">&nbsp;*</span></label>
+            <div class="radio-wrapper">
+              <input name="publishOnESS" id="yes" type="radio" [value]="true" [(ngModel)]="noticeDetails.publishOnESS"
+                [disabled]="!isEditable" />
+              Yes
+              <input name="publishOnESS" id="no" type="radio" [value]="false" [disabled]="!isEditable"
+                [(ngModel)]="noticeDetails.publishOnESS" />
+              No
+            </div>
+          </div>
+
+
+          <div class="input-field" *ngIf="isNoticesAndResponsePage">
+            <label for="designatedRecipients">Designated Recipient(s)</label>
+            <input type="text" id="designatedRecipients" name="designatedRecipients"
+              [(ngModel)]="noticeDetails.designatedRecipients" [disabled]="!isEditable" />
+          </div>
+
+          <div class="input-field" *ngIf="isNoticesAndResponsePage">
+            <label for="firmType">Firm Types</label>
+            <div class="checkbox-options">
+              <label *ngFor="let type of allFirmTypes" class="custom-checkbox">
+                <input type="checkbox" [checked]="isFirmTypeSelected(type.FirmTypeID)" />
+                <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+              </label>
+            </div>
+          </div>
+
+          <div class="input-field fullwidth " *ngIf="isNoticesAndResponsePage">
+            <label for="Firms">Firms</label>
+            <ul class="Firms-list">
+              <li *ngFor="let firm of getRelatedFirms(allfirms, relatedFirmsIDs)">
+                {{ firm.FirmName }}
+              </li>
+            </ul>
+          </div>
+
+          <div class="input-field fullwidth controlledFunctions" *ngIf="isNoticesAndResponsePage">
+            <label for="controlledFunctions">Controlled Functions</label>
+            <div class="checkbox-options">
+              <label *ngFor="let controlled of allControlled" class="custom-checkbox">
+                <input type="checkbox" [checked]="isControlledFunctionSelected(controlled.FunctionTypeID)" />
+                <span class="checkmark"></span> {{ controlled.FunctionTypeRptDesc }}
+              </label>
+            </div>
+          </div>
+
+          <div class="input-field fullwidth controlledFunctions" *ngIf="isNoticesAndResponsePage">
+            <label for="controlledFunctions">DNFBP Functions</label>
+            <div class="checkbox-options">
+              <label *ngFor="let contact of ContactFunctionTypeList" class="custom-checkbox">
+                <input type="checkbox" [checked]="isContactFunctionTypeSelected(contact.FunctionTypeID)" />
+                <span class="checkmark"></span> {{ contact.FunctionTypeDesc }}
+              </label>
+            </div>
+          </div>
+
+
+          <div class="input-field fullwidth controlledFunctions" *ngIf="isNoticesAndResponsePage">
+            <label for="contactType">Contact Type</label>
+            <div class="checkbox-options">
+              <label *ngFor="let type of allContactType" class="custom-checkbox">
+                <input type="checkbox" [checked]="isContactTypeSelected(type.ContactTypeID)" />
+                <span class="checkmark"></span> {{ type.ContactTypeDesc }}
+              </label>
+            </div>
+          </div>
+
+
+          <div class="input-field" *ngIf="isNoticesAndResponsePage">
+            <label for="sendNoticeToSUPSupervisor">Email Notice to SUP Supervisor<span
+                style="color: red">&nbsp;*</span></label>
+            <div class="radio-wrapper">
+              <input name="sendNoticeToSUPSupervisor" id="yes" type="radio" [value]="true"
+                [(ngModel)]="noticeDetails.sendNoticeToSUPSupervisor" [disabled]="!isEditable" />
+              Yes
+              <input name="sendNoticeToSUPSupervisor" id="no" type="radio" [value]="false" [disabled]="!isEditable"
+                [(ngModel)]="noticeDetails.sendNoticeToSUPSupervisor" />
+              No
+            </div>
+          </div>
+
+          <div class="input-field" *ngIf="isNoticesAndResponsePage">
+            <label for="sendNoticeToAMLSupervisor">Email Notice to AML Supervisor<span
+                style="color: red">&nbsp;*</span></label>
+            <div class="radio-wrapper">
+              <input name="sendNoticeToAMLSupervisor" id="yes" type="radio" [value]="true"
+                [(ngModel)]="noticeDetails.sendNoticeToAMLSupervisor" [disabled]="!isEditable" />
+              Yes
+              <input name="sendNoticeToAMLSupervisor" id="no" type="radio" [value]="false" [disabled]="!isEditable"
+                [(ngModel)]="noticeDetails.sendNoticeToAMLSupervisor" />
+              No
+            </div>
+          </div>
+
+
           <div class="input-field">
             <label for="noticeFinalizedBy">Notice Finalized By</label>
             <input type="text" id="noticeFinalizedBy" name="noticeFinalizedBy"
-              [(ngModel)]="noticeDetails.NoticeFinalizedBy" [disabled]="!isEditable" />
+              [(ngModel)]="noticeDetails.noticeFinalizedBy" [disabled]="!isEditable" />
           </div>
           <div class="input-field">
             <label for="noticeFinalizedDate">Notice Finalized Date</label>
             <input type="text" id="noticeFinalizedDate" name="noticeFinalizedDate"
-              [(ngModel)]="noticeDetails.NoticeFinalizedDate" [disabled]="!isEditable" />
+              [(ngModel)]="noticeDetails.noticeFinalizedDate" [disabled]="!isEditable" />
           </div>
-          <div class="input-field" *ngIf="noticeDetails.PublishOnWebsite">
+          <div class="input-field" *ngIf="noticeDetails.publishedOnWebsiteBy">
             <label for="publishedBy">Published on Website By</label>
-            <input type="text" id="publishedBy" name="publishedBy" [(ngModel)]="noticeDetails.PublishedOnWebsiteBy"
+            <input type="text" id="publishedBy" name="publishedBy" [(ngModel)]="noticeDetails.publishedOnWebsiteBy"
               [disabled]="!isEditable" />
           </div>
-          <div class="input-field" *ngIf="noticeDetails.PublishOnWebsite">
+          <div class="input-field" *ngIf="noticeDetails.publishOnWebsite">
             <label for="datePublished">Date Published on Website</label>
             <input type="text" id="datePublished" name="datePublished"
-              [(ngModel)]="noticeDetails.DatePublishedonWebsite" [disabled]="!isEditable" />
+              [(ngModel)]="noticeDetails.datePublishedonWebsite" [disabled]="!isEditable" />
           </div>
           <div class="input-field">
             <label for="additionalAttachments">Additional Attachment(s) (if any)</label>
@@ -101,14 +224,14 @@
           <div class="input-field">
             <label for="notificationSentDate">Notification Sent Date</label>
             <input type="text" id="notificationSentDate" name="notificationSentDate"
-              [(ngModel)]="noticeDetails.NotificationSentDate" [disabled]="!isEditable" />
+              [(ngModel)]="noticeDetails.notificationSentDate" [disabled]="!isEditable" />
           </div>
-          <div *ngIf="noticeDetails.ResponseDueDate" class="input-field">
+          <div *ngIf="noticeDetails.responseDueDate" class="input-field">
             <label for="responseDueDate">Response Due Date</label>
-            <input type="text" id="responseDueDate" name="responseDueDate" [(ngModel)]="noticeDetails.ResponseDueDate"
+            <input type="text" id="responseDueDate" name="responseDueDate" [(ngModel)]="noticeDetails.responseDueDate"
               [disabled]="!isEditable" />
           </div>
-          <div class="input-field">
+          <div class="input-field" *ngIf="!isNoticesAndResponsePage">
             <label for="noticeDetails">Notice Details</label>
             <a [routerLink]="['/view-notice-details']" target="_blank">View Notice Details</a>
           </div>
@@ -122,7 +245,7 @@
 
     </div>
 
-    <div class="popup-title-btn-row" *ngIf="questionnaireDetails && noticeDetails?.NoticeTypeID != 2">
+    <div class="popup-title-btn-row" *ngIf="questionnaireDetails && noticeDetails?.noticeTypeID != 2">
       <div class="popup-header">
         <h3>
           Questionnaire
@@ -132,36 +255,36 @@
         - Esclation condition(s) met </p>
       <hr>
     </div>
-    <div class="reporting-schedule-form" *ngIf="questionnaireDetails && noticeDetails?.NoticeTypeID != 2">
+    <div class="reporting-schedule-form" *ngIf="questionnaireDetails && noticeDetails?.noticeTypeID != 2">
       <div class="notice-list">
         <div class="inputs-row notice-details">
           <div *ngFor="let question of questionnaireDetails" class="input-field fullwidth">
             <div class="question-container">
-              <label [for]="'question' + question.NoticeQuestionNumber">{{ 'Question ' + question.NoticeQuestionNumber +
-                ': ' + question.NoticeQuestion }}</label>
-              <div *ngIf="hasEscalationOrExplanationCriteria(question.NoticeQuestionnaireItemID)"
+              <label [for]="'question' + question.noticeQuestionNumber">{{ 'Question ' + question.noticeQuestionNumber +
+                ': ' + question.noticeQuestion }}</label>
+              <div *ngIf="hasEscalationOrExplanationCriteria(question.noticeQuestionnaireItemID)"
                 class="info-icon-container">
-                <i (click)="openConditionsPopup(question.NoticeQuestionnaireItemID)" class="bi bi-info"></i>
+                <i (click)="openConditionsPopup(question.noticeQuestionnaireItemID)" class="bi bi-info"></i>
               </div>
             </div>
             <hr class="fullwidth">
-            <ng-container *ngIf="question.ResponseTypeID && question.ResponseTypeID !== responseTypes.Explanation">
+            <ng-container *ngIf="question.responseTypeID && question.responseTypeID !== responseTypes.Explanation">
               <label>Response: </label>
               <!-- <p [name]="'question' + question.NoticeQuestionNumber" [id]="'question' + question.NoticeQuestionNumber"
                 [(ngModel)]="question.Responses">
               </p> -->
-              <p [id]="'explanation' + question.Responses" [innerHTML]="getSanitizedHtml(question.Responses)">
+              <p [id]="'explanation' + question.responses" [innerHTML]="getSanitizedHtml(question.responses)">
               </p>
             </ng-container>
             <hr class="fullwidth"
-              *ngIf="shouldShowHr(question.Responses, question.ResponseTypeID, question.ExplanationRequired)">
+              *ngIf="shouldShowHr(question.responses, question.responseTypeID, question.explanationRequired)">
             <ng-container
-              *ngIf="question.ExplanationRequired === 1 || question.ExplanationRequired === 3 || question.ResponseTypeID == responseTypes.Explanation">
+              *ngIf="question.explanationRequired === 1 || question.explanationRequired === 3 || question.responseTypeID == responseTypes.Explanation">
               <label>Explanation: </label>
               <!-- <p [name]="'question' + question.NoticeQuestionNumber" [id]="'question' + question.NoticeQuestionNumber"
                 [(ngModel)]="question.Explanation">
               </p> -->
-              <p [id]="'explanation' + question.Explanation" [innerHTML]="getSanitizedHtml(question.Explanation)">
+              <p [id]="'explanation' + question.explanation" [innerHTML]="getSanitizedHtml(question.explanation)">
               </p>
             </ng-container>
           </div>
@@ -170,31 +293,31 @@
     </div>
 
 
-    <div class="popup-title-btn-row" *ngIf="noticeDetails?.NoticeTypeID != 2">
+    <div class="popup-title-btn-row" *ngIf="noticeDetails?.noticeTypeID != 2">
       <div class="popup-header">
         <h3>
           Notes
         </h3>
       </div>
     </div>
-    <div class="reporting-schedule-form" *ngIf="noticeDetails?.NoticeTypeID != 2">
+    <div class="reporting-schedule-form" *ngIf="noticeDetails?.noticeTypeID != 2">
       <div class="notice-list">
         <div class="inputs-row notice-details">
           <div class="input-field fullwidth">
-            <textarea [(ngModel)]="noticeDetails.Notes" [disabled]="!isEditable" name="notes"></textarea>
+            <textarea [(ngModel)]="noticeDetails.notes" [disabled]="!isEditable" name="notes"></textarea>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="popup-title-btn-row" *ngIf="noticeDetails?.NoticeTypeID != 2">
+    <div class="popup-title-btn-row" *ngIf="noticeDetails?.noticeTypeID != 2">
       <div class="popup-header">
         <h3>
           Additional Documentation Provided By Firm
         </h3>
       </div>
     </div>
-    <div class="reporting-schedule-form" *ngIf="noticeDetails?.NoticeTypeID != 2">
+    <div class="reporting-schedule-form" *ngIf="noticeDetails?.noticeTypeID != 2">
       <div class="notice-list">
         <div class="inputs-row notice-details">
           <div class="input-field fullwidth">
@@ -214,20 +337,20 @@
       </div>
     </div>
 
-    <div class="popup-title-btn-row" *ngIf="noticeDetails?.NoticeTypeID != 2">
+    <div class="popup-title-btn-row" *ngIf="noticeDetails?.noticeTypeID != 2">
       <div class="popup-header">
         <h3>
           Response Provider/Signatory Details
         </h3>
       </div>
     </div>
-    <div class="reporting-schedule-form" *ngIf="noticeDetails?.NoticeTypeID != 2">
+    <div class="reporting-schedule-form" *ngIf="noticeDetails?.noticeTypeID != 2">
       <div class="notice-list">
         <div class="inputs-row notice-details">
           <div class="input-field">
             <label for="responseProvdedBy">Response Provided By</label>
             <input type="text" id="responseProvdedBy" name="responseProvdedBy"
-              [(ngModel)]="noticeDetails.ResponseProvidedBy" [disabled]="!isEditable" />
+              [(ngModel)]="noticeDetails.responseProvidedBy" [disabled]="!isEditable" />
           </div>
           <div class="input-field">
             <label for="responseProvdedDate">Response Provided Date</label>
@@ -258,7 +381,7 @@
         <div>
           <p>An explanation is required when response provided by firm
             <span *ngFor="let condition of explanationConditions; let last = last">
-              <strong> {{ condition.EvaluationOperatorTypeDesc }} "{{ condition.ListValue || 0 }}"</strong>
+              <strong> {{ condition.evaluationOperatorTypeDesc }} "{{ condition.listValueDesc || 0 }}"</strong>
               <span *ngIf="!last"> or </span>
             </span>
           </p>
@@ -275,7 +398,7 @@
         <div>
           <p>Escalation is required when response provided by firm
             <span *ngFor="let condition of escalationConditions">
-              <strong> {{condition.EvaluationOperatorTypeDesc}} "{{ condition.ListValue || 0 }}" </strong>
+              <strong> {{condition.evaluationOperatorTypeDesc}} "{{ condition.listValueDesc || 0 }}" </strong>
             </span>
           </p>
         </div>
@@ -295,7 +418,7 @@
     <div class="popup-header">
       <h3>Email Notification</h3>
     </div>
-    <div class="email-body" [innerHTML]="getSanitizedHtml(noticeDetails.EmailNotificationSent)">
+    <div class="email-body" [innerHTML]="getSanitizedHtml(noticeDetails.emailNotificationContent)">
     </div>
   </div>
   <div class="popup-operations-place">

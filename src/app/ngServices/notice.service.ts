@@ -51,5 +51,8 @@ export class NoticeService {
     return this.http.get<any>(url);
   }
 
-  
+  getNoticeDetails(noticeID:number){
+    const url = `${this.baseUrlNotice}get_notice_details?noticeID=${noticeID}`;
+    return this.http.get<any>(url);
+  }
 }

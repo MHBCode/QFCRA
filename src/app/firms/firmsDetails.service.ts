@@ -460,7 +460,7 @@ export class FirmDetailsService {
 
 
 
-  isValidFirmSupervisor(firmId: number, userId: number): Observable<boolean> {
+  isValidFirmSupervisor(firmId: number | null = null, userId: number): Observable<boolean> {
     return this.securityService.isValidFirmSupervisor(firmId, userId).pipe(
       map(response => response.response)
     );

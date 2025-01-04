@@ -56,12 +56,29 @@
     gap: 0.5rem;
 }
 
+.custom-checkbox {
+    margin: 0px;
+    font-size: 0.9rem;
+}
+
+.checkbox-options {
+    display: inline-flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+
 .email-notification-link {
     color: blue;
     text-decoration: underline;
     cursor: pointer;
 }
 
+.Firms-list{
+    column-count: 3;
+    padding-inline-start: 2rem;
+    font-size: 0.9rem;
+}
 ::ng-deep .email-body table tr:nth-child(even) {
     background-color: white !important;
 }

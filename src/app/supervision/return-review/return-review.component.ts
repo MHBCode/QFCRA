@@ -6,6 +6,7 @@ import { LogformService } from 'src/app/ngServices/logform.service';
 import { SupervisionService } from '../supervision.service';
 import * as constants from 'src/app/app-constants';
 import { ReturnReviewService } from 'src/app/ngServices/return-review.service';
+import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 @Component({
   selector: 'app-return-review',
   templateUrl: './return-review.component.html',
@@ -41,7 +42,8 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     private firmDetailsService: FirmDetailsService,
     private logformService: LogformService,
     private supervisionService: SupervisionService,
-    private returnReviewService: ReturnReviewService
+    private returnReviewService: ReturnReviewService,
+    private objectwfService : ObjectwfService
   ) { }
 
   ngOnInit(): void {
@@ -215,7 +217,7 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     const objectId = constants.FrimsObject.ReturnsReview;
     const objectInstanceId = ReturnreView.RptReviewID;
     this.selectedReturnreView = ReturnreView;
-    this.returnReviewService.getReturnReviewRevision(objectId, objectInstanceId).subscribe(
+    this.objectwfService.getRevisions(objectId, objectInstanceId).subscribe(
       data => {
         this.ReturnReviewRevisionList = data.response;
         console.log("this.ReturnReviewRevisionList", this.ReturnReviewRevisionList)
@@ -246,7 +248,6 @@ export class ReturnReviewComponent implements OnInit, OnChanges {
     this.selectedReviewRevision = ReviewRevision;
     this.selectedReturnreView = ReturnreView;
     this.showPopup = true;
-    console.log("this.selectedReviewRevision", this.selectedReviewRevision)
     this.closeReturnReviewRevisionModal()
   }
 

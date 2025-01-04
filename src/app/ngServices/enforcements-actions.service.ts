@@ -27,4 +27,10 @@ export class EnforcementsActionsService {
     return this.http.post<any>(url,enfObj);
   }
 
+
+  getEnfData(userId: number,firmId: number | null = null, enforcementAndDisciplinaryActnID: number | null = null): Observable<any> {
+    const url = `${this.baseUrlEnforcement}get_enforcement_data?userId=${userId}${firmId !== null ? `&firmId=${firmId}` : ''}${enforcementAndDisciplinaryActnID !== null ? `&enforcementAndDisciplinaryActnID=${enforcementAndDisciplinaryActnID}` : ''}`;
+    return this.http.get<any>(url);
+  }
+
 }

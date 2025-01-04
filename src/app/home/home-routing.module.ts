@@ -21,7 +21,6 @@ import { RecommendationComponent } from './sub-pages/individualPages/individual-
 import { ReportsComponent } from './sub-pages/individualPages/individual-registration-status-subpages/reports/reports.component';
 import { TrackingComponent } from './sub-pages/individualPages/individual-registration-status-subpages/tracking/tracking.component';
 import { CreateNoticesComponent } from './sub-pages/create-notices/create-notices.component';
-import { EnforcementAndDisciplinaryActionComponent } from './sub-pages/enforcement-and-disciplinary-action/enforcement-and-disciplinary-action.component';
 import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisors.component';
 import { ViewControllerComponent } from './sub-pages/view-controller/view-controller.component';
 import { EditControllerComponent } from './sub-pages/edit-controller/edit-controller.component';
@@ -33,6 +32,7 @@ import { MyTeamTasksComponent } from './sub-components/my-team-tasks/my-team-tas
 import { CreateReminderComponent } from './sub-components/create-reminder/create-reminder.component';
 import { TaskListComponent } from './sub-components/task-list/task-list.component';
 import { NoticesComponent } from '../supervision/notices/notices.component';
+import { EnfActionsComponent } from '../supervision/enf-actions/enf-actions.component';
 
 const routes: Routes = [
   { path: '', component: MainPageComponent},
@@ -75,7 +75,7 @@ const routes: Routes = [
     ]
   },
   { path: 'create-notices' , component: CreateNoticesComponent},
-  { path: 'enforcement-and-disciplinary' , component:EnforcementAndDisciplinaryActionComponent},
+  { path: 'enforcement-and-disciplinary' , component:EnfActionsComponent},
   { path: 'co-supervisors' , component:CoSupervisorsComponent},
   { path: 'view-controller', component: ViewControllerComponent},
   { path: 'edit-controller', component: EditControllerComponent},

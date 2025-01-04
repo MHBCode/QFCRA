@@ -1,0 +1,63 @@
+<table class="supervision-tables">
+    <thead>
+        <tr>
+            <th>Legislation</th>
+            <th>Part</th>
+            <th>Provisions (From)</th>
+            <th>Provisions (To)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let prov of provisions" class="prov-row">
+            <td>{{ prov.RALegislationDesc }}</td>
+            <td>{{ prov.RAProvisionPartTypeDesc }}</td>
+            <td>{{ prov.FromProvisionRef }}</td>
+            <td class="infoTd">{{ prov.ToProvisionRef }}<span class="info"
+                    (click)="getProvisionDescByProvisionRange(prov)"><i class="bi bi-question-circle"></i></span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+<div class="overlay showDetails" *ngIf="showDetails"></div>
+<div class="form-container showDetailsForm popupcontainer" *ngIf="showDetails" style="display: block;">
+    <div class="popup-title-btn-row">
+        <div class="popup-header">
+            <h3>
+                Provision Descriptions
+            </h3>
+        </div>
+        <button class="close-button  close-icon" (click)="onCloseDetails()">
+            <i class="bi bi-x-circle"></i>
+        </button>
+    </div>
+    <div class="inputs-row">
+        <div class="input-field">
+            <label for="Legislation">Legislation</label>
+            <input type="text" id="Legislation" name="Legislation" [(ngModel)]="selectedItem.RALegislationDesc"
+                class="form-control" disabled />
+        </div>
+        <div class="input-field">
+            <label for="part Type">Part Type</label>
+            <input type="text" id="part Type" name="part Type" [(ngModel)]="selectedItem.RAProvisionPartTypeDesc"
+                class="form-control" disabled />
+        </div>
+        <table class="supervision-tables" *ngIf="provsionDetails.length > 0">
+            <thead>
+                <tr>
+                    <th>RA Provision Part #</th>
+                    <th>RA Provision Desc</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let provision of provsionDetails" class="prov-row">
+                    <td>{{ provision.RAProvisionPartRef }}</td>
+                    <td>{{ provision.RAProvisionDesc }}</td>
+                </tr>
+            </tbody>
+        </table>
+        
+    </div>
+</div>

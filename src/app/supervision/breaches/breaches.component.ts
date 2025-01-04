@@ -4,6 +4,7 @@ import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { BreachesService } from 'src/app/ngServices/breaches.service';
 import { SecurityService } from 'src/app/ngServices/security.service';
 import * as constants from 'src/app/app-constants';
+import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 @Component({
   selector: 'app-breaches',
   templateUrl: './breaches.component.html',
@@ -17,6 +18,7 @@ export class BreachesComponent {
   FIRMBreaches: any;
   paginatedBreaches: any = [];
   showPopup: boolean = false;
+  showSearchPopup: boolean = false;
   filteredBreaches: any;
   userId : number = 30;
   pageSize: number = 10;
@@ -26,7 +28,10 @@ export class BreachesComponent {
   breachLevels:any;
   breachAllStatus:any;
   paginatedItems: any[] = []; 
-
+  showRevision : boolean = false;
+  revisionList: any[] = []; 
+  selectedRevision: any = null;
+  selectedBreach: any = null;
 
   breachNumber: string | null = null;
   breachType: string | null = null;
@@ -41,7 +46,8 @@ export class BreachesComponent {
     private route: ActivatedRoute,
     private firmDetailsService: FirmDetailsService,
     private breachesService : BreachesService,
-    private securityService: SecurityService
+    private securityService: SecurityService,
+    private objectwfService : ObjectwfService
   ) {
 
   }
@@ -69,8 +75,8 @@ export class BreachesComponent {
     );
   }
 
-  togglePopup(): void {
-    this.showPopup = !this.showPopup;
+  toggleSearchPopup(): void {
+    this.showSearchPopup = !this.showSearchPopup;
   }
 
   loadBreaches() {
@@ -116,11 +122,11 @@ export class BreachesComponent {
       data => {
         this.filteredBreaches = data.response;
         this.applySearchAndPagination();
-        this.togglePopup();
+        this.toggleSearchPopup();
       },
       error => {
         this.filteredBreaches = [];
-        this.togglePopup();
+        this.toggleSearchPopup();
         console.error('Error fetching filtered breaches ', error);
       }
     );
@@ -175,5 +181,50 @@ export class BreachesComponent {
       });
   }
 
+
+  getRevision(breach: any, event: Event) {
+    debugger;
+    event.stopPropagation();
+    const objectId = constants.FrimsObject.Breach;
+    const objectInstanceId = breach.BreachRevNum;
+    this.selectedBreach = breach;
+    this.objectwfService.getRevisions(objectId, objectInstanceId).subscribe(
+      data => {
+        this.revisionList = data.response;
+        console.log("this.revisionList", this.revisionList)
+        if (this.revisionList.length > 0) {
+          this.showRevision = true
+        }
+      },
+      error => {
+        console.error(error);
+      }
+    )
+
+  }
+
+  closeRevisionModal() {
+    this.showRevision = false;
+    this.revisionList = [];
+  }
+
+  openViewPopup(breach: any): void {
+    this.selectedBreach = breach;
+    this.showPopup = true;
+  }
+
+  closePopup(): void {
+    this.showPopup = false;
+    this.selectedRevision = null;
+  }
+
+  openRevisionDetails(Revision: any, Breach: any): void {
+    this.selectedRevision = Revision;
+    this.selectedRevision = Revision;
+    this.selectedBreach = Breach;
+    this.showPopup = true;
+    console.log("this.selectedRevision", this.selectedRevision)
+    this.closeRevisionModal()
+  }
 
 }

@@ -4,8 +4,11 @@
     <div class="inputs-field-set">
         <div class="section table">
             <div class="form-section-title space-between">
-                <h2 class="edit-firm-header">
+                <h2 class="edit-firm-header" *ngIf="!isMainEnfActionListing">
                     List Of Enforcement & Disciplinary Actions > <span>{{ firmDetails?.FirmName }}</span>
+                </h2>
+                <h2 class="edit-firm-header" *ngIf="isMainEnfActionListing">
+                    List Of Enforcement & Disciplinary Actions
                 </h2>
                 <div class="btn">
                     <button *ngIf="getControlVisibility('imgBtnCreate') && !hideCreateBtn"
@@ -66,6 +69,5 @@
     </div>
 </div>
 
-<app-enf-actions-view-details (reloadEnf)="loadEnfActions()" *ngIf="showPopup" [enf]="selectedEnf" [firmId]="firmId" [isCreateEnf]="isCreateEnf"
-        [firmDetails]="firmDetails" (closeEnfPopup)="closePopup()">
+<app-enf-actions-view-details (reloadEnf)="loadEnfActions()" *ngIf="showPopup" [enf]="selectedEnf" [isCreateEnf]="isCreateEnf" (closeEnfPopup)="closePopup()" [routeFirmId]="firmId" [firmDeatailsFromParent]="firmDetails" [isMainEnfActionListing]="isMainEnfActionListing">
 </app-enf-actions-view-details>
