@@ -39,14 +39,17 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
 
   selectedFirmTypeIDs: number[] = [];
   selectedControlledFunctionIDs: number[] = [];
+  selectedResponseControlledFunctionIDs: number[] = [];
   selectedContactFunctionTypeIDs: number[] = [];
+  selectedResponseContactFunctionTypeIDs: number[] = [];
   relatedFirmsIDs: number[] = [];
   selectContactTypeIDs: number[] = [];
   allfirms: any = [];
   allControlled: any = [];
   allContactType: any = [];
   ContactFunctionTypeList: any = [];
-
+  allRespondentTypes: any = [];
+  allEvaluationRequirementTypes: any = [];
   // document
   attachmentbyFirm: any = [];
   attachmentNotice: any = [];
@@ -98,6 +101,8 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
       this.getAllControlled();
       this.getContactFunctionType();
       this.getAllContactTypes();
+      this.getAllRespondentTypes();
+      this.getAllEvaluationRequirementType();
       this.getNoticeDetails();
       this.getFirmTypes();
       this.isNoticesAndResponsePage = true;
@@ -108,7 +113,7 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
     this.isLoading = true;
     const currentOpType = ObjectOpType.List;
 
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType, null, null).then(() => {
       this.registerMasterPageControlEvents();
     });
   }
@@ -147,8 +152,6 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
         data => {
           this.noticeDetails = data.response;
           this.questionnaireDetails = this.noticeDetails.lstFirmNoticeResponseItems;
-          console.log('questionnaireDetails', this.questionnaireDetails);
-          // this.conditionDetails = (this.noticeDetailsInfo.find(item => item.key === "ResultSet3")?.value);
         },
         error => {
           console.error('Error fetching noticeTypes ', error);
@@ -161,7 +164,6 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
     this.firmService.getAllFirms().subscribe(
       (data) => {
         this.allfirms = data.response;
-        console.log('this.allfirms', this.allfirms);
       },
       (error) => {
         console.error('Error fetching firms:', error);
@@ -177,6 +179,9 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
           this.noticeDetailsInfo = data.response;
           this.noticeDetails = this.noticeDetailsInfo;
 
+
+          console.log("noticeDetails", this.noticeDetails)
+
           this.selectedFirmTypeIDs = this.noticeDetails.recipientCriteriaCSVFirmTypeIDs
             .split(',')
             .map((id) => parseInt(id, 10));
@@ -188,19 +193,23 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
             .split(',')
             .map((id) => parseInt(id, 10));
 
-          this.selectedContactFunctionTypeIDs = this.noticeDetails.recipientCriteriaCSVDNFBPFunctionTypeIDs
+          this.selectedResponseControlledFunctionIDs = this.noticeDetails.objNoticeQuestionnaire.respondentsControlledFunctionTypeIDs
             .split(',')
             .map((id) => parseInt(id, 10));
 
+          this.selectedResponseContactFunctionTypeIDs = this.noticeDetails.objNoticeQuestionnaire.respondentsDNFBPFunctionTypeIDs
+            .split(',')
+            .map((id) => parseInt(id, 10));
+
+          this.selectedContactFunctionTypeIDs = this.noticeDetails.recipientCriteriaCSVDNFBPFunctionTypeIDs
+            .split(',')
+            .map((id) => parseInt(id, 10));
 
           this.selectContactTypeIDs = this.noticeDetails.recipientCriteriaCSVContactTypeIDs
             .split(',')
             .map((id) => parseInt(id, 10));
 
-          console.log('relatedFirmsIDs', this.relatedFirmsIDs);
-
           this.questionnaireDetails = this.noticeDetailsInfo.objNoticeQuestionnaire;
-          console.log('noticeDetailsInfo', this.noticeDetailsInfo)
         },
         error => {
           console.error('Error fetching noticeTypes ', error);
@@ -209,21 +218,10 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
     }
   }
 
-  isFirmTypeSelected(firmTypeID: number): boolean {
-    return this.selectedFirmTypeIDs.includes(firmTypeID);
+  isIdSelected(selectedIDs: any = [], firmTypeID: number): boolean {
+    return selectedIDs.includes(firmTypeID);
   }
 
-  isControlledFunctionSelected(controlledFonctionID: number): boolean {
-    return this.selectedControlledFunctionIDs.includes(controlledFonctionID);
-  }
-
-  isContactTypeSelected(contactTypeID: number): boolean {
-    return this.selectContactTypeIDs.includes(contactTypeID);
-  }
-
-  isContactFunctionTypeSelected(contactFunctionTypeID: number): boolean {
-    return this.selectedContactFunctionTypeIDs.includes(contactFunctionTypeID);
-  }
   getRelatedFirms(firms: any[], ids: number[]): any[] {
     return firms.filter(firm => ids.includes(firm.FirmID));
   }
@@ -245,7 +243,6 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
     this.securityService.getObjectTypeTable(this.userId, constants.controlledFunctionTypes, constants.ObjectOpType.Create)
       .subscribe(data => {
         this.allControlled = data.response;
-        console.log("allControlled", this.allControlled)
       }, error => {
         console.error("Error fetching Controllers", error);
       });
@@ -258,6 +255,26 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
         this.allContactType = data.response.filter(
           (contact) => contact.ContactTypeID !== 3 && contact.ContactTypeID !== 4
         );
+      }, error => {
+        console.error("Error fetching Controllers", error);
+      });
+  }
+
+  getAllRespondentTypes(): void {
+    this.securityService.getObjectTypeTable(this.userId, constants.respondentTypes, constants.ObjectOpType.Create)
+      .subscribe(data => {
+        this.allRespondentTypes = data.response;
+        console.log('this.allRespon', this.allRespondentTypes)
+      }, error => {
+        console.error("Error fetching Controllers", error);
+      });
+  }
+
+
+  getAllEvaluationRequirementType(): void {
+    this.securityService.getObjectTypeTable(this.userId, constants.evaluationRequirementType, constants.ObjectOpType.Create)
+      .subscribe(data => {
+        this.allEvaluationRequirementTypes = data.response;
       }, error => {
         console.error("Error fetching Controllers", error);
       });

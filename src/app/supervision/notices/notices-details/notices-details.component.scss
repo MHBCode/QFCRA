@@ -82,3 +82,15 @@
 ::ng-deep .email-body table tr:nth-child(even) {
     background-color: white !important;
 }
+
+
+.allRespondentTypes {
+    display: inline-flex;
+    align-items: center;
+    margin-inline-end: 10px;
+}
+
+.allRespondentTypes input {
+    width: auto !important;
+    margin-inline-end: 5px;
+}

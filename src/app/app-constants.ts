@@ -55,7 +55,8 @@ export const currencyTypes = "V_CurrencyTypes"
 // Notices
 export const controlledFunctionTypes = "v_ControlledFunctionTypes";
 export const contactTypes = "v_ContactTypes";
-
+export const respondentTypes = "V_RespondentTypes";
+export const evaluationRequirementType = "V_EvaluationRequirementType";
 
 // Reporting Schedule
 export const firmRptSubmissionTypes = "V_FirmRptSubmissionTypes";

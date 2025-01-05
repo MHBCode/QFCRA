@@ -1,6 +1,7 @@
 <app-loader *ngIf="isLoading"></app-loader>
 <div class="overlay">
-  <div class="popupcontainer Rptpopupcontainer NoAnimationPopup" style="display:block" (click)="$event.stopPropagation()">
+  <div class="popupcontainer Rptpopupcontainer NoAnimationPopup" style="display:block"
+    (click)="$event.stopPropagation()">
     <!-- <div class="error-messages">
         <p *ngIf="errorMessages['OtherEntityName']">
           {{ errorMessages['OtherEntityName'] }}
@@ -23,7 +24,7 @@
       </button>
     </div>
     <div class="reporting-schedule-form">
-      <div class="notice-list">
+      <div class="notice-list" *ngIf="noticeDetails">
         <div class="inputs-row notice-details">
           <div class="input-field">
             <label for="typeOfNotice">Type of Notice</label>
@@ -33,9 +34,10 @@
           <div class="input-field">
             <label for="noticeName">Notice Name</label>
             <input type="text" id="noticeName" name="noticeName" [(ngModel)]="noticeDetails.noticeName"
-              [disabled]="!isEditable" *ngIf="noticeDetails.noticeTemplateID == 3" />
+              [disabled]="!isEditable" *ngIf="noticeDetails.noticeName != null" />
+
             <input type="text" id="noticeName" name="noticeName" [(ngModel)]="noticeDetails.noticeTemplateName"
-              [disabled]="!isEditable" *ngIf="noticeDetails.noticeTemplateID !== 3" />
+              [disabled]="!isEditable" *ngIf="noticeDetails.noticeTemplateName != null" />
           </div>
           <div class="input-field">
             <label for="internalRefNumber">Internal Reference Number</label>
@@ -119,7 +121,7 @@
             <label for="firmType">Firm Types</label>
             <div class="checkbox-options">
               <label *ngFor="let type of allFirmTypes" class="custom-checkbox">
-                <input type="checkbox" [checked]="isFirmTypeSelected(type.FirmTypeID)" />
+                <input type="checkbox" [checked]="isIdSelected(selectedFirmTypeIDs,type.FirmTypeID)" />
                 <span class="checkmark"></span> {{ type.FirmTypeDesc }}
               </label>
             </div>
@@ -138,7 +140,8 @@
             <label for="controlledFunctions">Controlled Functions</label>
             <div class="checkbox-options">
               <label *ngFor="let controlled of allControlled" class="custom-checkbox">
-                <input type="checkbox" [checked]="isControlledFunctionSelected(controlled.FunctionTypeID)" />
+                <input type="checkbox"
+                  [checked]="isIdSelected(selectedControlledFunctionIDs,controlled.FunctionTypeID)" />
                 <span class="checkmark"></span> {{ controlled.FunctionTypeRptDesc }}
               </label>
             </div>
@@ -148,7 +151,8 @@
             <label for="controlledFunctions">DNFBP Functions</label>
             <div class="checkbox-options">
               <label *ngFor="let contact of ContactFunctionTypeList" class="custom-checkbox">
-                <input type="checkbox" [checked]="isContactFunctionTypeSelected(contact.FunctionTypeID)" />
+                <input type="checkbox"
+                  [checked]="isIdSelected(selectedContactFunctionTypeIDs,contact.FunctionTypeID)" />
                 <span class="checkmark"></span> {{ contact.FunctionTypeDesc }}
               </label>
             </div>
@@ -159,7 +163,7 @@
             <label for="contactType">Contact Type</label>
             <div class="checkbox-options">
               <label *ngFor="let type of allContactType" class="custom-checkbox">
-                <input type="checkbox" [checked]="isContactTypeSelected(type.ContactTypeID)" />
+                <input type="checkbox" [checked]="isIdSelected(selectContactTypeIDs,type.ContactTypeID) " />
                 <span class="checkmark"></span> {{ type.ContactTypeDesc }}
               </label>
             </div>
@@ -214,14 +218,6 @@
               [(ngModel)]="noticeDetails.datePublishedonWebsite" [disabled]="!isEditable" />
           </div>
           <div class="input-field">
-            <label for="additionalAttachments">Additional Attachment(s) (if any)</label>
-            <ul class="additionalAttachments-list">
-              <li *ngFor="let doc of attachmentNotice">
-                <a [href]="doc.fileLoc" target="_blank">{{doc.FileName}}</a>
-              </li>
-            </ul>
-          </div>
-          <div class="input-field">
             <label for="notificationSentDate">Notification Sent Date</label>
             <input type="text" id="notificationSentDate" name="notificationSentDate"
               [(ngModel)]="noticeDetails.notificationSentDate" [disabled]="!isEditable" />
@@ -245,7 +241,132 @@
 
     </div>
 
-    <div class="popup-title-btn-row" *ngIf="questionnaireDetails && noticeDetails?.noticeTypeID != 2">
+    <div class="popup-title-btn-row" *ngIf="isNoticesAndResponsePage">
+      <div class="popup-header">
+        <h3>
+          Response Requirements
+        </h3>
+      </div>
+      <div class="reporting-schedule-form" *ngIf="isNoticesAndResponsePage && noticeDetails">
+        <div class="inputs-row notice-details">
+          <div class="input-field fullwidth">
+            <label for="workingDaysForResponse">The number of working days (from the Notification Sent Date) within
+              which a response is due</label>
+            <input type="text" id="workingDaysForResponse" name="workingDaysForResponse"
+              [(ngModel)]="noticeDetails.objNoticeQuestionnaire.workingDaysForResponse" [disabled]="!isEditable" />
+          </div>
+          <div class="input-field fullwidth">
+            <label for="subjectToLateFee">Administrative fees applicable if response not provided by firm within
+              specified due date<span style="color: red">&nbsp;*</span></label>
+            <div class="radio-wrapper">
+              <input name="subjectToLateFee" id="yes" type="radio" [value]="true"
+                [(ngModel)]="noticeDetails.objNoticeQuestionnaire.subjectToLateFee" [disabled]="!isEditable" />
+              Yes
+              <input name="subjectToLateFee" id="no" type="radio" [value]="false" [disabled]="!isEditable"
+                [(ngModel)]="noticeDetails.objNoticeQuestionnaire.subjectToLateFee" />
+              No
+            </div>
+          </div>
+          <div class="input-field fullwidth">
+            <label for="respondentType">Designated Signatories<span style="color: red">&nbsp;*</span></label>
+            <div class="radio-wrapper">
+              <div *ngFor="let respondent of allRespondentTypes" class="allRespondentTypes">
+                <input type="radio" name="respondentType" [value]="respondent.RespondentTypeID"
+                  [(ngModel)]="noticeDetails.objNoticeQuestionnaire.respondentTypeID" [disabled]="!isEditable" />
+                <span>{{ respondent.RespondentTypeDesc }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-field fullwidth controlledFunctions">
+            <label for="controlledFunctions">Controlled Functions</label>
+            <div class="checkbox-options">
+              <label *ngFor="let controlled of allControlled" class="custom-checkbox">
+                <input type="checkbox"
+                  [checked]="isIdSelected(selectedResponseControlledFunctionIDs,controlled.FunctionTypeID)" />
+                <span class="checkmark"></span> {{ controlled.FunctionTypeRptDesc }}
+              </label>
+            </div>
+          </div>
+
+          <div class="input-field fullwidth controlledFunctions">
+            <label for="controlledFunctions">DNFBP Functions</label>
+            <div class="checkbox-options">
+              <label *ngFor="let contact of ContactFunctionTypeList" class="custom-checkbox">
+                <input type="checkbox"
+                  [checked]="isIdSelected(selectedResponseContactFunctionTypeIDs,contact.FunctionTypeID)" />
+                <span class="checkmark"></span> {{ contact.FunctionTypeDesc }}
+              </label>
+            </div>
+          </div>
+
+          <div class="input-field fullwidth">
+            <b>Send a copy of the firm's response to</b>
+            <div class="input-field controlledFunctions">
+              <label for="controlledFunctions">SUP Supervisor</label>
+              <div class="radio-wrapper">
+                <div *ngFor="let eval of allEvaluationRequirementTypes" class="allRespondentTypes">
+                  <input type="radio" name="sendResponseToSUPSupervisor" [value]="eval.EvaluationRequirementTypeID"
+                    [(ngModel)]="noticeDetails.objNoticeQuestionnaire.sendResponseToSUPSupervisor"
+                    [disabled]="!isEditable" />
+                  <span>{{ eval.EvaluationRequirementTypeDesc }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="input-field controlledFunctions">
+              <label for="controlledFunctions">AML Supervisor </label>
+              <div class="radio-wrapper">
+                <div *ngFor="let eval of allEvaluationRequirementTypes" class="allRespondentTypes">
+                  <input type="radio" name="sendResponseToAMLSupervisor" [value]="eval.EvaluationRequirementTypeID"
+                    [(ngModel)]="noticeDetails.objNoticeQuestionnaire.sendResponseToAMLSupervisor"
+                    [disabled]="!isEditable" />
+                  <span>{{ eval.EvaluationRequirementTypeDesc }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="input-field controlledFunctions">
+              <label for="controlledFunctions">SUP Director</label>
+              <div class="radio-wrapper">
+                <div *ngFor="let eval of allEvaluationRequirementTypes" class="allRespondentTypes">
+                  <input type="radio" name="sendResponseToSUPDirector" [value]="eval.EvaluationRequirementTypeID"
+                    [(ngModel)]="noticeDetails.objNoticeQuestionnaire.sendResponseToSUPDirector"
+                    [disabled]="!isEditable" />
+                  <span>{{ eval.EvaluationRequirementTypeDesc }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="input-field controlledFunctions">
+              <label for="controlledFunctions">AML Director</label>
+              <div class="radio-wrapper">
+                <div *ngFor="let eval of allEvaluationRequirementTypes" class="allRespondentTypes">
+                  <input type="radio" name="sendResponseToAMLDirector" [value]="eval.EvaluationRequirementTypeID"
+                    [(ngModel)]="noticeDetails.objNoticeQuestionnaire.sendResponseToAMLDirector"
+                    [disabled]="!isEditable" />
+                  <span>{{ eval.EvaluationRequirementTypeDesc }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="input-field controlledFunctions">
+              <label for="controlledFunctions">Managing Director</label>
+              <div class="radio-wrapper">
+                <div *ngFor="let eval of allEvaluationRequirementTypes" class="allRespondentTypes">
+                  <input type="radio" name="sendResponseToMD" [value]="eval.EvaluationRequirementTypeID"
+                    [(ngModel)]="noticeDetails.objNoticeQuestionnaire.sendResponseToMD" [disabled]="!isEditable" />
+                  <span>{{ eval.EvaluationRequirementTypeDesc }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+    </div>
+
+    <div class="popup-title-btn-row" *ngIf="questionnaireDetails && noticeDetails && noticeDetails?.noticeTypeID != 2">
       <div class="popup-header">
         <h3>
           Questionnaire
@@ -255,7 +376,8 @@
         - Esclation condition(s) met </p>
       <hr>
     </div>
-    <div class="reporting-schedule-form" *ngIf="questionnaireDetails && noticeDetails?.noticeTypeID != 2">
+    <div class="reporting-schedule-form"
+      *ngIf="questionnaireDetails && noticeDetails && noticeDetails?.noticeTypeID != 2">
       <div class="notice-list">
         <div class="inputs-row notice-details">
           <div *ngFor="let question of questionnaireDetails" class="input-field fullwidth">
@@ -293,14 +415,14 @@
     </div>
 
 
-    <div class="popup-title-btn-row" *ngIf="noticeDetails?.noticeTypeID != 2">
+    <div class="popup-title-btn-row" *ngIf="noticeDetails && noticeDetails?.noticeTypeID != 2">
       <div class="popup-header">
         <h3>
           Notes
         </h3>
       </div>
     </div>
-    <div class="reporting-schedule-form" *ngIf="noticeDetails?.noticeTypeID != 2">
+    <div class="reporting-schedule-form" *ngIf="noticeDetails && noticeDetails?.noticeTypeID != 2">
       <div class="notice-list">
         <div class="inputs-row notice-details">
           <div class="input-field fullwidth">
@@ -310,14 +432,14 @@
       </div>
     </div>
 
-    <div class="popup-title-btn-row" *ngIf="noticeDetails?.noticeTypeID != 2">
+    <div class="popup-title-btn-row" *ngIf="noticeDetails && noticeDetails?.noticeTypeID != 2">
       <div class="popup-header">
         <h3>
           Additional Documentation Provided By Firm
         </h3>
       </div>
     </div>
-    <div class="reporting-schedule-form" *ngIf="noticeDetails?.noticeTypeID != 2">
+    <div class="reporting-schedule-form" *ngIf="noticeDetails && noticeDetails?.noticeTypeID != 2">
       <div class="notice-list">
         <div class="inputs-row notice-details">
           <div class="input-field fullwidth">
@@ -337,14 +459,14 @@
       </div>
     </div>
 
-    <div class="popup-title-btn-row" *ngIf="noticeDetails?.noticeTypeID != 2">
+    <div class="popup-title-btn-row" *ngIf="noticeDetails && noticeDetails?.noticeTypeID != 2">
       <div class="popup-header">
         <h3>
           Response Provider/Signatory Details
         </h3>
       </div>
     </div>
-    <div class="reporting-schedule-form" *ngIf="noticeDetails?.noticeTypeID != 2">
+    <div class="reporting-schedule-form" *ngIf="noticeDetails && noticeDetails?.noticeTypeID != 2">
       <div class="notice-list">
         <div class="inputs-row notice-details">
           <div class="input-field">
@@ -355,7 +477,7 @@
           <div class="input-field">
             <label for="responseProvdedDate">Response Provided Date</label>
             <input type="text" id="responseProvdedDate" name="responseProvdedDate"
-              [(ngModel)]="noticeDetails.ResponseProvidedDate" [disabled]="!isEditable" />
+              [(ngModel)]="noticeDetails.responseProvidedDate" [disabled]="!isEditable" />
           </div>
         </div>
       </div>
@@ -418,7 +540,10 @@
     <div class="popup-header">
       <h3>Email Notification</h3>
     </div>
-    <div class="email-body" [innerHTML]="getSanitizedHtml(noticeDetails.emailNotificationContent)">
+    <div class="email-body" *ngIf="!isNoticesAndResponsePage"
+      [innerHTML]="getSanitizedHtml(noticeDetails.emailNotificationContent)">
+    </div>
+    <div class="email-body" *ngIf="isNoticesAndResponsePage" [innerHTML]="getSanitizedHtml(noticeDetails.noticeEmail)">
     </div>
   </div>
   <div class="popup-operations-place">
