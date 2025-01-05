@@ -145,4 +145,8 @@ export class DateUtilService {
     return parsedDate.toISOString();
   }
 
+  isPositiveNonDecimal(value: number): boolean {
+    return value > 0 && Number.isInteger(value);
+  }
+
 }

@@ -16,6 +16,21 @@
       </button>
     </div>
 
+    <div class="error-messages">
+      <p *ngIf="errorMessages['ENTER_JUSTIFICATION']">
+        {{ errorMessages['ENTER_JUSTIFICATION'] }}
+      </p>
+      <p *ngIf="errorMessages['ENTER_IMPOSEDAMOUNT']">
+        {{ errorMessages['ENTER_IMPOSEDAMOUNT'] }}
+      </p>
+      <p *ngIf="errorMessages['VALID_IMPOSEDAMOUNT']">
+        {{ errorMessages['VALID_IMPOSEDAMOUNT'] }}
+      </p>
+      <p *ngIf="errorMessages['RULES_CALCULATION']">
+        {{ errorMessages['RULES_CALCULATION'] }}
+      </p>
+    </div>
+
     <div class="reporting-schedule-form" *ngIf="AdminFeeDetials?.length > 0">
       <div class="inputs-row">
         <div class="input-field">
@@ -75,7 +90,7 @@
         <div class="popup-header">
           <h3>Submission History</h3>
         </div>
-        <table class="fund-status-table">
+        <table class="submission-history-table">
           <thead>
             <tr>
               <th>Submission / Re-submission Due Date</th>
@@ -95,7 +110,7 @@
               <td>{{ ResubmissionHistory.materiallyCompleteDesc }}</td>
               <td>{{ ResubmissionHistory.resubmissionRequestedDate }}</td>
               <td>{{ ResubmissionHistory.resubmissionRequestBy }}</td>
-              <td>{{ ResubmissionHistory.wPublishedComments }}</td>
+              <td style="text-align: left;">{{ ResubmissionHistory.wPublishedComments }}</td>
               <td>{{ ResubmissionHistory.noLateDaysForDisplay }}</td>
               <td><a id="websiteLink" [href]="ResubmissionHistory.linkToSubmission" target="_blank"
                   rel="noopener noreferrer">
@@ -128,11 +143,13 @@
               <ng-container *ngIf="isEditModeAdminFee; else required">
                 <div class="required-container">
                   <input type="radio" [(ngModel)]="AdminFeeDetials[0].feeImposed" id="feeImposedYes"
-                    [disabled]="!isEditModeAdminFee" name="feeImposed" [value]="true" (change)="imposeAnAdministrativeonChange()"/>
+                    [disabled]="!isEditModeAdminFee" name="feeImposed" [value]="true"
+                    (change)="imposeAnAdministrativeonChange()" />
                   <label for="feeImposed">Yes</label>
 
                   <input type="radio" [(ngModel)]="AdminFeeDetials[0].feeImposed" id="feeImposedNo"
-                    [disabled]="!isEditModeAdminFee" name="feeImposed" [value]="false" (change)="imposeAnAdministrativeonChange()"/>
+                    [disabled]="!isEditModeAdminFee" name="feeImposed" [value]="false"
+                    (change)="imposeAnAdministrativeonChange()" />
                   <label for="feeImposed">No</label>
                 </div>
               </ng-container>
@@ -144,8 +161,9 @@
 
             <div class="input-field">
               <label for="imposedRules">Rules under which fee is being imposed</label>
-              <select *ngIf="isEditModeAdminFee; else rules" name="rules" id="rules">
-                <option [value]="0"></option>
+              <select *ngIf="isEditModeAdminFee; else rules" name="rules" id="rules"
+                [(ngModel)]="AdminFeeDetials[0].AdminFeeRateID">
+                <option [value]="0">Select</option>
                 <option [value]="option.AdminFeeRateID" *ngFor="let option of allAdminFeeRates">{{option.RuleDesc}}
                 </option>
               </select>
@@ -175,13 +193,16 @@
               </ng-template>
             </div>
             <div class="input-field">
-              <label class="bold-text" for="CalculatedFee">Fee to be imposed</label>
+              <label class="bold-text" for="fee">Fee to be imposed</label>
               <ng-container *ngIf="isEditModeAdminFee; else imposedFee">
-                <span>
-                  <select [disabled]="!selectedImposedRadio" name="currency" id="currency" [(ngModel)]="AdminFeeDetials[0].ImposedAmountCurrencyTypeID">
-                    <option *ngFor="let option of allCurrencyTypes" [value]="option.CurrencyTypeID">{{option.CurrencyCode}}</option>
+                <span class="fee-to-be-imposed-dropdowns">
+                  <select [disabled]="!selectedImposedRadio" name="currency" id="currency"
+                    [(ngModel)]="AdminFeeDetials[0].ImposedAmountCurrencyTypeID">
+                    <option *ngFor="let option of allCurrencyTypes" [value]="option.CurrencyTypeID">
+                      {{option.CurrencyCode}}</option>
                   </select>
-                  <input [disabled]="!selectedImposedRadio" class="amount" type="text" [(ngModel)]="AdminFeeDetials[0].ImposedAmount">
+                  <input [disabled]="!selectedImposedRadio" class="amount" type="number"
+                    [(ngModel)]="AdminFeeDetials[0].ImposedAmount">
                 </span>
               </ng-container>
 
@@ -204,93 +225,11 @@
         </ng-container>
       </div>
 
-      <app-review [fee]="fee" [firmId]="firmId" [firmDetails]="firmDetails" [isEditable]="isEditModeAdminFee"
-        [pageName]="Page.LateAdminFee" [Review]="UserObjectWfTasks">
-      </app-review>
-
-
-
-      <!-- <div class="rpt-list margin-top-10">
-        <div class="popup-header">
-          <h3>Review</h3>
-        </div>
-        <div *ngFor="let WfTask of UserObjectWfTasks ; let i = index">
-          <div *ngIf="i != 0" class="popup-header">
-            <h3></h3>
-          </div>
-          <table class="fund-status-table">
-            <thead>
-              <tr>
-                <th>Task</th>
-                <th>Role Assigned To</th>
-                <th>User Assigned To</th>
-                <th>Email(CC)</th>
-                <th>Assigned Date</th>
-                <th>Due Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{ WfTask.ObjectOpTypeName }}</td>
-                <td>{{ WfTask.AppRoleDesc }}</td>
-                <td>{{ WfTask.AssignedToUserName }}</td>
-                <td>{{ WfTask.CompletionEmailCC }}</td>
-                <td>{{ WfTask.WFTaskAssignedDate }}</td>
-                <td>{{ WfTask.DueDate }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="inputs-row report-entry">
-            <div class="input-field">
-              <label for="TaskInitiatedBy">Task Initiated By</label>
-              <input type="text" id="TaskInitiatedBy" [(ngModel)]="WfTask.CreatedByUserName" name="TaskInitiatedBy" [disabled]="!isEditable">
-            </div>
-
-            <div class="input-field">
-              <label for="TaskInitiatedDate">Task Initiated Date</label>
-              <input type="text" id="TaskInitiatedDate" name="TaskInitiatedDate" [(ngModel)]="WfTask.TaskInitiatedDate" [disabled]="!isEditable" />
-            </div>
-            <div class="input-field notes">
-              <label for="notes">Comments</label>
-              <div>
-                <ckeditor *ngIf="isEditable; else notes" [(ngModel)]="WfTask.ObjectWFComments"
-                  [editor]="Editor" style="height: 200px;" [config]="config"></ckeditor>
-              </div>
-              <ng-template #notes>
-                <p [innerHTML]="sanitizeHtml(WfTask.ObjectWFComments)">
-                </p>
-              </ng-template>
-            </div>
-
-            <div class="input-field">
-              <label for="Status">Status</label>
-              <input type="text" id="Status" name="Status" [disabled]="!isEditable" 
-              [(ngModel)]="WfTask.ObjectWFStatusTypeDesc"/>
-            </div>
-            <div class="input-field">
-              <label for="StatusSetBy">Status Set By</label>
-              <input type="text" id="StatusSetBy" name="StatusSetBy" [disabled]="!isEditable" 
-              [(ngModel)]="WfTask.StatusSetBy" />
-            </div>
-            <div class="input-field">
-              <label for="StatusSetDate">Status Set Date</label>
-              <input type="text" #dateInputs placeholder id="StatusSetDate" name="StatusSetDate"
-                [disabled]="!isEditable" [(ngModel)]="WfTask.CommentsDateTime"/>
-            </div>
-          </div>
-          <div *ngIf="i === UserObjectWfTasks.length - 1" class="popup-header">
-            <h3></h3>
-          </div>
-        </div>
-      </div>  -->
-      <div class="rpt-list margin-top-10">
-        <div class="inputs-row report-entry">
-          <div class="input-field">
-            <span>
-              <a (click)="getRevisionCommentsByWaiver()" style="color:blue;">Show Previous Workflow Comments</a>
-            </span>
-          </div>
-        </div>
+      <div>
+        <app-review [ObjectWFStatusID]="AdminFeeDetials[0].ObjectWfStatusID"
+          [ObjectInstanceID]="AdminFeeDetials[0].FirmrptAdminFeeID"
+          [ObjectInstanceRevNo]="AdminFeeDetials[0].FirmRptReviewRevNum" [Page]="Page.LateAdminFee"
+          [isEdit]="isEditModeAdminFee" (userObjTasksChange)="onReviewDataReceived($event)"></app-review>
       </div>
 
       <!-- Action Buttons -->
@@ -299,7 +238,7 @@
           <i class="bi bi-file-earmark-text"></i> Export to word
         </button>
 
-        <button (click)="editFee()" *ngIf="!hideEditBtn && getControlVisibility('imgBtnEdit')"
+        <button (click)="editAdminFee()" *ngIf="!hideEditBtn && getControlVisibility('imgBtnEdit')"
           [disabled]="!getControlEnablement('imgBtnEdit')">
           <i class="bi bi-pen"></i> Edit
         </button>
@@ -308,12 +247,13 @@
           Delete
         </button>
 
-        <button (click)="saveFee()" *ngIf="!hideSaveBtn && getControlVisibility('imgBtnSave')"
+        <button (click)="saveAdminFee()" *ngIf="!hideSaveBtn && getControlVisibility('imgBtnSave')"
           [disabled]="!getControlEnablement('imgBtnSave')">
           Save
         </button>
 
-        <button (click)="cancelFee()" class="cancel-btn" *ngIf="!hideCancelBtn && getControlVisibility('imgBtnCancel')"
+        <button (click)="cancelAdminFee()" class="cancel-btn"
+          *ngIf="!hideCancelBtn && getControlVisibility('imgBtnCancel')"
           [disabled]="!getControlEnablement('imgBtnCancel')">
           Cancel
         </button>
@@ -340,41 +280,5 @@
     </div>
     <div class="popup-operations-place">
       <button class="subbutton" (click)="closeCalculatedFeePopup()">Close</button>
-    </div>
-  </div>
-
-  <!-- Modal Popup for Showing Search Results -->
-  <div *ngIf="showPreviousCommentsModal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Previous Workflow Comments</h3>
-      </div>
-      <div class="modal-body">
-        <table class="contact-table">
-          <thead>
-            <tr>
-              <th>Version No.</th>
-              <th>Comments</th>
-              <th>Status</th>
-              <th>Status Set By</th>
-              <th>Status Set Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let RevisionComment of RevisionCommentsList">
-              <td>
-                {{ RevisionComment.ObjectInstanceRevNum }}
-              </td>
-              <td>{{ RevisionComment.WaiverComments }}</td>
-              <td>{{ RevisionComment.ObjectWFStatusTypeDesc }}</td>
-              <td>{{ RevisionComment.CommentorName }}</td>
-              <td>{{ RevisionComment.CommentDate }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="btn">
-        <button class="close-button" (click)="closePreviousCommentsModal()">Cancel</button>
-      </div>
     </div>
   </div>

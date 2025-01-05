@@ -325,7 +325,7 @@
                         <div class="input-field">
                             <label for="reportLink">Link to Report</label>
                             <span *ngIf="rpt.documentDetails?.FileName">{{rpt.DocTypeDesc}} : <a id="websiteLink"
-                                    [href]="rpt.DocFileLocation" target="_blank" rel="noopener noreferrer">
+                                    [href]="isCreateReportingSch ? sharePointUrl + currentRpt.documentDetails.DocFileLocation : rpt.DocFileLocation" target="_blank" rel="noopener noreferrer">
                                     {{rpt.documentDetails?.FileName}}
                                 </a></span>
                             <a *ngIf="(isEditModeReportingSch || isCreateReportingSch) && !rpt.DocID"

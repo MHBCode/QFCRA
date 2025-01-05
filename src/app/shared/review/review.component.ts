@@ -1,227 +1,364 @@
-import { Component, EventEmitter, Input, Output,ChangeDetectorRef, ElementRef, QueryList, ViewChildren } from '@angular/core';
-import { SupervisionService } from 'src/app/supervision/supervision.service';
-import { SecurityService } from 'src/app/ngServices/security.service';
-import { LogformService } from 'src/app/ngServices/logform.service';
 import * as constants from 'src/app/app-constants';
-import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
-import { ActivatedRoute } from '@angular/router';
-import { RegisteredfundService } from 'src/app/ngServices/registeredfund.service';
-import { Bold, ClassicEditor, Essentials, Font, FontColor, FontSize, Heading, Indent, IndentBlock, Italic, Link, List, MediaEmbed, Paragraph, Table, Undo } from 'ckeditor5';
-import Swal from 'sweetalert2';
-import {ObjectwfService} from 'src/app/ngServices/objectwf.service';
-import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
-import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.service';
-import { FirmRptAdminFeeService } from 'src/app/ngServices/firm-rpt-admin-fee.service';
-import { SafeHtml } from '@angular/platform-browser';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 import { WaiverService } from 'src/app/ngServices/waiver.service';
-import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
-import {UsersService} from 'src/app/ngServices/users.service'
+import { FlatpickrService } from '../flatpickr/flatpickr.service';
+import { SecurityService } from 'src/app/ngServices/security.service';
+import Swal from 'sweetalert2';
+import { UsersService } from 'src/app/ngServices/users.service';
+import { SupervisionService } from 'src/app/supervision/supervision.service';
+import { DateUtilService } from '../date-util/date-util.service';
+
 @Component({
   selector: 'app-review',
   templateUrl: './review.component.html',
-  styleUrls: ['./review.component.scss','../popup.scss', '../../supervision/supervision.scss']
+  styleUrls: ['./review.component.scss', '../popup.scss', '../../../assets/styles/forms.scss']
 })
-export class ReviewComponent {
+export class ReviewComponent implements OnInit {
 
-  isLoading : boolean = false
-  @Input() fee: any;
-  @Input() firmId: any;
-  @Input() firmDetails: any;
-  @Input() isEditable : any;
-  @Input() addtlReviewRequired : any;
-  @Input() addtlReviewRequiredDecisionMadeByName : any;
-  @Input() addtlReviewRequiredDecisionMadeOn : any;
-  @Input() pageName;
-  @Input() index: number;
-  @Input() Review: any;
-  @Input() isReviseMode : any;
-  @Input() UserObjectWfTasks: any;
-  Page = FrimsObject;
-  @Output() closeRegPopup = new EventEmitter<void>();
-  @Output() fundDeleted = new EventEmitter<void>();
-  
-  now = new Date();
-  currentDate = this.now.toISOString();
-  currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
-  taskRolesList: any
-  selectedAppRoleID: number = 0;
-  UsersInRoleList : any;
-  isShowEmailCCPopup:boolean = false;
-  UsersList :any;
- @Output() reviewsArray: any[] = [];
+
+
+  @Input() ObjectWFStatusID: number = 0;
+  @Input() Page: number = 0;
+  @Input() ObjectInstanceID: number = 0;
+  @Input() ObjectInstanceRevNo: number = 0;
+  @Input() isEdit: boolean = false;
+
+  WfStatus: number;
+
+  @Output() userObjTasksChange: EventEmitter<any> = new EventEmitter();
+  userObjTasks: any[] = [];
+  RevisionCommentsList: any[] = [];
+  allUsers: any[] = [];
+  recipientsTempUsersList: any[] = [];
+
+  selectedUser: number = 0;
+  selectedTask: any = null;
+
+  showPreviousCommentsPopup: boolean = false;
+  showEmailRecipients: boolean = false;
+
+  errorMessage: string = "";
+
   constructor(
-    private supervisionService: SupervisionService,
-    private securityService: SecurityService,
-    private route: ActivatedRoute,
-    private logForm : LogformService,
-    private registeredFundService: RegisteredfundService,
-    private firmDetailsService: FirmDetailsService,
-    private objectwfService: ObjectwfService,
+    private objectWF: ObjectwfService,
+    private waiverService: WaiverService,
     private flatpickrService: FlatpickrService,
-    private sanitizerService: SanitizerService,
-    private firmRptAdminFeeService: FirmRptAdminFeeService,
-    private waiverService : WaiverService,
-    private usersService : UsersService,
-    
+    private securityService: SecurityService,
+    private userService: UsersService,
+    private supervisionService: SupervisionService,
+    private dateUtilService: DateUtilService,
   ) {
 
   }
+
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.firmId = +params['id'];
-      //this.isFirmAuthorised();
-    });
-    console.log(this.fee)
-    if (!Array.isArray(this.Review)) {
-      console.error('Review is not an array:', this.Review);
-      this.Review = null; // Fallback to an empty array
-    }
+    this.getUsersForEmailPopup() // Load users first
+      .then(() => this.getUserObjectWfTasks()) // Then get tasks
+      .then(() => this.getWorkflowTaskRoles())
+      .catch(error => {
+        console.error("Error in initializing tasks:", error);
+      });
+    this.getObjectInstanceWorkflowStatus();
   }
+
   ngAfterViewInit() {
     this.dateInputs.changes.subscribe(() => {
       this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
     });
     this.flatpickrService.initializeFlatpickr(this.dateInputs.toArray());
   }
-  onClose(): void {
-    this.closeRegPopup.emit();
-  }
-  
-  public Editor = ClassicEditor;
 
-  public config = {
-    toolbar: [
-      'undo', 'redo', '|',
-      'heading', '|', 'bold', 'italic', '|',
-      'fontSize', 'fontColor', '|',
-      'link', 'insertTable', 'mediaEmbed', '|',
-      'bulletedList', 'numberedList', 'indent', 'outdent'
-    ],
-    plugins: [
-      Bold,
-      Essentials,
-      Heading,
-      Indent,
-      IndentBlock,
-      Italic,
-      Link,
-      List,
-      MediaEmbed,
-      Paragraph,
-      Table,
-      Undo,
-      Font,
-      FontSize,
-      FontColor
-    ],
-    licenseKey: ''
-  };
-  sanitizeHtml(html: string): SafeHtml {
-    return this.sanitizerService.sanitizeHtml(html);
-  }
-  showFirstReview: boolean = false
-  // AddFirstReview(){
-  //   this.showFirstReview = true;
-  // } 
-  ReviewObj = {
-    review:'',
-    task: 'Review',
-    roleassignedToId:0,
-    userAssignedToId:0,
-    dueDate: '',
-  }
-  AddFirstReview() {
-    this.reviewsArray.push({ ...this.ReviewObj });
-  }
-  getWorkflowTaskRoles(){
-    const objectTaskTypeID = this.UserObjectWfTasks.ObjectTaskTypeID;
-    const objectID = constants.FrimsObject.ReturnsReview;
-    const notificationFlag = 0;
-    const objectWFTaskDefID = this.UserObjectWfTasks.ObjectWFTaskDefID;
-    this.objectwfService.getWorkflowTaskRoles(objectTaskTypeID,objectID,notificationFlag,objectWFTaskDefID).subscribe({
-      next: (res) => {
-        this.taskRolesList = res.response;
-        console.log("taskRolesList",this.taskRolesList)
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error fitching taskRolesList', error);
-        this.isLoading = false;
-      },
+  getUserObjectWfTasks(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.objectWF.getUserObjectWfTasks(this.ObjectWFStatusID).subscribe({
+        next: (data) => {
+
+          const currentDate = new Date();
+
+          const formattedCurrentDate = this.dateUtilService.formatDateToCustomFormat(currentDate.toString());
+
+          this.userObjTasks = data.response;
+
+          if (this.isEdit) {
+            this.userObjTasks.forEach(task => {
+              if (this.supervisionService.isNullOrEmpty(task.wfTaskDueDate)) {
+                task.wfTaskDueDate = formattedCurrentDate; // Assign today's date
+              }
+              if (task.wfTaskAssignedToUser === null) {
+                task.emailToIDs = "";
+              }
+            });
+          }
+
+          this.userObjTasks.forEach(task => {
+            if (task.emailCCIDs) {
+              const userEmailIDs = task.emailCCIDs.split(';');
+              task.userDetails = userEmailIDs
+                .map(userID => {
+                  const user = this.allUsers.find(u => u.UserID === parseInt(userID.trim()));
+                  if (user) {
+                    return {
+                      UserID: user.UserID,
+                      UserName: user.UserName,
+                      UserEmailAddress: user.UserEmailAddress
+                    };
+                  }
+                  return null;
+                })
+                .filter(details => details);
+            } else {
+              task.userDetails = [];
+            }
+          });
+
+
+
+          this.emitUserObjTasks();
+          resolve();
+        },
+        error: (error) => {
+          console.error(error);
+          reject(error);
+        }
+      });
     });
   }
-  onRoleChange(event: Event,index: number) {
-    console.log('Selected AppRoleID:', this.selectedAppRoleID);
-    const target = event.target as HTMLSelectElement;
-    this.reviewsArray[index].roleassignedToId = parseInt(target.value, 10);
-    this.getUsersInRole(this.selectedAppRoleID);
-  }
-  
-  getUsersInRole(selectedAppRoleID){
-    const objectID = constants.FrimsObject.ReturnsReview;
-    const roleId = selectedAppRoleID;
-    this.securityService.getUsersInRole(objectID,roleId).subscribe({
-      next: (res) => {
-        this.UsersInRoleList = res.response;
-        console.log("UsersInRoleList",this.UsersInRoleList)
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error fitching UsersInRoleList', error);
-        this.isLoading = false;
-      },
+
+
+  // Get Roles Assigned To
+  getWorkflowTaskRoles() {
+    this.userObjTasks.forEach(task => {
+      this.objectWF.getWorkflowTaskRoles(
+        task.objectWFTaskTypeID,
+        this.Page,
+        constants.NotificationFlag.NotNotify,
+        task.objectWFTaskDefsID
+      ).subscribe({
+        next: (data) => {
+          task.taskRoles = data.response;
+          task.wfTaskAssignedToRole = task.taskRoles.find(role => role.AppRoleID === task.wfTaskAssignedToRole)?.AppRoleID || 0;
+          this.getUsersInRole(task);
+        },
+        error: (error) => {
+          console.error(error);
+        }
+      });
     });
   }
-  
 
-  // CancleFirstReview(){
-  //   Swal.fire({
-  //     text: "Your selection of 'No' for the 'Additional Review Required' field indicates that your review of this submission is complete and that you intend to close-out this review without any additional reviews. Any further changes to this review will have to be made by creating a new revision of this review by clicking on the 'Revise' button. If your review of this report has not been completed, please select 'Not Yet' and save your changes.",
-  //     icon: 'warning',
-  //     showCancelButton: true,
-  //     confirmButtonColor: '#982B1C',
-  //     cancelButtonColor: '#982B1C',
-  //     confirmButtonText: 'Ok',
-  //     cancelButtonText: 'Cancel'
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       this.showFirstReview = false;
-  //     }
-  //   });
-  // }
-  CancelFirstReview(index: number) {
-    Swal.fire({
-      text: "Your selection of 'No' for the 'Additional Review Required' field indicates that your review of this submission is complete and that you intend to close-out this review without any additional reviews. Any further changes to this review will have to be made by creating a new revision of this review by clicking on the 'Revise' button. If your review of this report has not been completed, please select 'Not Yet' and save your changes.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#982B1C',
-      cancelButtonColor: '#982B1C',
-      confirmButtonText: 'Yes, Remove',
-      cancelButtonText: 'Cancel'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.reviewsArray.splice(index, 1);
+  // Get Users Assigned To
+  getUsersInRole(task: any) {
+    this.securityService.getUsersInRole(this.Page, task.wfTaskAssignedToRole).subscribe({
+      next: (data) => {
+        task.taskUsers = data.response;
+        task.wfTaskAssignedToUser = task.taskUsers.find(user => user.UserId === task.wfTaskAssignedToUser)?.UserId || 0;
+      },
+      error: (error) => {
+        console.error(error);
       }
     });
   }
- // selected user
- openEmailCCPopup(){
-  this.isShowEmailCCPopup = true;
-  this.getUsers();
- }
 
- getUsers(){
-  this.usersService.getUsers().subscribe({
-    next: (res) => {
-      this.UsersList = res.response;
-      console.log("UsersList",this.UsersList)
-      this.isLoading = false;
-    },
-    error: (error) => {
-      console.error('Error fitching UsersList', error);
-      this.isLoading = false;
-    },
-  });
- }
+  userAssignedToOnChange(task: any) {
+
+    // Exclude the current task by comparing unique IDs
+    const duplicateTask = this.userObjTasks.find(
+      (t) =>
+        t.objectWFTaskStatusID !== task.objectWFTaskStatusID && // Ensure it's not the current task
+        parseInt(t.wfTaskAssignedToUser) === parseInt(task.wfTaskAssignedToUser)
+    );
+
+    if (duplicateTask) {
+      task.wfTaskAssignedToUser = null;
+
+      setTimeout(() => {
+        task.wfTaskAssignedToUser = 0; 
+      });
+      task.objectWFTaskStart = false;
+      task.emailToIDs = "";
+      task.emailToAddress = "";
+      task.userName = "";
+
+      Swal.fire({
+        text: 'User has already been assigned to a different task. Please assign the task to a different user.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+    } else {
+      if (parseInt(task.wfTaskAssignedToUser) !== 0) {
+        task.objectWFTaskStart = true;
+
+        const assignedToUser = this.allUsers.find(user => user.UserID === parseInt(task.wfTaskAssignedToUser));
+        task.emailToAddress = assignedToUser
+          ? assignedToUser.UserEmailAddress.split('@')[0] // remove domain
+          : '';
+
+        task.emailToIDs = task.wfTaskAssignedToUser.toString();
+
+        task.userName = assignedToUser.UserName;
+
+      } else {
+        task.objectWFTaskStart = false;
+      }
+    }
+    console.log('Current task:', task);
+    console.log('wfTaskAssignedToUser:', task.wfTaskAssignedToUser);
+    this.emitUserObjTasks();
+  }
+
+  getObjectInstanceWorkflowStatus() {
+    this.objectWF.getObjectInstanceWorkflowStatus(this.Page, this.ObjectInstanceID, this.ObjectInstanceRevNo).subscribe({
+      next: (response) => {
+        this.WfStatus = response.response;
+      },
+      error: (error) => {
+        console.error(error);
+      },
+      complete: () => {
+        console.log('Workflow status fetch complete');
+      }
+    });
+  }
+
+
+  openPreviousWFComments() {
+    this.showPreviousCommentsPopup = true;
+    this.waiverService.getRevisionCommentsByWaiver(this.ObjectWFStatusID).subscribe({
+      next: (res) => {
+        this.RevisionCommentsList = res.response;
+        console.log("RevisionCommentsList", this.RevisionCommentsList)
+      },
+      error: (error) => {
+        console.error('Error fetching RevisionCommentsList', error);
+      },
+    });
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.previousCommentsPopup') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .previousCommentsPopup not found');
+      }
+    }, 0)
+  }
+
+  closePreviousCommentsPopup() {
+    this.showPreviousCommentsPopup = false;
+    const popupWrapper = document.querySelector('.previousCommentsPopup') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none';
+    } else {
+      console.error('Element with class .previousCommentsPopup not found');
+    }
+  }
+
+  addRecipients(task: any) {
+    this.selectedTask = task;
+    this.showEmailRecipients = true;
+    this.recipientsTempUsersList = (task.userDetails || []).map(user => ({
+      ...user,
+      isChecked: true
+    }));
+    setTimeout(() => {
+      const popupWrapper = document.querySelector('.emailRecipientsPopup') as HTMLElement;
+      if (popupWrapper) {
+        popupWrapper.style.display = 'flex';
+      } else {
+        console.error('Element with class .emailRecipientsPopup not found');
+      }
+    }, 0)
+  }
+
+  closeEmailRecipientsPopup() {
+    this.showEmailRecipients = false;
+    this.selectedTask = null;
+    this.recipientsTempUsersList = [];
+    const popupWrapper = document.querySelector('.emailRecipientsPopup') as HTMLElement;
+    if (popupWrapper) {
+      popupWrapper.style.display = 'none';
+    } else {
+      console.error('Element with class .emailRecipientsPopup not found');
+    }
+  }
+
+  getUsersForEmailPopup(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.userService.getUsers().subscribe({
+        next: (users) => {
+          this.allUsers = users.response;
+          this.selectedUser = this.allUsers[0].UserID;
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error fetching users: ', error);
+          reject(error);
+        }
+      });
+    });
+  }
+
+  addUserToSelectedTask() {
+    if (this.selectedUser) {
+      const user = this.allUsers.find(u => u.UserID === Number(this.selectedUser));
+      if (user) {
+        const alreadyExists = this.recipientsTempUsersList.some(u => u.UserID === user.UserID);
+        if (alreadyExists) {
+          this.errorMessage = "User already selected.";
+        } else {
+          this.recipientsTempUsersList.push({
+            ...user,
+            isChecked: true
+          });
+          this.errorMessage = "";
+        }
+      }
+    }
+  }
+
+  okClickedSelectedTask() {
+    if (this.selectedTask) {
+      this.selectedTask.userDetails = [...this.recipientsTempUsersList];
+
+      this.selectedTask.emailCCAddress = this.selectedTask.userDetails
+        .map(user => user.UserEmailAddress.split('@')[0]) // remove domain
+        .join('; ');
+
+      this.selectedTask.emailCCIDs = this.selectedTask.userDetails
+        .map(user => user.UserID)
+        .join(';');
+
+      const assignedToUser = this.allUsers.find(user => user.UserID === this.selectedTask.wfTaskAssignedToUser);
+      this.selectedTask.emailToAddress = assignedToUser
+        ? assignedToUser.UserEmailAddress.split('@')[0] // remove domain
+        : '';
+
+      this.selectedTask.emailToIDs = this.selectedTask.wfTaskAssignedToUser.toString();
+
+    }
+    this.emitUserObjTasks();
+    this.closeEmailRecipientsPopup();
+  }
+
+
+  clearSelectedTaskUsers() {
+    if (this.selectedTask) {
+      this.recipientsTempUsersList = this.recipientsTempUsersList.filter(user => !user.isChecked);
+      this.emitUserObjTasks();
+    }
+  }
+
+  editWFTask(task: any) {
+    this.userObjTasks.forEach(item => {
+      item.isEditableTask = false;
+    });
+    // Set the selected task to editable
+    task.isEditableTask = true;
+  }
+
+  emitUserObjTasks() {
+    this.userObjTasksChange.emit(this.userObjTasks);
+  }
+
 }
