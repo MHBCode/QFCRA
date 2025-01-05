@@ -13,9 +13,7 @@ import { ReportsSubmissionsComponent } from './sub-components/reports-submission
 import { FirmsBySelectorComponent } from './sub-components/firms-by-selector/firms-by-selector.component';
 import { TaskListComponent } from './sub-components/task-list/task-list.component';
 import { FirmListComponent } from './sub-components/firm-list/firm-list.component';
-import { FirmsPageComponent } from './sub-pages/firms-page/firms-page.component';
 import { ViewFirmPageComponent } from './sub-pages/view-firm-page/view-firm-page.component';
-import { EditFirmComponent } from './sub-pages/edit-firm/edit-firm.component';
 import { NewFirmComponent } from './sub-pages/new-firm/new-firm.component';
 import { TasksPageComponent } from './sub-pages/tasksPages/tasks-page/tasks-page.component';
 import { SharedModule } from '../shared/shared.module';
@@ -25,17 +23,10 @@ import { IndividualRegistrationStatusComponent } from './sub-pages/individualPag
 import { IndividualPendingAiAppsComponent } from './sub-pages/individualPages/individual-pending-ai-apps/individual-pending-ai-apps.component';
 import { UserAccessComponent } from './sub-pages/adminPages/user-access/user-access.component';
 import { ReAssignTasksComponent } from './sub-pages/adminPages/re-assign-tasks/re-assign-tasks.component';
-import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm-reports.component';
-import { NoticesAndResponsesComponent } from './sub-pages/notices-and-responses/notices-and-responses.component';
-import { CreateNoticesComponent } from './sub-pages/create-notices/create-notices.component';
-import { EnforcementAndDisciplinaryActionComponent } from './sub-pages/enforcement-and-disciplinary-action/enforcement-and-disciplinary-action.component';
 import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisors.component';
 import { CreateIndividualComponent } from './sub-pages/individualPages/create-individual/create-individual.component';
 import { ViewIndividualComponent } from './sub-pages/individualPages/view-individual/view-individual.component';
 import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages/view-individual-status-change/view-individual-status-change.component';
-import { ViewControllerComponent } from './sub-pages/view-controller/view-controller.component';
-import { EditControllerComponent } from './sub-pages/edit-controller/edit-controller.component';
-import { CreateControllerComponent } from './sub-pages/create-controller/create-controller.component';
 import { ShadowSupervisorComponent } from './sub-components/shadow-supervisor/shadow-supervisor.component';
 import { TasksIAssignedComponent } from './sub-components/tasks-i-assigned/tasks-i-assigned.component';
 import { MyTeamTasksComponent } from './sub-components/my-team-tasks/my-team-tasks.component';
@@ -51,28 +42,19 @@ import { CreateReminderComponent } from './sub-components/create-reminder/create
     FirmsBySelectorComponent,
     TaskListComponent,
     FirmListComponent,
-    FirmsPageComponent,
     ViewFirmPageComponent,
-    EditFirmComponent,
     NewFirmComponent,
     TasksPageComponent,
     IndividualPageComponent,
     IndividualListComponent,
     IndividualRegistrationStatusComponent,
     IndividualPendingAiAppsComponent,
-    FirmReportsComponent,
     UserAccessComponent,
     ReAssignTasksComponent,
-    NoticesAndResponsesComponent,
-    CreateNoticesComponent,
-    EnforcementAndDisciplinaryActionComponent,
     CoSupervisorsComponent,
     CreateIndividualComponent,
     ViewIndividualComponent,
     ViewIndividualStatusChangeComponent,
-    ViewControllerComponent,
-    EditControllerComponent,
-    CreateControllerComponent,
     ShadowSupervisorComponent,
     TasksIAssignedComponent,
     MyTeamTasksComponent,

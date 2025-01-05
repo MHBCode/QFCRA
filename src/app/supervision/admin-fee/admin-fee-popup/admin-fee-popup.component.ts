@@ -42,6 +42,7 @@ export class AdminFeePopupComponent {
   AdminFeeDetials: any;
   showCalculatedFeePopup: boolean = false;
   userObjTasks: any[] = [];
+  objWorkFlow: any = {};
   ResubmissionHistoryList: any;
   CalculatedFee: any;
   dayCount: any;
@@ -325,6 +326,7 @@ export class AdminFeePopupComponent {
     ).subscribe({
       next: data => {
         this.rptWFStatus = data.response;
+        this.getObjectWorkFlow();
         this.applySecurityOnPage(this.Page.LateAdminFee);
       },
       error: error => {
@@ -336,13 +338,14 @@ export class AdminFeePopupComponent {
     });
   }
 
-  // getObjectWorkFlow() {
-  //   const firmRptAdminFeeID = this.AdminFeeDetials[0].FirmrptAdminFeeID;
-  //   const firmRptReviewRevNum = this.AdminFeeDetials[0].FirmRptReviewRevNum;
-  //   this.objectwfService.getObjectWorkflow(this.Page.LateAdminFee, firmRptAdminFeeID, firmRptReviewRevNum).subscribe(data => {
-  //     this.objWorkFlow = data.response;
-  //   })
-  // }
+  getObjectWorkFlow() {
+    const firmRptAdminFeeID = this.AdminFeeDetials[0].FirmrptAdminFeeID;
+    const firmRptReviewRevNum = this.AdminFeeDetials[0].FirmRptReviewRevNum;
+    this.objectwfService.getObjectWorkflow(this.Page.LateAdminFee, firmRptAdminFeeID, firmRptReviewRevNum).subscribe(data => {
+      this.objWorkFlow = data.response;
+      console.log(this.objWorkFlow);
+    })
+  }
 
 
   getResubmissionHistoryList() {
@@ -519,99 +522,97 @@ export class AdminFeePopupComponent {
   prepareAdminFeeObject(userId: number) {
     return {
       objFirmRptAdminFee: {
-        firmRptAdminFeeID: 0,
-        firmRptSchItemID: 0,
-        feeImposed: true,
-        calculatedAmount: "string",
-        imposedAmount: "string",
-        recommendation: "string",
-        justification: "string",
-        objectWFStatusID: 0,
-        createdBy: 0,
-        lastModifiedBy: 0,
-        objectId: 0,
-        firmRptReviewItemID: 0,
-        adminFeeRateID: 0,
-        calculatedAmountCurrencyTypeID: 0,
-        imposedAmountCurrencyTypeID: 0,
+        firmRptAdminFeeID: this.AdminFeeDetials[0].FirmrptAdminFeeID,
+        firmRptSchItemID: this.AdminFeeDetials[0].FirmRptSchItemID,
+        feeImposed: this.AdminFeeDetials[0].feeImposed,
+        calculatedAmount: this.AdminFeeDetials[0].CalculatedAmount.toString(),
+        imposedAmount: this.AdminFeeDetials[0].ImposedAmount.toString(),
+        recommendation: this.AdminFeeDetials[0].Recommendation,
+        justification: this.AdminFeeDetials[0].Justification,
+        objectWFStatusID: this.AdminFeeDetials[0].ObjectWfStatusID,
+        createdBy: userId,
+        lastModifiedBy: userId,
+        objectId: this.Page.LateAdminFee,
+        firmRptReviewItemID: this.AdminFeeDetials[0].FirmRptReviewItemID,
+        adminFeeRateID: this.AdminFeeDetials[0].AdminFeeRateID,
+        calculatedAmountCurrencyTypeID: this.AdminFeeDetials[0].CalculatedAmountCurrencyTypeID,
+        imposedAmountCurrencyTypeID: this.AdminFeeDetials[0].ImposedAmountCurrencyTypeID,
       },
       objWFStatus: {
-        objectWFStatusID: 0,
-        objectID: 0,
-        objectInstanceID: 0,
-        objectInstanceRevisionNo: 0,
-        objectWFStatusTypeID: 0,
-        createdBy: 0,
-        lastModifiedBy: 0,
-        comments: "string",
-        firmID: 0,
-        reportName: "string",
-        individualsName: "string",
-        objectWFTaskStatusID: 0,
-        objectWFLastModifiedByName: "string",
-        objectWFLastModifiedByDate: "string",
+        objectWFStatusID: this.objWorkFlow.ObjectWFStatusID,
+        objectID: this.objWorkFlow.ObjectID,
+        objectInstanceID: this.objWorkFlow.ObjectInstanceID,
+        objectInstanceRevisionNo: this.objWorkFlow.ObjectInstanceRevNum,
+        objectWFStatusTypeID: this.objWorkFlow.ObjectWFStatusTypeID,
+        createdBy: this.objWorkFlow.CreatedBy,
+        lastModifiedBy: userId,
+        comments: null,
+        firmID: null,
+        reportName: null,
+        individualsName: null,
+        objectWFTaskStatusID: null,
+        objectWFLastModifiedByName: this.objWorkFlow.ObjectWFLastModifiedByName,
+        objectWFLastModifiedByDate: this.dateUtilService.convertDateToYYYYMMDD(this.objWorkFlow.ObjectWFLastModifiedByDate),
       },
-      lstWFTasks: [
-        {
-          objectWFTaskStatusID: 0,
-          objectWFStatusID: 0,
-          objectWFTaskTypeID: 0,
-          objectWFTaskSequenceNo: 0,
-          wfTaskAssignedToUser: 0,
-          wfTaskAssignedToRole: 0,
-          wfTaskAssignedDate: "string",
-          wfTaskCompletedDate: "string",
-          wfTaskDueDate: "string",
-          objectWFStatusTypeID: 0,
-          objectWFTaskTypeDescription: "string",
-          wfTaskAssignedToRoleDescription: "string",
-          lastModifiedBy: 0,
-          emailToAddress: "string",
-          emailCCAddress: "string",
-          emailToIDs: "string",
-          emailCCIDs: "string",
-          userComments: "string",
-          taskSRNo: 0,
-          userName: "string",
-          objectWFStatusTypeDesc: "string",
-          objectWFCommentID: 0,
-          commentsDate: "string",
-          objectWFTaskStart: true,
-          objectWFTaskMandatory: true,
-          isNewTask: true,
-          firmName: "string",
-          fileName: "string",
-          objectID: 0,
-          objectName: "string",
-          objectNum: "string",
-          firmID: 0,
-          objectLink: "string",
-          objectIdentifierID: "string",
-          objectRevNum: "string",
-          isEnabled: true,
-          groupTaskFlag: true,
-          objectEditableFlag: true,
-          isEditableTask: true,
-          objectWFTaskDefsID: 0,
-          completionEmailTO: "string",
-          completionEmailCC: "string",
-          completionEmailCCIds: "string",
-          completionAssignToUserID: 0,
-          completionUserName: "string",
-          completionAssignToRoleID: 0,
-          completionAppRoleDesc: "string",
-          completionEmailToIds: "string",
-          wfTaskCompletedBy: "string",
-          reviewInitiatedBy: "string",
-          reviewInitiatedDate: "string",
-          taskInitiatedBy: 0,
-          taskInitiatedDate: "string",
-          taskInitiatedByName: "string",
-          reasonForEsclation: "string",
-          statusSetBy: "string",
-          defaultUserID: 0,
-        },
-      ],
+      lstWFTasks: this.userObjTasks.map((task: any) => ({
+        objectWFTaskStatusID: task.objectWFTaskStatusID,
+        objectWFStatusID: task.objectWFStatusID,
+        objectWFTaskTypeID: task.objectWFTaskTypeID,
+        objectWFTaskSequenceNo: task.objectWFTaskSequenceNo,
+        wfTaskAssignedToUser: task.wfTaskAssignedToUser,
+        wfTaskAssignedToRole: task.wfTaskAssignedToRole,
+        wfTaskAssignedDate: task.wfTaskAssignedDate,
+        wfTaskCompletedDate: task.wfTaskCompletedDate,
+        wfTaskDueDate: this.dateUtilService.convertDateToYYYYMMDD(task.wfTaskDueDate),
+        objectWFStatusTypeID: task.objectWFStatusTypeID,
+        objectWFTaskTypeDescription: task.objectWFTaskTypeDescription,
+        wfTaskAssignedToRoleDescription: task.wfTaskAssignedToRoleDescription,
+        lastModifiedBy: userId,
+        emailToAddress: task.emailToAddress,
+        emailCCAddress: task.emailCCAddress,
+        emailToIDs: task.emailToIDs,
+        emailCCIDs: task.emailCCIDs,
+        userComments: task.userComments,
+        taskSRNo: task.taskSRNo,
+        userName: task.userName,
+        objectWFStatusTypeDesc: task.objectWFStatusTypeDesc,
+        objectWFCommentID: task.objectWFCommentID,
+        commentsDate: task.commentsDate,
+        objectWFTaskStart: task.objectWFTaskStart,
+        objectWFTaskMandatory: task.objectWFTaskMandatory,
+        isNewTask: task.isNewTask,
+        firmName: task.firmName,
+        fileName: task.fileName,
+        objectID: task.objectID,
+        objectName: task.objectName,
+        objectNum: task.objectNum,
+        firmID: task.firmID,
+        objectLink: task.objectLink,
+        objectIdentifierID: task.objectIdentifierID,
+        objectRevNum: task.objectRevNum,
+        isEnabled: task.isEnabled,
+        groupTaskFlag: task.groupTaskFlag,
+        objectEditableFlag: task.objectEditableFlag,
+        isEditableTask: task.isEditableTask,
+        objectWFTaskDefsID: task.objectWFTaskDefsID,
+        completionEmailTO: task.completionEmailTO,
+        completionEmailCC: task.completionEmailCC,
+        completionEmailCCIds: task.completionEmailCCIds,
+        completionAssignToUserID: task.completionAssignToUserID,
+        completionUserName: task.completionUserName,
+        completionAssignToRoleID: task.completionAssignToRoleID,
+        completionAppRoleDesc: task.completionAppRoleDesc,
+        completionEmailToIds: task.completionEmailToIds,
+        wfTaskCompletedBy: task.wfTaskCompletedBy,
+        reviewInitiatedBy: task.reviewInitiatedBy,
+        reviewInitiatedDate: task.reviewInitiatedDate,
+        taskInitiatedBy: task.taskInitiatedBy,
+        taskInitiatedDate: task.taskInitiatedDate,
+        taskInitiatedByName: task.taskInitiatedByName,
+        reasonForEsclation: task.reasonForEsclation,
+        statusSetBy: task.statusSetBy,
+        defaultUserID: task.defaultUserID,
+      })),
       lstWFTaskNotification: [
         {
           objectWFTaskNotificationID: 0,
@@ -622,11 +623,11 @@ export class AdminFeePopupComponent {
           emailTo: true,
           emailCC: true,
           objectWFTaskSequenceNo: 0,
-          appRoleDescription: "string",
+          appRoleDescription: null,
           lastModifiedBy: 0,
-          userName: "string",
-          emailToAddress: "string",
-          emailCCAddress: "string",
+          userName: null,
+          emailToAddress: null,
+          emailCCAddress: null,
           taskSRNo: 0,
           completionNotificationFlag: 0,
         },
