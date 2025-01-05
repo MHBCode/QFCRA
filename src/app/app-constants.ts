@@ -39,7 +39,7 @@ export const firmRptBasisTypes = "FirmRptBasisTypes";
 export const journalEntryTypes = "V_SupervisionJournalEntryTypes";
 export const externalAuditors = "V_Firm_AuditorName";
 // Reg.Funds
-export const TypeOfFund = "V_RegisteredFundTypes" ;
+export const TypeOfFund = "V_RegisteredFundTypes";
 export const RFFundStatus = "V_RegisteredFundStatusTypes";
 // Enf Action
 export const enfActionsAuth = "V_EnforcementActionOnTypes_Auth"
@@ -68,10 +68,10 @@ export const Q300_PRUDENTIALRETURN = "12";
 export const Q400_PRUDENTIALRETURN = "29";
 export const ANNUAL = "Annual";
 export const SEMI_ANNUALLY = "Semi-Annual";
-export const BI_WEEKLY =     "Bi-Weekly";
-export const WEEKLY   =   "Weekly";
-export const DAILY    =  "Daily";
-export const OTHER    =  "Other";
+export const BI_WEEKLY = "Bi-Weekly";
+export const WEEKLY = "Weekly";
+export const DAILY = "Daily";
+export const OTHER = "Other";
 export const QUARTERLY = "Quarterly";
 export const BI_ANNUALLY = "Bi-Annually";
 export const ANNUALLY = "Annually";
@@ -118,92 +118,92 @@ export const DataFieldLabel = "\"##DataFieldLable##\"";
 export const ContactTypes = "v_ContactTypes";
 export const PreferredMethodofContact = "ContactMethodTypes";
 
-export const  BREAK_LINE_TAG = "<br />";
-export const  HTML_SPACE = "&nbsp;";
+export const BREAK_LINE_TAG = "<br />";
+export const HTML_SPACE = "&nbsp;";
 
-export const  SLASH_FORWORD = "/";
-export const  CHAR_SLASH_FORWORD = '/';
-export const  DOUBLE_FORWORDSLASH = "//";
-export const  BLANKSPACE = " ";
-export const  COMMA = ",";
-export const  AMPERSAND = "&";
-export const  NEWLINE = "\n";
-export const  PERCENTAGE = "%";
-export const  NOT_EQUAL = "!";
-export const  HASH = "#";
-export const  DOLLAR_SIGN = "$";
-export const  OR_SIGN = "|";
-export const  DOUBLE_BACKSLASH = "\\";
-export const  QUESTIONMARK = "?";
-export const  SEMICOLON = ";";
-export const  SEMICOLON_CHAR = ';';
-export const  COMMA_CHAR = ',';
-export const  PERCENTAGE20 = "%20";
-export const  EQUAL_SIGN = "=";
-export const  SINGLE_QUOTE = "'";
-export const  CURLYBRACE_OPEN = "{";
-export const  CURLYBRACE_CLOSE = "}";
-export const  BRACKET_OPEN = "(";
-export const  BRACKET_CLOSE = ")";
-export const  CHAR_HYPHEN = "-";
-export const  CHAR_DOT = ".";
-export const  CHAR_UNDERSCORE = "_";
-export const  CHAR_AT = "@";
-export const  CHAR_COLON = ":";
-export const  CHAR_COLON_WITH_SPACES = " : ";
-export const  CHAR_MULTIPLY = "*";
-export const  CHAR_PLUS = "+";
-export const  CHAR_EQUAL = "=";
-export const  CHAR_LIKEAPOSTROPHE = "`";
-export const  CHAR_TILT = "~";
-export const  CHAR_LESSTHAN = "<";
-export const  CHAR_GREATERTHAN = ">";
-export const  CHAR_COMMA = ',';
+export const SLASH_FORWORD = "/";
+export const CHAR_SLASH_FORWORD = '/';
+export const DOUBLE_FORWORDSLASH = "//";
+export const BLANKSPACE = " ";
+export const COMMA = ",";
+export const AMPERSAND = "&";
+export const NEWLINE = "\n";
+export const PERCENTAGE = "%";
+export const NOT_EQUAL = "!";
+export const HASH = "#";
+export const DOLLAR_SIGN = "$";
+export const OR_SIGN = "|";
+export const DOUBLE_BACKSLASH = "\\";
+export const QUESTIONMARK = "?";
+export const SEMICOLON = ";";
+export const SEMICOLON_CHAR = ';';
+export const COMMA_CHAR = ',';
+export const PERCENTAGE20 = "%20";
+export const EQUAL_SIGN = "=";
+export const SINGLE_QUOTE = "'";
+export const CURLYBRACE_OPEN = "{";
+export const CURLYBRACE_CLOSE = "}";
+export const BRACKET_OPEN = "(";
+export const BRACKET_CLOSE = ")";
+export const CHAR_HYPHEN = "-";
+export const CHAR_DOT = ".";
+export const CHAR_UNDERSCORE = "_";
+export const CHAR_AT = "@";
+export const CHAR_COLON = ":";
+export const CHAR_COLON_WITH_SPACES = " : ";
+export const CHAR_MULTIPLY = "*";
+export const CHAR_PLUS = "+";
+export const CHAR_EQUAL = "=";
+export const CHAR_LIKEAPOSTROPHE = "`";
+export const CHAR_TILT = "~";
+export const CHAR_LESSTHAN = "<";
+export const CHAR_GREATERTHAN = ">";
+export const CHAR_COMMA = ',';
 
- //Querystrings
- export const  QUERYSTRING_BREACHID = "bId";
- export const  QUERYSTRING_BREACHREVISION = "rvNo";
- export const  QUERYSTRING_FIRMID = "fiD";
- export const  QUERYSTRING_TABID = "tabId";
- export const  QUERYSTRING_SCHEDULEITEMID = "rptSchItemID";
- export const  QUERYSTRING_DOCID = "docID";
- export const  QUERYSTRING_MSG = "msg";
- export const  QUERYSTRING_MSG_HEADER = "msgHeader";
- export const  QUERYSTRING_MSG_DESCRIPTION = "msgDescription";
- export const  QUERYSTRING_WFSTATUS = "wfStatus";
- export const  QUERYSTRING_CONTACTID = "cId";
- export const  QUERYSTRING_CONTACTTYPEID = "ctId";
- export const  QUERYSTRING_CONTACTSTATUS = "cStatus";
- export const  QUERYSTRING_OTHERENTITYID = "oeId";
- export const  QUERYSTRING_RELATEDENTITYID = "reId";
- export const  QUERYSTRING_RELATEDENTITYTYPEID = "retId";
- export const  QUERYSTRING_CONTACTASSNID = "caId";
- export const  QUERYSTRING_FUNCTIONTYPEID = "ftId";
+//Querystrings
+export const QUERYSTRING_BREACHID = "bId";
+export const QUERYSTRING_BREACHREVISION = "rvNo";
+export const QUERYSTRING_FIRMID = "fiD";
+export const QUERYSTRING_TABID = "tabId";
+export const QUERYSTRING_SCHEDULEITEMID = "rptSchItemID";
+export const QUERYSTRING_DOCID = "docID";
+export const QUERYSTRING_MSG = "msg";
+export const QUERYSTRING_MSG_HEADER = "msgHeader";
+export const QUERYSTRING_MSG_DESCRIPTION = "msgDescription";
+export const QUERYSTRING_WFSTATUS = "wfStatus";
+export const QUERYSTRING_CONTACTID = "cId";
+export const QUERYSTRING_CONTACTTYPEID = "ctId";
+export const QUERYSTRING_CONTACTSTATUS = "cStatus";
+export const QUERYSTRING_OTHERENTITYID = "oeId";
+export const QUERYSTRING_RELATEDENTITYID = "reId";
+export const QUERYSTRING_RELATEDENTITYTYPEID = "retId";
+export const QUERYSTRING_CONTACTASSNID = "caId";
+export const QUERYSTRING_FUNCTIONTYPEID = "ftId";
 
- export const  QUERYSTRING_AINID = "ainId";
- export const  QUERYSTRING_APPID = "appId";
- export const  QUERYSTRING_AINUMBER = "aiNum";
- export const  QUERTSTRING_FLAG = "flg";
- export const  QUERYSTRING_INVOICES = "InId";
- export const  QUERYSTRING_RPTREVIEWID = "rptId";
- export const  QUERYSTRING_RPTREVISION = "rptRevId";
- export const  QUERYSTRING_OPERATIONSTATUSID = "operationId";
- export const  QUERYSTRING_CLIENTCLASSIFICATION = "clientId";
- export const  QUERYSTRING_INVOICENUMBER = "Inv";
- export const  QUERYSTRING_FIRMCROWAIVERID = "fcwId";
- export const  QUERYSTRING_FIRMCROREPORTSCHEDULEID = "fcrsId";
- export const  QUERYSTRING_PREV_WF_STATUSID = "prevWfSId";
- export const  QUERYSTRING_LASTDATEOFMONTH = "lDate";
- export const  QUERYSTRING_AINOCID = "nocID";
- export const  QUERYSTRING_RSCCID = "rscID";
- export const  QUERTSTRING_GENSUB = "genID";
- export const  QUERTSTRING_GENSUBREVNUM = "genRID";
- export const  QUERYSTRING_ENFID = "enfiD";
- export const  QUERY_RFID = "rfiD";
- 
- // sharePoint Url 
- export const sharePointUrl = "https://qfcra365.sharepoint.com/sites/FIRMSUAT/";
- 
+export const QUERYSTRING_AINID = "ainId";
+export const QUERYSTRING_APPID = "appId";
+export const QUERYSTRING_AINUMBER = "aiNum";
+export const QUERTSTRING_FLAG = "flg";
+export const QUERYSTRING_INVOICES = "InId";
+export const QUERYSTRING_RPTREVIEWID = "rptId";
+export const QUERYSTRING_RPTREVISION = "rptRevId";
+export const QUERYSTRING_OPERATIONSTATUSID = "operationId";
+export const QUERYSTRING_CLIENTCLASSIFICATION = "clientId";
+export const QUERYSTRING_INVOICENUMBER = "Inv";
+export const QUERYSTRING_FIRMCROWAIVERID = "fcwId";
+export const QUERYSTRING_FIRMCROREPORTSCHEDULEID = "fcrsId";
+export const QUERYSTRING_PREV_WF_STATUSID = "prevWfSId";
+export const QUERYSTRING_LASTDATEOFMONTH = "lDate";
+export const QUERYSTRING_AINOCID = "nocID";
+export const QUERYSTRING_RSCCID = "rscID";
+export const QUERTSTRING_GENSUB = "genID";
+export const QUERTSTRING_GENSUBREVNUM = "genRID";
+export const QUERYSTRING_ENFID = "enfiD";
+export const QUERY_RFID = "rfiD";
+
+// sharePoint Url 
+export const sharePointUrl = "https://qfcra365.sharepoint.com/sites/FIRMSUAT/";
+
 
 
 export enum FirmLicenseApplStatusType {
@@ -221,7 +221,7 @@ export enum FirmAuthorizationApplStatusType {
     Authorised = 13,
     AuthorisedWithdrawnVoluntary = 14,
     AuthorisedWithdrawnInvoluntary = 15
-} 
+}
 export enum AuditorsMessages {
     Select_Auditor_Name = 3901,
     Selected_Auditor_Name_already_Exsists = 3903,
@@ -284,14 +284,13 @@ export enum ControllerMessages {
     ENTER_VALID_PERCENTAGE = 4011,
     ENTER_PERCENTAGE_NOTEXCEED = 4012,
     ENTER_FIRSTNAME = 4013,
-    ENTER_FAMILYNAME= 4017,
+    ENTER_FAMILYNAME = 4017,
     Select_Place_Establishment = 4016,
     ENTER_REGISTEREDNUMBERCORPORATE = 4014,
     SELECT_TYPEOFCONTROL = 4015,
     SELECT_ISPEP = 9024,
 }
-export enum ContactMessage
-{
+export enum ContactMessage {
     FIRMEXIST = 9000,
     NotFound = 9001,
     UnableToSave = 9002,
@@ -309,7 +308,7 @@ export enum ContactMessage
     VALIDDATE = 9013,
     EFFECTIVEDATE_AND_ENDDATE = 9014,
     SELECT_ISPEP = 9024,
-     //Added By Salim on 02-June-2011
+    //Added By Salim on 02-June-2011
     SelectAvaiContact = 9015,
     CurrentResidenceaddress = 6503,
 
@@ -493,7 +492,7 @@ export enum FrimsObject {
 }
 export enum BreachStatus {
     PassedToLrc = 3,
-    Closed =5,
+    Closed = 5,
 }
 export enum CRORegisterReports {
     ENTER_DATE = 3600,
@@ -557,7 +556,7 @@ export enum DocumentType {
 }
 
 export enum MessagesLogForm {
-    
+
     SELECT_FIRM = 1100,
     SELECT_FORMTYPE = 1101,
     SELECT_LOGGEDBY = 1102,
@@ -602,11 +601,10 @@ export enum MessagesLogForm {
     QFCA_USERS_EmAIL = 1192,
     CRO_USERS_EmAIL = 1193,
     FILE_EXIST_ERROR = 1194,
-    
+
 }
 
-export enum ReportingScheduleMessages
-{
+export enum ReportingScheduleMessages {
     REPORTSNOTSCHEDULE_GENERATEPREVIOUSREPORT_SCHEDULEPREVIOUESSCHEDULE = 12000,
     ADD_REPORTLIST = 12001,
     CORRECT_REPORTLIST = 12002,
@@ -665,8 +663,7 @@ export enum ReportingScheduleMessages
     ALLITEM_PUBLISHED = 12057
 }
 
-export enum MessagesWaiverList
-{
+export enum MessagesWaiverList {
     SELECT_WAIVER = 800,
     FIRMEXIST = 801,
     WAIVEREDIT = 802,
@@ -692,8 +689,7 @@ export enum DocType {
     FIRM_DOCS = 210
 }
 
-export enum FunctionType
-{
+export enum FunctionType {
     IndividualController = 11,
     Director = 12,
     Secretary = 13,
@@ -703,19 +699,17 @@ export enum FunctionType
     MLRO = 7,
     CustomerFacing = 10,
     SigShareholder = 19,
-    UBO_IndividualController=25
+    UBO_IndividualController = 25
 }
-export enum DocType_DocCategory
-{
+export enum DocType_DocCategory {
     LogForm = 1,
     RptSchedule = 4,
-    CRORptSchedule=5,
+    CRORptSchedule = 5,
     PrudReturn = 6,
     AMLMLROReports = 7,
-    XBRLTYPES=10
+    XBRLTYPES = 10
 }
-export enum ReturnReviewMessages
-{
+export enum ReturnReviewMessages {
     SELECTRPT_REVIEW = 9100,
     RPT_REVIEWNOTFOUND = 9101,
     UNABLE_TO_DELETE = 9102,
@@ -747,30 +741,28 @@ export enum ReturnReviewMessages
     SAVEREPORTREVIEW_BEFORE_PUBLISHINGCOMMENTS = 9122,
     REVIEWCOMMENTSPUBLISH_CANNOTDELETE = 9123,
     ENTER_ITEMDESC = 9124,
-    METRAILYCOMPLETECHEKC=9125,
-    LATEFEEIMPOSED_MSG=9126,
-    LATE_FEE_ERROR_MSG=9127,
-    LATE_FEELIST_SELECT=9128,
-    LATE_FEEEIMPOSED=9129,
+    METRAILYCOMPLETECHEKC = 9125,
+    LATEFEEIMPOSED_MSG = 9126,
+    LATE_FEE_ERROR_MSG = 9127,
+    LATE_FEELIST_SELECT = 9128,
+    LATE_FEEEIMPOSED = 9129,
     LATE_FEEFORMULA = 9130,
-    LATEFEE_IMPOSED=9131,
-    LATEFEE_IMPOSEDACTION=9132,
+    LATEFEE_IMPOSED = 9131,
+    LATEFEE_IMPOSEDACTION = 9132,
     LATEFEE_IMPOSEDACTIONEDITMSG = 9133,
     LATEFEE_CANCELTMSG = 9134,
     MCC_RR_FLAG = 9135,
     NOT_AUTHORIZED_TO_EDIT_MLRO_REPORTS = 1514,
     EXPLANATION_PENDING_WARNINGS = 12049,
-    NO_DOCUMENT_SELECTED=12052
+    NO_DOCUMENT_SELECTED = 12052
 }
 
-export enum FirmRptBasisTypes
-{
+export enum FirmRptBasisTypes {
     Solo = 1,
     Consolidated = 2
 }
 
-export enum SupervisionData_Messages
-{
+export enum SupervisionData_Messages {
     SUPERVISION_DATA_SAVED_SUCCESSFULLY = 8600,
     INVALID_NO_OF_STAFF = 8601,
     INVALID_TOTAL_STAFF = 8602,
@@ -784,14 +776,12 @@ export enum SupervisionData_Messages
     NOTES_OUT_OF_LIMIT = 8609,
     SELECT_OPERATIONAL_STATUS = 8610
 }
-export enum RegisteredFund_Messages 
-{
+export enum RegisteredFund_Messages {
     RegisteredFund_Saved_SUCCESSFULLY = 18042,
-    Error_deleting_RegisteredFund = 18045 ,
-} 
+    Error_deleting_RegisteredFund = 18045,
+}
 
-export enum ResponseTypes
-{
+export enum ResponseTypes {
     Yes_No_NotApplicable = 1,
     Date = 2,
     Number = 3,
@@ -799,28 +789,24 @@ export enum ResponseTypes
     List_of_values_Multiple_Response = 5,
     Explanation = 6,
 }
-export enum FileType
-{
+export enum FileType {
     Instance = 1,
     HTML = 2,
     Excel_Attachment = 3
 }
 
-export enum MessageLogFormReport
-{
+export enum MessageLogFormReport {
     SELECT_FROM_DATE = 1300,
     SELECT_TO_DATE = 1301,
     INVALID_DATES = 1302
 }
 
-export enum GenerateReportType
-{
+export enum GenerateReportType {
     New = 1,
     FromPrevious = 2
 }
 
-export enum CROMessages
-{
+export enum CROMessages {
     ENTER_VALIDCROAPPLDATE = 3200,
     ENTER_VALIDCROAPPLSTATUSDATE = 3201,
     CROAPPLSTATUSDATE_EXCEEDS_CROAPPLDATE = 3202,
@@ -890,8 +876,8 @@ export enum CROMessages
     WAIVERFINALIZATION_CONFIRMATION = 3253,
     FIRMCROWAIVER_DELETED = 3254,
     WAIVERFINALIZED = 3255,
-    EFFECTIVEDATE_SHOULD_BELESSTHAN_EXPIRATIONDATE=3256,
-    WAIVERNEWDUEDATE_SHOULD_BE_FUTURE_OR_CURRENTDATE=3257,
+    EFFECTIVEDATE_SHOULD_BELESSTHAN_EXPIRATIONDATE = 3256,
+    WAIVERNEWDUEDATE_SHOULD_BE_FUTURE_OR_CURRENTDATE = 3257,
     WAIVERNEWDUEDATE_SHOULD_NOTBE_GREATER_THAN_EXPIRATIONDATE = 3258,
     WAIVERNEWDUEDATE_SHOULD_NOTBE_LESS_THAN_EFFECTIVEDATE = 3259,
 
@@ -899,19 +885,19 @@ export enum CROMessages
 
     SAVED_REPORTINGSCHEDULETAB = 3260,
     EXCEPTION_INSERTING_FORMREFERENCE = 3261,
-    ENTER_DUEDATE=3262,
-    ENTER_VALIDDUEDATE=3263,
+    ENTER_DUEDATE = 3262,
+    ENTER_VALIDDUEDATE = 3263,
     ENTER_FIRMCRO_RPTSCHITEMFROM = 3264,
     ENTER_VALIDFIRMCRO_RPTSCHITEMFROM = 3265,
     ENTER_FIRMCRO_RPTSCHITEMTO = 3266,
     ENTER_VALIDFIRMCRO_RPTSCHITEMTO = 3267,
-    RPTSCHITEMFROM_SHOULD_BELESSTHAN_RPTSCHITEMTO=3268,
-    SELECT_NOTREQUIREDREASON=3269,
-    SELECT_REPORTTYPE=3270,
-    ENTER_ALL_REQUIREDFIELDS=3271,
-    ADD_REPORTLIST=3272,
-    CORRECT_REPORTLIST=3273,
-    ENTER_VALIDFIRMCRO_REVIEWSTATUSDATE=3274,
+    RPTSCHITEMFROM_SHOULD_BELESSTHAN_RPTSCHITEMTO = 3268,
+    SELECT_NOTREQUIREDREASON = 3269,
+    SELECT_REPORTTYPE = 3270,
+    ENTER_ALL_REQUIREDFIELDS = 3271,
+    ADD_REPORTLIST = 3272,
+    CORRECT_REPORTLIST = 3273,
+    ENTER_VALIDFIRMCRO_REVIEWSTATUSDATE = 3274,
     ENTER_CROREPORTINPERIODFROM = 3275,
     ENTER_CROREPORTINPERIODTO = 3276,
     CRO_FINANCIALREPORTINGFROM_CANTEQUALORLATER_FINANCIALREPORTINGTODATE = 3277,
@@ -924,16 +910,16 @@ export enum CROMessages
     REPORTINGPERIODCHANGED_CLICKGENERATEREPORT = 3284,
     CROREPORTING_SCH_HEADER = 3285,
     CROREPORTING_SCH_TEXT = 3286,
-    NOREPORT_AVAILABLE_TO_PRINT=3287,
-    SCHEDULEITEMS_ARE_REVIEWED=3289,
+    NOREPORT_AVAILABLE_TO_PRINT = 3287,
+    SCHEDULEITEMS_ARE_REVIEWED = 3289,
 
     Alert_FirmCRORptSch_Title = 3290,
     Alert_FirmCRORptSch_Message = 3291,
-    PLEASE_SELECT_REPORT_TO_PRINT=3292,
+    PLEASE_SELECT_REPORT_TO_PRINT = 3292,
     WAIVER_IS_FINALIZED_AND_CANNOT_BE_DELETED = 3293,
     CRODOCUMENTLINKED_CANTDELETE = 3294,
-    FIRMCROREPORTINGSCHEDULE_DELETED=3295,
-    DUEDATE_SHOULDBE_BETWEEN_REPSCHFROM_TODATE=3296,
+    FIRMCROREPORTINGSCHEDULE_DELETED = 3295,
+    DUEDATE_SHOULDBE_BETWEEN_REPSCHFROM_TODATE = 3296,
 
     Alert_FirmCROWaiver_Title = 3297,
     Alert_FirmCROWaiver_Message = 3298,
@@ -941,8 +927,7 @@ export enum CROMessages
     SAVED_CROPAGE = 3300
 }
 
-export enum FirmUserMessages
-{
+export enum FirmUserMessages {
     FirmUser_Added = 8200,
     Date_Exception = 8201,
     UserName_Exception = 8202,
@@ -956,10 +941,197 @@ export enum FirmUserMessages
     FirmUser_Deleted = 8210
 }
 
-export enum WorkFlowStatusType
-{
+export enum WorkFlowStatusType {
     InProgress = 1,
     Completed = 2,
     Returned = 3,
-    Cancelled=4,
+    Cancelled = 4,
+}
+
+export enum NotificationFlag {
+    Notify = 1,
+    NotNotify = 0,
+}
+
+export enum LateAdminFeeMSG {
+    ENTER_JUSTIFICATION = 18000,
+    ENTER_IMPOSEDAMOUNT = 18001,
+    VALID_IMPOSEDAMOUNT = 18002,
+    ENTER_RECOMMENDATION = 18003,
+    SAVED_MSG = 18004,
+    FINANCE_EMAILSUBJECT = 18005,
+    FINANCE_EMAILTITLE = 18006,
+    FINANCE_EMAILRESONS = 18007,
+    FINANCE_EMAILREASONSDESC = 18008,
+    FINANCE_EMAILMSG = 18009,
+    FEE_CANCELLATIONREASON = 18011,
+    RULES_CALCULATION = 18012
+}
+
+export enum AISMessages
+{
+    FIRSTNAME = 10000,
+    SECONDNAME = 10001,
+    DATERECIVIED = 10002,
+    FUNCTIONS = 10003,
+    STATUSOFAPPLICATION = 10004,
+    STATUSDATE = 10005,
+    AISSAVEERROR = 10006,
+    AIINFROMATIONSAVED = 10007,
+    AIAPPLICATIOSAVE = 10008,
+    AIAPPLICATION_SAVED_ERROR = 10009,
+    AIINFORMATION_SAVED_ERROR = 10010,
+    AIINFROMATIO_EMAIL = 10011,
+    AISNOTEXISTS = 10012,
+    AICONTROLLED = 10013,
+    AIS_ADDRESS = 10014,
+    AI_DELETE = 10015,
+    SELECT_AI = 10016,
+    AI_APPLICATIOEXIST = 10017,
+    AI_DATEOFBIRTH = 10018,
+    AI_OTHEREMAIL = 10019,
+    AI_CANCEL = 10020,
+    AI_DELETE_MSG = 10021,
+    ACTIVITY_TYPEID = 10022,
+    ACTIONTYPE_FUNCTION = 10023,
+    ACTIONTYPEACTIVITY = 10024,
+    AIWITHDRAWN = 10025,
+    AICHECK = 10026,
+    AIADD = 10027,
+    AIDELTE = 10028,
+    AIDELTEDMESSAGE = 10029,
+    AINUMUBEReXISTS = 10030,
+    VALIDAINUMBER = 10031,
+    AINUMBERNOTPRESENT = 10032,
+    AISTRING = 10033,
+    CUSTOMFACING = 10034,
+    AI_STATUS = 10035,
+    AI_SELECT = 10036,
+    AIINAPPLICATION_SELECT = 10037,
+    AI_ALIASE = 10038,
+    AI_COUNTRY = 10039,
+    UNABLE_TO_DELETE = 9102,
+    AI_FROMDATE = 10040,
+    AI_TODATE = 10041,
+    AI_DATEVALID = 10042,
+    AI_VALIDMONTH = 10043,
+    AI_CREDENTAILSAVE = 10044,
+    AI_FUNCTIONSSAVE = 10045,
+    AI_RECOMMENDATION_UPDATED_SUCCESSFULLY = 10046,
+    AI_RECOMMENDATION_SAVED_SUCCESSFULLY = 10047,
+    AI_ASSESSMENT_UPDATED_SUCCESSFULLY = 10048,
+    AI_ASSESSMENT_SAVED_SUCCESSFULLY = 10049,
+    AI_RECOMMENDATION_WF_SELECT_ONETASK = 10050,
+    AI_RECOMMENDATION_WF_PREVS_TASK_NOT_STARTED = 10051,
+    AI_RECOMMENDATION_PREV_WF_NOTCOMPLETED = 10052,
+    AI_RECOMMENDATION_NOTSTART_AML_LEAD_REVIEW = 10053,
+    AI_RECOMMENDATION_APPLIED_FOR_MLRO = 10054,
+    AI_ASSESSMENT_TEXT_PLEASE_ENTER = 10055,
+    AI_ASSESSMENT_TEXT_DETAIL = 10056,
+    AI_ASSESSMENT_PLEASE_ENTER_OTHERDESCRIPTION = 10057,
+    AI_ASSESSMENT_FINANCIAL_SOUNDNESS_ISSUE = 10058,
+    AI_ASSESSMENT_FITNESS_ISSUE = 10059,
+    AI_ASSESSMENT_HONESTY = 10060,
+    AI_ASSESSMENT_RESIDENCY_NOTE = 10061,
+    AI_ASSESSMENT_WAIVER_NOTE = 10062,
+    AI_ASSESSMENT_NO_RECORD_FOUND = 10063,
+    AI_OPENITEM_ITEM_TYPE = 10064,
+    AI_OPENITEM_ITEM_DESCRIPTION = 10065,
+    AI_OPENITEM_ITEM_STATUS = 10066,
+    AI_OPENITEM_RESOLVE_DATE = 10067,
+    AI_OPENITEM_VALID_DATE = 10068,
+    AI_OPENITEM_RESOLVE_DATE_NOT_GREATER_TODAY = 10069,
+    AI_OPENITEM_MANNER_ADDRESSED = 10070,
+    AI_OPENITEM_SAVED_SUCCESSFULLY = 10071,
+    AI_OPENITEM_SAVEERROR = 10072,
+    AI_FANDP_SAVED_SUCCESSFULLY = 10073,
+    AI_FANDP_SELECT_YESNO = 10074,
+    AI_FANDP_NORECORD_FOUND = 10075,
+    AI_RECOMMENDATION_AIFORUM_ENDORSED = 10076,
+    AI_RECOMMENDATION_ENTER_ROLES = 10077,
+    AI_RECOMMENDATION_ENTER_REASON_FOR_APPLFEEWAIVER = 10078,
+    AI_DOC_ERROR = 10079,
+    AI_PERSONAL_FIRM = 10080,
+    AI_PERSONAL_FORMTYPE = 10081,
+    AI_APPLICATIONCOMPLETED = 10082,
+    AI_RECOMMENDATION_APPLFEEWAIVER_UNCHECKED = 10083,
+    AI_RECOMMENDATION_APPLFEEWAIVER_STARTBIT = 10084,
+    AI_DOCS_SAVE_MSG = 10085,
+    AI_ASSESSMENT_FUNCTION_ISSUE = 10086,
+    AI_DOCS_SAVES = 10087,
+    AI_SELECT_FILE = 10088,
+    AI_PRPOSEDLOCATION = 10089,
+    AI_CRE_EMPLOYERNAME = 10090,
+    AI_CRE_EMPLOYEMENTRECORD = 10091,
+    AI_CRE_TILLDATE = 10092,
+    AI_NRD_LIST = 10093,
+    AI_DATATO_GREATER_DATETO = 10094,
+    AI_MONTHNAME = 10095,
+    AI_CRE_VALID_DATE = 10096,
+    AI_GAPS_SEVEN = 10097,
+    AI_DATE_OVERLAP = 10098,
+    AI_DATE_GREATE_TODATE = 10099,
+    AI_CRE_CAREER = 10100,
+    AI_CRE_QUAL = 10101,
+    AI_CRE_CERT = 10102,
+    AI_CRE_OVERSEAS = 10103,
+    AI_CRE_GAPMSG = 10104,
+    AI_PER_NRDMSG = 10105,
+    AI_NUMBER_ENTERD = 10106,
+    AI_FUNC_APPROVED_DATE = 10107,
+    AI_FUNC_WITHDRAWN_DATE = 10108,
+    AI_FUNC_DATA = 10109,
+    TXT_MONTHS_MSG = 10110,
+    NO_PAYMENT_RECEIVED = 10111,
+    AI_PER_POROPSED = 10112,
+    AI_DOC_SAVE = 10113,
+    AI_REC_PENDING_OPENITEMS = 10114,
+    AI_FUNCTIONS_NOTEXISTS=10115,
+    AI_GAPES_IN_CAREER =10116,
+    AI_EMPLYMENT_RECORD=10117,
+    AI_VALIDDATES_EMPLOYE=10118,
+    NOT_ASSIGNED = 10119,
+    ASS_WFREVISION_MESSAGE = 10120,
+    REC_WFREVISION_MESSAGE = 10121,
+    COUNTRY_MSG =10122,
+    AI_FUNCTION_STATUS =10123,
+    AI_OPENITEMS_APPPROCESS =10124,
+    AI_OPENITEMS_IMPACTNOTES=10125,
+    AI_REVIEW_STRATSIGNOFF=10126,
+    AI_REVIEW_CANCELLEDSIGNOFF = 10127,
+    AI_REVIEW_TASKNOTCOMPLETED = 10128,
+    AI_REVIEW_TASKNOTSTARTED = 10129,
+    AI_REVIEW_CONFIRMSTRAT = 10130,
+    AI_REVIEW_CONFIRMCANCEL = 10131,
+    AI_OPENITEM_RESOLVE_DATE_NOT_GREATER_CRETEDDATE = 10132,
+    AI_OPENITEM_CREATEDDATE=10133,
+    AI_OPENITEM_CREATED_DATE_NOT_GREATER_TODAY = 10134,
+    REVIEW_DETAILS_SAVED_SUCCESSFULLY = 10135,
+    AI_RECOMMENDATION_TEXT_MESSAGE_Q03_Q11 = 10136,
+    AI_RECOMMENDATION_TEXT_MESSAGE_Q12 = 10137,
+    ASS_WFREVISION_MESSAGE_UNCHECKED = 10138,
+    REC_WFREVISION_MESSAGE_UNCHECKED = 10139,
+    AI_GAP_FLAG_NOTES=10140,
+    AI_FAP_CHK_NOTES=10141,
+    APPLICATION_ESUBMISSION_NOTCOMPLETED = 10142,
+    AI_FORMTYPE_SELECTED=10143,
+    AI_SYNC_COMP = 10144,
+    AI_SCREENINF_SUCC=10145,
+    AI_PHONE =10146, // Added by abrar on 16 jun 2011
+    ROLE_EXPREIENCE_GREATER=10147,
+    ROLESPECIFICEXPERIENCE=10148,
+    TOTALINDUSTRYEXPERIENCE=10149,
+    AI_OPENITEMS_ISSUESIDENTIFIEDDATE=10150,
+    AI_OPENRITEMS_IMPACT=10151,
+    AI_KNOWELDEGE_SAVE=10152,
+    AI_PRIORPOSITIONSAVE =10153,
+    AI_UNABLETOEDIT = 10163,
+    AI_CONDAPPROVALDATE = 10164,
+    FUNCTIONWITHDRAWNMESSAGE=10165,
+    NATUREOFARRANGEMENT=10166,
+    ISORDINERLYRESIDENT=10167,
+    ENTERCFEXECRSIED=10168,
+    AUTHORISEDSCOPE = 10182,
+    BUSSINESSEMAILADDRESS_VALIDATION = 10189,
+
 }

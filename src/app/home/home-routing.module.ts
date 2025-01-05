@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MainPageComponent } from './main-page/main-page.component';
-import { FirmsPageComponent } from './sub-pages/firms-page/firms-page.component';
 import { ViewFirmPageComponent } from './sub-pages/view-firm-page/view-firm-page.component';
-import { EditFirmComponent } from './sub-pages/edit-firm/edit-firm.component';
 import { NewFirmComponent } from './sub-pages/new-firm/new-firm.component';
 import { TasksPageComponent } from './sub-pages/tasksPages/tasks-page/tasks-page.component';
 import { IndividualPageComponent } from './sub-pages/individualPages/individual-page/individual-page.component';
@@ -11,7 +9,6 @@ import { IndividualRegistrationStatusComponent } from './sub-pages/individualPag
 import { IndividualPendingAiAppsComponent } from './sub-pages/individualPages/individual-pending-ai-apps/individual-pending-ai-apps.component';
 import { UserAccessComponent } from './sub-pages/adminPages/user-access/user-access.component';
 import { ReAssignTasksComponent } from './sub-pages/adminPages/re-assign-tasks/re-assign-tasks.component';
-import { FirmReportsComponent } from './sub-pages/reportsPages/firm-reports/firm-reports.component';
 import { CreateIndividualComponent } from './sub-pages/individualPages/create-individual/create-individual.component';
 import { ViewIndividualComponent } from './sub-pages/individualPages/view-individual/view-individual.component';
 import { ViewIndividualStatusChangeComponent } from './sub-pages/individualPages/view-individual-status-change/view-individual-status-change.component';
@@ -20,12 +17,7 @@ import { IndividualComponent } from './sub-pages/individualPages/individual-regi
 import { RecommendationComponent } from './sub-pages/individualPages/individual-registration-status-subpages/recommendation/recommendation.component';
 import { ReportsComponent } from './sub-pages/individualPages/individual-registration-status-subpages/reports/reports.component';
 import { TrackingComponent } from './sub-pages/individualPages/individual-registration-status-subpages/tracking/tracking.component';
-import { CreateNoticesComponent } from './sub-pages/create-notices/create-notices.component';
 import { CoSupervisorsComponent } from './sub-pages/co-supervisors/co-supervisors.component';
-import { ViewControllerComponent } from './sub-pages/view-controller/view-controller.component';
-import { EditControllerComponent } from './sub-pages/edit-controller/edit-controller.component';
-import { CreateControllerComponent } from './sub-pages/create-controller/create-controller.component';
-import { CreateContactComponent } from './sub-pages/create-contact/create-contact.component';
 import { ShadowSupervisorComponent } from './sub-components/shadow-supervisor/shadow-supervisor.component';
 import { TasksIAssignedComponent } from './sub-components/tasks-i-assigned/tasks-i-assigned.component';
 import { MyTeamTasksComponent } from './sub-components/my-team-tasks/my-team-tasks.component';
@@ -36,15 +28,12 @@ import { EnfActionsComponent } from '../supervision/enf-actions/enf-actions.comp
 
 const routes: Routes = [
   { path: '', component: MainPageComponent},
-  { path: 'firms-page', component: FirmsPageComponent},
   { path: 'view-firm/:id', component: ViewFirmPageComponent},
-  { path: 'edit-firm/:id', component: EditFirmComponent},
   { path: 'new-firm', component: NewFirmComponent},
   //{ path: 'tasks-page', component: TasksPageComponent},
   { path: 'individual-page', component: IndividualPageComponent},
   { path: 'individual-registration-status', component: IndividualRegistrationStatusComponent},
   { path: 'individual-pending-ai-apps', component: IndividualPendingAiAppsComponent},
-  { path: 'firm-reports', component: FirmReportsComponent},
   { path: 'userAccess', component: UserAccessComponent},
   { path: 're-assign-tasks', component: ReAssignTasksComponent},
   { path: 'notices-and-responses', component: NoticesComponent},
@@ -74,13 +63,8 @@ const routes: Routes = [
       { path: 'create-reminder', component: CreateReminderComponent },
     ]
   },
-  { path: 'create-notices' , component: CreateNoticesComponent},
   { path: 'enforcement-and-disciplinary' , component:EnfActionsComponent},
   { path: 'co-supervisors' , component:CoSupervisorsComponent},
-  { path: 'view-controller', component: ViewControllerComponent},
-  { path: 'edit-controller', component: EditControllerComponent},
-  { path: 'create-controller', component: CreateControllerComponent},
-  { path: 'create-contact', component: CreateContactComponent },
 ];
 
 @NgModule({

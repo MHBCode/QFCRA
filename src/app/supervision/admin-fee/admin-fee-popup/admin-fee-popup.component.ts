@@ -1,11 +1,9 @@
-import { Component, EventEmitter, Input, Output, ChangeDetectorRef, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ElementRef, QueryList, ViewChildren, ViewChild } from '@angular/core';
 import { SupervisionService } from '../../supervision.service';
-import { SecurityService } from 'src/app/ngServices/security.service';
 import { LogformService } from 'src/app/ngServices/logform.service';
 import * as constants from 'src/app/app-constants';
 import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { ActivatedRoute } from '@angular/router';
-import { RegisteredfundService } from 'src/app/ngServices/registeredfund.service';
 import { Bold, ClassicEditor, Essentials, Font, FontColor, FontSize, Heading, Indent, IndentBlock, Italic, Link, List, MediaEmbed, Paragraph, Table, Undo } from 'ckeditor5';
 import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
@@ -16,8 +14,8 @@ import { WaiverService } from 'src/app/ngServices/waiver.service';
 import { FrimsObject, ObjectOpType } from 'src/app/app-constants';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { tap, switchMap, forkJoin } from 'rxjs';
-import { isNullOrUndef } from 'chart.js/dist/helpers/helpers.core';
 import Swal from 'sweetalert2';
+import { ReviewComponent } from 'src/app/shared/review/review.component';
 @Component({
   selector: 'app-admin-fee-popup',
   templateUrl: './admin-fee-popup.component.html',
@@ -25,6 +23,7 @@ import Swal from 'sweetalert2';
 })
 export class AdminFeePopupComponent {
   @ViewChildren('dateInputs') dateInputs!: QueryList<ElementRef<HTMLInputElement>>;
+  @ViewChild(ReviewComponent) reviewComponent!: ReviewComponent;
 
   @Input() fee: any;
   @Input() firmId: any;
@@ -42,10 +41,9 @@ export class AdminFeePopupComponent {
   currentDateOnly = new Date(this.currentDate).toISOString().split('T')[0];
   AdminFeeDetials: any;
   showCalculatedFeePopup: boolean = false;
-  showPreviousCommentsModal: boolean = false;
-  UserObjectWfTasks: any[] = [];
+  userObjTasks: any[] = [];
+  objWorkFlow: any = {};
   ResubmissionHistoryList: any;
-  RevisionCommentsList: any;
   CalculatedFee: any;
   dayCount: any;
   rptWFStatus: number = 0;
@@ -55,6 +53,10 @@ export class AdminFeePopupComponent {
   //dropdowns
   allAdminFeeRates: any[] = [];
   allCurrencyTypes: any[] = [];
+
+  // Validations
+  hasValidationErrors: boolean = false;
+  errorMessages: { [key: string]: string } = {};
 
   // Security
   hideEditBtn: boolean = false;
@@ -106,10 +108,8 @@ export class AdminFeePopupComponent {
     private logForm: LogformService,
     private firmDetailsService: FirmDetailsService,
     private objectwfService: ObjectwfService,
-    private flatpickrService: FlatpickrService,
     private sanitizerService: SanitizerService,
     private firmRptAdminFeeService: FirmRptAdminFeeService,
-    private waiverService: WaiverService,
     private dateUtilService: DateUtilService
   ) {
 
@@ -131,6 +131,7 @@ export class AdminFeePopupComponent {
         this.getMessageProperty();
         this.populateAdminFeeRates();
         this.populateCurrencyTypes();
+        this.getResubmissionHistoryList();
       },
       error: (err) => {
         console.error('Error executing supervisor checks:', err);
@@ -158,14 +159,20 @@ export class AdminFeePopupComponent {
   applySecurityOnPage(objectId: FrimsObject) {
     this.isLoading = true;
     const currentOpType = this.isEditModeAdminFee ? ObjectOpType.Edit : ObjectOpType.View;
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType, this.rptWFStatus, this.fee.FirmrptAdminFeeID).then(() => {
-      if (!this.isEditModeAdminFee) {
-        this.hideButtonAccordinttoUsers();
-      }
-      this.registerMasterPageControlEvents();
-    })
-    this.isLoading = false;
+
+    this.firmDetailsService
+      .applyAppSecurity(this.userId, objectId, currentOpType, this.rptWFStatus, this.fee.FirmrptAdminFeeID)
+      .then(() => {
+        if (!this.isEditModeAdminFee) {
+          this.hideButtonAccordinttoUsers();
+        }
+        this.registerMasterPageControlEvents();
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
   }
+
 
   hideButtonAccordinttoUsers() {
     let isUserTaskInProgress: boolean = false;
@@ -176,7 +183,7 @@ export class AdminFeePopupComponent {
     let bShowButton = false;
 
     if (!this.supervisionService.isNullOrEmpty(objectWfStatusID)) {
-      const obj = this.UserObjectWfTasks.filter(item => item.wfTaskAssignedToUser === this.userId && item.objectWFStatusTypeID === 1);
+      const obj = this.userObjTasks.filter(item => item.wfTaskAssignedToUser === this.userId && item.objectWFStatusTypeID === 1);
       if (obj !== null && obj.length > 0) {
         isUserTaskInProgress = true;
       }
@@ -307,8 +314,7 @@ export class AdminFeePopupComponent {
           data.RptPeriodFromDate = this.dateUtilService.formatDateToCustomFormat(data.RptPeriodFromDate);
           data.RptPeriodToDate = this.dateUtilService.formatDateToCustomFormat(data.RptPeriodToDate);
         });
-        this.getResubmissionHistoryList();
-        this.getUserObjectWfTasks();
+        console.log(this.AdminFeeDetials);
       }),
       switchMap(() => {
         return this.objectwfService.getObjectInstanceWorkflowStatus(
@@ -320,6 +326,7 @@ export class AdminFeePopupComponent {
     ).subscribe({
       next: data => {
         this.rptWFStatus = data.response;
+        this.getObjectWorkFlow();
         this.applySecurityOnPage(this.Page.LateAdminFee);
       },
       error: error => {
@@ -331,17 +338,15 @@ export class AdminFeePopupComponent {
     });
   }
 
-  // getObjectWorkFlow() {
-  //   const firmRptAdminFeeID = this.AdminFeeDetials[0].FirmrptAdminFeeID;
-  //   const firmRptReviewRevNum = this.AdminFeeDetials[0].FirmRptReviewRevNum;
-  //   this.objectwfService.getObjectWorkflow(this.Page.LateAdminFee, firmRptAdminFeeID, firmRptReviewRevNum).subscribe(data => {
-  //     this.objWorkFlow = data.response;
-  //   })
-  // }
-
-  getObjectInstanceWorkflowStatus() {
-
+  getObjectWorkFlow() {
+    const firmRptAdminFeeID = this.AdminFeeDetials[0].FirmrptAdminFeeID;
+    const firmRptReviewRevNum = this.AdminFeeDetials[0].FirmRptReviewRevNum;
+    this.objectwfService.getObjectWorkflow(this.Page.LateAdminFee, firmRptAdminFeeID, firmRptReviewRevNum).subscribe(data => {
+      this.objWorkFlow = data.response;
+      console.log(this.objWorkFlow);
+    })
   }
+
 
   getResubmissionHistoryList() {
     const firmRptSchItemId = this.fee.FirmRptSchItemID
@@ -360,33 +365,9 @@ export class AdminFeePopupComponent {
     });
   }
 
-  getRevisionCommentsByWaiver() {
-    this.showPreviousCommentsModal = true;
-    const objectWFStatusID = this.fee.ObjectWfStatusID;
-    this.waiverService.getRevisionCommentsByWaiver(objectWFStatusID).subscribe({
-      next: (res) => {
-        this.RevisionCommentsList = res.response;
-        console.log("RevisionCommentsList", this.RevisionCommentsList)
-      },
-      error: (error) => {
-        console.error('Error fitching RevisionCommentsList', error);
-      },
-    });
-  }
-
-  getUserObjectWfTasks() {
-    const ObjectWFStatusID = this.fee.ObjectWfStatusID;
-    this.objectwfService.getUserObjectWfTasks(ObjectWFStatusID).subscribe({
-      next: (res) => {
-        this.UserObjectWfTasks = res.response;
-        console.log("UserObjectWfTasks", this.UserObjectWfTasks)
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error fitching UserObjectWfTasks', error);
-        this.isLoading = false;
-      },
-    });
+  onReviewDataReceived(tasks: any) {
+    this.userObjTasks = tasks;
+    console.log('Received review data:', this.userObjTasks);
   }
 
   getDocumentTypes() {
@@ -444,21 +425,18 @@ export class AdminFeePopupComponent {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error fitching UserObjectWfTasks', error);
+        console.error('Error fitching userObjTasks', error);
       },
     });
   }
 
-  closePreviousCommentsModal() {
-    this.showPreviousCommentsModal = false;
-  }
-
-  editFee() {
+  editAdminFee() {
     this.isEditModeAdminFee = true;
+    this.reviewComponent.ngOnInit();
     this.applySecurityOnPage(this.Page.LateAdminFee);
   }
 
-  cancelFee() {
+  cancelAdminFee() {
     Swal.fire({
       text: 'Are you sure you want to cancel your changes ?',
       icon: 'warning',
@@ -477,6 +455,11 @@ export class AdminFeePopupComponent {
 
   imposeAnAdministrativeonChange(): void {
     this.selectedImposedRadio = this.AdminFeeDetials[0].feeImposed;
+    if (this.selectedImposedRadio) {
+      this.AdminFeeDetials[0].ImposedAmount = this.AdminFeeDetials[0].CalculatedAmount;
+    } else {
+      this.AdminFeeDetials[0].ImposedAmount = 0;
+    }
   }
 
   populateAdminFeeRates() {
@@ -495,8 +478,204 @@ export class AdminFeePopupComponent {
     })
   }
 
-  saveFee() {
+  async validateAdminFee(flag: number): Promise<boolean> {
+    this.hasValidationErrors = false;
 
+    if (this.AdminFeeDetials[0].feeImposed === false && this.supervisionService.isNullOrEmpty(this.AdminFeeDetials[0].Justification)) {
+      this.loadErrorMessages('ENTER_JUSTIFICATION', constants.LateAdminFeeMSG.ENTER_JUSTIFICATION);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['ENTER_JUSTIFICATION'];
+    }
+
+    if (this.AdminFeeDetials[0].feeImposed === true && this.supervisionService.isNullOrEmpty(this.AdminFeeDetials[0].ImposedAmount)) {
+      this.loadErrorMessages('ENTER_IMPOSEDAMOUNT', constants.LateAdminFeeMSG.ENTER_IMPOSEDAMOUNT);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['ENTER_IMPOSEDAMOUNT'];
+    }
+
+    if (this.AdminFeeDetials[0].feeImposed === true && !this.supervisionService.isNullOrEmpty(this.AdminFeeDetials[0].ImposedAmount)) {
+      const imposedAmount = parseFloat(this.AdminFeeDetials[0].ImposedAmount);
+      if (!this.dateUtilService.isPositiveNonDecimal(imposedAmount)) {
+        this.loadErrorMessages('VALID_IMPOSEDAMOUNT', constants.LateAdminFeeMSG.VALID_IMPOSEDAMOUNT);
+        this.hasValidationErrors = true;
+      } else {
+        delete this.errorMessages['VALID_IMPOSEDAMOUNT'];
+      }
+    }
+
+    if (parseInt(this.AdminFeeDetials[0].AdminFeeRateID) === 0) {
+      this.loadErrorMessages('RULES_CALCULATION', constants.LateAdminFeeMSG.RULES_CALCULATION);
+      this.hasValidationErrors = true;
+    } else {
+      delete this.errorMessages['RULES_CALCULATION'];
+    }
+
+    if (flag === 1) {
+
+    }
+
+    return this.hasValidationErrors;
+  }
+
+  prepareAdminFeeObject(userId: number) {
+    return {
+      objFirmRptAdminFee: {
+        firmRptAdminFeeID: this.AdminFeeDetials[0].FirmrptAdminFeeID,
+        firmRptSchItemID: this.AdminFeeDetials[0].FirmRptSchItemID,
+        feeImposed: this.AdminFeeDetials[0].feeImposed,
+        calculatedAmount: this.AdminFeeDetials[0].CalculatedAmount.toString(),
+        imposedAmount: this.AdminFeeDetials[0].ImposedAmount.toString(),
+        recommendation: this.AdminFeeDetials[0].Recommendation,
+        justification: this.AdminFeeDetials[0].Justification,
+        objectWFStatusID: this.AdminFeeDetials[0].ObjectWfStatusID,
+        createdBy: userId,
+        lastModifiedBy: userId,
+        objectId: this.Page.LateAdminFee,
+        firmRptReviewItemID: this.AdminFeeDetials[0].FirmRptReviewItemID,
+        adminFeeRateID: this.AdminFeeDetials[0].AdminFeeRateID,
+        calculatedAmountCurrencyTypeID: this.AdminFeeDetials[0].CalculatedAmountCurrencyTypeID,
+        imposedAmountCurrencyTypeID: this.AdminFeeDetials[0].ImposedAmountCurrencyTypeID,
+      },
+      objWFStatus: {
+        objectWFStatusID: this.objWorkFlow.ObjectWFStatusID,
+        objectID: this.objWorkFlow.ObjectID,
+        objectInstanceID: this.objWorkFlow.ObjectInstanceID,
+        objectInstanceRevisionNo: this.objWorkFlow.ObjectInstanceRevNum,
+        objectWFStatusTypeID: this.objWorkFlow.ObjectWFStatusTypeID,
+        createdBy: this.objWorkFlow.CreatedBy,
+        lastModifiedBy: userId,
+        comments: null,
+        firmID: null,
+        reportName: null,
+        individualsName: null,
+        objectWFTaskStatusID: null,
+        objectWFLastModifiedByName: this.objWorkFlow.ObjectWFLastModifiedByName,
+        objectWFLastModifiedByDate: this.dateUtilService.convertDateToYYYYMMDD(this.objWorkFlow.ObjectWFLastModifiedByDate),
+      },
+      lstWFTasks: this.userObjTasks.map((task: any) => ({
+        objectWFTaskStatusID: task.objectWFTaskStatusID,
+        objectWFStatusID: task.objectWFStatusID,
+        objectWFTaskTypeID: task.objectWFTaskTypeID,
+        objectWFTaskSequenceNo: task.objectWFTaskSequenceNo,
+        wfTaskAssignedToUser: task.wfTaskAssignedToUser,
+        wfTaskAssignedToRole: task.wfTaskAssignedToRole,
+        wfTaskAssignedDate: task.wfTaskAssignedDate,
+        wfTaskCompletedDate: task.wfTaskCompletedDate,
+        wfTaskDueDate: this.dateUtilService.convertDateToYYYYMMDD(task.wfTaskDueDate),
+        objectWFStatusTypeID: task.objectWFStatusTypeID,
+        objectWFTaskTypeDescription: task.objectWFTaskTypeDescription,
+        wfTaskAssignedToRoleDescription: task.wfTaskAssignedToRoleDescription,
+        lastModifiedBy: userId,
+        emailToAddress: task.emailToAddress,
+        emailCCAddress: task.emailCCAddress,
+        emailToIDs: task.emailToIDs,
+        emailCCIDs: task.emailCCIDs,
+        userComments: task.userComments,
+        taskSRNo: task.taskSRNo,
+        userName: task.userName,
+        objectWFStatusTypeDesc: task.objectWFStatusTypeDesc,
+        objectWFCommentID: task.objectWFCommentID,
+        commentsDate: task.commentsDate,
+        objectWFTaskStart: task.objectWFTaskStart,
+        objectWFTaskMandatory: task.objectWFTaskMandatory,
+        isNewTask: task.isNewTask,
+        firmName: task.firmName,
+        fileName: task.fileName,
+        objectID: task.objectID,
+        objectName: task.objectName,
+        objectNum: task.objectNum,
+        firmID: task.firmID,
+        objectLink: task.objectLink,
+        objectIdentifierID: task.objectIdentifierID,
+        objectRevNum: task.objectRevNum,
+        isEnabled: task.isEnabled,
+        groupTaskFlag: task.groupTaskFlag,
+        objectEditableFlag: task.objectEditableFlag,
+        isEditableTask: task.isEditableTask,
+        objectWFTaskDefsID: task.objectWFTaskDefsID,
+        completionEmailTO: task.completionEmailTO,
+        completionEmailCC: task.completionEmailCC,
+        completionEmailCCIds: task.completionEmailCCIds,
+        completionAssignToUserID: task.completionAssignToUserID,
+        completionUserName: task.completionUserName,
+        completionAssignToRoleID: task.completionAssignToRoleID,
+        completionAppRoleDesc: task.completionAppRoleDesc,
+        completionEmailToIds: task.completionEmailToIds,
+        wfTaskCompletedBy: task.wfTaskCompletedBy,
+        reviewInitiatedBy: task.reviewInitiatedBy,
+        reviewInitiatedDate: task.reviewInitiatedDate,
+        taskInitiatedBy: task.taskInitiatedBy,
+        taskInitiatedDate: task.taskInitiatedDate,
+        taskInitiatedByName: task.taskInitiatedByName,
+        reasonForEsclation: task.reasonForEsclation,
+        statusSetBy: task.statusSetBy,
+        defaultUserID: task.defaultUserID,
+      })),
+      lstWFTaskNotification: [
+        {
+          objectWFTaskNotificationID: 0,
+          objectWFStatusID: 0,
+          objectWFTaskStatusID: 0,
+          appRoleID: 0,
+          userID: 0,
+          emailTo: true,
+          emailCC: true,
+          objectWFTaskSequenceNo: 0,
+          appRoleDescription: null,
+          lastModifiedBy: 0,
+          userName: null,
+          emailToAddress: null,
+          emailCCAddress: null,
+          taskSRNo: 0,
+          completionNotificationFlag: 0,
+        },
+      ],
+    }
+  }
+
+  async saveAdminFee() {
+    this.isLoading = true;
+    const isValid = await this.validateAdminFee(0);
+
+    if (isValid) {
+      this.supervisionService.showErrorAlert(constants.AISMessages.AISSAVEERROR, 'error');
+      this.isLoading = false;
+      return;
+    }
+
+    const AdminFeeDataObj = this.prepareAdminFeeObject(this.userId);
+
+    this.firmRptAdminFeeService.saveLateAdminFee(AdminFeeDataObj).subscribe({
+      next: (response) => {
+        this.isEditModeAdminFee = false;
+        this.isLoading = false;
+        this.closeAdminFeePopup.emit();
+        this.reloadAdminFee.emit();
+        this.applySecurityOnPage(this.Page.LateAdminFee);
+      },
+      error: (err) => {
+        console.error('Error saving late admin fee:', err);
+        this.isLoading = false;
+      },
+      complete: () => {
+        this.firmDetailsService.showSaveSuccessAlert(constants.LateAdminFeeMSG.SAVED_MSG);
+        console.log('Save late admin fee request completed.');
+      },
+    });
+
+  }
+
+  loadErrorMessages(fieldName: string, msgKey: number, placeholderValue?: string) {
+    this.supervisionService.getErrorMessages(fieldName, msgKey, null, placeholderValue).subscribe(
+      () => {
+        this.errorMessages[fieldName] = this.supervisionService.errorMessages[fieldName];
+      },
+      error => {
+        console.error(`Error loading error message for ${fieldName}:`, error);
+      }
+    );
   }
 
 }

@@ -5,7 +5,7 @@ import { FirmDetailsService } from 'src/app/firms/firmsDetails.service';
 import { SupervisionService } from 'src/app/supervision/supervision.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { FlatpickrService } from 'src/app/shared/flatpickr/flatpickr.service';
-import { firstValueFrom, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-co-supervisors',

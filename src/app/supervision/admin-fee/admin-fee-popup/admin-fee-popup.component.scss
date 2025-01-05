@@ -31,7 +31,7 @@
 
 .popupcontainer.Rptpopupcontainer {
   max-height: 97vh;
-  width: 95vw;
+  width: 85vw;
 }
 
 .disabled {
@@ -217,8 +217,16 @@
   background-color: #f4f4f4;
 }
 
-.fund-status-table th {
-  text-align: center;
+.submission-history-table {
+  border-bottom-left-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+}
+
+.submission-history-table {
+  th, td {
+    text-align: center;
+  }
+  
 }
 
 .required-container {
@@ -231,14 +239,15 @@
 }
 
 .overlay {
-  z-index: 101!important;
+  z-index: 101 !important;
 }
 
 .calculatedFeePopup {
   width: 40vw !important;
-  z-index: 101!important;
+  z-index: 101 !important;
+
   .popup-operations-place {
-    text-align: center!important;
+    text-align: center !important;
   }
 
   .popup-content {
@@ -249,5 +258,7 @@
 
 }
 
-
-
+.fee-to-be-imposed-dropdowns {
+  display: flex;
+  gap: 1rem;
+}

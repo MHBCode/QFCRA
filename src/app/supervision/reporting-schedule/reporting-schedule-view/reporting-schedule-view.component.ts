@@ -15,8 +15,8 @@ import { SanitizerService } from 'src/app/shared/sanitizer-string/sanitizer.serv
 import { ReturnReviewService } from 'src/app/ngServices/return-review.service';
 
 interface DocumentDetails {
-  DocID: number; // Replace with actual type
-  documentDetails: any; // Replace with the actual type of document details
+  DocID: number; 
+  documentDetails: any; 
 }
 
 @Component({
@@ -120,6 +120,8 @@ export class ReportingScheduleViewComponent {
     FirmRptFrom: `1/Jan/${this.currentYear}`,
     FirmRptTo: `31/Dec/${this.currentYear}`,
   };
+
+  sharePointUrl = constants.sharePointUrl; 
 
   showReferencePopup: boolean = false;
   currentRpt: any = {};
