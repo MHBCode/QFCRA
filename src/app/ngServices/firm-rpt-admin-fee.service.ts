@@ -27,4 +27,8 @@ export class FirmRptAdminFeeService {
     const url = `${this.baseUrlAdminFee}get_calculated_fee?adminFeeRateID=${adminFeeRateID}&day=${day}`; 
     return this.http.get<any>(url);
   }
+  saveLateAdminFee(rowData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<any>(`${this.baseUrlAdminFee}save_late_admin_fee`, rowData, { headers: headers });
+  }
 }
