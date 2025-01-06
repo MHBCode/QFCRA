@@ -17,7 +17,7 @@ export class EnforcementsActionsService {
     return this.http.get<any>(url);
   }
 
-  getAllRelatedIndividuals(firmId: number,firmTypeID: number) {
+  getAllRelatedIndividuals(firmId: number,firmTypeID: number | null = null) {
     const url = `${this.baseUrlEnforcement}get_related_individuals?firmId=${firmId}&firmtypeID=${firmTypeID}`;
     return this.http.get<any>(url);
   }

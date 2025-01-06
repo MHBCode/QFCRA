@@ -14,6 +14,7 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { ReviewComponent } from './review/review.component';
 import { WorkflowComponent } from './workflow/workflow.component';
 import { ReferenceFormComponent } from './reference-form/reference-form.component';
+import { FirmPopupFilterComponent } from './firm-popup-filter/firm-popup-filter.component';
 @NgModule({
   declarations: [
     DataPlaceComponent,
@@ -22,7 +23,8 @@ import { ReferenceFormComponent } from './reference-form/reference-form.componen
     PaginationComponent,
     ReviewComponent,
     WorkflowComponent,
-    ReferenceFormComponent
+    ReferenceFormComponent,
+    FirmPopupFilterComponent
   ],
   imports: [
     CommonModule,

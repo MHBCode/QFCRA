@@ -223,7 +223,8 @@
           </div>
           <div class="input-field" *ngIf="!isNoticesAndResponsePage">
             <label for="noticeDetails">Notice Details</label>
-            <a [routerLink]="['/home/notices-and-responses',noticeDetails.noticeID]" target="_blank">View Notice Details</a>
+            <a [routerLink]="['/home/notices-and-responses',noticeDetails.noticeID]" target="_blank">View Notice
+              Details</a>
           </div>
           <div class="input-field">
             <label for="emailNotification">Link to Email Notification</label>
@@ -294,7 +295,7 @@
             </div>
           </div>
 
-          <div class="input-field fullwidth">
+          <div class="input-field fullwidth copySection">
             <b>Send a copy of the firm's response to</b>
             <div class="input-field controlledFunctions">
               <label for="controlledFunctions">SUP Supervisor</label>
@@ -357,7 +358,6 @@
           </div>
         </div>
       </div>
-      <hr>
     </div>
 
     <div class="popup-title-btn-row" *ngIf="questionnaireDetails && noticeDetails && noticeDetails?.noticeTypeID != 2">
@@ -366,9 +366,11 @@
           Questionnaire
         </h3>
       </div>
-      <p><span style="color: red;">*</span> - Explanation required condition(s) met; <span style="color: red;">#</span>
-        - Esclation condition(s) met </p>
-      <hr>
+      <p *ngIf="!isNoticesAndResponsePage"><span style="color: red;">*</span> - Explanation required condition(s) met;
+        <span style="color: red;">#</span>
+        - Esclation condition(s) met
+      </p>
+      <hr *ngIf="!isNoticesAndResponsePage">
     </div>
     <div class="reporting-schedule-form"
       *ngIf="questionnaireDetails && noticeDetails && noticeDetails?.noticeTypeID != 2">
@@ -384,18 +386,16 @@
               </div>
             </div>
             <hr class="fullwidth">
-            <ng-container *ngIf="question.responseTypeID && question.responseTypeID !== responseTypes.Explanation">
+            <ng-container
+              *ngIf="!isNoticesAndResponsePage && question.responseTypeID && question.responseTypeID !== responseTypes.Explanation">
               <label>Response: </label>
-              <!-- <p [name]="'question' + question.NoticeQuestionNumber" [id]="'question' + question.NoticeQuestionNumber"
-                [(ngModel)]="question.Responses">
-              </p> -->
               <p [id]="'explanation' + question.responses" [innerHTML]="getSanitizedHtml(question.responses)">
               </p>
             </ng-container>
             <hr class="fullwidth"
               *ngIf="shouldShowHr(question.responses, question.responseTypeID, question.explanationRequired)">
             <ng-container
-              *ngIf="question.explanationRequired === 1 || question.explanationRequired === 3 || question.responseTypeID == responseTypes.Explanation">
+              *ngIf="!isNoticesAndResponsePage && (question.explanationRequired === 1 || question.explanationRequired === 3 || question.responseTypeID == responseTypes.Explanation)">
               <label>Explanation: </label>
               <!-- <p [name]="'question' + question.NoticeQuestionNumber" [id]="'question' + question.NoticeQuestionNumber"
                 [(ngModel)]="question.Explanation">
@@ -403,6 +403,24 @@
               <p [id]="'explanation' + question.explanation" [innerHTML]="getSanitizedHtml(question.explanation)">
               </p>
             </ng-container>
+            <div class="questionnaireNoticeDetails" *ngIf="isNoticesAndResponsePage">
+              <div>
+                <label>Response Type</label>
+                <p>{{question.responseTypeDesc}}
+                </p>
+                <p>{{question.listNameDesc}}</p>
+              </div>
+              <div>
+                <label>Response Mandatory</label>
+                <p>{{question.responseMandatory}}
+                </p>
+              </div>
+              <div>
+                <label>Explanation Required</label>
+                <p>{{question.evaluationRequirementTypeDesc}}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

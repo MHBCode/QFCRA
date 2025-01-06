@@ -86,6 +86,7 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    if(this.)
     this.loadAdditionalDocument();
     this.loadAdditionalDocumentByFirm();
     this.applySecurityOnPage(this.Page.Notices);
@@ -212,7 +213,9 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
             .split(',')
             .map((id) => parseInt(id, 10)) : '';
 
-          this.questionnaireDetails = this.noticeDetailsInfo.objNoticeQuestionnaire;
+          this.questionnaireDetails = this.noticeDetailsInfo.objNoticeQuestionnaire.lstNoticeQuestionnaireItems;
+
+          console.log('this.questionnaireDetails',this.questionnaireDetails);
         },
         error => {
           console.error('Error fetching noticeTypes ', error);
@@ -368,12 +371,16 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
 
   openConditionsPopup(noticeQuestionnaireItemID: number) {
     this.showCondtionsPopup = true;
-    debugger;
-    this.explanationConditions = this.questionnaireDetails
+
+    const questionnaireDetailsItem = this.questionnaireDetails.filter(
+      (item) => item.noticeQuestionnaireItemID === noticeQuestionnaireItemID
+    );
+
+    this.explanationConditions = questionnaireDetailsItem
       .flatMap(detail => detail.lstResponseCriteria)
       .filter(condition => condition.evaluationReasonTypeID === 1);
 
-    this.escalationConditions = this.questionnaireDetails
+    this.escalationConditions = questionnaireDetailsItem
       .flatMap(detail => detail.lstEsclationCriteria)
       .filter(condition => condition.evaluationReasonTypeID === 2);
 

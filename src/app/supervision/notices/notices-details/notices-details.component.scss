@@ -94,3 +94,29 @@
     width: auto !important;
     margin-inline-end: 5px;
 }
+
+.questionnaireNoticeDetails {
+    display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.questionnaireNoticeDetails > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.questionnaireNoticeDetails > div > label {
+    font-weight: bold;
+}
+.copySection{
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.copySection > b {
+    width: 100%;
+}

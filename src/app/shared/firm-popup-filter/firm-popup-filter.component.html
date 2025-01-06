@@ -1,0 +1,71 @@
+<div class="overlay">
+    <div class="popupcontainer" style="display:block" (click)="$event.stopPropagation()">
+        <div class="popup-title-btn-row">
+            <div class="popup-header">
+                <h3>
+                    Firms List
+                </h3>
+            </div>
+            <button class="close-button  close-icon" (click)="onClose()">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+        <div class="reporting-schedule-form">
+            <div class="input-field fullwidth">
+                <label for="firmType">Firm Types</label>
+                <div class="checkbox-options">
+                    <label *ngFor="let type of allFirmTypes" class="custom-checkbox">
+                        <input type="checkbox"/>
+                        <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-field fullwidth">
+                <label for="firmType">Firm Types</label>
+                <div class="checkbox-options">
+                    <label *ngFor="let type of allFirmStatus" class="custom-checkbox">
+                        <input type="checkbox"/>
+                        <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                    </label>
+                </div>
+            </div>
+            <div class="input-field fullwidth">
+                <label for="firmType">Firm Types</label>
+                <div class="checkbox-options">
+                    <label *ngFor="let type of allAuthStatus" class="custom-checkbox">
+                        <input type="checkbox"/>
+                        <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                    </label>
+                </div>
+            </div>
+            <div class="input-field fullwidth">
+                <label for="firmType">Firm Types</label>
+                <div class="checkbox-options">
+                    <label *ngFor="let type of allLicenseStatus" class="custom-checkbox">
+                        <input type="checkbox"/>
+                        <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                    </label>
+                </div>
+            </div>
+            <div class="input-field fullwidth">
+                <label for="firmType">Firm Types</label>
+                <div class="checkbox-options">
+                    <label *ngFor="let type of allLegalStatus" class="custom-checkbox">
+                        <input type="checkbox"/>
+                        <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                    </label>
+                </div>
+            </div>
+            <div class="input-field fullwidth">
+                <label for="firmType">Firm Types</label>
+                <div class="checkbox-options">
+                    <label *ngFor="let type of allprudentialCategoryTypes" class="custom-checkbox">
+                        <input type="checkbox"/>
+                        <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

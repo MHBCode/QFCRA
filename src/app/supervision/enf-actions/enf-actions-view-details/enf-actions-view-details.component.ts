@@ -168,86 +168,94 @@ export class EnfActionsViewDetailsComponent implements OnInit {
       this.firmDetails = this.firmDeatailsFromParent;
     }
 
-    if (!this.isCreateEnf) {
-      forkJoin({
-        userRoles: this.firmDetailsService.loadAssignedUserRoles(this.userId),
-        levelUsers: this.firmDetailsService.loadAssignedLevelUsers(),
-        isDirector: this.isUserDirector(),
-        isSupervisor: this.isValidFirmSupervisor(),
-
-      }).subscribe({
-        next: ({
-          userRoles,
-          levelUsers,
-          isDirector,
-          isSupervisor,
-
-        }) => {
-          // Assign data to component properties
-          this.assignedUserRoles = userRoles;
-          this.assignedLevelUsers = levelUsers;
-          this.UserDirector = isDirector;
-          this.ValidFirmSupervisor = isSupervisor;
-
-          // Apply security after all data is loaded
-          this.loadDocuments();
-          this.loadEnfDetails(this.enf.EnforcementAndDisciplinaryActnID).subscribe({
-            next: () => {
-              this.applySecurityOnPage(this.Page.Enforcement, false);
-              this.isLoading = false;
-            },
-            error: (error) => {
-              console.error('Error loading enforcement details: ', error);
-              this.isLoading = false;
-            }
-          });
-        },
-        error: (err) => {
-          console.error('Error initializing page:', err);
-          this.isLoading = false;
-        },
-      });
-    } else {
-      forkJoin({
-        userRoles: this.firmDetailsService.loadAssignedUserRoles(this.userId),
-        levelUsers: this.firmDetailsService.loadAssignedLevelUsers(),
-        isDirector: this.isUserDirector(),
-        isSupervisor: this.isValidFirmSupervisor(),
-
-      }).subscribe({
-        next: ({
-          userRoles,
-          levelUsers,
-          isDirector,
-          isSupervisor,
-
-        }) => {
-          // Assign data to component properties
-          this.assignedUserRoles = userRoles;
-          this.assignedLevelUsers = levelUsers;
-          this.UserDirector = isDirector;
-          this.ValidFirmSupervisor = isSupervisor;
-
-          // Apply security after all data is loaded
-          this.populateEnfActionsAuth();
-          this.populateEnfActionsDNFBP();
-          this.populateFirmNamesAuthorised();
-          this.populateFirmNamesDNFBP();
-
-          this.showIndividualsDropdown = false;
-
-          this.applySecurityOnPage(this.Page.Enforcement, true); // on create mode
-        },
-        error: (err) => {
-          console.error('Error initializing page:', err);
-          this.isLoading = false;
-        },
-      });
-    }
-
     if (this.isMainEnfActionListing) {
       this.getFirmTypes();
+      this.populateEnfActionsAuth();
+      this.populateEnfActionsDNFBP();
+      this.populateFirmNamesAuthorised();
+      this.populateFirmNamesDNFBP();
+      this.showIndividualsDropdown = false;
+      this.isLoading = false;
     }
+    else {
+      if (!this.isCreateEnf) {
+        forkJoin({
+          userRoles: this.firmDetailsService.loadAssignedUserRoles(this.userId),
+          levelUsers: this.firmDetailsService.loadAssignedLevelUsers(),
+          isDirector: this.isUserDirector(),
+          isSupervisor: this.isValidFirmSupervisor(),
+
+        }).subscribe({
+          next: ({
+            userRoles,
+            levelUsers,
+            isDirector,
+            isSupervisor,
+
+          }) => {
+            // Assign data to component properties
+            this.assignedUserRoles = userRoles;
+            this.assignedLevelUsers = levelUsers;
+            this.UserDirector = isDirector;
+            this.ValidFirmSupervisor = isSupervisor;
+
+            // Apply security after all data is loaded
+            this.loadDocuments();
+            this.loadEnfDetails(this.enf.EnforcementAndDisciplinaryActnID).subscribe({
+              next: () => {
+                this.applySecurityOnPage(this.Page.Enforcement, false);
+                this.isLoading = false;
+              },
+              error: (error) => {
+                console.error('Error loading enforcement details: ', error);
+                this.isLoading = false;
+              }
+            });
+          },
+          error: (err) => {
+            console.error('Error initializing page:', err);
+            this.isLoading = false;
+          },
+        });
+      } else {
+        forkJoin({
+          userRoles: this.firmDetailsService.loadAssignedUserRoles(this.userId),
+          levelUsers: this.firmDetailsService.loadAssignedLevelUsers(),
+          isDirector: this.isUserDirector(),
+          isSupervisor: this.isValidFirmSupervisor(),
+
+        }).subscribe({
+          next: ({
+            userRoles,
+            levelUsers,
+            isDirector,
+            isSupervisor,
+
+          }) => {
+            // Assign data to component properties
+            this.assignedUserRoles = userRoles;
+            this.assignedLevelUsers = levelUsers;
+            this.UserDirector = isDirector;
+            this.ValidFirmSupervisor = isSupervisor;
+
+            // Apply security after all data is loaded
+            this.populateEnfActionsAuth();
+            this.populateEnfActionsDNFBP();
+            this.populateFirmNamesAuthorised();
+            this.populateFirmNamesDNFBP();
+
+            this.showIndividualsDropdown = false;
+
+            this.applySecurityOnPage(this.Page.Enforcement, true); // on create mode
+          },
+          error: (err) => {
+            console.error('Error initializing page:', err);
+            this.isLoading = false;
+          },
+        });
+      }
+    }
+
   }
 
 
@@ -532,6 +540,9 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   set firmName(value: number) {
     if (this.isCreateEnf) {
       this.firmId = value;
+      if (value && this.isMainEnfActionListing) {
+        this.loadFirmDetails(value);
+      }
     }
     else {
       this.enfDetails[0].FirmID = value;
@@ -721,7 +732,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     this.individuals = [];
 
 
-    if (this.enfTypeID == 2 && (this.firmDetails.FirmTypeID == 1 || this.selectedFirmTypeID == 1)) {
+    if (this.enfTypeID == 2 && (this.firmDetails?.FirmTypeID == 1 || this.selectedFirmTypeID == 1)) {
       this.populateApprovedIndividuals().subscribe(() => {
         this.individuals = this.allApprovedIndividuals.map(individual => ({
           id: individual.AppIndividualID,
@@ -737,7 +748,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
         }));
         this.showIndividualsDropdown = true; // Show dropdown
       });
-    } else if (this.enfTypeID == 5 && (this.firmDetails.FirmTypeID == 2 || this.selectedFirmTypeID == 2)) { // Registered or Required Individuals
+    } else if (this.enfTypeID == 5 && (this.firmDetails?.FirmTypeID == 2 || this.selectedFirmTypeID == 2)) { // Registered or Required Individuals
       this.popuplateRequiredIndividuals(1).subscribe(() => {
         this.individuals = this.allRequiredIndividuals.map(individual => ({
           id: individual.ContactAssnID,
@@ -1018,7 +1029,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   }
 
   populateRelatedIndividuals(): Observable<any> {
-    return this.enfService.getAllRelatedIndividuals(this.firmId, this.firmDetails.FirmTypeID).pipe(
+    return this.enfService.getAllRelatedIndividuals(this.firmId, this.firmDetails?.FirmTypeID).pipe(
       tap(
         (types) => {
           this.allRelatedIndividuals = types.response || [];
