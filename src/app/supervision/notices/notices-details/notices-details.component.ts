@@ -86,7 +86,6 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    if(this.)
     this.loadAdditionalDocument();
     this.loadAdditionalDocumentByFirm();
     this.applySecurityOnPage(this.Page.Notices);
