@@ -2,12 +2,6 @@
 <div class="overlay">
   <div class="popupcontainer Rptpopupcontainer NoAnimationPopup" style="display:block"
     (click)="$event.stopPropagation()">
-    <!-- <div class="error-messages">
-        <p *ngIf="errorMessages['OtherEntityName']">
-          {{ errorMessages['OtherEntityName'] }}
-        </p>
-      </div> -->
-    <!-- Title -->
     <div class="popup-title-btn-row">
       <div class="popup-header" *ngIf="firmId">
         <h3>
@@ -229,7 +223,7 @@
           </div>
           <div class="input-field" *ngIf="!isNoticesAndResponsePage">
             <label for="noticeDetails">Notice Details</label>
-            <a [routerLink]="['/view-notice-details']" target="_blank">View Notice Details</a>
+            <a [routerLink]="['/home/notices-and-responses',noticeDetails.noticeID]" target="_blank">View Notice Details</a>
           </div>
           <div class="input-field">
             <label for="emailNotification">Link to Email Notification</label>

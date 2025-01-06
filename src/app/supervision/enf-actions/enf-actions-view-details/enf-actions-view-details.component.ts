@@ -13,6 +13,7 @@ import { JournalService } from 'src/app/ngServices/journal.service';
 import { DateUtilService } from 'src/app/shared/date-util/date-util.service';
 import { ObjectwfService } from 'src/app/ngServices/objectwf.service';
 import { LogformService } from 'src/app/ngServices/logform.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-enf-actions-view-details',
@@ -150,11 +151,18 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     private journalService: JournalService,
     private dateUtilService: DateUtilService,
     private objectWF: ObjectwfService,
+    private router: Router,
+    private route: ActivatedRoute,
     private logForm: LogformService
   ) { }
 
   ngOnInit(): void {
     this.isLoading = true; // Start loading
+
+
+    this.route.params.subscribe(params => {
+      this.firmId = +params['id'];
+    })
 
     if (this.isCreateEnf && !this.isMainEnfActionListing) {
       this.firmDetails = this.firmDeatailsFromParent;
@@ -254,7 +262,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
     this.isLoading = true;
     const currentOpType = Mode ? ObjectOpType.Create : ObjectOpType.View;
 
-    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType,null,null).then(() => {
+    this.firmDetailsService.applyAppSecurity(this.userId, objectId, currentOpType, null, null).then(() => {
       this.registerMasterPageControlEvents();
     });
   }
@@ -555,11 +563,11 @@ export class EnfActionsViewDetailsComponent implements OnInit {
       }
     }
     else {
-      if (this.enfTypeID == 2 && this.selectedFirmTypeID == 1) {
+      if (this.enfTypeID == 2 && ((this.isCreateEnf && this.selectedFirmTypeID === 1) || (this.isEditModeEnf && this.firmDetails?.FirmTypeID === 1))) {
         return 'Approved Individuals';
       } else if (this.enfTypeID == 3 || this.enfTypeID == 6) {
         return 'Related Individuals';
-      } else if (this.enfTypeID == 5 && this.selectedFirmTypeID === 2) {
+      } else if (this.enfTypeID == 5 && ((this.isCreateEnf && this.selectedFirmTypeID === 2) || (this.isEditModeEnf && this.firmDetails?.FirmTypeID === 2))) {
         return 'Required Individuals';
       } else {
         return '';
@@ -711,9 +719,9 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   onActionFirmTypeChange(): void {
     this.selectedIndividualId = 0;
     this.individuals = [];
-    
 
-    if (this.enfTypeID == 2 && ((!this.isMainEnfActionListing && this.firmDetails.FirmTypeID == 1) || (this.isMainEnfActionListing && this.selectedFirmTypeID == 1))) {
+
+    if (this.enfTypeID == 2 && (this.firmDetails.FirmTypeID == 1 || this.selectedFirmTypeID == 1)) {
       this.populateApprovedIndividuals().subscribe(() => {
         this.individuals = this.allApprovedIndividuals.map(individual => ({
           id: individual.AppIndividualID,
@@ -729,7 +737,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
         }));
         this.showIndividualsDropdown = true; // Show dropdown
       });
-    } else if (this.enfTypeID == 5 && ((!this.isMainEnfActionListing && this.firmDetails.FirmTypeID == 2) || (this.isMainEnfActionListing && this.selectedFirmTypeID == 2))) { // Registered or Required Individuals
+    } else if (this.enfTypeID == 5 && (this.firmDetails.FirmTypeID == 2 || this.selectedFirmTypeID == 2)) { // Registered or Required Individuals
       this.popuplateRequiredIndividuals(1).subscribe(() => {
         this.individuals = this.allRequiredIndividuals.map(individual => ({
           id: individual.ContactAssnID,
@@ -841,8 +849,8 @@ export class EnfActionsViewDetailsComponent implements OnInit {
       firmID: this.isMainEnfActionListing ? this.firmId : this.firmName,
       firmName: null,
       qfcNum: this.isCreateEnf ? null : this.enfDetails[0].QFCNum,
-      appIndividualID: this.showIndividualsDropdown && (this.enfTypeID === 2) ? this.selectedIndividualId : null,
-      contactAssnID: this.showIndividualsDropdown && (this.enfTypeID === 3 || this.enfTypeID === 6 || this.enfTypeID === 5) ? this.selectedIndividualId : null,
+      appIndividualID: this.showIndividualsDropdown && (this.enfTypeID == 2) ? this.selectedIndividualId : null,
+      contactAssnID: this.showIndividualsDropdown && (this.enfTypeID == 3 || this.enfTypeID == 6 || this.enfTypeID == 5) ? this.selectedIndividualId : null,
       appIndividualName: this.isCreateEnf ? null : this.enfDetails[0].AppIndividualName,
       enforcementActionOnTypeID: this.enfTypeID,
       enforcementActionOnTypeDesc: this.isCreateEnf ? null : this.enfDetails[0].EnforcementActionOnTypeDesc,
@@ -1010,7 +1018,7 @@ export class EnfActionsViewDetailsComponent implements OnInit {
   }
 
   populateRelatedIndividuals(): Observable<any> {
-    return this.enfService.getAllRelatedIndividuals(this.routeFirmId, this.firmDetails.FirmTypeID).pipe(
+    return this.enfService.getAllRelatedIndividuals(this.firmId, this.firmDetails.FirmTypeID).pipe(
       tap(
         (types) => {
           this.allRelatedIndividuals = types.response || [];

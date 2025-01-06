@@ -151,6 +151,9 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
       this.noticeService.getFirmNoticeDetails(this.firmId, this.notice.FirmNoticeID).subscribe(
         data => {
           this.noticeDetails = data.response;
+          
+          console.log('this.noticeDetails',this.noticeDetails);
+
           this.questionnaireDetails = this.noticeDetails.lstFirmNoticeResponseItems;
         },
         error => {
@@ -182,32 +185,32 @@ export class NoticesDetailsComponent implements OnInit, OnChanges {
 
           console.log("noticeDetails", this.noticeDetails)
 
-          this.selectedFirmTypeIDs = this.noticeDetails.recipientCriteriaCSVFirmTypeIDs
+          this.selectedFirmTypeIDs = this.noticeDetails.recipientCriteriaCSVFirmTypeIDs ? this.noticeDetails.recipientCriteriaCSVFirmTypeIDs
             .split(',')
-            .map((id) => parseInt(id, 10));
+            .map((id) => parseInt(id, 10)) : [];
 
-          this.relatedFirmsIDs = this.noticeDetails.recipientCriteriaCSVFirmIDs.split(',')
-            .map((id) => parseInt(id, 10));
+          this.relatedFirmsIDs = this.noticeDetails.recipientCriteriaCSVFirmIDs ? this.noticeDetails.recipientCriteriaCSVFirmIDs.split(',')
+            .map((id) => parseInt(id, 10)) : [];
 
-          this.selectedControlledFunctionIDs = this.noticeDetails.recipientCriteriaCSVControlledFunctionTypeIDs
+          this.selectedControlledFunctionIDs = this.noticeDetails.recipientCriteriaCSVControlledFunctionTypeIDs ? this.noticeDetails.recipientCriteriaCSVControlledFunctionTypeIDs
             .split(',')
-            .map((id) => parseInt(id, 10));
+            .map((id) => parseInt(id, 10)) : [];
 
-          this.selectedResponseControlledFunctionIDs = this.noticeDetails.objNoticeQuestionnaire.respondentsControlledFunctionTypeIDs
+          this.selectedResponseControlledFunctionIDs = this.noticeDetails.objNoticeQuestionnaire.respondentsControlledFunctionTypeIDs ? this.noticeDetails.objNoticeQuestionnaire.respondentsControlledFunctionTypeIDs
             .split(',')
-            .map((id) => parseInt(id, 10));
+            .map((id) => parseInt(id, 10)) : '';
 
-          this.selectedResponseContactFunctionTypeIDs = this.noticeDetails.objNoticeQuestionnaire.respondentsDNFBPFunctionTypeIDs
+          this.selectedResponseContactFunctionTypeIDs = this.noticeDetails.objNoticeQuestionnaire.respondentsDNFBPFunctionTypeIDs ? this.noticeDetails.objNoticeQuestionnaire.respondentsDNFBPFunctionTypeIDs
             .split(',')
-            .map((id) => parseInt(id, 10));
+            .map((id) => parseInt(id, 10)) : '';
 
-          this.selectedContactFunctionTypeIDs = this.noticeDetails.recipientCriteriaCSVDNFBPFunctionTypeIDs
+          this.selectedContactFunctionTypeIDs = this.noticeDetails.recipientCriteriaCSVDNFBPFunctionTypeIDs ? this.noticeDetails.recipientCriteriaCSVDNFBPFunctionTypeIDs
             .split(',')
-            .map((id) => parseInt(id, 10));
+            .map((id) => parseInt(id, 10)) : '';
 
-          this.selectContactTypeIDs = this.noticeDetails.recipientCriteriaCSVContactTypeIDs
+          this.selectContactTypeIDs = this.noticeDetails.recipientCriteriaCSVContactTypeIDs ? this.noticeDetails.recipientCriteriaCSVContactTypeIDs
             .split(',')
-            .map((id) => parseInt(id, 10));
+            .map((id) => parseInt(id, 10)) : '';
 
           this.questionnaireDetails = this.noticeDetailsInfo.objNoticeQuestionnaire;
         },

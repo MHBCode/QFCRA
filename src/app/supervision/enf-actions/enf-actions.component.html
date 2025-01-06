@@ -1,6 +1,6 @@
 <app-loader *ngIf="isLoading"></app-loader>
 
-<div class="form-section">
+<div class="form-section" [ngClass]="isMainEnfActionListing ? 'isMainEnfListing' : '' ">
     <div class="inputs-field-set">
         <div class="section table">
             <div class="form-section-title space-between">

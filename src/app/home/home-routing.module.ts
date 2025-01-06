@@ -37,6 +37,7 @@ const routes: Routes = [
   { path: 'userAccess', component: UserAccessComponent},
   { path: 're-assign-tasks', component: ReAssignTasksComponent},
   { path: 'notices-and-responses', component: NoticesComponent},
+  { path: 'notices-and-responses/:nId', component: NoticesComponent},
   { path: 'create-individual', component: CreateIndividualComponent},
   { path: 'view-individual', component: ViewIndividualComponent},
   {

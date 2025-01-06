@@ -31,6 +31,7 @@ export class NoticesComponent implements OnInit {
   FIRMNotices: any;
   paginatedNotices: any = [];
   firmId: number = 0;
+  paramsNoticeId: number = 0;
   showPopup: boolean = false;
   isLoading: boolean = false;
   notices: any;
@@ -81,6 +82,7 @@ export class NoticesComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.firmId = +params['id'];
+      this.paramsNoticeId = +params['nId'];
       if (!this.firmId) {
         this.firmId = null;
         this.isMainNoticeListing = true;
@@ -131,7 +133,12 @@ export class NoticesComponent implements OnInit {
     this.noticeService.getNoticesList(this.payloadparams).subscribe(data => {
       this.filteredNotices = data.response; // Full data
       this.applySearchAndPagination(); // Initialize pagination
+      if (this.paramsNoticeId) {
+        const noticeItem = this.filteredNotices.filter(item => item.NoticeID == this.paramsNoticeId)[0];
+        this.openNoticeViewPopup(noticeItem, this.firmDetails);
+    }
     });
+
   }
 
 
@@ -361,6 +368,7 @@ export class NoticesComponent implements OnInit {
     this.selectedNotice = notice;
     this.showViewPopup = true;
   }
+
 
   closeViewPopup(): void {
     this.showViewPopup = false;

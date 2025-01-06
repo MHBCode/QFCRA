@@ -33,22 +33,23 @@
                 </p>
             </div>
             <div class="inputs-row">
-                <div class="input-field" *ngIf="isMainEnfActionListing">
+                <div class="input-field" *ngIf="isMainEnfActionListing && isCreateEnf">
                     <label for="firmType">Firm Types</label>
-                    <div class="checkbox-options">
-                        <label *ngFor="let type of allFirmTypes" class="custom-checkbox">
-                            <input type="checkbox" [checked]="selectedFirmTypeID === type.FirmTypeID"
-                                (change)="onFirmTypeChange(type.FirmTypeID)" />
-                            <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                    <div class="radio-wrapper">
+                        <label *ngFor="let type of allFirmTypes" class="custom-radio">
+                            <input type="radio" 
+                                   [name]="'firmType'" 
+                                   [checked]="selectedFirmTypeID === type.FirmTypeID" 
+                                   (change)="onFirmTypeChange(type.FirmTypeID)" />
+                            <span class="radiomark"></span> {{ type.FirmTypeDesc }}
                         </label>
                     </div>
                 </div>
-
-                <div [ngStyle]="!isMainEnfActionListing ? { 'width': '100%' } : {}" class="input-field">
+                <div  class="input-field">
                     <label for="enfTypeID">Action On <span *ngIf="isEditModeEnf || isCreateEnf"
                             style="color: red;">*</span></label>
                     <ng-container *ngIf="!isMainEnfActionListing">
-                        <select [ngStyle]="!isMainEnfActionListing ? { 'width': '49%' } : {}"
+                        <select 
                             *ngIf="isEditModeEnf || isCreateEnf; else actionOnDropdown" [(ngModel)]="enfTypeID"
                             (change)="onActionFirmTypeChange()" name="enfTypeID" id="enfTypeID" [ngClass]="{
                             'error-border': errorMessages['enfTypeID']}">
@@ -58,6 +59,7 @@
                                 [value]="option.EnforcementActionOnTypeID">
                                 {{option.EnforcementActionOnTypeDesc}}</option>
                         </select>
+                        
                         <ng-template #actionOnDropdown>
                             <input style="width: 49%;" disabled [(ngModel)]="enfDetails[0].EnforcementActionOnTypeDesc"
                                 type="text">
@@ -66,11 +68,11 @@
                     <ng-container *ngIf="isMainEnfActionListing">
                         <select
                             *ngIf="isEditModeEnf || isCreateEnf; else actionOnDropdown" [(ngModel)]="enfTypeID"
-                        [disabled]="!selectedFirmTypeID"  (change)="onActionFirmTypeChange()" name="enfTypeID" id="enfTypeID" [ngClass]="{
+                        [disabled]="isCreateEnf && !selectedFirmTypeID"  (change)="onActionFirmTypeChange()" name="enfTypeID" id="enfTypeID" [ngClass]="{
                         'error-border': errorMessages['enfTypeID']}">
                             <option [value]="0">Select</option>
                             <option
-                                *ngFor="let option of (selectedFirmTypeID === 1 ? allEnfActionAuth : allEnfActionDNFBP)"
+                                *ngFor="let option of (((isCreateEnf && selectedFirmTypeID === 1) || (isEditModeEnf && firmDetails?.FirmTypeID === 1)) ? allEnfActionAuth : allEnfActionDNFBP)"
                                 [value]="option.EnforcementActionOnTypeID">
                                 {{option.EnforcementActionOnTypeDesc}}</option>
                         </select>
@@ -80,6 +82,15 @@
                         </ng-template>
                     </ng-container>
                 </div>
+
+                <div class="input-field">
+                    <label for="typeOfAction">Type of Action<span *ngIf="isEditModeEnf || isCreateEnf"
+                            style="color: red;">*</span></label>
+                    <input [disabled]="!isEditModeEnf && !isCreateEnf" type="text" [(ngModel)]="typeOfAction"
+                        id="typeOfAction" name="typeOfAction" [ngClass]="{
+                            'error-border': errorMessages['typeOfAction']}" />
+                </div>
+
 
                 <div class="input-field">
                     <label for="actionDateFrom">Action Effective From <span *ngIf="isEditModeEnf || isCreateEnf"
@@ -95,13 +106,6 @@
                         id="actionDateTo" name="actionDateTo" #dateInputs />
                 </div>
 
-                <div class="input-field">
-                    <label for="typeOfAction">Type of Action<span *ngIf="isEditModeEnf || isCreateEnf"
-                            style="color: red;">*</span></label>
-                    <input [disabled]="!isEditModeEnf && !isCreateEnf" type="text" [(ngModel)]="typeOfAction"
-                        id="typeOfAction" name="typeOfAction" [ngClass]="{
-                            'error-border': errorMessages['typeOfAction']}" />
-                </div>
 
                 <div class="input-field">
                     <label for="firmName">Firm Name<span *ngIf="isEditModeEnf || isCreateEnf"
@@ -128,7 +132,7 @@
                         'error-border': errorMessages['firmName']}">
                             <option [value]="0">Select</option>
                             <option
-                                *ngFor="let option of (selectedFirmTypeID === 1 ? allFirmNamesAuth : allFirmNamesDNFBP)"
+                                *ngFor="let option of (((isCreateEnf && selectedFirmTypeID === 1) || (isEditModeEnf && firmDetails?.FirmTypeID === 1)) ? allFirmNamesAuth : allFirmNamesDNFBP)"
                                 [value]="option.FirmID">
                                 {{ option.FirmName }}
                             </option>
