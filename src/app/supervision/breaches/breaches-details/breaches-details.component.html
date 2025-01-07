@@ -94,7 +94,8 @@
                     <h3>Breach Details</h3>
                 </div>
                 <div class="inputs-row">
-                    <app-provision-table class="fullwidth margin-bottom-20"  [provisions]="provisionBreachGroup"></app-provision-table>
+                    <app-provision-table class="fullwidth margin-bottom-20"
+                        [provisions]="provisionBreachGroup"></app-provision-table>
                     <div class="fullwidth input-field">
                         <label for="summary">Breach Summary</label>
                         <div style="min-width: 100%;" *ngIf="isEditable; else summary">
@@ -108,7 +109,51 @@
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="breachProvision" *ngIf="ActionItems.length != 0">
+                <div class="popup-header">
+                    <h3 class="add-header">Action Token / Update(s)
+                        <button class="add-recipients-btn bi bi-plus" title="Add New Action"
+                            (click)="addNewRow()"></button>
+                    </h3>
+                </div>
+                <table class="action-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Updated By</th>
+                            <th>Notes</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Display old items -->
+                        <tr *ngFor="let ActionItem of ActionItems">
+                            <td>{{ ActionItem.createdDate }}</td>
+                            <td>{{ ActionItem.updatedByUserName }}</td>
+                            <td>{{ ActionItem.notes }}</td>
+                            <td></td> <!-- No delete option for original rows -->
+                        </tr>
 
+                        <!-- Display new items -->
+                        <tr *ngFor="let ActionItem of newActionItems; let i = index">
+                            <td><input type="date" [(ngModel)]="ActionItem.createdDate"></td>
+                            <td><input type="text" disabled [(ngModel)]="ActionItem.updatedByUserName"
+                                    placeholder="Updated By">
+                            </td>
+                            <td><textarea style="width: 100%;" [(ngModel)]="ActionItem.notes" placeholder="Notes"
+                                    rows="4" cols="20"></textarea></td>
+                            <td class="removeRow">
+                                <button (click)="removeNewRow(i)">x</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <app-review [ObjectWFStatusID]="breachDetails.wfStatusId"
+                  [ObjectInstanceID]="breachDetails.BreachId"
+                  [ObjectInstanceRevNo]="breachDetails.BreachRevNum" [Page]="Page.Breach"
+                  [isEdit]="isEditMode" (userObjTasksChange)="onBreachDataReceived($event)"></app-review>
+              </div>
+        </div>
     </div>
-</div>

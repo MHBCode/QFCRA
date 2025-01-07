@@ -17,3 +17,23 @@
     transition: border 0.3s ease;
     width: 100%;
 }
+
+table.action-table td:nth-child(1),table.action-table td:nth-child(2) {
+    white-space: nowrap;
+}
+.add-recipients-btn ,.removeRow button{
+    background-color: #a51e36;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-left: auto;
+
+    &:hover {
+        background-color: #920e2b;
+    }
+}
+
+.add-header{
+    display: inline-flex;
+}

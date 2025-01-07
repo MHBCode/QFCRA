@@ -45,7 +45,8 @@ import { FirmPopupFilterComponent } from './firm-popup-filter/firm-popup-filter.
     CKEditorModule,
     ReviewComponent,
     WorkflowComponent,
-    ReferenceFormComponent
+    ReferenceFormComponent,
+    FirmPopupFilterComponent
   ]
 })
 export class SharedModule { }

@@ -1,0 +1,42 @@
+.custom-checkbox {
+    margin: 0px;
+    font-size: 0.9rem;
+}
+
+.checkbox-options {
+    display: inline-flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+
+.input-search-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  
+  .search,
+  .reset {
+    background-color: #a51e36;
+    color: #ffffff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .search:hover,
+  .reset:hover {
+    background-color: #8e172e;
+  }
+  
+  .reset {
+    background-color: #a1a1a1;
+  }
+  
+  .reset:hover {
+    background-color: #898989;
+  }

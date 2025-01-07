@@ -13,59 +13,177 @@
         <div class="reporting-schedule-form">
             <div class="input-field fullwidth">
                 <label for="firmType">Firm Types</label>
+                <label class="custom-checkbox">
+                    <input type="checkbox" id="firmType" [checked]="isAllFirmTypesSelected()"
+                        (change)="toggleAllFirmTypes($event)" />
+                    <span class="checkmark"></span> All
+                </label>
                 <div class="checkbox-options">
                     <label *ngFor="let type of allFirmTypes" class="custom-checkbox">
-                        <input type="checkbox"/>
+                        <input type="checkbox" [checked]="isFirmTypeSelected(type.FirmTypeID)"
+                            (change)="toggleFirmType(type.FirmTypeID, $event)" />
                         <span class="checkmark"></span> {{ type.FirmTypeDesc }}
                     </label>
                 </div>
             </div>
 
             <div class="input-field fullwidth">
-                <label for="firmType">Firm Types</label>
+                <label for="firmStatus">Firm Status</label>
+                <label class="custom-checkbox">
+                    <input type="checkbox" id="firmStatus" [checked]="isAllFirmStatusSelected()"
+                        (change)="toggleAllFirmStatus($event)" />
+                    <span class="checkmark"></span> All
+                </label>
                 <div class="checkbox-options">
                     <label *ngFor="let type of allFirmStatus" class="custom-checkbox">
-                        <input type="checkbox"/>
-                        <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                        <input type="checkbox" [checked]="isFirmStatusSelected(type.FirmStatusTypeID)"
+                            (change)="toggleFirmStatus(type.FirmStatusTypeID, $event)" />
+                        <span class="checkmark"></span> {{ type.FIrmStatusTypeDesc }}
                     </label>
                 </div>
             </div>
-            <div class="input-field fullwidth">
-                <label for="firmType">Firm Types</label>
+
+            <div class="input-field fullwidth" *ngIf="allAuthStatus.length > 0">
+                <label for="authorisationStatus">Authorisation Status</label>
+                <label class="custom-checkbox">
+                    <input type="checkbox" [checked]="isAllAuthStatusSelected()"
+                        (change)="toggleAllAuthStatus($event)" />
+                    <span class="checkmark"></span> All
+                </label>
                 <div class="checkbox-options">
                     <label *ngFor="let type of allAuthStatus" class="custom-checkbox">
-                        <input type="checkbox"/>
-                        <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                        <input type="checkbox" [checked]="isAuthStatusSelected(type.FirmApplStatusTypeID)"
+                            (change)="toggleAuthStatus(type.FirmApplStatusTypeID, $event)" />
+                        <span class="checkmark"></span> {{ type.FirmApplStatusTypeDesc }}
                     </label>
                 </div>
             </div>
-            <div class="input-field fullwidth">
-                <label for="firmType">Firm Types</label>
+
+            <div class="input-field fullwidth" *ngIf="allLicenseStatus.length > 0">
+                <label for="licenseStatus">License Status</label>
+                <label class="custom-checkbox">
+                    <input type="checkbox" [checked]="isAllLicenseStatusSelected()"
+                        (change)="toggleAllLicenseStatus($event)" />
+                    <span class="checkmark"></span> All
+                </label>
                 <div class="checkbox-options">
                     <label *ngFor="let type of allLicenseStatus" class="custom-checkbox">
-                        <input type="checkbox"/>
-                        <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                        <input type="checkbox" [checked]="isLicenseStatusSelected(type.FirmApplStatusTypeID)"
+                            (change)="toggleLicenseStatus(type.FirmApplStatusTypeID, $event)" />
+                        <span class="checkmark"></span> {{ type.FirmApplStatusTypeDesc }}
                     </label>
                 </div>
             </div>
-            <div class="input-field fullwidth">
-                <label for="firmType">Firm Types</label>
+
+            <div class="input-field fullwidth" *ngIf="allLegalStatus.length > 0">
+                <label for="legalStatus">Legal Status</label>
+                <label class="custom-checkbox">
+                    <input type="checkbox" [checked]="isAllLegalStatusSelected()"
+                        (change)="toggleAllLegalStatus($event)" />
+                    <span class="checkmark"></span> All
+                </label>
                 <div class="checkbox-options">
                     <label *ngFor="let type of allLegalStatus" class="custom-checkbox">
-                        <input type="checkbox"/>
-                        <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                        <input type="checkbox" [checked]="isLegalStatusSelected(type.LegalStatusTypeID)"
+                            (change)="toggleLegalStatus(type.LegalStatusTypeID, $event)" />
+                        <span class="checkmark"></span> {{ type.LegalStatusTypeDesc }}
                     </label>
                 </div>
             </div>
-            <div class="input-field fullwidth">
-                <label for="firmType">Firm Types</label>
+
+            <div class="input-field fullwidth" *ngIf="allprudentialCategoryTypes.length > 0">
+                <label for="prudentialCategory">Prudential Category</label>
+                <label class="custom-checkbox">
+                    <input type="checkbox" [checked]="isAllPrudentialCategorySelected()"
+                        (change)="toggleAllPrudentialCategory($event)" />
+                    <span class="checkmark"></span> All
+                </label>
                 <div class="checkbox-options">
                     <label *ngFor="let type of allprudentialCategoryTypes" class="custom-checkbox">
-                        <input type="checkbox"/>
-                        <span class="checkmark"></span> {{ type.FirmTypeDesc }}
+                        <input type="checkbox" [checked]="isPrudentialCategorySelected(type.PrudentialCategoryTypeID)"
+                            (change)="togglePrudentialCategory(type.PrudentialCategoryTypeID, $event)" />
+                        <span class="checkmark"></span> {{ type.PrudentialCategoryTypeDesc }}
                     </label>
                 </div>
             </div>
+
+            <div class="input-field fullwidth" *ngIf="sectorTypes.length > 0">
+                <label for="sectors">Sectors</label>
+                <label class="custom-checkbox">
+                    <input type="checkbox" [checked]="isAllSectorsSelected()" (change)="toggleAllSectors($event)" />
+                    <span class="checkmark"></span> All
+                </label>
+                <div class="checkbox-options">
+                    <label *ngFor="let type of sectorTypes" class="custom-checkbox">
+                        <input type="checkbox" [checked]="isSectorSelected(type.SectorTypeID)"
+                            (change)="toggleSector(type.SectorTypeID, $event)" />
+                        <span class="checkmark"></span> {{ type.SectorTypeShortDesc }}
+                    </label>
+                </div>
+            </div>
+            <div class="input-field fullwidth" *ngIf="supervisionCategory.length > 0">
+                <label for="supervisionCategory">Supervision Category</label>
+                <label class="custom-checkbox">
+                    <input type="checkbox" [checked]="isAllSupervisionCategorySelected()"
+                        (change)="toggleAllSupervisionCategory($event)" />
+                    <span class="checkmark"></span> All
+                </label>
+
+                <div class="checkbox-options">
+                    <label *ngFor="let type of supervisionCategory" class="custom-checkbox">
+                        <input type="checkbox"
+                            [checked]="isSupervisionCategorySelected(type.FirmRptClassificationTypeID)"
+                            (change)="toggleSupervisionCategory(type.FirmRptClassificationTypeID, $event)" />
+                        <span class="checkmark"></span> {{ type.FirmRptClassificationTypeDesc }}
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-field fullwidth" *ngIf="authorisationCategoryTypes.length > 0">
+                <label for="authorisationCategory">Authorisation Category</label>
+                <label class="custom-checkbox">
+                    <input type="checkbox" [checked]="isAllAuthorisationCategorySelected()"
+                        (change)="toggleAllAuthorisationCategory($event)" />
+                    <span class="checkmark"></span> All
+                </label>
+                <div class="checkbox-options">
+                    <label *ngFor="let type of authorisationCategoryTypes" class="custom-checkbox">
+                        <input type="checkbox"
+                            [checked]="isAuthorisationCategorySelected(type.AuthorisationCategoryTypeID)"
+                            (change)="toggleAuthorisationCategory(type.AuthorisationCategoryTypeID, $event)" />
+                        <span class="checkmark"></span> {{ type.AuthorisationCategoryTypeDesc }}
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="input-search-buttons">
+            <button type="button" class="reset" (click)="resetFilters()">Reset</button>
+            <button type="button" class="search" (click)="searchFirms()">Search</button>
+        </div>
+
+        <table *ngIf="filteredFirms.length > 0">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Firm Name</th>
+                    <th>QFC Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let firm of filteredFirms" [class.selected]="isSelected(firm.FirmID)">
+                    <td>
+                        <input type="checkbox" [checked]="isSelected(firm.FirmID)" (change)="onRowSelect(firm)" />
+                    </td>
+                    <td>{{ firm.FirmName }}</td>
+                    <td>{{ firm.QFCNUM }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div *ngIf="filteredFirms.length > 0">
+            <button (click)="addSelectedFirms()">Add</button>
+            <button (click)="onClose()">Close</button>
         </div>
     </div>
 </div>

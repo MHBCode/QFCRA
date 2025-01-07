@@ -126,36 +126,24 @@ export class FirmService {
     return this.http.get<any>(url);
   }
 
-  getFirmsList(criteria: any): Observable<any> {
-    let params = new HttpParams();
-    console.log("foim-service getFirmsList",)
-    if (criteria.firmName && criteria.firmName !== 'all') {
-      params = params.append('FirmName', criteria.firmName);
-    }
-    if (criteria.qfcNumber) {
-      params = params.append('QFCNumber', criteria.qfcNumber);
-    }
-    if (criteria.firmType !== undefined) {
-      params = params.append('CSVFirmTypes', criteria.firmType.toString());
-    }
-    if (criteria.firmStatus !== undefined) {
-      params = params.append('CSVFirmStatus', criteria.firmStatus.toString());
-    }
-    if (criteria.legalStatus && criteria.legalStatus !== 'all') {
-      params = params.append('CSVLegalStatus', criteria.legalStatus);
-    }
-    if (criteria.prudentialCategory !== undefined) {
-      params = params.append('CSVPrudentialCategory', criteria.prudentialCategory.toString());
-    }
-    if (criteria.sectors !== undefined) {
-      params = params.append('CSVSectorTypes', criteria.sectors.toString());
-    }
-    if (criteria.authorisationStatus && criteria.authorisationStatus !== 'all') {
-      params = params.append('CSVAuthorisationStatus', criteria.authorisationStatus);
-    }
-    console.log("foim-service getFirmsList", params)
-    return this.http.get<any>(`${this.baseUrlFirms}get_firms_list`, { params });
+  getFirmsList(params: any): Observable<any> {
+    let httpParams = new HttpParams();
+    Object.keys(params).forEach(key => {
+      const value = params[key];
+    
+      if (value !== null && value !== undefined) {
+        if (!isNaN(value) && typeof value !== 'string') {
+          httpParams = httpParams.set(key, String(value));
+        } else {
+          httpParams = httpParams.set(key, value);
+        }
+      }
+    });
+    
+    const url = `${this.baseUrlFirms}get_firms_list`;
+    return this.http.get<any>(url, { params: httpParams });
   }
+
 
   // supervision pages
 
